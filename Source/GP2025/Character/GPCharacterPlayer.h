@@ -10,6 +10,14 @@
 /**
  * 
  */
+
+UENUM()
+enum class ECharacterPlayerControlType : uint8
+{
+	Default,
+	Aim
+};
+
 UCLASS()
 class GP2025_API AGPCharacterPlayer : public AGPCharacterBase
 {
@@ -23,6 +31,13 @@ protected :
 
 public :
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+// Character Control Section
+	void SetCharacterControl(ECharacterPlayerControlType NewCharacterPlayerControlType);
+	virtual void SetCharacterControlData(const class UGPCharacterPlayerControlData* CharacterPlayerControlData);
+
+	UPROPERTY(EditAnywhere , Category = "CharacterControl" , Meta = (AllowPrivateAccess = "true"))
+	TMap<ECharacterPlayerControlType, class UGPCharacterPlayerControlData*> CharacterPlayerControlManager;
 
 // Camera Section
 protected :

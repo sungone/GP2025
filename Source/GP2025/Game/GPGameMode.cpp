@@ -5,17 +5,17 @@
 
 AGPGameMode::AGPGameMode()
 {
-	//// Default Pawn Class Setting
-	//static ConstructorHelpers::FClassFinder<APawn> DefaultPawnClassRef(TEXT("/Script/GP2025.GPCharacterPlayer'"));
-	//if (DefaultPawnClassRef.Class)
-	//{
-	//	DefaultPawnClass = DefaultPawnClassRef.Class;
-	//}
+	// Default Pawn Class Setting
+	static ConstructorHelpers::FClassFinder<APawn> DefaultPawnClassRef(TEXT("/Script/GP2025.GPCharacterPlayer"));
+	if (DefaultPawnClassRef.Class)
+	{
+		DefaultPawnClass = DefaultPawnClassRef.Class;
+	}
 
-	//// PlayerController Setting
-	//static ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerClassRef(TEXT("/Script/GP2025.GPPlayerController"));
-	//if (PlayerControllerClassRef.Class)
-	//{
-	//	PlayerControllerClass = PlayerControllerClassRef.Class;
-	//}
+	// PlayerController Setting
+	static ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerClassRef(TEXT("/Script/GP2025.GPPlayerController"));
+	if (PlayerControllerClassRef.Class)
+	{
+		PlayerControllerClass = PlayerControllerClassRef.Class;
+	}
 }
