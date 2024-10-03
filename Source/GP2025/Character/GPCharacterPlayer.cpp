@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GPCharacterPlayerControlData.h"
+#include "Network/GPGameInstance.h"
 
 AGPCharacterPlayer::AGPCharacterPlayer()
 {
@@ -145,7 +146,12 @@ void AGPCharacterPlayer::SetCharacterControlData(const UGPCharacterPlayerControl
 void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
-	
+
+	if (MovementVector.IsNearlyZero())  // 입력이 없으면 아무 동작도 하지 않음
+	{
+		return;
+	}
+
 	const FRotator Rotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);
 
@@ -154,6 +160,22 @@ void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 
 	AddMovementInput(ForwardDirection, MovementVector.X);
 	AddMovementInput(RightDirection, MovementVector.Y);
+
+	// 현재 위치
+	FVector CurrentLocation = GetActorLocation();
+	float DistanceMoved = FVector::Dist(CurrentLocation, PreviousLocation);
+
+	// 일정 거리 이상 이동한 경우에만 패킷을 전송
+	if (DistanceMoved > 10.0f)  // 10 유닛 이상 이동했을 때만 서버로 전송
+	{
+		if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
+		{
+			GameInstance->SendPlayerMovePacket(CurrentLocation, GetActorRotation());
+		}
+
+		// 이전 위치를 업데이트
+		PreviousLocation = CurrentLocation;
+	}
 }
 
 
