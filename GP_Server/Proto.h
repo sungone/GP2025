@@ -10,7 +10,6 @@ enum class EPacketType : uint16_t
 	C_LOGIN,
 	C_LOGINOUT,
 	C_MOVE,
-
 	S_LOGININFO
 };
 

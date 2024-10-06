@@ -7,7 +7,6 @@
 
 #include <iostream>
 #include <array>
-
 #include "Proto.h"
 
 enum OPERATION { OP_RECV, OP_SEND, OP_ACCEPT };
