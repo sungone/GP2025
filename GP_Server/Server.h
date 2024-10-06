@@ -74,8 +74,11 @@ public:
 				break;
 			}
 			case OP_RECV:
-				clients[key].process_packet(rw_byte);
+			{
+				char* p = ex_over->send_buf;
+				clients[key].process_packet(key, (uint8_t*)p);
 				break;
+			}
 			case OP_SEND:
 				delete ex_over;
 				break;

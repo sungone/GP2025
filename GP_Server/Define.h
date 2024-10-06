@@ -15,24 +15,24 @@ enum OPERATION { OP_RECV, OP_SEND, OP_ACCEPT };
 class EXP_OVER {
 public:
 	WSAOVERLAPPED wsaover;
-	WSABUF wsabuf[1];
+	WSABUF wsabuf;
 	char	send_buf[BUFSIZE];
 	OPERATION comp_type;
 public:
-	EXP_OVER(char s_id, char* mess, int m_size)
+	EXP_OVER(unsigned char* packet)
 	{
 		ZeroMemory(&wsaover, sizeof(wsaover));
-		wsabuf[0].buf = send_buf;
-		wsabuf[0].len = m_size + 2;
-		send_buf[0] = m_size + 2;
-		send_buf[1] = s_id;
-		memcpy(send_buf + 2, mess, m_size);
+		wsabuf.len = packet[0];
+		wsabuf.buf = send_buf;
+		comp_type = OP_SEND;
+		memcpy(send_buf, packet, packet[0]);
 	}
 	EXP_OVER()
 	{
 		ZeroMemory(&wsaover, sizeof(wsaover));
-		wsabuf[0].buf = send_buf;
-		wsabuf[0].len = BUFSIZE;
+		wsabuf.buf = send_buf;
+		wsabuf.len = BUFSIZE;
+		comp_type = OP_RECV;
 	}
 };
 
