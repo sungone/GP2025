@@ -1,11 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Network/GPGameInstance.h"
+#include "GPNetworkThread.h"
+
 #include "Sockets.h"
 #include "Common/TcpSocketBuilder.h"
 #include "Serialization/ArrayWriter.h"
 #include "SocketSubsystem.h"
-#include "../../GP2025/GP_Server/Proto.h"
+
+#include "../../GP_Server/Proto.h"
 
 void UGPGameInstance::Init()
 {
@@ -22,6 +25,8 @@ void UGPGameInstance::Shutdown()
 void UGPGameInstance::ConnectToServer()
 {
 	Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("ClientSocket"));
+	Socket->SetNonBlocking(true);
+
 	FIPv4Address Ip;
 	FIPv4Address::Parse(IpAddress, Ip);
 
@@ -37,6 +42,7 @@ void UGPGameInstance::ConnectToServer()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Connection Success")));
 		SendPlayerLoginPacket();
+		NetworkThread = MakeShared<GPNetworkThread>(Socket);
 	}
 	else
 	{
@@ -46,6 +52,11 @@ void UGPGameInstance::ConnectToServer()
 
 void UGPGameInstance::DisconnectFromServer()
 {
+	if (NetworkThread)
+	{
+		NetworkThread->Destroy();
+	}
+
 	if (Socket)
 	{
 		ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get();
@@ -71,21 +82,14 @@ void UGPGameInstance::SendPlayerMovePacket(FVector Position, FRotator Rotation)
 	Packet.Header.PacketType = EPacketType::C_MOVE;
 	Packet.Header.PacketSize = sizeof(FMovePacket);
 	Packet.PlayerID = PlayerID;
-	Packet.X = Position.X;
-	Packet.Y = Position.Y;
-	Packet.Z = Position.Z;
-	Packet.Yaw = Rotation.Yaw;
-	Packet.Pitch = Rotation.Pitch;
-	Packet.Roll = Rotation.Roll;
+	Packet.VecInfo.X = Position.X;
+	Packet.VecInfo.Y = Position.Y;
+	Packet.VecInfo.Z = Position.Z;
+	Packet.VecInfo.Yaw = Rotation.Yaw;
+	Packet.VecInfo.Pitch = Rotation.Pitch;
+	Packet.VecInfo.Roll = Rotation.Roll;
 
 	int32 BytesSent = 0;
-	if (Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FMovePacket), BytesSent))
-	{
-		UE_LOG(LogTemp, Log, TEXT("Sent Move Packet: PlayerID=%d, Position=(%f, %f, %f), Rotation=(Yaw: %f, Pitch: %f, Roll: %f)"),
-			Packet.PlayerID, Packet.X, Packet.Y, Packet.Z, Packet.Yaw, Packet.Pitch, Packet.Roll);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to send Move Packet for PlayerID=%d"), Packet.PlayerID);
-	}
+	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FMovePacket), BytesSent);
+
 }

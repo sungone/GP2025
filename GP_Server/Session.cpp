@@ -3,29 +3,71 @@
 
 extern std::array<Session, MAX_CLIENT> clients;
 
-void Session::process_packet(DWORD transfer_size)
+void Session::process_packet(int32 id, uint8_t* packet)
 {
-	FMovePacket ReceivedPacket;
-	memcpy(&ReceivedPacket, recv_over_.send_buf, sizeof(FMovePacket));
+	uint8_t packet_type = packet[0];
+	switch (static_cast<EPacketType>(packet_type))
+	{
+	case EPacketType::C_LOGIN:
+		std::cout << "Login Packet[" << id << "]" << std::endl;
+		clients[id].is_login = true;
+		clients[id].send_login_packet();
+		for (auto& cl : clients)
+		{
+			if (not cl.is_login) continue;
+			if (cl.id == id) continue;
+			cl.send_add_player_packet(id);
+		}
 
-	std::cout << "Transfer size: " << transfer_size << std::endl;
-	std::cout << "Received from Client: PlayerID = " << ReceivedPacket.PlayerID
-		<< ", Position = (" << ReceivedPacket.X << ", " << ReceivedPacket.Y << ", " << ReceivedPacket.Z << ")"
-		<< ", Rotation = (Yaw: " << ReceivedPacket.Yaw << ", Pitch: " << ReceivedPacket.Pitch << ", Roll: " << ReceivedPacket.Roll << ")" << std::endl;
 
-	FMovePacket ResponsePacket;
-	ResponsePacket.Header.PacketType = EPacketType::C_MOVE;
-	ResponsePacket.Header.PacketSize = sizeof(FMovePacket);
-	ResponsePacket.PlayerID = ReceivedPacket.PlayerID;
+		break;
+	case EPacketType::C_LOGINOUT:
+		std::cout << "LoginOut Packet[" << id << "]" << std::endl;
+		break;
+	case EPacketType::C_MOVE:
+	{
+		FMovePacket* p = reinterpret_cast<FMovePacket*>(packet);
+		memcpy(&clients[id].pos, &(p->VecInfo), sizeof(FVectorInfo));
+		std::cout << "Move Packet[" << id << "] ("
+			<< clients[id].pos.X << ", "
+			<< clients[id].pos.Y << ", "
+			<< clients[id].pos.Z << ")" 
+			<< std::endl;
+		for (auto& cl : clients)
+			if (cl.is_login)
+				cl.send_move_packet(id);
 
-	char SendBuffer[sizeof(FMovePacket)];
-	memcpy(SendBuffer, &ResponsePacket, sizeof(FMovePacket));
+		break;
+	}
+	}
+}
 
-	WSABUF wsabuf[1];
-	wsabuf[0].buf = SendBuffer;
-	wsabuf[0].len = sizeof(SendBuffer);
+void Session::send_move_packet(int32 id)
+{
+	FMovePacket pk;
+	pk.Header.PacketSize = sizeof(FMovePacket);
+	pk.Header.PacketType = EPacketType::S_MOVE_PLAYER;
+	pk.PlayerID = id;
+	pk.VecInfo = clients[id].pos;
+	do_send(&pk);
+}
 
-	for (auto& ss : clients)
-		ss.do_send(id, recv_over_.send_buf, transfer_size);
-	do_recv();
+void Session::send_login_packet()
+{
+	FLoginInfoPacket pk;
+	pk.Header.PacketSize = sizeof(FLoginInfoPacket);
+	pk.Header.PacketType = EPacketType::S_LOGININFO;
+	pk.PlayerID = id;
+	pk.VecInfo = pos;
+	do_send(&pk);
+}
+
+void Session::send_add_player_packet(int32 id)
+{
+	FLoginInfoPacket pk;
+	pk.Header.PacketSize = sizeof(FLoginInfoPacket);
+	pk.Header.PacketType = EPacketType::S_LOGININFO;
+	pk.PlayerID = id;
+	pk.VecInfo = pos;
+	do_send(&pk);
 }
