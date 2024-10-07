@@ -36,9 +36,9 @@ void UGPGameInstance::ConnectToServer()
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Connecting To Server...")));
 
-	bool Connected = Socket->Connect(*InternetAddr);
+	Socket->Connect(*InternetAddr);
 
-	if (Connected)
+	if (Socket->GetConnectionState() == SCS_Connected)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Connection Success")));
 		SendPlayerLoginPacket();
@@ -91,5 +91,4 @@ void UGPGameInstance::SendPlayerMovePacket(FVector Position, FRotator Rotation)
 
 	int32 BytesSent = 0;
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FMovePacket), BytesSent);
-
 }
