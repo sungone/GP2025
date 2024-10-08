@@ -52,7 +52,7 @@ public:
 				}
 				else {
 					std::cout << "GQCS Error on client[" << key << "]\n";
-					//disconnect(static_cast<int>(key));
+					clients[key].disconnect();
 					if (ex_over->comp_type == OP_SEND) delete ex_over;
 					continue;
 				}
@@ -75,8 +75,21 @@ public:
 			}
 			case OP_RECV:
 			{
+				int remain_data = rw_byte + clients[key].prev_remain;
 				char* p = ex_over->send_buf;
-				clients[key].process_packet(key, (uint8_t*)p);
+				while (remain_data > 0) {
+					int packet_size = p[1];
+					if (packet_size <= remain_data) {
+						clients[key].process_packet(p);
+						p = p + packet_size;
+						remain_data = remain_data - packet_size;
+					}
+					else break;
+				}
+				clients[key].prev_remain = remain_data;
+				if (remain_data > 0)
+					memcpy(ex_over->send_buf, p, remain_data);
+				clients[key].do_recv();
 				break;
 			}
 			case OP_SEND:

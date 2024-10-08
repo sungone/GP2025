@@ -59,6 +59,7 @@ void UGPGameInstance::DisconnectFromServer()
 
 	if (Socket)
 	{
+		this->SendPlayerLogoutPacket();
 		ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get();
 		SocketSubsystem->DestroySocket(Socket);
 		Socket = nullptr;
@@ -74,6 +75,17 @@ void UGPGameInstance::SendPlayerLoginPacket()
 
 	int32 BytesSent = 0;
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FLoginPacket), BytesSent);
+}
+
+void UGPGameInstance::SendPlayerLogoutPacket()
+{
+	FLogoutPacket Packet;
+	Packet.Header.PacketType = EPacketType::C_LOGOUT;
+	Packet.Header.PacketSize = sizeof(FLogoutPacket);
+	Packet.PlayerID = this->PlayerID;
+
+	int32 BytesSent = 0;
+	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FLogoutPacket), BytesSent);
 }
 
 void UGPGameInstance::SendPlayerMovePacket(FVector Position, FRotator Rotation)

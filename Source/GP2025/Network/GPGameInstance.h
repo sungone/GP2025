@@ -22,6 +22,7 @@ public :
 	void DisconnectFromServer();
 
 	void SendPlayerLoginPacket();
+	void SendPlayerLogoutPacket();
 	void SendPlayerMovePacket(FVector Position, FRotator Rotation);
 
 public :

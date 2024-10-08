@@ -7,7 +7,7 @@ using int32 = int;   // int32를 int로 정의
 enum class EPacketType : uint8_t
 {
 	C_LOGIN,
-	C_LOGINOUT,
+	C_LOGOUT,
 	C_MOVE,
 
 	S_LOGININFO,
@@ -40,6 +40,12 @@ struct FLoginPacket
 	int32 PlayerID;
 };
 
+struct FLogoutPacket
+{
+	FPacketHeader Header;
+	int32 PlayerID;
+};
+
 struct FLoginInfoPacket
 {
 	FPacketHeader Header;
@@ -59,6 +65,12 @@ struct FAddPlayerPacket
 	FPacketHeader Header;
 	int32 PlayerID;
 	FVectorInfo VecInfo;
+};
+
+struct FRemovePlayerPacket
+{
+	FPacketHeader Header;
+	int32 PlayerID;
 };
 
 #pragma pack(pop)
