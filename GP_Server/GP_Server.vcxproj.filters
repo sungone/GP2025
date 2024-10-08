@@ -15,25 +15,25 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Proto.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Define.h">
-      <Filter>Resource Files</Filter>
+    <ClInclude Include="Session.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Server.h">
-      <Filter>Resource Files</Filter>
+      <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Session.h">
-      <Filter>Resource Files</Filter>
+    <ClInclude Include="Define.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Proto.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Session.cpp">
-      <Filter>Resource Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Resource Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
