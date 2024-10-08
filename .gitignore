@@ -74,7 +74,7 @@ Plugins/**/Intermediate/*
 # Cache files for the editor to use
 DerivedDataCache/*
 
-x64/
+**/x64/*
 
 *.vcxproj.filters
 *.vcxproj.user
