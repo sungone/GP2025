@@ -64,6 +64,14 @@ protected :
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> SprintAction;
 
+// Character Movement Section
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
+	float WalkSpeed = 300.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
+	float SprintSpeed = 1500.f;
+
+
 // Control Function
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);

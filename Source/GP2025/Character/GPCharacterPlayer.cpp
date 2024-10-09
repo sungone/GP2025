@@ -27,7 +27,7 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 500.f, 0.f);
 	GetCharacterMovement()->JumpZVelocity = 800.f;
 	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = 500.f;
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
@@ -229,11 +229,11 @@ void AGPCharacterPlayer::StopJumping()
 void AGPCharacterPlayer::StartSprinting()
 {
 	UE_LOG(LogTemp, Warning, TEXT("StartSprinting called"));
-	GetCharacterMovement()->MaxWalkSpeed = 1500.f;
+	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
 }
 
 void AGPCharacterPlayer::StopSprinting()
 {
 	UE_LOG(LogTemp, Warning, TEXT("StopSprinting called"));
-	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
