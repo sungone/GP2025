@@ -228,12 +228,10 @@ void AGPCharacterPlayer::StopJumping()
 
 void AGPCharacterPlayer::StartSprinting()
 {
-	UE_LOG(LogTemp, Warning, TEXT("StartSprinting called"));
 	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
 }
 
 void AGPCharacterPlayer::StopSprinting()
 {
-	UE_LOG(LogTemp, Warning, TEXT("StopSprinting called"));
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
