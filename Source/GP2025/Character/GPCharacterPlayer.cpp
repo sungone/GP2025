@@ -186,3 +186,39 @@ void AGPCharacterPlayer::Look(const FInputActionValue& Value)
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
 }
+
+void AGPCharacterPlayer::Jump()
+{
+	Super::Jump();
+
+	FVector CurrentLocation = GetActorLocation();
+	float DistanceMoved = FVector::Dist(CurrentLocation, PreviousLocation);
+
+	if (DistanceMoved > 10.0f)
+	{
+		if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
+		{
+			GameInstance->SendPlayerMovePacket(CurrentLocation, GetActorRotation());
+		}
+
+		PreviousLocation = CurrentLocation;
+	}
+}
+
+void AGPCharacterPlayer::StopJumping()
+{
+	Super::StopJumping();
+
+	FVector CurrentLocation = GetActorLocation();
+	float DistanceMoved = FVector::Dist(CurrentLocation, PreviousLocation);
+
+	if (DistanceMoved > 10.0f)
+	{
+		if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
+		{
+			GameInstance->SendPlayerMovePacket(CurrentLocation, GetActorRotation());
+		}
+
+		PreviousLocation = CurrentLocation;
+	}
+}

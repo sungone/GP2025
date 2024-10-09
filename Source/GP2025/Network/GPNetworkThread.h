@@ -14,6 +14,7 @@ public:
 	
 	virtual uint32 Run() override;
 	void Destroy() { isThreadRuning = false; };
+
 private:
 	FRunnableThread* Thread = nullptr;
 	FSocket* Socket;

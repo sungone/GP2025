@@ -22,7 +22,6 @@ void UGPPlayerAnimInstance::NativeInitializeAnimation()
 	}
 }
 
-
 void UGPPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
@@ -30,7 +29,7 @@ void UGPPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (Movement)
 	{
 		Velocity = Movement->Velocity;
-		GroundSpeed = Velocity.Size2D();
+		GroundSpeed = Velocity.Size2D(); // z °ª Á¦¿Ü
 		bIsIdle = GroundSpeed < MovingThreshould;
 		bIsFalling = Movement->IsFalling();
 		bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);

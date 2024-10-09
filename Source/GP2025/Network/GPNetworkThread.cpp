@@ -1,11 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Network/GPNetworkThread.h"
 #include "Sockets.h"
 #include "Serialization/ArrayWriter.h"
 #include "SocketSubsystem.h"
-
 #include "../../GP_Server/Proto.h"
 
 GPNetworkThread::GPNetworkThread(FSocket* Socket)

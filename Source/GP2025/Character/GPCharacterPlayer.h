@@ -64,7 +64,10 @@ protected :
 // Control Function
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	virtual void Jump() override;
+	virtual void StopJumping() override;
 
 private :
 	FVector PreviousLocation;
+
 };
