@@ -27,7 +27,7 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 500.f, 0.f);
 	GetCharacterMovement()->JumpZVelocity = 800.f;
 	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = 500.f;
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
@@ -83,12 +83,19 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 		LookAction = InputActionLookRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSprintRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Sprint.IA_Sprint'"));
+	if (InputActionSprintRef.Object)
+	{
+		SprintAction = InputActionSprintRef.Object;
+	}
+
 	// Character Player Control Setting
 	static ConstructorHelpers::FObjectFinder<UGPCharacterPlayerControlData> DefaultDataRef(TEXT("/Script/GP2025.GPCharacterPlayerControlData'/Game/CharacterPlayerControl/GPC_Default.GPC_Default'"));
 	if (DefaultDataRef.Object)
 	{
 		CharacterPlayerControlManager.Add(ECharacterPlayerControlType::Default, DefaultDataRef.Object);
 	}
+
 }
 
 void AGPCharacterPlayer::BeginPlay()
@@ -107,7 +114,9 @@ void AGPCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AGPCharacterPlayer::StopJumping);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::Look);
-
+	
+	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::StartSprinting);
+	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AGPCharacterPlayer::StopSprinting);
 }
 
 void AGPCharacterPlayer::SetCharacterControl(ECharacterPlayerControlType NewCharacterPlayerControlType)
@@ -139,8 +148,6 @@ void AGPCharacterPlayer::SetCharacterControlData(const UGPCharacterPlayerControl
 	GetCharacterMovement()->bUseControllerDesiredRotation = CharacterPlayerControlData->bUseControllerDesiredRotation;
 	GetCharacterMovement()->RotationRate = CharacterPlayerControlData->RotationRate;
 }
-
-
 
 // WASD 이동 구현 로직
 void AGPCharacterPlayer::Move(const FInputActionValue& Value)
@@ -213,4 +220,16 @@ void AGPCharacterPlayer::Look(const FInputActionValue& Value)
 
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
+}
+
+void AGPCharacterPlayer::StartSprinting()
+{
+	UE_LOG(LogTemp, Warning, TEXT("StartSprinting called"));
+	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+}
+
+void AGPCharacterPlayer::StopSprinting()
+{
+	UE_LOG(LogTemp, Warning, TEXT("StopSprinting called"));
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
