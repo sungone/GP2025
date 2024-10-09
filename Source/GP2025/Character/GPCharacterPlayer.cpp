@@ -103,8 +103,8 @@ void AGPCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::Jump);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AGPCharacterPlayer::StopJumping);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::Look);
 
@@ -175,6 +175,30 @@ void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 
 		// 이전 위치를 업데이트
 		PreviousLocation = CurrentLocation;
+	}
+}
+
+void AGPCharacterPlayer::Jump()
+{
+	Super::Jump();
+
+	if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
+	{
+		FVector CurrentLocation = GetActorLocation();
+		FRotator CurrentRotation = GetActorRotation();
+		GameInstance->SendPlayerMovePacket(CurrentLocation, CurrentRotation);
+	}
+}
+
+void AGPCharacterPlayer::StopJumping()
+{
+	Super::StopJumping();
+
+	if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
+	{
+		FVector CurrentLocation = GetActorLocation();
+		FRotator CurrentRotation = GetActorRotation();
+		GameInstance->SendPlayerMovePacket(CurrentLocation, CurrentRotation);
 	}
 }
 
