@@ -61,6 +61,9 @@ protected :
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> SprintAction;
+
 // Control Function
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -69,5 +72,10 @@ protected :
 
 private :
 	FVector PreviousLocation;
+	bool bWasJumping = false;
+
+	// Sprint Functions
+	void StartSprinting();
+	void StopSprinting();
 
 };

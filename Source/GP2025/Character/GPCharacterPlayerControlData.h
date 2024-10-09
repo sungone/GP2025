@@ -29,6 +29,13 @@ public :
 	UPROPERTY(EditAnywhere, Category = "CharacterMovement")
 	FRotator RotationRate;
 
+	// Character Movement Section
+	UPROPERTY(EditAnywhere , Category = "Character Movement")
+	float WalkSpeed;
+
+	UPROPERTY(EditAnywhere , Category = "Character Movement")
+	float SprintSpeed;
+
 	UPROPERTY(EditAnywhere , BlueprintReadOnly , Category = "Input")
 	TObjectPtr<class UInputMappingContext> InputMappingContext;
 

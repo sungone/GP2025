@@ -6,4 +6,6 @@
 UGPCharacterPlayerControlData::UGPCharacterPlayerControlData()
 {
 	TargetArmLength = 400.f;
+	WalkSpeed = 300.f;
+	SprintSpeed = 1500.f;
 }

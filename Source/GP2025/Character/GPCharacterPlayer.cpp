@@ -25,7 +25,7 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 	// Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 500.f, 0.f);
-	GetCharacterMovement()->JumpZVelocity = 1500.f;
+	GetCharacterMovement()->JumpZVelocity = 800.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
@@ -83,12 +83,19 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 		LookAction = InputActionLookRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSprintRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Sprint.IA_Sprint'"));
+	if (InputActionSprintRef.Object)
+	{
+		SprintAction = InputActionSprintRef.Object;
+	}
+
 	// Character Player Control Setting
 	static ConstructorHelpers::FObjectFinder<UGPCharacterPlayerControlData> DefaultDataRef(TEXT("/Script/GP2025.GPCharacterPlayerControlData'/Game/CharacterPlayerControl/GPC_Default.GPC_Default'"));
 	if (DefaultDataRef.Object)
 	{
 		CharacterPlayerControlManager.Add(ECharacterPlayerControlType::Default, DefaultDataRef.Object);
 	}
+
 }
 
 void AGPCharacterPlayer::BeginPlay()
@@ -103,10 +110,12 @@ void AGPCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::Jump);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AGPCharacterPlayer::StopJumping);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::Look);
+	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::StartSprinting);
+	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AGPCharacterPlayer::StopSprinting);
 
 }
 
@@ -168,9 +177,15 @@ void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 	// 일정 거리 이상 이동한 경우에만 패킷을 전송
 	if (DistanceMoved > 10.0f)  // 10 유닛 이상 이동했을 때만 서버로 전송
 	{
-		if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
+		bool bIsCurrentlyJumping = GetCharacterMovement()->IsFalling();
+
+		if (bIsCurrentlyJumping != bWasJumping)
 		{
-			GameInstance->SendPlayerMovePacket(CurrentLocation, GetActorRotation());
+			if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
+			{
+				GameInstance->SendPlayerMovePacket(CurrentLocation, GetActorRotation(), bIsCurrentlyJumping);
+			}
+			bWasJumping = bIsCurrentlyJumping;
 		}
 
 		// 이전 위치를 업데이트
@@ -191,17 +206,11 @@ void AGPCharacterPlayer::Jump()
 {
 	Super::Jump();
 
-	FVector CurrentLocation = GetActorLocation();
-	float DistanceMoved = FVector::Dist(CurrentLocation, PreviousLocation);
-
-	if (DistanceMoved > 10.0f)
+	if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
 	{
-		if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
-		{
-			GameInstance->SendPlayerMovePacket(CurrentLocation, GetActorRotation());
-		}
-
-		PreviousLocation = CurrentLocation;
+		FVector CurrentLocation = GetActorLocation();
+		FRotator CurrentRotation = GetActorRotation();
+		GameInstance->SendPlayerMovePacket(CurrentLocation, CurrentRotation , true);
 	}
 }
 
@@ -209,16 +218,22 @@ void AGPCharacterPlayer::StopJumping()
 {
 	Super::StopJumping();
 
-	FVector CurrentLocation = GetActorLocation();
-	float DistanceMoved = FVector::Dist(CurrentLocation, PreviousLocation);
-
-	if (DistanceMoved > 10.0f)
+	if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
 	{
-		if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
-		{
-			GameInstance->SendPlayerMovePacket(CurrentLocation, GetActorRotation());
-		}
-
-		PreviousLocation = CurrentLocation;
+		FVector CurrentLocation = GetActorLocation();
+		FRotator CurrentRotation = GetActorRotation();
+		GameInstance->SendPlayerMovePacket(CurrentLocation, CurrentRotation, false);
 	}
+}
+
+void AGPCharacterPlayer::StartSprinting()
+{
+	UE_LOG(LogTemp, Warning, TEXT("StartSprinting called"));
+	GetCharacterMovement()->MaxWalkSpeed = 1500.f;
+}
+
+void AGPCharacterPlayer::StopSprinting()
+{
+	UE_LOG(LogTemp, Warning, TEXT("StopSprinting called"));
+	GetCharacterMovement()->MaxWalkSpeed = 300.f;
 }
