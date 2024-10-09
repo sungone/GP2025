@@ -21,10 +21,10 @@ public:
 	EXP_OVER(unsigned char* packet)
 	{
 		ZeroMemory(&wsaover, sizeof(wsaover));
-		wsabuf.len = packet[0];
+		wsabuf.len = packet[1];
 		wsabuf.buf = send_buf;
 		comp_type = OP_SEND;
-		memcpy(send_buf, packet, packet[0]);
+		memcpy(send_buf, packet, packet[1]);
 	}
 	EXP_OVER()
 	{

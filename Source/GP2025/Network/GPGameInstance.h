@@ -23,7 +23,7 @@ public :
 
 	void SendPlayerLoginPacket();
 	void SendPlayerLogoutPacket();
-	void SendPlayerMovePacket(FVector Position, FRotator Rotation);
+	void SendPlayerMovePacket(FVector Position, FRotator Rotation, bool IsJumping);
 
 public :
 	class FSocket* Socket;
