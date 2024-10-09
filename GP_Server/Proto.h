@@ -58,6 +58,7 @@ struct FMovePacket
 	FPacketHeader Header;
 	int32 PlayerID;
 	FVectorInfo VecInfo;
+	bool IsJumping;
 };
 
 struct FAddPlayerPacket

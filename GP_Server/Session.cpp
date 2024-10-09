@@ -33,10 +33,12 @@ void Session::process_packet(char* packet)
 	{
 		FMovePacket* p = reinterpret_cast<FMovePacket*>(packet);
 		memcpy(&clients[id].pos, &(p->VecInfo), sizeof(FVectorInfo));
+		is_jumping = p->IsJumping;
 		std::cout << "<- Recv:: Move Packet[" << id << "] ("
 			<< clients[id].pos.X << ", "
 			<< clients[id].pos.Y << ", "
 			<< clients[id].pos.Z << ")"
+			<<" is jumping? "<< (is_jumping ? "true" : "false")
 			<< std::endl;
 		for (auto& cl : clients)
 		{

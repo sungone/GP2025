@@ -25,7 +25,7 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 	// Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 500.f, 0.f);
-	GetCharacterMovement()->JumpZVelocity = 1500.f;
+	GetCharacterMovement()->JumpZVelocity = 800.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
@@ -161,19 +161,23 @@ void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 	AddMovementInput(ForwardDirection, MovementVector.X);
 	AddMovementInput(RightDirection, MovementVector.Y);
 
-	// 현재 위치
 	FVector CurrentLocation = GetActorLocation();
 	float DistanceMoved = FVector::Dist(CurrentLocation, PreviousLocation);
 
-	// 일정 거리 이상 이동한 경우에만 패킷을 전송
-	if (DistanceMoved > 10.0f)  // 10 유닛 이상 이동했을 때만 서버로 전송
+
+	if (DistanceMoved > 10.0f)
 	{
-		if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
+		bool bIsCurrentlyJumping = GetCharacterMovement()->IsFalling();
+
+		if (bIsCurrentlyJumping != bWasJumping)
 		{
-			GameInstance->SendPlayerMovePacket(CurrentLocation, GetActorRotation());
+			if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
+			{
+				GameInstance->SendPlayerMovePacket(CurrentLocation, GetActorRotation(), bIsCurrentlyJumping);
+			}
+			bWasJumping = bIsCurrentlyJumping;
 		}
 
-		// 이전 위치를 업데이트
 		PreviousLocation = CurrentLocation;
 	}
 }
@@ -186,7 +190,7 @@ void AGPCharacterPlayer::Jump()
 	{
 		FVector CurrentLocation = GetActorLocation();
 		FRotator CurrentRotation = GetActorRotation();
-		GameInstance->SendPlayerMovePacket(CurrentLocation, CurrentRotation);
+		GameInstance->SendPlayerMovePacket(CurrentLocation, CurrentRotation, true);
 	}
 }
 
@@ -198,7 +202,7 @@ void AGPCharacterPlayer::StopJumping()
 	{
 		FVector CurrentLocation = GetActorLocation();
 		FRotator CurrentRotation = GetActorRotation();
-		GameInstance->SendPlayerMovePacket(CurrentLocation, CurrentRotation);
+		GameInstance->SendPlayerMovePacket(CurrentLocation, CurrentRotation,false);
 	}
 }
 

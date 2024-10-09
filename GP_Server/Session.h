@@ -42,6 +42,7 @@ public:
 public:
 	int32	id;
 	bool is_login = false;
+	bool is_jumping = false;
 	FVectorInfo pos;
 	SOCKET socket;
 	EXP_OVER recv_over;

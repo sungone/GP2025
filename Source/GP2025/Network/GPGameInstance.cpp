@@ -88,7 +88,7 @@ void UGPGameInstance::SendPlayerLogoutPacket()
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FLogoutPacket), BytesSent);
 }
 
-void UGPGameInstance::SendPlayerMovePacket(FVector Position, FRotator Rotation)
+void UGPGameInstance::SendPlayerMovePacket(FVector Position, FRotator Rotation, bool IsJumping)
 {
 	FMovePacket Packet;
 	Packet.Header.PacketType = EPacketType::C_MOVE;
@@ -100,6 +100,7 @@ void UGPGameInstance::SendPlayerMovePacket(FVector Position, FRotator Rotation)
 	Packet.VecInfo.Yaw = Rotation.Yaw;
 	Packet.VecInfo.Pitch = Rotation.Pitch;
 	Packet.VecInfo.Roll = Rotation.Roll;
+	Packet.IsJumping = IsJumping;
 
 	int32 BytesSent = 0;
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FMovePacket), BytesSent);

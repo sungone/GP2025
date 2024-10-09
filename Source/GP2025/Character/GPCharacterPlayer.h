@@ -69,4 +69,5 @@ protected :
 
 private :
 	FVector PreviousLocation;
+	bool bWasJumping = false;
 };
