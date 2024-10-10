@@ -32,6 +32,14 @@ protected :
 public :
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+// PlayerID Section
+public :
+
+	int32 PlayerID;
+	FORCEINLINE int32 GetPlayerID() const { return PlayerID; }
+	FORCEINLINE void SetPlayerID(int32 ID) { PlayerID = ID; }
+
+public :
 // Character Control Section
 	void SetCharacterControl(ECharacterPlayerControlType NewCharacterPlayerControlType);
 	virtual void SetCharacterControlData(const class UGPCharacterPlayerControlData* CharacterPlayerControlData);

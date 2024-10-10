@@ -7,6 +7,7 @@
 #include "Common/TcpSocketBuilder.h"
 #include "Serialization/ArrayWriter.h"
 #include "SocketSubsystem.h"
+#include "Character/GPCharacterPlayer.h"
 
 #include "../../GP_Server/Proto.h"
 
@@ -93,7 +94,7 @@ void UGPGameInstance::SendPlayerMovePacket(FVector Position, FRotator Rotation, 
 	FMovePacket Packet;
 	Packet.Header.PacketType = EPacketType::C_MOVE;
 	Packet.Header.PacketSize = sizeof(FMovePacket);
-	Packet.PlayerID = PlayerID;
+	Packet.PlayerID = this->PlayerID;
 	Packet.VecInfo.X = Position.X;
 	Packet.VecInfo.Y = Position.Y;
 	Packet.VecInfo.Z = Position.Z;
@@ -104,4 +105,31 @@ void UGPGameInstance::SendPlayerMovePacket(FVector Position, FRotator Rotation, 
 
 	int32 BytesSent = 0;
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FMovePacket), BytesSent);
+}
+
+AGPCharacterPlayer* UGPGameInstance::FindPlayerByID(int32 ID)
+{
+	for (const TPair<AGPCharacterPlayer* , int32>& Pair : PlayerArr)
+	{
+		if (Pair.Value == ID)
+		{
+			return Pair.Key;
+		}
+	}
+
+	return nullptr;
+}
+
+void UGPGameInstance::AddPlayer(AGPCharacterPlayer* NewPlayer , int32 ID)
+{
+	if (NewPlayer)	PlayerArr.Add(NewPlayer , ID);
+}
+
+void UGPGameInstance::RemovePlayer(int32 ID)
+{
+	AGPCharacterPlayer* Player = FindPlayerByID(ID);
+	if (Player)
+	{
+		PlayerArr.Remove(Player);
+	}
 }

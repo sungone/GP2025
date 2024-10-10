@@ -4,6 +4,8 @@
 #include "Sockets.h"
 #include "Serialization/ArrayWriter.h"
 #include "SocketSubsystem.h"
+#include "Character/GPCharacterPlayer.h"
+#include "GPGameInstance.h"
 #include "../../GP_Server/Proto.h"
 
 GPNetworkThread::GPNetworkThread(FSocket* Socket)
@@ -45,8 +47,8 @@ uint32 GPNetworkThread::Run()
 						//  로비 위치에 랜덤하게 위치 정보 받아올 수도 있고..)
 						FLoginInfoPacket* LoginInfoPacket = reinterpret_cast<FLoginInfoPacket*>(Buffer.GetData());
 						// -> 내플레이어 아이디 값 설정해주기.
-
 						break;
+						
 					}
 					case EPacketType::S_ADD_PLAYER:
 					{

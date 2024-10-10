@@ -9,6 +9,7 @@
 /**
  * 
  */
+
 UCLASS()
 class GP2025_API UGPGameInstance : public UGameInstance
 {
@@ -30,4 +31,19 @@ public :
 	FString IpAddress = TEXT("127.0.0.1");
 	int16 Port = 4000;
 	TSharedPtr<class GPNetworkThread> NetworkThread;
+
+public :
+	int32 PlayerID;
+	FORCEINLINE int32 GetPlayerID() const { return PlayerID; }
+	FORCEINLINE void SetPlayerID(int32 ID) { PlayerID = ID; }
+
+// All PlayerID Managed
+public :
+
+	// 현재 서버에 접속한 플레이어의 정보를 관리하는 Map
+	TMap<class AGPCharacterPlayer* , int32> PlayerArr;
+	AGPCharacterPlayer* FindPlayerByID(int32 ID);
+	void AddPlayer(AGPCharacterPlayer* NewPlayer , int32 ID);
+	void RemovePlayer(int32 ID);
+
 };
