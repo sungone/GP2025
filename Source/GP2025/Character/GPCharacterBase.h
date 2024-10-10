@@ -14,4 +14,6 @@ class GP2025_API AGPCharacterBase : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AGPCharacterBase();
+
+	int32 PlayerID;
 };
