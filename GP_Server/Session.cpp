@@ -1,6 +1,10 @@
 #include "Define.h"
 #include "Session.h"
+#include <random>
 
+std::default_random_engine dre;
+std::uniform_real_distribution<float> ud_x(-1000,-3000);
+std::uniform_real_distribution<float> ud_y(-1500,-3500);
 extern std::array<Session, MAX_CLIENT> clients;
 
 void Session::process_packet(char* packet)
@@ -12,6 +16,9 @@ void Session::process_packet(char* packet)
 	case EPacketType::C_LOGIN:
 		std::cout << "<- Recv:: Login Packet[" << recv_id << "]" << std::endl;
 		clients[recv_id].is_login = true;
+		clients[recv_id].info.X = ud_x(dre);
+		clients[recv_id].info.Y = ud_y(dre);
+		clients[recv_id].info.Z = 116;
 		clients[recv_id].send_login_packet();
 		for (auto& cl : clients)
 		{
@@ -37,7 +44,8 @@ void Session::process_packet(char* packet)
 		std::cout << "<- Recv:: Move Packet[" << recv_id << "] ("
 			<< clients[recv_id].info.X << ", "
 			<< clients[recv_id].info.Y << ", "
-			<< clients[recv_id].info.Z << "), "
+			<< clients[recv_id].info.Z << "), Rotate ("
+			<< clients[recv_id].info.Yaw << ") , "
 			<< "State " << clients[recv_id].info.State << ""
 			<< std::endl;
 		for (auto& cl : clients)
@@ -62,8 +70,7 @@ void Session::send_move_packet(int32 id)
 	std::cout << "-> Send:: Move Packet [" << id << "] ("
 		<< pk.PlayerInfo.X << ","
 		<< pk.PlayerInfo.Y << ","
-		<< pk.PlayerInfo.Z << ") to [" << this->getId() << "]"
-		<< std::endl;
+		<< pk.PlayerInfo.Z << ") to [" << this->getId() << "]\n";
 	do_send(&pk);
 }
 
@@ -73,7 +80,10 @@ void Session::send_login_packet()
 	pk.Header.PacketSize = sizeof(FLoginInfoPacket);
 	pk.Header.PacketType = EPacketType::S_LOGININFO;
 	pk.PlayerInfo = info;
-	std::cout << "-> Send:: Login Info Packet [" << pk.PlayerInfo.ID << "]" << std::endl;
+	std::cout << "-> Send:: Login Info Packet [" << pk.PlayerInfo.ID << "] ("
+		<< pk.PlayerInfo.X << ","
+		<< pk.PlayerInfo.Y << ","
+		<< pk.PlayerInfo.Z << ")\n";
 	do_send(&pk);
 }
 
