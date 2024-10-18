@@ -28,35 +28,27 @@ public :
 
 protected :
 	virtual void BeginPlay() override;
-
-public :
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-// PlayerID Section
-public :
-
-	int32 PlayerID;
-	FORCEINLINE int32 GetPlayerID() const { return PlayerID; }
-	FORCEINLINE void SetPlayerID(int32 ID) { PlayerID = ID; }
-
-public :
-// Character Control Section
 	void SetCharacterControl(ECharacterPlayerControlType NewCharacterPlayerControlType);
 	virtual void SetCharacterControlData(const class UGPCharacterPlayerControlData* CharacterPlayerControlData);
+
+	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
+	virtual void Jump() override;
+	virtual void StopJumping() override;
+	void StartSprinting();
+	void StopSprinting();
 
 	UPROPERTY(EditAnywhere , Category = "CharacterControl" , Meta = (AllowPrivateAccess = "true"))
 	TMap<ECharacterPlayerControlType, class UGPCharacterPlayerControlData*> CharacterPlayerControlManager;
 
-// Camera Section
-protected :
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera" , Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USpringArmComponent> CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UCameraComponent> FollowCamera;
 
-// Input Section
-protected :
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input" , Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputMappingContext> DefaultMappingContext;
 
@@ -72,26 +64,9 @@ protected :
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> SprintAction;
 
-// Character Movement Section
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
 	float WalkSpeed = 300.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
 	float SprintSpeed = 1500.f;
-
-
-// Control Function
-	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
-	virtual void Jump() override;
-	virtual void StopJumping() override;
-
-private :
-	FVector PreviousLocation;
-	bool bWasJumping = false;
-
-	// Sprint Functions
-	void StartSprinting();
-	void StopSprinting();
-
 };

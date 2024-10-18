@@ -13,41 +13,6 @@
 
 AGPCharacterPlayer::AGPCharacterPlayer()
 {
-	// Pawn
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
-	bUseControllerRotationRoll = false;
-
-	// Capsule
-	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.f);
-	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Pawn"));
-
-	// Movement
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 500.f, 0.f);
-	GetCharacterMovement()->JumpZVelocity = 800.f;
-	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
-	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
-
-	// Mesh
-	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	GetMesh()->SetCollisionProfileName(TEXT("CharacterMesh"));
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/DokkaebiAssets/boss_body_bip.boss_body_bip'"));
-	if (CharacterMeshRef.Object)
-	{
-		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
-	}
-
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Animation/PlayerAnimation/ABP_GPCharacterPlayer.ABP_GPCharacterPlayer_C"));
-	if (AnimInstanceClassRef.Class)
-	{
-		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
-	}
-
 	// Camera 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
@@ -102,6 +67,11 @@ void AGPCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	SetCharacterControl(ECharacterPlayerControlType::Default);
+	if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
+	{
+		GameInstance->MyPlayer = this;
+		GameInstance->OtherPlayerClass = AGPCharacterBase::StaticClass();
+	}
 }
 
 void AGPCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -149,14 +119,11 @@ void AGPCharacterPlayer::SetCharacterControlData(const UGPCharacterPlayerControl
 	GetCharacterMovement()->RotationRate = CharacterPlayerControlData->RotationRate;
 }
 
-
-
-// WASD 이동 구현 로직
 void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	if (MovementVector.IsNearlyZero())  // 입력이 없으면 아무 동작도 하지 않음
+	if (MovementVector.IsNearlyZero())
 	{
 		return;
 	}
@@ -170,30 +137,25 @@ void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 	AddMovementInput(ForwardDirection, MovementVector.X);
 	AddMovementInput(RightDirection, MovementVector.Y);
 
-	// 현재 위치
 	FVector CurrentLocation = GetActorLocation();
 	float DistanceMoved = FVector::Dist(CurrentLocation, PreviousLocation);
 
-	// 일정 거리 이상 이동한 경우에만 패킷을 전송
-	if (DistanceMoved > 10.0f)  // 10 유닛 이상 이동했을 때만 서버로 전송
+	PlayerInfo.SetVector(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
+	PlayerInfo.Yaw = YawRotation.Yaw;
+	if (DistanceMoved > 10.0f)
 	{
-		bool bIsCurrentlyJumping = GetCharacterMovement()->IsFalling();
+		if (PlayerInfo.State != STATE_JUMP)
+			PlayerInfo.State = STATE_WALK;
 
-		if (bIsCurrentlyJumping != bWasJumping)
+		if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
 		{
-			if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
-			{
-				GameInstance->SendPlayerMovePacket(CurrentLocation, GetActorRotation(), bIsCurrentlyJumping);
-			}
-			bWasJumping = bIsCurrentlyJumping;
+			GameInstance->SendPlayerMovePacket();
 		}
 
-		// 이전 위치를 업데이트
 		PreviousLocation = CurrentLocation;
 	}
 }
 
-// 마우스 화면 전환 로직
 void AGPCharacterPlayer::Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
@@ -208,9 +170,8 @@ void AGPCharacterPlayer::Jump()
 
 	if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
 	{
-		FVector CurrentLocation = GetActorLocation();
-		FRotator CurrentRotation = GetActorRotation();
-		GameInstance->SendPlayerMovePacket(CurrentLocation, CurrentRotation , true);
+		PlayerInfo.State = STATE_JUMP;
+		GameInstance->SendPlayerMovePacket();
 	}
 }
 
@@ -220,18 +181,19 @@ void AGPCharacterPlayer::StopJumping()
 
 	if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
 	{
-		FVector CurrentLocation = GetActorLocation();
-		FRotator CurrentRotation = GetActorRotation();
-		GameInstance->SendPlayerMovePacket(CurrentLocation, CurrentRotation, false);
+		PlayerInfo.State = STATE_IDLE;
+		GameInstance->SendPlayerMovePacket();
 	}
 }
 
 void AGPCharacterPlayer::StartSprinting()
 {
 	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+	PlayerInfo.State = STATE_RUN;
 }
 
 void AGPCharacterPlayer::StopSprinting()
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	PlayerInfo.State = STATE_IDLE;
 }

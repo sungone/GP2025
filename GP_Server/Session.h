@@ -6,7 +6,6 @@ public:
 
 	Session()
 	{
-		id = 0;
 		socket = INVALID_SOCKET;
 	}
 
@@ -35,15 +34,13 @@ public:
 
 	void send_move_packet(int32 id);
 	void send_login_packet();
-	void send_add_player_packet(int32 id);
+	void send_add_player_packet(int32 add_id);
 	void send_remove_player_packet(int32 id);
 	void disconnect();
-
+	int32 getId() { return info.ID; }
 public:
-	int32	id;
 	bool is_login = false;
-	bool is_jumping = false;
-	FVectorInfo pos;
+	FPlayerInfo info;
 	SOCKET socket;
 	EXP_OVER recv_over;
 	int32 prev_remain;

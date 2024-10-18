@@ -60,13 +60,13 @@ public:
 			switch (ex_over->comp_type) {
 			case OP_ACCEPT:
 			{
-				int32 client_id = get_new_id();
-				if (client_id != -1) {
-					clients[client_id].id = client_id;
-					clients[client_id].socket = c_socket;
+				int32 accept_id = get_new_id();
+				if (accept_id != -1) {
+					clients[accept_id].info.ID = accept_id;
+					clients[accept_id].socket = c_socket;
 					CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket),
-						h_iocp, client_id, 0);
-					clients[client_id].do_recv();
+						h_iocp, accept_id, 0);
+					clients[accept_id].do_recv();
 				}
 				c_socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 				ZeroMemory(&a_over.wsaover, sizeof(a_over.wsaover));

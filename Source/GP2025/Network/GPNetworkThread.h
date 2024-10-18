@@ -19,6 +19,4 @@ private:
 	FRunnableThread* Thread = nullptr;
 	FSocket* Socket;
 	bool isThreadRuning = true;
-
-	TArray<uint8> Buffer;
 };

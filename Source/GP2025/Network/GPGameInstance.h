@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "../../GP_Server/Proto.h"
 #include "GPGameInstance.generated.h"
 
+class AGPCharacterBase;
 /**
  * 
  */
@@ -24,7 +26,12 @@ public :
 
 	void SendPlayerLoginPacket();
 	void SendPlayerLogoutPacket();
-	void SendPlayerMovePacket(FVector Position, FRotator Rotation, bool IsJumping);
+	void SendPlayerMovePacket();
+	
+	void ProcessPacket();
+
+	void AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer);
+	void RemovePlayer(int32 ID);
 
 public :
 	class FSocket* Socket;
@@ -33,17 +40,10 @@ public :
 	TSharedPtr<class GPNetworkThread> NetworkThread;
 
 public :
-	int32 PlayerID;
-	FORCEINLINE int32 GetPlayerID() const { return PlayerID; }
-	FORCEINLINE void SetPlayerID(int32 ID) { PlayerID = ID; }
+	TSubclassOf<AGPCharacterBase> OtherPlayerClass;
 
-// All PlayerID Managed
-public :
-
-	// 현재 서버에 접속한 플레이어의 정보를 관리하는 Map
-	TMap<class AGPCharacterPlayer* , int32> PlayerArr;
-	AGPCharacterPlayer* FindPlayerByID(int32 ID);
-	void AddPlayer(AGPCharacterPlayer* NewPlayer , int32 ID);
-	void RemovePlayer(int32 ID);
-
+	AGPCharacterBase* MyPlayer;
+	TMap<int32, AGPCharacterBase* > Players;
+	
+	TQueue<TArray<uint8>, EQueueMode::Mpsc> RecvQueue;
 };

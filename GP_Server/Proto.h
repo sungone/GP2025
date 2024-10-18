@@ -1,10 +1,11 @@
+#pragma once
 constexpr short SERVER_PORT = 4000;
 constexpr int BUFSIZE = 1024;
 constexpr int MAX_CLIENT = 1000;
 
 using int32 = int;   // int32를 int로 정의
 
-enum class EPacketType : uint8_t
+enum EPacketType : uint8_t
 {
 	C_LOGIN,
 	C_LOGOUT,
@@ -16,14 +17,29 @@ enum class EPacketType : uint8_t
 	S_MOVE_PLAYER,
 };
 
-struct FVectorInfo
+enum EMoveStateType : uint8_t
 {
+	STATE_IDLE,
+	STATE_WALK,
+	STATE_RUN,
+	STATE_JUMP
+};
+
+struct FPlayerInfo
+{
+	int32 ID;
 	float X;
 	float Y;
 	float Z;
 	float Yaw;
-	float Pitch;
-	float Roll;
+	int State;
+
+	void SetVector(float X_, float Y_, float Z_)
+	{
+		X = X_;
+		Y = Y_;
+		Z = Z_;
+	};
 };
 
 #pragma pack(push, 1)
@@ -37,7 +53,6 @@ struct FPacketHeader
 struct FLoginPacket
 {
 	FPacketHeader Header;
-	int32 PlayerID;
 };
 
 struct FLogoutPacket
@@ -49,23 +64,20 @@ struct FLogoutPacket
 struct FLoginInfoPacket
 {
 	FPacketHeader Header;
-	int32 PlayerID;
-	FVectorInfo VecInfo;
+	FPlayerInfo PlayerInfo;
 };
 
 struct FMovePacket
 {
 	FPacketHeader Header;
-	int32 PlayerID;
-	FVectorInfo VecInfo;
-	bool IsJumping;
+	FPlayerInfo PlayerInfo;
 };
 
 struct FAddPlayerPacket
 {
 	FPacketHeader Header;
 	int32 PlayerID;
-	FVectorInfo VecInfo;
+	FPlayerInfo PlayerInfo;
 };
 
 struct FRemovePlayerPacket

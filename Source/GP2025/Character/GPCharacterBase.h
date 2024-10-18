@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "../../GP_Server/Proto.h"
 #include "GPCharacterBase.generated.h"
 
 UCLASS()
@@ -14,5 +15,10 @@ class GP2025_API AGPCharacterBase : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AGPCharacterBase();
+	virtual void BeginPlay();
+	void SetPlayerInfo(FPlayerInfo& PlayerInfo_);
 
+public:
+	FPlayerInfo PlayerInfo;
+	FVector PreviousLocation;
 };
