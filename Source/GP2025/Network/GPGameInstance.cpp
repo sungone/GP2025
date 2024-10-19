@@ -127,6 +127,7 @@ void UGPGameInstance::ProcessPacket()
 			case EPacketType::S_REMOVE_PLAYER:
 			{
 				FLogoutPacket* RemovePlayerPacket = reinterpret_cast<FLogoutPacket*>(PacketData.GetData());
+				RemovePlayer(RemovePlayerPacket->PlayerID);
 				break;
 			}
 			case EPacketType::S_MOVE_PLAYER:
@@ -180,9 +181,16 @@ void UGPGameInstance::AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer)
 	}
 }
 
-void UGPGameInstance::RemovePlayer(int32 ID)
+void UGPGameInstance::RemovePlayer(int32 PlayerID)
 {
+	auto Player = Players.Find(PlayerID);
+	if (Player)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Remove player [%d]"), PlayerID);
 
+		Players.Remove(PlayerID);
+		(*Player)->Destroy();
+	}
 }
 
 void UGPGameInstance::UpdatePlayer(FPlayerInfo& PlayerInfo)

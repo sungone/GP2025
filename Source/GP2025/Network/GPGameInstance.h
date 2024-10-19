@@ -31,7 +31,7 @@ public :
 	void ProcessPacket();
 
 	void AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer);
-	void RemovePlayer(int32 ID);
+	void RemovePlayer(int32 PlayerID);
 	void UpdatePlayer(FPlayerInfo& PlayerInfo);
 public :
 	class FSocket* Socket;
