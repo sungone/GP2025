@@ -140,8 +140,12 @@ void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 	FVector CurrentLocation = GetActorLocation();
 	float DistanceMoved = FVector::Dist(CurrentLocation, PreviousLocation);
 
+	FVector DesiredMovementDirection = (ForwardDirection * MovementVector.X) + (RightDirection * MovementVector.Y);
+	DesiredMovementDirection.Z = 0;
+	FRotator DesiredRotation = DesiredMovementDirection.Rotation();
+
 	PlayerInfo.SetVector(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
-	PlayerInfo.Yaw = YawRotation.Yaw;
+	PlayerInfo.Yaw = DesiredRotation.Yaw;
 	if (DistanceMoved > 10.0f)
 	{
 		if (PlayerInfo.State != STATE_JUMP)
