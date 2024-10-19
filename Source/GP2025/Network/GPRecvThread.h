@@ -6,11 +6,11 @@
 
 class FSocket;
 
-class GP2025_API GPNetworkThread :public FRunnable
+class GP2025_API GPRecvThread :public FRunnable
 {
 public:
-	GPNetworkThread(FSocket* Socket);
-	~GPNetworkThread() {};
+	GPRecvThread(FSocket* Socket);
+	~GPRecvThread() {};
 	
 	virtual uint32 Run() override;
 	void Destroy() { isThreadRuning = false; };

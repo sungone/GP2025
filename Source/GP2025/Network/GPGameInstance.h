@@ -32,12 +32,12 @@ public :
 
 	void AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer);
 	void RemovePlayer(int32 ID);
-
+	void UpdatePlayer(FPlayerInfo& PlayerInfo);
 public :
 	class FSocket* Socket;
 	FString IpAddress = TEXT("127.0.0.1");
 	int16 Port = 4000;
-	TSharedPtr<class GPNetworkThread> NetworkThread;
+	TSharedPtr<class GPRecvThread> RecvThread;
 
 public :
 	TSubclassOf<AGPCharacterBase> OtherPlayerClass;

@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Network/GPNetworkThread.h"
+#include "Network/GPRecvThread.h"
 #include "Sockets.h"
 #include "Serialization/ArrayWriter.h"
 #include "SocketSubsystem.h"
@@ -9,13 +9,13 @@
 #include "Engine/World.h"
 #include "../../GP_Server/Proto.h"
 
-GPNetworkThread::GPNetworkThread(FSocket* Socket)
+GPRecvThread::GPRecvThread(FSocket* Socket)
 	: Socket(Socket)
 {
-	Thread = FRunnableThread::Create(this, TEXT("WorkerThread"));
+	Thread = FRunnableThread::Create(this, TEXT("RecvThread"));
 }
 
-uint32 GPNetworkThread::Run()
+uint32 GPRecvThread::Run()
 {
 	while (!GWorld)
 	{

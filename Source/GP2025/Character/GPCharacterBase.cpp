@@ -52,6 +52,9 @@ void AGPCharacterBase::BeginPlay()
 void AGPCharacterBase::SetPlayerInfo(FPlayerInfo& PlayerInfo_)
 {
 	PlayerInfo = PlayerInfo_;
-	UE_LOG(LogTemp, Warning, TEXT("Set PlayerInfo[%d] (%f,%f,%f)"), PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z);
+	SetActorLocation(FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z));
+	SetActorRotation(FRotator(0, PlayerInfo.Yaw, 0));
+	UE_LOG(LogTemp, Warning, TEXT("Set PlayerInfo[%d] (%f,%f,%f)(%f)"), 
+		PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 }
 

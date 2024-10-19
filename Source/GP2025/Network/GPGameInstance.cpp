@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Network/GPGameInstance.h"
-#include "GPNetworkThread.h"
+#include "GPRecvThread.h"
 
 #include "Sockets.h"
 #include "Common/TcpSocketBuilder.h"
@@ -42,7 +42,7 @@ void UGPGameInstance::ConnectToServer()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Connection Success")));
 		SendPlayerLoginPacket();
-		NetworkThread = MakeShared<GPNetworkThread>(Socket);
+		RecvThread = MakeShared<GPRecvThread>(Socket);
 	}
 	else
 	{
@@ -52,9 +52,9 @@ void UGPGameInstance::ConnectToServer()
 
 void UGPGameInstance::DisconnectFromServer()
 {
-	if (NetworkThread)
+	if (RecvThread)
 	{
-		NetworkThread->Destroy();
+		RecvThread->Destroy();
 	}
 
 	if (Socket)
@@ -94,7 +94,7 @@ void UGPGameInstance::SendPlayerMovePacket()
 	Packet.Header.PacketSize = sizeof(FMovePacket);
 	Packet.PlayerInfo = MyPlayer->PlayerInfo;
 	int32 BytesSent = 0;
-	UE_LOG(LogTemp, Warning, TEXT("Send [%d] (%f,%f,%f)"), 
+	UE_LOG(LogTemp, Warning, TEXT("Send [%d] (%f,%f,%f)"),
 		Packet.PlayerInfo.ID, Packet.PlayerInfo.X, Packet.PlayerInfo.Y, Packet.PlayerInfo.Z);
 
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FMovePacket), BytesSent);
@@ -115,22 +115,12 @@ void UGPGameInstance::ProcessPacket()
 			case EPacketType::S_LOGININFO:
 			{
 				FLoginInfoPacket* LoginInfoPacket = reinterpret_cast<FLoginInfoPacket*>(PacketData.GetData());
-				UE_LOG(LogTemp, Warning, TEXT("LOGININFO [%d] (%f,%f,%f)"),
-					LoginInfoPacket->PlayerInfo.ID, 
-					LoginInfoPacket->PlayerInfo.X,
-					LoginInfoPacket->PlayerInfo.Y,
-					LoginInfoPacket->PlayerInfo.Z);
 				AddPlayer(LoginInfoPacket->PlayerInfo, true);
 				break;
 			}
 			case EPacketType::S_ADD_PLAYER:
 			{
 				FAddPlayerPacket* AddPlayerPacket = reinterpret_cast<FAddPlayerPacket*>(PacketData.GetData());
-				UE_LOG(LogTemp, Warning, TEXT("add [%d] (%f,%f,%f)"),
-					AddPlayerPacket->PlayerInfo.ID,
-					AddPlayerPacket->PlayerInfo.X,
-					AddPlayerPacket->PlayerInfo.Y,
-					AddPlayerPacket->PlayerInfo.Z);
 				AddPlayer(AddPlayerPacket->PlayerInfo, false);
 				break;
 			}
@@ -142,11 +132,7 @@ void UGPGameInstance::ProcessPacket()
 			case EPacketType::S_MOVE_PLAYER:
 			{
 				FMovePacket* MovePlayerPacket = reinterpret_cast<FMovePacket*>(PacketData.GetData());
-				UE_LOG(LogTemp, Warning, TEXT("other player move [%d] (%f,%f,%f)"),
-					MovePlayerPacket->PlayerInfo.ID,
-					MovePlayerPacket->PlayerInfo.X,
-					MovePlayerPacket->PlayerInfo.Y,
-					MovePlayerPacket->PlayerInfo.Z);
+				UpdatePlayer(MovePlayerPacket->PlayerInfo);
 				break;
 			}
 			default:
@@ -165,12 +151,15 @@ void UGPGameInstance::AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer)
 		return;
 
 	FVector SpawnLocation(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z);
-	FRotator SpawnRotation(0, PlayerInfo.Yaw,0);
+	FRotator SpawnRotation(0, PlayerInfo.Yaw, 0);
 
 	if (isMyPlayer)
 	{
 		if (MyPlayer == nullptr)
 			return;
+
+		UE_LOG(LogTemp, Warning, TEXT("Add my player [%d] (%f,%f,%f)(%f)"),
+			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 
 		MyPlayer->SetPlayerInfo(PlayerInfo);
 		Players.Add(PlayerInfo.ID, MyPlayer);
@@ -182,6 +171,10 @@ void UGPGameInstance::AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer)
 		{
 			Player = World->SpawnActor<AGPCharacterBase>(OtherPlayerClass, SpawnLocation, SpawnRotation);
 		}
+
+		UE_LOG(LogTemp, Warning, TEXT("Add other player [%d] (%f,%f,%f)(%f)"),
+			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
+
 		Player->SetPlayerInfo(PlayerInfo);
 		Players.Add(PlayerInfo.ID, Player);
 	}
@@ -190,4 +183,15 @@ void UGPGameInstance::AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer)
 void UGPGameInstance::RemovePlayer(int32 ID)
 {
 
+}
+
+void UGPGameInstance::UpdatePlayer(FPlayerInfo& PlayerInfo)
+{
+	auto Player = Players.Find(PlayerInfo.ID);
+	if (Player)
+	{
+		(*Player)->SetPlayerInfo(PlayerInfo);
+		UE_LOG(LogTemp, Warning, TEXT("Update other player [%d] (%f,%f,%f)(%f)"),
+			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
+	}
 }

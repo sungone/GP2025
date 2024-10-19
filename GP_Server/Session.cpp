@@ -3,8 +3,8 @@
 #include <random>
 
 std::default_random_engine dre;
-std::uniform_real_distribution<float> ud_x(-1000,-3000);
-std::uniform_real_distribution<float> ud_y(-1500,-3500);
+std::uniform_real_distribution<float> ud_x(-3000, -1000);
+std::uniform_real_distribution<float> ud_y(-3500, -1500);
 extern std::array<Session, MAX_CLIENT> clients;
 
 void Session::process_packet(char* packet)
