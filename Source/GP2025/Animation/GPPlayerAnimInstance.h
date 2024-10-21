@@ -17,7 +17,7 @@ class GP2025_API UGPPlayerAnimInstance : public UAnimInstance
 public :
 	UGPPlayerAnimInstance();
 
-protected :
+public :
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 

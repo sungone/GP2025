@@ -146,6 +146,7 @@ void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 
 	PlayerInfo.SetVector(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
 	PlayerInfo.Yaw = DesiredRotation.Yaw;
+	
 	if (DistanceMoved > 10.0f)
 	{
 		if (PlayerInfo.State != STATE_JUMP)

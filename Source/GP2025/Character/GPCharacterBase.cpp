@@ -3,6 +3,7 @@
 #include "Character/GPCharacterBase.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Animation/GPPlayerAnimInstance.h"
 #include "Network/GPGameInstance.h"
 
 // Sets default values
@@ -52,9 +53,36 @@ void AGPCharacterBase::BeginPlay()
 void AGPCharacterBase::SetPlayerInfo(FPlayerInfo& PlayerInfo_)
 {
 	PlayerInfo = PlayerInfo_;
-	SetActorLocation(FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z));
+
+	FVector CurrentLocation = GetActorLocation();
+	FVector NewLocation(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z);
+	float DeltaTime = GetWorld()->GetDeltaSeconds();
+
+	FVector InterpolatedLocation = FMath::VInterpTo(CurrentLocation, NewLocation, DeltaTime, 5.0f);
+	SetActorLocation(InterpolatedLocation);
 	SetActorRotation(FRotator(0, PlayerInfo.Yaw, 0));
-	UE_LOG(LogTemp, Warning, TEXT("Set PlayerInfo[%d] (%f,%f,%f)(%f)"), 
+
+	// 이동 속도를 계산하여 GroundSpeed 업데이트
+	float DistanceMoved = FVector::Dist(CurrentLocation, InterpolatedLocation);
+	float CalculatedSpeed = DistanceMoved / DeltaTime;  // cm/s 단위 속도 계산
+
+	// GroundSpeed를 AnimInstance에 직접 설정
+	SetGroundSpeed(CalculatedSpeed);
+
+	UE_LOG(LogTemp, Warning, TEXT("Set PlayerInfo[%d] (%f,%f,%f)(%f)"),
 		PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 }
 
+void AGPCharacterBase::SetGroundSpeed(float TargetSpeed)
+{
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		UGPPlayerAnimInstance* PlayerAnimInstance = Cast<UGPPlayerAnimInstance>(AnimInstance);
+		if (PlayerAnimInstance)
+		{
+			// GroundSpeed를 직접 설정
+			PlayerAnimInstance->GroundSpeed = FMath::FInterpTo(PlayerAnimInstance->GroundSpeed, TargetSpeed, GetWorld()->GetDeltaSeconds(), 5.0f);
+			UE_LOG(LogTemp, Warning, TEXT("GroundSpeed : %f"),PlayerAnimInstance->GroundSpeed);
+		}
+	}
+}
