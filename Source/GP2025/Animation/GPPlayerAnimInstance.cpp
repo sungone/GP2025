@@ -7,7 +7,7 @@
 
 UGPPlayerAnimInstance::UGPPlayerAnimInstance()
 {
-	MovingThreshould = 3.f;
+	MovingThreshould = 10.f;
 	JumpingThreshould = 100.f;
 }
 
@@ -26,12 +26,12 @@ void UGPPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	if (Movement)
-	{
-		Velocity = Movement->Velocity;
-		GroundSpeed = Velocity.Size2D(); // z °ª Á¦¿Ü
+    if (Movement)
+    {
+		//Velocity = Movement->Velocity;
+		//GroundSpeed = Velocity.Size2D();
 		bIsIdle = GroundSpeed < MovingThreshould;
 		bIsFalling = Movement->IsFalling();
 		bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);
-	}
+    }
 }
