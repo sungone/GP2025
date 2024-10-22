@@ -54,6 +54,14 @@ void AGPCharacterBase::SetPlayerInfo(FPlayerInfo& PlayerInfo_)
 {
 	PlayerInfo = PlayerInfo_;
 
+	SetPlayerLocationAndRotation(PlayerInfo);
+
+	UE_LOG(LogTemp, Warning, TEXT("Set PlayerInfo[%d] (%f,%f,%f)(%f)"),
+		PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
+}
+
+void AGPCharacterBase::SetPlayerLocationAndRotation(FPlayerInfo& PlayerInfo_)
+{
 	FVector CurrentLocation = GetActorLocation();
 	FVector NewLocation(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z);
 	float DeltaTime = GetWorld()->GetDeltaSeconds();
@@ -61,7 +69,4 @@ void AGPCharacterBase::SetPlayerInfo(FPlayerInfo& PlayerInfo_)
 	FVector InterpolatedLocation = FMath::VInterpTo(CurrentLocation, NewLocation, DeltaTime, 5.0f);
 	SetActorLocation(InterpolatedLocation);
 	SetActorRotation(FRotator(0, PlayerInfo.Yaw, 0));
-
-	UE_LOG(LogTemp, Warning, TEXT("Set PlayerInfo[%d] (%f,%f,%f)(%f)"),
-		PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 }

@@ -17,6 +17,7 @@ public:
 	AGPCharacterBase();
 	virtual void BeginPlay();
 	void SetPlayerInfo(FPlayerInfo& PlayerInfo_);
+	void SetPlayerLocationAndRotation(FPlayerInfo& PlayerInfo_);
 	
 public:
 	FPlayerInfo PlayerInfo;
