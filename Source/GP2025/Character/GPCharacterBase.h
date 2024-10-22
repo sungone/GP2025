@@ -17,7 +17,6 @@ public:
 	AGPCharacterBase();
 	virtual void BeginPlay();
 	void SetPlayerInfo(FPlayerInfo& PlayerInfo_);
-	void SetGroundSpeed(float TargetSpeed);
 	
 public:
 	FPlayerInfo PlayerInfo;
