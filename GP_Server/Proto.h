@@ -19,6 +19,7 @@ enum EPacketType : uint8_t
 
 enum EMoveStateType : uint8_t
 {
+	STATE_NONE,
 	STATE_IDLE,
 	STATE_WALK,
 	STATE_RUN,

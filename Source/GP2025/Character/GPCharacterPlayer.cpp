@@ -123,10 +123,8 @@ void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	if (MovementVector.IsNearlyZero())
-	{
-		return;
-	}
+	// MovementVector 값을 확인
+	UE_LOG(LogTemp, Warning, TEXT("MovementVector: X=%f, Y=%f"), MovementVector.X, MovementVector.Y);
 
 	const FRotator Rotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -146,8 +144,26 @@ void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 
 	PlayerInfo.SetVector(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
 	PlayerInfo.Yaw = DesiredRotation.Yaw;
+
+	if (DistanceMoved < 5.0f)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("IsNearbyzero"));
+		// 정지 상태로 간주, 서버에 멈춘 상태 전송
+		if (PlayerInfo.State != STATE_IDLE)
+		{
+			PlayerInfo.State = STATE_IDLE;
+		}
+
+		if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
+		{
+			GameInstance->SendPlayerMovePacket();
+		}
+
+		PlayerInfo.State = STATE_NONE;
+		return;
+	}
 	
-	if (DistanceMoved > 10.0f)
+	if (DistanceMoved > 5.0f)
 	{
 		if (PlayerInfo.State != STATE_JUMP)
 			PlayerInfo.State = STATE_WALK;
