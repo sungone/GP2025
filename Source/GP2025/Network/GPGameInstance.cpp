@@ -102,47 +102,61 @@ void UGPGameInstance::SendPlayerMovePacket()
 
 void UGPGameInstance::ProcessPacket()
 {
+	static TArray<uint8> RemainingData;
+
 	TArray<uint8> PacketData;
 
 	while (RecvQueue.Dequeue(PacketData))
 	{
-		if (PacketData.Num() >= sizeof(FPacketHeader))
-		{
-			FPacketHeader* PacketHeader = reinterpret_cast<FPacketHeader*>(PacketData.GetData());
+		RemainingData.Append(PacketData);
 
-			switch (PacketHeader->PacketType)
+		while (RemainingData.Num() > sizeof(FPacketHeader))
+		{
+			FPacketHeader* PacketHeader = reinterpret_cast<FPacketHeader*>(RemainingData.GetData());
+
+			if (RemainingData.Num() >= PacketHeader->PacketSize)
 			{
-			case EPacketType::S_LOGININFO:
-			{
-				FLoginInfoPacket* LoginInfoPacket = reinterpret_cast<FLoginInfoPacket*>(PacketData.GetData());
-				AddPlayer(LoginInfoPacket->PlayerInfo, true);
-				break;
+				switch (PacketHeader->PacketType)
+				{
+				case EPacketType::S_LOGININFO:
+				{
+					FLoginInfoPacket* LoginInfoPacket = reinterpret_cast<FLoginInfoPacket*>(RemainingData.GetData());
+					AddPlayer(LoginInfoPacket->PlayerInfo, true);
+					break;
+				}
+				case EPacketType::S_ADD_PLAYER:
+				{
+					FAddPlayerPacket* AddPlayerPacket = reinterpret_cast<FAddPlayerPacket*>(RemainingData.GetData());
+					AddPlayer(AddPlayerPacket->PlayerInfo, false);
+					break;
+				}
+				case EPacketType::S_REMOVE_PLAYER:
+				{
+					FLogoutPacket* RemovePlayerPacket = reinterpret_cast<FLogoutPacket*>(RemainingData.GetData());
+					RemovePlayer(RemovePlayerPacket->PlayerID);
+					break;
+				}
+				case EPacketType::S_MOVE_PLAYER:
+				{
+					FMovePacket* MovePlayerPacket = reinterpret_cast<FMovePacket*>(RemainingData.GetData());
+					UpdatePlayer(MovePlayerPacket->PlayerInfo);
+					break;
+				}
+				default:
+					UE_LOG(LogTemp, Warning, TEXT("Unknown Packet Type received."));
+					break;
+				}
+
+				RemainingData.RemoveAt(0, PacketHeader->PacketSize, false);
 			}
-			case EPacketType::S_ADD_PLAYER:
+			else
 			{
-				FAddPlayerPacket* AddPlayerPacket = reinterpret_cast<FAddPlayerPacket*>(PacketData.GetData());
-				AddPlayer(AddPlayerPacket->PlayerInfo, false);
-				break;
-			}
-			case EPacketType::S_REMOVE_PLAYER:
-			{
-				FLogoutPacket* RemovePlayerPacket = reinterpret_cast<FLogoutPacket*>(PacketData.GetData());
-				RemovePlayer(RemovePlayerPacket->PlayerID);
-				break;
-			}
-			case EPacketType::S_MOVE_PLAYER:
-			{
-				FMovePacket* MovePlayerPacket = reinterpret_cast<FMovePacket*>(PacketData.GetData());
-				UpdatePlayer(MovePlayerPacket->PlayerInfo);
-				break;
-			}
-			default:
-				UE_LOG(LogTemp, Warning, TEXT("Unknown Packet Type received."));
 				break;
 			}
 		}
 	}
 }
+
 
 
 void UGPGameInstance::AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer)
