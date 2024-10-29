@@ -14,10 +14,16 @@ void UGPGameInstance::Init()
 {
 	Super::Init();
 	ConnectToServer();
+
+	if (Socket && Socket->GetConnectionState() == SCS_Connected)
+	{
+		StartSendingMovePacket();
+	}
 }
 
 void UGPGameInstance::Shutdown()
 {
+	StopSendingMovePacket();
 	DisconnectFromServer();
 	Super::Shutdown();
 }
@@ -157,8 +163,6 @@ void UGPGameInstance::ProcessPacket()
 	}
 }
 
-
-
 void UGPGameInstance::AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer)
 {
 	auto* World = GetWorld();
@@ -216,4 +220,14 @@ void UGPGameInstance::UpdatePlayer(FPlayerInfo& PlayerInfo)
 		UE_LOG(LogTemp, Warning, TEXT("Update other player [%d] (%f,%f,%f)(%f)"),
 			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 	}
+}
+
+void UGPGameInstance::StartSendingMovePacket()
+{
+	GetWorld()->GetTimerManager().SetTimer(PlayerUpdateTimerHandle, this, &UGPGameInstance::SendPlayerMovePacket, 1.0f, true);
+}
+
+void UGPGameInstance::StopSendingMovePacket()
+{
+	GetWorld()->GetTimerManager().ClearTimer(PlayerUpdateTimerHandle);
 }

@@ -33,6 +33,14 @@ public :
 	void AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer);
 	void RemovePlayer(int32 PlayerID);
 	void UpdatePlayer(FPlayerInfo& PlayerInfo);
+
+// 1초마다 서버에게 플레이어의 정보를 send 하는 기능
+public :
+	void StartSendingMovePacket();
+	void StopSendingMovePacket();
+
+	FTimerHandle PlayerUpdateTimerHandle;
+
 public :
 	class FSocket* Socket;
 	FString IpAddress = TEXT("127.0.0.1");
