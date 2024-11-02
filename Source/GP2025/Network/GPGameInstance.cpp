@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Network/GPGameInstance.h"
-#include "GPRecvThread.h"
 
 #include "Sockets.h"
 #include "Common/TcpSocketBuilder.h"
@@ -48,7 +47,6 @@ void UGPGameInstance::ConnectToServer()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Connection Success")));
 		SendPlayerLoginPacket();
-		RecvThread = MakeShared<GPRecvThread>(Socket);
 	}
 	else
 	{
@@ -58,11 +56,6 @@ void UGPGameInstance::ConnectToServer()
 
 void UGPGameInstance::DisconnectFromServer()
 {
-	if (RecvThread)
-	{
-		RecvThread->Destroy();
-	}
-
 	if (Socket)
 	{
 		this->SendPlayerLogoutPacket();
@@ -106,9 +99,27 @@ void UGPGameInstance::SendPlayerMovePacket()
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FMovePacket), BytesSent);
 }
 
+void UGPGameInstance::ReceiveData()
+{
+	uint32 DataSize;
+	if (Socket->HasPendingData(DataSize))
+	{
+		TArray<uint8> RecvData;
+		RecvData.SetNumUninitialized(FMath::Min(DataSize, 65507u));
+
+		int32 BytesRead = 0;
+		Socket->Recv(RecvData.GetData(), RecvData.Num(), BytesRead);
+
+		if (BytesRead > 0)
+		{
+			RecvQueue.Enqueue(RecvData);
+		}
+	}
+}
+
 void UGPGameInstance::ProcessPacket()
 {
-	static TArray<uint8> RemainingData;
+	ReceiveData();
 
 	TArray<uint8> PacketData;
 

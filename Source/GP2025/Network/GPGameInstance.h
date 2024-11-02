@@ -28,6 +28,7 @@ public :
 	void SendPlayerLogoutPacket();
 	void SendPlayerMovePacket();
 	
+	void ReceiveData();
 	void ProcessPacket();
 
 	void AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer);
@@ -53,5 +54,6 @@ public :
 	AGPCharacterBase* MyPlayer;
 	TMap<int32, AGPCharacterBase* > Players;
 	
+	TArray<uint8> RemainingData;
 	TQueue<TArray<uint8>, EQueueMode::Mpsc> RecvQueue;
 };
