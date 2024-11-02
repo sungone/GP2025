@@ -20,9 +20,6 @@ public:
 
 	void SetPlayerInfo(FPlayerInfo& PlayerInfo_);
 
-	void SetAnimVar();
-
 public:
 	FPlayerInfo PlayerInfo;
-	FPlayerInfo PrevPlayerInfo;
 };
