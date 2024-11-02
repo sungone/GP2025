@@ -61,53 +61,31 @@ void AGPCharacterBase::Tick(float DeltaTime)
 		return;
 	}
 
-	FVector CurrentLocation = GetActorLocation();
-	FRotator CurrentRotation = GetActorRotation();
+	FVector Location = GetActorLocation();
+	FVector DestLocation = FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z);
 
-	if (DeltaTime > 0)
-	{
-		// 이전 위치와 현재 위치의 차이를 이용해 Velocity 계산
-		FVector CalculatedVelocity = (CurrentLocation - PreviousLocation) / DeltaTime;
-		float Speed = CalculatedVelocity.Size2D();
+	FVector MoveDir = (DestLocation - Location);
+	const float DistToDest = MoveDir.Length();
+	MoveDir.Normalize();
 
-		// 애니메이션 인스턴스에 Velocity와 애니메이션 상태 업데이트
-		UGPPlayerAnimInstance* AnimInstance = Cast<UGPPlayerAnimInstance>(GetMesh()->GetAnimInstance());
-		if (AnimInstance)
-		{
-			AnimInstance->Velocity = CalculatedVelocity;
-			AnimInstance->GroundSpeed = Speed;
-			AnimInstance->bIsIdle = Speed < AnimInstance->MovingThreshould;
+	float MoveDist = (MoveDir * 600.f * DeltaTime).Length();
+	MoveDist = FMath::Min(MoveDist, DistToDest);
+	FVector NextLocation = Location + MoveDir * MoveDist;
 
-			// 원격 캐릭터를 부드럽게 목표 위치로 이동
-			float InterpSpeed = FMath::Max(Speed, 300.f); // 최소 속도 설정 (300.0f 이상인 경우만 반영)
-			FVector NewCalculatedLocation = FMath::VInterpConstantTo(CurrentLocation, NewLocation, DeltaTime, InterpSpeed);
-			FRotator NewCalculatedRotation = FMath::RInterpTo(CurrentRotation, NewRotation, DeltaTime, 5.0f);
+	SetActorLocation(NextLocation);
 
-			SetActorLocation(NewCalculatedLocation);
-			SetActorRotation(NewCalculatedRotation);
+	FRotator Rotation = GetActorRotation();
+	Rotation.Yaw = PlayerInfo.Yaw;
 
-			
-		}
-
-		PreviousLocation = CurrentLocation;
-	}
+	SetActorRotation(Rotation);
 }
-
 
 void AGPCharacterBase::SetPlayerInfo(FPlayerInfo& PlayerInfo_)
 {
 	PlayerInfo = PlayerInfo_;
 
-	SetPlayerLocationAndRotation(PlayerInfo);
-
 	UE_LOG(LogTemp, Warning, TEXT("Set PlayerInfo[%d] (%f,%f,%f)(%f)"),
 		PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 }
 
-void AGPCharacterBase::SetPlayerLocationAndRotation(FPlayerInfo& PlayerInfo_)
-{
-	PlayerInfo = PlayerInfo_;
 
-	NewLocation = FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z);
-	NewRotation = FRotator(0, PlayerInfo.Yaw, 0);
-}

@@ -19,13 +19,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void SetPlayerInfo(FPlayerInfo& PlayerInfo_);
-	void SetPlayerLocationAndRotation(FPlayerInfo& PlayerInfo_);
 
 public:
 	FPlayerInfo PlayerInfo;
-	FVector PreviousLocation;
-
-// 서버에서 새로 받은 위치 정보들 - 다른 클라이언트들을 움직이기 위해 사용
-	FVector NewLocation;
-	FRotator NewRotation;
 };
