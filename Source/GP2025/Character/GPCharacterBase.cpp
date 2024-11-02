@@ -61,12 +61,17 @@ void AGPCharacterBase::Tick(float DeltaTime)
 		return;
 	}
 
+	// 위치 회전 동기화 / 위치 보간
 	FVector Location = GetActorLocation();
 	FVector DestLocation = FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z);
 
 	FVector MoveDir = (DestLocation - Location);
 	const float DistToDest = MoveDir.Length();
 	MoveDir.Normalize();
+
+	// 목표 위치까지의 평균 속도 계산 (1초 동안 일정하게 이동)
+	FVector AverageVelocity = MoveDir / 1.0f;  // 1초 동안 이동할 위치를 기준으로 평균 속도 설정
+	float GroundSpeed = AverageVelocity.Size(); // 속력 계산
 
 	float MoveDist = (MoveDir * 600.f * DeltaTime).Length();
 	MoveDist = FMath::Min(MoveDist, DistToDest);
@@ -78,14 +83,53 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	Rotation.Yaw = PlayerInfo.Yaw;
 
 	SetActorRotation(Rotation);
+
 }
 
 void AGPCharacterBase::SetPlayerInfo(FPlayerInfo& PlayerInfo_)
 {
+	PrevPlayerInfo = PlayerInfo;
 	PlayerInfo = PlayerInfo_;
 
-	UE_LOG(LogTemp, Warning, TEXT("Set PlayerInfo[%d] (%f,%f,%f)(%f)"),
-		PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
+	SetAnimVar();
+	
+	UE_LOG(LogTemp, Warning, TEXT("Set PlayerInfo[%d] (%f,%f,%f)(%f) (%d)"),
+		PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw , PlayerInfo.State);
+}
+
+void AGPCharacterBase::SetAnimVar()
+{
+	FVector CurLocation = FVector(PrevPlayerInfo.X , PrevPlayerInfo.Y , PrevPlayerInfo.Z);
+
+	UE_LOG(LogTemp, Warning, TEXT(" CurLocation (%f %f %f)"),
+		CurLocation.X, CurLocation.Y, CurLocation.Z);
+
+	FVector DisLocation = FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z);
+
+	UE_LOG(LogTemp, Warning, TEXT(" DisLocation (%f %f %f)"),
+		DisLocation.X, DisLocation.Y, DisLocation.Z);
+
+	FVector Velocity = (DisLocation - CurLocation);
+
+	// 애니메이션 동기화
+	UGPPlayerAnimInstance* AnimInstance = Cast<UGPPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	if (AnimInstance)
+	{
+		if (PlayerInfo.State == STATE_IDLE)
+		{
+			AnimInstance->bIsIdle = true;
+			AnimInstance->GroundSpeed = 0;
+		}
+		else
+		{
+			AnimInstance->bIsIdle = false;
+			AnimInstance->Velocity = Velocity;
+			AnimInstance->GroundSpeed = Velocity.Size2D();
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("Set Other Player Animation (%f %f %f) (%f)"),
+			Velocity.X, Velocity.Y, Velocity.Z, Velocity.Size2D());
+	}
 }
 
 
