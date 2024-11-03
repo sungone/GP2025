@@ -123,6 +123,16 @@ void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
+	if (MovementVector.IsNearlyZero())
+	{
+		PlayerInfo.State = STATE_IDLE;
+		return;
+	}
+	else
+	{
+		PlayerInfo.State = STATE_WALK;
+	}
+
 	const FRotator Rotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);
 
@@ -163,9 +173,11 @@ void AGPCharacterPlayer::StopJumping()
 void AGPCharacterPlayer::StartSprinting()
 {
 	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+	PlayerInfo.State = STATE_RUN;
 }
 
 void AGPCharacterPlayer::StopSprinting()
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	PlayerInfo.State = STATE_WALK;
 }

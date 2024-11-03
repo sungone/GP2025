@@ -69,11 +69,25 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	const float DistToDest = MoveDir.Length();
 	MoveDir.Normalize();
 
-	FVector InterpolatedVelocity = MoveDir * 600.f; // 원하는 속도 (600.f)로 설정
-	InterpolatedVelocity = InterpolatedVelocity.GetClampedToMaxSize(DistToDest / DeltaTime);
-	GetCharacterMovement()->Velocity = InterpolatedVelocity;
+	float VelocitySpeed = 0;
 
-	float MoveDist = (MoveDir * 600.f * DeltaTime).Length();
+	if (PlayerInfo.State == STATE_IDLE)
+	{
+		VelocitySpeed = 0;
+	}
+	else if (PlayerInfo.State == STATE_WALK)
+	{
+		VelocitySpeed = 300;
+	}
+	else if (PlayerInfo.State == STATE_RUN)
+	{
+		VelocitySpeed = 900;
+	}
+
+	FVector Velocity = MoveDir * VelocitySpeed;
+	GetCharacterMovement()->Velocity = Velocity;
+
+	float MoveDist = (MoveDir * 300.f * DeltaTime).Length();
 	MoveDist = FMath::Min(MoveDist, DistToDest);
 	FVector NextLocation = Location + MoveDir * MoveDist;
 

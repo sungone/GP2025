@@ -235,7 +235,7 @@ void UGPGameInstance::UpdatePlayer(FPlayerInfo& PlayerInfo)
 
 void UGPGameInstance::StartSendingMovePacket()
 {
-	GetWorld()->GetTimerManager().SetTimer(PlayerUpdateTimerHandle, this, &UGPGameInstance::SendPlayerMovePacket, 1.0f, true);
+	GetWorld()->GetTimerManager().SetTimer(PlayerUpdateTimerHandle, this, &UGPGameInstance::SendPlayerMovePacket, 1.F, true);
 }
 
 void UGPGameInstance::StopSendingMovePacket()
