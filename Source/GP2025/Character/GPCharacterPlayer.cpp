@@ -123,16 +123,6 @@ void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	if (MovementVector.IsNearlyZero())
-	{
-		PlayerInfo.State = STATE_IDLE;
-		return;
-	}
-	else
-	{
-		PlayerInfo.State = STATE_WALK;
-	}
-
 	const FRotator Rotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);
 
@@ -150,6 +140,18 @@ void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 
 	PlayerInfo.SetVector(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
 	PlayerInfo.Yaw = DesiredRotation.Yaw;
+
+	// 움직임 상태 설정
+	if (MovementVector.IsNearlyZero())  // 움직임이 없을 때
+	{
+		PlayerInfo.RemoveState(STATE_WALK);  // WALK 상태 제거
+		PlayerInfo.AddState(STATE_IDLE);     // IDLE 상태 추가
+	}
+	else  // 움직임이 있을 때
+	{
+		PlayerInfo.RemoveState(STATE_IDLE);  // IDLE 상태 제거
+		PlayerInfo.AddState(STATE_WALK);     // WALK 상태 추가
+	}
 }
 
 void AGPCharacterPlayer::Look(const FInputActionValue& Value)
@@ -163,21 +165,25 @@ void AGPCharacterPlayer::Look(const FInputActionValue& Value)
 void AGPCharacterPlayer::Jump()
 {
 	Super::Jump();
+	PlayerInfo.AddState(STATE_JUMP);
 }
 
 void AGPCharacterPlayer::StopJumping()
 {
 	Super::StopJumping();
+	PlayerInfo.RemoveState(STATE_JUMP);
 }
 
 void AGPCharacterPlayer::StartSprinting()
 {
 	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
-	PlayerInfo.State = STATE_RUN;
+	PlayerInfo.RemoveState(STATE_WALK);
+	PlayerInfo.AddState(STATE_RUN);
 }
 
 void AGPCharacterPlayer::StopSprinting()
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-	PlayerInfo.State = STATE_WALK;
+	PlayerInfo.RemoveState(STATE_RUN);
+	PlayerInfo.AddState(STATE_WALK);
 }

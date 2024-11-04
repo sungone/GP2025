@@ -19,6 +19,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void SetPlayerInfo(FPlayerInfo& PlayerInfo_);
+	void SetPlayerInfoMessage();
 
 public:
 	FPlayerInfo PlayerInfo;

@@ -43,6 +43,10 @@ AGPCharacterBase::AGPCharacterBase()
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetCollisionProfileName(TEXT("CharacterMesh"));
+
+	{
+		PlayerInfo.AddState(STATE_IDLE);
+	}
 }
 
 void AGPCharacterBase::BeginPlay()
@@ -71,15 +75,15 @@ void AGPCharacterBase::Tick(float DeltaTime)
 
 	float VelocitySpeed = 0;
 
-	if (PlayerInfo.State == STATE_IDLE)
+	if (PlayerInfo.HasState(STATE_IDLE))
 	{
 		VelocitySpeed = 0;
 	}
-	else if (PlayerInfo.State == STATE_WALK)
+	else if (PlayerInfo.HasState(STATE_WALK))
 	{
 		VelocitySpeed = 300;
 	}
-	else if (PlayerInfo.State == STATE_RUN)
+	else if (PlayerInfo.HasState(STATE_RUN))
 	{
 		VelocitySpeed = 900;
 	}
@@ -102,8 +106,26 @@ void AGPCharacterBase::Tick(float DeltaTime)
 void AGPCharacterBase::SetPlayerInfo(FPlayerInfo& PlayerInfo_)
 {
 	PlayerInfo = PlayerInfo_;
-	
-	UE_LOG(LogTemp, Warning, TEXT("Set PlayerInfo[%d] (%f,%f,%f)(%f) (%d)"),
-		PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw , PlayerInfo.State);
+	SetPlayerInfoMessage();
+}
+
+void AGPCharacterBase::SetPlayerInfoMessage()
+{
+	FString StateString;
+
+	// 각 상태에 대해 설정 여부를 검사하고 문자열에 추가
+	if (PlayerInfo.State & STATE_IDLE) StateString += TEXT("IDLE ");
+	if (PlayerInfo.State & STATE_WALK) StateString += TEXT("WALK ");
+	if (PlayerInfo.State & STATE_RUN) StateString += TEXT("RUN ");
+	if (PlayerInfo.State & STATE_JUMP) StateString += TEXT("JUMP ");
+
+	// 비트가 모두 설정되지 않았을 경우
+	if (StateString.IsEmpty())
+	{
+		StateString = TEXT("NONE");
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Set PlayerInfo[%d] (%f, %f, %f)(%f) (%s)"),
+		PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw, *StateString);
 }
 

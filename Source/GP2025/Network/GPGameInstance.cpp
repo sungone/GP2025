@@ -88,6 +88,11 @@ void UGPGameInstance::SendPlayerLogoutPacket()
 
 void UGPGameInstance::SendPlayerMovePacket()
 {
+	if (MyPlayer->PlayerInfo.HasState(STATE_IDLE))
+	{
+		return;
+	}
+
 	FMovePacket Packet;
 	Packet.Header.PacketType = EPacketType::C_MOVE;
 	Packet.Header.PacketSize = sizeof(FMovePacket);
