@@ -40,6 +40,7 @@ void Session::process_packet(char* packet)
 	{
 		FMovePacket* p = reinterpret_cast<FMovePacket*>(packet);
 		memcpy(&clients[recv_id].info, &(p->PlayerInfo), sizeof(FPlayerInfo));
+
 		std::cout << "<- Recv:: Move Packet[" << recv_id << "] ("
 			<< clients[recv_id].info.X << ", "
 			<< clients[recv_id].info.Y << ", "

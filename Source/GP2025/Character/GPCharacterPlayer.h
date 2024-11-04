@@ -28,6 +28,7 @@ public :
 
 protected :
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void SetCharacterControl(ECharacterPlayerControlType NewCharacterPlayerControlType);
@@ -69,4 +70,7 @@ protected :
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
 	float SprintSpeed = 1500.f;
+
+public :
+	FVector LastLocation;
 };

@@ -61,6 +61,8 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 		CharacterPlayerControlManager.Add(ECharacterPlayerControlType::Default, DefaultDataRef.Object);
 	}
 
+	////
+	LastLocation = GetActorLocation();
 }
 
 void AGPCharacterPlayer::BeginPlay()
@@ -72,6 +74,32 @@ void AGPCharacterPlayer::BeginPlay()
 		GameInstance->MyPlayer = this;
 		GameInstance->OtherPlayerClass = AGPCharacterBase::StaticClass();
 	}
+}
+
+void AGPCharacterPlayer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	// 현재 위치 가져오기
+	FVector CurrentLocation = GetActorLocation();
+
+	// 위치 변화량 계산
+	float DistanceMoved = FVector::DistSquared(CurrentLocation, LastLocation);
+
+	// 움직임 상태 설정 (임계값 0.01f를 기준으로 설정)
+	if (DistanceMoved < 0.01f)  // 움직임이 거의 없을 때
+	{
+		PlayerInfo.RemoveState(STATE_WALK);
+		PlayerInfo.AddState(STATE_IDLE);
+	}
+	else  // 움직임이 있을 때
+	{
+		PlayerInfo.RemoveState(STATE_IDLE);
+		PlayerInfo.AddState(STATE_WALK);
+	}
+
+	// 현재 위치를 LastLocation에 저장하여 다음 Tick에서 비교
+	LastLocation = CurrentLocation;
 }
 
 void AGPCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -123,6 +151,21 @@ void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
+	// MovementVector 크기 출력
+	UE_LOG(LogTemp, Warning, TEXT("Movement Vector Size: %f"), MovementVector.Size());
+
+	// 움직임 상태 설정
+	if (MovementVector.SizeSquared() < 0.01f)  // 움직임 벡터의 크기가 0.01f 미만일 때
+	{
+		PlayerInfo.RemoveState(STATE_WALK);  // WALK 상태 제거
+		PlayerInfo.AddState(STATE_IDLE);     // IDLE 상태 추가
+	}
+	else  // 움직임이 있을 때
+	{
+		PlayerInfo.RemoveState(STATE_IDLE);  // IDLE 상태 제거
+		PlayerInfo.AddState(STATE_WALK);     // WALK 상태 추가
+	}
+
 	const FRotator Rotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);
 
@@ -140,18 +183,6 @@ void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 
 	PlayerInfo.SetVector(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
 	PlayerInfo.Yaw = DesiredRotation.Yaw;
-
-	// 움직임 상태 설정
-	if (MovementVector.IsNearlyZero())  // 움직임이 없을 때
-	{
-		PlayerInfo.RemoveState(STATE_WALK);  // WALK 상태 제거
-		PlayerInfo.AddState(STATE_IDLE);     // IDLE 상태 추가
-	}
-	else  // 움직임이 있을 때
-	{
-		PlayerInfo.RemoveState(STATE_IDLE);  // IDLE 상태 제거
-		PlayerInfo.AddState(STATE_WALK);     // WALK 상태 추가
-	}
 }
 
 void AGPCharacterPlayer::Look(const FInputActionValue& Value)
