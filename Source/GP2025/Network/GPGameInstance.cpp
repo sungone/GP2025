@@ -192,6 +192,8 @@ void UGPGameInstance::AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer)
 			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 
 		MyPlayer->SetPlayerInfo(PlayerInfo);
+		MyPlayer->SetActorLocation(FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z));
+		
 		Players.Add(PlayerInfo.ID, MyPlayer);
 	}
 	else
@@ -206,6 +208,8 @@ void UGPGameInstance::AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer)
 			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 
 		Player->SetPlayerInfo(PlayerInfo);
+		Player->SetActorLocation(FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z));
+		
 		Players.Add(PlayerInfo.ID, Player);
 	}
 }
