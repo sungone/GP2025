@@ -60,9 +60,6 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 	{
 		CharacterPlayerControlManager.Add(ECharacterPlayerControlType::Default, DefaultDataRef.Object);
 	}
-
-	////
-	LastLocation = GetActorLocation();
 }
 
 void AGPCharacterPlayer::BeginPlay()
@@ -98,8 +95,7 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 		PlayerInfo.AddState(STATE_WALK);
 	}
 
-	// 현재 위치를 LastLocation에 저장하여 다음 Tick에서 비교
-	LastLocation = CurrentLocation;
+	PlayerInfo.Speed = GetVelocity().Size2D();
 }
 
 void AGPCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -150,9 +146,6 @@ void AGPCharacterPlayer::SetCharacterControlData(const UGPCharacterPlayerControl
 void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	// MovementVector 크기 출력
-	UE_LOG(LogTemp, Warning, TEXT("Movement Vector Size: %f"), MovementVector.Size());
 
 	// 움직임 상태 설정
 	if (MovementVector.SizeSquared() < 0.01f)  // 움직임 벡터의 크기가 0.01f 미만일 때

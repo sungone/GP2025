@@ -58,44 +58,37 @@ void AGPCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// 현재 플레이어가 로컬 플레이어 인지 확인
+	// 현재 플레이어가 로컬 플레이어이면 return
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 	if (GameInstance && GameInstance->MyPlayer == this)
 	{
 		return;
 	}
 
+	UGPPlayerAnimInstance* AnimInstance = Cast<UGPPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	if (!AnimInstance)
+		return;
+
 	// 위치 회전 동기화 / 위치 보간
 	FVector Location = GetActorLocation();
 	FVector DestLocation = FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z);
+
+	float Speed = PlayerInfo.Speed;
+
+	UE_LOG(LogTemp, Warning, TEXT("Ground Speed :  (%f)"),
+		Speed);
 
 	FVector MoveDir = (DestLocation - Location);
 	const float DistToDest = MoveDir.Length();
 	MoveDir.Normalize();
 
-	float VelocitySpeed = 0;
-
-	if (PlayerInfo.HasState(STATE_IDLE))
-	{
-		VelocitySpeed = 0;
-	}
-	else if (PlayerInfo.HasState(STATE_WALK))
-	{
-		VelocitySpeed = 300;
-	}
-	else if (PlayerInfo.HasState(STATE_RUN))
-	{
-		VelocitySpeed = 900;
-	}
-
-	FVector Velocity = MoveDir * VelocitySpeed;
-	GetCharacterMovement()->Velocity = Velocity;
-
-	float MoveDist = (MoveDir * 300.f * DeltaTime).Length();
+	float MoveDist = (MoveDir * Speed * DeltaTime).Length();
 	MoveDist = FMath::Min(MoveDist, DistToDest);
 	FVector NextLocation = Location + MoveDir * MoveDist;
 
 	SetActorLocation(NextLocation);
+
+	GetCharacterMovement()->Velocity = MoveDir * Speed;
 
 	FRotator Rotation = GetActorRotation();
 	Rotation.Yaw = PlayerInfo.Yaw;
