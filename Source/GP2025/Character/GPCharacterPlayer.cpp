@@ -77,6 +77,7 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
 	// 현재 위치 가져오기
 	FVector CurrentLocation = GetActorLocation();
 
@@ -96,6 +97,7 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 	}
 
 	PlayerInfo.Speed = GetVelocity().Size2D();
+	LastLocation = CurrentLocation;
 }
 
 void AGPCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -146,18 +148,6 @@ void AGPCharacterPlayer::SetCharacterControlData(const UGPCharacterPlayerControl
 void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	// 움직임 상태 설정
-	if (MovementVector.SizeSquared() < 0.01f)  // 움직임 벡터의 크기가 0.01f 미만일 때
-	{
-		PlayerInfo.RemoveState(STATE_WALK);  // WALK 상태 제거
-		PlayerInfo.AddState(STATE_IDLE);     // IDLE 상태 추가
-	}
-	else  // 움직임이 있을 때
-	{
-		PlayerInfo.RemoveState(STATE_IDLE);  // IDLE 상태 제거
-		PlayerInfo.AddState(STATE_WALK);     // WALK 상태 추가
-	}
 
 	const FRotator Rotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);

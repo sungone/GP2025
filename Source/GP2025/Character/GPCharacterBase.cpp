@@ -65,18 +65,11 @@ void AGPCharacterBase::Tick(float DeltaTime)
 		return;
 	}
 
-	UGPPlayerAnimInstance* AnimInstance = Cast<UGPPlayerAnimInstance>(GetMesh()->GetAnimInstance());
-	if (!AnimInstance)
-		return;
-
 	// 위치 회전 동기화 / 위치 보간
 	FVector Location = GetActorLocation();
 	FVector DestLocation = FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z);
 
 	float Speed = PlayerInfo.Speed;
-
-	UE_LOG(LogTemp, Warning, TEXT("Ground Speed :  (%f)"),
-		Speed);
 
 	FVector MoveDir = (DestLocation - Location);
 	const float DistToDest = MoveDir.Length();
@@ -99,6 +92,7 @@ void AGPCharacterBase::Tick(float DeltaTime)
 void AGPCharacterBase::SetPlayerInfo(FPlayerInfo& PlayerInfo_)
 {
 	PlayerInfo = PlayerInfo_;
+
 	SetPlayerInfoMessage();
 }
 
@@ -109,7 +103,7 @@ void AGPCharacterBase::SetPlayerInfoMessage()
 	// 각 상태에 대해 설정 여부를 검사하고 문자열에 추가
 	if (PlayerInfo.State & STATE_IDLE) StateString += TEXT("IDLE ");
 	if (PlayerInfo.State & STATE_WALK) StateString += TEXT("WALK ");
-	if (PlayerInfo.State & STATE_RUN) StateString += TEXT("RUN ");
+	if (PlayerInfo.State & !STATE_WALK) StateString += TEXT("RUN ");
 	if (PlayerInfo.State & STATE_JUMP) StateString += TEXT("JUMP ");
 
 	// 비트가 모두 설정되지 않았을 경우
@@ -121,4 +115,3 @@ void AGPCharacterBase::SetPlayerInfoMessage()
 	UE_LOG(LogTemp, Warning, TEXT("Set PlayerInfo[%d] (%f, %f, %f)(%f) (%s)"),
 		PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw, *StateString);
 }
-
