@@ -18,8 +18,7 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
-	void SetPlayerInfo(FPlayerInfo& PlayerInfo_);
-	void SetPlayerInfoMessage();
+	void SetClientInfoFromServer(FPlayerInfo& PlayerInfo_);
 
 public:
 	FPlayerInfo PlayerInfo;

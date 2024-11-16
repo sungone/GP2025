@@ -13,16 +13,10 @@ void UGPGameInstance::Init()
 {
 	Super::Init();
 	ConnectToServer();
-
-	if (Socket && Socket->GetConnectionState() == SCS_Connected)
-	{
-		StartSendingMovePacket();
-	}
 }
 
 void UGPGameInstance::Shutdown()
 {
-	StopSendingMovePacket();
 	DisconnectFromServer();
 	Super::Shutdown();
 }
@@ -88,11 +82,6 @@ void UGPGameInstance::SendPlayerLogoutPacket()
 
 void UGPGameInstance::SendPlayerMovePacket()
 {
-	if (MyPlayer->PlayerInfo.HasState(STATE_IDLE))
-	{
-		return;
-	}
-
 	FMovePacket Packet;
 	Packet.Header.PacketType = EPacketType::C_MOVE;
 	Packet.Header.PacketSize = sizeof(FMovePacket);
@@ -196,7 +185,7 @@ void UGPGameInstance::AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer)
 		UE_LOG(LogTemp, Warning, TEXT("Add my player [%d] (%f,%f,%f)(%f)"),
 			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 
-		MyPlayer->SetPlayerInfo(PlayerInfo);
+		MyPlayer->SetClientInfoFromServer(PlayerInfo);
 		MyPlayer->SetActorLocation(FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z));
 		
 		Players.Add(PlayerInfo.ID, MyPlayer);
@@ -212,7 +201,7 @@ void UGPGameInstance::AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer)
 		UE_LOG(LogTemp, Warning, TEXT("Add other player [%d] (%f,%f,%f)(%f)"),
 			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 
-		Player->SetPlayerInfo(PlayerInfo);
+		Player->SetClientInfoFromServer(PlayerInfo);
 		Player->SetActorLocation(FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z));
 		
 		Players.Add(PlayerInfo.ID, Player);
@@ -236,18 +225,8 @@ void UGPGameInstance::UpdatePlayer(FPlayerInfo& PlayerInfo)
 	auto Player = Players.Find(PlayerInfo.ID);
 	if (Player)
 	{
-		(*Player)->SetPlayerInfo(PlayerInfo);
+		(*Player)->SetClientInfoFromServer(PlayerInfo);
 		UE_LOG(LogTemp, Warning, TEXT("Update other player [%d] (%f,%f,%f)(%f)"),
 			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 	}
-}
-
-void UGPGameInstance::StartSendingMovePacket()
-{
-	GetWorld()->GetTimerManager().SetTimer(PlayerUpdateTimerHandle, this, &UGPGameInstance::SendPlayerMovePacket, 1.F, true);
-}
-
-void UGPGameInstance::StopSendingMovePacket()
-{
-	GetWorld()->GetTimerManager().ClearTimer(PlayerUpdateTimerHandle);
 }

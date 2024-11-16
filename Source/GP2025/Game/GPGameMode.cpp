@@ -23,7 +23,6 @@ AGPGameMode::AGPGameMode()
 	{
 		PlayerControllerClass = PlayerControllerClassRef.Class;
 	}
-
 }
 
 void AGPGameMode::Tick(float DeltaTime)

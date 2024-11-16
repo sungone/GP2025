@@ -61,57 +61,35 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	// 현재 플레이어가 로컬 플레이어이면 return
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 	if (GameInstance && GameInstance->MyPlayer == this)
-	{
 		return;
-	}
 
 	// 위치 회전 동기화 / 위치 보간
+	// 현재의 틱 위치와 서버에서 최근에 전송받은 위치를 FVector 에 저장
 	FVector Location = GetActorLocation();
 	FVector DestLocation = FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z);
 
-	float Speed = PlayerInfo.Speed;
-
+	// 이동해야 할 거리값을 DistToDest 에 저장
 	FVector MoveDir = (DestLocation - Location);
 	const float DistToDest = MoveDir.Length();
 	MoveDir.Normalize();
+
+	float Speed = PlayerInfo.Speed;
 
 	float MoveDist = (MoveDir * Speed * DeltaTime).Length();
 	MoveDist = FMath::Min(MoveDist, DistToDest);
 	FVector NextLocation = Location + MoveDir * MoveDist;
 
 	SetActorLocation(NextLocation);
-
 	GetCharacterMovement()->Velocity = MoveDir * Speed;
 
 	FRotator Rotation = GetActorRotation();
 	Rotation.Yaw = PlayerInfo.Yaw;
-
 	SetActorRotation(Rotation);
 }
 
-void AGPCharacterBase::SetPlayerInfo(FPlayerInfo& PlayerInfo_)
+void AGPCharacterBase::SetClientInfoFromServer(FPlayerInfo& PlayerInfo_)
 {
 	PlayerInfo = PlayerInfo_;
-
-	SetPlayerInfoMessage();
 }
 
-void AGPCharacterBase::SetPlayerInfoMessage()
-{
-	FString StateString;
 
-	// 각 상태에 대해 설정 여부를 검사하고 문자열에 추가
-	if (PlayerInfo.State & STATE_IDLE) StateString += TEXT("IDLE ");
-	if (PlayerInfo.State & STATE_WALK) StateString += TEXT("WALK ");
-	if (PlayerInfo.State & !STATE_WALK) StateString += TEXT("RUN ");
-	if (PlayerInfo.State & STATE_JUMP) StateString += TEXT("JUMP ");
-
-	// 비트가 모두 설정되지 않았을 경우
-	if (StateString.IsEmpty())
-	{
-		StateString = TEXT("NONE");
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Set PlayerInfo[%d] (%f, %f, %f)(%f) (%s)"),
-		PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw, *StateString);
-}

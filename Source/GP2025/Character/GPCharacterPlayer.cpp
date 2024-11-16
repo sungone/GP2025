@@ -71,21 +71,31 @@ void AGPCharacterPlayer::BeginPlay()
 		GameInstance->MyPlayer = this;
 		GameInstance->OtherPlayerClass = AGPCharacterBase::StaticClass();
 	}
+
+	LastLocation = GetActorLocation();
 }
 
 void AGPCharacterPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
+	if (!GameInstance)
+		return;
 
 	// 현재 위치 가져오기
 	FVector CurrentLocation = GetActorLocation();
+	float CurrentYaw = GetActorRotation().Yaw;
 
 	// 위치 변화량 계산
 	float DistanceMoved = FVector::DistSquared(CurrentLocation, LastLocation);
 
+	const float DistThreshold = 30.f;
+	const float YawThreshold = 0.1f;
+	bool bYawChanged = (FMath::Abs(CurrentYaw - PlayerInfo.Yaw) > YawThreshold);
+
 	// 움직임 상태 설정 (임계값 0.01f를 기준으로 설정)
-	if (DistanceMoved < 0.01f)  // 움직임이 거의 없을 때
+	if (DistanceMoved < 0.1f)  // 움직임이 거의 없을 때
 	{
 		PlayerInfo.RemoveState(STATE_WALK);
 		PlayerInfo.AddState(STATE_IDLE);
@@ -96,8 +106,34 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 		PlayerInfo.AddState(STATE_WALK);
 	}
 
-	PlayerInfo.Speed = GetVelocity().Size2D();
 	LastLocation = CurrentLocation;
+	PlayerInfo.Speed = GetVelocity().Size2D();
+
+	// **반영할 회전 값을 업데이트**
+	if (bYawChanged)
+	{
+		PlayerInfo.Yaw = CurrentYaw;  // 현재 Yaw 값으로 업데이트
+	}
+
+	if (DistanceMoved > DistThreshold)
+	{
+		PlayerInfo.X = CurrentLocation.X;
+		PlayerInfo.Y = CurrentLocation.Y;
+		PlayerInfo.Z = CurrentLocation.Z;
+	}
+
+	// 1초마다 플레이어 이동 패킷을 서버로 보냄
+	MovePacketSendTimer -= DeltaTime;
+
+	if (MovePacketSendTimer <= 0)
+	{
+		MovePacketSendTimer = 0.2;
+
+		if (!PlayerInfo.HasState(STATE_IDLE) || bYawChanged || DistanceMoved > DistThreshold)
+		{
+			GameInstance->SendPlayerMovePacket();
+		}
+	}
 }
 
 void AGPCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -112,7 +148,6 @@ void AGPCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::Look);
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::StartSprinting);
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AGPCharacterPlayer::StopSprinting);
-
 }
 
 void AGPCharacterPlayer::SetCharacterControl(ECharacterPlayerControlType NewCharacterPlayerControlType)
@@ -149,31 +184,36 @@ void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	const FRotator Rotation = Controller->GetControlRotation();
-	const FRotator YawRotation(0, Rotation.Yaw, 0);
+	if (Controller != nullptr)
+	{
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-	AddMovementInput(ForwardDirection, MovementVector.X);
-	AddMovementInput(RightDirection, MovementVector.Y);
+		AddMovementInput(ForwardDirection, MovementVector.X);
+		AddMovementInput(RightDirection, MovementVector.Y);
 
-	FVector CurrentLocation = GetActorLocation();
+		FVector DesiredMovementDirection = (ForwardDirection * MovementVector.X) + (RightDirection * MovementVector.Y);
+		DesiredMovementDirection.Z = 0;
+		FRotator DesiredRotation = DesiredMovementDirection.Rotation();
+		PlayerInfo.Yaw = DesiredRotation.Yaw;
 
-	FVector DesiredMovementDirection = (ForwardDirection * MovementVector.X) + (RightDirection * MovementVector.Y);
-	DesiredMovementDirection.Z = 0;
-	FRotator DesiredRotation = DesiredMovementDirection.Rotation();
-
-	PlayerInfo.SetVector(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
-	PlayerInfo.Yaw = DesiredRotation.Yaw;
+		FVector CurrentLocation = GetActorLocation();
+		PlayerInfo.SetVector(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
+	}
 }
 
 void AGPCharacterPlayer::Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
-	AddControllerYawInput(LookAxisVector.X);
-	AddControllerPitchInput(LookAxisVector.Y);
+	if (Controller != nullptr)
+	{
+		AddControllerYawInput(LookAxisVector.X);
+		AddControllerPitchInput(LookAxisVector.Y);
+	}
 }
 
 void AGPCharacterPlayer::Jump()
