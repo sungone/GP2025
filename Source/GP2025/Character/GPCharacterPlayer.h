@@ -73,6 +73,7 @@ protected :
 
 public :
 	FVector LastLocation;
+	FPlayerInfo LastSendPlayerInfo;
 
 public :
 	float MovePacketSendTimer = 0.2; // 서버와의 패킷 교환 시간

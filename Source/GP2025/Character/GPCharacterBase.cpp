@@ -85,6 +85,18 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	FRotator Rotation = GetActorRotation();
 	Rotation.Yaw = PlayerInfo.Yaw;
 	SetActorRotation(Rotation);
+
+	// 점프 상태 처리: MovementComponent 활용
+	if (PlayerInfo.HasState(STATE_JUMP))
+	{
+		// 점프 상태
+		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+	}
+	else if (!PlayerInfo.HasState(STATE_JUMP) && NextLocation.Z < 120.f)
+	{
+		// 착지 상태
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	}
 }
 
 void AGPCharacterBase::SetClientInfoFromServer(FPlayerInfo& PlayerInfo_)

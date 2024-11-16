@@ -73,6 +73,7 @@ void AGPCharacterPlayer::BeginPlay()
 	}
 
 	LastLocation = GetActorLocation();
+	LastSendPlayerInfo = PlayerInfo;
 }
 
 void AGPCharacterPlayer::Tick(float DeltaTime)
@@ -86,6 +87,12 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 	// 현재 위치 가져오기
 	FVector CurrentLocation = GetActorLocation();
 	float CurrentYaw = GetActorRotation().Yaw;
+
+	if (PlayerInfo.HasState(STATE_WALK))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Current Location (%f,%f,%f)"),
+			CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
+	}
 
 	// 위치 변화량 계산
 	float DistanceMoved = FVector::DistSquared(CurrentLocation, LastLocation);
@@ -106,10 +113,15 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 		PlayerInfo.AddState(STATE_WALK);
 	}
 
+	if (PlayerInfo.HasState(STATE_WALK))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CharacterPlayer State %d"),
+			PlayerInfo.State);
+	}
+
 	LastLocation = CurrentLocation;
 	PlayerInfo.Speed = GetVelocity().Size2D();
 
-	// **반영할 회전 값을 업데이트**
 	if (bYawChanged)
 	{
 		PlayerInfo.Yaw = CurrentYaw;  // 현재 Yaw 값으로 업데이트
@@ -133,6 +145,14 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 		{
 			GameInstance->SendPlayerMovePacket();
 		}
+
+		if (PlayerInfo.HasState(STATE_IDLE) && CurrentLocation.Z > 120.f)
+		{
+			PlayerInfo.Z = 115.7f;
+			GameInstance->SendPlayerMovePacket();
+		}
+
+		LastSendPlayerInfo = PlayerInfo;
 	}
 }
 
