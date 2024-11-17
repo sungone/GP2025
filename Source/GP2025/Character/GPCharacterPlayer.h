@@ -74,8 +74,8 @@ protected:
 public:
 	FVector LastLocation;
 	FPlayerInfo LastSendPlayerInfo;
-	bool isJump = false;
 
 public:
-	float MovePacketSendTimer = 0.2; // 서버와의 패킷 교환 시간
+	float MovePacketSendTimer = 0.25; // 서버와의 패킷 교환 시간
+	bool isJumpStart = false;
 };
