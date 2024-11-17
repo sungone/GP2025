@@ -87,6 +87,7 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 	// 현재 위치 가져오기
 	FVector CurrentLocation = GetActorLocation();
 	float CurrentYaw = GetActorRotation().Yaw;
+	PlayerInfo.Speed = GetVelocity().Size2D();
 
 	if (PlayerInfo.HasState(STATE_WALK))
 	{
@@ -95,14 +96,14 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 	}
 
 	// 위치 변화량 계산
-	float DistanceMoved = FVector::DistSquared(CurrentLocation, LastLocation);
-
 	const float DistThreshold = 30.f;
-	const float YawThreshold = 0.1f;
+	float DistanceMoved = FVector::DistSquared(CurrentLocation, LastLocation);
+	LastLocation = CurrentLocation;
+
+	const float YawThreshold = 10.f;
 	bool bYawChanged = (FMath::Abs(CurrentYaw - PlayerInfo.Yaw) > YawThreshold);
 
-	// 움직임 상태 설정 (임계값 0.01f를 기준으로 설정)
-	if (DistanceMoved < 0.1f)  // 움직임이 거의 없을 때
+	if (DistanceMoved < 0.01f)  // 움직임이 거의 없을 때
 	{
 		PlayerInfo.RemoveState(STATE_WALK);
 		PlayerInfo.AddState(STATE_IDLE);
@@ -113,42 +114,46 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 		PlayerInfo.AddState(STATE_WALK);
 	}
 
-	if (PlayerInfo.HasState(STATE_WALK))
+	if (PlayerInfo.HasState(STATE_IDLE) && bYawChanged)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("CharacterPlayer State %d"),
-			PlayerInfo.State);
+		PlayerInfo.Yaw = CurrentYaw;
+		GameInstance->SendPlayerMovePacket();
 	}
 
-	LastLocation = CurrentLocation;
-	PlayerInfo.Speed = GetVelocity().Size2D();
-
-	if (bYawChanged)
-	{
-		PlayerInfo.Yaw = CurrentYaw;  // 현재 Yaw 값으로 업데이트
-	}
-
-	if (DistanceMoved > DistThreshold)
+	if (PlayerInfo.HasState(STATE_IDLE) && DistanceMoved > DistThreshold)
 	{
 		PlayerInfo.X = CurrentLocation.X;
 		PlayerInfo.Y = CurrentLocation.Y;
 		PlayerInfo.Z = CurrentLocation.Z;
+		GameInstance->SendPlayerMovePacket();
 	}
+
+	if (PlayerInfo.HasState(STATE_IDLE) && !PlayerInfo.HasState(STATE_JUMP) && isJump == true)
+	{
+		PlayerInfo.Z = 115.7f;
+		PlayerInfo.Speed = LastSendPlayerInfo.Speed;
+		GameInstance->SendPlayerMovePacket();
+		isJump = false;
+	}
+
+	// 제자리 점프 시 점프 적용 안됨..
 
 	// 1초마다 플레이어 이동 패킷을 서버로 보냄
 	MovePacketSendTimer -= DeltaTime;
+
+	if (PlayerInfo.HasState(STATE_JUMP))
+	{
+		GameInstance->SendPlayerMovePacket();
+		LastSendPlayerInfo = PlayerInfo;
+		return;
+	}
 
 	if (MovePacketSendTimer <= 0)
 	{
 		MovePacketSendTimer = 0.2;
 
-		if (!PlayerInfo.HasState(STATE_IDLE) || bYawChanged || DistanceMoved > DistThreshold)
+		if (!PlayerInfo.HasState(STATE_IDLE))
 		{
-			GameInstance->SendPlayerMovePacket();
-		}
-
-		if (PlayerInfo.HasState(STATE_IDLE) && CurrentLocation.Z > 120.f)
-		{
-			PlayerInfo.Z = 115.7f;
 			GameInstance->SendPlayerMovePacket();
 		}
 
@@ -240,6 +245,7 @@ void AGPCharacterPlayer::Jump()
 {
 	Super::Jump();
 	PlayerInfo.AddState(STATE_JUMP);
+	isJump = true;
 }
 
 void AGPCharacterPlayer::StopJumping()

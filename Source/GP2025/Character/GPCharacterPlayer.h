@@ -8,7 +8,7 @@
 #include "GPCharacterPlayer.generated.h"
 
 /**
- * 
+ *
  */
 
 UENUM()
@@ -23,10 +23,10 @@ class GP2025_API AGPCharacterPlayer : public AGPCharacterBase
 {
 	GENERATED_BODY()
 
-public :
+public:
 	AGPCharacterPlayer();
 
-protected :
+protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -41,16 +41,16 @@ protected :
 	void StartSprinting();
 	void StopSprinting();
 
-	UPROPERTY(EditAnywhere , Category = "CharacterControl" , Meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "CharacterControl", Meta = (AllowPrivateAccess = "true"))
 	TMap<ECharacterPlayerControlType, class UGPCharacterPlayerControlData*> CharacterPlayerControlManager;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera" , Meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USpringArmComponent> CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UCameraComponent> FollowCamera;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input" , Meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputMappingContext> DefaultMappingContext;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
@@ -71,10 +71,11 @@ protected :
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
 	float SprintSpeed = 1500.f;
 
-public :
+public:
 	FVector LastLocation;
 	FPlayerInfo LastSendPlayerInfo;
+	bool isJump = false;
 
-public :
+public:
 	float MovePacketSendTimer = 0.2; // 서버와의 패킷 교환 시간
 };
