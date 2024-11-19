@@ -37,7 +37,7 @@ struct FPlayerInfo
     float Speed;
     uint32_t State;  // 비트 플래그로 사용할 수 있도록 uint32_t로 변경
 
-    void SetVector(float X_, float Y_, float Z_)
+    void SetLocation(float X_, float Y_, float Z_)
     {
         X = X_;
         Y = Y_;

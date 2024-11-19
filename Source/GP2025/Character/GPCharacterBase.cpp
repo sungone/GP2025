@@ -89,14 +89,15 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	// 점프 상태 처리: MovementComponent 활용
 	if (PlayerInfo.HasState(STATE_JUMP))
 	{
-		// 점프 상태
 		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 	}
 	else if (!PlayerInfo.HasState(STATE_JUMP) && NextLocation.Z < 120.f)
 	{
-		// 착지 상태
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	}
+
+	if(!PlayerInfo.HasState(STATE_IDLE))
+		UE_LOG(LogTemp, Warning, TEXT("DistToDest : %f, MoveDist : %f, Speed : %f"), DistToDest , MoveDist , Speed);
 }
 
 void AGPCharacterBase::SetClientInfoFromServer(FPlayerInfo& PlayerInfo_)

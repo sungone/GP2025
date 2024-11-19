@@ -13,7 +13,7 @@
 
 AGPCharacterPlayer::AGPCharacterPlayer()
 {
-	// Camera 
+	// Camera Setting
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 400.f;
@@ -23,7 +23,7 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
-	// Input
+	// Input Setting
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/PlayerInput/IMC_PlayerIMC.IMC_PlayerIMC'"));
 	if (nullptr != InputMappingContextRef.Object)
 	{
@@ -66,13 +66,16 @@ void AGPCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	SetCharacterControl(ECharacterPlayerControlType::Default);
-	if (UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance()))
+
+	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
+	if (GameInstance)
 	{
 		GameInstance->MyPlayer = this;
 		GameInstance->OtherPlayerClass = AGPCharacterBase::StaticClass();
 	}
 
 	LastLocation = GetActorLocation();
+	LastRotationYaw = GetActorRotation().Yaw;
 	LastSendPlayerInfo = PlayerInfo;
 }
 
@@ -85,23 +88,24 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 		return;
 
 	FVector CurrentLocation = GetActorLocation();
-	float CurrentYaw = GetActorRotation().Yaw;
+	float CurrentRotationYaw = GetActorRotation().Yaw;
 
-	PlayerInfo.SetVector(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
-	PlayerInfo.Yaw = CurrentYaw;
+	PlayerInfo.SetLocation(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
+	PlayerInfo.Yaw = CurrentRotationYaw;
 	PlayerInfo.Speed = GetVelocity().Size();
 
 	const float DistThreshold = 30.f;
 	float DistanceMoved = FVector::DistSquared(CurrentLocation, LastLocation);
 	LastLocation = CurrentLocation;
 
-	const float YawThreshold = 10.f;
-	bool bYawChanged = (FMath::Abs(CurrentYaw - PlayerInfo.Yaw) > YawThreshold);
+	const float YawThreshold = 30.f;
+	bool bYawChanged = (FMath::Abs(CurrentRotationYaw - LastRotationYaw) > YawThreshold);
+	LastRotationYaw = CurrentRotationYaw;
 
-	const float DistThresholdZ = 5.f;
-	float DistanceMovedZ = FMath::Abs(CurrentLocation.Z - LastLocation.Z);
+	const float IDLEThreshold = 0.1f;
 
-	if (DistanceMoved >= 0.01f || DistanceMovedZ > DistThresholdZ)
+	// Update IDLE - WALK
+	if (DistanceMoved >= IDLEThreshold)
 	{
 		PlayerInfo.RemoveState(STATE_IDLE);
 		PlayerInfo.AddState(STATE_WALK);
@@ -112,41 +116,65 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 		PlayerInfo.AddState(STATE_IDLE);
 	}
 
-	if (PlayerInfo.HasState(STATE_IDLE) && bYawChanged)
+	// Update Player Rotation Yaw
+	if (bYawChanged && PlayerInfo.HasState(STATE_IDLE))
 	{
-		PlayerInfo.Yaw = CurrentYaw;
+		UE_LOG(LogTemp, Warning, TEXT("correction of RotationYaw"));
+		PlayerInfo.Yaw = CurrentRotationYaw;
 		GameInstance->SendPlayerMovePacket();
 		LastSendPlayerInfo = PlayerInfo;
 		return;
 	}
 
-	if (PlayerInfo.HasState(STATE_IDLE) && DistanceMoved > DistThreshold)
+	// 위차 오차 보정
+	if (DistanceMoved > DistThreshold && PlayerInfo.HasState(STATE_IDLE))
 	{
 		PlayerInfo.X = CurrentLocation.X;
 		PlayerInfo.Y = CurrentLocation.Y;
 		PlayerInfo.Z = CurrentLocation.Z;
-		PlayerInfo.Yaw = CurrentYaw;
+		PlayerInfo.Yaw = CurrentRotationYaw;
 
-		PlayerInfo.Speed = 300.f;
+		if (LastSendPlayerInfo.HasState(STATE_RUN))
+		{
+			PlayerInfo.Speed = SprintSpeed;
+		}
+		else
+		{
+			PlayerInfo.Speed = WalkSpeed;
+		}
 
+		UE_LOG(LogTemp, Warning, TEXT("correction of movement"));
+		
 		GameInstance->SendPlayerMovePacket();
 		LastSendPlayerInfo = PlayerInfo;
 		return;
 	}
 
-	// 점프 시작 시 패킷을 보냄
+	// 점프 시작
 	if (isJumpStart)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Start Jump"));
 		isJumpStart = false;
 		GameInstance->SendPlayerMovePacket();
 		LastSendPlayerInfo = PlayerInfo;
 		return;
 	}
 
+	// 점프가 끝나도 클라이언트가 공중에 있을 때 처리
 	if (PlayerInfo.HasState(STATE_IDLE) && !PlayerInfo.HasState(STATE_JUMP) && LastSendPlayerInfo.Z > 120.f)
 	{
-		PlayerInfo.Z = 115.7f;
-		PlayerInfo.Speed = 300.f;
+		UE_LOG(LogTemp, Warning, TEXT("correction of ZLocation"));
+		PlayerInfo.Z = GroundZLocation;
+
+		if (LastSendPlayerInfo.HasState(STATE_RUN))
+		{
+			PlayerInfo.Speed = SprintSpeed;
+		}
+		else
+		{
+			PlayerInfo.Speed = WalkSpeed;
+		}
+
 		GameInstance->SendPlayerMovePacket();
 		LastSendPlayerInfo = PlayerInfo;
 		return;
@@ -156,20 +184,21 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 
 	if (MovePacketSendTimer <= 0)
 	{
-		MovePacketSendTimer = 0.25;
+		MovePacketSendTimer = 0.5;
 
-		if ((!PlayerInfo.HasState(STATE_IDLE)) || (DistanceMoved >= 0.01f))
+		if ((!PlayerInfo.HasState(STATE_IDLE)) || (DistanceMoved >= IDLEThreshold))
 		{
 			GameInstance->SendPlayerMovePacket();
 		}
 
 		LastSendPlayerInfo = PlayerInfo;
 	}
-	else {
-		if ((PlayerInfo.HasState(STATE_IDLE)) && (DistanceMoved >= 0.01f))
+	else 
+	{
+		if ((PlayerInfo.HasState(STATE_IDLE)) && (DistanceMoved >= IDLEThreshold))
 		{
 			GameInstance->SendPlayerMovePacket();
-			MovePacketSendTimer = 0.25;
+			MovePacketSendTimer = 0.5;
 			LastSendPlayerInfo = PlayerInfo;
 		}
 	}
