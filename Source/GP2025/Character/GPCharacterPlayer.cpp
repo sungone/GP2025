@@ -85,8 +85,10 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 		return;
 
 	FVector CurrentLocation = GetActorLocation();
-	PlayerInfo.Z = CurrentLocation.Z;
 	float CurrentYaw = GetActorRotation().Yaw;
+
+	PlayerInfo.SetVector(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
+	PlayerInfo.Yaw = CurrentYaw;
 	PlayerInfo.Speed = GetVelocity().Size();
 
 	const float DistThreshold = 30.f;
@@ -224,13 +226,13 @@ void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 		AddMovementInput(ForwardDirection, MovementVector.X);
 		AddMovementInput(RightDirection, MovementVector.Y);
 
-		FVector DesiredMovementDirection = (ForwardDirection * MovementVector.X) + (RightDirection * MovementVector.Y);
-		DesiredMovementDirection.Z = 0;
-		FRotator DesiredRotation = DesiredMovementDirection.Rotation();
-		PlayerInfo.Yaw = DesiredRotation.Yaw;
+		//FVector DesiredMovementDirection = (ForwardDirection * MovementVector.X) + (RightDirection * MovementVector.Y);
+		//DesiredMovementDirection.Z = 0;
+		//FRotator DesiredRotation = DesiredMovementDirection.Rotation();
+		//PlayerInfo.Yaw = DesiredRotation.Yaw;
 
-		FVector CurrentLocation = GetActorLocation();
-		PlayerInfo.SetVector(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
+		//FVector CurrentLocation = GetActorLocation();
+		//PlayerInfo.SetVector(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
 	}
 }
 
