@@ -158,12 +158,20 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 	{
 		MovePacketSendTimer = 0.25;
 
-		if (!PlayerInfo.HasState(STATE_IDLE))
+		if ((!PlayerInfo.HasState(STATE_IDLE)) || (DistanceMoved >= 0.01f))
 		{
 			GameInstance->SendPlayerMovePacket();
 		}
 
 		LastSendPlayerInfo = PlayerInfo;
+	}
+	else {
+		if ((PlayerInfo.HasState(STATE_IDLE)) && (DistanceMoved >= 0.01f))
+		{
+			GameInstance->SendPlayerMovePacket();
+			MovePacketSendTimer = 0.25;
+			LastSendPlayerInfo = PlayerInfo;
+		}
 	}
 }
 
