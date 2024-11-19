@@ -85,8 +85,9 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 		return;
 
 	FVector CurrentLocation = GetActorLocation();
+	PlayerInfo.Z = CurrentLocation.Z;
 	float CurrentYaw = GetActorRotation().Yaw;
-	PlayerInfo.Speed = GetVelocity().Size2D();
+	PlayerInfo.Speed = GetVelocity().Size();
 
 	const float DistThreshold = 30.f;
 	float DistanceMoved = FVector::DistSquared(CurrentLocation, LastLocation);
@@ -95,15 +96,18 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 	const float YawThreshold = 10.f;
 	bool bYawChanged = (FMath::Abs(CurrentYaw - PlayerInfo.Yaw) > YawThreshold);
 
-	if (DistanceMoved < 0.01f)
-	{
-		PlayerInfo.RemoveState(STATE_WALK);
-		PlayerInfo.AddState(STATE_IDLE);
-	}
-	else
+	const float DistThresholdZ = 5.f;
+	float DistanceMovedZ = FMath::Abs(CurrentLocation.Z - LastLocation.Z);
+
+	if (DistanceMoved >= 0.01f || DistanceMovedZ > DistThresholdZ)
 	{
 		PlayerInfo.RemoveState(STATE_IDLE);
 		PlayerInfo.AddState(STATE_WALK);
+	}
+	else
+	{
+		PlayerInfo.RemoveState(STATE_WALK);
+		PlayerInfo.AddState(STATE_IDLE);
 	}
 
 	if (PlayerInfo.HasState(STATE_IDLE) && bYawChanged)
@@ -145,8 +149,6 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 		LastSendPlayerInfo = PlayerInfo;
 		return;
 	}
-
-	// 0.5초마다 플레이어 이동 패킷을 서버로 보냄
 
 	MovePacketSendTimer -= DeltaTime;
 
@@ -246,6 +248,7 @@ void AGPCharacterPlayer::Look(const FInputActionValue& Value)
 void AGPCharacterPlayer::Jump()
 {
 	Super::Jump();
+	PlayerInfo.RemoveState(STATE_IDLE);
 	PlayerInfo.AddState(STATE_JUMP);
 	isJumpStart = true;
 }
