@@ -58,46 +58,46 @@ void AGPCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// 현재 플레이어가 로컬 플레이어이면 return
+	// 내 플레이어의 위치를 설정하는 것이면 return
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 	if (GameInstance && GameInstance->MyPlayer == this)
 		return;
 
-	// 위치 회전 동기화 / 위치 보간
-	// 현재의 틱 위치와 서버에서 최근에 전송받은 위치를 FVector 에 저장
+	/// 미끄러지는 문제 해결하기 ///
+	{
+
+	}
+
+	/// Other Client 위치 및 회전 동기화 ///
 	FVector Location = GetActorLocation();
 	FVector DestLocation = FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z);
+	float Speed = PlayerInfo.Speed;
 
-	// 이동해야 할 거리값을 DistToDest 에 저장
 	FVector MoveDir = (DestLocation - Location);
 	const float DistToDest = MoveDir.Length();
 	MoveDir.Normalize();
-
-	float Speed = PlayerInfo.Speed;
 
 	float MoveDist = (MoveDir * Speed * DeltaTime).Length();
 	MoveDist = FMath::Min(MoveDist, DistToDest);
 	FVector NextLocation = Location + MoveDir * MoveDist;
 
-	SetActorLocation(NextLocation);
-	GetCharacterMovement()->Velocity = MoveDir * Speed;
-
 	FRotator Rotation = GetActorRotation();
 	Rotation.Yaw = PlayerInfo.Yaw;
-	SetActorRotation(Rotation);
 
-	// 점프 상태 처리: MovementComponent 활용
+	SetActorLocationAndRotation(NextLocation, Rotation);
+
+	/// Ohter Client 속도 동기화 ///
+	GetCharacterMovement()->Velocity = MoveDir * Speed;
+
+	/// Other Client 점프 동기화 ///
 	if (PlayerInfo.HasState(STATE_JUMP))
 	{
 		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 	}
-	else if (!PlayerInfo.HasState(STATE_JUMP) && NextLocation.Z < 120.f)
+	else if (!PlayerInfo.HasState(STATE_JUMP) && GetActorLocation().Z < 120.f)
 	{
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	}
-
-	if(!PlayerInfo.HasState(STATE_IDLE))
-		UE_LOG(LogTemp, Warning, TEXT("DistToDest : %f, MoveDist : %f, Speed : %f"), DistToDest , MoveDist , Speed);
 }
 
 void AGPCharacterBase::SetClientInfoFromServer(FPlayerInfo& PlayerInfo_)

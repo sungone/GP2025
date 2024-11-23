@@ -94,76 +94,48 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 	PlayerInfo.Yaw = CurrentRotationYaw;
 	PlayerInfo.Speed = GetVelocity().Size();
 
-	const float DistThreshold = 30.f;
 	float DistanceMoved = FVector::DistSquared(CurrentLocation, LastLocation);
 	LastLocation = CurrentLocation;
 
-	const float YawThreshold = 30.f;
+	const float YawThreshold = 10.f;
 	bool bYawChanged = (FMath::Abs(CurrentRotationYaw - LastRotationYaw) > YawThreshold);
 	LastRotationYaw = CurrentRotationYaw;
 
-	const float IDLEThreshold = 0.1f;
-
-	// Update IDLE - WALK
-	if (DistanceMoved >= IDLEThreshold)
+	// IDLE 상태인지 아닌지 판단 - IDLE 조건 1 : 이동 거리가 0.5cm 이하
+	const float NotMovedThreshold = 0.25f;
+	if (DistanceMoved >= NotMovedThreshold)
 	{
 		PlayerInfo.RemoveState(STATE_IDLE);
-		PlayerInfo.AddState(STATE_WALK);
 	}
 	else
 	{
-		PlayerInfo.RemoveState(STATE_WALK);
 		PlayerInfo.AddState(STATE_IDLE);
+		GameInstance->SendPlayerMovePacket();
+		LastSendPlayerInfo = PlayerInfo;
+		return;
 	}
 
-	// Update Player Rotation Yaw
+	// IDLE 상태에서 캐릭터의 회전이 변경되었을 때 패킷 전송
 	if (bYawChanged && PlayerInfo.HasState(STATE_IDLE))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("correction of RotationYaw"));
 		PlayerInfo.Yaw = CurrentRotationYaw;
 		GameInstance->SendPlayerMovePacket();
 		LastSendPlayerInfo = PlayerInfo;
 		return;
 	}
 
-	// 위차 오차 보정
-	if (DistanceMoved > DistThreshold && PlayerInfo.HasState(STATE_IDLE))
-	{
-		PlayerInfo.X = CurrentLocation.X;
-		PlayerInfo.Y = CurrentLocation.Y;
-		PlayerInfo.Z = CurrentLocation.Z;
-		PlayerInfo.Yaw = CurrentRotationYaw;
-
-		if (LastSendPlayerInfo.HasState(STATE_RUN))
-		{
-			PlayerInfo.Speed = SprintSpeed;
-		}
-		else
-		{
-			PlayerInfo.Speed = WalkSpeed;
-		}
-
-		UE_LOG(LogTemp, Warning, TEXT("correction of movement"));
-		
-		GameInstance->SendPlayerMovePacket();
-		LastSendPlayerInfo = PlayerInfo;
-		return;
-	}
-
-	// 점프 시작
+	// Jump() 시 패킷 전송
 	if (isJumpStart)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Start Jump"));
 		isJumpStart = false;
 		GameInstance->SendPlayerMovePacket();
 		LastSendPlayerInfo = PlayerInfo;
 		return;
 	}
 
-	// 점프가 끝나도 클라이언트가 공중에 있을 때 처리
+	// 점프 후 착지를 안하고 플레이어가 계속 공중에 떠 있다면 떨어뜨리기 위해 패킷 전송
 	if (PlayerInfo.HasState(STATE_IDLE) && !PlayerInfo.HasState(STATE_JUMP) && LastSendPlayerInfo.Z > 120.f)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("correction of ZLocation"));
 		PlayerInfo.Z = GroundZLocation;
 
 		if (LastSendPlayerInfo.HasState(STATE_RUN))
@@ -180,25 +152,24 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 		return;
 	}
 
+	// 일정 시간마다 서버에 패킷 전송
 	MovePacketSendTimer -= DeltaTime;
-
 	if (MovePacketSendTimer <= 0)
 	{
-		MovePacketSendTimer = 0.5;
+		MovePacketSendTimer = 0.25;
 
-		if ((!PlayerInfo.HasState(STATE_IDLE)) || (DistanceMoved >= IDLEThreshold))
+		if ((!PlayerInfo.HasState(STATE_IDLE)) || (DistanceMoved >= NotMovedThreshold))
 		{
 			GameInstance->SendPlayerMovePacket();
+			LastSendPlayerInfo = PlayerInfo;
 		}
-
-		LastSendPlayerInfo = PlayerInfo;
 	}
 	else 
 	{
-		if ((PlayerInfo.HasState(STATE_IDLE)) && (DistanceMoved >= IDLEThreshold))
+		if ((PlayerInfo.HasState(STATE_IDLE)) && (DistanceMoved >= NotMovedThreshold))
 		{
 			GameInstance->SendPlayerMovePacket();
-			MovePacketSendTimer = 0.5;
+			MovePacketSendTimer = 0.25;
 			LastSendPlayerInfo = PlayerInfo;
 		}
 	}
@@ -262,14 +233,6 @@ void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 
 		AddMovementInput(ForwardDirection, MovementVector.X);
 		AddMovementInput(RightDirection, MovementVector.Y);
-
-		//FVector DesiredMovementDirection = (ForwardDirection * MovementVector.X) + (RightDirection * MovementVector.Y);
-		//DesiredMovementDirection.Z = 0;
-		//FRotator DesiredRotation = DesiredMovementDirection.Rotation();
-		//PlayerInfo.Yaw = DesiredRotation.Yaw;
-
-		//FVector CurrentLocation = GetActorLocation();
-		//PlayerInfo.SetVector(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
 	}
 }
 
@@ -301,7 +264,6 @@ void AGPCharacterPlayer::StopJumping()
 void AGPCharacterPlayer::StartSprinting()
 {
 	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
-	PlayerInfo.RemoveState(STATE_WALK);
 	PlayerInfo.AddState(STATE_RUN);
 }
 
@@ -309,5 +271,4 @@ void AGPCharacterPlayer::StopSprinting()
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	PlayerInfo.RemoveState(STATE_RUN);
-	PlayerInfo.AddState(STATE_WALK);
 }

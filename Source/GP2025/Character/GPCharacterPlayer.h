@@ -77,7 +77,7 @@ public:
 	FPlayerInfo LastSendPlayerInfo;
 
 public:
-	float MovePacketSendTimer = 0.5; // 서버와의 패킷 교환 시간
+	float MovePacketSendTimer = 0.25; // 서버와의 패킷 교환 시간
 	float GroundZLocation = 115.7;
 	bool isJumpStart = false;
 	
