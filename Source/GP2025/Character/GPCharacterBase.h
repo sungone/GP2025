@@ -23,11 +23,12 @@ public:
 public:
 	FPlayerInfo PlayerInfo;
 
-
-// 기본 공격 애니메이션 몽타주 관련 코드
+// 기본 공격 애니메이션 및 공격 애니메이션 몽타주 코드
 public :
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	TObjectPtr<class UAnimMontage> AutoAttackActionMontage;
 
 	void ProcessAutoAttackCommand();
+	void OnAutoAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	bool bIsAutoAttacking = false;
 };

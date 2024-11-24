@@ -22,6 +22,12 @@ AGPCharacterBase::AGPCharacterBase()
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
 
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AutoAttackMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/PlayerAnimation/AM_SwordAttack.AM_SwordAttack'"));
+	if (AutoAttackMontageRef.Object)
+	{
+		AutoAttackActionMontage = AutoAttackMontageRef.Object;
+	}
+
 	// Pawn
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -109,10 +115,26 @@ void AGPCharacterBase::SetClientInfoFromServer(FPlayerInfo& PlayerInfo_)
 void AGPCharacterBase::ProcessAutoAttackCommand()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (!AnimInstance)
+	if (!AnimInstance || !AutoAttackActionMontage)
 		return;
 
+	if (AnimInstance->Montage_IsPlaying(AutoAttackActionMontage))
+		return;
+
+	bIsAutoAttacking = true;
+
+	FOnMontageEnded MontageEndedDelegate;
+	MontageEndedDelegate.BindUObject(this, &AGPCharacterBase::OnAutoAttackMontageEnded);
 	AnimInstance->Montage_Play(AutoAttackActionMontage , 1.f);
+	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, AutoAttackActionMontage);
+}
+
+void AGPCharacterBase::OnAutoAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (Montage == AutoAttackActionMontage)
+	{
+		bIsAutoAttacking = false;
+	}
 }
 
 

@@ -283,5 +283,5 @@ void AGPCharacterPlayer::StopSprinting()
 
 void AGPCharacterPlayer::AutoAttack()
 {
-
+	ProcessAutoAttackCommand();
 }
