@@ -87,10 +87,23 @@ void UGPGameInstance::SendPlayerMovePacket()
 	Packet.Header.PacketSize = sizeof(FMovePacket);
 	Packet.PlayerInfo = MyPlayer->PlayerInfo;
 	int32 BytesSent = 0;
-	UE_LOG(LogTemp, Warning, TEXT("Send [%d] (%f,%f,%f)"),
+	UE_LOG(LogTemp, Warning, TEXT("SendPlayerMovePacket : Send [%d] (%f,%f,%f)"),
 		Packet.PlayerInfo.ID, Packet.PlayerInfo.X, Packet.PlayerInfo.Y, Packet.PlayerInfo.Z);
 
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FMovePacket), BytesSent);
+}
+
+void UGPGameInstance::sendPlayerAttackPacket()
+{
+	FAttackPacket Packet;
+	Packet.Header.PacketType = EPacketType::C_ATTACK;
+	Packet.Header.PacketSize = sizeof(FAttackPacket);
+	Packet.PlayerInfo = MyPlayer->PlayerInfo;
+	int32 BytesSent = 0;
+	UE_LOG(LogTemp, Log, TEXT("sendPlayerAttackPacket : Send [%d] (%f,%f,%f)"),
+		Packet.PlayerInfo.ID, Packet.PlayerInfo.X, Packet.PlayerInfo.Y, Packet.PlayerInfo.Z);
+
+	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FAttackPacket), BytesSent);
 }
 
 void UGPGameInstance::ReceiveData()
@@ -151,6 +164,12 @@ void UGPGameInstance::ProcessPacket()
 				{
 					FMovePacket* MovePlayerPacket = reinterpret_cast<FMovePacket*>(RemainingData.GetData());
 					UpdatePlayer(MovePlayerPacket->PlayerInfo);
+					break;
+				}
+				case EPacketType::S_ATTACK_PLAYER :
+				{
+					FAttackPacket* AttackPlayerPacket = reinterpret_cast<FAttackPacket*>(RemainingData.GetData());
+					UpdatePlayer(AttackPlayerPacket->PlayerInfo);
 					break;
 				}
 				default:

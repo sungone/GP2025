@@ -27,6 +27,7 @@ public :
 	void SendPlayerLoginPacket();
 	void SendPlayerLogoutPacket();
 	void SendPlayerMovePacket();
+	void sendPlayerAttackPacket();
 	
 	void ReceiveData();
 	void ProcessPacket();

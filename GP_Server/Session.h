@@ -34,6 +34,7 @@ public:
 	void process_packet(char* packet);
 
 	void send_move_packet(int32 id);
+	void send_attack_packet(int32 id);
 	void send_login_packet();
 	void send_add_player_packet(int32 add_id);
 	void send_remove_player_packet(int32 id);

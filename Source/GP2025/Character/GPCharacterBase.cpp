@@ -70,6 +70,13 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	if (GameInstance && GameInstance->MyPlayer == this)
 		return;
 
+	/// Other Client 공격 모션 동기화 ///
+	if (bIsAutoAttacking == false && PlayerInfo.HasState(STATE_AUTOATTACK))
+	{
+		ProcessAutoAttackCommand();
+		return;
+	}
+
 	/// 미끄러지는 문제 해결하기 ///
 	{
 

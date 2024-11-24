@@ -283,5 +283,31 @@ void AGPCharacterPlayer::StopSprinting()
 
 void AGPCharacterPlayer::AutoAttack()
 {
+	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
+	if (!GameInstance)
+		return;
+
+	if (false == bIsAutoAttacking)
+	{
+		PlayerInfo.AddState(STATE_AUTOATTACK);
+		GameInstance->sendPlayerAttackPacket();
+	}
+
 	ProcessAutoAttackCommand();
+
+	FOnMontageEnded MontageEndedDelegate;
+	MontageEndedDelegate.BindLambda([this](UAnimMontage* Montage, bool bInterrupted)
+		{
+			if (Montage == AutoAttackActionMontage)
+			{
+				PlayerInfo.RemoveState(STATE_AUTOATTACK);
+				UE_LOG(LogTemp, Log, TEXT("STATE_AUTOATTACK removed after AutoAttack finished"));
+			}
+		});
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, AutoAttackActionMontage);
+	}
 }

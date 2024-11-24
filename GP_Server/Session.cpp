@@ -74,6 +74,19 @@ void Session::send_move_packet(int32 id)
 	do_send(&pk);
 }
 
+void Session::send_attack_packet(int32 id)
+{
+	FAttackPacket pk;
+	pk.Header.PacketSize = sizeof(FAttackPacket);
+	pk.Header.PacketType = EPacketType::S_ATTACK_PLAYER;
+	pk.PlayerInfo = clients[id].info;
+	std::cout << "-> Send:: Attack Packet [" << id << "] ("
+		<< pk.PlayerInfo.X << ","
+		<< pk.PlayerInfo.Y << ","
+		<< pk.PlayerInfo.Z << ") to [" << this->getId() << "]\n";
+	do_send(&pk);
+}
+
 void Session::send_login_packet()
 {
 	FLoginInfoPacket pk;
