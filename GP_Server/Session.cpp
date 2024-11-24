@@ -56,6 +56,26 @@ void Session::process_packet(char* packet)
 		}
 		break;
 	}
+	case EPacketType::C_ATTACK:
+	{
+		FAttackPacket* p = reinterpret_cast<FAttackPacket*>(packet);
+		memcpy(&clients[recv_id].info, &(p->PlayerInfo), sizeof(FPlayerInfo));
+
+		std::cout << "<- Recv:: Attack Packet[" << recv_id << "] ("
+			<< clients[recv_id].info.X << ", "
+			<< clients[recv_id].info.Y << ", "
+			<< clients[recv_id].info.Z << "), Rotate ("
+			<< clients[recv_id].info.Yaw << ") , "
+			<< "State " << clients[recv_id].info.State << ""
+			<< std::endl;
+		for (auto& cl : clients)
+		{
+			if (cl.getId() == recv_id) continue;
+			if (cl.is_login)
+				cl.send_attack_packet(recv_id);
+		}
+		break;
+	}
 	default:
 		std::cout << "<- Recv:: Unknown Packet" << std::endl;
 	}

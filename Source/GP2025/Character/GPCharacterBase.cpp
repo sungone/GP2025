@@ -53,6 +53,7 @@ AGPCharacterBase::AGPCharacterBase()
 
 	{
 		PlayerInfo.AddState(STATE_IDLE);
+		PlayerInfo.State = 1; // IDLE
 	}
 }
 
@@ -141,6 +142,11 @@ void AGPCharacterBase::OnAutoAttackMontageEnded(UAnimMontage* Montage, bool bInt
 	if (Montage == AutoAttackActionMontage)
 	{
 		bIsAutoAttacking = false;
+
+		if (PlayerInfo.HasState(STATE_AUTOATTACK))
+		{
+			PlayerInfo.RemoveState(STATE_AUTOATTACK);
+		}
 	}
 }
 
