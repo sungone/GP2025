@@ -161,7 +161,7 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 	// 일정 시간마다 서버에 패킷 전송
 	if (MovePacketSendTimer <= 0)
 	{
-		MovePacketSendTimer = 0.5;
+		MovePacketSendTimer = PACKETSENDTIME;
 
 		if ((!PlayerInfo.HasState(STATE_IDLE)) || (DistanceMoved >= NotMovedThreshold))
 		{
@@ -175,7 +175,7 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 		if ((PlayerInfo.HasState(STATE_IDLE)) && (DistanceMoved >= NotMovedThreshold))
 		{
 			GameInstance->SendPlayerMovePacket();
-			MovePacketSendTimer = 0.5;
+			MovePacketSendTimer = PACKETSENDTIME;
 			LastSendPlayerInfo = PlayerInfo;
 			UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : I am Idle but when I moved"));
 		}

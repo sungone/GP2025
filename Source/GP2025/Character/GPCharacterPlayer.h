@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/GPCharacterBase.h"
 #include "InputActionValue.h"
+#define PACKETSENDTIME 0.25
 #include "GPCharacterPlayer.generated.h"
 
 /**
@@ -81,7 +82,7 @@ public:
 	FPlayerInfo LastSendPlayerInfo;
 
 public:
-	float MovePacketSendTimer = 0.5; // 서버와의 패킷 교환 시간
+	float MovePacketSendTimer = PACKETSENDTIME; // 서버와의 패킷 교환 시간
 	float GroundZLocation = 115.7;
 	bool isJumpStart = false;
 	

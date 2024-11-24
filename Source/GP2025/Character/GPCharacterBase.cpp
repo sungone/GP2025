@@ -72,7 +72,7 @@ void AGPCharacterBase::Tick(float DeltaTime)
 		return;
 
 	/// Other Client 공격 모션 동기화 ///
-	if (bIsAutoAttacking == false && PlayerInfo.HasState(STATE_AUTOATTACK))
+	if (PlayerInfo.HasState(STATE_AUTOATTACK) && bIsAutoAttacking == false)
 	{
 		ProcessAutoAttackCommand();
 		return;
