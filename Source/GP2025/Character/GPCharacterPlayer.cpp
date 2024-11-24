@@ -54,6 +54,12 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 		SprintAction = InputActionSprintRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionAutoAttackRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_AutoAttack.IA_AutoAttack'"));
+	if (InputActionAutoAttackRef.Object)
+	{
+		AutoAttackAction = InputActionAutoAttackRef.Object;
+	}
+
 	// Character Player Control Setting
 	static ConstructorHelpers::FObjectFinder<UGPCharacterPlayerControlData> DefaultDataRef(TEXT("/Script/GP2025.GPCharacterPlayerControlData'/Game/CharacterPlayerControl/GPC_Default.GPC_Default'"));
 	if (DefaultDataRef.Object)
@@ -87,6 +93,7 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 	if (!GameInstance)
 		return;
 
+	MovePacketSendTimer -= DeltaTime;
 	FVector CurrentLocation = GetActorLocation();
 	float CurrentRotationYaw = GetActorRotation().Yaw;
 
@@ -103,25 +110,13 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 
 	// IDLE 상태인지 아닌지 판단 - IDLE 조건 1 : 이동 거리가 0.5cm 이하
 	const float NotMovedThreshold = 0.25f;
-	if (DistanceMoved >= NotMovedThreshold)
+	if ( (DistanceMoved >= NotMovedThreshold) )
 	{
 		PlayerInfo.RemoveState(STATE_IDLE);
 	}
-	else
+	else if ( (DistanceMoved < NotMovedThreshold) )
 	{
 		PlayerInfo.AddState(STATE_IDLE);
-		GameInstance->SendPlayerMovePacket();
-		LastSendPlayerInfo = PlayerInfo;
-		return;
-	}
-
-	// IDLE 상태에서 캐릭터의 회전이 변경되었을 때 패킷 전송
-	if (bYawChanged && PlayerInfo.HasState(STATE_IDLE))
-	{
-		PlayerInfo.Yaw = CurrentRotationYaw;
-		GameInstance->SendPlayerMovePacket();
-		LastSendPlayerInfo = PlayerInfo;
-		return;
 	}
 
 	// Jump() 시 패킷 전송
@@ -130,6 +125,7 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 		isJumpStart = false;
 		GameInstance->SendPlayerMovePacket();
 		LastSendPlayerInfo = PlayerInfo;
+		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Jump Issue"));
 		return;
 	}
 
@@ -149,19 +145,29 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 
 		GameInstance->SendPlayerMovePacket();
 		LastSendPlayerInfo = PlayerInfo;
+		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Air Fixed Issue"));
+		return;
+	}
+
+	// IDLE 상태에서 캐릭터의 회전이 변경되었을 때 패킷 전송
+	if (bYawChanged && PlayerInfo.HasState(STATE_IDLE))
+	{
+		GameInstance->SendPlayerMovePacket();
+		LastSendPlayerInfo = PlayerInfo;
+		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Rotation Issue"));
 		return;
 	}
 
 	// 일정 시간마다 서버에 패킷 전송
-	MovePacketSendTimer -= DeltaTime;
 	if (MovePacketSendTimer <= 0)
 	{
-		MovePacketSendTimer = 0.25;
+		MovePacketSendTimer = 0.5;
 
 		if ((!PlayerInfo.HasState(STATE_IDLE)) || (DistanceMoved >= NotMovedThreshold))
 		{
 			GameInstance->SendPlayerMovePacket();
 			LastSendPlayerInfo = PlayerInfo;
+			UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : periodically"));
 		}
 	}
 	else 
@@ -169,8 +175,9 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 		if ((PlayerInfo.HasState(STATE_IDLE)) && (DistanceMoved >= NotMovedThreshold))
 		{
 			GameInstance->SendPlayerMovePacket();
-			MovePacketSendTimer = 0.25;
+			MovePacketSendTimer = 0.5;
 			LastSendPlayerInfo = PlayerInfo;
+			UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : I am Idle but when I moved"));
 		}
 	}
 }
@@ -187,6 +194,7 @@ void AGPCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::Look);
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::StartSprinting);
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AGPCharacterPlayer::StopSprinting);
+	EnhancedInputComponent->BindAction(AutoAttackAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::AutoAttack);
 }
 
 void AGPCharacterPlayer::SetCharacterControl(ECharacterPlayerControlType NewCharacterPlayerControlType)
@@ -271,4 +279,9 @@ void AGPCharacterPlayer::StopSprinting()
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	PlayerInfo.RemoveState(STATE_RUN);
+}
+
+void AGPCharacterPlayer::AutoAttack()
+{
+
 }

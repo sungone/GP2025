@@ -40,6 +40,7 @@ protected:
 	virtual void StopJumping() override;
 	void StartSprinting();
 	void StopSprinting();
+	void AutoAttack();
 
 	UPROPERTY(EditAnywhere, Category = "CharacterControl", Meta = (AllowPrivateAccess = "true"))
 	TMap<ECharacterPlayerControlType, class UGPCharacterPlayerControlData*> CharacterPlayerControlManager;
@@ -65,6 +66,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> SprintAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> AutoAttackAction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
 	float WalkSpeed = 300.f;
 
@@ -77,7 +81,7 @@ public:
 	FPlayerInfo LastSendPlayerInfo;
 
 public:
-	float MovePacketSendTimer = 0.25; // 서버와의 패킷 교환 시간
+	float MovePacketSendTimer = 0.5; // 서버와의 패킷 교환 시간
 	float GroundZLocation = 115.7;
 	bool isJumpStart = false;
 	

@@ -5,6 +5,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Animation/GPPlayerAnimInstance.h"
 #include "Network/GPGameInstance.h"
+#include "Animation/AnimMontage.h"
 
 // Sets default values
 AGPCharacterBase::AGPCharacterBase()
@@ -103,6 +104,15 @@ void AGPCharacterBase::Tick(float DeltaTime)
 void AGPCharacterBase::SetClientInfoFromServer(FPlayerInfo& PlayerInfo_)
 {
 	PlayerInfo = PlayerInfo_;
+}
+
+void AGPCharacterBase::ProcessAutoAttackCommand()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (!AnimInstance)
+		return;
+
+	AnimInstance->Montage_Play(AutoAttackActionMontage , 1.f);
 }
 
 
