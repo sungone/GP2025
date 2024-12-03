@@ -80,7 +80,10 @@ void AGPCharacterBase::Tick(float DeltaTime)
 
 	/// 미끄러지는 문제 해결하기 ///
 	{
-
+		if (PlayerInfo.Speed < 200.f)
+		{
+			PlayerInfo.Speed = 300.f;
+		}
 	}
 
 	/// Other Client 위치 및 회전 동기화 ///
