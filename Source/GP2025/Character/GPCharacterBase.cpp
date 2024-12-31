@@ -1,28 +1,29 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+
 
 #include "Character/GPCharacterBase.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Animation/GPPlayerAnimInstance.h"
 #include "Network/GPGameInstance.h"
+#include "Character/GPCharacterControlData.h"
 #include "Animation/AnimMontage.h"
 
 // Sets default values
 AGPCharacterBase::AGPCharacterBase()
 {
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/DokkaebiAssets/boss_body_bip.boss_body_bip'"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/temporaryAssets/ManPlayer/Man.Man'"));
 	if (CharacterMeshRef.Object)
 	{
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
 	}
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Animation/PlayerAnimation/ABP_GPCharacterPlayer.ABP_GPCharacterPlayer_C"));
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Animation/WarriorAnimation/ABP_Warrior.ABP_Warrior_C"));
 	if (AnimInstanceClassRef.Class)
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> AutoAttackMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/PlayerAnimation/AM_SwordAttack.AM_SwordAttack'"));
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AutoAttackMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/WarriorAnimation/AM_WarriorAttack.AM_WarriorAttack'"));
 	if (AutoAttackMontageRef.Object)
 	{
 		AutoAttackActionMontage = AutoAttackMontageRef.Object;
@@ -55,6 +56,20 @@ AGPCharacterBase::AGPCharacterBase()
 		PlayerInfo.AddState(STATE_IDLE);
 		PlayerInfo.State = 1; // IDLE
 	}
+
+	// Character Control ¼³Á¤
+	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> WarriorDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterControl/GPC_Warrior.GPC_Warrior'"));
+	if (WarriorDataRef.Object)
+	{
+		CharacterControlManager.Add(ECharacterControlType::Warrior, WarriorDataRef.Object);
+	}
+
+	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> GunnerDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterControl/GPC_Gunner.GPC_Gunner'"));
+	if (GunnerDataRef.Object)
+	{
+		CharacterControlManager.Add(ECharacterControlType::Gunner, GunnerDataRef.Object);
+	}
+
 }
 
 void AGPCharacterBase::BeginPlay()
@@ -151,6 +166,17 @@ void AGPCharacterBase::OnAutoAttackMontageEnded(UAnimMontage* Montage, bool bInt
 			PlayerInfo.RemoveState(STATE_AUTOATTACK);
 		}
 	}
+}
+
+void AGPCharacterBase::SetCharacterControlData(const UGPCharacterControlData* CharacterControlData)
+{
+	// Pawn
+	bUseControllerRotationYaw = CharacterControlData->bUseControllerRotationYaw;
+
+	// CharacterMovement
+	GetCharacterMovement()->bOrientRotationToMovement = CharacterControlData->bOrientRotationToMovement;
+	GetCharacterMovement()->bUseControllerDesiredRotation = CharacterControlData->bUseControllerDesiredRotation;
+	GetCharacterMovement()->RotationRate = CharacterControlData->RotationRate;
 }
 
 

@@ -7,17 +7,16 @@
 
 AGPGameMode::AGPGameMode()
 {
-
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Default Pawn Class Setting
+	// Default Pawn Class 설정
 	static ConstructorHelpers::FClassFinder<APawn> DefaultPawnClassRef(TEXT("/Script/GP2025.GPCharacterPlayer"));
 	if (DefaultPawnClassRef.Class)
 	{
 		DefaultPawnClass = DefaultPawnClassRef.Class;
 	}
 
-	// PlayerController Setting
+	// Player Controller 설정
 	static ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerClassRef(TEXT("/Script/GP2025.GPPlayerController"));
 	if (PlayerControllerClassRef.Class)
 	{

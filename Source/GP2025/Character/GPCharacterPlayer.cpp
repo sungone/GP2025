@@ -8,7 +8,7 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "GPCharacterPlayerControlData.h"
+#include "GPCharacterControlData.h"
 #include "Network/GPGameInstance.h"
 
 AGPCharacterPlayer::AGPCharacterPlayer()
@@ -60,18 +60,19 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 		AutoAttackAction = InputActionAutoAttackRef.Object;
 	}
 
-	// Character Player Control Setting
-	static ConstructorHelpers::FObjectFinder<UGPCharacterPlayerControlData> DefaultDataRef(TEXT("/Script/GP2025.GPCharacterPlayerControlData'/Game/CharacterPlayerControl/GPC_Default.GPC_Default'"));
-	if (DefaultDataRef.Object)
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionChangeCharacterTypeRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_ChangeCharacterType.IA_ChangeCharacterType'"));
+	if (InputActionChangeCharacterTypeRef.Object)
 	{
-		CharacterPlayerControlManager.Add(ECharacterPlayerControlType::Default, DefaultDataRef.Object);
+		ChangeCharacterTypeAction = InputActionChangeCharacterTypeRef.Object;
 	}
+
+	CurrentCharacterControlType = ECharacterControlType::Warrior;
 }
 
 void AGPCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	SetCharacterControl(ECharacterPlayerControlType::Default);
+	SetCharacterControl(CurrentCharacterControlType);
 
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 	if (GameInstance)
@@ -195,36 +196,47 @@ void AGPCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::StartSprinting);
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AGPCharacterPlayer::StopSprinting);
 	EnhancedInputComponent->BindAction(AutoAttackAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::AutoAttack);
+	EnhancedInputComponent->BindAction(ChangeCharacterTypeAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::ChangeCharacterControl);
 }
 
-void AGPCharacterPlayer::SetCharacterControl(ECharacterPlayerControlType NewCharacterPlayerControlType)
+void AGPCharacterPlayer::ChangeCharacterControl()
 {
-	UGPCharacterPlayerControlData* NewCharacterPlayerControl = CharacterPlayerControlManager[NewCharacterPlayerControlType];
-	check(NewCharacterPlayerControl);
+	if (CurrentCharacterControlType == ECharacterControlType::Warrior)
+	{
+		SetCharacterControl(ECharacterControlType::Gunner);
+		UE_LOG(LogTemp, Log, TEXT("Change Gunner Control Type."));
+	}
+	else if (CurrentCharacterControlType == ECharacterControlType::Gunner)
+	{
+		SetCharacterControl(ECharacterControlType::Warrior);
+		UE_LOG(LogTemp, Log, TEXT("Change Warrior Control Type."));
+	}
+}
 
-	SetCharacterControlData(NewCharacterPlayerControl);
+void AGPCharacterPlayer::SetCharacterControl(ECharacterControlType NewCharacterControlType)
+{
+	UGPCharacterControlData* NewCharacterControl = CharacterControlManager[NewCharacterControlType];
+	check(NewCharacterControl);
+
+	SetCharacterControlData(NewCharacterControl);
 
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
 		Subsystem->ClearAllMappings();
-		UInputMappingContext* NewMappingContext = NewCharacterPlayerControl->InputMappingContext;
+		UInputMappingContext* NewMappingContext = NewCharacterControl->InputMappingContext;
 		if (NewMappingContext)
 		{
 			Subsystem->AddMappingContext(NewMappingContext, 0);
 		}
 	}
+
+	CurrentCharacterControlType = NewCharacterControlType;
 }
 
-void AGPCharacterPlayer::SetCharacterControlData(const UGPCharacterPlayerControlData* CharacterPlayerControlData)
+void AGPCharacterPlayer::SetCharacterControlData(const UGPCharacterControlData* CharacterControlData)
 {
-	// Pawn
-	bUseControllerRotationYaw = CharacterPlayerControlData->bUseControllerRotationYaw;
-
-	// CharacterMovement
-	GetCharacterMovement()->bOrientRotationToMovement = CharacterPlayerControlData->bOrientRotationToMovement;
-	GetCharacterMovement()->bUseControllerDesiredRotation = CharacterPlayerControlData->bUseControllerDesiredRotation;
-	GetCharacterMovement()->RotationRate = CharacterPlayerControlData->RotationRate;
+	Super::SetCharacterControlData(CharacterControlData);
 }
 
 void AGPCharacterPlayer::Move(const FInputActionValue& Value)

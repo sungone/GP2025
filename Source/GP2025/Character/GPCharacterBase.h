@@ -7,17 +7,24 @@
 #include "../../GP_Server/Proto.h"
 #include "GPCharacterBase.generated.h"
 
+UENUM()
+enum class ECharacterControlType : uint8
+{
+	Warrior ,
+	Gunner
+};
+
 UCLASS()
 class GP2025_API AGPCharacterBase : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	AGPCharacterBase();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
+	// 서버에서 받은 다른 클라이언트 정보를 업데이트
 	void SetClientInfoFromServer(FPlayerInfo& PlayerInfo_);
 
 public:
@@ -31,4 +38,11 @@ public :
 	void ProcessAutoAttackCommand();
 	void OnAutoAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 	bool bIsAutoAttacking = false;
+
+// Control Data 세팅
+protected :
+	virtual void SetCharacterControlData(const class UGPCharacterControlData* CharacterControlData);
+
+	UPROPERTY(EditAnywhere, Category = "CharacterControl", Meta = (AllowPrivateAccess = "true"))
+	TMap<ECharacterControlType, class UGPCharacterControlData*> CharacterControlManager;
 };

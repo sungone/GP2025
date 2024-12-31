@@ -32,9 +32,10 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	void SetCharacterControl(ECharacterPlayerControlType NewCharacterPlayerControlType);
-	virtual void SetCharacterControlData(const class UGPCharacterPlayerControlData* CharacterPlayerControlData);
+	void SetCharacterControl(ECharacterControlType NewCharacterControlType);
+	virtual void SetCharacterControlData(const class UGPCharacterControlData* CharacterControlData) override;
 
+	// Input 함수들
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	virtual void Jump() override;
@@ -42,16 +43,17 @@ protected:
 	void StartSprinting();
 	void StopSprinting();
 	void AutoAttack();
+	void ChangeCharacterControl();
 
-	UPROPERTY(EditAnywhere, Category = "CharacterControl", Meta = (AllowPrivateAccess = "true"))
-	TMap<ECharacterPlayerControlType, class UGPCharacterPlayerControlData*> CharacterPlayerControlManager;
-
+	// 숄더뷰 카메라 세팅
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USpringArmComponent> CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UCameraComponent> FollowCamera;
 
+
+	// Input 변수들
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputMappingContext> DefaultMappingContext;
 
@@ -70,12 +72,19 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> AutoAttackAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ChangeCharacterTypeAction;
+
+	// Sprint Speed 변수
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
 	float WalkSpeed = 300.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
 	float SprintSpeed = 1500.f;
 
+
+
+	// 다른 뷰어 클라이언트들의 위치 동기화를 위해 위치를 계산하는 변수들
 public:
 	FVector LastLocation;
 	float LastRotationYaw;
@@ -85,5 +94,8 @@ public:
 	float MovePacketSendTimer = PACKETSENDTIME; // 서버와의 패킷 교환 시간
 	float GroundZLocation = 115.7;
 	bool isJumpStart = false;
-	
+
+
+public :
+	ECharacterControlType CurrentCharacterControlType;
 };
