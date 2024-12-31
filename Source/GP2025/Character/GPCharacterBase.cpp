@@ -3,7 +3,6 @@
 #include "Character/GPCharacterBase.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Animation/GPPlayerAnimInstance.h"
 #include "Network/GPGameInstance.h"
 #include "Character/GPCharacterControlData.h"
 #include "Animation/AnimMontage.h"
