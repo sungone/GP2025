@@ -199,8 +199,13 @@ void AGPCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(ChangeCharacterTypeAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::ChangeCharacterControl);
 }
 
+bool bCanChangeCharacterControl = true;
 void AGPCharacterPlayer::ChangeCharacterControl()
 {
+	if (!bCanChangeCharacterControl)
+		return;
+	bCanChangeCharacterControl = false;
+
 	if (CurrentCharacterControlType == ECharacterControlType::Warrior)
 	{
 		SetCharacterControl(ECharacterControlType::Gunner);
@@ -211,6 +216,12 @@ void AGPCharacterPlayer::ChangeCharacterControl()
 		SetCharacterControl(ECharacterControlType::Warrior);
 		UE_LOG(LogTemp, Log, TEXT("Change Warrior Control Type."));
 	}
+
+	// 일정 시간 후 플래그를 다시 활성화
+	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
+		{
+			bCanChangeCharacterControl = true;
+		});
 }
 
 void AGPCharacterPlayer::SetCharacterControl(ECharacterControlType NewCharacterControlType)

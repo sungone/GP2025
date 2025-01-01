@@ -178,6 +178,15 @@ void AGPCharacterBase::SetCharacterControlData(const UGPCharacterControlData* Ch
 	GetCharacterMovement()->bOrientRotationToMovement = CharacterControlData->bOrientRotationToMovement;
 	GetCharacterMovement()->bUseControllerDesiredRotation = CharacterControlData->bUseControllerDesiredRotation;
 	GetCharacterMovement()->RotationRate = CharacterControlData->RotationRate;
+
+	// 스켈레탈 메시
+	GetMesh()->SetSkeletalMesh(CharacterControlData->SkeletalMesh);
+
+	// 애니메이션 블루프린트
+	GetMesh()->SetAnimInstanceClass(CharacterControlData->AnimBlueprint);
+
+	// 애니메이션 몽타주
+	AutoAttackActionMontage = CharacterControlData->AnimMontage;
 }
 
 
