@@ -16,4 +16,10 @@ AGPCharacterPlayerWarrior::AGPCharacterPlayerWarrior()
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AutoAttackMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/WarriorAnimation/AM_WarriorAttack.AM_WarriorAttack'"));
+	if (AutoAttackMontageRef.Object)
+	{
+		AutoAttackActionMontage = AutoAttackMontageRef.Object;
+	}
 }

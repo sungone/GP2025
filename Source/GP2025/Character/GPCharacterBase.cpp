@@ -10,19 +10,21 @@
 // Sets default values
 AGPCharacterBase::AGPCharacterBase()
 {
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/temporaryAssets/ManPlayer/Man.Man'"));
+
+	// 스켈레탈 매쉬 , 애니메이션 블루프린트 , 애니메이션 몽타주 설정!!
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/temporaryAssets/WomanPlayer/Woman.Woman'"));
 	if (CharacterMeshRef.Object)
 	{
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
 	}
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Animation/WarriorAnimation/ABP_Warrior.ABP_Warrior_C"));
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Animation/GunnerAnimation/ABP_Gunner.ABP_Gunner_C"));
 	if (AnimInstanceClassRef.Class)
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> AutoAttackMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/WarriorAnimation/AM_WarriorAttack.AM_WarriorAttack'"));
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AutoAttackMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/GunnerAnimation/AM_GunnerAttack.AM_GunnerAttack'"));
 	if (AutoAttackMontageRef.Object)
 	{
 		AutoAttackActionMontage = AutoAttackMontageRef.Object;

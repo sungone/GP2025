@@ -16,4 +16,10 @@ AGPCharacterPlayerGunner::AGPCharacterPlayerGunner()
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AutoAttackMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/GunnerAnimation/AM_GunnerAttack.AM_GunnerAttack'"));
+	if (AutoAttackMontageRef.Object)
+	{
+		AutoAttackActionMontage = AutoAttackMontageRef.Object;
+	}
 }
