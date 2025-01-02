@@ -10,8 +10,12 @@
 UENUM()
 enum class ECharacterControlType : uint8
 {
+	// 플레이어
 	Warrior ,
 	Gunner
+
+	// 몬스터
+
 };
 
 UCLASS()

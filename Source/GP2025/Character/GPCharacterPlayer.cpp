@@ -131,7 +131,7 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 	}
 
 	// 점프 후 착지를 안하고 플레이어가 계속 공중에 떠 있다면 떨어뜨리기 위해 패킷 전송
-	if (PlayerInfo.HasState(STATE_IDLE) && !PlayerInfo.HasState(STATE_JUMP) && LastSendPlayerInfo.Z > 120.f)
+	if (PlayerInfo.HasState(STATE_IDLE) && !PlayerInfo.HasState(STATE_JUMP) && LastSendPlayerInfo.Z > 150.f)
 	{
 		PlayerInfo.Z = GroundZLocation;
 

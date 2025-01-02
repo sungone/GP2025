@@ -42,7 +42,7 @@ AGPCharacterBase::AGPCharacterBase()
 	// Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 500.f, 0.f);
-	GetCharacterMovement()->JumpZVelocity = 800.f;
+	GetCharacterMovement()->JumpZVelocity = 400.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
@@ -128,7 +128,7 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	{
 		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 	}
-	else if (!PlayerInfo.HasState(STATE_JUMP) && GetActorLocation().Z < 120.f)
+	else if (!PlayerInfo.HasState(STATE_JUMP) && GetActorLocation().Z < 150.f)
 	{
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	}

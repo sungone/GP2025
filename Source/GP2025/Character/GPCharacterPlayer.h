@@ -92,7 +92,7 @@ public:
 
 public:
 	float MovePacketSendTimer = PACKETSENDTIME; // 서버와의 패킷 교환 시간
-	float GroundZLocation = 115.7;
+	float GroundZLocation = 147.7;
 	bool isJumpStart = false;
 
 
