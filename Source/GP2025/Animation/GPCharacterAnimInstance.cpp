@@ -2,4 +2,37 @@
 
 
 #include "Animation/GPCharacterAnimInstance.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
+UGPCharacterAnimInstance::UGPCharacterAnimInstance()
+{
+	MovingThreshould = 10.f;
+	JumpingThreshould = 100.f;
+}
+
+void UGPCharacterAnimInstance::NativeInitializeAnimation()
+{
+	Super::NativeInitializeAnimation();
+	Owner = Cast<ACharacter>(GetOwningActor());
+
+	if (Owner)
+	{
+		Movement = Owner->GetCharacterMovement();
+	}
+
+}
+
+void UGPCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
+{
+	Super::NativeUpdateAnimation(DeltaSeconds);
+
+	if (Movement)
+	{
+		Velocity = Movement->Velocity;
+		GroundSpeed = Velocity.Size2D();
+		bIsIdle = GroundSpeed < MovingThreshould;
+		bIsFalling = Movement->IsFalling();
+		bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);
+	}
+}
