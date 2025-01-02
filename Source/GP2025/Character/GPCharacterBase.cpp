@@ -71,6 +71,11 @@ AGPCharacterBase::AGPCharacterBase()
 		CharacterControlManager.Add(ECharacterControlType::Gunner, GunnerDataRef.Object);
 	}
 
+	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> MouseMonsterDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterControl/GPC_MouseMonster.GPC_MouseMonster'"));
+	if (MouseMonsterDataRef.Object)
+	{
+		CharacterControlManager.Add(ECharacterControlType::Mouse, MouseMonsterDataRef.Object);
+	}
 }
 
 void AGPCharacterBase::BeginPlay()

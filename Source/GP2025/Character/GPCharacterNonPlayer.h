@@ -16,9 +16,11 @@ class GP2025_API AGPCharacterNonPlayer : public AGPCharacterBase
 	
 public :
 	AGPCharacterNonPlayer();
-
+	virtual void BeginPlay() override;
 protected :
+	virtual void SetCharacterControlData(const class UGPCharacterControlData* CharacterControlData) override;
+	void SetCharacterControl(ECharacterControlType NewCharacterControlType);
 
 private :
-	// ECharacterControlType CurrentCharacterControlType;
+	ECharacterControlType CurrentCharacterControlType;
 };
