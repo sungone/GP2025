@@ -10,17 +10,3 @@ AGPInventoryMoney::AGPInventoryMoney()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-// Called when the game starts or when spawned
-void AGPInventoryMoney::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void AGPInventoryMoney::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
