@@ -7,28 +7,34 @@
 UENUM()
 enum class EItemCategoryType : uint8
 {
-	Weapon ,
-	Armor ,
-	Usable ,
-	Unusable ,
+	weapon ,
+	armor ,
+	useable ,
+	unuseable ,
 	NONE
 };
 
 UENUM()
 enum class EItemDetailType : uint8
 {
-	Weapon,
-	Armor,
-	Usable,
-	Unusable ,
+	bow,
+	sword,
+	helmet,
+	chest,
+	consumable,
+	EXP ,
+	Gold ,
+	Quest ,
 	NONE
 };
 
 UENUM()
 enum class EItemAbilityType : uint8
 {
-	Recover ,
-	AttackBuff ,
+	recove,
+	atc_buff,
+	EXP,
+	Gold ,
 	NONE
 };
 
@@ -46,15 +52,7 @@ public :
 
 	// 아이템 이름
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	FString ItemName;
-
-	// 아이템 양
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	int32 Amount;
-
-	// 아이템 매쉬
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	UStaticMesh* ItemMesh;
+	FText ItemName;
 
 	// 아이템 카테고리 구분
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
@@ -100,6 +98,14 @@ public :
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	uint8 bIsMonster : 1;
 
+	// 상점에서 살 때 가격
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	int32 ResellPrice;
+
+	// 상점에서 살 때 가격
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	int32 Price;
+
 	// 되팔 수 있는지 여부
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	uint8 bCanResell : 1;
@@ -108,7 +114,19 @@ public :
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	uint8 bIsBuy : 1;
 
-	// 상점에서 살 때 가격
+	// 아이템 설명
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	int32 Price;
+	FText ItemDescription;
+
+	// 아이템 양
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	int32 ItemStackSize;
+
+	// 아이템 썸네일
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	UTexture2D* ItemThumbnail;
+
+	// 아이템 매쉬
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	UStaticMesh* ItemMesh;
 };
