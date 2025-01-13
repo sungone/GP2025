@@ -204,3 +204,35 @@
 -------------
 1. 다음미팅
  - 1월 13일 오후 6시 30분
+
+2, 행동트리
+ - 언리얼과 비슷한 행동트리 노드 객체를 구현해서 행동트리를 만들어야 하고, 트리레벨이 3-4이상되는 복잡한 행동트리를 갖는 몬스터를 제작한다
+
+2024-01-13
+--------------
+0. 종합설계기획 통과
+ - 지적사항 : 컨텐츠 부족
+ - 지적사항 : NPC AI구현을 하는데 도전하려는 내용은 무엇인가???
+1. 진행상황
+ - UI 추가 
+2. 중점연구과제
+ - High Quality Modeling
+ - 동접 5000
+ - NPC AI ???  => RIO로 변경
+  참조 : https://github.com/Tuesberry/RIO_IOCP_Server?tab=readme-ov-file, https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002659298,  https://about.ncsoft.com/news/article/techstandard-1-230404
+  * 
+3. ToDo
+ - 전투
+  - 전투 구현
+   * HP, 데미지, 사망
+  - 몬스터 ( Animation 및 동기화)
+   * SPawn, 이동, HP, 공격, 사망
+  - 전투 UI
+   * HP Bar, 공격시 데미지 표시 ( Miss, 382 )
+ - 모델링
+  * 남자 모델링을 Unreal에 넣기, 애니메이션 동기화 시키기, 이동 시 발 미끌어지지 않게 하기. 
+4. 다음 미팅
+ - 2월 10일 : 오후 3시 30분
+ - 전투, 모델링
+ - RIO 연구
+
