@@ -17,6 +17,8 @@ enum EPacketType : uint8_t
 	S_REMOVE_PLAYER,
 	S_MOVE_PLAYER,
     S_ATTACK_PLAYER,
+
+    S_SPAWN_MONSTER,
 };
 
 enum EMoveStateType : uint32_t
@@ -60,6 +62,18 @@ struct FPlayerInfo
     {
         return (State & CheckState) != 0;
     }
+};
+
+struct FMonsterInfo
+{
+    int32 ID;
+    float X;
+    float Y;
+    float Z;
+    float Yaw;
+    float MaxHp;
+    float Hp;
+    uint32_t State;
 };
 
 #pragma pack(push, 1)
@@ -110,6 +124,12 @@ struct FRemovePlayerPacket
 {
 	FPacketHeader Header;
 	int32 PlayerID;
+};
+
+struct FSpawnMonsterPacket
+{
+    FPacketHeader Header;
+    FMonsterInfo MonsterInfo;
 };
 
 #pragma pack(pop)

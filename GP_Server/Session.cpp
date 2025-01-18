@@ -1,10 +1,12 @@
 #include "Session.h"
 #include <random>
+#include "MonsterManager.h"
 
 std::default_random_engine dre;
 std::uniform_real_distribution<float> ud_x(-3000, -1000);
 std::uniform_real_distribution<float> ud_y(-3500, -1500);
 extern std::array<Session, MAX_CLIENT> clients;
+extern MonsterManager MonsterMgr;
 
 void Session::process_packet(char* packet)
 {
@@ -31,6 +33,25 @@ void Session::process_packet(char* packet)
 			if (not cl.is_login) continue;
 			send_add_player_packet(cl.getId());
 		}
+
+		// 클라이언트가 로그인 요청을 보내면 서버에 몬스터 한마리를 스폰시킴
+		// 25.01.18 -> 이동 , 공격 빼고 스폰만 일단 해볼 예정
+		{
+			static int32 MonsterIDCounter = 1;
+
+			EMonster MonsterType = EMonster::M_Mouse;
+
+			// 몬스터 생성
+			MonsterMgr.SpawnMonster(MonsterIDCounter, MonsterType, ud_x(dre), ud_y(dre), 116.f, 90.f);
+			for (auto& cl : clients)
+			{
+				if (cl.is_login)
+					cl.send_spawn_monster_packet(MonsterIDCounter);
+			}
+
+			MonsterIDCounter++;
+		}
+
 		break;
 	case EPacketType::C_LOGOUT:
 		std::cout << "<- Recv:: LoginOut Packet[" << recv_id << "]" << std::endl;
@@ -147,4 +168,22 @@ void Session::disconnect()
 	for (auto& cl : clients)
 		if (cl.is_login)
 			clients[cl.getId()].send_remove_player_packet(this->getId());
+}
+
+void Session::send_spawn_monster_packet(int32 id)
+{
+	Monster* Monster = MonsterMgr.GetMonsterByID(id);
+	if (!Monster)
+	{
+		std::cerr << "Error: Monster with ID " << id << " not found!\n";
+		return;
+	}
+
+	FSpawnMonsterPacket pk;
+	pk.Header.PacketType = EPacketType::S_SPAWN_MONSTER;
+	pk.Header.PacketSize = sizeof(FSpawnMonsterPacket);
+	pk.MonsterInfo = Monster->GetInfo();
+
+	std::cout << "-> Send:: Spawn Monster[" << pk.MonsterInfo.ID << "]" << std::endl;
+	do_send(&pk);
 }

@@ -7,6 +7,7 @@
 #include "Serialization/ArrayWriter.h"
 #include "SocketSubsystem.h"
 #include "Character/GPCharacterPlayer.h"
+#include "Character/GPCharacterNonPlayer.h"
 #include "../../GP_Server/Proto.h"
 
 void UGPGameInstance::Init()
@@ -172,6 +173,12 @@ void UGPGameInstance::ProcessPacket()
 					UpdatePlayer(AttackPlayerPacket->PlayerInfo);
 					break;
 				}
+				case EPacketType::S_SPAWN_MONSTER:
+				{
+					FSpawnMonsterPacket* SpawnMonsterPacket = reinterpret_cast<FSpawnMonsterPacket*>(RemainingData.GetData());
+					SpawnMonster(SpawnMonsterPacket->MonsterInfo);
+					break;
+				}
 				default:
 					UE_LOG(LogTemp, Warning, TEXT("Unknown Packet Type received."));
 					break;
@@ -248,4 +255,26 @@ void UGPGameInstance::UpdatePlayer(FPlayerInfo& PlayerInfo)
 		UE_LOG(LogTemp, Warning, TEXT("Update other player [%d] (%f,%f,%f)(%f)"),
 			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 	}
+}
+
+void UGPGameInstance::SpawnMonster(FMonsterInfo& MonsterInfo)
+{
+	auto* World = GetWorld();
+	if (World == nullptr)
+		return;
+
+	FVector SpawnLocation(MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z);
+	FRotator SpawnRotation(0, MonsterInfo.Yaw, 0);
+
+	AGPCharacterBase* Monster = nullptr;
+	while (Monster == nullptr)
+	{
+		Monster = World->SpawnActor<AGPCharacterBase>(MonsterClass, SpawnLocation, SpawnRotation);
+		UE_LOG(LogTemp, Warning, TEXT("Spawn Monster [%d] (%f,%f,%f)(%f)"),
+			MonsterInfo.ID, MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z, MonsterInfo.Yaw);
+
+		Monster->SetActorLocation(FVector(MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z));
+		Monsters.Add(MonsterInfo.ID, Monster);
+	}
+
 }

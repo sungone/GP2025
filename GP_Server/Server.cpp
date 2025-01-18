@@ -1,6 +1,7 @@
 #include "Server.h"
 
 std::array<Session, MAX_CLIENT> clients;
+MonsterManager MonsterMgr;
 
 void Server::Init()
 {

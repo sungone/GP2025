@@ -8,6 +8,7 @@
 #include "GPGameInstance.generated.h"
 
 class AGPCharacterBase;
+class AGPCharacterNonPlayer;
 /**
  * 
  */
@@ -36,6 +37,8 @@ public :
 	void RemovePlayer(int32 PlayerID);
 	void UpdatePlayer(FPlayerInfo& PlayerInfo);
 
+	void SpawnMonster(FMonsterInfo& MonsterInfo);
+
 public :
 	class FSocket* Socket;
 	FString IpAddress = TEXT("127.0.0.1");
@@ -44,9 +47,11 @@ public :
 
 public :
 	TSubclassOf<AGPCharacterBase> OtherPlayerClass;
+	TSubclassOf<AGPCharacterBase> MonsterClass;
 
 	AGPCharacterBase* MyPlayer;
 	TMap<int32, AGPCharacterBase*> Players;
+	TMap<int32, AGPCharacterBase*> Monsters;
 	
 	TArray<uint8> RemainingData;
 	TQueue<TArray<uint8>, EQueueMode::Mpsc> RecvQueue;

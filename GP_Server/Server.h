@@ -1,6 +1,7 @@
 #pragma once
 #include "Define.h"
 #include "Session.h"
+#include "MonsterManager.h"
 
 class Server {
 public:

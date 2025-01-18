@@ -40,6 +40,10 @@ public:
 	void send_remove_player_packet(int32 id);
 	void disconnect();
 	int32 getId() { return info.ID; }
+
+	// ∏ÛΩ∫≈Õ
+	void send_spawn_monster_packet(int32 id);
+
 public:
 	bool is_login = false;
 	FPlayerInfo info;

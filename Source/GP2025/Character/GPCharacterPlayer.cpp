@@ -83,6 +83,7 @@ void AGPCharacterPlayer::BeginPlay()
 	{
 		GameInstance->MyPlayer = this;
 		GameInstance->OtherPlayerClass = AGPCharacterBase::StaticClass();
+		GameInstance->MonsterClass = AGPCharacterBase::StaticClass();
 	}
 
 	LastLocation = GetActorLocation();
