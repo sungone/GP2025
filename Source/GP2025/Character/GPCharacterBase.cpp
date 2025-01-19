@@ -8,6 +8,9 @@
 #include "Animation/AnimMontage.h"
 #include "Physics/GPCollision.h"
 #include "Engine/DamageEvents.h"
+#include "CharacterStat/GPCharacterStatComponent.h"
+#include "UI/GPWidgetComponent.h"
+#include "UI/GPHpBarWidget.h"
 
 // Sets default values
 AGPCharacterBase::AGPCharacterBase()
@@ -78,6 +81,22 @@ AGPCharacterBase::AGPCharacterBase()
 	{
 		CharacterControlManager.Add(ECharacterControlType::Mouse, MouseMonsterDataRef.Object);
 	}
+
+	// Stat Component
+	Stat = CreateDefaultSubobject<UGPCharacterStatComponent>(TEXT("Stat"));
+
+	// Widget Component
+	HpBar = CreateDefaultSubobject<UGPWidgetComponent>(TEXT("Widget"));
+	HpBar->SetupAttachment(GetMesh());
+	HpBar->SetRelativeLocation(FVector(0.f, 0.f, 180.f));
+	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/UI/WBP_CharacterHpBar.WBP_CharacterHpBar_C"));
+	if (HpBarWidgetRef.Class)
+	{
+		HpBar->SetWidgetClass(HpBarWidgetRef.Class);
+		HpBar->SetWidgetSpace(EWidgetSpace::Screen);
+		HpBar->SetDrawSize(FVector2D(150.f , 15.f));
+		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }
 
 void AGPCharacterBase::BeginPlay()
@@ -145,6 +164,12 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	}
 }
 
+void AGPCharacterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	// Stat->OnHpZero.AddUObject(this , &AGPCharacterBase::)
+}
+
 void AGPCharacterBase::SetClientInfoFromServer(FPlayerInfo& PlayerInfo_)
 {
 	PlayerInfo = PlayerInfo_;
@@ -207,7 +232,7 @@ void AGPCharacterBase::AttackHitCheck()
 	
 	const float AttackRange = 40.f;
 	const float AttackRadius = 50.f;
-	const float AttackDamage = 30.f;
+	const float AttackDamage = Stat->GetDamage();
 
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
@@ -233,6 +258,8 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	Stat->ApplyDamage(DamageAmount);
+
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 	if (!GameInstance) 
 		return DamageAmount;
@@ -249,6 +276,17 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	}
 	
 	return DamageAmount;
+}
+
+void AGPCharacterBase::SetupCharacterWidget(UGPUserWidget* InUserWidget)
+{
+	UGPHpBarWidget* HpBarWidget = Cast<UGPHpBarWidget>(InUserWidget);
+	if (HpBarWidget)
+	{
+		HpBarWidget->SetMaxHp(Stat->GetMaxHp());
+		HpBarWidget->UpdateHpBar(Stat->GetCurrentHp());
+		Stat->OnHpChanged.AddUObject(HpBarWidget, &UGPHpBarWidget::UpdateHpBar);
+	}
 }
 
 
