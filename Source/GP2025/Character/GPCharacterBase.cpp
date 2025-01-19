@@ -6,6 +6,7 @@
 #include "Network/GPGameInstance.h"
 #include "Character/GPCharacterControlData.h"
 #include "Animation/AnimMontage.h"
+#include "Physics/GPCollision.h"
 
 // Sets default values
 AGPCharacterBase::AGPCharacterBase()
@@ -37,7 +38,7 @@ AGPCharacterBase::AGPCharacterBase()
 
 	// Capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.f);
-	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Pawn"));
+	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_GPCAPSULE);
 
 	// Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -51,7 +52,7 @@ AGPCharacterBase::AGPCharacterBase()
 	// Mesh
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	GetMesh()->SetCollisionProfileName(TEXT("CharacterMesh"));
+	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
 	{
 		PlayerInfo.AddState(STATE_IDLE);
@@ -90,6 +91,10 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	// 내 플레이어의 위치를 설정하는 것이면 return
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 	if (GameInstance && GameInstance->MyPlayer == this)
+		return;
+
+	// 몬스터이면 return
+	if (GameInstance->MonsterClass)
 		return;
 
 	/// Other Client 공격 모션 동기화 ///
@@ -192,6 +197,34 @@ void AGPCharacterBase::SetCharacterControlData(const UGPCharacterControlData* Ch
 
 	// 애니메이션 몽타주
 	AutoAttackActionMontage = CharacterControlData->AnimMontage;
+}
+
+void AGPCharacterBase::AttackHitCheck()
+{
+	FHitResult OutHitResult;
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
+	
+	const float AttackRange = 40.f;
+	const float AttackRadius = 50.f;
+	const float AttackDamage = 30.f;
+
+	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
+	const FVector End = Start + GetActorForwardVector() * AttackRange;
+
+	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, CCHANNEL_GPACTION, FCollisionShape::MakeSphere(AttackRadius), Params);
+	if (HitDetected)
+	{
+
+	}
+
+#if ENABLE_DRAW_DEBUG
+
+	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
+	float CapsuleHalfHeight = AttackRange * 0.5f;
+	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
+
+	DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 5.f);
+#endif
 }
 
 

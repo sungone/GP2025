@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "../../GP_Server/Proto.h"
+#include "Interface/GPAnimationAttackInterface.h"
 #include "GPCharacterBase.generated.h"
 
 UENUM()
@@ -19,7 +20,7 @@ enum class ECharacterControlType : uint8
 };
 
 UCLASS()
-class GP2025_API AGPCharacterBase : public ACharacter
+class GP2025_API AGPCharacterBase : public ACharacter , public IGPAnimationAttackInterface
 {
 	GENERATED_BODY()
 
@@ -49,4 +50,8 @@ protected :
 
 	UPROPERTY(EditAnywhere, Category = "CharacterControl", Meta = (AllowPrivateAccess = "true"))
 	TMap<ECharacterControlType, class UGPCharacterControlData*> CharacterControlManager;
+
+// Attack Hit Section
+protected :
+	virtual void AttackHitCheck() override;
 };
