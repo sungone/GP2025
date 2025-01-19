@@ -7,6 +7,7 @@
 #include "Character/GPCharacterControlData.h"
 #include "Animation/AnimMontage.h"
 #include "Physics/GPCollision.h"
+#include "Engine/DamageEvents.h"
 
 // Sets default values
 AGPCharacterBase::AGPCharacterBase()
@@ -214,7 +215,8 @@ void AGPCharacterBase::AttackHitCheck()
 	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, CCHANNEL_GPACTION, FCollisionShape::MakeSphere(AttackRadius), Params);
 	if (HitDetected)
 	{
-
+		FDamageEvent DamageEvent;
+		OutHitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
 	}
 
 #if ENABLE_DRAW_DEBUG
@@ -225,6 +227,28 @@ void AGPCharacterBase::AttackHitCheck()
 
 	DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 5.f);
 #endif
+}
+
+float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
+	if (!GameInstance) 
+		return DamageAmount;
+
+	if (this == GameInstance->MyPlayer) // 데미지를 입은게 플레이어(나)라면
+	{
+		UE_LOG(LogTemp, Log, TEXT("Attacked Player!!!!!!!!!!"));
+		GameInstance->SendHitPacket(true , DamageAmount);
+	}
+	else if (this->IsA(GameInstance->MonsterClass)) // 데미지를 입은게 몬스터라면
+	{
+		UE_LOG(LogTemp, Log, TEXT("Attacked Monster!!!!!!!!!"));
+		GameInstance->SendHitPacket(false , DamageAmount);
+	}
+	
+	return DamageAmount;
 }
 
 

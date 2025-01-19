@@ -11,6 +11,7 @@ enum EPacketType : uint8_t
 	C_LOGOUT,
 	C_MOVE,
     C_ATTACK,
+    C_HIT,
 
 	S_LOGININFO,
 	S_ADD_PLAYER,
@@ -113,6 +114,13 @@ struct FAttackPacket
     FPlayerInfo PlayerInfo;
 };
 
+struct FHitPacket
+{
+    FPacketHeader Header;
+    bool isPlayer;
+    float DamageAmount;
+};
+
 struct FAddPlayerPacket
 {
 	FPacketHeader Header;
@@ -131,5 +139,7 @@ struct FSpawnMonsterPacket
     FPacketHeader Header;
     FMonsterInfo MonsterInfo;
 };
+
+
 
 #pragma pack(pop)

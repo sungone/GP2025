@@ -107,6 +107,19 @@ void UGPGameInstance::sendPlayerAttackPacket()
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FAttackPacket), BytesSent);
 }
 
+void UGPGameInstance::SendHitPacket(bool isPlayer , float DamageAmount)
+{
+	FHitPacket Packet;
+	Packet.Header.PacketType = EPacketType::C_HIT;
+	Packet.Header.PacketSize = sizeof(FHitPacket);
+	Packet.isPlayer = isPlayer;
+	Packet.DamageAmount = DamageAmount;
+	int32 BytesSent = 0;
+	UE_LOG(LogTemp, Log, TEXT("sendHitPacket : DamageAmount = %f"), DamageAmount);
+
+	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FHitPacket), BytesSent);
+}
+
 void UGPGameInstance::ReceiveData()
 {
 	uint32 DataSize;

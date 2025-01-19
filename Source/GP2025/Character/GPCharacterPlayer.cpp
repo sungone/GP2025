@@ -10,6 +10,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "GPCharacterControlData.h"
 #include "Network/GPGameInstance.h"
+#include "GPCharacterNonPlayer.h"
 #include "Inventory/GPInventoryMoney.h"
 
 AGPCharacterPlayer::AGPCharacterPlayer()

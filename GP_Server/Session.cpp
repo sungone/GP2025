@@ -97,6 +97,11 @@ void Session::process_packet(char* packet)
 		}
 		break;
 	}
+	case EPacketType::C_HIT :
+	{
+		std::cout << "<- Recv:: Hit Packet : Hit Character" << std::endl;
+		break;
+	}
 	default:
 		std::cout << "<- Recv:: Unknown Packet" << std::endl;
 	}
