@@ -32,9 +32,13 @@ public :
 	float ApplyDamage(float InDamage);
 
 	FORCEINLINE float GetDamage() { return Attack; }
+	FORCEINLINE void SetDamage(float attack) { Attack = attack; }
 
-protected :
+	FORCEINLINE void SetMaxHp(float Hp) { MaxHp = Hp; }
+	FORCEINLINE void SetCurrentHp(float Hp) { CurrentHp = Hp; }
 	void SetHp(float NewHp);
+protected :
+
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Stat")
 	int Lv;

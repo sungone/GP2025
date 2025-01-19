@@ -258,7 +258,7 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	Stat->ApplyDamage(DamageAmount);
+	// Stat->ApplyDamage(DamageAmount);
 
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 	if (!GameInstance) 

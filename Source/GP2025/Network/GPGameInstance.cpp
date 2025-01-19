@@ -7,7 +7,7 @@
 #include "Serialization/ArrayWriter.h"
 #include "SocketSubsystem.h"
 #include "Character/GPCharacterPlayer.h"
-#include "Character/GPCharacterNonPlayer.h"
+#include "CharacterStat/GPCharacterStatComponent.h"
 #include "../../GP_Server/Proto.h"
 
 void UGPGameInstance::Init()
@@ -287,6 +287,8 @@ void UGPGameInstance::SpawnMonster(FMonsterInfo& MonsterInfo)
 			MonsterInfo.ID, MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z, MonsterInfo.Yaw);
 
 		Monster->SetActorLocation(FVector(MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z));
+		Monster->Stat->SetMaxHp(MonsterInfo.MaxHp);
+		Monster->Stat->SetCurrentHp(MonsterInfo.MaxHp);
 		Monsters.Add(MonsterInfo.ID, Monster);
 	}
 

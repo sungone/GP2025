@@ -60,7 +60,7 @@ protected :
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 // Stat Section
-protected :
+public :
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat" , Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UGPCharacterStatComponent> Stat;
 
