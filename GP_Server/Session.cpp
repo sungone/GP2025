@@ -1,10 +1,8 @@
 #include "Session.h"
-#include <random>
+#include "SessionManager.h"
 
-std::default_random_engine dre;
-std::uniform_real_distribution<float> ud_x(-3000, -1000);
-std::uniform_real_distribution<float> ud_y(-3500, -1500);
-extern std::array<Session, MAX_CLIENT> clients;
+//Todo : ∏Æ∆—≈‰∏µ
+std::array<Session, MAX_CLIENT>& clients  = SessionManager::GetInst().clients;
 
 void Session::process_packet(char* packet)
 {
@@ -13,45 +11,38 @@ void Session::process_packet(char* packet)
 	switch (packet_type)
 	{
 	case EPacketType::C_LOGIN:
-		std::cout << "<- Recv:: Login Packet[" << recv_id << "]" << std::endl;
-		clients[recv_id].is_login = true;
-		clients[recv_id].info.X = ud_x(dre);
-		clients[recv_id].info.Y = ud_y(dre);
-		clients[recv_id].info.Z = 116;
+		LOG(LogType::RecvLog, std::format("Login PKT [{}]", recv_id));
+		clients[recv_id].Login();
 		clients[recv_id].send_login_packet();
 		for (auto& cl : clients)
 		{
 			if (cl.getId() == recv_id) continue;
-			if (not cl.is_login) continue;
+			if (not cl.bLogin) continue;
 			cl.send_add_player_packet(recv_id);
 		}
 		for (auto& cl : clients)
 		{
 			if (cl.getId() == recv_id) continue;
-			if (not cl.is_login) continue;
+			if (not cl.bLogin) continue;
 			send_add_player_packet(cl.getId());
 		}
 		break;
 	case EPacketType::C_LOGOUT:
-		std::cout << "<- Recv:: LoginOut Packet[" << recv_id << "]" << std::endl;
-		disconnect();
+		LOG(LogType::RecvLog, std::format("LoginOut PKT [{}]", recv_id));
+		Disconnect();
 		break;
 	case EPacketType::C_MOVE:
 	{
 		FMovePacket* p = reinterpret_cast<FMovePacket*>(packet);
 		memcpy(&clients[recv_id].info, &(p->PlayerInfo), sizeof(FPlayerInfo));
+		LOG(LogType::RecvLog, std::format("Move PKT [{}] ({}, {}, {} / Yaw: {}), State {} ",
+			recv_id, clients[recv_id].info.X, clients[recv_id].info.Y, clients[recv_id].info.Z,
+			clients[recv_id].info.Yaw, clients[recv_id].info.State));
 
-		std::cout << "<- Recv:: Move Packet[" << recv_id << "] ("
-			<< clients[recv_id].info.X << ", "
-			<< clients[recv_id].info.Y << ", "
-			<< clients[recv_id].info.Z << "), Rotate ("
-			<< clients[recv_id].info.Yaw << ") , "
-			<< "State " << clients[recv_id].info.State << ""
-			<< std::endl;
 		for (auto& cl : clients)
 		{
 			if (cl.getId() == recv_id) continue;
-			if (cl.is_login)
+			if (cl.bLogin)
 				cl.send_move_packet(recv_id);
 		}
 		break;
@@ -60,64 +51,42 @@ void Session::process_packet(char* packet)
 	{
 		FAttackPacket* p = reinterpret_cast<FAttackPacket*>(packet);
 		memcpy(&clients[recv_id].info, &(p->PlayerInfo), sizeof(FPlayerInfo));
+		LOG(LogType::RecvLog, std::format("Attack PKT [{}]", recv_id));
 
-		std::cout << "<- Recv:: Attack Packet[" << recv_id << "] ("
-			<< clients[recv_id].info.X << ", "
-			<< clients[recv_id].info.Y << ", "
-			<< clients[recv_id].info.Z << "), Rotate ("
-			<< clients[recv_id].info.Yaw << ") , "
-			<< "State " << clients[recv_id].info.State << ""
-			<< std::endl;
 		for (auto& cl : clients)
 		{
 			if (cl.getId() == recv_id) continue;
-			if (cl.is_login)
+			if (cl.bLogin)
 				cl.send_attack_packet(recv_id);
 		}
 		break;
 	}
 	default:
-		std::cout << "<- Recv:: Unknown Packet" << std::endl;
+		LOG(LogType::SendLog, std::format("Unknown Packet"));
 	}
 }
 
 void Session::send_move_packet(int32 id)
 {
-	FMovePacket pk;
-	pk.Header.PacketSize = sizeof(FMovePacket);
-	pk.Header.PacketType = EPacketType::S_MOVE_PLAYER;
-	pk.PlayerInfo = clients[id].info;
-	std::cout << "-> Send:: Move Packet [" << id << "] ("
-		<< pk.PlayerInfo.X << ","
-		<< pk.PlayerInfo.Y << ","
-		<< pk.PlayerInfo.Z << ") to [" << this->getId() << "]\n";
-	do_send(&pk);
+	auto pk = FObjectInfoPacket(EPacketType::S_MOVE_PLAYER, clients[id].info);
+	LOG(LogType::SendLog, std::format("Move PKT [{}]", this->getId()));
+
+	DoSend(&pk);
 }
 
 void Session::send_attack_packet(int32 id)
 {
-	FAttackPacket pk;
-	pk.Header.PacketSize = sizeof(FAttackPacket);
-	pk.Header.PacketType = EPacketType::S_ATTACK_PLAYER;
-	pk.PlayerInfo = clients[id].info;
-	std::cout << "-> Send:: Attack Packet [" << id << "] ("
-		<< pk.PlayerInfo.X << ","
-		<< pk.PlayerInfo.Y << ","
-		<< pk.PlayerInfo.Z << ") to [" << this->getId() << "]\n";
-	do_send(&pk);
+	auto pk = FObjectInfoPacket(EPacketType::S_ATTACK_PLAYER, clients[id].info);
+	LOG(LogType::SendLog, std::format("Attack PKT [{}]", this->getId()));
+
+	DoSend(&pk);
 }
 
 void Session::send_login_packet()
 {
-	FLoginInfoPacket pk;
-	pk.Header.PacketSize = sizeof(FLoginInfoPacket);
-	pk.Header.PacketType = EPacketType::S_LOGININFO;
-	pk.PlayerInfo = info;
-	std::cout << "-> Send:: Login Info Packet [" << pk.PlayerInfo.ID << "] ("
-		<< pk.PlayerInfo.X << ","
-		<< pk.PlayerInfo.Y << ","
-		<< pk.PlayerInfo.Z << ")\n";
-	do_send(&pk);
+	auto pk = FObjectInfoPacket(EPacketType::S_LOGININFO, info);
+	LOG(LogType::SendLog, std::format("LoginInfo PKT [{}]", pk.Info.ID));
+	DoSend(&pk);
 }
 
 void Session::send_add_player_packet(int32 add_id)
@@ -127,8 +96,9 @@ void Session::send_add_player_packet(int32 add_id)
 	pk.Header.PacketType = EPacketType::S_ADD_PLAYER;
 	pk.PlayerID = this->getId();
 	pk.PlayerInfo = clients[add_id].info;
-	std::cout << "-> Send:: Add Player[" << pk.PlayerInfo.ID << "] Packet to [" << pk.PlayerID << "]" << std::endl;
-	do_send(&pk);
+	LOG(LogType::SendLog, std::format("AddPlayer PKT [{}] -> [{}]", pk.PlayerInfo.ID, pk.PlayerID));
+
+	DoSend(&pk);
 }
 
 void Session::send_remove_player_packet(int32 remove_id)
@@ -137,14 +107,15 @@ void Session::send_remove_player_packet(int32 remove_id)
 	pk.Header.PacketSize = sizeof(FRemovePlayerPacket);
 	pk.Header.PacketType = EPacketType::S_REMOVE_PLAYER;
 	pk.PlayerID = remove_id;
-	std::cout << "-> Send:: Remove Player[" << pk.PlayerID << "] Packet to [" << this->getId() << "]" << std::endl;
-	do_send(&pk);
+	LOG(LogType::SendLog, std::format("RemovePlayer PKT [{}] -> [{}]", pk.PlayerID, this->getId()));
+
+	DoSend(&pk);
 }
 
-void Session::disconnect()
+void Session::Disconnect()
 {
-	this->is_login = false;
+	this->bLogin = false;
 	for (auto& cl : clients)
-		if (cl.is_login)
+		if (cl.bLogin)
 			clients[cl.getId()].send_remove_player_packet(this->getId());
 }

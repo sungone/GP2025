@@ -70,6 +70,19 @@ struct FPacketHeader
 	uint8_t PacketSize;
 };
 
+struct FObjectInfoPacket
+{
+    FPacketHeader Header;
+    FPlayerInfo Info;
+    
+    FObjectInfoPacket(EPacketType type, FPlayerInfo& info)
+        : Info{ info }
+    {
+        Header.PacketType = type;
+        Header.PacketSize = sizeof(FObjectInfoPacket);
+    }
+};
+
 struct FLoginPacket
 {
 	FPacketHeader Header;

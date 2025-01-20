@@ -2,6 +2,7 @@
 
 int main()
 {
-	Server server;
-	server.Run();
+	Server& server = Server::GetInst();
+	if (server.Init())
+		server.Run();
 }

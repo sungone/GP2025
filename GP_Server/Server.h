@@ -1,18 +1,37 @@
 #pragma once
 #include "Define.h"
-#include "Session.h"
+#include "IOCP.h"
+#include "SessionManager.h"
 
 class Server {
 public:
-	void Init();
+	static Server& GetInst()
+	{
+		static Server inst;
+		return inst;
+	}
+	~Server() { Close(); }
+
+	bool Init();
 	void Run();
-	
-	int32 get_new_id();
+	void Close();
 
 private:
-	HANDLE h_iocp;
-	SOCKET s_socket;
-	SOCKET c_socket;
+	void CreateWokerThreads();
+	void WorkerThreadLoop();
+	void HandleError(ExpOver* ex_over, int id);
+	
+	void DoAccept();
 
-	bool is_running = true;
+	void HandleAccept();
+	void HandleRecv(int id, int recvByte, ExpOver* expOver);
+
+private:
+	bool bRunning = true;
+	SOCKET listenSocket;
+	SOCKET acceptSocket;
+	ExpOver acceptOver;
+
+	IOCP& iocp = IOCP::GetInst();
+	SessionManager& sessionMgr = SessionManager::GetInst();
 };

@@ -6,33 +6,40 @@
 #pragma comment(lib, "MSWSock.lib")
 
 #include <iostream>
+#include <vector>
+#include <mutex>
+#include <thread>
+#include <memory>
 #include <array>
+#include <unordered_map>
+#include <functional>
+#include <random>
+
 #include "Proto.h"
+#include "Loger.h"
 
-enum OPERATION { OP_RECV, OP_SEND, OP_ACCEPT };
+enum CompType { RECV, SEND, ACCEPT };
 
-class EXP_OVER {
+class ExpOver {
 public:
 	WSAOVERLAPPED wsaover;
 	WSABUF wsabuf;
-	char	send_buf[BUFSIZE];
-	OPERATION comp_type;
+	char	buf[BUFSIZE];
+	CompType comp_type;
 public:
-	EXP_OVER(unsigned char* packet)
+	ExpOver(unsigned char* packet)
 	{
 		ZeroMemory(&wsaover, sizeof(wsaover));
 		wsabuf.len = packet[1];
-		wsabuf.buf = send_buf;
-		comp_type = OP_SEND;
-		memcpy(send_buf, packet, packet[1]);
+		wsabuf.buf = buf;
+		comp_type = SEND;
+		memcpy(buf, packet, packet[1]);
 	}
-	EXP_OVER()
+	ExpOver()
 	{
 		ZeroMemory(&wsaover, sizeof(wsaover));
-		wsabuf.buf = send_buf;
+		wsabuf.buf = buf;
 		wsabuf.len = BUFSIZE;
-		comp_type = OP_RECV;
+		comp_type = RECV;
 	}
 };
-
-void error_display(const char* msg, int err_no);
