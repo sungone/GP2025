@@ -25,9 +25,9 @@ Monster::Monster(int32 ID, EMonster MonsterType , float LocationX , float Locati
     isAttacking = false;
 }
 
-FMonsterInfo Monster::GetInfo() const
+FCharacterInfo Monster::GetInfo() const
 {
-    FMonsterInfo Info;
+    FCharacterInfo Info;
 
     // ∞Ì¿Ø ID
     Info.ID = ID;

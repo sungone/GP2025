@@ -22,6 +22,16 @@ enum EPacketType : uint8_t
     S_SPAWN_MONSTER,
 };
 
+enum ECharacterType : uint8_t
+{
+    // 플레이어
+    Warrior ,
+    Gunner ,
+
+    // 몬스터
+    Mouse ,
+};
+
 enum EMoveStateType : uint32_t
 {
     STATE_NONE = 0, // 2^0
@@ -32,13 +42,15 @@ enum EMoveStateType : uint32_t
     // 추가 상태를 비트 플래그로 계속 정의할 수 있습니다.
 };
 
-struct FPlayerInfo
+struct FCharacterInfo
 {
     int32 ID;
     float X;
     float Y;
     float Z;
     float Yaw;
+    float MaxHp;
+    float Hp;
     float Speed;
     uint32_t State;  // 비트 플래그로 사용할 수 있도록 uint32_t로 변경
 
@@ -65,18 +77,6 @@ struct FPlayerInfo
     }
 };
 
-struct FMonsterInfo
-{
-    int32 ID;
-    float X;
-    float Y;
-    float Z;
-    float Yaw;
-    float MaxHp;
-    float Hp;
-    uint32_t State;
-};
-
 #pragma pack(push, 1)
 
 struct FPacketHeader
@@ -99,19 +99,19 @@ struct FLogoutPacket
 struct FLoginInfoPacket
 {
 	FPacketHeader Header;
-	FPlayerInfo PlayerInfo;
+    FCharacterInfo PlayerInfo;
 };
 
 struct FMovePacket
 {
 	FPacketHeader Header;
-	FPlayerInfo PlayerInfo;
+    FCharacterInfo PlayerInfo;
 };
 
 struct FAttackPacket
 {
     FPacketHeader Header;
-    FPlayerInfo PlayerInfo;
+    FCharacterInfo PlayerInfo;
 };
 
 struct FHitPacket
@@ -125,7 +125,7 @@ struct FAddPlayerPacket
 {
 	FPacketHeader Header;
 	int32 PlayerID;
-	FPlayerInfo PlayerInfo;
+    FCharacterInfo PlayerInfo;
 };
 
 struct FRemovePlayerPacket
@@ -137,7 +137,7 @@ struct FRemovePlayerPacket
 struct FSpawnMonsterPacket
 {
     FPacketHeader Header;
-    FMonsterInfo MonsterInfo;
+    FCharacterInfo MonsterInfo;
 };
 
 

@@ -46,7 +46,7 @@ public:
 
 public:
 	bool is_login = false;
-	FPlayerInfo info;
+	FCharacterInfo info;
 	SOCKET socket;
 	EXP_OVER recv_over;
 	int32 prev_remain;

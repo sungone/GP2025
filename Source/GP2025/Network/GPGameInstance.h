@@ -35,10 +35,10 @@ public :
 	void ReceiveData();
 	void ProcessPacket();
 
-	void AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer);
+	void AddPlayer(FCharacterInfo& PlayerInfo, bool isMyPlayer);
 	void RemovePlayer(int32 PlayerID);
-	void UpdatePlayer(FPlayerInfo& PlayerInfo);
-	void SpawnMonster(FMonsterInfo& MonsterInfo);
+	void UpdatePlayer(FCharacterInfo& PlayerInfo);
+	void SpawnMonster(FCharacterInfo& MonsterInfo);
 
 public :
 	class FSocket* Socket;

@@ -207,7 +207,7 @@ void UGPGameInstance::ProcessPacket()
 	}
 }
 
-void UGPGameInstance::AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer)
+void UGPGameInstance::AddPlayer(FCharacterInfo& PlayerInfo, bool isMyPlayer)
 {
 	auto* World = GetWorld();
 	if (World == nullptr)
@@ -259,7 +259,7 @@ void UGPGameInstance::RemovePlayer(int32 PlayerID)
 	}
 }
 
-void UGPGameInstance::UpdatePlayer(FPlayerInfo& PlayerInfo)
+void UGPGameInstance::UpdatePlayer(FCharacterInfo& PlayerInfo)
 {
 	auto Player = Players.Find(PlayerInfo.ID);
 	if (Player)
@@ -270,7 +270,7 @@ void UGPGameInstance::UpdatePlayer(FPlayerInfo& PlayerInfo)
 	}
 }
 
-void UGPGameInstance::SpawnMonster(FMonsterInfo& MonsterInfo)
+void UGPGameInstance::SpawnMonster(FCharacterInfo& MonsterInfo)
 {
 	auto* World = GetWorld();
 	if (World == nullptr)
@@ -287,6 +287,7 @@ void UGPGameInstance::SpawnMonster(FMonsterInfo& MonsterInfo)
 			MonsterInfo.ID, MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z, MonsterInfo.Yaw);
 
 		Monster->SetActorLocation(FVector(MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z));
+		Monster->SetCharacterControl(ECharacterControlType::M_Mouse);
 		Monster->Stat->SetMaxHp(MonsterInfo.MaxHp);
 		Monster->Stat->SetCurrentHp(MonsterInfo.MaxHp);
 		Monsters.Add(MonsterInfo.ID, Monster);

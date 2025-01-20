@@ -60,7 +60,7 @@ void Session::process_packet(char* packet)
 	case EPacketType::C_MOVE:
 	{
 		FMovePacket* p = reinterpret_cast<FMovePacket*>(packet);
-		memcpy(&clients[recv_id].info, &(p->PlayerInfo), sizeof(FPlayerInfo));
+		memcpy(&clients[recv_id].info, &(p->PlayerInfo), sizeof(FCharacterInfo));
 
 		std::cout << "<- Recv:: Move Packet[" << recv_id << "] ("
 			<< clients[recv_id].info.X << ", "
@@ -80,7 +80,7 @@ void Session::process_packet(char* packet)
 	case EPacketType::C_ATTACK:
 	{
 		FAttackPacket* p = reinterpret_cast<FAttackPacket*>(packet);
-		memcpy(&clients[recv_id].info, &(p->PlayerInfo), sizeof(FPlayerInfo));
+		memcpy(&clients[recv_id].info, &(p->PlayerInfo), sizeof(FCharacterInfo));
 
 		std::cout << "<- Recv:: Attack Packet[" << recv_id << "] ("
 			<< clients[recv_id].info.X << ", "

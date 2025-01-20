@@ -68,7 +68,7 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 		ChangeCharacterTypeAction = InputActionChangeCharacterTypeRef.Object;
 	}
 
-	CurrentCharacterControlType = ECharacterControlType::Warrior;
+	CurrentCharacterControlType = ECharacterControlType::P_Warrior;
 
 	// 충돌 함수 바인드
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AGPCharacterPlayer::OnCapsuleBeginOverlap);
@@ -212,14 +212,14 @@ void AGPCharacterPlayer::ChangeCharacterControl()
 		return;
 	bCanChangeCharacterControl = false;
 
-	if (CurrentCharacterControlType == ECharacterControlType::Warrior)
+	if (CurrentCharacterControlType == ECharacterControlType::P_Warrior)
 	{
-		SetCharacterControl(ECharacterControlType::Gunner);
+		SetCharacterControl(ECharacterControlType::P_Gunner);
 		UE_LOG(LogTemp, Log, TEXT("Change Gunner Control Type."));
 	}
-	else if (CurrentCharacterControlType == ECharacterControlType::Gunner)
+	else if (CurrentCharacterControlType == ECharacterControlType::P_Gunner)
 	{
-		SetCharacterControl(ECharacterControlType::Warrior);
+		SetCharacterControl(ECharacterControlType::P_Warrior);
 		UE_LOG(LogTemp, Log, TEXT("Change Warrior Control Type."));
 	}
 
@@ -243,10 +243,10 @@ void AGPCharacterPlayer::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedCo
 
 void AGPCharacterPlayer::SetCharacterControl(ECharacterControlType NewCharacterControlType)
 {
+	Super::SetCharacterControl(NewCharacterControlType);
+
 	UGPCharacterControlData* NewCharacterControl = CharacterControlManager[NewCharacterControlType];
 	check(NewCharacterControl);
-
-	SetCharacterControlData(NewCharacterControl);
 
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))

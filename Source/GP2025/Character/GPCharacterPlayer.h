@@ -32,7 +32,7 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	void SetCharacterControl(ECharacterControlType NewCharacterControlType);
+	virtual void SetCharacterControl(ECharacterControlType NewCharacterControlType) override;
 	virtual void SetCharacterControlData(const class UGPCharacterControlData* CharacterControlData) override;
 
 	// Input 함수들
@@ -86,16 +86,12 @@ protected:
 public:
 	FVector LastLocation;
 	float LastRotationYaw;
-	FPlayerInfo LastSendPlayerInfo;
+	FCharacterInfo LastSendPlayerInfo;
 
 public:
 	float MovePacketSendTimer = PACKETSENDTIME; // 서버와의 패킷 교환 시간
 	float GroundZLocation = 147.7;
 	bool isJumpStart = false;
-
-
-public :
-	ECharacterControlType CurrentCharacterControlType;
 
 
 // 아이템 충돌처리

@@ -21,7 +21,7 @@ class Monster
 public :
 	Monster(int32 ID, EMonster MonsterType, float LocationX, float LocationY, float LocationZ, float Yaw);
 
-	FMonsterInfo GetInfo() const;
+	FCharacterInfo GetInfo() const;
 private :
 	// Monster Info
 	int32 ID;

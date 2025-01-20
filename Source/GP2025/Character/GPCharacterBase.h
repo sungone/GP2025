@@ -13,11 +13,11 @@ UENUM()
 enum class ECharacterControlType : uint8
 {
 	// 플레이어
-	Warrior ,
-	Gunner ,
+	P_Warrior ,
+	P_Gunner ,
 
 	// 몬스터
-	Mouse
+	M_Mouse
 };
 
 UCLASS()
@@ -33,10 +33,10 @@ public:
 	virtual void PostInitializeComponents() override;
 
 	// 서버에서 받은 다른 클라이언트 정보를 업데이트
-	void SetClientInfoFromServer(FPlayerInfo& PlayerInfo_);
+	void SetClientInfoFromServer(FCharacterInfo& PlayerInfo_);
 
 public:
-	FPlayerInfo PlayerInfo;
+	FCharacterInfo PlayerInfo;
 
 // 기본 공격 애니메이션 및 공격 애니메이션 몽타주 코드
 public :
@@ -48,11 +48,14 @@ public :
 	bool bIsAutoAttacking = false;
 
 // Control Data 세팅
-protected :
+public :
 	virtual void SetCharacterControlData(const class UGPCharacterControlData* CharacterControlData);
+	virtual void SetCharacterControl(ECharacterControlType NewCharacterControlType);
 
 	UPROPERTY(EditAnywhere, Category = "CharacterControl", Meta = (AllowPrivateAccess = "true"))
 	TMap<ECharacterControlType, class UGPCharacterControlData*> CharacterControlManager;
+
+	ECharacterControlType CurrentCharacterControlType;
 
 // Attack Hit Section
 protected :

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "../../GP_Server/Proto.h"
 #include "GPCharacterStatComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnHpZeroDelegate);
@@ -37,6 +38,7 @@ public :
 	FORCEINLINE void SetMaxHp(float Hp) { MaxHp = Hp; }
 	FORCEINLINE void SetCurrentHp(float Hp) { CurrentHp = Hp; }
 	void SetHp(float NewHp);
+
 protected :
 
 

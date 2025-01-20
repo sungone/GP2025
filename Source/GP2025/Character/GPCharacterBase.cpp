@@ -67,19 +67,19 @@ AGPCharacterBase::AGPCharacterBase()
 	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> WarriorDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterControl/GPC_Warrior.GPC_Warrior'"));
 	if (WarriorDataRef.Object)
 	{
-		CharacterControlManager.Add(ECharacterControlType::Warrior, WarriorDataRef.Object);
+		CharacterControlManager.Add(ECharacterControlType::P_Warrior, WarriorDataRef.Object);
 	}
 
 	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> GunnerDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterControl/GPC_Gunner.GPC_Gunner'"));
 	if (GunnerDataRef.Object)
 	{
-		CharacterControlManager.Add(ECharacterControlType::Gunner, GunnerDataRef.Object);
+		CharacterControlManager.Add(ECharacterControlType::P_Gunner, GunnerDataRef.Object);
 	}
 
 	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> MouseMonsterDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterControl/GPC_MouseMonster.GPC_MouseMonster'"));
 	if (MouseMonsterDataRef.Object)
 	{
-		CharacterControlManager.Add(ECharacterControlType::Mouse, MouseMonsterDataRef.Object);
+		CharacterControlManager.Add(ECharacterControlType::M_Mouse, MouseMonsterDataRef.Object);
 	}
 
 	// Stat Component
@@ -170,7 +170,7 @@ void AGPCharacterBase::PostInitializeComponents()
 	// Stat->OnHpZero.AddUObject(this , &AGPCharacterBase::)
 }
 
-void AGPCharacterBase::SetClientInfoFromServer(FPlayerInfo& PlayerInfo_)
+void AGPCharacterBase::SetClientInfoFromServer(FCharacterInfo& PlayerInfo_)
 {
 	PlayerInfo = PlayerInfo_;
 }
@@ -223,6 +223,16 @@ void AGPCharacterBase::SetCharacterControlData(const UGPCharacterControlData* Ch
 
 	// 局聪皋捞记 根鸥林
 	AutoAttackActionMontage = CharacterControlData->AnimMontage;
+}
+
+void AGPCharacterBase::SetCharacterControl(ECharacterControlType NewCharacterControlType)
+{
+	UGPCharacterControlData* NewCharacterControl = CharacterControlManager[NewCharacterControlType];
+	check(NewCharacterControl);
+
+	SetCharacterControlData(NewCharacterControl);
+
+	CurrentCharacterControlType = NewCharacterControlType;
 }
 
 void AGPCharacterBase::AttackHitCheck()
