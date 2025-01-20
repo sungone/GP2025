@@ -20,6 +20,7 @@ enum EPacketType : uint8_t
     S_ATTACK_PLAYER,
 
     S_SPAWN_MONSTER,
+    S_MONSTER_REDUCE_HP,
 };
 
 enum ECharacterType : uint8_t
@@ -118,8 +119,9 @@ struct FAttackPacket
 struct FHitPacket
 {
     FPacketHeader Header;
-    bool isPlayer;
-    float DamageAmount;
+    FCharacterInfo AttackerInfo;
+    FCharacterInfo attackedInfo;
+    bool isAttackerPlayer;
 };
 
 struct FAddPlayerPacket
@@ -141,6 +143,17 @@ struct FSpawnMonsterPacket
     FCharacterInfo MonsterInfo;
 };
 
+struct FInfoPacket
+{
+    FPacketHeader Header;
+    FCharacterInfo CharacterInfo;
+};
 
+struct FMonsterHpUpdatePacket
+{
+    FPacketHeader Header;
+    int32 MonsterID;
+    float Hp;
+};
 
 #pragma pack(pop)

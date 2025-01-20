@@ -115,9 +115,9 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	if (GameInstance && GameInstance->MyPlayer == this)
 		return;
 
-	// 몬스터이면 return
-	if (GameInstance->MonsterClass)
-		return;
+	//// 몬스터이면 return
+	//if (this->IsA(GameInstance->MonsterClass))
+	//	return;
 
 	/// Other Client 공격 모션 동기화 ///
 	if (CharacterInfo.HasState(STATE_AUTOATTACK) && bIsAutoAttacking == false)
@@ -271,21 +271,15 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 	// Stat->ApplyDamage(DamageAmount);
 
-	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
-	if (!GameInstance) 
-		return DamageAmount;
+	AGPCharacterBase* AttackerCharacter = CastChecked<AGPCharacterBase>(DamageCauser);
 
-	if (this == GameInstance->MyPlayer) // 데미지를 입은게 플레이어(나)라면
-	{
-		UE_LOG(LogTemp, Log, TEXT("Attacked Player!!!!!!!!!!"));
-		GameInstance->SendHitPacket(true , DamageAmount);
-	}
-	else if (this->IsA(GameInstance->MonsterClass)) // 데미지를 입은게 몬스터라면
-	{
-		UE_LOG(LogTemp, Log, TEXT("Attacked Monster!!!!!!!!!"));
-		GameInstance->SendHitPacket(false , DamageAmount);
-	}
-	
+	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
+	if (!GameInstance) return DamageAmount;
+
+	bool bIsPlayer = (AttackerCharacter == GameInstance->MyPlayer);
+		
+	GameInstance->SendHitPacket(AttackerCharacter->CharacterInfo , this->CharacterInfo , bIsPlayer);
+
 	return DamageAmount;
 }
 

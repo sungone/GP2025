@@ -99,7 +99,26 @@ void Session::process_packet(char* packet)
 	}
 	case EPacketType::C_HIT :
 	{
-		std::cout << "<- Recv:: Hit Packet : Hit Character" << std::endl;
+		FHitPacket* p = reinterpret_cast<FHitPacket*>(packet);
+		std::cout << "Attacker ID : " << p->AttackerInfo.ID << " , Attacked ID : " << p->attackedInfo.ID 
+			<< "IsAttackerPlayer : " << p->isAttackerPlayer << std::endl;
+
+		if (p->isAttackerPlayer) // 공격자가 플레이어라면
+		{
+			Monster* AttackedMonster = MonsterMgr.GetMonsterByID(p->attackedInfo.ID);
+			AttackedMonster->Attacked(p->AttackerInfo.Damage);
+
+			for (auto& cl : clients)
+			{
+				if (cl.is_login)
+					cl.send_spawn_HpUpdate_packet(AttackedMonster->GetID());
+			}
+		}
+		else // 공격자가 몬스터라면
+		{
+
+		}
+
 		break;
 	}
 	default:
@@ -190,5 +209,24 @@ void Session::send_spawn_monster_packet(int32 id)
 	pk.MonsterInfo = Monster->GetInfo();
 
 	std::cout << "-> Send:: Spawn Monster[" << pk.MonsterInfo.ID << "]" << std::endl;
+	do_send(&pk);
+}
+
+void Session::send_spawn_HpUpdate_packet(int32 id)
+{
+	Monster* monster = MonsterMgr.GetMonsterByID(id);
+	if (!monster)
+	{
+		std::cerr << "Error: Monster with ID " << id << " not found!\n";
+		return;
+	}
+
+	FMonsterHpUpdatePacket pk;
+	pk.Header.PacketType = EPacketType::S_MONSTER_REDUCE_HP;
+	pk.Header.PacketSize = sizeof(FMonsterHpUpdatePacket);
+	pk.MonsterID = monster->GetID();
+	pk.Hp = monster->GetHp();
+
+	std::cout << "Monster ID : " << pk.MonsterID << ", Current Hp : " << pk.Hp << std::endl;
 	do_send(&pk);
 }

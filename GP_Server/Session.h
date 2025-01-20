@@ -4,7 +4,6 @@
 class Session {
 
 public:
-
 	Session()
 	{
 		socket = INVALID_SOCKET;
@@ -43,6 +42,7 @@ public:
 
 	// ∏ÛΩ∫≈Õ
 	void send_spawn_monster_packet(int32 id);
+	void send_spawn_HpUpdate_packet(int32 id);
 
 public:
 	bool is_login = false;

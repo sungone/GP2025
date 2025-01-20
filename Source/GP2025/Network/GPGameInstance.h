@@ -31,7 +31,7 @@ public :
 	void SendPlayerMovePacket();
 	void SendPlayerAttackPacket();
 
-	void SendHitPacket(bool isPlayer , float DamageAmount);
+	void SendHitPacket(FCharacterInfo& Attacker , FCharacterInfo& Attacked , bool isAttackerPlayer);
 	
 	void ReceiveData();
 	void ProcessPacket();

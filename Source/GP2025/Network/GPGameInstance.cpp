@@ -111,17 +111,18 @@ void UGPGameInstance::SendPlayerAttackPacket()
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FAttackPacket), BytesSent);
 }
 
-void UGPGameInstance::SendHitPacket(bool isPlayer , float DamageAmount)
+void UGPGameInstance::SendHitPacket(FCharacterInfo& Attacker, FCharacterInfo& Attacked , bool isAttackerPlayer)
 {
 	FHitPacket Packet;
 	Packet.Header.PacketType = EPacketType::C_HIT;
 	Packet.Header.PacketSize = sizeof(FHitPacket);
-	Packet.isPlayer = isPlayer;
-	Packet.DamageAmount = DamageAmount;
+	Packet.AttackerInfo = Attacker;
+	Packet.attackedInfo = Attacked;
+	Packet.isAttackerPlayer = isAttackerPlayer;
 
 	int32 BytesSent = 0;
 
-	UE_LOG(LogTemp, Log, TEXT("sendHitPacket : DamageAmount = %f"), DamageAmount);
+	UE_LOG(LogTemp, Log, TEXT("Attack %d -> %d"), Packet.AttackerInfo.ID , Packet.attackedInfo.ID);
 
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FHitPacket), BytesSent);
 }
@@ -294,6 +295,7 @@ void UGPGameInstance::SpawnMonster(FCharacterInfo& MonsterInfo)
 
 		Monster->SetActorLocation(FVector(MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z));
 		Monster->SetCharacterControl(ECharacterType::M_Mouse);
+		Monster->CharacterInfo = MonsterInfo;
 		Monster->Stat->SetMaxHp(MonsterInfo.MaxHp);
 		Monster->Stat->SetCurrentHp(MonsterInfo.MaxHp);
 		Monsters.Add(MonsterInfo.ID, Monster);

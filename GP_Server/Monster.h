@@ -8,6 +8,10 @@ public :
 	Monster(int32 ID, ECharacterType MonsterType , float LocationX, float LocationY, float LocationZ, float Yaw);
 
 	FCharacterInfo GetInfo() const;
+	int32 GetID() const { return ID; }
+	float GetHp() const { return Hp; }
+
+	void Attacked(float damage);
 
 protected :
 	// Monster Info
@@ -29,8 +33,8 @@ protected :
 	float ScaleY;
 	float ScaleZ;
 
-	float Hp; // 최대 체력
-	float MaxHp; // 현재 체력
+	float Hp; // 현재 체력
+	float MaxHp; // 최대 체력
 	float Attack; // 공격력
 	float CrtRate; // 크리티컬 확률
 	float MoveSpeed; // 이동 속도

@@ -45,3 +45,13 @@ FCharacterInfo Monster::GetInfo() const
 
     return Info;
 }
+
+void Monster::Attacked(float damage)
+{
+    if ((Hp - damage) <= 0) 
+        Hp = 0;
+    else
+    {
+        Hp = Hp - damage;
+    }
+}

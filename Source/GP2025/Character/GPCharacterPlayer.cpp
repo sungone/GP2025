@@ -12,6 +12,7 @@
 #include "Network/GPGameInstance.h"
 #include "GPCharacterNonPlayer.h"
 #include "Inventory/GPInventoryMoney.h"
+#include "CharacterStat/GPCharacterStatComponent.h"
 
 AGPCharacterPlayer::AGPCharacterPlayer()
 {
@@ -91,6 +92,11 @@ void AGPCharacterPlayer::BeginPlay()
 	LastLocation = GetActorLocation();
 	LastRotationYaw = GetActorRotation().Yaw;
 	LastSendPlayerInfo = CharacterInfo;
+
+	// FCharacterInfo 에 데미지 Hp 설정
+	CharacterInfo.MaxHp = Stat->GetMaxHp();
+	CharacterInfo.Hp = CharacterInfo.MaxHp;
+	CharacterInfo.Damage = Stat->GetDamage();
 }
 
 void AGPCharacterPlayer::Tick(float DeltaTime)
