@@ -1,28 +1,20 @@
 #include "Monster.h"
 
-Monster::Monster(int32 ID, EMonster MonsterType , float LocationX , float LocationY , float LocationZ , float Yaw)
-	: ID(ID) , MonsterType(MonsterType) , LocationX(LocationX) , LocationY(LocationY) 
-    , LocationZ(LocationZ) , RotationYaw(Yaw)
+Monster::Monster(int32 ID, ECharacterType MonsterType , float LocationX , float LocationY , float LocationZ , float Yaw)
+	: ID(ID) , MonsterType(MonsterType) , LocationX(LocationX) , LocationY(LocationY) , LocationZ(LocationZ) , RotationYaw(Yaw)
 {
     // 기본 속성 초기화
     Hp = 100.f;
     MaxHp = 100.f;
-    atk = 20.f;
-    crt_rate = 0.1f;
+    Attack = 20.f;
+    CrtRate = 0.1f;
     MoveSpeed = 300.f;
-    dodge = 0.05f;
-    cooltime = 2.0f;
+    Dodge = 0.05f;
+    Cooltime = 2.0f;
     AttackRange = 150.f;
     AttackSpeed = 1.0f;
-
-    is_boss = false;
-
+    isBoss = false;
     State = 0;
-
-    isAlive = true;
-    isAggroed = false;
-    isMoving = false;
-    isAttacking = false;
 }
 
 FCharacterInfo Monster::GetInfo() const
@@ -31,6 +23,9 @@ FCharacterInfo Monster::GetInfo() const
 
     // 고유 ID
     Info.ID = ID;
+
+    // 몬스터 종류
+    Info.CharacterType = MonsterType;
 
     // 위치 및 회전
     Info.X = LocationX;
@@ -41,6 +36,9 @@ FCharacterInfo Monster::GetInfo() const
     // 체력
     Info.Hp = Hp;
     Info.MaxHp = MaxHp;
+
+    // 공격력
+    Info.Damage = Attack;
 
     // 상태
     Info.State = State;

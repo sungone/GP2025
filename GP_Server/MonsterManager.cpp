@@ -1,7 +1,7 @@
 #include "MonsterManager.h"
 #include "iostream"
 
-void MonsterManager::SpawnMonster(int32 ID, EMonster MonsterType, float X , float Y , float Z ,float Yaw)
+void MonsterManager::SpawnMonster(int32 ID, ECharacterType MonsterType , float X , float Y , float Z ,float Yaw)
 {
     if (Monsters.find(ID) != Monsters.end())
     {
@@ -9,8 +9,8 @@ void MonsterManager::SpawnMonster(int32 ID, EMonster MonsterType, float X , floa
         return;
     }
 
-    Monsters.emplace(ID, Monster(ID, MonsterType, X , Y , Z , Yaw));
-    std::cout << "Spawned Monster: ID=" << ID << ", MonsterType =" << MonsterType
+    Monsters.emplace(ID, Monster(ID, MonsterType , X , Y , Z , Yaw));
+    std::cout << "Spawned Monster: ID=" << ID << ", MonsterType = " << MonsterType
         << ", Location=(" << X << ", " << Y << ", " << Z << ")\n";
 }
 

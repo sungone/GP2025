@@ -8,7 +8,7 @@ class MonsterManager
 public :
 	
 	// 몬스터 생성
-	void SpawnMonster(int32 ID, EMonster MonsterType, float X, float Y, float Z, float Yaw);
+	void SpawnMonster(int32 ID, ECharacterType MonsterType, float X, float Y, float Z, float Yaw);
 
 	// 몬스터 제거
 	void RemoveMonster(int32 ID);

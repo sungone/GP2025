@@ -39,7 +39,7 @@ void Session::process_packet(char* packet)
 		{
 			static int32 MonsterIDCounter = 1;
 
-			EMonster MonsterType = EMonster::M_Mouse;
+			ECharacterType MonsterType = ECharacterType::M_Mouse;
 
 			// 몬스터 생성
 			MonsterMgr.SpawnMonster(MonsterIDCounter, MonsterType, ud_x(dre), ud_y(dre), 116.f, 90.f);

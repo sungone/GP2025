@@ -25,32 +25,33 @@ enum EPacketType : uint8_t
 enum ECharacterType : uint8_t
 {
     // 플레이어
-    Warrior ,
-    Gunner ,
+    P_Warrior ,
+    P_Gunner ,
 
     // 몬스터
-    Mouse ,
+    M_Mouse ,
 };
 
 enum EMoveStateType : uint32_t
 {
-    STATE_NONE = 0, // 2^0
-    STATE_IDLE = 1 << 0,  // 2^1
-    STATE_RUN = 1 << 1,  // 2^2
-    STATE_JUMP = 1 << 2,  // 2^3
-    STATE_AUTOATTACK = 1 << 3, // 2^4
-    // 추가 상태를 비트 플래그로 계속 정의할 수 있습니다.
+    STATE_NONE = 0, 
+    STATE_IDLE = 1 << 0, 
+    STATE_RUN = 1 << 1,  
+    STATE_JUMP = 1 << 2, 
+    STATE_AUTOATTACK = 1 << 3,
 };
 
 struct FCharacterInfo
 {
     int32 ID;
+    ECharacterType CharacterType;
     float X;
     float Y;
     float Z;
     float Yaw;
     float MaxHp;
     float Hp;
+    float Damage;
     float Speed;
     uint32_t State;  // 비트 플래그로 사용할 수 있도록 uint32_t로 변경
 
