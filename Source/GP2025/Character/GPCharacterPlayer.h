@@ -30,12 +30,13 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void SetCharacterControl(ECharacterType NewCharacterControlType) override;
 	virtual void SetCharacterControlData(const class UGPCharacterControlData* CharacterControlData) override;
 
-	// Input 함수들
+	// Input 함수
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	virtual void Jump() override;
@@ -45,7 +46,7 @@ protected:
 	void AutoAttack();
 	void ChangeCharacterControl();
 
-	// 숄더뷰 카메라 세팅
+	// 카메라 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USpringArmComponent> CameraBoom;
 
@@ -53,7 +54,7 @@ protected:
 	TObjectPtr<class UCameraComponent> FollowCamera;
 
 
-	// Input 변수들
+	// Input 변수
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputMappingContext> DefaultMappingContext;
 

@@ -27,9 +27,10 @@ public :
 
 	void SendPlayerLoginPacket();
 	void SendPlayerLogoutPacket();
-	void SendPlayerMovePacket();
 
-	void sendPlayerAttackPacket();
+	void SendPlayerMovePacket();
+	void SendPlayerAttackPacket();
+
 	void SendHitPacket(bool isPlayer , float DamageAmount);
 	
 	void ReceiveData();

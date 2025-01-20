@@ -15,7 +15,7 @@
 
 AGPCharacterPlayer::AGPCharacterPlayer()
 {
-	// Camera Setting
+	// 카메라 세팅
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 400.f;
@@ -25,7 +25,7 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
-	// Input Setting
+	// Input 세팅
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/PlayerInput/IMC_PlayerIMC.IMC_PlayerIMC'"));
 	if (nullptr != InputMappingContextRef.Object)
 	{
@@ -68,7 +68,8 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 		ChangeCharacterTypeAction = InputActionChangeCharacterTypeRef.Object;
 	}
 
-	CurrentCharacterControlType = ECharacterType::P_Warrior;
+	// 기본 캐릭터 타입을 전사 캐릭터로
+	CurrentCharacterType = ECharacterType::P_Warrior;
 
 	// 충돌 함수 바인드
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AGPCharacterPlayer::OnCapsuleBeginOverlap);
@@ -77,7 +78,7 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 void AGPCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	SetCharacterControl(CurrentCharacterControlType);
+	SetCharacterControl(CurrentCharacterType);
 
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 	if (GameInstance)
@@ -89,7 +90,7 @@ void AGPCharacterPlayer::BeginPlay()
 
 	LastLocation = GetActorLocation();
 	LastRotationYaw = GetActorRotation().Yaw;
-	LastSendPlayerInfo = PlayerInfo;
+	LastSendPlayerInfo = CharacterInfo;
 }
 
 void AGPCharacterPlayer::Tick(float DeltaTime)
@@ -104,9 +105,9 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 	FVector CurrentLocation = GetActorLocation();
 	float CurrentRotationYaw = GetActorRotation().Yaw;
 
-	PlayerInfo.SetLocation(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
-	PlayerInfo.Yaw = CurrentRotationYaw;
-	PlayerInfo.Speed = GetVelocity().Size();
+	CharacterInfo.SetLocation(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
+	CharacterInfo.Yaw = CurrentRotationYaw;
+	CharacterInfo.Speed = GetVelocity().Size();
 
 	float DistanceMoved = FVector::DistSquared(CurrentLocation, LastLocation);
 	LastLocation = CurrentLocation;
@@ -119,11 +120,11 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 	const float NotMovedThreshold = 0.25f;
 	if ( (DistanceMoved >= NotMovedThreshold) )
 	{
-		PlayerInfo.RemoveState(STATE_IDLE);
+		CharacterInfo.RemoveState(STATE_IDLE);
 	}
 	else if ( (DistanceMoved < NotMovedThreshold) )
 	{
-		PlayerInfo.AddState(STATE_IDLE);
+		CharacterInfo.AddState(STATE_IDLE);
 	}
 
 	// Jump() 시 패킷 전송
@@ -131,36 +132,36 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 	{
 		isJumpStart = false;
 		GameInstance->SendPlayerMovePacket();
-		LastSendPlayerInfo = PlayerInfo;
+		LastSendPlayerInfo = CharacterInfo;
 		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Jump Issue"));
 		return;
 	}
 
 	// 점프 후 착지를 안하고 플레이어가 계속 공중에 떠 있다면 떨어뜨리기 위해 패킷 전송
-	if (PlayerInfo.HasState(STATE_IDLE) && !PlayerInfo.HasState(STATE_JUMP) && LastSendPlayerInfo.Z > 150.f)
+	if (CharacterInfo.HasState(STATE_IDLE) && !CharacterInfo.HasState(STATE_JUMP) && LastSendPlayerInfo.Z > 150.f)
 	{
-		PlayerInfo.Z = GroundZLocation;
+		CharacterInfo.Z = GroundZLocation;
 
 		if (LastSendPlayerInfo.HasState(STATE_RUN))
 		{
-			PlayerInfo.Speed = SprintSpeed;
+			CharacterInfo.Speed = SprintSpeed;
 		}
 		else
 		{
-			PlayerInfo.Speed = WalkSpeed;
+			CharacterInfo.Speed = WalkSpeed;
 		}
 
 		GameInstance->SendPlayerMovePacket();
-		LastSendPlayerInfo = PlayerInfo;
+		LastSendPlayerInfo = CharacterInfo;
 		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Air Fixed Issue"));
 		return;
 	}
 
 	// IDLE 상태에서 캐릭터의 회전이 변경되었을 때 패킷 전송
-	if (bYawChanged && PlayerInfo.HasState(STATE_IDLE))
+	if (bYawChanged && CharacterInfo.HasState(STATE_IDLE))
 	{
 		GameInstance->SendPlayerMovePacket();
-		LastSendPlayerInfo = PlayerInfo;
+		LastSendPlayerInfo = CharacterInfo;
 		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Rotation Issue"));
 		return;
 	}
@@ -170,20 +171,20 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 	{
 		MovePacketSendTimer = PACKETSENDTIME;
 
-		if ((!PlayerInfo.HasState(STATE_IDLE)) || (DistanceMoved >= NotMovedThreshold))
+		if ((!CharacterInfo.HasState(STATE_IDLE)) || (DistanceMoved >= NotMovedThreshold))
 		{
 			GameInstance->SendPlayerMovePacket();
-			LastSendPlayerInfo = PlayerInfo;
+			LastSendPlayerInfo = CharacterInfo;
 			UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : periodically"));
 		}
 	}
 	else 
 	{
-		if ((PlayerInfo.HasState(STATE_IDLE)) && (DistanceMoved >= NotMovedThreshold))
+		if ((CharacterInfo.HasState(STATE_IDLE)) && (DistanceMoved >= NotMovedThreshold))
 		{
 			GameInstance->SendPlayerMovePacket();
 			MovePacketSendTimer = PACKETSENDTIME;
-			LastSendPlayerInfo = PlayerInfo;
+			LastSendPlayerInfo = CharacterInfo;
 			UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : I am Idle but when I moved"));
 		}
 	}
@@ -212,12 +213,12 @@ void AGPCharacterPlayer::ChangeCharacterControl()
 		return;
 	bCanChangeCharacterControl = false;
 
-	if (CurrentCharacterControlType == ECharacterType::P_Warrior)
+	if (CurrentCharacterType == ECharacterType::P_Warrior)
 	{
 		SetCharacterControl(ECharacterType::P_Gunner);
 		UE_LOG(LogTemp, Log, TEXT("Change Gunner Control Type."));
 	}
-	else if (CurrentCharacterControlType == ECharacterType::P_Gunner)
+	else if (CurrentCharacterType == ECharacterType::P_Gunner)
 	{
 		SetCharacterControl(ECharacterType::P_Warrior);
 		UE_LOG(LogTemp, Log, TEXT("Change Warrior Control Type."));
@@ -259,7 +260,7 @@ void AGPCharacterPlayer::SetCharacterControl(ECharacterType NewCharacterControlT
 		}
 	}
 
-	CurrentCharacterControlType = NewCharacterControlType;
+	CurrentCharacterType = NewCharacterControlType;
 }
 
 void AGPCharacterPlayer::SetCharacterControlData(const UGPCharacterControlData* CharacterControlData)
@@ -298,27 +299,27 @@ void AGPCharacterPlayer::Look(const FInputActionValue& Value)
 void AGPCharacterPlayer::Jump()
 {
 	Super::Jump();
-	PlayerInfo.RemoveState(STATE_IDLE);
-	PlayerInfo.AddState(STATE_JUMP);
+	CharacterInfo.RemoveState(STATE_IDLE);
+	CharacterInfo.AddState(STATE_JUMP);
 	isJumpStart = true;
 }
 
 void AGPCharacterPlayer::StopJumping()
 {
 	Super::StopJumping();
-	PlayerInfo.RemoveState(STATE_JUMP);
+	CharacterInfo.RemoveState(STATE_JUMP);
 }
 
 void AGPCharacterPlayer::StartSprinting()
 {
 	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
-	PlayerInfo.AddState(STATE_RUN);
+	CharacterInfo.AddState(STATE_RUN);
 }
 
 void AGPCharacterPlayer::StopSprinting()
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-	PlayerInfo.RemoveState(STATE_RUN);
+	CharacterInfo.RemoveState(STATE_RUN);
 }
 
 void AGPCharacterPlayer::AutoAttack()
@@ -327,10 +328,10 @@ void AGPCharacterPlayer::AutoAttack()
 	if (!GameInstance)
 		return;
 
-	if (bIsAutoAttacking == false && !PlayerInfo.HasState(STATE_AUTOATTACK))
+	if (bIsAutoAttacking == false && !CharacterInfo.HasState(STATE_AUTOATTACK))
 	{
-		PlayerInfo.AddState(STATE_AUTOATTACK);
-		GameInstance->sendPlayerAttackPacket();
+		CharacterInfo.AddState(STATE_AUTOATTACK);
+		GameInstance->SendPlayerAttackPacket();
 	}
 
 	ProcessAutoAttackCommand();

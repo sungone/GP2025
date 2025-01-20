@@ -19,14 +19,12 @@ public:
 	AGPCharacterBase();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-
 	virtual void PostInitializeComponents() override;
 
 	// 서버에서 받은 다른 클라이언트 정보를 업데이트
-	void SetClientInfoFromServer(FCharacterInfo& PlayerInfo_);
-
-public:
-	FCharacterInfo PlayerInfo;
+	void SetCharacterInfoFromServer(FCharacterInfo& CharacterInfo_);
+	FCharacterInfo CharacterInfo;
+	
 
 // 기본 공격 애니메이션 및 공격 애니메이션 몽타주 코드
 public :
@@ -44,7 +42,7 @@ public :
 
 	TMap<ECharacterType, class UGPCharacterControlData*> CharacterControlManager;
 
-	ECharacterType CurrentCharacterControlType;
+	ECharacterType CurrentCharacterType;
 
 // Attack Hit Section
 protected :

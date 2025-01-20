@@ -19,7 +19,7 @@ public :
 	virtual void BeginPlay() override;
 protected :
 	virtual void SetCharacterControlData(const class UGPCharacterControlData* CharacterControlData) override;
-	void SetCharacterControl(ECharacterType NewCharacterControlType);
+	virtual void SetCharacterControl(ECharacterType NewCharacterControlType) override;
 
 private :
 	ECharacterType CurrentCharacterControlType;

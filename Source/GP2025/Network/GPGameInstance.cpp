@@ -75,7 +75,7 @@ void UGPGameInstance::SendPlayerLogoutPacket()
 	FLogoutPacket Packet;
 	Packet.Header.PacketType = EPacketType::C_LOGOUT;
 	Packet.Header.PacketSize = sizeof(FLogoutPacket);
-	Packet.PlayerID = MyPlayer->PlayerInfo.ID;
+	Packet.PlayerID = MyPlayer->CharacterInfo.ID;
 
 	int32 BytesSent = 0;
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FLogoutPacket), BytesSent);
@@ -86,21 +86,25 @@ void UGPGameInstance::SendPlayerMovePacket()
 	FMovePacket Packet;
 	Packet.Header.PacketType = EPacketType::C_MOVE;
 	Packet.Header.PacketSize = sizeof(FMovePacket);
-	Packet.PlayerInfo = MyPlayer->PlayerInfo;
+	Packet.PlayerInfo = MyPlayer->CharacterInfo;
+
 	int32 BytesSent = 0;
+
 	UE_LOG(LogTemp, Warning, TEXT("SendPlayerMovePacket : Send [%d] (%f,%f,%f)"),
 		Packet.PlayerInfo.ID, Packet.PlayerInfo.X, Packet.PlayerInfo.Y, Packet.PlayerInfo.Z);
 
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FMovePacket), BytesSent);
 }
 
-void UGPGameInstance::sendPlayerAttackPacket()
+void UGPGameInstance::SendPlayerAttackPacket()
 {
 	FAttackPacket Packet;
 	Packet.Header.PacketType = EPacketType::C_ATTACK;
 	Packet.Header.PacketSize = sizeof(FAttackPacket);
-	Packet.PlayerInfo = MyPlayer->PlayerInfo;
+	Packet.PlayerInfo = MyPlayer->CharacterInfo;
+
 	int32 BytesSent = 0;
+
 	UE_LOG(LogTemp, Log, TEXT("sendPlayerAttackPacket : Send [%d] (%f,%f,%f)"),
 		Packet.PlayerInfo.ID, Packet.PlayerInfo.X, Packet.PlayerInfo.Y, Packet.PlayerInfo.Z);
 
@@ -114,7 +118,9 @@ void UGPGameInstance::SendHitPacket(bool isPlayer , float DamageAmount)
 	Packet.Header.PacketSize = sizeof(FHitPacket);
 	Packet.isPlayer = isPlayer;
 	Packet.DamageAmount = DamageAmount;
+
 	int32 BytesSent = 0;
+
 	UE_LOG(LogTemp, Log, TEXT("sendHitPacket : DamageAmount = %f"), DamageAmount);
 
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FHitPacket), BytesSent);
@@ -224,7 +230,7 @@ void UGPGameInstance::AddPlayer(FCharacterInfo& PlayerInfo, bool isMyPlayer)
 		UE_LOG(LogTemp, Warning, TEXT("Add my player [%d] (%f,%f,%f)(%f)"),
 			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 
-		MyPlayer->SetClientInfoFromServer(PlayerInfo);
+		MyPlayer->SetCharacterInfoFromServer(PlayerInfo);
 		MyPlayer->SetActorLocation(FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z));
 		
 		Players.Add(PlayerInfo.ID, MyPlayer);
@@ -240,7 +246,7 @@ void UGPGameInstance::AddPlayer(FCharacterInfo& PlayerInfo, bool isMyPlayer)
 		UE_LOG(LogTemp, Warning, TEXT("Add other player [%d] (%f,%f,%f)(%f)"),
 			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 
-		Player->SetClientInfoFromServer(PlayerInfo);
+		Player->SetCharacterInfoFromServer(PlayerInfo);
 		Player->SetActorLocation(FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z));
 		
 		Players.Add(PlayerInfo.ID, Player);
@@ -264,7 +270,7 @@ void UGPGameInstance::UpdatePlayer(FCharacterInfo& PlayerInfo)
 	auto Player = Players.Find(PlayerInfo.ID);
 	if (Player)
 	{
-		(*Player)->SetClientInfoFromServer(PlayerInfo);
+		(*Player)->SetCharacterInfoFromServer(PlayerInfo);
 		UE_LOG(LogTemp, Warning, TEXT("Update other player [%d] (%f,%f,%f)(%f)"),
 			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 	}

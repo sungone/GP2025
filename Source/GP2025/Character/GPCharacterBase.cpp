@@ -12,39 +12,40 @@
 #include "UI/GPWidgetComponent.h"
 #include "UI/GPHpBarWidget.h"
 
-// Sets default values
 AGPCharacterBase::AGPCharacterBase()
 {
 
-	// 스켈레탈 매쉬 , 애니메이션 블루프린트 , 애니메이션 몽타주 설정!!
+	// 캐릭터 스켈레탈 매쉬 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/temporaryAssets/WomanPlayer/Woman.Woman'"));
 	if (CharacterMeshRef.Object)
 	{
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
 	}
 
+	// 캐릭터 애니메이션 블루프린트
 	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Animation/GunnerAnimation/ABP_Gunner.ABP_Gunner_C"));
 	if (AnimInstanceClassRef.Class)
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
 
+	// 캐릭터 애니메이션 몽타주
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> AutoAttackMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/GunnerAnimation/AM_GunnerAttack.AM_GunnerAttack'"));
 	if (AutoAttackMontageRef.Object)
 	{
 		AutoAttackActionMontage = AutoAttackMontageRef.Object;
 	}
 
-	// Pawn
+	// 폰 회전을 컨트롤러 회전과 똑같이 사용
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-	// Capsule
+	// 캡슐 컴포넌트 설정
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.f);
 	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_GPCAPSULE);
 
-	// Movement
+	// 무브먼트 컴포넌트 설정
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 500.f, 0.f);
 	GetCharacterMovement()->JumpZVelocity = 400.f;
@@ -53,17 +54,18 @@ AGPCharacterBase::AGPCharacterBase()
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
-	// Mesh
+	// 매쉬 설정
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
+	// CharacterInfo 설정
 	{
-		PlayerInfo.AddState(STATE_IDLE);
-		PlayerInfo.State = 1; // IDLE
+		CharacterInfo.AddState(STATE_IDLE);
+		CharacterInfo.State = 1; // IDLE
 	}
 
-	// Character Control 설정
+	// 캐릭터 타입 설정
 	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> WarriorDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterControl/GPC_Warrior.GPC_Warrior'"));
 	if (WarriorDataRef.Object)
 	{
@@ -118,7 +120,7 @@ void AGPCharacterBase::Tick(float DeltaTime)
 		return;
 
 	/// Other Client 공격 모션 동기화 ///
-	if (PlayerInfo.HasState(STATE_AUTOATTACK) && bIsAutoAttacking == false)
+	if (CharacterInfo.HasState(STATE_AUTOATTACK) && bIsAutoAttacking == false)
 	{
 		ProcessAutoAttackCommand();
 		return;
@@ -126,16 +128,16 @@ void AGPCharacterBase::Tick(float DeltaTime)
 
 	/// 미끄러지는 문제 해결하기 ///
 	{
-		if (PlayerInfo.Speed < 200.f)
+		if (CharacterInfo.Speed < 200.f)
 		{
-			PlayerInfo.Speed = 300.f;
+			CharacterInfo.Speed = 300.f;
 		}
 	}
 
 	/// Other Client 위치 및 회전 동기화 ///
 	FVector Location = GetActorLocation();
-	FVector DestLocation = FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z);
-	float Speed = PlayerInfo.Speed;
+	FVector DestLocation = FVector(CharacterInfo.X, CharacterInfo.Y, CharacterInfo.Z);
+	float Speed = CharacterInfo.Speed;
 
 	FVector MoveDir = (DestLocation - Location);
 	const float DistToDest = MoveDir.Length();
@@ -146,7 +148,7 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	FVector NextLocation = Location + MoveDir * MoveDist;
 
 	FRotator Rotation = GetActorRotation();
-	Rotation.Yaw = PlayerInfo.Yaw;
+	Rotation.Yaw = CharacterInfo.Yaw;
 
 	SetActorLocationAndRotation(NextLocation, Rotation);
 
@@ -154,11 +156,11 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	GetCharacterMovement()->Velocity = MoveDir * Speed;
 
 	/// Other Client 점프 동기화 ///
-	if (PlayerInfo.HasState(STATE_JUMP))
+	if (CharacterInfo.HasState(STATE_JUMP))
 	{
 		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 	}
-	else if (!PlayerInfo.HasState(STATE_JUMP) && GetActorLocation().Z < 150.f)
+	else if (!CharacterInfo.HasState(STATE_JUMP) && GetActorLocation().Z < 150.f)
 	{
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	}
@@ -167,12 +169,11 @@ void AGPCharacterBase::Tick(float DeltaTime)
 void AGPCharacterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	// Stat->OnHpZero.AddUObject(this , &AGPCharacterBase::)
 }
 
-void AGPCharacterBase::SetClientInfoFromServer(FCharacterInfo& PlayerInfo_)
+void AGPCharacterBase::SetCharacterInfoFromServer(FCharacterInfo& CharacterInfo_)
 {
-	PlayerInfo = PlayerInfo_;
+	CharacterInfo = CharacterInfo_;
 }
 
 void AGPCharacterBase::ProcessAutoAttackCommand()
@@ -198,19 +199,19 @@ void AGPCharacterBase::OnAutoAttackMontageEnded(UAnimMontage* Montage, bool bInt
 	{
 		bIsAutoAttacking = false;
 
-		if (PlayerInfo.HasState(STATE_AUTOATTACK))
+		if (CharacterInfo.HasState(STATE_AUTOATTACK))
 		{
-			PlayerInfo.RemoveState(STATE_AUTOATTACK);
+			CharacterInfo.RemoveState(STATE_AUTOATTACK);
 		}
 	}
 }
 
 void AGPCharacterBase::SetCharacterControlData(const UGPCharacterControlData* CharacterControlData)
 {
-	// Pawn
+	// 폰 
 	bUseControllerRotationYaw = CharacterControlData->bUseControllerRotationYaw;
 
-	// CharacterMovement
+	// 캐릭터 무브먼트 
 	GetCharacterMovement()->bOrientRotationToMovement = CharacterControlData->bOrientRotationToMovement;
 	GetCharacterMovement()->bUseControllerDesiredRotation = CharacterControlData->bUseControllerDesiredRotation;
 	GetCharacterMovement()->RotationRate = CharacterControlData->RotationRate;
@@ -232,7 +233,7 @@ void AGPCharacterBase::SetCharacterControl(ECharacterType NewCharacterControlTyp
 
 	SetCharacterControlData(NewCharacterControl);
 
-	CurrentCharacterControlType = NewCharacterControlType;
+	CurrentCharacterType = NewCharacterControlType;
 }
 
 void AGPCharacterBase::AttackHitCheck()

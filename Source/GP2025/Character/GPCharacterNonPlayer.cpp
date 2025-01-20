@@ -22,10 +22,5 @@ void AGPCharacterNonPlayer::SetCharacterControlData(const UGPCharacterControlDat
 
 void AGPCharacterNonPlayer::SetCharacterControl(ECharacterType NewCharacterControlType)
 {
-	UGPCharacterControlData* NewCharacterControl = CharacterControlManager[NewCharacterControlType];
-	check(NewCharacterControl);
-
-	SetCharacterControlData(NewCharacterControl);
-
-	CurrentCharacterControlType = NewCharacterControlType;
+	Super::SetCharacterControl(NewCharacterControlType);
 }
