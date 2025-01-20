@@ -9,16 +9,6 @@
 #include "Interface/GPCharacterWidgetInterface.h"
 #include "GPCharacterBase.generated.h"
 
-UENUM()
-enum class ECharacterControlType : uint8
-{
-	// 플레이어
-	P_Warrior ,
-	P_Gunner ,
-
-	// 몬스터
-	M_Mouse
-};
 
 UCLASS()
 class GP2025_API AGPCharacterBase : public ACharacter , public IGPAnimationAttackInterface ,public IGPCharacterWidgetInterface
@@ -50,12 +40,11 @@ public :
 // Control Data 세팅
 public :
 	virtual void SetCharacterControlData(const class UGPCharacterControlData* CharacterControlData);
-	virtual void SetCharacterControl(ECharacterControlType NewCharacterControlType);
+	virtual void SetCharacterControl(ECharacterType NewCharacterControlType);
 
-	UPROPERTY(EditAnywhere, Category = "CharacterControl", Meta = (AllowPrivateAccess = "true"))
-	TMap<ECharacterControlType, class UGPCharacterControlData*> CharacterControlManager;
+	TMap<ECharacterType, class UGPCharacterControlData*> CharacterControlManager;
 
-	ECharacterControlType CurrentCharacterControlType;
+	ECharacterType CurrentCharacterControlType;
 
 // Attack Hit Section
 protected :

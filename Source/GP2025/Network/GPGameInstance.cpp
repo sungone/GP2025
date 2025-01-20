@@ -287,7 +287,7 @@ void UGPGameInstance::SpawnMonster(FCharacterInfo& MonsterInfo)
 			MonsterInfo.ID, MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z, MonsterInfo.Yaw);
 
 		Monster->SetActorLocation(FVector(MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z));
-		Monster->SetCharacterControl(ECharacterControlType::M_Mouse);
+		Monster->SetCharacterControl(ECharacterType::M_Mouse);
 		Monster->Stat->SetMaxHp(MonsterInfo.MaxHp);
 		Monster->Stat->SetCurrentHp(MonsterInfo.MaxHp);
 		Monsters.Add(MonsterInfo.ID, Monster);

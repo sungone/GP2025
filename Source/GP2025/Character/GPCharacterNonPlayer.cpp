@@ -6,7 +6,7 @@
 
 AGPCharacterNonPlayer::AGPCharacterNonPlayer()
 {
-	CurrentCharacterControlType = ECharacterControlType::M_Mouse;
+	CurrentCharacterControlType = ECharacterType::M_Mouse;
 }
 
 void AGPCharacterNonPlayer::BeginPlay()
@@ -20,7 +20,7 @@ void AGPCharacterNonPlayer::SetCharacterControlData(const UGPCharacterControlDat
 	Super::SetCharacterControlData(CharacterControlData);
 }
 
-void AGPCharacterNonPlayer::SetCharacterControl(ECharacterControlType NewCharacterControlType)
+void AGPCharacterNonPlayer::SetCharacterControl(ECharacterType NewCharacterControlType)
 {
 	UGPCharacterControlData* NewCharacterControl = CharacterControlManager[NewCharacterControlType];
 	check(NewCharacterControl);

@@ -67,19 +67,19 @@ AGPCharacterBase::AGPCharacterBase()
 	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> WarriorDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterControl/GPC_Warrior.GPC_Warrior'"));
 	if (WarriorDataRef.Object)
 	{
-		CharacterControlManager.Add(ECharacterControlType::P_Warrior, WarriorDataRef.Object);
+		CharacterControlManager.Add(ECharacterType::P_Warrior, WarriorDataRef.Object);
 	}
 
 	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> GunnerDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterControl/GPC_Gunner.GPC_Gunner'"));
 	if (GunnerDataRef.Object)
 	{
-		CharacterControlManager.Add(ECharacterControlType::P_Gunner, GunnerDataRef.Object);
+		CharacterControlManager.Add(ECharacterType::P_Gunner, GunnerDataRef.Object);
 	}
 
 	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> MouseMonsterDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterControl/GPC_MouseMonster.GPC_MouseMonster'"));
 	if (MouseMonsterDataRef.Object)
 	{
-		CharacterControlManager.Add(ECharacterControlType::M_Mouse, MouseMonsterDataRef.Object);
+		CharacterControlManager.Add(ECharacterType::M_Mouse, MouseMonsterDataRef.Object);
 	}
 
 	// Stat Component
@@ -225,7 +225,7 @@ void AGPCharacterBase::SetCharacterControlData(const UGPCharacterControlData* Ch
 	AutoAttackActionMontage = CharacterControlData->AnimMontage;
 }
 
-void AGPCharacterBase::SetCharacterControl(ECharacterControlType NewCharacterControlType)
+void AGPCharacterBase::SetCharacterControl(ECharacterType NewCharacterControlType)
 {
 	UGPCharacterControlData* NewCharacterControl = CharacterControlManager[NewCharacterControlType];
 	check(NewCharacterControl);

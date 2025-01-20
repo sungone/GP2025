@@ -32,7 +32,7 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	virtual void SetCharacterControl(ECharacterControlType NewCharacterControlType) override;
+	virtual void SetCharacterControl(ECharacterType NewCharacterControlType) override;
 	virtual void SetCharacterControlData(const class UGPCharacterControlData* CharacterControlData) override;
 
 	// Input ÇÔ¼öµé
