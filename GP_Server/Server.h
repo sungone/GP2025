@@ -1,19 +1,52 @@
 #pragma once
 #include "Define.h"
-#include "Session.h"
-#include "MonsterManager.h"
+#include "IOCP.h"
+#include "SessionManager.h"
+#include <conio.h>
 
 class Server {
 public:
-	void Init();
+	static Server& GetInst()
+	{
+		static Server inst;
+		return inst;
+	}
+	~Server() { Close(); }
+	void CheckForExitKey()
+	{
+		while (bRunning)
+		{
+			if (_kbhit())
+			{
+				char key = _getch();
+				if (key == 'q' || key == 27) // 'q'나 ESC 키
+				{
+					bRunning = false;
+				}
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(100)); // CPU 점유율 최소화
+		}
+	}
+	bool Init();
 	void Run();
-	
-	int32 get_new_id();
+	void Close();
 
 private:
-	HANDLE h_iocp;
-	SOCKET s_socket;
-	SOCKET c_socket;
+	void CreateWokerThreads();
+	void WorkerThreadLoop();
+	void HandleError(ExpOver* ex_over, int id);
+	
+	void DoAccept();
 
-	bool is_running = true;
+	void HandleAccept();
+	void HandleRecv(int id, int recvByte, ExpOver* expOver);
+
+private:
+	bool bRunning = true;
+	SOCKET listenSocket;
+	SOCKET acceptSocket;
+	ExpOver acceptOver;
+
+	IOCP& iocp = IOCP::GetInst();
+	SessionManager& sessionMgr = SessionManager::GetInst();
 };

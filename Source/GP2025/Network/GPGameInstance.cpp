@@ -7,7 +7,6 @@
 #include "Serialization/ArrayWriter.h"
 #include "SocketSubsystem.h"
 #include "Character/GPCharacterPlayer.h"
-#include "CharacterStat/GPCharacterStatComponent.h"
 #include "../../GP_Server/Proto.h"
 
 void UGPGameInstance::Init()
@@ -62,69 +61,35 @@ void UGPGameInstance::DisconnectFromServer()
 
 void UGPGameInstance::SendPlayerLoginPacket()
 {
-	FLoginPacket Packet;
-	Packet.Header.PacketType = EPacketType::C_LOGIN;
-	Packet.Header.PacketSize = sizeof(FLoginPacket);
-
+	Packet Packet(EPacketType::C_LOGIN);
 	int32 BytesSent = 0;
-	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FLoginPacket), BytesSent);
+	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(Packet), BytesSent);
 }
 
 void UGPGameInstance::SendPlayerLogoutPacket()
 {
-	FLogoutPacket Packet;
-	Packet.Header.PacketType = EPacketType::C_LOGOUT;
-	Packet.Header.PacketSize = sizeof(FLogoutPacket);
-	Packet.PlayerID = MyPlayer->CharacterInfo.ID;
-
+	IDPacket Packet(EPacketType::C_LOGOUT, MyPlayer->PlayerInfo.ID);
 	int32 BytesSent = 0;
-	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FLogoutPacket), BytesSent);
+	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(IDPacket), BytesSent);
 }
 
 void UGPGameInstance::SendPlayerMovePacket()
 {
-	FMovePacket Packet;
-	Packet.Header.PacketType = EPacketType::C_MOVE;
-	Packet.Header.PacketSize = sizeof(FMovePacket);
-	Packet.PlayerInfo = MyPlayer->CharacterInfo;
-
+	InfoPacket Packet(EPacketType::C_MOVE, MyPlayer->PlayerInfo);
 	int32 BytesSent = 0;
-
 	UE_LOG(LogTemp, Warning, TEXT("SendPlayerMovePacket : Send [%d] (%f,%f,%f)"),
-		Packet.PlayerInfo.ID, Packet.PlayerInfo.X, Packet.PlayerInfo.Y, Packet.PlayerInfo.Z);
-
-	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FMovePacket), BytesSent);
+		Packet.Data.ID, Packet.Data.X, Packet.Data.Y, Packet.Data.Z);
+	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(InfoPacket), BytesSent);
 }
 
-void UGPGameInstance::SendPlayerAttackPacket()
+void UGPGameInstance::sendPlayerAttackPacket()
 {
-	FAttackPacket Packet;
-	Packet.Header.PacketType = EPacketType::C_ATTACK;
-	Packet.Header.PacketSize = sizeof(FAttackPacket);
-	Packet.PlayerInfo = MyPlayer->CharacterInfo;
-
+	InfoPacket Packet(EPacketType::C_ATTACK, MyPlayer->PlayerInfo);
 	int32 BytesSent = 0;
-
 	UE_LOG(LogTemp, Log, TEXT("sendPlayerAttackPacket : Send [%d] (%f,%f,%f)"),
-		Packet.PlayerInfo.ID, Packet.PlayerInfo.X, Packet.PlayerInfo.Y, Packet.PlayerInfo.Z);
+		Packet.Data.ID, Packet.Data.X, Packet.Data.Y, Packet.Data.Z);
 
-	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FAttackPacket), BytesSent);
-}
-
-void UGPGameInstance::SendHitPacket(FCharacterInfo& Attacker, FCharacterInfo& Attacked , bool isAttackerPlayer)
-{
-	FHitPacket Packet;
-	Packet.Header.PacketType = EPacketType::C_HIT;
-	Packet.Header.PacketSize = sizeof(FHitPacket);
-	Packet.AttackerInfo = Attacker;
-	Packet.attackedInfo = Attacked;
-	Packet.isAttackerPlayer = isAttackerPlayer;
-
-	int32 BytesSent = 0;
-
-	UE_LOG(LogTemp, Log, TEXT("Attack %d -> %d"), Packet.AttackerInfo.ID , Packet.attackedInfo.ID);
-
-	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FHitPacket), BytesSent);
+	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(InfoPacket), BytesSent);
 }
 
 void UGPGameInstance::ReceiveData()
@@ -165,38 +130,32 @@ void UGPGameInstance::ProcessPacket()
 				{
 				case EPacketType::S_LOGININFO:
 				{
-					FLoginInfoPacket* LoginInfoPacket = reinterpret_cast<FLoginInfoPacket*>(RemainingData.GetData());
-					AddPlayer(LoginInfoPacket->PlayerInfo, true);
+					InfoPacket* LoginInfoPacket = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
+					AddPlayer(LoginInfoPacket->Data, true);
 					break;
 				}
 				case EPacketType::S_ADD_PLAYER:
 				{
-					FAddPlayerPacket* AddPlayerPacket = reinterpret_cast<FAddPlayerPacket*>(RemainingData.GetData());
-					AddPlayer(AddPlayerPacket->PlayerInfo, false);
+					InfoPacket* AddPlayerPacket = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
+					AddPlayer(AddPlayerPacket->Data, false);
 					break;
 				}
 				case EPacketType::S_REMOVE_PLAYER:
 				{
-					FLogoutPacket* RemovePlayerPacket = reinterpret_cast<FLogoutPacket*>(RemainingData.GetData());
-					RemovePlayer(RemovePlayerPacket->PlayerID);
+					IDPacket* RemovePlayerPacket = reinterpret_cast<IDPacket*>(RemainingData.GetData());
+					RemovePlayer(RemovePlayerPacket->Data);
 					break;
 				}
 				case EPacketType::S_MOVE_PLAYER:
 				{
-					FMovePacket* MovePlayerPacket = reinterpret_cast<FMovePacket*>(RemainingData.GetData());
-					UpdatePlayer(MovePlayerPacket->PlayerInfo);
+					InfoPacket* MovePlayerPacket = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
+					UpdatePlayer(MovePlayerPacket->Data);
 					break;
 				}
 				case EPacketType::S_ATTACK_PLAYER :
 				{
-					FAttackPacket* AttackPlayerPacket = reinterpret_cast<FAttackPacket*>(RemainingData.GetData());
-					UpdatePlayer(AttackPlayerPacket->PlayerInfo);
-					break;
-				}
-				case EPacketType::S_SPAWN_MONSTER:
-				{
-					FSpawnMonsterPacket* SpawnMonsterPacket = reinterpret_cast<FSpawnMonsterPacket*>(RemainingData.GetData());
-					SpawnMonster(SpawnMonsterPacket->MonsterInfo);
+					InfoPacket* AttackPlayerPacket = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
+					UpdatePlayer(AttackPlayerPacket->Data);
 					break;
 				}
 				default:
@@ -214,7 +173,7 @@ void UGPGameInstance::ProcessPacket()
 	}
 }
 
-void UGPGameInstance::AddPlayer(FCharacterInfo& PlayerInfo, bool isMyPlayer)
+void UGPGameInstance::AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer)
 {
 	auto* World = GetWorld();
 	if (World == nullptr)
@@ -231,7 +190,7 @@ void UGPGameInstance::AddPlayer(FCharacterInfo& PlayerInfo, bool isMyPlayer)
 		UE_LOG(LogTemp, Warning, TEXT("Add my player [%d] (%f,%f,%f)(%f)"),
 			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 
-		MyPlayer->SetCharacterInfoFromServer(PlayerInfo);
+		MyPlayer->SetClientInfoFromServer(PlayerInfo);
 		MyPlayer->SetActorLocation(FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z));
 		
 		Players.Add(PlayerInfo.ID, MyPlayer);
@@ -247,7 +206,7 @@ void UGPGameInstance::AddPlayer(FCharacterInfo& PlayerInfo, bool isMyPlayer)
 		UE_LOG(LogTemp, Warning, TEXT("Add other player [%d] (%f,%f,%f)(%f)"),
 			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 
-		Player->SetCharacterInfoFromServer(PlayerInfo);
+		Player->SetClientInfoFromServer(PlayerInfo);
 		Player->SetActorLocation(FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z));
 		
 		Players.Add(PlayerInfo.ID, Player);
@@ -266,39 +225,13 @@ void UGPGameInstance::RemovePlayer(int32 PlayerID)
 	}
 }
 
-void UGPGameInstance::UpdatePlayer(FCharacterInfo& PlayerInfo)
+void UGPGameInstance::UpdatePlayer(FPlayerInfo& PlayerInfo)
 {
 	auto Player = Players.Find(PlayerInfo.ID);
 	if (Player)
 	{
-		(*Player)->SetCharacterInfoFromServer(PlayerInfo);
+		(*Player)->SetClientInfoFromServer(PlayerInfo);
 		UE_LOG(LogTemp, Warning, TEXT("Update other player [%d] (%f,%f,%f)(%f)"),
 			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 	}
-}
-
-void UGPGameInstance::SpawnMonster(FCharacterInfo& MonsterInfo)
-{
-	auto* World = GetWorld();
-	if (World == nullptr)
-		return;
-
-	FVector SpawnLocation(MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z);
-	FRotator SpawnRotation(0, MonsterInfo.Yaw, 0);
-
-	AGPCharacterBase* Monster = nullptr;
-	while (Monster == nullptr)
-	{
-		Monster = World->SpawnActor<AGPCharacterBase>(MonsterClass, SpawnLocation, SpawnRotation);
-		UE_LOG(LogTemp, Warning, TEXT("Spawn Monster [%d] (%f,%f,%f)(%f)"),
-			MonsterInfo.ID, MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z, MonsterInfo.Yaw);
-
-		Monster->SetActorLocation(FVector(MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z));
-		Monster->SetCharacterControl(ECharacterType::M_Mouse);
-		Monster->CharacterInfo = MonsterInfo;
-		Monster->Stat->SetMaxHp(MonsterInfo.MaxHp);
-		Monster->Stat->SetCurrentHp(MonsterInfo.MaxHp);
-		Monsters.Add(MonsterInfo.ID, Monster);
-	}
-
 }
