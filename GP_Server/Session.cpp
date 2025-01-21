@@ -1,232 +1,54 @@
 #include "Session.h"
-#include <random>
-#include "MonsterManager.h"
+#include "SessionManager.h"
 
-std::default_random_engine dre;
-std::uniform_real_distribution<float> ud_x(-3000, -1000);
-std::uniform_real_distribution<float> ud_y(-3500, -1500);
-extern std::array<Session, MAX_CLIENT> clients;
-extern MonsterManager MonsterMgr;
-
-void Session::process_packet(char* packet)
+void Session::DoRecv()
 {
-	int32 recv_id = getId();
-	EPacketType packet_type = static_cast<EPacketType>(packet[0]);
-	switch (packet_type)
+	ZeroMemory(&recvOver.wsaover, sizeof(recvOver.wsaover));
+	DWORD recv_flag = 0;
+	recvOver.wsabuf.len = BUFSIZE - remain;
+	recvOver.wsabuf.buf = recvOver.buf + remain;
+	WSARecv(socket, &recvOver.wsabuf, 1, 0, &recv_flag, &recvOver.wsaover, 0);
+}
+void Session::DoSend(Packet* packet)
+{
+	switch (packet->Header.PacketType)
 	{
-	case EPacketType::C_LOGIN:
-		std::cout << "<- Recv:: Login Packet[" << recv_id << "]" << std::endl;
-		clients[recv_id].is_login = true;
-		clients[recv_id].info.X = ud_x(dre);
-		clients[recv_id].info.Y = ud_y(dre);
-		clients[recv_id].info.Z = 116;
-		clients[recv_id].send_login_packet();
-		for (auto& cl : clients)
-		{
-			if (cl.getId() == recv_id) continue;
-			if (not cl.is_login) continue;
-			cl.send_add_player_packet(recv_id);
-		}
-		for (auto& cl : clients)
-		{
-			if (cl.getId() == recv_id) continue;
-			if (not cl.is_login) continue;
-			send_add_player_packet(cl.getId());
-		}
-
-		// 클라이언트가 로그인 요청을 보내면 서버에 몬스터 한마리를 스폰시킴
-		// 25.01.18 -> 이동 , 공격 빼고 스폰만 일단 해볼 예정
-		{
-			static int32 MonsterIDCounter = 1;
-
-			ECharacterType MonsterType = ECharacterType::M_Mouse;
-
-			// 몬스터 생성
-			MonsterMgr.SpawnMonster(MonsterIDCounter, MonsterType, ud_x(dre), ud_y(dre), 116.f, 90.f);
-			for (auto& cl : clients)
-			{
-				if (cl.is_login)
-					cl.send_spawn_monster_packet(MonsterIDCounter);
-			}
-
-			MonsterIDCounter++;
-		}
-
+	case S_LOGININFO:
+		LOG(LogType::SendLog, std::format("LoginInfo PKT to [{}]", id));
 		break;
-	case EPacketType::C_LOGOUT:
-		std::cout << "<- Recv:: LoginOut Packet[" << recv_id << "]" << std::endl;
-		disconnect();
+	case S_ADD_PLAYER:
+		LOG(LogType::SendLog, std::format("AddPlayer PKT to [{}]", id));
 		break;
-	case EPacketType::C_MOVE:
-	{
-		FMovePacket* p = reinterpret_cast<FMovePacket*>(packet);
-		memcpy(&clients[recv_id].info, &(p->PlayerInfo), sizeof(FCharacterInfo));
-
-		std::cout << "<- Recv:: Move Packet[" << recv_id << "] ("
-			<< clients[recv_id].info.X << ", "
-			<< clients[recv_id].info.Y << ", "
-			<< clients[recv_id].info.Z << "), Rotate ("
-			<< clients[recv_id].info.Yaw << ") , "
-			<< "State " << clients[recv_id].info.State << ""
-			<< std::endl;
-		for (auto& cl : clients)
-		{
-			if (cl.getId() == recv_id) continue;
-			if (cl.is_login)
-				cl.send_move_packet(recv_id);
-		}
+	case S_REMOVE_PLAYER:
+		LOG(LogType::SendLog, std::format("RemovePlayer PKT to [{}]", id));
 		break;
-	}
-	case EPacketType::C_ATTACK:
-	{
-		FAttackPacket* p = reinterpret_cast<FAttackPacket*>(packet);
-		memcpy(&clients[recv_id].info, &(p->PlayerInfo), sizeof(FCharacterInfo));
-
-		std::cout << "<- Recv:: Attack Packet[" << recv_id << "] ("
-			<< clients[recv_id].info.X << ", "
-			<< clients[recv_id].info.Y << ", "
-			<< clients[recv_id].info.Z << "), Rotate ("
-			<< clients[recv_id].info.Yaw << ") , "
-			<< "State " << clients[recv_id].info.State << ""
-			<< std::endl;
-		for (auto& cl : clients)
-		{
-			if (cl.getId() == recv_id) continue;
-			if (cl.is_login)
-				cl.send_attack_packet(recv_id);
-		}
+	case S_MOVE_PLAYER:
+		LOG(LogType::SendLog, std::format("MovePlayer PKT to [{}]", id));
 		break;
-	}
-	case EPacketType::C_HIT :
-	{
-		FHitPacket* p = reinterpret_cast<FHitPacket*>(packet);
-		std::cout << "Attacker ID : " << p->AttackerInfo.ID << " , Attacked ID : " << p->attackedInfo.ID 
-			<< "IsAttackerPlayer : " << p->isAttackerPlayer << std::endl;
-
-		if (p->isAttackerPlayer) // 공격자가 플레이어라면
-		{
-			Monster* AttackedMonster = MonsterMgr.GetMonsterByID(p->attackedInfo.ID);
-			AttackedMonster->Attacked(p->AttackerInfo.Damage);
-
-			for (auto& cl : clients)
-			{
-				if (cl.is_login)
-					cl.send_spawn_HpUpdate_packet(AttackedMonster->GetID());
-			}
-		}
-		else // 공격자가 몬스터라면
-		{
-
-		}
-
+	case S_ATTACK_PLAYER:
+		LOG(LogType::SendLog, std::format("AttackPlayer PKT to [{}]", id));
 		break;
-	}
 	default:
-		std::cout << "<- Recv:: Unknown Packet" << std::endl;
+		break;
 	}
+	auto send_data = new ExpOver{ reinterpret_cast<unsigned char*>(packet) };
+	WSASend(socket, &send_data->wsabuf, 1, nullptr, 0, &send_data->wsaover, nullptr);
 }
 
-void Session::send_move_packet(int32 id)
+void Session::Login()
 {
-	FMovePacket pk;
-	pk.Header.PacketSize = sizeof(FMovePacket);
-	pk.Header.PacketType = EPacketType::S_MOVE_PLAYER;
-	pk.PlayerInfo = clients[id].info;
-	std::cout << "-> Send:: Move Packet [" << id << "] ("
-		<< pk.PlayerInfo.X << ","
-		<< pk.PlayerInfo.Y << ","
-		<< pk.PlayerInfo.Z << ") to [" << this->getId() << "]\n";
-	do_send(&pk);
+	static std::default_random_engine dre;
+	static std::uniform_real_distribution<float> ud_x(-3000, -1000);
+	static std::uniform_real_distribution<float> ud_y(-3500, -1500);
+
+	bLogin = true;
+	info.X = ud_x(dre);
+	info.Y = ud_y(dre);
+	info.Z = 116;
 }
 
-void Session::send_attack_packet(int32 id)
+void Session::Disconnect()
 {
-	FAttackPacket pk;
-	pk.Header.PacketSize = sizeof(FAttackPacket);
-	pk.Header.PacketType = EPacketType::S_ATTACK_PLAYER;
-	pk.PlayerInfo = clients[id].info;
-	std::cout << "-> Send:: Attack Packet [" << id << "] ("
-		<< pk.PlayerInfo.X << ","
-		<< pk.PlayerInfo.Y << ","
-		<< pk.PlayerInfo.Z << ") to [" << this->getId() << "]\n";
-	do_send(&pk);
-}
-
-void Session::send_login_packet()
-{
-	FLoginInfoPacket pk;
-	pk.Header.PacketSize = sizeof(FLoginInfoPacket);
-	pk.Header.PacketType = EPacketType::S_LOGININFO;
-	pk.PlayerInfo = info;
-	std::cout << "-> Send:: Login Info Packet [" << pk.PlayerInfo.ID << "] ("
-		<< pk.PlayerInfo.X << ","
-		<< pk.PlayerInfo.Y << ","
-		<< pk.PlayerInfo.Z << ")\n";
-	do_send(&pk);
-}
-
-void Session::send_add_player_packet(int32 add_id)
-{
-	FAddPlayerPacket pk;
-	pk.Header.PacketSize = sizeof(FAddPlayerPacket);
-	pk.Header.PacketType = EPacketType::S_ADD_PLAYER;
-	pk.PlayerID = this->getId();
-	pk.PlayerInfo = clients[add_id].info;
-	std::cout << "-> Send:: Add Player[" << pk.PlayerInfo.ID << "] Packet to [" << pk.PlayerID << "]" << std::endl;
-	do_send(&pk);
-}
-
-void Session::send_remove_player_packet(int32 remove_id)
-{
-	FRemovePlayerPacket pk;
-	pk.Header.PacketSize = sizeof(FRemovePlayerPacket);
-	pk.Header.PacketType = EPacketType::S_REMOVE_PLAYER;
-	pk.PlayerID = remove_id;
-	std::cout << "-> Send:: Remove Player[" << pk.PlayerID << "] Packet to [" << this->getId() << "]" << std::endl;
-	do_send(&pk);
-}
-
-void Session::disconnect()
-{
-	this->is_login = false;
-	for (auto& cl : clients)
-		if (cl.is_login)
-			clients[cl.getId()].send_remove_player_packet(this->getId());
-}
-
-void Session::send_spawn_monster_packet(int32 id)
-{
-	Monster* Monster = MonsterMgr.GetMonsterByID(id);
-	if (!Monster)
-	{
-		std::cerr << "Error: Monster with ID " << id << " not found!\n";
-		return;
-	}
-
-	FSpawnMonsterPacket pk;
-	pk.Header.PacketType = EPacketType::S_SPAWN_MONSTER;
-	pk.Header.PacketSize = sizeof(FSpawnMonsterPacket);
-	pk.MonsterInfo = Monster->GetInfo();
-
-	std::cout << "-> Send:: Spawn Monster[" << pk.MonsterInfo.ID << "]" << std::endl;
-	do_send(&pk);
-}
-
-void Session::send_spawn_HpUpdate_packet(int32 id)
-{
-	Monster* monster = MonsterMgr.GetMonsterByID(id);
-	if (!monster)
-	{
-		std::cerr << "Error: Monster with ID " << id << " not found!\n";
-		return;
-	}
-
-	FMonsterHpUpdatePacket pk;
-	pk.Header.PacketType = EPacketType::S_MONSTER_REDUCE_HP;
-	pk.Header.PacketSize = sizeof(FMonsterHpUpdatePacket);
-	pk.MonsterID = monster->GetID();
-	pk.Hp = monster->GetHp();
-
-	std::cout << "Monster ID : " << pk.MonsterID << ", Current Hp : " << pk.Hp << std::endl;
-	do_send(&pk);
+	bLogin = false;
+	closesocket(socket);
 }
