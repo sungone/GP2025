@@ -1,4 +1,5 @@
 #include "SessionManager.h"
+#include "PacketManager.h"
 
 void SessionManager::RegisterSession(SOCKET& socket)
 {
@@ -29,7 +30,7 @@ void SessionManager::HandleRecvBuffer(int id, int recvByte, ExpOver* expOver)
 	while (dataSize > 0) {
 		int packetSize = packet[1];
 		if (packetSize <= dataSize) {
-			session.process_packet(packet);
+			PacketManager::GetInst().ProcessPacket(session, packet);
 			packet = packet + packetSize;
 			dataSize = dataSize - packetSize;
 		}
@@ -38,4 +39,23 @@ void SessionManager::HandleRecvBuffer(int id, int recvByte, ExpOver* expOver)
 	session.remain = dataSize;
 	if (dataSize > 0)
 		memcpy(expOver->buf, packet, dataSize);
+}
+
+void SessionManager::Broadcast(Packet* packet, int exptId)
+{
+	for (auto& session : clients)
+	{
+		if (!session.bLogin || exptId == session.id)
+			continue;
+		session.DoSend(packet);
+	}
+}
+
+int SessionManager::GenerateId()
+{
+	for (int i = 1; i < MAX_CLIENT + 1; ++i)
+	{
+		if (clients[i].bLogin) continue;
+		return i;
+	}
 }

@@ -25,14 +25,14 @@ public:
 	WSAOVERLAPPED wsaover;
 	WSABUF wsabuf;
 	char	buf[BUFSIZE];
-	CompType comp_type;
+	CompType compType;
 public:
 	ExpOver(unsigned char* packet)
 	{
 		ZeroMemory(&wsaover, sizeof(wsaover));
 		wsabuf.len = packet[1];
 		wsabuf.buf = buf;
-		comp_type = SEND;
+		compType = SEND;
 		memcpy(buf, packet, packet[1]);
 	}
 	ExpOver()
@@ -40,6 +40,6 @@ public:
 		ZeroMemory(&wsaover, sizeof(wsaover));
 		wsabuf.buf = buf;
 		wsabuf.len = BUFSIZE;
-		comp_type = RECV;
+		compType = RECV;
 	}
 };

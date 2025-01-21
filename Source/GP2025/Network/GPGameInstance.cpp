@@ -61,49 +61,35 @@ void UGPGameInstance::DisconnectFromServer()
 
 void UGPGameInstance::SendPlayerLoginPacket()
 {
-	FLoginPacket Packet;
-	Packet.Header.PacketType = EPacketType::C_LOGIN;
-	Packet.Header.PacketSize = sizeof(FLoginPacket);
-
+	Packet Packet(EPacketType::C_LOGIN);
 	int32 BytesSent = 0;
-	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FLoginPacket), BytesSent);
+	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(Packet), BytesSent);
 }
 
 void UGPGameInstance::SendPlayerLogoutPacket()
 {
-	FLogoutPacket Packet;
-	Packet.Header.PacketType = EPacketType::C_LOGOUT;
-	Packet.Header.PacketSize = sizeof(FLogoutPacket);
-	Packet.PlayerID = MyPlayer->PlayerInfo.ID;
-
+	IDPacket Packet(EPacketType::C_LOGOUT, MyPlayer->PlayerInfo.ID);
 	int32 BytesSent = 0;
-	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FLogoutPacket), BytesSent);
+	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(IDPacket), BytesSent);
 }
 
 void UGPGameInstance::SendPlayerMovePacket()
 {
-	FMovePacket Packet;
-	Packet.Header.PacketType = EPacketType::C_MOVE;
-	Packet.Header.PacketSize = sizeof(FMovePacket);
-	Packet.PlayerInfo = MyPlayer->PlayerInfo;
+	InfoPacket Packet(EPacketType::C_MOVE, MyPlayer->PlayerInfo);
 	int32 BytesSent = 0;
 	UE_LOG(LogTemp, Warning, TEXT("SendPlayerMovePacket : Send [%d] (%f,%f,%f)"),
-		Packet.PlayerInfo.ID, Packet.PlayerInfo.X, Packet.PlayerInfo.Y, Packet.PlayerInfo.Z);
-
-	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FMovePacket), BytesSent);
+		Packet.Data.ID, Packet.Data.X, Packet.Data.Y, Packet.Data.Z);
+	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(InfoPacket), BytesSent);
 }
 
 void UGPGameInstance::sendPlayerAttackPacket()
 {
-	FAttackPacket Packet;
-	Packet.Header.PacketType = EPacketType::C_ATTACK;
-	Packet.Header.PacketSize = sizeof(FAttackPacket);
-	Packet.PlayerInfo = MyPlayer->PlayerInfo;
+	InfoPacket Packet(EPacketType::C_ATTACK, MyPlayer->PlayerInfo);
 	int32 BytesSent = 0;
 	UE_LOG(LogTemp, Log, TEXT("sendPlayerAttackPacket : Send [%d] (%f,%f,%f)"),
-		Packet.PlayerInfo.ID, Packet.PlayerInfo.X, Packet.PlayerInfo.Y, Packet.PlayerInfo.Z);
+		Packet.Data.ID, Packet.Data.X, Packet.Data.Y, Packet.Data.Z);
 
-	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FAttackPacket), BytesSent);
+	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(InfoPacket), BytesSent);
 }
 
 void UGPGameInstance::ReceiveData()
@@ -144,32 +130,32 @@ void UGPGameInstance::ProcessPacket()
 				{
 				case EPacketType::S_LOGININFO:
 				{
-					FLoginInfoPacket* LoginInfoPacket = reinterpret_cast<FLoginInfoPacket*>(RemainingData.GetData());
-					AddPlayer(LoginInfoPacket->PlayerInfo, true);
+					InfoPacket* LoginInfoPacket = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
+					AddPlayer(LoginInfoPacket->Data, true);
 					break;
 				}
 				case EPacketType::S_ADD_PLAYER:
 				{
-					FAddPlayerPacket* AddPlayerPacket = reinterpret_cast<FAddPlayerPacket*>(RemainingData.GetData());
-					AddPlayer(AddPlayerPacket->PlayerInfo, false);
+					InfoPacket* AddPlayerPacket = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
+					AddPlayer(AddPlayerPacket->Data, false);
 					break;
 				}
 				case EPacketType::S_REMOVE_PLAYER:
 				{
-					FLogoutPacket* RemovePlayerPacket = reinterpret_cast<FLogoutPacket*>(RemainingData.GetData());
-					RemovePlayer(RemovePlayerPacket->PlayerID);
+					IDPacket* RemovePlayerPacket = reinterpret_cast<IDPacket*>(RemainingData.GetData());
+					RemovePlayer(RemovePlayerPacket->Data);
 					break;
 				}
 				case EPacketType::S_MOVE_PLAYER:
 				{
-					FMovePacket* MovePlayerPacket = reinterpret_cast<FMovePacket*>(RemainingData.GetData());
-					UpdatePlayer(MovePlayerPacket->PlayerInfo);
+					InfoPacket* MovePlayerPacket = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
+					UpdatePlayer(MovePlayerPacket->Data);
 					break;
 				}
 				case EPacketType::S_ATTACK_PLAYER :
 				{
-					FAttackPacket* AttackPlayerPacket = reinterpret_cast<FAttackPacket*>(RemainingData.GetData());
-					UpdatePlayer(AttackPlayerPacket->PlayerInfo);
+					InfoPacket* AttackPlayerPacket = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
+					UpdatePlayer(AttackPlayerPacket->Data);
 					break;
 				}
 				default:

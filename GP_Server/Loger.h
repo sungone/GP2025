@@ -45,8 +45,8 @@ private:
 		switch (type)
 		{
 		case LogType::Warning: return "Warning";
-		case LogType::SendLog: return "<- Send";
-		case LogType::RecvLog: return "-> Recv";
+		case LogType::SendLog: return "<< Send";
+		case LogType::RecvLog: return ">> Recv";
 		default: return "Unknown";
 		}
 	}

@@ -33,8 +33,12 @@ bool Server::Init()
 
 void Server::Run()
 {
+	/*std::thread inputThread(&Server::CheckForExitKey,this);
+	inputThread.join();*/
+
 	DoAccept();
-	CreateWokerThreads();
+	//CreateWokerThreads();
+	WorkerThreadLoop();
 }
 
 void Server::Close()
@@ -74,7 +78,7 @@ void Server::WorkerThreadLoop()
 			continue;
 		}
 
-		switch (expOver->comp_type) {
+		switch (expOver->compType) {
 		case ACCEPT:
 		{
 			HandleAccept();
@@ -94,7 +98,7 @@ void Server::WorkerThreadLoop()
 
 void Server::HandleError(ExpOver* ex_over, int id)
 {
-	switch (ex_over->comp_type)
+	switch (ex_over->compType)
 	{
 	case ACCEPT:
 		LOG(Warning, "CompType : ACCEPT");
@@ -115,7 +119,7 @@ void Server::DoAccept()
 {
 	ZeroMemory(&acceptOver.wsaover, sizeof(acceptOver.wsaover));
 	acceptSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-	acceptOver.comp_type = ACCEPT;
+	acceptOver.compType = ACCEPT;
 	AcceptEx(listenSocket, acceptSocket, acceptOver.buf, 0,
 		sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, 0, &acceptOver.wsaover);
 }
