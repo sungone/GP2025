@@ -11,16 +11,15 @@ enum EPacketType : uint8_t
 	C_MOVE,
 	C_ATTACK,
 
-	S_LOGININFO,
+	S_PLAYER_LOGIN_INFO,
 	S_ADD_PLAYER,
 	S_REMOVE_PLAYER,
-	S_MOVE_PLAYER,
-	S_ATTACK_PLAYER,
+	S_PLAYER_STATUS_UPDATE,
 
 	S_ADD_MONSTER,
 	S_REMOVE_MONSTER,
 	S_MOVE_MONSTER,
-	S_MONSTER_REDUCE_HP,
+	S_MONSTER_STATUS_UPDATE,
 };
 
 enum ECharacterType : uint8_t
@@ -40,7 +39,7 @@ enum EMoveStateType : uint32_t
 	STATE_AUTOATTACK = 1 << 3, // 2^4
 };
 
-struct FCharacterInfo
+struct FStatusData
 {
 	int32 ID;
 	ECharacterType CharacterType;
@@ -63,6 +62,12 @@ struct FCharacterInfo
 	void AddState(EMoveStateType NewState) { State |= NewState; }
 	void RemoveState(EMoveStateType RemoveState) { State &= ~RemoveState; }
 	bool HasState(EMoveStateType CheckState) const { return (State & CheckState) != 0; }
+};
+
+struct FAttackData
+{
+	int32 AttackerID;
+	int32 AttackedID;
 };
 
 #pragma pack(push, 1)
@@ -96,7 +101,8 @@ struct TPacket : public Packet
 	}
 };
 
-using InfoPacket = TPacket<FCharacterInfo>;
-using IDPacket = TPacket<int32>;
 using FPacketHeader = Packet::PacketHeader;
+using InfoPacket = TPacket<FStatusData>;
+using IDPacket = TPacket<int32>;
+using AttackPacket = TPacket<FAttackData>;
 #pragma pack(pop)

@@ -171,7 +171,7 @@ void AGPCharacterBase::PostInitializeComponents()
 	Super::PostInitializeComponents();
 }
 
-void AGPCharacterBase::SetCharacterInfoFromServer(FCharacterInfo& CharacterInfo_)
+void AGPCharacterBase::SetCharacterInfoFromServer(FStatusData& CharacterInfo_)
 {
 	CharacterInfo = CharacterInfo_;
 }
@@ -278,7 +278,7 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 	bool bIsPlayer = (AttackerCharacter == GameInstance->MyPlayer);
 		
-	GameInstance->SendHitPacket(AttackerCharacter->CharacterInfo , this->CharacterInfo , bIsPlayer);
+	GameInstance->SendPlayerAttackPacket(AttackerCharacter->CharacterInfo , this->CharacterInfo , bIsPlayer);
 
 	return DamageAmount;
 }

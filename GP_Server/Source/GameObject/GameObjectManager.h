@@ -10,7 +10,7 @@ public:
 		static GameObjectManager inst;
 		return inst;
 	}
-	void SetBunkerRandomLocation(FCharacterInfo& info)
+	void SetBunkerRandomLocation(FStatusData& info)
 	{
 		static std::default_random_engine dre;
 		static std::uniform_real_distribution<float> ud_x(-3000, -1000);

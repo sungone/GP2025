@@ -17,7 +17,7 @@ public:
 
 public:
 	bool bLogin = false;
-	FCharacterInfo info;
+	FStatusData info;
 	int32& id = info.ID;
 	SOCKET socket = INVALID_SOCKET;
 	ExpOver recvOver;

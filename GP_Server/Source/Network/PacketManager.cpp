@@ -33,7 +33,7 @@ void PacketManager::ProcessPacket(Session& session, char* packet)
 void PacketManager::HandleLoginPacket(Session& session)
 {
 	session.Login();
-	auto loginPkt = InfoPacket(EPacketType::S_LOGININFO, session.info);
+	auto loginPkt = InfoPacket(EPacketType::S_PLAYER_LOGIN_INFO, session.info);
 	session.DoSend(&loginPkt);
 
 	auto myInfoPkt = InfoPacket(EPacketType::S_ADD_PLAYER, session.info);
@@ -59,13 +59,17 @@ void PacketManager::HandleMovePacket(Session& session, char* packet)
 {
 	InfoPacket* p = reinterpret_cast<InfoPacket*>(packet);
 	session.info = p->Data;
-	auto pkt = InfoPacket(EPacketType::S_MOVE_PLAYER, session.info);
+	auto pkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, session.info);
 	sessionMgr.Broadcast(&pkt,session.id);
 }
 
 void PacketManager::HandleAttackPacket(Session& session, char* packet)
 {
+	//todo:
+	// - 내 정보, 공격 대상 정보 -> 업데이트&전송
+
 	InfoPacket* p = reinterpret_cast<InfoPacket*>(packet);
 	session.info = p->Data;
-	//todo
+	auto pkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, session.info);
+	sessionMgr.Broadcast(&pkt, session.id);
 }

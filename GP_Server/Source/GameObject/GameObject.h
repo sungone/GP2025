@@ -4,6 +4,6 @@
 class GameObject
 {
 protected:
-	FCharacterInfo info;
+	FStatusData info;
 };
 

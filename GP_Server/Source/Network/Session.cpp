@@ -14,7 +14,7 @@ void Session::DoSend(Packet* packet)
 {
 	switch (packet->Header.PacketType)
 	{
-	case S_LOGININFO:
+	case S_PLAYER_LOGIN_INFO:
 		LOG(LogType::SendLog, std::format("LoginInfo PKT to [{}]", id));
 		break;
 	case S_ADD_PLAYER:
@@ -23,13 +23,9 @@ void Session::DoSend(Packet* packet)
 	case S_REMOVE_PLAYER:
 		LOG(LogType::SendLog, std::format("RemovePlayer PKT to [{}]", id));
 		break;
-	case S_MOVE_PLAYER:
-		LOG(LogType::SendLog, std::format("MovePlayer PKT to [{}]", id));
+	case S_PLAYER_STATUS_UPDATE:
+		LOG(LogType::SendLog, std::format("PlayerUpdate PKT to [{}]", id));
 		break;
-	case S_ATTACK_PLAYER:
-		LOG(LogType::SendLog, std::format("AttackPlayer PKT to [{}]", id));
-		break;
-
 	default:
 		LOG(LogType::SendLog, "Unknown Packet Type");
 		break;
