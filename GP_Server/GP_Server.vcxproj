@@ -104,6 +104,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Source\Header;$(SolutionDir)Source\Common;$(SolutionDir)Source\GameObject;$(SolutionDir)Source\Network;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,24 +130,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Define.h" />
-    <ClInclude Include="GameObject.h" />
-    <ClInclude Include="IOCP.h" />
-    <ClInclude Include="Loger.h" />
-    <ClInclude Include="PacketManager.h" />
-    <ClInclude Include="Proto.h" />
-    <ClInclude Include="Server.h" />
-    <ClInclude Include="Session.h" />
-    <ClInclude Include="SessionManager.h" />
+    <ClInclude Include="Source\GameObject\GameObjectManager.h" />
+    <ClInclude Include="Source\GameObject\Player.h" />
+    <ClInclude Include="Source\Common\Proto.h" />
+    <ClInclude Include="Source\GameObject\GameObject.h" />
+    <ClInclude Include="Source\GameObject\Monster.h" />
+    <ClInclude Include="Source\Header\Define.h" />
+    <ClInclude Include="Source\Header\Loger.h" />
+    <ClInclude Include="Source\Network\IOCP.h" />
+    <ClInclude Include="Source\Network\PacketManager.h" />
+    <ClInclude Include="Source\Network\Server.h" />
+    <ClInclude Include="Source\Network\Session.h" />
+    <ClInclude Include="Source\Network\SessionManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="IOCP.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="PacketManager.cpp" />
-    <ClCompile Include="Server.cpp" />
-    <ClCompile Include="Session.cpp" />
-    <ClCompile Include="SessionManager.cpp" />
+    <ClCompile Include="Source\GameObject\GameObjectManager.cpp" />
+    <ClCompile Include="Source\GameObject\Player.cpp" />
+    <ClCompile Include="Source\GameObject\GameObject.cpp" />
+    <ClCompile Include="Source\GameObject\Monster.cpp" />
+    <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\Network\IOCP.cpp" />
+    <ClCompile Include="Source\Network\PacketManager.cpp" />
+    <ClCompile Include="Source\Network\Server.cpp" />
+    <ClCompile Include="Source\Network\Session.cpp" />
+    <ClCompile Include="Source\Network\SessionManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

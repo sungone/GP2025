@@ -3,6 +3,7 @@
 
 class GameObject
 {
-	FPlayerInfo info;
+protected:
+	FCharacterInfo info;
 };
 

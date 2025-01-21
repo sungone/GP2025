@@ -70,7 +70,7 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 	}
 
 	// 기본 캐릭터 타입을 전사 캐릭터로
-	CurrentCharacterType = ECharacterType::P_Warrior;
+	CurrentCharacterType = ECharacterType::P_WARRIOR;
 
 	// 충돌 함수 바인드
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AGPCharacterPlayer::OnCapsuleBeginOverlap);
@@ -219,14 +219,14 @@ void AGPCharacterPlayer::ChangeCharacterControl()
 		return;
 	bCanChangeCharacterControl = false;
 
-	if (CurrentCharacterType == ECharacterType::P_Warrior)
+	if (CurrentCharacterType == ECharacterType::P_WARRIOR)
 	{
-		SetCharacterControl(ECharacterType::P_Gunner);
+		SetCharacterControl(ECharacterType::P_GUNNER);
 		UE_LOG(LogTemp, Log, TEXT("Change Gunner Control Type."));
 	}
-	else if (CurrentCharacterType == ECharacterType::P_Gunner)
+	else if (CurrentCharacterType == ECharacterType::P_GUNNER)
 	{
-		SetCharacterControl(ECharacterType::P_Warrior);
+		SetCharacterControl(ECharacterType::P_WARRIOR);
 		UE_LOG(LogTemp, Log, TEXT("Change Warrior Control Type."));
 	}
 

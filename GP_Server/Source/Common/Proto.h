@@ -1,9 +1,8 @@
 #pragma once
 constexpr short SERVER_PORT = 4000;
 constexpr int BUFSIZE = 1024;
-constexpr int MAX_CLIENT = 1000;
 
-using int32 = int;   // int32를 int로 정의
+using int32 = int;
 
 enum EPacketType : uint8_t
 {
@@ -17,6 +16,19 @@ enum EPacketType : uint8_t
 	S_REMOVE_PLAYER,
 	S_MOVE_PLAYER,
 	S_ATTACK_PLAYER,
+
+	S_ADD_MONSTER,
+	S_REMOVE_MONSTER,
+	S_MOVE_MONSTER,
+	S_MONSTER_REDUCE_HP,
+};
+
+enum ECharacterType : uint8_t
+{
+	P_WARRIOR,
+	P_GUNNER,
+
+	M_MOUSE,
 };
 
 enum EMoveStateType : uint32_t
@@ -26,18 +38,21 @@ enum EMoveStateType : uint32_t
 	STATE_RUN = 1 << 1,  // 2^2
 	STATE_JUMP = 1 << 2,  // 2^3
 	STATE_AUTOATTACK = 1 << 3, // 2^4
-	// 추가 상태를 비트 플래그로 계속 정의할 수 있습니다.
 };
 
-struct FPlayerInfo
+struct FCharacterInfo
 {
 	int32 ID;
+	ECharacterType CharacterType;
 	float X;
 	float Y;
 	float Z;
 	float Yaw;
+	float MaxHp;
+	float Hp;
+	float Damage;
 	float Speed;
-	uint32_t State;  // 비트 플래그로 사용할 수 있도록 uint32_t로 변경
+	uint32_t State;
 
 	void SetLocation(float X_, float Y_, float Z_)
 	{
@@ -45,25 +60,12 @@ struct FPlayerInfo
 		Y = Y_;
 		Z = Z_;
 	};
-
-	void AddState(EMoveStateType NewState)
-	{
-		State |= NewState;
-	}
-
-	void RemoveState(EMoveStateType RemoveState)
-	{
-		State &= ~RemoveState;
-	}
-
-	bool HasState(EMoveStateType CheckState) const
-	{
-		return (State & CheckState) != 0;
-	}
+	void AddState(EMoveStateType NewState) { State |= NewState; }
+	void RemoveState(EMoveStateType RemoveState) { State &= ~RemoveState; }
+	bool HasState(EMoveStateType CheckState) const { return (State & CheckState) != 0; }
 };
 
 #pragma pack(push, 1)
-
 
 struct Packet
 {
@@ -88,13 +90,13 @@ struct TPacket : public Packet
 	T Data;
 
 	TPacket(EPacketType type, const T& payload)
-		: Packet(type) , Data(payload)
+		: Packet(type), Data(payload)
 	{
 		Header.PacketSize = sizeof(PacketHeader) + sizeof(T);
 	}
 };
 
-using InfoPacket = TPacket<FPlayerInfo>;
+using InfoPacket = TPacket<FCharacterInfo>;
 using IDPacket = TPacket<int32>;
 using FPacketHeader = Packet::PacketHeader;
 #pragma pack(pop)

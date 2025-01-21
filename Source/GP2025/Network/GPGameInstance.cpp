@@ -7,7 +7,6 @@
 #include "Serialization/ArrayWriter.h"
 #include "SocketSubsystem.h"
 #include "Character/GPCharacterPlayer.h"
-#include "../../GP_Server/Proto.h"
 
 void UGPGameInstance::Init()
 {
@@ -68,28 +67,44 @@ void UGPGameInstance::SendPlayerLoginPacket()
 
 void UGPGameInstance::SendPlayerLogoutPacket()
 {
-	IDPacket Packet(EPacketType::C_LOGOUT, MyPlayer->PlayerInfo.ID);
+	IDPacket Packet(EPacketType::C_LOGOUT, MyPlayer->CharacterInfo.ID);
 	int32 BytesSent = 0;
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(IDPacket), BytesSent);
 }
 
 void UGPGameInstance::SendPlayerMovePacket()
 {
-	InfoPacket Packet(EPacketType::C_MOVE, MyPlayer->PlayerInfo);
+	InfoPacket Packet(EPacketType::C_MOVE, MyPlayer->CharacterInfo);
 	int32 BytesSent = 0;
 	UE_LOG(LogTemp, Warning, TEXT("SendPlayerMovePacket : Send [%d] (%f,%f,%f)"),
 		Packet.Data.ID, Packet.Data.X, Packet.Data.Y, Packet.Data.Z);
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(InfoPacket), BytesSent);
 }
 
-void UGPGameInstance::sendPlayerAttackPacket()
+void UGPGameInstance::SendPlayerAttackPacket()
 {
-	InfoPacket Packet(EPacketType::C_ATTACK, MyPlayer->PlayerInfo);
+	InfoPacket Packet(EPacketType::C_ATTACK, MyPlayer->CharacterInfo);
 	int32 BytesSent = 0;
-	UE_LOG(LogTemp, Log, TEXT("sendPlayerAttackPacket : Send [%d] (%f,%f,%f)"),
+	UE_LOG(LogTemp, Log, TEXT("SendPlayerAttackPacket : Send [%d] (%f,%f,%f)"),
 		Packet.Data.ID, Packet.Data.X, Packet.Data.Y, Packet.Data.Z);
 
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(InfoPacket), BytesSent);
+}
+
+void UGPGameInstance::SendHitPacket(FCharacterInfo& Attacker, FCharacterInfo& Attacked, bool isAttackerPlayer)
+{
+	//FHitPacket Packet;
+	//Packet.Header.PacketType = EPacketType::C_HIT;
+	//Packet.Header.PacketSize = sizeof(FHitPacket);
+	//Packet.AttackerInfo = Attacker;
+	//Packet.attackedInfo = Attacked;
+	//Packet.isAttackerPlayer = isAttackerPlayer;
+
+	//int32 BytesSent = 0;
+
+	//UE_LOG(LogTemp, Log, TEXT("Attack %d -> %d"), Packet.AttackerInfo.ID, Packet.attackedInfo.ID);
+
+	//Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(FHitPacket), BytesSent);
 }
 
 void UGPGameInstance::ReceiveData()
@@ -172,8 +187,7 @@ void UGPGameInstance::ProcessPacket()
 		}
 	}
 }
-
-void UGPGameInstance::AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer)
+void UGPGameInstance::AddPlayer(FCharacterInfo& PlayerInfo, bool isMyPlayer)
 {
 	auto* World = GetWorld();
 	if (World == nullptr)
@@ -190,7 +204,7 @@ void UGPGameInstance::AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer)
 		UE_LOG(LogTemp, Warning, TEXT("Add my player [%d] (%f,%f,%f)(%f)"),
 			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 
-		MyPlayer->SetClientInfoFromServer(PlayerInfo);
+		MyPlayer->SetCharacterInfoFromServer(PlayerInfo);
 		MyPlayer->SetActorLocation(FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z));
 		
 		Players.Add(PlayerInfo.ID, MyPlayer);
@@ -206,7 +220,7 @@ void UGPGameInstance::AddPlayer(FPlayerInfo& PlayerInfo, bool isMyPlayer)
 		UE_LOG(LogTemp, Warning, TEXT("Add other player [%d] (%f,%f,%f)(%f)"),
 			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 
-		Player->SetClientInfoFromServer(PlayerInfo);
+		Player->SetCharacterInfoFromServer(PlayerInfo);
 		Player->SetActorLocation(FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z));
 		
 		Players.Add(PlayerInfo.ID, Player);
@@ -225,13 +239,39 @@ void UGPGameInstance::RemovePlayer(int32 PlayerID)
 	}
 }
 
-void UGPGameInstance::UpdatePlayer(FPlayerInfo& PlayerInfo)
+void UGPGameInstance::UpdatePlayer(FCharacterInfo& PlayerInfo)
 {
 	auto Player = Players.Find(PlayerInfo.ID);
 	if (Player)
 	{
-		(*Player)->SetClientInfoFromServer(PlayerInfo);
+		(*Player)->SetCharacterInfoFromServer(PlayerInfo);
 		UE_LOG(LogTemp, Warning, TEXT("Update other player [%d] (%f,%f,%f)(%f)"),
 			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
 	}
+}
+
+void UGPGameInstance::SpawnMonster(FCharacterInfo& MonsterInfo)
+{
+	//auto* World = GetWorld();
+	//if (World == nullptr)
+	//	return;
+
+	//FVector SpawnLocation(MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z);
+	//FRotator SpawnRotation(0, MonsterInfo.Yaw, 0);
+
+	//AGPCharacterBase* Monster = nullptr;
+	//while (Monster == nullptr)
+	//{
+	//	Monster = World->SpawnActor<AGPCharacterBase>(MonsterClass, SpawnLocation, SpawnRotation);
+	//	UE_LOG(LogTemp, Warning, TEXT("Spawn Monster [%d] (%f,%f,%f)(%f)"),
+	//		MonsterInfo.ID, MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z, MonsterInfo.Yaw);
+
+	//	Monster->SetActorLocation(FVector(MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z));
+	//	Monster->SetCharacterControl(ECharacterType::M_MOUSE);
+	//	Monster->CharacterInfo = MonsterInfo;
+	//	Monster->Stat->SetMaxHp(MonsterInfo.MaxHp);
+	//	Monster->Stat->SetCurrentHp(MonsterInfo.MaxHp);
+	//	Monsters.Add(MonsterInfo.ID, Monster);
+	//}
+
 }

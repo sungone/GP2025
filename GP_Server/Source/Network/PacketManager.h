@@ -19,7 +19,7 @@ public:
 	void HandleAttackPacket(Session& session, char* packet);
 
 private:
-	std::array<Session, MAX_CLIENT>& clients = SessionManager::GetInst().GetClients();
+	std::array<Session, MAX_PLAYER>& sessions = SessionManager::GetInst().GetSessions();
 	SessionManager& sessionMgr = SessionManager::GetInst();
 };
 

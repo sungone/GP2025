@@ -18,6 +18,9 @@
 #include "Proto.h"
 #include "Loger.h"
 
+constexpr int MAX_PLAYER = 1000;
+constexpr int MAX_MONSTER = 1000;
+
 enum CompType { RECV, SEND, ACCEPT };
 
 class ExpOver {

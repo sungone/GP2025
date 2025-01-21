@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-#include "../../GP_Server/Proto.h"
+#include "../../GP_Server/Source/Common/Proto.h"
 #include "GPGameInstance.generated.h"
 
 class AGPCharacterBase;

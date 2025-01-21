@@ -69,19 +69,19 @@ AGPCharacterBase::AGPCharacterBase()
 	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> WarriorDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterControl/GPC_Warrior.GPC_Warrior'"));
 	if (WarriorDataRef.Object)
 	{
-		CharacterControlManager.Add(ECharacterType::P_Warrior, WarriorDataRef.Object);
+		CharacterControlManager.Add(ECharacterType::P_WARRIOR, WarriorDataRef.Object);
 	}
 
 	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> GunnerDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterControl/GPC_Gunner.GPC_Gunner'"));
 	if (GunnerDataRef.Object)
 	{
-		CharacterControlManager.Add(ECharacterType::P_Gunner, GunnerDataRef.Object);
+		CharacterControlManager.Add(ECharacterType::P_GUNNER, GunnerDataRef.Object);
 	}
 
 	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> MouseMonsterDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterControl/GPC_MouseMonster.GPC_MouseMonster'"));
 	if (MouseMonsterDataRef.Object)
 	{
-		CharacterControlManager.Add(ECharacterType::M_Mouse, MouseMonsterDataRef.Object);
+		CharacterControlManager.Add(ECharacterType::M_MOUSE, MouseMonsterDataRef.Object);
 	}
 
 	// Stat Component

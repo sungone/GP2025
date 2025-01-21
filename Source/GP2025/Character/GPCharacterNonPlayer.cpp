@@ -6,7 +6,7 @@
 
 AGPCharacterNonPlayer::AGPCharacterNonPlayer()
 {
-	CurrentCharacterControlType = ECharacterType::M_Mouse;
+	CurrentCharacterControlType = ECharacterType::M_MOUSE;
 }
 
 void AGPCharacterNonPlayer::BeginPlay()

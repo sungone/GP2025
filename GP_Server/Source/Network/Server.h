@@ -24,7 +24,7 @@ public:
 					bRunning = false;
 				}
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(100)); // CPU 점유율 최소화
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 	}
 	bool Init();

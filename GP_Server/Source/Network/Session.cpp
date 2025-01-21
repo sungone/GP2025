@@ -1,5 +1,6 @@
 #include "Session.h"
 #include "SessionManager.h"
+#include "GameObjectManager.h"
 
 void Session::DoRecv()
 {
@@ -28,7 +29,9 @@ void Session::DoSend(Packet* packet)
 	case S_ATTACK_PLAYER:
 		LOG(LogType::SendLog, std::format("AttackPlayer PKT to [{}]", id));
 		break;
+
 	default:
+		LOG(LogType::SendLog, "Unknown Packet Type");
 		break;
 	}
 	auto send_data = new ExpOver{ reinterpret_cast<unsigned char*>(packet) };
@@ -37,14 +40,8 @@ void Session::DoSend(Packet* packet)
 
 void Session::Login()
 {
-	static std::default_random_engine dre;
-	static std::uniform_real_distribution<float> ud_x(-3000, -1000);
-	static std::uniform_real_distribution<float> ud_y(-3500, -1500);
-
 	bLogin = true;
-	info.X = ud_x(dre);
-	info.Y = ud_y(dre);
-	info.Z = 116;
+	GameObjectManager::GetInst().SetBunkerRandomLocation(info);
 }
 
 void Session::Disconnect()

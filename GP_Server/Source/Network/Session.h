@@ -1,8 +1,9 @@
 #pragma once
 #include "Define.h"
+#include "Player.h"
 
-class Session {
-
+class Session
+{
 public:
 	Session() = default;
 	~Session() { closesocket(socket); }
@@ -16,7 +17,7 @@ public:
 
 public:
 	bool bLogin = false;
-	FPlayerInfo info;
+	FCharacterInfo info;
 	int32& id = info.ID;
 	SOCKET socket = INVALID_SOCKET;
 	ExpOver recvOver;

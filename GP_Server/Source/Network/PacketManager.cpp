@@ -39,7 +39,7 @@ void PacketManager::HandleLoginPacket(Session& session)
 	auto myInfoPkt = InfoPacket(EPacketType::S_ADD_PLAYER, session.info);
 	sessionMgr.Broadcast(&myInfoPkt,session.id);
 
-	for (auto& cl : clients)
+	for (auto& cl : sessions)
 	{
 		if (cl.id == session.id || !cl.id)
 			continue;

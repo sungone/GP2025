@@ -5,26 +5,26 @@ void SessionManager::RegisterSession(SOCKET& socket)
 {
 	int id = GenerateId();
 	if (id != -1) {
-		clients[id].info.ID = id;
-		clients[id].socket = socket;
+		sessions[id].info.ID = id;
+		sessions[id].socket = socket;
 		iocp.RegisterSocket(socket, id);
-		clients[id].DoRecv();
+		sessions[id].DoRecv();
 	}
 }
 
 void SessionManager::Disconnect(int id)
 {
-	clients[id].Disconnect();
+	sessions[id].Disconnect();
 }
 
 void SessionManager::DoRecv(int id)
 {
-	clients[id].DoRecv();
+	sessions[id].DoRecv();
 }
 
 void SessionManager::HandleRecvBuffer(int id, int recvByte, ExpOver* expOver)
 {
-	Session& session = clients[id];
+	Session& session = sessions[id];
 	int dataSize = recvByte + session.remain;
 	char* packet = expOver->buf;
 	while (dataSize > 0) {
@@ -43,7 +43,7 @@ void SessionManager::HandleRecvBuffer(int id, int recvByte, ExpOver* expOver)
 
 void SessionManager::Broadcast(Packet* packet, int exptId)
 {
-	for (auto& session : clients)
+	for (auto& session : sessions)
 	{
 		if (!session.bLogin || exptId == session.id)
 			continue;
@@ -53,9 +53,9 @@ void SessionManager::Broadcast(Packet* packet, int exptId)
 
 int SessionManager::GenerateId()
 {
-	for (int i = 1; i < MAX_CLIENT + 1; ++i)
+	for (int i = 1; i < MAX_PLAYER + 1; ++i)
 	{
-		if (clients[i].bLogin) continue;
+		if (sessions[i].bLogin) continue;
 		return i;
 	}
 }
