@@ -26,6 +26,15 @@ void Session::DoSend(Packet* packet)
 	case S_PLAYER_STATUS_UPDATE:
 		LOG(LogType::SendLog, std::format("PlayerUpdate PKT to [{}]", id));
 		break;
+	case S_ADD_MONSTER:
+		LOG(LogType::SendLog, std::format("AddMonster PKT to [{}]", id));
+		break;
+	case S_REMOVE_MONSTER:
+		LOG(LogType::SendLog, std::format("RemoveMonster PKT to [{}]", id));
+		break;
+	case S_MONSTER_STATUS_UPDATE:
+		LOG(LogType::SendLog, std::format("Monsterpdate PKT to [{}]", id));
+		break;
 	default:
 		LOG(LogType::SendLog, "Unknown Packet Type");
 		break;
