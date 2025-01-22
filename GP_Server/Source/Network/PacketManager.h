@@ -1,7 +1,7 @@
 #pragma once
 #include "Session.h"
-#include "Session.h"
 #include "SessionManager.h"
+#include "GameManager.h"
 
 class PacketManager
 {
@@ -21,5 +21,6 @@ public:
 private:
 	std::array<Session, MAX_PLAYER>& sessions = SessionManager::GetInst().GetSessions();
 	SessionManager& sessionMgr = SessionManager::GetInst();
+	GameManager& gameMgr = GameManager::GetInst();
 };
 

@@ -13,12 +13,13 @@ public:
 
 		info.SetLocation(ud_x(dre), ud_y(dre), 116);
 	}
-	void Init()
+	virtual void Init()
 	{
 		info.MaxHp = 100.0f;
 		info.Hp = info.MaxHp;
 		SetBunkerRandomLocation();
 	}
+	FInfoData GetInfo() const { return info; }
 protected:
 	FInfoData info;
 	int& id = info.ID;

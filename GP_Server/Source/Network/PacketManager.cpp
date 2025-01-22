@@ -46,7 +46,7 @@ void PacketManager::HandleLoginPacket(Session& session)
 		auto otherInfoPkt = InfoPacket(EPacketType::S_ADD_PLAYER, cl.info);
 		session.DoSend(&otherInfoPkt);
 	}
-
+	gameMgr.SpawnMonster(session);
 }
 
 void PacketManager::HandleLogoutPacket(Session& session)

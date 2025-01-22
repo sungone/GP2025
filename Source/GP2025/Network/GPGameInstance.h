@@ -38,13 +38,12 @@ public :
 	void AddPlayer(FInfoData& PlayerInfo, bool isMyPlayer);
 	void RemovePlayer(int32 PlayerID);
 	void UpdatePlayer(FInfoData& PlayerInfo);
-	void SpawnMonster(FInfoData& MonsterInfo);
+	void AddMonster(FInfoData& MonsterInfo);
 
 public :
 	class FSocket* Socket;
 	FString IpAddress = TEXT("127.0.0.1");
 	int16 Port = 4000;
-	TSharedPtr<class GPRecvThread> RecvThread;
 
 public :
 	TSubclassOf<AGPCharacterBase> OtherPlayerClass;

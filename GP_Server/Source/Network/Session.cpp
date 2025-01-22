@@ -1,6 +1,6 @@
 #include "Session.h"
 #include "SessionManager.h"
-#include "GameObjectManager.h"
+#include "GameManager.h"
 
 void Session::DoRecv()
 {

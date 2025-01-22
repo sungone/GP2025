@@ -19,7 +19,6 @@ enum EPacketType : uint8_t
 
 	S_ADD_MONSTER,
 	S_REMOVE_MONSTER,
-	S_MOVE_MONSTER,
 	S_MONSTER_STATUS_UPDATE,
 };
 

@@ -136,26 +136,42 @@ void UGPGameInstance::ProcessPacket()
 				{
 				case EPacketType::S_LOGIN_SUCCESS:
 				{
-					InfoPacket* LoginInfoPacket = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
-					AddPlayer(LoginInfoPacket->Data, true);
+					InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
+					AddPlayer(Pkt->Data, true);
 					break;
 				}
 				case EPacketType::S_ADD_PLAYER:
 				{
-					InfoPacket* AddPlayerPacket = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
-					AddPlayer(AddPlayerPacket->Data, false);
+					InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
+					AddPlayer(Pkt->Data, false);
 					break;
 				}
 				case EPacketType::S_REMOVE_PLAYER:
 				{
-					IDPacket* RemovePlayerPacket = reinterpret_cast<IDPacket*>(RemainingData.GetData());
-					RemovePlayer(RemovePlayerPacket->Data);
+					IDPacket* Pkt = reinterpret_cast<IDPacket*>(RemainingData.GetData());
+					RemovePlayer(Pkt->Data);
 					break;
 				}
 				case EPacketType::S_PLAYER_STATUS_UPDATE:
 				{
-					InfoPacket* MovePlayerPacket = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
-					UpdatePlayer(MovePlayerPacket->Data);
+					InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
+					UpdatePlayer(Pkt->Data);
+					break;
+				}
+				case EPacketType::S_ADD_MONSTER:
+				{
+					InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
+					AddMonster(Pkt->Data);
+					break;
+				}
+				case EPacketType::S_REMOVE_MONSTER:
+				{
+					IDPacket* Pkt = reinterpret_cast<IDPacket*>(RemainingData.GetData());
+					break;
+				}
+				case EPacketType::S_MONSTER_STATUS_UPDATE:
+				{
+					InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
 					break;
 				}
 				default:
@@ -236,7 +252,7 @@ void UGPGameInstance::UpdatePlayer(FInfoData& PlayerInfo)
 	}
 }
 
-void UGPGameInstance::SpawnMonster(FInfoData& MonsterInfo)
+void UGPGameInstance::AddMonster(FInfoData& MonsterInfo)
 {
 	auto* World = GetWorld();
 	if (World == nullptr)
