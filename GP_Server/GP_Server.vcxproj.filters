@@ -60,7 +60,7 @@
     <ClInclude Include="Source\Network\Session.h">
       <Filter>Source Files\Network\Session</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\GameObjectManager.h">
+    <ClInclude Include="Source\GameObject\GameManager.h">
       <Filter>Source Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="Source\Common\Proto.h">
@@ -95,7 +95,7 @@
     <ClCompile Include="Source\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameObject\GameObjectManager.cpp">
+    <ClCompile Include="Source\GameObject\GameManager.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
     <ClCompile Include="Source\GameObject\Player.cpp">

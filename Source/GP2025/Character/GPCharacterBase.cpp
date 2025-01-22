@@ -171,7 +171,7 @@ void AGPCharacterBase::PostInitializeComponents()
 	Super::PostInitializeComponents();
 }
 
-void AGPCharacterBase::SetCharacterInfoFromServer(FStatusData& CharacterInfo_)
+void AGPCharacterBase::SetCharacterInfoFromServer(FInfoData& CharacterInfo_)
 {
 	CharacterInfo = CharacterInfo_;
 }

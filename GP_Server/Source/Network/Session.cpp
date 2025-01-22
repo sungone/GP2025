@@ -14,7 +14,7 @@ void Session::DoSend(Packet* packet)
 {
 	switch (packet->Header.PacketType)
 	{
-	case S_PLAYER_LOGIN_INFO:
+	case S_LOGIN_SUCCESS:
 		LOG(LogType::SendLog, std::format("LoginInfo PKT to [{}]", id));
 		break;
 	case S_ADD_PLAYER:
@@ -37,7 +37,11 @@ void Session::DoSend(Packet* packet)
 void Session::Login()
 {
 	bLogin = true;
-	GameObjectManager::GetInst().SetBunkerRandomLocation(info);
+	static std::default_random_engine dre;
+	static std::uniform_real_distribution<float> ud_x(-3000, -1000);
+	static std::uniform_real_distribution<float> ud_y(-3500, -1500);
+	
+	info.SetLocation(ud_x(dre), ud_y(dre), 116);
 }
 
 void Session::Disconnect()

@@ -87,7 +87,7 @@ protected:
 public:
 	FVector LastLocation;
 	float LastRotationYaw;
-	FStatusData LastSendPlayerInfo;
+	FInfoData LastSendPlayerInfo;
 
 public:
 	float MovePacketSendTimer = PACKETSENDTIME; // 서버와의 패킷 교환 시간

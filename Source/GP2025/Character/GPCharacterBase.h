@@ -22,8 +22,8 @@ public:
 	virtual void PostInitializeComponents() override;
 
 	// 서버에서 받은 다른 클라이언트 정보를 업데이트
-	void SetCharacterInfoFromServer(FStatusData& CharacterInfo_);
-	FStatusData CharacterInfo;
+	void SetCharacterInfoFromServer(FInfoData& CharacterInfo_);
+	FInfoData CharacterInfo;
 	
 
 // 기본 공격 애니메이션 및 공격 애니메이션 몽타주 코드

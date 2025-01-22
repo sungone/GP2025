@@ -89,7 +89,7 @@ void UGPGameInstance::SendPlayerAttackPacket()
 	
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(InfoPacket), BytesSent);
 }
-void UGPGameInstance::SendPlayerAttackPacket(FStatusData& Attacker, FStatusData& Attacked, bool isAttackerPlayer)
+void UGPGameInstance::SendPlayerAttackPacket(FInfoData& Attacker, FInfoData& Attacked, bool isAttackerPlayer)
 {
 	AttackPacket Packet(EPacketType::C_ATTACK, { Attacker.ID, Attacked.ID });
 	int32 BytesSent = 0;
@@ -134,7 +134,7 @@ void UGPGameInstance::ProcessPacket()
 			{
 				switch (PacketHeader->PacketType)
 				{
-				case EPacketType::S_PLAYER_LOGIN_INFO:
+				case EPacketType::S_LOGIN_SUCCESS:
 				{
 					InfoPacket* LoginInfoPacket = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
 					AddPlayer(LoginInfoPacket->Data, true);
@@ -173,7 +173,7 @@ void UGPGameInstance::ProcessPacket()
 	}
 }
 
-void UGPGameInstance::AddPlayer(FStatusData& PlayerInfo, bool isMyPlayer)
+void UGPGameInstance::AddPlayer(FInfoData& PlayerInfo, bool isMyPlayer)
 {
 	auto* World = GetWorld();
 	if (World == nullptr)
@@ -225,7 +225,7 @@ void UGPGameInstance::RemovePlayer(int32 PlayerID)
 	}
 }
 
-void UGPGameInstance::UpdatePlayer(FStatusData& PlayerInfo)
+void UGPGameInstance::UpdatePlayer(FInfoData& PlayerInfo)
 {
 	auto Player = Players.Find(PlayerInfo.ID);
 	if (Player)
@@ -236,7 +236,7 @@ void UGPGameInstance::UpdatePlayer(FStatusData& PlayerInfo)
 	}
 }
 
-void UGPGameInstance::SpawnMonster(FStatusData& MonsterInfo)
+void UGPGameInstance::SpawnMonster(FInfoData& MonsterInfo)
 {
 	auto* World = GetWorld();
 	if (World == nullptr)

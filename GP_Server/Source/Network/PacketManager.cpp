@@ -33,7 +33,7 @@ void PacketManager::ProcessPacket(Session& session, char* packet)
 void PacketManager::HandleLoginPacket(Session& session)
 {
 	session.Login();
-	auto loginPkt = InfoPacket(EPacketType::S_PLAYER_LOGIN_INFO, session.info);
+	auto loginPkt = InfoPacket(EPacketType::S_LOGIN_SUCCESS, session.info);
 	session.DoSend(&loginPkt);
 
 	auto myInfoPkt = InfoPacket(EPacketType::S_ADD_PLAYER, session.info);
@@ -46,6 +46,7 @@ void PacketManager::HandleLoginPacket(Session& session)
 		auto otherInfoPkt = InfoPacket(EPacketType::S_ADD_PLAYER, cl.info);
 		session.DoSend(&otherInfoPkt);
 	}
+
 }
 
 void PacketManager::HandleLogoutPacket(Session& session)

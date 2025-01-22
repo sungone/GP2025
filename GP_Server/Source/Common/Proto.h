@@ -11,7 +11,8 @@ enum EPacketType : uint8_t
 	C_MOVE,
 	C_ATTACK,
 
-	S_PLAYER_LOGIN_INFO,
+	S_LOGIN_SUCCESS,
+
 	S_ADD_PLAYER,
 	S_REMOVE_PLAYER,
 	S_PLAYER_STATUS_UPDATE,
@@ -24,6 +25,8 @@ enum EPacketType : uint8_t
 
 enum ECharacterType : uint8_t
 {
+	//INVALID = -1,
+
 	P_WARRIOR,
 	P_GUNNER,
 
@@ -39,7 +42,7 @@ enum EMoveStateType : uint32_t
 	STATE_AUTOATTACK = 1 << 3, // 2^4
 };
 
-struct FStatusData
+struct FInfoData
 {
 	int32 ID;
 	ECharacterType CharacterType;
@@ -102,7 +105,7 @@ struct TPacket : public Packet
 };
 
 using FPacketHeader = Packet::PacketHeader;
-using InfoPacket = TPacket<FStatusData>;
+using InfoPacket = TPacket<FInfoData>;
 using IDPacket = TPacket<int32>;
 using AttackPacket = TPacket<FAttackData>;
 #pragma pack(pop)

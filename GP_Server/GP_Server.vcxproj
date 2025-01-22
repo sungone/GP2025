@@ -130,7 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Source\GameObject\GameObjectManager.h" />
+    <ClInclude Include="Source\GameObject\GameManager.h" />
     <ClInclude Include="Source\GameObject\Player.h" />
     <ClInclude Include="Source\Common\Proto.h" />
     <ClInclude Include="Source\GameObject\GameObject.h" />
@@ -144,7 +144,7 @@
     <ClInclude Include="Source\Network\SessionManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\GameObject\GameObjectManager.cpp" />
+    <ClCompile Include="Source\GameObject\GameManager.cpp" />
     <ClCompile Include="Source\GameObject\Player.cpp" />
     <ClCompile Include="Source\GameObject\GameObject.cpp" />
     <ClCompile Include="Source\GameObject\Monster.cpp" />
