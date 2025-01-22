@@ -11,6 +11,7 @@
 enum LogType
 {
 	Warning,
+	Log,
 	RecvLog,
 	SendLog,
 };
@@ -30,7 +31,7 @@ public:
 		std::string levelStr = LevelToString(type);
 
 		std::cout
-			<< levelStr << " : "
+			<< levelStr
 #ifdef _DEBUG
 			<< "[" << functionName << "] "
 #endif
@@ -44,9 +45,10 @@ private:
 	{
 		switch (type)
 		{
-		case LogType::Warning: return "Warning";
-		case LogType::SendLog: return "<< Send";
-		case LogType::RecvLog: return ">> Recv";
+		case LogType::Warning: return "[Warning] ";
+		case LogType::Log: return "[Log] ";
+		case LogType::SendLog: return "[<<SendLog] ";
+		case LogType::RecvLog: return "[>>RecvLog]  ";
 		default: return "Unknown";
 		}
 	}

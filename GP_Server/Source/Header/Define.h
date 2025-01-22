@@ -21,6 +21,9 @@
 constexpr int MAX_PLAYER = 1000;
 constexpr int MAX_MONSTER = 10;
 
+constexpr int PKT_TYPE_INDEX = 0;
+constexpr int PKT_SIZE_INDEX = 1;
+
 enum CompType { RECV, SEND, ACCEPT };
 
 class ExpOver {

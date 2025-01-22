@@ -277,8 +277,14 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	if (!GameInstance) return DamageAmount;
 
 	bool bIsPlayer = (AttackerCharacter == GameInstance->MyPlayer);
-		
-	GameInstance->SendPlayerAttackPacket(AttackerCharacter->CharacterInfo , this->CharacterInfo , bIsPlayer);
+	
+	if(bIsPlayer)
+		GameInstance->SendPlayerAttackPacket(this->CharacterInfo);
+	else
+	{
+		//todo: send mons atk pkt
+	
+	}
 
 	return DamageAmount;
 }

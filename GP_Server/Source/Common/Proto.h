@@ -55,6 +55,10 @@ struct FInfoData
 	float Speed;
 	uint32_t State;
 
+	FInfoData() : MaxHp(100.0f), Damage(20.0f)
+	{ 
+		Hp = MaxHp; 
+	};
 	void SetLocation(float X_, float Y_, float Z_)
 	{
 		X = X_;
@@ -68,8 +72,8 @@ struct FInfoData
 
 struct FAttackData
 {
-	int32 AttackerID;
-	int32 AttackedID;
+	FInfoData Attacker;
+	FInfoData Attacked;
 };
 
 #pragma pack(push, 1)

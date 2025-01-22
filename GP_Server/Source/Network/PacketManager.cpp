@@ -2,7 +2,7 @@
 
 void PacketManager::ProcessPacket(Session& session, char* packet)
 {
-	EPacketType packetType = static_cast<EPacketType>(packet[0]);
+	EPacketType packetType = static_cast<EPacketType>(packet[PKT_TYPE_INDEX]);
 
 	switch (packetType)
 	{
@@ -37,7 +37,7 @@ void PacketManager::HandleLoginPacket(Session& session)
 	session.DoSend(&loginPkt);
 
 	auto myInfoPkt = InfoPacket(EPacketType::S_ADD_PLAYER, session.info);
-	sessionMgr.Broadcast(&myInfoPkt,session.id);
+	sessionMgr.Broadcast(&myInfoPkt, session.id);
 
 	for (auto& cl : sessions)
 	{
@@ -53,7 +53,7 @@ void PacketManager::HandleLogoutPacket(Session& session)
 {
 	session.Disconnect();
 	auto pkt = IDPacket(EPacketType::S_REMOVE_PLAYER, session.id);
-	sessionMgr.Broadcast(&pkt,session.id);
+	sessionMgr.Broadcast(&pkt, session.id);
 }
 
 void PacketManager::HandleMovePacket(Session& session, char* packet)
@@ -61,16 +61,36 @@ void PacketManager::HandleMovePacket(Session& session, char* packet)
 	InfoPacket* p = reinterpret_cast<InfoPacket*>(packet);
 	session.info = p->Data;
 	auto pkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, session.info);
-	sessionMgr.Broadcast(&pkt,session.id);
+	sessionMgr.Broadcast(&pkt, session.id);
 }
 
 void PacketManager::HandleAttackPacket(Session& session, char* packet)
 {
-	//todo:
-	// - 내 정보, 공격 대상 정보 -> 업데이트&전송
+	uint8_t packetSize = static_cast<EPacketType>(packet[PKT_SIZE_INDEX]);
+	if (packetSize == sizeof(InfoPacket))
+	{
+		InfoPacket* p = reinterpret_cast<InfoPacket*>(packet);
+		session.info = p->Data;
+		auto pkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, session.info);
+		sessionMgr.Broadcast(&pkt, session.id);
+	}
+	else
+	{
+		//todo: 충돌처리 서버에서 하도록
 
-	InfoPacket* p = reinterpret_cast<InfoPacket*>(packet);
-	session.info = p->Data;
-	auto pkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, session.info);
-	sessionMgr.Broadcast(&pkt, session.id);
+		AttackPacket* p = reinterpret_cast<AttackPacket*>(packet);
+		FAttackData data = p->Data;
+		LOG(LogType::Log, std::format("Attacker[{}] -> Attacked[{}]", data.Attacker.ID, data.Attacked.ID));
+
+		// for anim 동기화
+		session.info = data.Attacker;
+		auto pkt1 = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, session.info);
+		sessionMgr.Broadcast(&pkt1);
+
+		// hp 감소
+		gameMgr.OnAttackMonster(session, data.Attacked);
+		auto monster = gameMgr.GetMonsterInfo(data.Attacked.ID);
+		auto pkt2 = InfoPacket(EPacketType::S_MONSTER_STATUS_UPDATE, monster);
+		sessionMgr.Broadcast(&pkt2);
+	}
 }

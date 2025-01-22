@@ -4,7 +4,7 @@
 class Monster : public GameObject
 {
 public:
-	Monster() {};
+	Monster() { Init(); }
 	void Init() override
 	{
 		GameObject::Init();

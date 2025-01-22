@@ -80,15 +80,11 @@ void Server::WorkerThreadLoop()
 
 		switch (expOver->compType) {
 		case ACCEPT:
-		{
 			HandleAccept();
 			break;
-		}
 		case RECV:
-		{
 			HandleRecv(sessionId, recvByte, expOver);
 			break;
-		}
 		case SEND:
 			delete expOver;
 			break;
