@@ -6,5 +6,5 @@ UGPCharacterControlData::UGPCharacterControlData()
 {
 	TargetArmLength = 400.f;
 	WalkSpeed = 300.f;
-	SprintSpeed = 1500.f;
+	SprintSpeed = 600.f;
 }
