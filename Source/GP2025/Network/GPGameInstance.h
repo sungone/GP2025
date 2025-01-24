@@ -30,7 +30,7 @@ public :
 
 	void SendPlayerMovePacket();
 	void SendPlayerAttackPacket();
-	void SendPlayerAttackPacket(FInfoData& Attacker, FInfoData& Attacked, bool isAttackerPlayer);
+	void SendPlayerAttackPacket(FInfoData& Attacker);
 
 	void ReceiveData();
 	void ProcessPacket();
@@ -38,7 +38,10 @@ public :
 	void AddPlayer(FInfoData& PlayerInfo, bool isMyPlayer);
 	void RemovePlayer(int32 PlayerID);
 	void UpdatePlayer(FInfoData& PlayerInfo);
+
 	void AddMonster(FInfoData& MonsterInfo);
+	void RemoveMonster(FInfoData& MonsterInfo);
+	void UpdateMonster(FInfoData& MonsterInfo);
 
 public :
 	class FSocket* Socket;

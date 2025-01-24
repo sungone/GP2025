@@ -4,7 +4,7 @@
 class GameObject
 {
 public:
-	GameObject() {};
+	GameObject() { };
 	void SetBunkerRandomLocation()
 	{
 		static std::default_random_engine dre;
@@ -15,11 +15,9 @@ public:
 	}
 	virtual void Init()
 	{
-		info.MaxHp = 100.0f;
-		info.Hp = info.MaxHp;
 		SetBunkerRandomLocation();
 	}
-	FInfoData GetInfo() const { return info; }
+	FInfoData& GetInfo() { return info; }
 protected:
 	FInfoData info;
 	int& id = info.ID;

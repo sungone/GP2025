@@ -6,6 +6,7 @@
 #include "Common/TcpSocketBuilder.h"
 #include "Serialization/ArrayWriter.h"
 #include "SocketSubsystem.h"
+#include "CharacterStat/GPCharacterStatComponent.h"
 #include "Character/GPCharacterPlayer.h"
 
 void UGPGameInstance::Init()
@@ -76,8 +77,7 @@ void UGPGameInstance::SendPlayerMovePacket()
 {
 	InfoPacket Packet(EPacketType::C_MOVE, MyPlayer->CharacterInfo);
 	int32 BytesSent = 0;
-	UE_LOG(LogTemp, Warning, TEXT("SendPlayerMovePacket : Send [%d] (%f,%f,%f)"),
-		Packet.Data.ID, Packet.Data.X, Packet.Data.Y, Packet.Data.Z);
+	UE_LOG(LogTemp, Warning, TEXT("SendPlayerMovePacket : Send [%d]"), Packet.Data.ID);
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(InfoPacket), BytesSent);
 }
 
@@ -85,18 +85,18 @@ void UGPGameInstance::SendPlayerAttackPacket()
 {
 	InfoPacket Packet(EPacketType::C_ATTACK, MyPlayer->CharacterInfo);
 	int32 BytesSent = 0;
-	UE_LOG(LogTemp, Log, TEXT("SendPlayerAttackPacket : Send [%d]"), Packet.Data.ID);
-	
+	UE_LOG(LogTemp, Warning, TEXT("SendPlayerMovePacket : Send [%d]"), Packet.Data.ID);
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(InfoPacket), BytesSent);
 }
-void UGPGameInstance::SendPlayerAttackPacket(FInfoData& Attacker, FInfoData& Attacked, bool isAttackerPlayer)
-{
-	AttackPacket Packet(EPacketType::C_ATTACK, { Attacker.ID, Attacked.ID });
-	int32 BytesSent = 0;
-	UE_LOG(LogTemp, Log, TEXT("SendPlayerAttackPacket : "));
 
+void UGPGameInstance::SendPlayerAttackPacket(FInfoData& Attacked)
+{
+	AttackPacket Packet(EPacketType::C_ATTACK, { MyPlayer->CharacterInfo, Attacked });
+	int32 BytesSent = 0;
+	UE_LOG(LogTemp, Warning, TEXT("SendPlayerMovePacket"));
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(AttackPacket), BytesSent);
 }
+
 
 void UGPGameInstance::ReceiveData()
 {
@@ -172,6 +172,7 @@ void UGPGameInstance::ProcessPacket()
 				case EPacketType::S_MONSTER_STATUS_UPDATE:
 				{
 					InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
+					UpdateMonster(Pkt->Data);
 					break;
 				}
 				default:
@@ -271,9 +272,26 @@ void UGPGameInstance::AddMonster(FInfoData& MonsterInfo)
 		Monster->SetActorLocation(FVector(MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z));
 		Monster->SetCharacterControl(ECharacterType::M_MOUSE);
 		Monster->CharacterInfo = MonsterInfo;
-		//Monster->Stat->SetMaxHp(MonsterInfo.MaxHp);
-		//Monster->Stat->SetCurrentHp(MonsterInfo.MaxHp);
+		Monster->Stat->SetMaxHp(MonsterInfo.MaxHp);
+		Monster->Stat->SetCurrentHp(MonsterInfo.Hp);
 		Monsters.Add(MonsterInfo.ID, Monster);
 	}
 
+}
+
+void UGPGameInstance::RemoveMonster(FInfoData& MonsterInfo)
+{
+
+}
+
+void UGPGameInstance::UpdateMonster(FInfoData& MonsterInfo)
+{
+	auto Monster = Monsters.Find(MonsterInfo.ID);
+	if (Monster)
+	{
+		(*Monster)->CharacterInfo = MonsterInfo;
+		(*Monster)->Stat->SetMaxHp(MonsterInfo.MaxHp);
+		(*Monster)->Stat->SetCurrentHp(MonsterInfo.Hp);
+		UE_LOG(LogTemp, Warning, TEXT("Update monster [%d]"), MonsterInfo.ID);
+	}
 }
