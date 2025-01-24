@@ -292,6 +292,7 @@ void UGPGameInstance::UpdateMonster(FInfoData& MonsterInfo)
 		(*Monster)->CharacterInfo = MonsterInfo;
 		(*Monster)->Stat->SetMaxHp(MonsterInfo.MaxHp);
 		(*Monster)->Stat->SetCurrentHp(MonsterInfo.Hp);
+		(*Monster)->Stat->SetHp(MonsterInfo.Hp);
 		UE_LOG(LogTemp, Warning, TEXT("Update monster [%d]"), MonsterInfo.ID);
 	}
 }
