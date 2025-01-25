@@ -138,7 +138,7 @@
     <ClInclude Include="Source\GameObject\GameManager.h" />
     <ClInclude Include="Source\GameObject\Player.h" />
     <ClInclude Include="Source\Common\Proto.h" />
-    <ClInclude Include="Source\GameObject\GameObject.h" />
+    <ClInclude Include="Source\GameObject\Character.h" />
     <ClInclude Include="Source\GameObject\Monster.h" />
     <ClInclude Include="Source\GameObject\Timer.h" />
     <ClInclude Include="Source\Header\Define.h" />
@@ -152,7 +152,7 @@
   <ItemGroup>
     <ClCompile Include="Source\GameObject\GameManager.cpp" />
     <ClCompile Include="Source\GameObject\Player.cpp" />
-    <ClCompile Include="Source\GameObject\GameObject.cpp" />
+    <ClCompile Include="Source\GameObject\Character.cpp" />
     <ClCompile Include="Source\GameObject\Monster.cpp" />
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\Network\IOCP.cpp" />

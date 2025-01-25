@@ -28,11 +28,14 @@
     <Filter Include="Source Files\Network\Server">
       <UniqueIdentifier>{17f2af66-87ad-4819-b1e8-c8e64fbd720a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Game\Player">
-      <UniqueIdentifier>{2775b8fd-e811-495b-b5ba-642efc6ae4ca}</UniqueIdentifier>
+    <Filter Include="Source Files\Game\Character">
+      <UniqueIdentifier>{0966d558-393f-4cde-bc3a-30a33c8d61fe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Game\Monster">
+    <Filter Include="Source Files\Game\Character\Monster">
       <UniqueIdentifier>{cd98eaf1-8ee3-4548-98d5-26a68c3787cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Character\Player">
+      <UniqueIdentifier>{2775b8fd-e811-495b-b5ba-642efc6ae4ca}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -41,9 +44,6 @@
     </ClInclude>
     <ClInclude Include="Source\Header\Loger.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameObject\GameObject.h">
-      <Filter>Source Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="Source\Network\PacketManager.h">
       <Filter>Source Files\Network\Packet</Filter>
@@ -67,19 +67,19 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameObject\Player.h">
-      <Filter>Source Files\Game\Player</Filter>
+      <Filter>Source Files\Game\Character\Player</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameObject\Monster.h">
-      <Filter>Source Files\Game\Monster</Filter>
+      <Filter>Source Files\Game\Character\Monster</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameObject\Timer.h">
       <Filter>Source Files\Game</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GameObject\Character.h">
+      <Filter>Source Files\Game\Character</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\GameObject\GameObject.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Network\PacketManager.cpp">
       <Filter>Source Files\Network\Packet</Filter>
     </ClCompile>
@@ -102,10 +102,13 @@
       <Filter>Source Files\Game</Filter>
     </ClCompile>
     <ClCompile Include="Source\GameObject\Player.cpp">
-      <Filter>Source Files\Game\Player</Filter>
+      <Filter>Source Files\Game\Character\Player</Filter>
     </ClCompile>
     <ClCompile Include="Source\GameObject\Monster.cpp">
-      <Filter>Source Files\Game\Monster</Filter>
+      <Filter>Source Files\Game\Character\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GameObject\Character.cpp">
+      <Filter>Source Files\Game\Character</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

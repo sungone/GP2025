@@ -32,6 +32,88 @@ enum ECharacterType : uint8_t
 	M_MOUSE,
 };
 
+#pragma region ObjectType
+
+namespace CharacterType
+{
+	enum class ECharacterType : uint8_t
+	{
+		PLAYER,
+		MONSTER,
+		NPC
+	};
+
+	enum class EPlayerType : uint8_t
+	{
+		WARRIOR,
+		GUNNER
+	};
+
+	enum class EMonsterType : uint8_t
+	{
+		ENERGY_DRINK,
+		BUBBLE_TEA,
+		COFFEE,
+		MOUSE,
+		KEYBOARD,
+		DESKTOP,
+		COGWHEEL,
+		BOLT_NUT,
+		DRILL,
+		TINO
+	};
+
+	enum class ENPCType : uint8_t
+	{
+		PROFESSOR,
+		GUARD,
+		STUDENT
+	};
+}
+
+namespace ItemType
+{
+	enum class EItemType : uint8_t
+	{
+		WEAPON,
+		ARMOR,
+		CONSUMABLE,
+	};
+
+	enum class EWeaponType : uint8_t
+	{
+		BIRD_GUN,
+		PULSE_GUN,
+		POSITRON,
+		PRACS_WORD,
+		PULSE_SWORD,
+		ENERGY_SWORD,
+	};
+
+	enum class EArmorType : uint8_t
+	{
+		ALLOY_HELMET,
+		ENHANCED_HELMET,
+		TITANIUM_ARMOR,
+		POWERED_ARMOR,
+
+		SUIT,
+		TUCLOTHES
+	};
+
+	enum class EConsumableType : uint8_t
+	{
+		HPKIT_LOW,
+		HPKIT_MID,
+		HPKIT_HIGH,
+
+		COFFEE,
+		DDALBA,
+		MANGBA,
+	};
+}
+#pragma endregion // 추후 이렇게 바꾸려함
+
 enum ECharacterStateType : uint32_t
 {
 	STATE_NONE = 0, // 2^0
@@ -51,16 +133,11 @@ struct FInfoData
 	float Y;
 	float Z;
 	float Yaw;
-	float MaxHp;
-	float Hp;
-	float Damage;
+	int MaxHp;
+	int Hp;
+	int Damage;
 	float Speed;
 	uint32_t State;
-
-	FInfoData() : MaxHp(100.0f), Damage(20.0f)
-	{ 
-		Hp = MaxHp; 
-	};
 
 	void SetLocation(float X_, float Y_, float Z_)
 	{

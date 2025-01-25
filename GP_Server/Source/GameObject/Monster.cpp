@@ -6,6 +6,16 @@
 static std::random_device rd;
 static std::mt19937 gen(rd());
 
+void Monster::Init()
+{
+    Character::Init();
+    static int i = 0;
+    info.ID = i++;
+    info.CharacterType = M_MOUSE;
+    info.Speed = 200.f;
+    info.State = ECharacterStateType::STATE_IDLE;
+}
+
 void Monster::UpdateBehavior()
 {
     switch (info.State)

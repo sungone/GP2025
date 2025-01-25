@@ -41,8 +41,8 @@ void Server::Run()
 	inputThread.join();*/
 
 	DoAccept();
-	//CreateWokerThreads();
-	WorkerThreadLoop();
+	CreateWokerThreads();
+	//WorkerThreadLoop();
 }
 
 void Server::Close()

@@ -23,25 +23,14 @@ public:
 		}
 	}
 
-	void OnAttackMonster(Session& session , FInfoData& atkInfo)
+	void OnAttackMonster(Session& session , FInfoData& damaged)
 	{
 		// std::lock_guard<std::mutex> lock(monsterMutex);
 
-		auto& monster = GetMonsterInfo(atkInfo.ID);
+		auto& monster = GetMonsterInfo(damaged.ID);
 		auto& damage = session.info.Damage;
 		auto& hp = monster.Hp;
-		LOG(LogType::Log, std::format("before : damage[{}] = {}, hp[{}] = {}",
-			session.id,damage,monster.ID, hp));
-
-		if ((hp - damage) <= 0)
-			hp = 0;
-		else
-		{
-			hp -= damage;
-		}
-		LOG(LogType::Log, std::format("after : damage[{}] = {}, hp[{}] = {}",
-			session.id, damage, monster.ID, hp));
-
+		monsters[damaged.ID].OnDamaged(damage);
 	}
 
 	FInfoData& GetMonsterInfo(int id) { return monsters[id].GetInfo(); }
