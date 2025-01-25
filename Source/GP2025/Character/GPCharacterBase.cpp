@@ -243,7 +243,7 @@ void AGPCharacterBase::AttackHitCheck()
 	
 	const float AttackRange = 40.f;
 	const float AttackRadius = 50.f;
-	const float AttackDamage = Stat->GetDamage();
+	const float AttackDamage = CharacterInfo.Damage;
 
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
@@ -269,8 +269,6 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	// Stat->ApplyDamage(DamageAmount);
-
 	AGPCharacterBase* AttackerCharacter = CastChecked<AGPCharacterBase>(DamageCauser);
 
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
@@ -283,7 +281,7 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	else
 	{
 		//todo: send mons atk pkt
-	
+		Stat->ApplyDamage(DamageAmount);
 	}
 
 	return DamageAmount;
