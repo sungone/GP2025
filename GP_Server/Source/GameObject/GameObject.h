@@ -17,8 +17,10 @@ public:
 	{
 		SetBunkerRandomLocation();
 	}
+
 	FInfoData& GetInfo() { return info; }
-protected:
+
+ protected :
 	FInfoData info;
 	int& id = info.ID;
 };

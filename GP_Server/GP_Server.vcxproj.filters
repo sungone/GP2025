@@ -34,9 +34,6 @@
     <Filter Include="Source Files\Game\Monster">
       <UniqueIdentifier>{cd98eaf1-8ee3-4548-98d5-26a68c3787cb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Game\BehaviorTree">
-      <UniqueIdentifier>{156abd11-4fb6-493f-9589-c2d49b7338b4}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Header\Define.h">
@@ -75,8 +72,8 @@
     <ClInclude Include="Source\GameObject\Monster.h">
       <Filter>Source Files\Game\Monster</Filter>
     </ClInclude>
-    <ClInclude Include="Node.h">
-      <Filter>Source Files\Game\BehaviorTree</Filter>
+    <ClInclude Include="Source\GameObject\Timer.h">
+      <Filter>Source Files\Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -109,9 +106,6 @@
     </ClCompile>
     <ClCompile Include="Source\GameObject\Monster.cpp">
       <Filter>Source Files\Game\Monster</Filter>
-    </ClCompile>
-    <ClCompile Include="Node.cpp">
-      <Filter>Source Files\Game\BehaviorTree</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

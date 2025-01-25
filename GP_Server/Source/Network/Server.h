@@ -2,6 +2,7 @@
 #include "Define.h"
 #include "IOCP.h"
 #include "SessionManager.h"
+#include "GameManager.h"
 #include <conio.h>
 
 class Server {
@@ -49,4 +50,5 @@ private:
 
 	IOCP& iocp = IOCP::GetInst();
 	SessionManager& sessionMgr = SessionManager::GetInst();
+	GameManager& gameMgr = GameManager::GetInst();
 };

@@ -1,5 +1,6 @@
 #include "Server.h"
 #include "SessionManager.h"
+#include "GameManager.h"
 
 bool Server::Init()
 {
@@ -27,6 +28,8 @@ bool Server::Init()
 
 	iocp.Init();
 	iocp.RegisterSocket(listenSocket);
+
+	gameMgr.StartMonsterStateBroadcast();
 
 	return true;
 }

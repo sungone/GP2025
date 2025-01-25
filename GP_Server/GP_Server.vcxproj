@@ -135,12 +135,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Node.h" />
     <ClInclude Include="Source\GameObject\GameManager.h" />
     <ClInclude Include="Source\GameObject\Player.h" />
     <ClInclude Include="Source\Common\Proto.h" />
     <ClInclude Include="Source\GameObject\GameObject.h" />
     <ClInclude Include="Source\GameObject\Monster.h" />
+    <ClInclude Include="Source\GameObject\Timer.h" />
     <ClInclude Include="Source\Header\Define.h" />
     <ClInclude Include="Source\Header\Loger.h" />
     <ClInclude Include="Source\Network\IOCP.h" />
@@ -150,7 +150,6 @@
     <ClInclude Include="Source\Network\SessionManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Node.cpp" />
     <ClCompile Include="Source\GameObject\GameManager.cpp" />
     <ClCompile Include="Source\GameObject\Player.cpp" />
     <ClCompile Include="Source\GameObject\GameObject.cpp" />

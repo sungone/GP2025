@@ -41,6 +41,14 @@ enum EMoveStateType : uint32_t
 	STATE_AUTOATTACK = 1 << 3, // 2^4
 };
 
+enum MonsterState : uint32_t
+{
+	M_STATE_IDLE = 0 ,
+	M_STATE_WALK = 1 << 0 ,
+	M_STATE_ATTACK = 1 << 1 , 
+	M_STATE_DIE = 1 << 2
+};
+
 struct FInfoData
 {
 	int32 ID;
@@ -59,12 +67,14 @@ struct FInfoData
 	{ 
 		Hp = MaxHp; 
 	};
+
 	void SetLocation(float X_, float Y_, float Z_)
 	{
 		X = X_;
 		Y = Y_;
 		Z = Z_;
 	};
+
 	void AddState(EMoveStateType NewState) { State |= NewState; }
 	void RemoveState(EMoveStateType RemoveState) { State &= ~RemoveState; }
 	bool HasState(EMoveStateType CheckState) const { return (State & CheckState) != 0; }
@@ -74,6 +84,12 @@ struct FAttackData
 {
 	FInfoData Attacker;
 	FInfoData Attacked;
+};
+
+struct FMonsterStateData
+{
+	int32 ID;
+	uint32_t State;
 };
 
 #pragma pack(push, 1)
@@ -111,4 +127,5 @@ using FPacketHeader = Packet::PacketHeader;
 using InfoPacket = TPacket<FInfoData>;
 using IDPacket = TPacket<int32>;
 using AttackPacket = TPacket<FAttackData>;
+using MonsterStatePacket = TPacket<FMonsterStateData>;
 #pragma pack(pop)
