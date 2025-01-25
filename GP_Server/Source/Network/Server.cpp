@@ -30,6 +30,7 @@ bool Server::Init()
 	iocp.RegisterSocket(listenSocket);
 
 	gameMgr.StartMonsterStateBroadcast();
+	gameMgr.StartMonsterAIUpdate();
 
 	return true;
 }
@@ -47,6 +48,9 @@ void Server::Run()
 void Server::Close()
 {
 	bRunning = false;
+
+	gameMgr.StopMonsterStateBroadcast();
+	gameMgr.StopMonsterAIUpdate();
 
 	if (listenSocket != INVALID_SOCKET) {
 		closesocket(listenSocket);

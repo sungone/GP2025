@@ -20,22 +20,8 @@ public:
 
     uint32_t GetState() const { return info.State; }
 
-    void Update(float deltaTime)
-    {
-        stateTimer += deltaTime;
-        if (stateTimer >= stateInterval)
-        {
-            stateTimer = 0.0f;
-            UpdateBehavior();
-        }
-    }
-
 public :
-    bool ShouldStartWalking() { return rand() % 3 == 0; }
-    bool ShouldAttack() { return rand() % 5 == 0; }
-
-public:
-    float stateTimer;     
-    float stateInterval;  
+    bool ShouldStartWalking();
+    bool ShouldAttack();
 }; 
 

@@ -1,13 +1,16 @@
 #include "Monster.h"
 #include "Proto.h"
 #include "SessionManager.h"
+#include "GameManager.h"
+#include <random>
+static std::random_device rd;
+static std::mt19937 gen(rd());
 
 void Monster::UpdateBehavior()
 {
     switch (info.State)
     {
     case MonsterState::M_STATE_IDLE:
-        std::cout << "Monster is idling." << std::endl;
         if (ShouldStartWalking())
             ChangeState(MonsterState::M_STATE_WALK);
         else if (ShouldAttack())
@@ -15,7 +18,6 @@ void Monster::UpdateBehavior()
         break;
 
     case MonsterState::M_STATE_WALK:
-        std::cout << "Monster is walking." << std::endl;
         if (ShouldAttack())
             ChangeState(MonsterState::M_STATE_ATTACK);
         else if (!ShouldStartWalking())
@@ -23,19 +25,19 @@ void Monster::UpdateBehavior()
         break;
 
     case MonsterState::M_STATE_ATTACK:
-        std::cout << "Monster is attacking!" << std::endl;
         if (!ShouldAttack())
             ChangeState(MonsterState::M_STATE_IDLE);
         break;
 
     case MonsterState::M_STATE_DIE:
-        std::cout << "Monster is dead." << std::endl;
         break;
     }
 }
 
 void Monster::ChangeState(MonsterState newState)
 {
+    std::lock_guard<std::mutex> lock(GameManager::GetInst().monsterMutex);
+
     if (info.State != newState)
     {
         std::cout << "[State Change] Monster " << info.ID
@@ -44,11 +46,17 @@ void Monster::ChangeState(MonsterState newState)
 
         info.State = newState;
         info.State = static_cast<uint32_t>(info.State);
-
-        //FMonsterStateData StateData = { info.ID , static_cast<uint32_t>(currentState) };
-        //MonsterStatePacket packet(S_MONSTER_STATUS_UPDATE, StateData);
-
-        //SessionManager::GetInst().Broadcast(&packet);
-        //std::cout << "Monster " << info.ID << " changed state to " << static_cast<uint32_t>(newState) << "." << std::endl;
     }
+}
+
+bool Monster::ShouldStartWalking()
+{
+    static std::uniform_int_distribution<int> dist(0, 2); 
+    return dist(gen) == 0; 
+}
+
+bool Monster::ShouldAttack()
+{
+    static std::uniform_int_distribution<int> dist(0, 4); 
+    return dist(gen) == 0; 
 }

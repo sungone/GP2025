@@ -25,6 +25,8 @@ public:
 
 	void OnAttackMonster(Session& session , FInfoData& atkInfo)
 	{
+		// std::lock_guard<std::mutex> lock(monsterMutex);
+
 		auto& monster = GetMonsterInfo(atkInfo.ID);
 		auto& damage = session.info.Damage;
 		auto& hp = monster.Hp;
@@ -41,23 +43,25 @@ public:
 			session.id, damage, monster.ID, hp));
 
 	}
+
 	FInfoData& GetMonsterInfo(int id) { return monsters[id].GetInfo(); }
 	std::array<Monster, MAX_MONSTER> monsters;
 
 public :
-	Timer timer;
+	Timer MonsterStateBroadcastTimer;
+	Timer MonsterAIUpdateTimer;
 	std::mutex monsterMutex;
 
 	void StartMonsterStateBroadcast()
 	{
-		timer.Start(5000, [this]() {
+		MonsterStateBroadcastTimer.Start(5000, [this]() {
 			BroadcastMonsterStates();
 			});
 	}
 
 	void StopMonsterStateBroadcast()
 	{
-		timer.Stop();
+		MonsterStateBroadcastTimer.Stop();
 	}
 
 	void BroadcastMonsterStates()
@@ -71,7 +75,6 @@ public :
 
 			SessionManager::GetInst().Broadcast(&packet);
 
-			// µð¹ö±ë ·Î±×
 			std::cout << "Broadcasted state for monster " << monster.GetInfo().ID
 				<< " with state " << static_cast<uint32_t>(monster.GetState()) << "." << std::endl;
 		}
@@ -79,12 +82,17 @@ public :
 
 	void StartMonsterAIUpdate()
 	{
-		timer.Start(500, [this]() {
+		MonsterAIUpdateTimer.Start(6000, [this]() {
 			for (auto& monster : monsters)
 			{
 				monster.UpdateBehavior();
 			}
 			});
+	} 
+
+	void StopMonsterAIUpdate()
+	{
+		MonsterAIUpdateTimer.Stop();
 	}
 };
 
