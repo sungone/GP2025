@@ -70,8 +70,8 @@ public :
 
 		for (auto& monster : monsters)
 		{
-			FMonsterStateData stateData = { monster.GetInfo().ID, static_cast<uint32_t>(monster.GetState()) };
-			MonsterStatePacket packet(S_MONSTER_STATUS_UPDATE, stateData);
+			FInfoData MonsterInfoData = monster.GetInfo();
+			MonsterInfoPacket packet(S_MONSTER_STATUS_UPDATE, MonsterInfoData);
 
 			SessionManager::GetInst().Broadcast(&packet);
 

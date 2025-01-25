@@ -11,12 +11,15 @@ public:
 		static int i = 0;
 		info.ID = i++;
 		info.CharacterType = M_MOUSE;
-		info.State = MonsterState::M_STATE_IDLE;
+		info.Hp = 100.f;
+		info.Damage = 20.f;
+		info.Speed = 200.f;
+		info.State = ECharacterStateType::STATE_IDLE;
 	}
 
     void UpdateBehavior();
 
-	void ChangeState(MonsterState newState);
+	void ChangeState(ECharacterStateType newState);
 
     uint32_t GetState() const { return info.State; }
 

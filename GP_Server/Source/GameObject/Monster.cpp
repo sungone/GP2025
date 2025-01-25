@@ -10,31 +10,41 @@ void Monster::UpdateBehavior()
 {
     switch (info.State)
     {
-    case MonsterState::M_STATE_IDLE:
+    case ECharacterStateType::STATE_IDLE:
         if (ShouldStartWalking())
-            ChangeState(MonsterState::M_STATE_WALK);
+        {
+            ChangeState(ECharacterStateType::STATE_WALK);
+        }
         else if (ShouldAttack())
-            ChangeState(MonsterState::M_STATE_ATTACK);
+        {
+            ChangeState(ECharacterStateType::STATE_AUTOATTACK);
+        }
         break;
 
-    case MonsterState::M_STATE_WALK:
+    case ECharacterStateType::STATE_WALK:
         if (ShouldAttack())
-            ChangeState(MonsterState::M_STATE_ATTACK);
+        {
+            ChangeState(ECharacterStateType::STATE_AUTOATTACK);
+        }
         else if (!ShouldStartWalking())
-            ChangeState(MonsterState::M_STATE_IDLE);
+        {
+            ChangeState(ECharacterStateType::STATE_IDLE);
+        }
         break;
 
-    case MonsterState::M_STATE_ATTACK:
+    case ECharacterStateType::STATE_AUTOATTACK:
         if (!ShouldAttack())
-            ChangeState(MonsterState::M_STATE_IDLE);
+        {
+            ChangeState(ECharacterStateType::STATE_IDLE);
+        }
         break;
 
-    case MonsterState::M_STATE_DIE:
+    case ECharacterStateType::STATE_DIE:
         break;
     }
 }
 
-void Monster::ChangeState(MonsterState newState)
+void Monster::ChangeState(ECharacterStateType newState)
 {
     std::lock_guard<std::mutex> lock(GameManager::GetInst().monsterMutex);
 
@@ -51,12 +61,35 @@ void Monster::ChangeState(MonsterState newState)
 
 bool Monster::ShouldStartWalking()
 {
-    static std::uniform_int_distribution<int> dist(0, 2); 
-    return dist(gen) == 0; 
+    static std::uniform_int_distribution<int> dist(0, 2);
+    static std::uniform_real_distribution<float> distX(-1000.0f, 1000.0f); 
+    static std::uniform_real_distribution<float> distY(-1000.0f, 1000.0f); 
+    if (dist(gen) == 0)
+    {
+        float newX = info.X + distX(gen);
+        float newY = info.Y + distY(gen);
+
+        float deltaX = newX - info.X;
+        float deltaY = newY - info.Y;
+        float newYaw = std::atan2(deltaY, deltaX) * (180.0f / 3.14159265f); 
+
+        info.SetLocation(newX, newY, info.Z);
+        info.Yaw = newYaw;
+
+        std::cout << "Monster moved to new location: (" << newX << ", " << newY << ", " << info.Z << ")" << std::endl;
+        return true;
+    }
+    
+    return false;
 }
 
 bool Monster::ShouldAttack()
 {
     static std::uniform_int_distribution<int> dist(0, 4); 
-    return dist(gen) == 0; 
+    if (dist(gen) == 0)
+    {
+        return true;
+    }
+
+    return false;
 }

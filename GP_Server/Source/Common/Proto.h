@@ -32,21 +32,15 @@ enum ECharacterType : uint8_t
 	M_MOUSE,
 };
 
-enum EMoveStateType : uint32_t
+enum ECharacterStateType : uint32_t
 {
 	STATE_NONE = 0, // 2^0
 	STATE_IDLE = 1 << 0,  // 2^1
 	STATE_RUN = 1 << 1,  // 2^2
 	STATE_JUMP = 1 << 2,  // 2^3
 	STATE_AUTOATTACK = 1 << 3, // 2^4
-};
-
-enum MonsterState : uint32_t
-{
-	M_STATE_IDLE = 0 ,
-	M_STATE_WALK = 1 << 0 ,
-	M_STATE_ATTACK = 1 << 1 , 
-	M_STATE_DIE = 1 << 2
+	STATE_DIE = 1 << 4,
+	STATE_WALK = 1 << 5,
 };
 
 struct FInfoData
@@ -75,21 +69,15 @@ struct FInfoData
 		Z = Z_;
 	};
 
-	void AddState(EMoveStateType NewState) { State |= NewState; }
-	void RemoveState(EMoveStateType RemoveState) { State &= ~RemoveState; }
-	bool HasState(EMoveStateType CheckState) const { return (State & CheckState) != 0; }
+	void AddState(ECharacterStateType NewState) { State |= NewState; }
+	void RemoveState(ECharacterStateType RemoveState) { State &= ~RemoveState; }
+	bool HasState(ECharacterStateType CheckState) const { return (State & CheckState) != 0; }
 };
 
 struct FAttackData
 {
 	FInfoData Attacker;
 	FInfoData Attacked;
-};
-
-struct FMonsterStateData
-{
-	int32 ID;
-	uint32_t State;
 };
 
 #pragma pack(push, 1)
@@ -127,5 +115,5 @@ using FPacketHeader = Packet::PacketHeader;
 using InfoPacket = TPacket<FInfoData>;
 using IDPacket = TPacket<int32>;
 using AttackPacket = TPacket<FAttackData>;
-using MonsterStatePacket = TPacket<FMonsterStateData>;
+using MonsterInfoPacket = TPacket<FInfoData>;
 #pragma pack(pop)
