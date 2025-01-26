@@ -71,4 +71,6 @@ public :
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> MonsterDeadMontage;
+
+	float DeadEventDelayTime = 3.f;
 };
