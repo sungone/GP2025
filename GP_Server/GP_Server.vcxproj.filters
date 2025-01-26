@@ -45,9 +45,6 @@
     <ClInclude Include="Source\Header\Loger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Network\PacketManager.h">
-      <Filter>Source Files\Network\Packet</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Network\IOCP.h">
       <Filter>Source Files\Network\Server</Filter>
     </ClInclude>
@@ -77,6 +74,9 @@
     </ClInclude>
     <ClInclude Include="Source\GameObject\Character.h">
       <Filter>Source Files\Game\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Network\PacketManager.h">
+      <Filter>Source Files\Network\Packet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

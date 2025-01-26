@@ -258,7 +258,6 @@ void AGPCharacterBase::AttackHitCheck()
 	const float AttackRadius = 50.f;
 	const float AttackDamage = CharacterInfo.Damage;
 
-	UE_LOG(LogTemp, Log, TEXT("Attack Damage : %f"), AttackDamage);
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
 

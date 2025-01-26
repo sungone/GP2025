@@ -79,6 +79,12 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 void AGPCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// FInfoData 에 데미지 Hp 설정
+	CharacterInfo.MaxHp = Stat->GetMaxHp();
+	CharacterInfo.Hp = CharacterInfo.MaxHp;
+	CharacterInfo.Damage = Stat->GetDamage();
+
 	SetCharacterControl(CurrentCharacterType);
 
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
@@ -92,11 +98,6 @@ void AGPCharacterPlayer::BeginPlay()
 	LastLocation = GetActorLocation();
 	LastRotationYaw = GetActorRotation().Yaw;
 	LastSendPlayerInfo = CharacterInfo;
-
-	// FInfoData 에 데미지 Hp 설정
-	CharacterInfo.MaxHp = Stat->GetMaxHp();
-	CharacterInfo.Hp = CharacterInfo.MaxHp;
-	CharacterInfo.Damage = Stat->GetDamage();
 }
 
 void AGPCharacterPlayer::Tick(float DeltaTime)
