@@ -43,7 +43,7 @@ public :
 
 	void StartMonsterStateBroadcast()
 	{
-		MonsterStateBroadcastTimer.Start(5000, [this]() {
+		MonsterStateBroadcastTimer.Start(3000, [this]() {
 			BroadcastMonsterStates();
 			});
 	}
@@ -73,7 +73,7 @@ public :
 	
 	void StartMonsterAIUpdate()
 	{
-		MonsterAIUpdateTimer.Start(6000, [this]() {
+		MonsterAIUpdateTimer.Start(4000, [this]() {
 			for (auto& monster : monsters)
 			{
 				monster.UpdateBehavior();
