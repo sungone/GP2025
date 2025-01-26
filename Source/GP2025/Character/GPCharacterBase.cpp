@@ -36,6 +36,19 @@ AGPCharacterBase::AGPCharacterBase()
 		AutoAttackActionMontage = AutoAttackMontageRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/WarriorAnimation/AM_Dead.AM_Dead'"));
+	if (DeadMontageRef.Object)
+	{
+		DeadMontage = DeadMontageRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> MonsterDeadMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/MouseMonsterAnimation/AM_Dead.AM_Dead'"));
+	if (MonsterDeadMontageRef.Object)
+	{
+		MonsterDeadMontage = MonsterDeadMontageRef.Object;
+	}
+
+
 	// 폰 회전을 컨트롤러 회전과 똑같이 사용
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -245,6 +258,7 @@ void AGPCharacterBase::AttackHitCheck()
 	const float AttackRadius = 50.f;
 	const float AttackDamage = CharacterInfo.Damage;
 
+	UE_LOG(LogTemp, Log, TEXT("Attack Damage : %f"), AttackDamage);
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
 
@@ -282,6 +296,11 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	{
 		//todo: send mons atk pkt
 		Stat->ApplyDamage(DamageAmount);
+
+		if (Stat->GetCurrentHp() <= 0)
+		{
+			SetDead();
+		}
 	}
 
 	return DamageAmount;
@@ -295,6 +314,28 @@ void AGPCharacterBase::SetupCharacterWidget(UGPUserWidget* InUserWidget)
 		HpBarWidget->SetMaxHp(Stat->GetMaxHp());
 		HpBarWidget->UpdateHpBar(Stat->GetCurrentHp());
 		Stat->OnHpChanged.AddUObject(HpBarWidget, &UGPHpBarWidget::UpdateHpBar);
+	}
+}
+
+void AGPCharacterBase::SetDead()
+{
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	PlayDeadAnimation();
+	SetActorEnableCollision(false);
+}
+
+void AGPCharacterBase::PlayDeadAnimation()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->StopAllMontages(0.f);
+
+	if (CurrentCharacterType == ECharacterType::M_MOUSE)
+	{
+		AnimInstance->Montage_Play(MonsterDeadMontage, 1.f);
+	}
+	else
+	{
+		AnimInstance->Montage_Play(DeadMontage, 1.f);
 	}
 }
 

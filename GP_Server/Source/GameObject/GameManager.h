@@ -59,7 +59,9 @@ public :
 
 		for (auto& monster : monsters)
 		{
+			if (monster.IsHpZero()) { monster.GetInfo().State = ECharacterStateType::STATE_DIE; }
 			FInfoData MonsterInfoData = monster.GetInfo();
+
 			MonsterInfoPacket packet(S_MONSTER_STATUS_UPDATE, MonsterInfoData);
 
 			SessionManager::GetInst().Broadcast(&packet);
@@ -68,7 +70,7 @@ public :
 				<< " with state " << static_cast<uint32_t>(monster.GetState()) << "." << std::endl;
 		}
 	}
-
+	
 	void StartMonsterAIUpdate()
 	{
 		MonsterAIUpdateTimer.Start(6000, [this]() {

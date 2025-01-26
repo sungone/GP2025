@@ -93,7 +93,7 @@ void AGPCharacterPlayer::BeginPlay()
 	LastRotationYaw = GetActorRotation().Yaw;
 	LastSendPlayerInfo = CharacterInfo;
 
-	// FCharacterInfo 에 데미지 Hp 설정
+	// FInfoData 에 데미지 Hp 설정
 	CharacterInfo.MaxHp = Stat->GetMaxHp();
 	CharacterInfo.Hp = CharacterInfo.MaxHp;
 	CharacterInfo.Damage = Stat->GetDamage();

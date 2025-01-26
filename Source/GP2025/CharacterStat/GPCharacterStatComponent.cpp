@@ -16,9 +16,6 @@ UGPCharacterStatComponent::UGPCharacterStatComponent()
 void UGPCharacterStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	CurrentHp = MaxHp;
-	
 }
 
 float UGPCharacterStatComponent::ApplyDamage(float InDamage)

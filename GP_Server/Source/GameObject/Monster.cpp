@@ -12,8 +12,6 @@ void Monster::Init()
     static int i = 0;
     info.ID = i++;
     info.CharacterType = M_MOUSE;
-    info.Speed = 200.f;
-    info.State = ECharacterStateType::STATE_IDLE;
 }
 
 void Monster::UpdateBehavior()
@@ -47,9 +45,6 @@ void Monster::UpdateBehavior()
         {
             ChangeState(ECharacterStateType::STATE_IDLE);
         }
-        break;
-
-    case ECharacterStateType::STATE_DIE:
         break;
     }
 }
@@ -95,8 +90,18 @@ bool Monster::ShouldStartWalking()
 
 bool Monster::ShouldAttack()
 {
-    static std::uniform_int_distribution<int> dist(0, 4); 
+    static std::uniform_int_distribution<int> dist(0, 1); 
     if (dist(gen) == 0)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool Monster::IsHpZero()
+{
+    if (info.Hp <= 0)
     {
         return true;
     }

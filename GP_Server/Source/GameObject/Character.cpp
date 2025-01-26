@@ -6,6 +6,9 @@ void Character::Init()
 	info.MaxHp = 100;
 	info.Hp = info.MaxHp;
 	info.Damage = 20;
+	info.Speed = 200.f;
+	info.Damage = 100.f;
+	info.State = ECharacterStateType::STATE_IDLE;
 }
 
 void Character::OnDamaged(int damage)

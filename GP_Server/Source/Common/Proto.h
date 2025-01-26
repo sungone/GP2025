@@ -133,9 +133,9 @@ struct FInfoData
 	float Y;
 	float Z;
 	float Yaw;
-	int MaxHp;
-	int Hp;
-	int Damage;
+	float MaxHp;
+	float Hp;
+	float Damage;
 	float Speed;
 	uint32_t State;
 

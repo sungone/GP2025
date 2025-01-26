@@ -60,4 +60,15 @@ public :
 	TObjectPtr<class UGPWidgetComponent> HpBar;
 
 	virtual void SetupCharacterWidget(class UGPUserWidget* InUserWidget) override;
+
+// Dead Section
+public :
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat" , Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> DeadMontage;
+
+	virtual void SetDead();
+	void PlayDeadAnimation();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> MonsterDeadMontage;
 };

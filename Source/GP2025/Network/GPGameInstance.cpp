@@ -93,7 +93,6 @@ void UGPGameInstance::SendPlayerAttackPacket(FInfoData& Attacked)
 {
 	AttackPacket Packet(EPacketType::C_ATTACK, { MyPlayer->CharacterInfo, Attacked });
 	int32 BytesSent = 0;
-	UE_LOG(LogTemp, Warning, TEXT("SendPlayerMovePacket"));
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(AttackPacket), BytesSent);
 }
 
@@ -289,6 +288,12 @@ void UGPGameInstance::UpdateMonster(FInfoData& MonsterInfo)
 	auto Monster = Monsters.Find(MonsterInfo.ID);
 	if (Monster)
 	{
+		if (MonsterInfo.HasState(ECharacterStateType::STATE_DIE))
+		{
+			(*Monster)->SetDead();
+			return;
+		}
+
 		(*Monster)->CharacterInfo = MonsterInfo;
 		(*Monster)->Stat->SetMaxHp(MonsterInfo.MaxHp);
 		(*Monster)->Stat->SetCurrentHp(MonsterInfo.Hp);
