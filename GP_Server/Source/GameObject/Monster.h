@@ -7,7 +7,7 @@ public:
 	Monster() { Init(); }
     void Init() override;
 
-    void UpdateBehavior();
+    void Update();
 	void ChangeState(ECharacterStateType newState);
 
     uint32_t GetState() const { return info.State; }
@@ -16,7 +16,5 @@ public:
 public :
     bool ShouldStartWalking();
     bool ShouldAttack();
-
-    bool IsHpZero();
 }; 
 

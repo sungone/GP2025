@@ -15,42 +15,26 @@ public:
 		static GameManager inst;
 		return inst;
 	}
+	GameManager()
+	{
+		CreateMonster();
+	}
 	void AddPlayer(int id, std::shared_ptr<Character> player);
 	void RemoveCharacter(int id);
 
 	void CreateMonster();
-	void SpawnMonster(Session& session)
-	{
-		for (int i = 0;i<MAX_MONSTER;++i)
-		{
-			monsters[i].Init();
-			monsters[i].GetInfo().ID = i;
-			auto Pkt = InfoPacket(EPacketType::S_ADD_MONSTER, monsters[i].GetInfo());
-			session.DoSend(&Pkt);
-		}
-		for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
-		{
-			if (characters[i] && characters[i]->IsValid())
-			{
-				auto Pkt = InfoPacket(EPacketType::S_ADD_MONSTER, characters[i]->GetInfo());
-				session.DoSend(&Pkt);
-			}
-		}
-	}
+	void SpawnMonster(Session& session);
 
-	void OnDamaged(float damage, FInfoData& damaged)
-	{
-		auto& monster = GetMonsterInfo(damaged.ID);
-		monsters[damaged.ID].OnDamaged(damage);
-	}
+	void OnDamaged(float damage, FInfoData& damaged);
 
-	FInfoData& GetMonsterInfo(int id) { return monsters[id].GetInfo(); }
+	std::shared_ptr<Character> GetCharacterByID(int id);
+	FInfoData& GetInfo(int id) { return GetCharacterByID(id).get()->GetInfo(); }
+
 private:
-	std::array<Monster, MAX_MONSTER> monsters;
 	std::array<std::shared_ptr<Character>, MAX_CHARACTER> characters;
 
 #pragma region AIÀÛ¾÷
-public :
+public:
 	Timer MonsterStateBroadcastTimer;
 	Timer MonsterAIUpdateTimer;
 	std::mutex monsterMutex;
@@ -71,29 +55,36 @@ public :
 	{
 		std::lock_guard<std::mutex> lock(monsterMutex);
 
-		for (auto& monster : monsters)
+		for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 		{
-			if (monster.IsHpZero()) { monster.GetInfo().State = ECharacterStateType::STATE_DIE; }
-			FInfoData MonsterInfoData = monster.GetInfo();
+			if (characters[i] && characters[i]->IsValid())
+			{
+				auto& monster = characters[i];
+				if (monster->IsDead()) { monster->GetInfo().State = ECharacterStateType::STATE_DIE; }
+				FInfoData MonsterInfoData = monster->GetInfo();
 
-			MonsterInfoPacket packet(S_MONSTER_STATUS_UPDATE, MonsterInfoData);
+				MonsterInfoPacket packet(S_MONSTER_STATUS_UPDATE, MonsterInfoData);
 
-			SessionManager::GetInst().Broadcast(&packet);
+				SessionManager::GetInst().Broadcast(&packet);
 
-			std::cout << "Broadcasted state for monster " << monster.GetInfo().ID
-				<< " with state " << static_cast<uint32_t>(monster.GetState()) << "." << std::endl;
+				std::cout << "Broadcasted state for monster " << monster->GetInfo().ID
+					<< " with state " << static_cast<uint32_t>(monster->GetInfo().State) << "." << std::endl;
+			}
 		}
 	}
-	
+
 	void StartMonsterAIUpdate()
 	{
 		MonsterAIUpdateTimer.Start(4000, [this]() {
-			for (auto& monster : monsters)
+			for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 			{
-				monster.UpdateBehavior();
+				if (characters[i] && characters[i]->IsValid())
+				{
+					characters[i]->Update();
+				}
 			}
 			});
-	} 
+	}
 
 	void StopMonsterAIUpdate()
 	{

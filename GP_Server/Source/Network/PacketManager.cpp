@@ -92,7 +92,7 @@ void PacketManager::HandleAttackPacket(Session& session, char* packet)
 
 		// hp °¨¼Ò
 		gameMgr.OnDamaged(playerInfo.Damage, data.Attacked);
-		auto monster = gameMgr.GetMonsterInfo(data.Attacked.ID);
+		auto monster = gameMgr.GetInfo(data.Attacked.ID);
 		auto pkt2 = InfoPacket(EPacketType::S_MONSTER_STATUS_UPDATE, monster);
 		sessionMgr.Broadcast(&pkt2);
 	}

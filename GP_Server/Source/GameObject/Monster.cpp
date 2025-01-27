@@ -12,7 +12,7 @@ void Monster::Init()
     info.CharacterType = M_MOUSE;
 }
 
-void Monster::UpdateBehavior()
+void Monster::Update()
 {
     switch (info.State)
     {
@@ -90,16 +90,6 @@ bool Monster::ShouldAttack()
 {
     static std::uniform_int_distribution<int> dist(0, 1); 
     if (dist(gen) == 0)
-    {
-        return true;
-    }
-
-    return false;
-}
-
-bool Monster::IsHpZero()
-{
-    if (info.Hp <= 0)
     {
         return true;
     }
