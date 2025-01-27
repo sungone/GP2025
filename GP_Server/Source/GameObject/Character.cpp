@@ -11,7 +11,7 @@ void Character::Init()
 	info.State = ECharacterStateType::STATE_IDLE;
 }
 
-void Character::OnDamaged(int damage)
+void Character::OnDamaged(float damage)
 {
 	auto& hp = info.Hp;
 	if ((hp - damage) <= 0)

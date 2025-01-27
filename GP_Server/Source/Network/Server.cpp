@@ -41,8 +41,8 @@ void Server::Run()
 	inputThread.join();*/
 
 	DoAccept();
-	CreateWokerThreads();
-	//WorkerThreadLoop();
+	//CreateWokerThreads();
+	WorkerThreadLoop();
 }
 
 void Server::Close()
@@ -129,7 +129,7 @@ void Server::DoAccept()
 
 void Server::HandleAccept()
 {
-	sessionMgr.RegisterSession(acceptSocket);
+	sessionMgr.Connect(acceptSocket);
 	DoAccept();
 }
 

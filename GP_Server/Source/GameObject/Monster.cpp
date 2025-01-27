@@ -9,8 +9,6 @@ static std::mt19937 gen(rd());
 void Monster::Init()
 {
     Character::Init();
-    static int i = 0;
-    info.ID = i++;
     info.CharacterType = M_MOUSE;
 }
 

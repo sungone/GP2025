@@ -13,12 +13,13 @@ public:
 	void DoSend(Packet* packet);
 
 	void Login();
+	void Connect(SOCKET& socket, int id);
 	void Disconnect();
 
 public:
 	bool bLogin = false;
-	FInfoData info;
-	int32& id = info.ID;
+	int id = -1;
+	std::shared_ptr<Player> player;
 	SOCKET socket = INVALID_SOCKET;
 	ExpOver recvOver;
 	int32 remain;

@@ -12,6 +12,7 @@ void Session::DoRecv()
 }
 void Session::DoSend(Packet* packet)
 {
+#pragma region //Log
 	switch (packet->Header.PacketType)
 	{
 	case S_LOGIN_SUCCESS:
@@ -39,6 +40,7 @@ void Session::DoSend(Packet* packet)
 		LOG(LogType::SendLog, "Unknown Packet Type");
 		break;
 	}
+#pragma endregion
 	auto send_data = new ExpOver{ reinterpret_cast<unsigned char*>(packet) };
 	WSASend(socket, &send_data->wsabuf, 1, nullptr, 0, &send_data->wsaover, nullptr);
 }
@@ -46,11 +48,16 @@ void Session::DoSend(Packet* packet)
 void Session::Login()
 {
 	bLogin = true;
-	static std::default_random_engine dre;
-	static std::uniform_real_distribution<float> ud_x(-3000, -1000);
-	static std::uniform_real_distribution<float> ud_y(-3500, -1500);
-	
-	info.SetLocation(ud_x(dre), ud_y(dre), 116);
+}
+
+void Session::Connect(SOCKET& socket, int id)
+{
+	this->id = id;
+	this->socket = socket;
+
+	player = std::make_shared<Player>();
+	player->Init();
+	player->GetInfo().ID = id;
 }
 
 void Session::Disconnect()

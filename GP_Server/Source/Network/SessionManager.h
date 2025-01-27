@@ -11,8 +11,7 @@ public:
 		static SessionManager inst;
 		return inst;
 	}
-
-	void RegisterSession(SOCKET& socket);
+	void Connect(SOCKET& socket);
 	void Disconnect(int id);
 
 	void DoRecv(int id);

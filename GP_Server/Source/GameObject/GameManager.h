@@ -5,6 +5,8 @@
 #include "Timer.h"
 #include "SessionManager.h"
 
+constexpr int MAX_CHARACTER = MAX_PLAYER + MAX_MONSTER;
+
 class GameManager
 {
 public:
@@ -13,29 +15,41 @@ public:
 		static GameManager inst;
 		return inst;
 	}
+	void AddPlayer(int id, std::shared_ptr<Character> player);
+	void RemoveCharacter(int id);
 
+	void CreateMonster();
 	void SpawnMonster(Session& session)
 	{
-		for (auto& m : monsters)
+		for (int i = 0;i<MAX_MONSTER;++i)
 		{
-			auto Pkt = InfoPacket(EPacketType::S_ADD_MONSTER, m.GetInfo());
+			monsters[i].Init();
+			monsters[i].GetInfo().ID = i;
+			auto Pkt = InfoPacket(EPacketType::S_ADD_MONSTER, monsters[i].GetInfo());
 			session.DoSend(&Pkt);
+		}
+		for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
+		{
+			if (characters[i] && characters[i]->IsValid())
+			{
+				auto Pkt = InfoPacket(EPacketType::S_ADD_MONSTER, characters[i]->GetInfo());
+				session.DoSend(&Pkt);
+			}
 		}
 	}
 
-	void OnAttackMonster(Session& session , FInfoData& damaged)
+	void OnDamaged(float damage, FInfoData& damaged)
 	{
-		// std::lock_guard<std::mutex> lock(monsterMutex);
-
 		auto& monster = GetMonsterInfo(damaged.ID);
-		auto& damage = session.info.Damage;
-		auto& hp = monster.Hp;
 		monsters[damaged.ID].OnDamaged(damage);
 	}
 
 	FInfoData& GetMonsterInfo(int id) { return monsters[id].GetInfo(); }
+private:
 	std::array<Monster, MAX_MONSTER> monsters;
+	std::array<std::shared_ptr<Character>, MAX_CHARACTER> characters;
 
+#pragma region AIÀÛ¾÷
 public :
 	Timer MonsterStateBroadcastTimer;
 	Timer MonsterAIUpdateTimer;
@@ -85,5 +99,7 @@ public :
 	{
 		MonsterAIUpdateTimer.Stop();
 	}
+#pragma endregion
+
 };
 

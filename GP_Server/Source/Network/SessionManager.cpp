@@ -1,12 +1,11 @@
 #include "SessionManager.h"
 #include "PacketManager.h"
 
-void SessionManager::RegisterSession(SOCKET& socket)
+void SessionManager::Connect(SOCKET& socket)
 {
 	int id = GenerateId();
 	if (id != -1) {
-		sessions[id].info.ID = id;
-		sessions[id].socket = socket;
+		sessions[id].Connect(socket,id);
 		iocp.RegisterSocket(socket, id);
 		sessions[id].DoRecv();
 	}
@@ -58,4 +57,5 @@ int SessionManager::GenerateId()
 		if (sessions[i].bLogin) continue;
 		return i;
 	}
+	return -1;
 }

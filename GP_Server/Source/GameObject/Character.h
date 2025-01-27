@@ -8,7 +8,7 @@ public:
 
 	virtual void Init();
 	
-	void OnDamaged(int damage);
+	void OnDamaged(float damage);
 	void SetBunkerRandomLocation();
 	FInfoData& GetInfo() { return info; }
 
