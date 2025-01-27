@@ -1,5 +1,12 @@
 #include "GameManager.h"
 
+void GameManager::Init()
+{
+	CreateMonster();
+	StartMonsterStateBroadcast();
+	StartMonsterAIUpdate();
+}
+
 void GameManager::AddPlayer(int id, std::shared_ptr<Character> player)
 {
 	characters[id] = player;

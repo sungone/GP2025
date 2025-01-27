@@ -29,8 +29,7 @@ bool Server::Init()
 	iocp.Init();
 	iocp.RegisterSocket(listenSocket);
 
-	gameMgr.StartMonsterStateBroadcast();
-	gameMgr.StartMonsterAIUpdate();
+	gameMgr.Init();
 
 	return true;
 }

@@ -52,7 +52,7 @@ void SessionManager::Broadcast(Packet* packet, int exptId)
 
 int SessionManager::GenerateId()
 {
-	for (int i = 1; i < MAX_PLAYER + 1; ++i)
+	for (int i = 1; i < MAX_CLIENT + 1; ++i)
 	{
 		if (sessions[i].bLogin) continue;
 		return i;

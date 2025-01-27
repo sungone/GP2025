@@ -18,8 +18,7 @@
 #include "Proto.h"
 #include "Loger.h"
 
-constexpr int MAX_PLAYER = 1000;
-constexpr int MAX_MONSTER = 10;
+constexpr int MAX_CLIENT = 1000;
 
 constexpr int PKT_TYPE_INDEX = 0;
 constexpr int PKT_SIZE_INDEX = 1;

@@ -8,15 +8,7 @@ public:
 
 	virtual void Init();
 	virtual void Update() {};
-	virtual bool IsDead()
-	{
-		if (info.Hp <= 0)
-		{
-			return true;
-		}
-
-		return false;
-	}
+	virtual bool IsDead();
 
 
 	void OnDamaged(float damage);

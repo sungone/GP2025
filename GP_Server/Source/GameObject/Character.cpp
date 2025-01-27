@@ -11,6 +11,11 @@ void Character::Init()
 	info.State = ECharacterStateType::STATE_IDLE;
 }
 
+bool Character::IsDead()
+{
+	return (info.Hp <= 0);
+}
+
 void Character::OnDamaged(float damage)
 {
 	auto& hp = info.Hp;

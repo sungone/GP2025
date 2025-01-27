@@ -5,6 +5,8 @@
 #include "Timer.h"
 #include "SessionManager.h"
 
+constexpr int MAX_PLAYER = MAX_CLIENT;
+constexpr int MAX_MONSTER = 10;
 constexpr int MAX_CHARACTER = MAX_PLAYER + MAX_MONSTER;
 
 class GameManager
@@ -15,10 +17,8 @@ public:
 		static GameManager inst;
 		return inst;
 	}
-	GameManager()
-	{
-		CreateMonster();
-	}
+	
+	void Init();
 	void AddPlayer(int id, std::shared_ptr<Character> player);
 	void RemoveCharacter(int id);
 
