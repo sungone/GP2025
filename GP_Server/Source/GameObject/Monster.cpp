@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Monster.h"
 #include "Proto.h"
 #include "SessionManager.h"

@@ -1,5 +1,4 @@
 #pragma once
-#include "Define.h"
 #include "Monster.h"
 #include "Session.h"
 #include "Timer.h"

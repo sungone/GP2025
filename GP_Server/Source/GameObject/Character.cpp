@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Character.h"
 
 void Character::Init()

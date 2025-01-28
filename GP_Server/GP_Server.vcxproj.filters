@@ -31,84 +31,96 @@
     <Filter Include="Source Files\Game\Character">
       <UniqueIdentifier>{0966d558-393f-4cde-bc3a-30a33c8d61fe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Game\Character\Monster">
-      <UniqueIdentifier>{cd98eaf1-8ee3-4548-98d5-26a68c3787cb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Game\Character\Player">
-      <UniqueIdentifier>{2775b8fd-e811-495b-b5ba-642efc6ae4ca}</UniqueIdentifier>
+    <Filter Include="Source Files\Utils">
+      <UniqueIdentifier>{bd2831f8-ef1c-49f1-856e-b8adecab7014}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Header\Define.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\Loger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Network\IOCP.h">
-      <Filter>Source Files\Network\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Network\Server.h">
-      <Filter>Source Files\Network\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Network\SessionManager.h">
-      <Filter>Source Files\Network\Session</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Network\Session.h">
-      <Filter>Source Files\Network\Session</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameObject\GameManager.h">
-      <Filter>Source Files\Game</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Common\Proto.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\Player.h">
-      <Filter>Source Files\Game\Character\Player</Filter>
+    <ClInclude Include="Source\Core\ExpOver.h">
+      <Filter>Source Files\Network\Server</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\Monster.h">
-      <Filter>Source Files\Game\Character\Monster</Filter>
+    <ClInclude Include="Source\Utils\Lock.h">
+      <Filter>Source Files\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\Timer.h">
-      <Filter>Source Files\Game</Filter>
+    <ClInclude Include="Source\Utils\Loger.h">
+      <Filter>Source Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Session.h">
+      <Filter>Source Files\Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\SessionManager.h">
+      <Filter>Source Files\Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\IOCP.h">
+      <Filter>Source Files\Network\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Server.h">
+      <Filter>Source Files\Network\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\PacketManager.h">
+      <Filter>Source Files\Network\Packet</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameObject\Character.h">
       <Filter>Source Files\Game\Character</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Network\PacketManager.h">
-      <Filter>Source Files\Network\Packet</Filter>
+    <ClInclude Include="Source\GameObject\Monster.h">
+      <Filter>Source Files\Game\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameObject\Player.h">
+      <Filter>Source Files\Game\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Utils\Timer.h">
+      <Filter>Source Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameObject\GameManager.h">
+      <Filter>Source Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\pch.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Network\PacketManager.cpp">
-      <Filter>Source Files\Network\Packet</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Network\IOCP.cpp">
-      <Filter>Source Files\Network\Server</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Network\Server.cpp">
-      <Filter>Source Files\Network\Server</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Network\Session.cpp">
-      <Filter>Source Files\Network\Session</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Network\SessionManager.cpp">
-      <Filter>Source Files\Network\Session</Filter>
-    </ClCompile>
     <ClCompile Include="Source\main.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ExpOver.cpp">
+      <Filter>Source Files\Network\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Utils\Lock.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Session.cpp">
+      <Filter>Source Files\Network\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\SessionManager.cpp">
+      <Filter>Source Files\Network\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\IOCP.cpp">
+      <Filter>Source Files\Network\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Server.cpp">
+      <Filter>Source Files\Network\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\PacketManager.cpp">
+      <Filter>Source Files\Network\Packet</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GameObject\Character.cpp">
+      <Filter>Source Files\Game\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GameObject\Monster.cpp">
+      <Filter>Source Files\Game\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GameObject\Player.cpp">
+      <Filter>Source Files\Game\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\GameObject\GameManager.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameObject\Player.cpp">
-      <Filter>Source Files\Game\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GameObject\Monster.cpp">
-      <Filter>Source Files\Game\Character\Monster</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GameObject\Character.cpp">
-      <Filter>Source Files\Game\Character</Filter>
+    <ClCompile Include="Source\pch.cpp">
+      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

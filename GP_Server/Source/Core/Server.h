@@ -1,5 +1,4 @@
 #pragma once
-#include "Define.h"
 #include "IOCP.h"
 #include "SessionManager.h"
 #include "GameManager.h"

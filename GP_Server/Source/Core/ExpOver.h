@@ -1,31 +1,8 @@
 #pragma once
 
-#include <WS2tcpip.h>
-#include <MSWSock.h>
-#pragma comment(lib, "WS2_32.lib")
-#pragma comment(lib, "MSWSock.lib")
-
-#include <iostream>
-#include <vector>
-#include <mutex>
-#include <thread>
-#include <memory>
-#include <array>
-#include <unordered_map>
-#include <functional>
-#include <random>
-
-#include "Proto.h"
-#include "Loger.h"
-
-constexpr uint32 MAX_CLIENT = 1000;
-
-constexpr BYTE PKT_TYPE_INDEX = 0;
-constexpr BYTE PKT_SIZE_INDEX = 1;
-
 enum CompType { RECV, SEND, ACCEPT };
 
-class ExpOver 
+class ExpOver
 {
 public:
 	ExpOver(unsigned char* packet)

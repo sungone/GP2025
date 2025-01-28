@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "SessionManager.h"
 #include "PacketManager.h"
 

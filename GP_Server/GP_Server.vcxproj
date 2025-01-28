@@ -108,8 +108,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source\Header;$(SolutionDir)Source\Common;$(SolutionDir)Source\GameObject;$(SolutionDir)Source\Network;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Source\Header;$(SolutionDir)Source\Common;$(SolutionDir)Source\GameObject;$(SolutionDir)Source\Core;$(SolutionDir)Source\Utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,6 +128,8 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)Source\Header;$(SolutionDir)Source\Common;$(SolutionDir)Source\GameObject;$(SolutionDir)Source\Network;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -135,31 +139,38 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Source\GameObject\GameManager.h" />
-    <ClInclude Include="Source\GameObject\Player.h" />
+    <ClInclude Include="Source\Core\ExpOver.h" />
+    <ClInclude Include="Source\Core\IOCP.h" />
+    <ClInclude Include="Source\Core\PacketManager.h" />
+    <ClInclude Include="Source\Core\Server.h" />
+    <ClInclude Include="Source\Core\Session.h" />
+    <ClInclude Include="Source\Core\SessionManager.h" />
     <ClInclude Include="Source\Common\Proto.h" />
     <ClInclude Include="Source\GameObject\Character.h" />
+    <ClInclude Include="Source\GameObject\GameManager.h" />
     <ClInclude Include="Source\GameObject\Monster.h" />
-    <ClInclude Include="Source\GameObject\Timer.h" />
-    <ClInclude Include="Source\Header\Define.h" />
-    <ClInclude Include="Source\Header\Loger.h" />
-    <ClInclude Include="Source\Network\IOCP.h" />
-    <ClInclude Include="Source\Network\PacketManager.h" />
-    <ClInclude Include="Source\Network\Server.h" />
-    <ClInclude Include="Source\Network\Session.h" />
-    <ClInclude Include="Source\Network\SessionManager.h" />
+    <ClInclude Include="Source\GameObject\Player.h" />
+    <ClInclude Include="Source\pch.h" />
+    <ClInclude Include="Source\Utils\Lock.h" />
+    <ClInclude Include="Source\Utils\Loger.h" />
+    <ClInclude Include="Source\Utils\Timer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\GameObject\GameManager.cpp" />
-    <ClCompile Include="Source\GameObject\Player.cpp" />
+    <ClCompile Include="Source\Core\ExpOver.cpp" />
+    <ClCompile Include="Source\Core\IOCP.cpp" />
+    <ClCompile Include="Source\Core\PacketManager.cpp" />
+    <ClCompile Include="Source\Core\Server.cpp" />
+    <ClCompile Include="Source\Core\Session.cpp" />
+    <ClCompile Include="Source\Core\SessionManager.cpp" />
     <ClCompile Include="Source\GameObject\Character.cpp" />
+    <ClCompile Include="Source\GameObject\GameManager.cpp" />
     <ClCompile Include="Source\GameObject\Monster.cpp" />
+    <ClCompile Include="Source\GameObject\Player.cpp" />
     <ClCompile Include="Source\main.cpp" />
-    <ClCompile Include="Source\Network\IOCP.cpp" />
-    <ClCompile Include="Source\Network\PacketManager.cpp" />
-    <ClCompile Include="Source\Network\Server.cpp" />
-    <ClCompile Include="Source\Network\Session.cpp" />
-    <ClCompile Include="Source\Network\SessionManager.cpp" />
+    <ClCompile Include="Source\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Source\Utils\Lock.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

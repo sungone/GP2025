@@ -1,5 +1,4 @@
 #pragma once
-
 using BYTE = unsigned char;
 using int16 = __int16;
 using int32 = __int32;
@@ -9,6 +8,9 @@ using uint16 = unsigned __int16;
 using uint32 = unsigned __int32;
 using uint64 = unsigned __int64;
 
+constexpr uint32 MAX_CLIENT = 1000;
+constexpr BYTE PKT_TYPE_INDEX = 0;
+constexpr BYTE PKT_SIZE_INDEX = 1;
 constexpr int16 SERVER_PORT = 4000;
 constexpr uint32 BUFSIZE = 1024;
 
@@ -32,8 +34,6 @@ enum EPacketType : uint8
 
 enum ECharacterType : uint8
 {
-	//INVALID = -1,
-
 	P_WARRIOR,
 	P_GUNNER,
 
