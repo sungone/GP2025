@@ -19,8 +19,8 @@ public:
 	void HandleAttackPacket(Session& session, BYTE* packet);
 
 private:
-	std::array<Session, MAX_CLIENT>& sessions = SessionManager::GetInst().GetSessions();
-	SessionManager& sessionMgr = SessionManager::GetInst();
-	GameManager& gameMgr = GameManager::GetInst();
+	std::array<Session, MAX_CLIENT>& _sessions = SessionManager::GetInst().GetSessions();
+	SessionManager& _sessionMgr = SessionManager::GetInst();
+	GameManager& _gameMgr = GameManager::GetInst();
 };
 

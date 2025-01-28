@@ -10,10 +10,10 @@ public:
 
 	void OnDamaged(float damage);
 	void SetBunkerRandomLocation();
-	FInfoData& GetInfo() { return info; }
-	bool IsValid() const { return info.ID != -1; }
+	FInfoData& GetInfo() { return _info; }
+	bool IsValid() const { return _info.ID != -1; }
 protected:
-	FInfoData info;
-	int32& id = info.ID;
+	FInfoData _info;
+	int32& _id = _info.ID;
 };
 

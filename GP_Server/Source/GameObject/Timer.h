@@ -6,16 +6,16 @@
 class Timer
 {
 public:
-    Timer() : isRunning(false) {}
+    Timer() : _isRunning(false) {}
 
     void Start(int intervalMs, std::function<void()> callback)
     {
-        isRunning = true;
-        timerThread = std::thread([this, intervalMs, callback]() {
-            while (isRunning)
+        _isRunning = true;
+        _timerThread = std::thread([this, intervalMs, callback]() {
+            while (_isRunning)
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(intervalMs));
-                if (isRunning) 
+                if (_isRunning) 
                     callback();
             }
             });
@@ -23,9 +23,9 @@ public:
 
     void Stop()
     {
-        isRunning = false;
-        if (timerThread.joinable())
-            timerThread.join();
+        _isRunning = false;
+        if (_timerThread.joinable())
+            _timerThread.join();
     }
 
     ~Timer()
@@ -34,6 +34,6 @@ public:
     }
 
 private:
-    std::atomic<bool> isRunning;
-    std::thread timerThread;
+    std::atomic<bool> _isRunning;
+    std::thread _timerThread;
 };

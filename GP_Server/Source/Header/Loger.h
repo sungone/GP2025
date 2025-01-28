@@ -26,7 +26,7 @@ public:
 
 	void LogMessage(LogType type, const std::string& message, const char* functionName)
 	{
-		std::lock_guard<std::mutex> lock(logMutex);
+		std::lock_guard<std::mutex> lock(_logLock);
 
 		std::string levelStr = LevelToString(type);
 
@@ -53,5 +53,5 @@ private:
 		}
 	}
 
-	std::mutex logMutex;
+	std::mutex _logLock;
 };

@@ -25,57 +25,57 @@ void PacketManager::ProcessPacket(Session& session, BYTE* packet)
 
 void PacketManager::HandleLoginPacket(Session& session)
 {
-	LOG(LogType::RecvLog, std::format("Login PKT [{}]", session.id));
-	auto& playerInfo = session.player.get()->GetInfo();
+	LOG(LogType::RecvLog, std::format("Login PKT [{}]", session._id));
+	auto& playerInfo = session._player.get()->GetInfo();
 	session.Login();
 	auto loginPkt = InfoPacket(EPacketType::S_LOGIN_SUCCESS, playerInfo);
 	session.DoSend(&loginPkt);
 
 	auto myInfoPkt = InfoPacket(EPacketType::S_ADD_PLAYER, playerInfo);
-	sessionMgr.Broadcast(&myInfoPkt, session.id);
+	_sessionMgr.Broadcast(&myInfoPkt, session._id);
 
-	for (auto& cl : sessions)
+	for (auto& cl : _sessions)
 	{
-		if (cl.id == session.id || !cl.bLogin)
+		if (cl._id == session._id || !cl._bLogin)
 			continue;
-		auto otherInfoPkt = InfoPacket(EPacketType::S_ADD_PLAYER, cl.player->GetInfo());
+		auto otherInfoPkt = InfoPacket(EPacketType::S_ADD_PLAYER, cl._player->GetInfo());
 		session.DoSend(&otherInfoPkt);
 	}
-	gameMgr.SpawnMonster(session);
+	_gameMgr.SpawnMonster(session);
 }
 
 void PacketManager::HandleLogoutPacket(Session& session)
 {
-	LOG(LogType::RecvLog, std::format("Logout PKT [{}]", session.id));
+	LOG(LogType::RecvLog, std::format("Logout PKT [{}]", session._id));
 	session.Disconnect();
-	auto pkt = IDPacket(EPacketType::S_REMOVE_PLAYER, session.id);
-	sessionMgr.Broadcast(&pkt, session.id);
+	auto pkt = IDPacket(EPacketType::S_REMOVE_PLAYER, session._id);
+	_sessionMgr.Broadcast(&pkt, session._id);
 }
 
 void PacketManager::HandleMovePacket(Session& session, BYTE* packet)
 {
-	auto& playerInfo = session.player.get()->GetInfo();
+	auto& playerInfo = session._player.get()->GetInfo();
 	LOG(LogType::RecvLog, std::format("Move PKT [{}] ({:.2f}, {:.2f}, {:.2f} / Yaw: {:.2f}, State {})",
 		playerInfo.ID, playerInfo.X, playerInfo.Y, playerInfo.Z, playerInfo.Yaw, playerInfo.State));
 
 	InfoPacket* p = reinterpret_cast<InfoPacket*>(packet);
 	playerInfo = p->Data;
 	auto pkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, playerInfo);
-	sessionMgr.Broadcast(&pkt, session.id);
+	_sessionMgr.Broadcast(&pkt, session._id);
 }
 
 void PacketManager::HandleAttackPacket(Session& session, BYTE* packet)
 {
-	LOG(LogType::RecvLog, std::format("Attack PKT [{}]", session.id));
+	LOG(LogType::RecvLog, std::format("Attack PKT [{}]", session._id));
 	
-	auto& playerInfo = session.player.get()->GetInfo();
+	auto& playerInfo = session._player.get()->GetInfo();
 	uint8_t packetSize = static_cast<EPacketType>(packet[PKT_SIZE_INDEX]);
 	if (packetSize == sizeof(InfoPacket))
 	{
 		InfoPacket* p = reinterpret_cast<InfoPacket*>(packet);
 		playerInfo = p->Data;
 		auto pkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, playerInfo);
-		sessionMgr.Broadcast(&pkt, session.id);
+		_sessionMgr.Broadcast(&pkt, session._id);
 	}
 	else
 	{
@@ -88,14 +88,14 @@ void PacketManager::HandleAttackPacket(Session& session, BYTE* packet)
 		// for anim 동기화
 		playerInfo = data.Attacker;
 		auto pkt1 = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, playerInfo);
-		sessionMgr.Broadcast(&pkt1);
+		_sessionMgr.Broadcast(&pkt1);
 
 		// hp 감소
-		if(gameMgr.OnDamaged(playerInfo.Damage, data.Attacked))
+		if(_gameMgr.OnDamaged(playerInfo.Damage, data.Attacked))
 		{
-			auto monster = gameMgr.GetInfo(data.Attacked.ID);
+			auto monster = _gameMgr.GetInfo(data.Attacked.ID);
 			auto pkt2 = InfoPacket(EPacketType::S_MONSTER_STATUS_UPDATE, monster);
-			sessionMgr.Broadcast(&pkt2);
+			_sessionMgr.Broadcast(&pkt2);
 		}
 	}
 }

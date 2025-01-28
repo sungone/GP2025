@@ -15,14 +15,14 @@ public:
 	~Server() { Close(); }
 	void CheckForExitKey()
 	{
-		while (bRunning)
+		while (_bRunning)
 		{
 			if (_kbhit())
 			{
 				char key = _getch();
 				if (key == 'q' || key == 27) // 'q'³ª ESC Å°
 				{
-					bRunning = false;
+					_bRunning = false;
 				}
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -35,20 +35,20 @@ public:
 private:
 	void CreateWokerThreads();
 	void WorkerThreadLoop();
-	void HandleError(ExpOver* ex_over, int32 id);
+	void HandleError(ExpOver* ex_over, int32 _id);
 	
 	void DoAccept();
 
 	void HandleAccept();
-	void HandleRecv(int32 id, int32 recvByte, ExpOver* expOver);
+	void HandleRecv(int32 _id, int32 recvByte, ExpOver* expOver);
 
 private:
-	bool bRunning = true;
-	SOCKET listenSocket;
-	SOCKET acceptSocket;
-	ExpOver acceptOver;
+	bool _bRunning = true;
+	SOCKET _listenSocket;
+	SOCKET _acceptSocket;
+	ExpOver _acceptOver;
 
-	IOCP& iocp = IOCP::GetInst();
-	SessionManager& sessionMgr = SessionManager::GetInst();
-	GameManager& gameMgr = GameManager::GetInst();
+	IOCP& _iocp = IOCP::GetInst();
+	SessionManager& _sessionMgr = SessionManager::GetInst();
+	GameManager& _gameMgr = GameManager::GetInst();
 };

@@ -19,9 +19,9 @@ public:
 	void Broadcast(Packet* packet, int32 exptId = -1);
 	int GenerateId();
 
-	std::array<Session, MAX_CLIENT>& GetSessions() { return sessions; }
+	std::array<Session, MAX_CLIENT>& GetSessions() { return _sessions; }
 private:
-	std::array<Session, MAX_CLIENT> sessions;
-	IOCP& iocp = IOCP::GetInst();
+	std::array<Session, MAX_CLIENT> _sessions;
+	IOCP& _iocp = IOCP::GetInst();
 };
 

@@ -10,8 +10,8 @@ public:
     void Update();
 	void ChangeState(ECharacterStateType newState);
 
-    uint32_t GetState() const { return info.State; }
-    void SetState(ECharacterStateType newState) { info.State = newState; }
+    uint32_t GetState() const { return _info.State; }
+    void SetState(ECharacterStateType newState) { _info.State = newState; }
 
 public :
     bool ShouldStartWalking();

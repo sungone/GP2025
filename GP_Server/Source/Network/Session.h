@@ -6,7 +6,7 @@ class Session
 {
 public:
 	Session() = default;
-	~Session() { closesocket(socket); }
+	~Session() { closesocket(_socket); }
 
 public:
 	void DoRecv();
@@ -17,10 +17,10 @@ public:
 	void Disconnect();
 
 public:
-	bool bLogin = false;
-	int id = -1;
-	std::shared_ptr<Player> player;
-	SOCKET socket = INVALID_SOCKET;
-	ExpOver recvOver;
-	int32 remain;
+	bool _bLogin = false;
+	int _id = -1;
+	std::shared_ptr<Player> _player;
+	SOCKET _socket = INVALID_SOCKET;
+	ExpOver _recvOver;
+	int32 _remain;
 };

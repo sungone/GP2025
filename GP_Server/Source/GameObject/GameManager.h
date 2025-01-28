@@ -31,35 +31,35 @@ public:
 	FInfoData& GetInfo(int32 id) { return GetCharacterByID(id).get()->GetInfo(); }
 
 private:
-	std::array<std::shared_ptr<Character>, MAX_CHARACTER> characters;
+	std::array<std::shared_ptr<Character>, MAX_CHARACTER> _characters;
 
 #pragma region AIÀÛ¾÷
 public:
-	Timer MonsterStateBroadcastTimer;
-	Timer MonsterAIUpdateTimer;
-	std::mutex monsterMutex;
+	Timer _MonsterStateBroadcastTimer;
+	Timer _MonsterAIUpdateTimer;
+	std::mutex _monsterMutex;
 
 	void StartMonsterStateBroadcast()
 	{
-		MonsterStateBroadcastTimer.Start(3000, [this]() {
+		_MonsterStateBroadcastTimer.Start(3000, [this]() {
 			BroadcastMonsterStates();
 			});
 	}
 
 	void StopMonsterStateBroadcast()
 	{
-		MonsterStateBroadcastTimer.Stop();
+		_MonsterStateBroadcastTimer.Stop();
 	}
 
 	void BroadcastMonsterStates()
 	{
-		std::lock_guard<std::mutex> lock(monsterMutex);
+		std::lock_guard<std::mutex> lock(_monsterMutex);
 
 		for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 		{
-			if (characters[i] && characters[i]->IsValid())
+			if (_characters[i] && _characters[i]->IsValid())
 			{
-				auto& monster = characters[i];
+				auto& monster = _characters[i];
 				if (monster->IsDead())
 				{
 					LOG(SendLog, std::format("Remove monster[{}]", monster->GetInfo().ID));
@@ -77,12 +77,12 @@ public:
 
 	void StartMonsterAIUpdate()
 	{
-		MonsterAIUpdateTimer.Start(4000, [this]() {
+		_MonsterAIUpdateTimer.Start(4000, [this]() {
 			for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 			{
-				if (characters[i] && characters[i]->IsValid())
+				if (_characters[i] && _characters[i]->IsValid())
 				{
-					characters[i]->Update();
+					_characters[i]->Update();
 				}
 			}
 			});
@@ -90,7 +90,7 @@ public:
 
 	void StopMonsterAIUpdate()
 	{
-		MonsterAIUpdateTimer.Stop();
+		_MonsterAIUpdateTimer.Stop();
 	}
 #pragma endregion
 

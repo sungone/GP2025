@@ -2,19 +2,19 @@
 
 bool IOCP::Init()
 {
-	hIOCP = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0);
-	if (hIOCP == nullptr) {
+	_hIOCP = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0);
+	if (_hIOCP == nullptr) {
 		return false;
 	}
 	return true;
 }
 
-void IOCP::RegisterSocket(SOCKET& socket, ULONG_PTR key)
+void IOCP::RegisterSocket(SOCKET& _socket, ULONG_PTR key)
 {
-	CreateIoCompletionPort(reinterpret_cast<HANDLE>(socket), hIOCP, key, 0);
+	CreateIoCompletionPort(reinterpret_cast<HANDLE>(_socket), _hIOCP, key, 0);
 }
 
 bool IOCP::GetCompletion(DWORD& rw_byte, ULONG_PTR& key, LPWSAOVERLAPPED& over)
 {
-	return GetQueuedCompletionStatus(hIOCP, &rw_byte, &key, &over, INFINITE);
+	return GetQueuedCompletionStatus(_hIOCP, &rw_byte, &key, &over, INFINITE);
 }

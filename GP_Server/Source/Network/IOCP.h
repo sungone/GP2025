@@ -11,16 +11,16 @@ public:
 	}
 	~IOCP()
 	{
-		if (hIOCP) {
-			CloseHandle(hIOCP);
-			hIOCP = nullptr;
+		if (_hIOCP) {
+			CloseHandle(_hIOCP);
+			_hIOCP = nullptr;
 		}
 	}
 
 	bool Init();
-	void RegisterSocket(SOCKET& socket, ULONG_PTR key = NULL);
+	void RegisterSocket(SOCKET& _socket, ULONG_PTR key = NULL);
 	bool GetCompletion(DWORD& rw_byte, ULONG_PTR& key, LPWSAOVERLAPPED& over);
 
 private:
-	HANDLE hIOCP;
+	HANDLE _hIOCP;
 };

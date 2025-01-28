@@ -3,22 +3,22 @@
 void Character::Init()
 {
 	SetBunkerRandomLocation();
-	info.MaxHp = 100;
-	info.Hp = info.MaxHp;
-	info.Damage = 20;
-	info.Speed = 200.f;
-	info.Damage = 100.f;
-	info.State = ECharacterStateType::STATE_IDLE;
+	_info.MaxHp = 100;
+	_info.Hp = _info.MaxHp;
+	_info.Damage = 20;
+	_info.Speed = 200.f;
+	_info.Damage = 100.f;
+	_info.State = ECharacterStateType::STATE_IDLE;
 }
 
 bool Character::IsDead()
 {
-	return (info.Hp <= 0);
+	return (_info.Hp <= 0);
 }
 
 void Character::OnDamaged(float damage)
 {
-	auto& hp = info.Hp;
+	auto& hp = _info.Hp;
 	if ((hp - damage) <= 0)
 		hp = 0;
 	else
@@ -33,5 +33,5 @@ void Character::SetBunkerRandomLocation()
 	static std::uniform_real_distribution<float> ud_x(-3000, -1000);
 	static std::uniform_real_distribution<float> ud_y(-3500, -1500);
 
-	info.SetLocation(ud_x(dre), ud_y(dre), 116);
+	_info.SetLocation(ud_x(dre), ud_y(dre), 116);
 }

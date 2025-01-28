@@ -25,26 +25,27 @@ constexpr BYTE PKT_SIZE_INDEX = 1;
 
 enum CompType { RECV, SEND, ACCEPT };
 
-class ExpOver {
-public:
-	WSAOVERLAPPED wsaover;
-	WSABUF wsabuf;
-	char	buf[BUFSIZE];
-	CompType compType;
+class ExpOver 
+{
 public:
 	ExpOver(unsigned char* packet)
 	{
-		ZeroMemory(&wsaover, sizeof(wsaover));
-		wsabuf.len = packet[1];
-		wsabuf.buf = buf;
-		compType = SEND;
-		memcpy(buf, packet, packet[1]);
+		ZeroMemory(&_wsaover, sizeof(_wsaover));
+		_wsabuf.len = packet[1];
+		_wsabuf.buf = _buf;
+		_compType = SEND;
+		memcpy(_buf, packet, packet[1]);
 	}
 	ExpOver()
 	{
-		ZeroMemory(&wsaover, sizeof(wsaover));
-		wsabuf.buf = buf;
-		wsabuf.len = BUFSIZE;
-		compType = RECV;
+		ZeroMemory(&_wsaover, sizeof(_wsaover));
+		_wsabuf.buf = _buf;
+		_wsabuf.len = BUFSIZE;
+		_compType = RECV;
 	}
+public:
+	WSAOVERLAPPED _wsaover;
+	WSABUF _wsabuf;
+	char	_buf[BUFSIZE];
+	CompType _compType;
 };

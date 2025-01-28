@@ -9,8 +9,8 @@ bool Server::Init()
 	if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0) {
 		return false;
 	}
-	listenSocket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
-	if (listenSocket == INVALID_SOCKET) {
+	_listenSocket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
+	if (_listenSocket == INVALID_SOCKET) {
 		return false;
 	}
 	SOCKADDR_IN addr_s;
@@ -18,18 +18,18 @@ bool Server::Init()
 	addr_s.sin_port = htons(SERVER_PORT);
 	addr_s.sin_addr.s_addr = htonl(ADDR_ANY);
 
-	if (bind(listenSocket, reinterpret_cast<sockaddr*>(&addr_s), sizeof(addr_s)) == SOCKET_ERROR) {
+	if (bind(_listenSocket, reinterpret_cast<sockaddr*>(&addr_s), sizeof(addr_s)) == SOCKET_ERROR) {
 		return false;
 	}
 
-	if (listen(listenSocket, SOMAXCONN) == SOCKET_ERROR) {
+	if (listen(_listenSocket, SOMAXCONN) == SOCKET_ERROR) {
 		return false;
 	}
 
-	iocp.Init();
-	iocp.RegisterSocket(listenSocket);
+	_iocp.Init();
+	_iocp.RegisterSocket(_listenSocket);
 
-	gameMgr.Init();
+	_gameMgr.Init();
 
 	return true;
 }
@@ -46,14 +46,14 @@ void Server::Run()
 
 void Server::Close()
 {
-	bRunning = false;
+	_bRunning = false;
 
-	gameMgr.StopMonsterStateBroadcast();
-	gameMgr.StopMonsterAIUpdate();
+	_gameMgr.StopMonsterStateBroadcast();
+	_gameMgr.StopMonsterAIUpdate();
 
-	if (listenSocket != INVALID_SOCKET) {
-		closesocket(listenSocket);
-		listenSocket = INVALID_SOCKET;
+	if (_listenSocket != INVALID_SOCKET) {
+		closesocket(_listenSocket);
+		_listenSocket = INVALID_SOCKET;
 	}
 
 	WSACleanup();
@@ -76,15 +76,15 @@ void Server::WorkerThreadLoop()
 	ULONG_PTR sessionId;
 	LPWSAOVERLAPPED over;
 
-	while (bRunning) {
-		BOOL ret = iocp.GetCompletion(recvByte, sessionId, over);
+	while (_bRunning) {
+		BOOL ret = _iocp.GetCompletion(recvByte, sessionId, over);
 		ExpOver* expOver = reinterpret_cast<ExpOver*>(over);
 		if (!ret) {
 			HandleError(expOver, sessionId);
 			continue;
 		}
 
-		switch (expOver->compType) {
+		switch (expOver->_compType) {
 		case ACCEPT:
 			HandleAccept();
 			break;
@@ -100,18 +100,18 @@ void Server::WorkerThreadLoop()
 
 void Server::HandleError(ExpOver* ex_over, int32 id)
 {
-	switch (ex_over->compType)
+	switch (ex_over->_compType)
 	{
 	case ACCEPT:
 		LOG(Warning, "CompType : ACCEPT");
 		break;
 	case RECV:
 		LOG(Warning, "CompType : RECV");
-		sessionMgr.Disconnect(id);
+		_sessionMgr.Disconnect(id);
 		break;
 	case SEND:
 		LOG(Warning, "CompType : SEND");
-		sessionMgr.Disconnect(id);
+		_sessionMgr.Disconnect(id);
 		delete ex_over;
 		break;
 	}
@@ -119,22 +119,22 @@ void Server::HandleError(ExpOver* ex_over, int32 id)
 
 void Server::DoAccept()
 {
-	ZeroMemory(&acceptOver.wsaover, sizeof(acceptOver.wsaover));
-	acceptSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-	acceptOver.compType = ACCEPT;
-	AcceptEx(listenSocket, acceptSocket, acceptOver.buf, 0,
-		sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, 0, &acceptOver.wsaover);
+	ZeroMemory(&_acceptOver._wsaover, sizeof(_acceptOver._wsaover));
+	_acceptSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+	_acceptOver._compType = ACCEPT;
+	AcceptEx(_listenSocket, _acceptSocket, _acceptOver._buf, 0,
+		sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, 0, &_acceptOver._wsaover);
 }
 
 void Server::HandleAccept()
 {
-	sessionMgr.Connect(acceptSocket);
+	_sessionMgr.Connect(_acceptSocket);
 	DoAccept();
 }
 
-void Server::HandleRecv(int32 id, int32 recvByte, ExpOver* expOver)
+void Server::HandleRecv(int32 _id, int32 recvByte, ExpOver* expOver)
 {
-	sessionMgr.HandleRecvBuffer(id, recvByte, expOver);
-	sessionMgr.DoRecv(id);
+	_sessionMgr.HandleRecvBuffer(_id, recvByte, expOver);
+	_sessionMgr.DoRecv(_id);
 }
 

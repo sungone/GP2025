@@ -9,12 +9,12 @@ static std::mt19937 gen(rd());
 void Monster::Init()
 {
     Character::Init();
-    info.CharacterType = M_MOUSE;
+    _info.CharacterType = M_MOUSE;
 }
 
 void Monster::Update()
 {
-    switch (info.State)
+    switch (_info.State)
     {
     case ECharacterStateType::STATE_IDLE:
         if (ShouldStartWalking())
@@ -49,16 +49,16 @@ void Monster::Update()
 
 void Monster::ChangeState(ECharacterStateType newState)
 {
-    std::lock_guard<std::mutex> lock(GameManager::GetInst().monsterMutex);
+    std::lock_guard<std::mutex> lock(GameManager::GetInst()._monsterMutex);
 
-    if (info.State != newState)
+    if (_info.State != newState)
     {
         LOG(Log, std::format("monster [{}] - state from {} to {}",
-            info.ID,
-            static_cast<uint32_t>(info.State),
+            _info.ID,
+            static_cast<uint32_t>(_info.State),
             static_cast<uint32_t>(newState)));
-        info.State = newState;
-        info.State = static_cast<uint32_t>(info.State);
+        _info.State = newState;
+        _info.State = static_cast<uint32_t>(_info.State);
     }
 }
 
@@ -69,17 +69,17 @@ bool Monster::ShouldStartWalking()
     static std::uniform_real_distribution<float> distY(-1000.0f, 1000.0f); 
     if (dist(gen) == 0)
     {
-        float newX = info.X + distX(gen);
-        float newY = info.Y + distY(gen);
+        float newX = _info.X + distX(gen);
+        float newY = _info.Y + distY(gen);
 
-        float deltaX = newX - info.X;
-        float deltaY = newY - info.Y;
+        float deltaX = newX - _info.X;
+        float deltaY = newY - _info.Y;
         float newYaw = std::atan2(deltaY, deltaX) * (180.0f / 3.14159265f); 
 
-        info.SetLocation(newX, newY, info.Z);
-        info.Yaw = newYaw;
+        _info.SetLocation(newX, newY, _info.Z);
+        _info.Yaw = newYaw;
 
-        LOG(Log, std::format("Monster move ({}, {}, {})", newX, newY, info.Z));
+        LOG(Log, std::format("Monster move ({}, {}, {})", newX, newY, _info.Z));
         return true;
     }
     
