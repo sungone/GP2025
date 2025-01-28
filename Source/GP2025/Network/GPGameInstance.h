@@ -40,7 +40,7 @@ public :
 	void UpdatePlayer(FInfoData& PlayerInfo);
 
 	void AddMonster(FInfoData& MonsterInfo);
-	void RemoveMonster(FInfoData& MonsterInfo);
+	void RemoveMonster(int32 MonsterID);
 	void UpdateMonster(FInfoData& MonsterInfo);
 
 public :

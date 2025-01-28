@@ -18,10 +18,10 @@
 #include "Proto.h"
 #include "Loger.h"
 
-constexpr int MAX_CLIENT = 1000;
+constexpr uint32 MAX_CLIENT = 1000;
 
-constexpr int PKT_TYPE_INDEX = 0;
-constexpr int PKT_SIZE_INDEX = 1;
+constexpr BYTE PKT_TYPE_INDEX = 0;
+constexpr BYTE PKT_SIZE_INDEX = 1;
 
 enum CompType { RECV, SEND, ACCEPT };
 

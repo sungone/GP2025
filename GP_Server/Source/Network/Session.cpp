@@ -41,7 +41,7 @@ void Session::DoSend(Packet* packet)
 		break;
 	}
 #pragma endregion
-	auto send_data = new ExpOver{ reinterpret_cast<unsigned char*>(packet) };
+	auto send_data = new ExpOver{ reinterpret_cast<BYTE*>(packet) };
 	WSASend(socket, &send_data->wsabuf, 1, nullptr, 0, &send_data->wsaover, nullptr);
 }
 
@@ -50,7 +50,7 @@ void Session::Login()
 	bLogin = true;
 }
 
-void Session::Connect(SOCKET& socket, int id)
+void Session::Connect(SOCKET& socket, int32 id)
 {
 	this->id = id;
 	this->socket = socket;

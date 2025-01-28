@@ -13,7 +13,7 @@ public:
 	void DoSend(Packet* packet);
 
 	void Login();
-	void Connect(SOCKET& socket, int id);
+	void Connect(SOCKET& socket, int32 id);
 	void Disconnect();
 
 public:

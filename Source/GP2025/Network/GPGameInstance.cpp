@@ -166,6 +166,7 @@ void UGPGameInstance::ProcessPacket()
 				case EPacketType::S_REMOVE_MONSTER:
 				{
 					IDPacket* Pkt = reinterpret_cast<IDPacket*>(RemainingData.GetData());
+					RemoveMonster(Pkt->Data);
 					break;
 				}
 				case EPacketType::S_MONSTER_STATUS_UPDATE:
@@ -264,26 +265,39 @@ void UGPGameInstance::AddMonster(FInfoData& MonsterInfo)
 	FVector SpawnLocation(MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z);
 	FRotator SpawnRotation(0, MonsterInfo.Yaw, 0);
 
-	AGPCharacterBase* Monster = nullptr;
-	while (Monster == nullptr)
-	{
-		Monster = World->SpawnActor<AGPCharacterBase>(MonsterClass, SpawnLocation, SpawnRotation);
-		UE_LOG(LogTemp, Warning, TEXT("Spawn Monster [%d] (%f,%f,%f)(%f)"),
-			MonsterInfo.ID, MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z, MonsterInfo.Yaw);
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-		Monster->SetActorLocation(FVector(MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z));
-		Monster->SetCharacterControl(ECharacterType::M_MOUSE);
-		Monster->CharacterInfo = MonsterInfo;
-		Monster->Stat->SetMaxHp(MonsterInfo.MaxHp);
-		Monster->Stat->SetCurrentHp(MonsterInfo.Hp);
-		Monsters.Add(MonsterInfo.ID, Monster);
+	AGPCharacterBase* Monster = World->SpawnActor<AGPCharacterBase>(MonsterClass, SpawnLocation, SpawnRotation, SpawnParams);
+
+	if (Monster == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to spawn monster [%d] at location (%f, %f, %f)."),
+			MonsterInfo.ID, SpawnLocation.X, SpawnLocation.Y, SpawnLocation.Z);
+		return;
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("Spawned Monster [%d] at (%f, %f, %f) with rotation (%f)."),
+		MonsterInfo.ID, SpawnLocation.X, SpawnLocation.Y, SpawnLocation.Z, SpawnRotation.Yaw);
+
+	Monster->SetActorLocation(FVector(MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z));
+	Monster->SetCharacterControl(ECharacterType::M_MOUSE);
+	Monster->CharacterInfo = MonsterInfo;
+	Monster->Stat->SetMaxHp(MonsterInfo.MaxHp);
+	Monster->Stat->SetCurrentHp(MonsterInfo.Hp);
+	Monsters.Add(MonsterInfo.ID, Monster);
 }
 
-void UGPGameInstance::RemoveMonster(FInfoData& MonsterInfo)
+void UGPGameInstance::RemoveMonster(int32 MonsterID)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Remove monster [%d]"), MonsterID);
+	auto Monster = Monsters.Find(MonsterID);
 
+	if (Monster)
+	{
+		(*Monster)->SetDead();
+		return;
+	}
 }
 
 void UGPGameInstance::UpdateMonster(FInfoData& MonsterInfo)

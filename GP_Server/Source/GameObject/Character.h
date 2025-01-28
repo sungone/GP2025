@@ -4,12 +4,9 @@
 class Character
 {
 public:
-	Character() { };
-
 	virtual void Init();
 	virtual void Update() {};
 	virtual bool IsDead();
-
 
 	void OnDamaged(float damage);
 	void SetBunkerRandomLocation();
@@ -17,6 +14,6 @@ public:
 	bool IsValid() const { return info.ID != -1; }
 protected:
 	FInfoData info;
-	int& id = info.ID;
+	int32& id = info.ID;
 };
 

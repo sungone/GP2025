@@ -61,9 +61,9 @@ void Server::Close()
 
 void Server::CreateWokerThreads()
 {
-	int numThreads = std::thread::hardware_concurrency();
+	int32 numThreads = std::thread::hardware_concurrency();
 	std::vector<std::thread> threads;
-	for (int i = 0; i < numThreads; ++i) {
+	for (int32 i = 0; i < numThreads; ++i) {
 		threads.emplace_back(&Server::WorkerThreadLoop, this);
 	}
 	for (auto& thread : threads)
@@ -98,7 +98,7 @@ void Server::WorkerThreadLoop()
 	}
 }
 
-void Server::HandleError(ExpOver* ex_over, int id)
+void Server::HandleError(ExpOver* ex_over, int32 id)
 {
 	switch (ex_over->compType)
 	{
@@ -132,7 +132,7 @@ void Server::HandleAccept()
 	DoAccept();
 }
 
-void Server::HandleRecv(int id, int recvByte, ExpOver* expOver)
+void Server::HandleRecv(int32 id, int32 recvByte, ExpOver* expOver)
 {
 	sessionMgr.HandleRecvBuffer(id, recvByte, expOver);
 	sessionMgr.DoRecv(id);

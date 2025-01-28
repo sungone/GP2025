@@ -1,10 +1,18 @@
 #pragma once
-constexpr short SERVER_PORT = 4000;
-constexpr int BUFSIZE = 1024;
 
-using int32 = int;
+using BYTE = unsigned char;
+using int16 = __int16;
+using int32 = __int32;
+using int64 = __int64;
+using uint8 = unsigned __int8;
+using uint16 = unsigned __int16;
+using uint32 = unsigned __int32;
+using uint64 = unsigned __int64;
 
-enum EPacketType : uint8_t
+constexpr int16 SERVER_PORT = 4000;
+constexpr uint32 BUFSIZE = 1024;
+
+enum EPacketType : uint8
 {
 	C_LOGIN,
 	C_LOGOUT,
@@ -22,7 +30,7 @@ enum EPacketType : uint8_t
 	S_MONSTER_STATUS_UPDATE,
 };
 
-enum ECharacterType : uint8_t
+enum ECharacterType : uint8
 {
 	//INVALID = -1,
 
@@ -36,20 +44,20 @@ enum ECharacterType : uint8_t
 
 namespace CharacterType
 {
-	enum class ECharacterType : uint8_t
+	enum class ECharacterType : uint8
 	{
 		PLAYER,
 		MONSTER,
 		NPC
 	};
 
-	enum class EPlayerType : uint8_t
+	enum class EPlayerType : uint8
 	{
 		WARRIOR,
 		GUNNER
 	};
 
-	enum class EMonsterType : uint8_t
+	enum class EMonsterType : uint8
 	{
 		ENERGY_DRINK,
 		BUBBLE_TEA,
@@ -63,7 +71,7 @@ namespace CharacterType
 		TINO
 	};
 
-	enum class ENPCType : uint8_t
+	enum class ENPCType : uint8
 	{
 		PROFESSOR,
 		GUARD,
@@ -73,14 +81,14 @@ namespace CharacterType
 
 namespace ItemType
 {
-	enum class EItemType : uint8_t
+	enum class EItemType : uint8
 	{
 		WEAPON,
 		ARMOR,
 		CONSUMABLE,
 	};
 
-	enum class EWeaponType : uint8_t
+	enum class EWeaponType : uint8
 	{
 		BIRD_GUN,
 		PULSE_GUN,
@@ -90,7 +98,7 @@ namespace ItemType
 		ENERGY_SWORD,
 	};
 
-	enum class EArmorType : uint8_t
+	enum class EArmorType : uint8
 	{
 		ALLOY_HELMET,
 		ENHANCED_HELMET,
@@ -101,7 +109,7 @@ namespace ItemType
 		TUCLOTHES
 	};
 
-	enum class EConsumableType : uint8_t
+	enum class EConsumableType : uint8
 	{
 		HPKIT_LOW,
 		HPKIT_MID,
@@ -114,7 +122,7 @@ namespace ItemType
 }
 #pragma endregion // 추후 이렇게 바꾸려함
 
-enum ECharacterStateType : uint32_t
+enum ECharacterStateType : uint8
 {
 	STATE_NONE = 0, // 2^0
 	STATE_IDLE = 1 << 0,  // 2^1
@@ -137,7 +145,7 @@ struct FInfoData
 	float Hp;
 	float Damage;
 	float Speed;
-	uint32_t State;
+	uint32 State;
 
 	void SetLocation(float X_, float Y_, float Z_)
 	{

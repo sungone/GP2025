@@ -1,6 +1,6 @@
 #include "PacketManager.h"
 
-void PacketManager::ProcessPacket(Session& session, char* packet)
+void PacketManager::ProcessPacket(Session& session, BYTE* packet)
 {
 	EPacketType packetType = static_cast<EPacketType>(packet[PKT_TYPE_INDEX]);
 
@@ -52,10 +52,10 @@ void PacketManager::HandleLogoutPacket(Session& session)
 	sessionMgr.Broadcast(&pkt, session.id);
 }
 
-void PacketManager::HandleMovePacket(Session& session, char* packet)
+void PacketManager::HandleMovePacket(Session& session, BYTE* packet)
 {
 	auto& playerInfo = session.player.get()->GetInfo();
-	LOG(LogType::RecvLog, std::format("Move PKT [{}] ({}, {}, {} / Yaw: {}, State {})",
+	LOG(LogType::RecvLog, std::format("Move PKT [{}] ({:.2f}, {:.2f}, {:.2f} / Yaw: {:.2f}, State {})",
 		playerInfo.ID, playerInfo.X, playerInfo.Y, playerInfo.Z, playerInfo.Yaw, playerInfo.State));
 
 	InfoPacket* p = reinterpret_cast<InfoPacket*>(packet);
@@ -64,7 +64,7 @@ void PacketManager::HandleMovePacket(Session& session, char* packet)
 	sessionMgr.Broadcast(&pkt, session.id);
 }
 
-void PacketManager::HandleAttackPacket(Session& session, char* packet)
+void PacketManager::HandleAttackPacket(Session& session, BYTE* packet)
 {
 	LOG(LogType::RecvLog, std::format("Attack PKT [{}]", session.id));
 	
@@ -91,9 +91,11 @@ void PacketManager::HandleAttackPacket(Session& session, char* packet)
 		sessionMgr.Broadcast(&pkt1);
 
 		// hp °¨¼Ò
-		gameMgr.OnDamaged(playerInfo.Damage, data.Attacked);
-		auto monster = gameMgr.GetInfo(data.Attacked.ID);
-		auto pkt2 = InfoPacket(EPacketType::S_MONSTER_STATUS_UPDATE, monster);
-		sessionMgr.Broadcast(&pkt2);
+		if(gameMgr.OnDamaged(playerInfo.Damage, data.Attacked))
+		{
+			auto monster = gameMgr.GetInfo(data.Attacked.ID);
+			auto pkt2 = InfoPacket(EPacketType::S_MONSTER_STATUS_UPDATE, monster);
+			sessionMgr.Broadcast(&pkt2);
+		}
 	}
 }

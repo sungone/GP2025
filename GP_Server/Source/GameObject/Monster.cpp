@@ -53,10 +53,10 @@ void Monster::ChangeState(ECharacterStateType newState)
 
     if (info.State != newState)
     {
-        std::cout << "[State Change] Monster " << info.ID
-            << " from " << static_cast<uint32_t>(info.State)
-            << " to " << static_cast<uint32_t>(newState) << std::endl;
-
+        LOG(Log, std::format("monster [{}] - state from {} to {}",
+            info.ID,
+            static_cast<uint32_t>(info.State),
+            static_cast<uint32_t>(newState)));
         info.State = newState;
         info.State = static_cast<uint32_t>(info.State);
     }
@@ -79,7 +79,7 @@ bool Monster::ShouldStartWalking()
         info.SetLocation(newX, newY, info.Z);
         info.Yaw = newYaw;
 
-        std::cout << "Monster moved to new location: (" << newX << ", " << newY << ", " << info.Z << ")" << std::endl;
+        LOG(Log, std::format("Monster move ({}, {}, {})", newX, newY, info.Z));
         return true;
     }
     

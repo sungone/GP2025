@@ -3,7 +3,7 @@
 
 void SessionManager::Connect(SOCKET& socket)
 {
-	int id = GenerateId();
+	int32 id = GenerateId();
 	if (id != -1) {
 		sessions[id].Connect(socket,id);
 		iocp.RegisterSocket(socket, id);
@@ -11,23 +11,23 @@ void SessionManager::Connect(SOCKET& socket)
 	}
 }
 
-void SessionManager::Disconnect(int id)
+void SessionManager::Disconnect(int32 id)
 {
 	sessions[id].Disconnect();
 }
 
-void SessionManager::DoRecv(int id)
+void SessionManager::DoRecv(int32 id)
 {
 	sessions[id].DoRecv();
 }
 
-void SessionManager::HandleRecvBuffer(int id, int recvByte, ExpOver* expOver)
+void SessionManager::HandleRecvBuffer(int32 id, int32 recvByte, ExpOver* expOver)
 {
 	Session& session = sessions[id];
-	int dataSize = recvByte + session.remain;
-	char* packet = expOver->buf;
+	int32 dataSize = recvByte + session.remain;
+	BYTE* packet = reinterpret_cast<BYTE*>(expOver->buf);
 	while (dataSize > 0) {
-		int packetSize = packet[1];
+		int32 packetSize = packet[PKT_SIZE_INDEX];
 		if (packetSize <= dataSize) {
 			PacketManager::GetInst().ProcessPacket(session, packet);
 			packet = packet + packetSize;
@@ -40,7 +40,7 @@ void SessionManager::HandleRecvBuffer(int id, int recvByte, ExpOver* expOver)
 		memcpy(expOver->buf, packet, dataSize);
 }
 
-void SessionManager::Broadcast(Packet* packet, int exptId)
+void SessionManager::Broadcast(Packet* packet, int32 exptId)
 {
 	for (auto& session : sessions)
 	{
@@ -52,7 +52,7 @@ void SessionManager::Broadcast(Packet* packet, int exptId)
 
 int SessionManager::GenerateId()
 {
-	for (int i = 1; i < MAX_CLIENT + 1; ++i)
+	for (int32 i = 1; i < MAX_CLIENT + 1; ++i)
 	{
 		if (sessions[i].bLogin) continue;
 		return i;

@@ -35,12 +35,12 @@ public:
 private:
 	void CreateWokerThreads();
 	void WorkerThreadLoop();
-	void HandleError(ExpOver* ex_over, int id);
+	void HandleError(ExpOver* ex_over, int32 id);
 	
 	void DoAccept();
 
 	void HandleAccept();
-	void HandleRecv(int id, int recvByte, ExpOver* expOver);
+	void HandleRecv(int32 id, int32 recvByte, ExpOver* expOver);
 
 private:
 	bool bRunning = true;
