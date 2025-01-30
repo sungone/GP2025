@@ -18,8 +18,8 @@ public :
 	AGPCharacterNonPlayer();
 	virtual void BeginPlay() override;
 protected :
-	virtual void SetCharacterControlData(const class UGPCharacterControlData* CharacterControlData) override;
-	virtual void SetCharacterControl(ECharacterType NewCharacterControlType) override;
+	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
+	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
 
 private :
 	ECharacterType CurrentCharacterControlType;

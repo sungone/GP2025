@@ -85,7 +85,7 @@ void AGPCharacterPlayer::BeginPlay()
 	CharacterInfo.Hp = CharacterInfo.MaxHp;
 	CharacterInfo.Damage = Stat->GetDamage();
 
-	SetCharacterControl(CurrentCharacterType);
+	SetCharacterType(CurrentCharacterType);
 
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 	if (GameInstance)
@@ -222,12 +222,12 @@ void AGPCharacterPlayer::ChangeCharacterControl()
 
 	if (CurrentCharacterType == ECharacterType::P_WARRIOR)
 	{
-		SetCharacterControl(ECharacterType::P_GUNNER);
+		SetCharacterType(ECharacterType::P_GUNNER);
 		UE_LOG(LogTemp, Log, TEXT("Change Gunner Control Type."));
 	}
 	else if (CurrentCharacterType == ECharacterType::P_GUNNER)
 	{
-		SetCharacterControl(ECharacterType::P_WARRIOR);
+		SetCharacterType(ECharacterType::P_WARRIOR);
 		UE_LOG(LogTemp, Log, TEXT("Change Warrior Control Type."));
 	}
 
@@ -249,30 +249,30 @@ void AGPCharacterPlayer::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedCo
 	}
 }
 
-void AGPCharacterPlayer::SetCharacterControl(ECharacterType NewCharacterControlType)
+void AGPCharacterPlayer::SetCharacterType(ECharacterType NewCharacterType)
 {
-	Super::SetCharacterControl(NewCharacterControlType);
+	Super::SetCharacterType(NewCharacterType);
 
-	UGPCharacterControlData* NewCharacterControl = CharacterControlManager[NewCharacterControlType];
-	check(NewCharacterControl);
+	UGPCharacterControlData* NewCharacterData = CharacterTypeManager[NewCharacterType];
+	check(NewCharacterData);
 
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
 		Subsystem->ClearAllMappings();
-		UInputMappingContext* NewMappingContext = NewCharacterControl->InputMappingContext;
+		UInputMappingContext* NewMappingContext = NewCharacterData->InputMappingContext;
 		if (NewMappingContext)
 		{
 			Subsystem->AddMappingContext(NewMappingContext, 0);
 		}
 	}
 
-	CurrentCharacterType = NewCharacterControlType;
+	CurrentCharacterType = NewCharacterType;
 }
 
-void AGPCharacterPlayer::SetCharacterControlData(const UGPCharacterControlData* CharacterControlData)
+void AGPCharacterPlayer::SetCharacterData(const UGPCharacterControlData* CharacterControlData)
 {
-	Super::SetCharacterControlData(CharacterControlData);
+	Super::SetCharacterData(CharacterControlData);
 }
 
 void AGPCharacterPlayer::Move(const FInputActionValue& Value)

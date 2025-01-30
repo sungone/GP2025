@@ -60,6 +60,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "SpringArm")
 	uint32 bDoCollisionTest : 1;
 
+
 	/// 스켈레탈 매쉬 , 애니메이션 블루프린트 & 몽타주 설정
 	UPROPERTY(EditAnywhere, Category = "Mesh")
 	USkeletalMesh* SkeletalMesh;
@@ -68,5 +69,8 @@ public:
 	TSubclassOf<UAnimInstance> AnimBlueprint;
 
 	UPROPERTY(EditAnywhere, Category = "Animation")
-	UAnimMontage* AnimMontage;
+	UAnimMontage* AttackAnimMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	UAnimMontage* DeadAnimMontage;
 };

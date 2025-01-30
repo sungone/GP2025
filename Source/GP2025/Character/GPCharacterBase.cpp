@@ -16,38 +16,31 @@ AGPCharacterBase::AGPCharacterBase()
 {
 
 	// 캐릭터 스켈레탈 매쉬 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/temporaryAssets/WomanPlayer/Woman.Woman'"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/qudgus/chracter/mesh/main_man.main_man'"));
 	if (CharacterMeshRef.Object)
 	{
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
 	}
 
 	// 캐릭터 애니메이션 블루프린트
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Animation/GunnerAnimation/ABP_Gunner.ABP_Gunner_C"));
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Animation/P_Warrior/ABP_Warrior.ABP_Warrior_C"));
 	if (AnimInstanceClassRef.Class)
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
 
 	// 캐릭터 애니메이션 몽타주
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> AutoAttackMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/GunnerAnimation/AM_GunnerAttack.AM_GunnerAttack'"));
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AutoAttackMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/P_Warrior/AM_Attack.AM_Attack'"));
 	if (AutoAttackMontageRef.Object)
 	{
-		AutoAttackActionMontage = AutoAttackMontageRef.Object;
+		AttackActionMontage = AutoAttackMontageRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/WarriorAnimation/AM_Dead.AM_Dead'"));
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/P_Warrior/AM_Dead.AM_Dead'"));
 	if (DeadMontageRef.Object)
 	{
 		DeadMontage = DeadMontageRef.Object;
 	}
-
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> MonsterDeadMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/MouseMonsterAnimation/AM_Dead.AM_Dead'"));
-	if (MonsterDeadMontageRef.Object)
-	{
-		MonsterDeadMontage = MonsterDeadMontageRef.Object;
-	}
-
 
 	// 폰 회전을 컨트롤러 회전과 똑같이 사용
 	bUseControllerRotationPitch = false;
@@ -79,22 +72,40 @@ AGPCharacterBase::AGPCharacterBase()
 	}
 
 	// 캐릭터 타입 설정
-	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> WarriorDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterControl/GPC_Warrior.GPC_Warrior'"));
+	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> WarriorDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_Warrior.GPC_Warrior'"));
 	if (WarriorDataRef.Object)
 	{
-		CharacterControlManager.Add(ECharacterType::P_WARRIOR, WarriorDataRef.Object);
+		CharacterTypeManager.Add(ECharacterType::P_WARRIOR, WarriorDataRef.Object);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> GunnerDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterControl/GPC_Gunner.GPC_Gunner'"));
+	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> GunnerDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_Gunner.GPC_Gunner'"));
 	if (GunnerDataRef.Object)
 	{
-		CharacterControlManager.Add(ECharacterType::P_GUNNER, GunnerDataRef.Object);
+		CharacterTypeManager.Add(ECharacterType::P_GUNNER, GunnerDataRef.Object);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> MouseMonsterDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterControl/GPC_MouseMonster.GPC_MouseMonster'"));
+	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> MouseMonsterDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_MouseMonster.GPC_MouseMonster'"));
 	if (MouseMonsterDataRef.Object)
 	{
-		CharacterControlManager.Add(ECharacterType::M_MOUSE, MouseMonsterDataRef.Object);
+		CharacterTypeManager.Add(ECharacterType::M_MOUSE, MouseMonsterDataRef.Object);
+	}
+
+	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> BubbleTeaDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_BubbleTea.GPC_BubbleTea'"));
+	if (BubbleTeaDataRef.Object)
+	{
+		CharacterTypeManager.Add(ECharacterType::M_BUBBLETEA, BubbleTeaDataRef.Object);
+	}
+
+	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> EnergydrinkDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_EnergyDrink.GPC_EnergyDrink'"));
+	if (EnergydrinkDataRef.Object)
+	{
+		CharacterTypeManager.Add(ECharacterType::M_ENERGYDRINK, EnergydrinkDataRef.Object);
+	}
+
+	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> CoffeeDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_Coffee.GPC_Coffee'"));
+	if (CoffeeDataRef.Object)
+	{
+		CharacterTypeManager.Add(ECharacterType::M_COFFEE, CoffeeDataRef.Object);
 	}
 
 	// Stat Component
@@ -192,23 +203,23 @@ void AGPCharacterBase::SetCharacterInfoFromServer(FInfoData& CharacterInfo_)
 void AGPCharacterBase::ProcessAutoAttackCommand()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (!AnimInstance || !AutoAttackActionMontage)
+	if (!AnimInstance || !AttackActionMontage)
 		return;
 
-	if (AnimInstance->Montage_IsPlaying(AutoAttackActionMontage))
+	if (AnimInstance->Montage_IsPlaying(AttackActionMontage))
 		return;
 
 	bIsAutoAttacking = true;
 
 	FOnMontageEnded MontageEndedDelegate;
 	MontageEndedDelegate.BindUObject(this, &AGPCharacterBase::OnAutoAttackMontageEnded);
-	AnimInstance->Montage_Play(AutoAttackActionMontage , 1.f);
-	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, AutoAttackActionMontage);
+	AnimInstance->Montage_Play(AttackActionMontage , 1.f);
+	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, AttackActionMontage);
 }
 
 void AGPCharacterBase::OnAutoAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-	if (Montage == AutoAttackActionMontage)
+	if (Montage == AttackActionMontage)
 	{
 		bIsAutoAttacking = false;
 
@@ -219,34 +230,37 @@ void AGPCharacterBase::OnAutoAttackMontageEnded(UAnimMontage* Montage, bool bInt
 	}
 }
 
-void AGPCharacterBase::SetCharacterControlData(const UGPCharacterControlData* CharacterControlData)
+void AGPCharacterBase::SetCharacterData(const UGPCharacterControlData* CharacterData)
 {
 	// 폰 
-	bUseControllerRotationYaw = CharacterControlData->bUseControllerRotationYaw;
+	bUseControllerRotationYaw = CharacterData->bUseControllerRotationYaw;
 
 	// 캐릭터 무브먼트 
-	GetCharacterMovement()->bOrientRotationToMovement = CharacterControlData->bOrientRotationToMovement;
-	GetCharacterMovement()->bUseControllerDesiredRotation = CharacterControlData->bUseControllerDesiredRotation;
-	GetCharacterMovement()->RotationRate = CharacterControlData->RotationRate;
+	GetCharacterMovement()->bOrientRotationToMovement = CharacterData->bOrientRotationToMovement;
+	GetCharacterMovement()->bUseControllerDesiredRotation = CharacterData->bUseControllerDesiredRotation;
+	GetCharacterMovement()->RotationRate = CharacterData->RotationRate;
 
 	// 스켈레탈 메시
-	GetMesh()->SetSkeletalMesh(CharacterControlData->SkeletalMesh);
+	GetMesh()->SetSkeletalMesh(CharacterData->SkeletalMesh);
 
 	// 애니메이션 블루프린트
-	GetMesh()->SetAnimInstanceClass(CharacterControlData->AnimBlueprint);
+	GetMesh()->SetAnimInstanceClass(CharacterData->AnimBlueprint);
 
-	// 애니메이션 몽타주
-	AutoAttackActionMontage = CharacterControlData->AnimMontage;
+	// 애니메이션 몽타주 (Attack)
+	AttackActionMontage = CharacterData->AttackAnimMontage;
+
+	// 애니메이션 몽타주 (Dead)
+	DeadMontage = CharacterData->DeadAnimMontage;
 }
 
-void AGPCharacterBase::SetCharacterControl(ECharacterType NewCharacterControlType)
+void AGPCharacterBase::SetCharacterType(ECharacterType NewCharacterType)
 {
-	UGPCharacterControlData* NewCharacterControl = CharacterControlManager[NewCharacterControlType];
-	check(NewCharacterControl);
+	UGPCharacterControlData* NewCharacterData = CharacterTypeManager[NewCharacterType];
+	check(NewCharacterData);
 
-	SetCharacterControlData(NewCharacterControl);
+	SetCharacterData(NewCharacterData);
 
-	CurrentCharacterType = NewCharacterControlType;
+	CurrentCharacterType = NewCharacterType;
 }
 
 void AGPCharacterBase::AttackHitCheck()
@@ -335,15 +349,7 @@ void AGPCharacterBase::PlayDeadAnimation()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->StopAllMontages(0.f);
-
-	if (CurrentCharacterType == ECharacterType::M_MOUSE)
-	{
-		AnimInstance->Montage_Play(MonsterDeadMontage, 1.f);
-	}
-	else
-	{
-		AnimInstance->Montage_Play(DeadMontage, 1.f);
-	}
+	AnimInstance->Montage_Play(DeadMontage, 1.f);
 }
 
 

@@ -38,6 +38,9 @@ enum ECharacterType : uint8
 	P_GUNNER,
 
 	M_MOUSE,
+	M_BUBBLETEA,
+	M_ENERGYDRINK,
+	M_COFFEE,
 };
 
 #pragma region ObjectType

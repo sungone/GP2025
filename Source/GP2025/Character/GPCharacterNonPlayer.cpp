@@ -6,21 +6,21 @@
 
 AGPCharacterNonPlayer::AGPCharacterNonPlayer()
 {
-	CurrentCharacterControlType = ECharacterType::M_MOUSE;
+	CurrentCharacterType = ECharacterType::M_MOUSE;
 }
 
 void AGPCharacterNonPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	SetCharacterControl(CurrentCharacterControlType);
+	SetCharacterType(CurrentCharacterType);
 }
 
-void AGPCharacterNonPlayer::SetCharacterControlData(const UGPCharacterControlData* CharacterControlData)
+void AGPCharacterNonPlayer::SetCharacterData(const UGPCharacterControlData* CharacterData)
 {
-	Super::SetCharacterControlData(CharacterControlData);
+	Super::SetCharacterData(CharacterData);
 }
 
-void AGPCharacterNonPlayer::SetCharacterControl(ECharacterType NewCharacterControlType)
+void AGPCharacterNonPlayer::SetCharacterType(ECharacterType NewCharacterType)
 {
-	Super::SetCharacterControl(NewCharacterControlType);
+	Super::SetCharacterType(NewCharacterType);
 }

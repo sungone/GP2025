@@ -281,7 +281,7 @@ void UGPGameInstance::AddMonster(FInfoData& MonsterInfo)
 		MonsterInfo.ID, SpawnLocation.X, SpawnLocation.Y, SpawnLocation.Z, SpawnRotation.Yaw);
 
 	Monster->SetActorLocation(FVector(MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z));
-	Monster->SetCharacterControl(ECharacterType::M_MOUSE);
+	Monster->SetCharacterType(ECharacterType::M_BUBBLETEA);
 	Monster->CharacterInfo = MonsterInfo;
 	Monster->Stat->SetMaxHp(MonsterInfo.MaxHp);
 	Monster->Stat->SetCurrentHp(MonsterInfo.Hp);

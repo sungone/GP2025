@@ -29,7 +29,7 @@ public:
 // 기본 공격 애니메이션 및 공격 애니메이션 몽타주 코드
 public :
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TObjectPtr<class UAnimMontage> AutoAttackActionMontage;
+	TObjectPtr<class UAnimMontage> AttackActionMontage;
 
 	void ProcessAutoAttackCommand();
 	void OnAutoAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
@@ -37,10 +37,10 @@ public :
 
 // Control Data 세팅
 public :
-	virtual void SetCharacterControlData(const class UGPCharacterControlData* CharacterControlData);
-	virtual void SetCharacterControl(ECharacterType NewCharacterControlType);
+	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterData);
+	virtual void SetCharacterType(ECharacterType NewCharacterType);
 
-	TMap<ECharacterType, class UGPCharacterControlData*> CharacterControlManager;
+	TMap<ECharacterType, class UGPCharacterControlData*> CharacterTypeManager;
 
 	ECharacterType CurrentCharacterType;
 
@@ -63,14 +63,10 @@ public :
 
 // Dead Section
 public :
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat" , Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UAnimMontage> DeadMontage;
-
 	virtual void SetDead();
 	void PlayDeadAnimation();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UAnimMontage> MonsterDeadMontage;
-
+	TObjectPtr<class UAnimMontage> DeadMontage;
 	float DeadEventDelayTime = 3.f;
 };

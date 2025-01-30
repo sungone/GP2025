@@ -33,8 +33,8 @@ protected:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	virtual void SetCharacterControl(ECharacterType NewCharacterControlType) override;
-	virtual void SetCharacterControlData(const class UGPCharacterControlData* CharacterControlData) override;
+	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
+	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
 
 	// Input ÇÔ¼ö
 	void Move(const FInputActionValue& Value);
