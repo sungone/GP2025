@@ -142,6 +142,7 @@
     <ClInclude Include="Source\Core\ExpOver.h" />
     <ClInclude Include="Source\Core\IOCP.h" />
     <ClInclude Include="Source\Core\PacketManager.h" />
+    <ClInclude Include="Source\Core\PacketQueue.h" />
     <ClInclude Include="Source\Core\Server.h" />
     <ClInclude Include="Source\Core\Session.h" />
     <ClInclude Include="Source\Core\SessionManager.h" />
@@ -159,6 +160,7 @@
     <ClCompile Include="Source\Core\ExpOver.cpp" />
     <ClCompile Include="Source\Core\IOCP.cpp" />
     <ClCompile Include="Source\Core\PacketManager.cpp" />
+    <ClCompile Include="Source\Core\PacketQueue.cpp" />
     <ClCompile Include="Source\Core\Server.cpp" />
     <ClCompile Include="Source\Core\Session.cpp" />
     <ClCompile Include="Source\Core\SessionManager.cpp" />
@@ -170,7 +172,6 @@
     <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Source\Utils\Lock.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

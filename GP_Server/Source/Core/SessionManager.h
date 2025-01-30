@@ -16,11 +16,12 @@ public:
 	void DoRecv(int32 id);
 	void HandleRecvBuffer(int32 id, int32 recvByte, ExpOver* expOver);
 	void Broadcast(Packet* packet, int32 exptId = -1);
-	int GenerateId();
+	int32 GenerateId();
 
 	std::array<Session, MAX_CLIENT>& GetSessions() { return _sessions; }
 private:
 	std::array<Session, MAX_CLIENT> _sessions;
 	IOCP& _iocp = IOCP::GetInst();
+	RWLock _smgrLock;
 };
 

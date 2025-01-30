@@ -10,6 +10,7 @@
 #include <thread>
 #include <memory>
 #include <array>
+#include <queue>
 #include <unordered_map>
 #include <functional>
 #include <random>
@@ -17,3 +18,4 @@
 #include "Proto.h"
 #include "Loger.h"
 #include "ExpOver.h"
+#include "Lock.h"

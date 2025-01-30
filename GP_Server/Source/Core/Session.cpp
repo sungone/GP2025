@@ -5,6 +5,7 @@
 
 void Session::DoRecv()
 {
+	RWLock::WriteGuard guard(_sLock);
 	ZeroMemory(&_recvOver._wsaover, sizeof(_recvOver._wsaover));
 	DWORD recv_flag = 0;
 	_recvOver._wsabuf.len = BUFSIZE - _remain;
@@ -13,6 +14,8 @@ void Session::DoRecv()
 }
 void Session::DoSend(Packet* packet)
 {
+	RWLock::WriteGuard guard(_sLock);
+
 #pragma region //Log
 	switch (packet->Header.PacketType)
 	{
@@ -46,13 +49,9 @@ void Session::DoSend(Packet* packet)
 	WSASend(_socket, &send_data->_wsabuf, 1, nullptr, 0, &send_data->_wsaover, nullptr);
 }
 
-void Session::Login()
-{
-	_bLogin = true;
-}
-
 void Session::Connect(SOCKET& socket, int32 id)
 {
+	RWLock::WriteGuard guard(_sLock);
 	this->_id = id;
 	this->_socket = socket;
 
@@ -63,6 +62,43 @@ void Session::Connect(SOCKET& socket, int32 id)
 
 void Session::Disconnect()
 {
+	RWLock::WriteGuard guard(_sLock);
 	_bLogin = false;
 	closesocket(_socket);
+}
+
+void Session::SetLogin()
+{
+	RWLock::WriteGuard guard(_sLock);
+	_bLogin = true;
+}
+
+bool Session::IsLogin()
+{
+	RWLock::ReadGuard guard(_sLock);
+	return _bLogin;
+}
+
+int32 Session::GetId()
+{
+	RWLock::ReadGuard guard(_sLock);
+	return _id;
+}
+
+int32 Session::GetRemainSize()
+{
+	RWLock::ReadGuard guard(_sLock);
+	return _remain;
+}
+
+void Session::SetRemainSize(int32 size)
+{
+	RWLock::WriteGuard guard(_sLock);
+	_remain = size;
+}
+
+FInfoData& Session::GetPlayerInfo()
+{
+	RWLock::ReadGuard guard(_sLock);
+	return _player->GetInfo();
 }
