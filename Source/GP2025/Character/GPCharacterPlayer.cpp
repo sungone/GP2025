@@ -86,6 +86,7 @@ void AGPCharacterPlayer::BeginPlay()
 	CharacterInfo.Damage = Stat->GetDamage();
 
 	SetCharacterType(CurrentCharacterType);
+	EquipItemFromDataAsset(CharacterTypeManager[CurrentCharacterType]);
 
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 	if (GameInstance)

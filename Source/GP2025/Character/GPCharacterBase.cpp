@@ -128,9 +128,6 @@ AGPCharacterBase::AGPCharacterBase()
 void AGPCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	EquipItemFromDataAsset(CharacterTypeManager[CurrentCharacterType]);
-
-// 플레이어 바지 입히기
 }
 
 void AGPCharacterBase::Tick(float DeltaTime)
