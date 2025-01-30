@@ -73,4 +73,20 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	UAnimMontage* DeadAnimMontage;
+
+	// 장비 아이템 설정
+	UPROPERTY(EditAnywhere, Category = "Equipment")
+	USkeletalMesh* HelmetMesh;
+
+	UPROPERTY(EditAnywhere, Category = "Equipment")
+	USkeletalMesh* ChestMesh;
+
+	UPROPERTY(EditAnywhere, Category = "Equipment")
+	USkeletalMesh* SwordMesh;
+	
+	UPROPERTY(EditAnywhere, Category = "Equipment")
+	USkeletalMesh* GunMesh;
+
+	UPROPERTY(EditAnywhere, Category = "Equipment")
+	USkeletalMesh* PantsMesh;
 };

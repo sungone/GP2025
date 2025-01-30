@@ -69,4 +69,38 @@ public :
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> DeadMontage;
 	float DeadEventDelayTime = 3.f;
+
+// Equip Item Section
+public : 
+	void EquipHelmet(USkeletalMesh* HelmetMesh);
+	void UnequipHelmet();
+
+	void EquipChest(USkeletalMesh* ChestMesh);
+	void UnequipChest();
+
+	void EquipSword(USkeletalMesh* SwordMesh);
+	void UnequipSword();
+
+	void EquipGun(USkeletalMesh* GunMesh);
+	void UnequipGun();
+
+	void EquipPants(USkeletalMesh* PantsMesh);
+	void UnequipPants();
+
+	void EquipItemFromDataAsset(UGPCharacterControlData* CharacterData);
+
+	UPROPERTY(VisibleAnywhere, Category = "Equip")
+	TObjectPtr<USkeletalMeshComponent> HelmetMeshComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Equip")
+	TObjectPtr<USkeletalMeshComponent> ChestMeshComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Equip")
+	TObjectPtr<USkeletalMeshComponent> SwordMeshComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Equip")
+	TObjectPtr<USkeletalMeshComponent> GunMeshComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Equip")
+	TObjectPtr<USkeletalMeshComponent> PantsMeshComp;
 };

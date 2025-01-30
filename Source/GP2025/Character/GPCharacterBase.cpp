@@ -128,6 +128,9 @@ AGPCharacterBase::AGPCharacterBase()
 void AGPCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+	EquipItemFromDataAsset(CharacterTypeManager[CurrentCharacterType]);
+
+// 플레이어 바지 입히기
 }
 
 void AGPCharacterBase::Tick(float DeltaTime)
@@ -350,6 +353,145 @@ void AGPCharacterBase::PlayDeadAnimation()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->StopAllMontages(0.f);
 	AnimInstance->Montage_Play(DeadMontage, 1.f);
+}
+
+void AGPCharacterBase::EquipHelmet(USkeletalMesh* HelmetMesh)
+{
+	if (!GetMesh() || !HelmetMesh) return;
+
+	if (!HelmetMeshComp)
+	{
+		HelmetMeshComp = NewObject<USkeletalMeshComponent>(this);
+		HelmetMeshComp->RegisterComponent();
+		HelmetMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("HelmetSocket"));
+	}
+
+	HelmetMeshComp->SetSkeletalMesh(HelmetMesh);
+}
+
+void AGPCharacterBase::UnequipHelmet()
+{
+	if (HelmetMeshComp)
+	{
+		HelmetMeshComp->DestroyComponent();
+		HelmetMeshComp = nullptr;
+	}
+}
+
+void AGPCharacterBase::EquipChest(USkeletalMesh* ChestMesh)
+{
+	if (!GetMesh() || !ChestMesh) return;
+
+	if (!ChestMeshComp)
+	{
+		ChestMeshComp = NewObject<USkeletalMeshComponent>(this);
+		ChestMeshComp->RegisterComponent();
+		ChestMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("ChestSocket"));
+	}
+	ChestMeshComp->SetSkeletalMesh(ChestMesh);
+}
+
+void AGPCharacterBase::UnequipChest()
+{
+	if (ChestMeshComp)
+	{
+		ChestMeshComp->DestroyComponent();
+		ChestMeshComp = nullptr;
+	}
+}
+
+void AGPCharacterBase::EquipSword(USkeletalMesh* SwordMesh)
+{
+	 
+}
+
+void AGPCharacterBase::UnequipSword()
+{
+
+}
+
+void AGPCharacterBase::EquipGun(USkeletalMesh* GunMesh)
+{
+
+}
+
+void AGPCharacterBase::UnequipGun()
+{
+}
+
+void AGPCharacterBase::EquipPants(USkeletalMesh* PantsMesh)
+{
+	if (!GetMesh() || !PantsMesh) return;
+
+	if (!PantsMeshComp)
+	{
+		PantsMeshComp = NewObject<USkeletalMeshComponent>(this);
+		PantsMeshComp->RegisterComponent();
+		PantsMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("PantsSocket"));
+	}
+
+	PantsMeshComp->SetSkeletalMesh(PantsMesh);
+}
+
+void AGPCharacterBase::UnequipPants()
+{
+	if (PantsMeshComp)
+	{
+		PantsMeshComp->DestroyComponent();
+		PantsMeshComp = nullptr;
+	}
+}
+
+void AGPCharacterBase::EquipItemFromDataAsset(UGPCharacterControlData* CharacterData)
+{
+	if (!CharacterData) return;
+
+	if (CharacterData->HelmetMesh)
+	{
+		EquipHelmet(CharacterData->HelmetMesh);
+	}
+	else
+	{
+		UnequipHelmet();
+	}
+
+	if (CharacterData->ChestMesh)
+	{
+		EquipChest(CharacterData->ChestMesh);
+	}
+	else
+	{
+		UnequipChest();
+	}
+
+	if (CharacterData->SwordMesh)
+	{
+		EquipSword(CharacterData->SwordMesh);
+	}
+	else
+	{
+		UnequipSword();
+	}
+
+	if (CharacterData->GunMesh)
+	{
+		EquipGun(CharacterData->GunMesh);
+	}
+	else
+	{
+		UnequipGun();
+	}
+
+	if (CharacterData->PantsMesh)
+	{
+		EquipPants(CharacterData->PantsMesh);
+	}
+	else
+	{
+		UnequipPants();
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Equipped!!!"));
 }
 
 
