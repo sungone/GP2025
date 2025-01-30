@@ -58,7 +58,7 @@ void SessionManager::Broadcast(Packet* packet, int32 exptId)
 
 int SessionManager::GenerateId()
 {
-	for (int32 i = 0; i < MAX_CLIENT; ++i)
+	for (int32 i = 1; i < MAX_CLIENT; ++i)
 	{
 		if (_sessions[i].IsLogin()) continue;
 		return i;

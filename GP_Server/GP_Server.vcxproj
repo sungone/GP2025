@@ -139,6 +139,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DBConnection.h" />
+    <ClInclude Include="DBConnectionPool.h" />
     <ClInclude Include="Source\Core\ExpOver.h" />
     <ClInclude Include="Source\Core\IOCP.h" />
     <ClInclude Include="Source\Core\PacketManager.h" />
@@ -157,6 +159,8 @@
     <ClInclude Include="Source\Utils\Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DBConnection.cpp" />
+    <ClCompile Include="DBConnectionPool.cpp" />
     <ClCompile Include="Source\Core\ExpOver.cpp" />
     <ClCompile Include="Source\Core\IOCP.cpp" />
     <ClCompile Include="Source\Core\PacketManager.cpp" />

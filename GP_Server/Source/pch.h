@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include <functional>
 #include <random>
+#include <sqlext.h>
 
 #include "Proto.h"
 #include "Loger.h"
