@@ -400,23 +400,14 @@ void AGPCharacterBase::UnequipChest()
 	}
 }
 
-void AGPCharacterBase::EquipSword(USkeletalMesh* SwordMesh)
+void AGPCharacterBase::EquipWeapon(USkeletalMesh* WeaponMesh)
 {
 	 
 }
 
-void AGPCharacterBase::UnequipSword()
+void AGPCharacterBase::UnequipWeapon()
 {
 
-}
-
-void AGPCharacterBase::EquipGun(USkeletalMesh* GunMesh)
-{
-
-}
-
-void AGPCharacterBase::UnequipGun()
-{
 }
 
 void AGPCharacterBase::EquipPants(USkeletalMesh* PantsMesh)
@@ -464,22 +455,13 @@ void AGPCharacterBase::EquipItemFromDataAsset(UGPCharacterControlData* Character
 		UnequipChest();
 	}
 
-	if (CharacterData->SwordMesh)
+	if (CharacterData->WeaponMesh)
 	{
-		EquipSword(CharacterData->SwordMesh);
+		EquipWeapon(CharacterData->WeaponMesh);
 	}
 	else
 	{
-		UnequipSword();
-	}
-
-	if (CharacterData->GunMesh)
-	{
-		EquipGun(CharacterData->GunMesh);
-	}
-	else
-	{
-		UnequipGun();
+		UnequipWeapon();
 	}
 
 	if (CharacterData->PantsMesh)

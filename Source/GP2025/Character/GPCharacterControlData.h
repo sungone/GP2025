@@ -82,10 +82,7 @@ public:
 	USkeletalMesh* ChestMesh;
 
 	UPROPERTY(EditAnywhere, Category = "Equipment")
-	USkeletalMesh* SwordMesh;
-	
-	UPROPERTY(EditAnywhere, Category = "Equipment")
-	USkeletalMesh* GunMesh;
+	USkeletalMesh* WeaponMesh;
 
 	UPROPERTY(EditAnywhere, Category = "Equipment")
 	USkeletalMesh* PantsMesh;
