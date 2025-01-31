@@ -11,6 +11,7 @@
 #include "CharacterStat/GPCharacterStatComponent.h"
 #include "UI/GPWidgetComponent.h"
 #include "UI/GPHpBarWidget.h"
+#include "UI/GPFloatingDamageText.h"
 
 AGPCharacterBase::AGPCharacterBase()
 {
@@ -295,6 +296,19 @@ void AGPCharacterBase::AttackHitCheck()
 float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	// Floating Damage UI
+	{
+		FVector SpawnLocation = GetActorLocation() + FVector(0, 0, 100);
+		FActorSpawnParameters SpawnParams;
+		AGPFloatingDamageText* DamageText = GetWorld()->SpawnActor<AGPFloatingDamageText>(AGPFloatingDamageText::StaticClass(), 
+			SpawnLocation, FRotator::ZeroRotator, SpawnParams);
+
+		if (DamageText)
+		{
+			DamageText->SetDamageText(DamageAmount);
+		}
+	}
 
 	AGPCharacterBase* AttackerCharacter = CastChecked<AGPCharacterBase>(DamageCauser);
 
