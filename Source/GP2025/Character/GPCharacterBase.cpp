@@ -55,9 +55,10 @@ AGPCharacterBase::AGPCharacterBase()
 	// 무브먼트 컴포넌트 설정
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 500.f, 0.f);
-	GetCharacterMovement()->JumpZVelocity = 400.f;
+	GetCharacterMovement()->JumpZVelocity = 300.f;
 	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = 600.f;
+	GetCharacterMovement()->GravityScale = 1.f;
+	GetCharacterMovement()->MaxWalkSpeed = 300.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
@@ -83,12 +84,6 @@ AGPCharacterBase::AGPCharacterBase()
 	if (GunnerDataRef.Object)
 	{
 		CharacterTypeManager.Add(ECharacterType::P_GUNNER, GunnerDataRef.Object);
-	}
-
-	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> MouseMonsterDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_MouseMonster.GPC_MouseMonster'"));
-	if (MouseMonsterDataRef.Object)
-	{
-		CharacterTypeManager.Add(ECharacterType::M_MOUSE, MouseMonsterDataRef.Object);
 	}
 
 	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> BubbleTeaDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_BubbleTea.GPC_BubbleTea'"));
@@ -139,10 +134,6 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 	if (GameInstance && GameInstance->MyPlayer == this)
 		return;
-
-	//// 몬스터이면 return
-	//if (this->IsA(GameInstance->MonsterClass))
-	//	return;
 
 	/// Other Client 공격 모션 동기화 ///
 	if (CharacterInfo.HasState(STATE_AUTOATTACK) && bIsAutoAttacking == false)

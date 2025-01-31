@@ -121,11 +121,12 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 	LastLocation = CurrentLocation;
 
 	const float YawThreshold = 10.f;
-	bool bYawChanged = (FMath::Abs(CurrentRotationYaw - LastRotationYaw) > YawThreshold);
+	float YawDifference = FMath::Abs(FMath::FindDeltaAngleDegrees(CurrentRotationYaw, LastRotationYaw));
+	bool bYawChanged = (YawDifference > YawThreshold);
 	LastRotationYaw = CurrentRotationYaw;
 
 	// IDLE 상태인지 아닌지 판단 - IDLE 조건 1 : 이동 거리가 0.5cm 이하
-	const float NotMovedThreshold = 0.25f;
+	const float NotMovedThreshold = 2.f;
 	if ( (DistanceMoved >= NotMovedThreshold) )
 	{
 		CharacterInfo.RemoveState(STATE_IDLE);
@@ -136,28 +137,27 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 	}
 
 	// Jump() 시 패킷 전송
-	if (isJumpStart)
+	if (isJumpStart && !bWasJumping)
 	{
 		isJumpStart = false;
+		bWasJumping = true;
 		GameInstance->SendPlayerMovePacket();
 		LastSendPlayerInfo = CharacterInfo;
 		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Jump Issue"));
 		return;
 	}
 
+	// 착지 시 bWasJumping 초기화
+	if (GetCharacterMovement()->IsMovingOnGround())
+		bWasJumping = false;
+
+	const float AirThreshold = 10.f;
 	// 점프 후 착지를 안하고 플레이어가 계속 공중에 떠 있다면 떨어뜨리기 위해 패킷 전송
-	if (CharacterInfo.HasState(STATE_IDLE) && !CharacterInfo.HasState(STATE_JUMP) && LastSendPlayerInfo.Z > 150.f)
+	if (CharacterInfo.HasState(STATE_IDLE) && !CharacterInfo.HasState(STATE_JUMP) 
+		&& (LastSendPlayerInfo.Z - GroundZLocation) > AirThreshold)
 	{
 		CharacterInfo.Z = GroundZLocation;
-
-		if (LastSendPlayerInfo.HasState(STATE_RUN))
-		{
-			CharacterInfo.Speed = SprintSpeed;
-		}
-		else
-		{
-			CharacterInfo.Speed = WalkSpeed;
-		}
+		CharacterInfo.Speed = LastSendPlayerInfo.HasState(STATE_RUN) ? SprintSpeed : WalkSpeed;
 
 		GameInstance->SendPlayerMovePacket();
 		LastSendPlayerInfo = CharacterInfo;
@@ -175,25 +175,24 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 	}
 
 	// 일정 시간마다 서버에 패킷 전송
-	if (MovePacketSendTimer <= 0)
+	if (MovePacketSendTimer <= 0 || (CharacterInfo.HasState(STATE_IDLE) && DistanceMoved >= NotMovedThreshold))
 	{
 		MovePacketSendTimer = PACKETSENDTIME;
 
-		if ((!CharacterInfo.HasState(STATE_IDLE)) || (DistanceMoved >= NotMovedThreshold))
+		// IDLE 상태가 아니거나 일정 거리 이상 이동한 경우 패킷 전송
+		if (!CharacterInfo.HasState(STATE_IDLE) || DistanceMoved >= NotMovedThreshold)
 		{
 			GameInstance->SendPlayerMovePacket();
 			LastSendPlayerInfo = CharacterInfo;
-			UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : periodically"));
-		}
-	}
-	else 
-	{
-		if ((CharacterInfo.HasState(STATE_IDLE)) && (DistanceMoved >= NotMovedThreshold))
-		{
-			GameInstance->SendPlayerMovePacket();
-			MovePacketSendTimer = PACKETSENDTIME;
-			LastSendPlayerInfo = CharacterInfo;
-			UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : I am Idle but when I moved"));
+
+			if (MovePacketSendTimer <= 0)
+			{
+				UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : periodically"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : I am Idle but when I moved"));
+			}
 		}
 	}
 }
@@ -307,9 +306,9 @@ void AGPCharacterPlayer::Look(const FInputActionValue& Value)
 void AGPCharacterPlayer::Jump()
 {
 	Super::Jump();
+	isJumpStart = true;
 	CharacterInfo.RemoveState(STATE_IDLE);
 	CharacterInfo.AddState(STATE_JUMP);
-	isJumpStart = true;
 }
 
 void AGPCharacterPlayer::StopJumping()

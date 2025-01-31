@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/GPCharacterBase.h"
 #include "InputActionValue.h"
-#define PACKETSENDTIME 0.5
+#define PACKETSENDTIME 0.25
 #include "GPCharacterPlayer.generated.h"
 
 /**
@@ -81,7 +81,7 @@ protected:
 	float WalkSpeed = 300.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
-	float SprintSpeed = 1500.f;
+	float SprintSpeed = 600.f;
 
 	// 다른 뷰어 클라이언트들의 위치 동기화를 위해 위치를 계산하는 변수들
 public:
@@ -93,6 +93,7 @@ public:
 	float MovePacketSendTimer = PACKETSENDTIME; // 서버와의 패킷 교환 시간
 	float GroundZLocation = 147.7;
 	bool isJumpStart = false;
+	bool bWasJumping = false;
 
 
 // 아이템 충돌처리
