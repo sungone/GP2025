@@ -1,11 +1,12 @@
 #include "pch.h"
 #include "GameManager.h"
 
-void GameManager::Init()
+bool GameManager::Init()
 {
 	CreateMonster();
 	StartMonsterStateBroadcast();
 	StartMonsterAIUpdate();
+	return true;
 }
 
 void GameManager::AddPlayer(int32 id, std::shared_ptr<Character> player)

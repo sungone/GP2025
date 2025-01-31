@@ -17,7 +17,7 @@ public:
 		return inst;
 	}
 	
-	void Init();
+	bool Init();
 	void AddPlayer(int32 id, std::shared_ptr<Character> player);
 	void RemoveCharacter(int32 id);
 

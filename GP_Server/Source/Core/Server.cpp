@@ -1,47 +1,67 @@
 #include "pch.h"
 #include "Server.h"
-#include "SessionManager.h"
-#include "GameManager.h"
 
 bool Server::Init()
 {
 	std::wcout.imbue(std::locale("korean"));
+
+	if (!_dbPool.InitPool(L"GP2025", 10))
+	{
+		LOG(LogType::Warning, "DB");
+		return false;
+	}
+
 	WSADATA wsa_data;
-	if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0) {
+	if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
+	{
+		LOG(LogType::Warning, "WSAStartup");
 		return false;
 	}
+
 	_listenSocket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
-	if (_listenSocket == INVALID_SOCKET) {
+	if (_listenSocket == INVALID_SOCKET)
+	{
+		LOG(LogType::Warning, "WSASocket");
 		return false;
 	}
+
 	SOCKADDR_IN addr_s;
 	addr_s.sin_family = AF_INET;
 	addr_s.sin_port = htons(SERVER_PORT);
 	addr_s.sin_addr.s_addr = htonl(ADDR_ANY);
 
-	if (bind(_listenSocket, reinterpret_cast<sockaddr*>(&addr_s), sizeof(addr_s)) == SOCKET_ERROR) {
+	if (bind(_listenSocket, reinterpret_cast<sockaddr*>(&addr_s), sizeof(addr_s)) == SOCKET_ERROR)
+	{
+		LOG(LogType::Warning, "bind");
 		return false;
 	}
 
-	if (listen(_listenSocket, SOMAXCONN) == SOCKET_ERROR) {
+	if (listen(_listenSocket, SOMAXCONN) == SOCKET_ERROR)
+	{
+		LOG(LogType::Warning, "listen");
 		return false;
 	}
 
-	_iocp.Init();
+	if (!_iocp.Init())
+	{
+		LOG(LogType::Warning, "IOCP");
+		return false;
+	}
 	_iocp.RegisterSocket(_listenSocket);
 
-	_gameMgr.Init();
+	if (!_gameMgr.Init())
+	{
+		LOG(LogType::Warning, "GameMgr");
+		return false;
+	}
 
+	LOG(LogType::Log, "Successfully initialized");
 	return true;
 }
 
 void Server::Run()
 {
-	/*std::thread inputThread(&Server::CheckForExitKey,this);
-	inputThread.join();*/
-
 	DoAccept();
-	//CreateWokerThreads();
 	WorkerThreadLoop();
 }
 

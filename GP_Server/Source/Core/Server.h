@@ -2,7 +2,7 @@
 #include "IOCP.h"
 #include "SessionManager.h"
 #include "GameManager.h"
-#include <conio.h>
+#include "DBConnectionPool.h"
 
 class Server {
 public:
@@ -12,21 +12,7 @@ public:
 		return inst;
 	}
 	~Server() { Close(); }
-	void CheckForExitKey()
-	{
-		while (_bRunning)
-		{
-			if (_kbhit())
-			{
-				char key = _getch();
-				if (key == 'q' || key == 27) // 'q'³ª ESC Å°
-				{
-					_bRunning = false;
-				}
-			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		}
-	}
+
 	bool Init();
 	void Run();
 	void Close();
@@ -50,4 +36,5 @@ private:
 	IOCP& _iocp = IOCP::GetInst();
 	SessionManager& _sessionMgr = SessionManager::GetInst();
 	GameManager& _gameMgr = GameManager::GetInst();
+	DBConnectionPool& _dbPool = DBConnectionPool::GetInst();
 };

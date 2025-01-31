@@ -6,17 +6,33 @@ bool DBConnection::Connect(const std::wstring& dsn)
     SQLRETURN retcode;
 
     retcode = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);
-    if (retcode != SQL_SUCCESS) return false;
+    if (retcode != SQL_SUCCESS)
+    {
+        LOG(LogType::Warning, "Failed to allocate ODBC environment handle.");
+        return false;
+    }
 
     retcode = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
-    if (retcode != SQL_SUCCESS) return false;
+    if (retcode != SQL_SUCCESS)
+    {
+        LOG(LogType::Warning, "Failed to set ODBC version attribute.");
+        return false;
+    }
 
     retcode = SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
-    if (retcode != SQL_SUCCESS) return false;
+    if (retcode != SQL_SUCCESS)
+    {
+        LOG(LogType::Warning, "Failed to allocate ODBC database handle.");
+        return false;
+    }
 
     SQLSetConnectAttr(hdbc, SQL_LOGIN_TIMEOUT, (SQLPOINTER)5, 0);
     retcode = SQLConnectW(hdbc, (SQLWCHAR*)dsn.c_str(), SQL_NTS, nullptr, 0, nullptr, 0);
-    if (retcode != SQL_SUCCESS) return false;
+    if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO)
+    {
+        LOG(LogType::Warning, "Query execution failed!");
+        return false;
+    }
 
     return true;
 }

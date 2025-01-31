@@ -3,12 +3,12 @@
 
 class DBConnectionPool {
 public:
-    static DBConnectionPool& GetInstance() {
-        static DBConnectionPool instance;
-        return instance;
+    static DBConnectionPool& GetInst() {
+        static DBConnectionPool inst;
+        return inst;
     }
 
-    void InitPool(const std::wstring& dsn, size_t poolSize);
+    bool InitPool(const std::wstring& dsn, size_t poolSize);
     std::unique_ptr<DBConnection> GetConnection();
     void ReturnConnection(std::unique_ptr<DBConnection> conn);
 

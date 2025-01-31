@@ -34,6 +34,9 @@
     <Filter Include="Source Files\Utils">
       <UniqueIdentifier>{bd2831f8-ef1c-49f1-856e-b8adecab7014}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\DB">
+      <UniqueIdentifier>{279a80cf-c6df-44b5-834c-3bb024f4dc75}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Common\Proto.h">
@@ -81,6 +84,15 @@
     <ClInclude Include="Source\pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DBConnection.h">
+      <Filter>Source Files\DB</Filter>
+    </ClInclude>
+    <ClInclude Include="DBConnectionPool.h">
+      <Filter>Source Files\DB</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\PacketQueue.h">
+      <Filter>Source Files\Network\Packet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\main.cpp">
@@ -88,9 +100,6 @@
     </ClCompile>
     <ClCompile Include="Source\Core\ExpOver.cpp">
       <Filter>Source Files\Network\Server</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Utils\Lock.cpp">
-      <Filter>Source Files\Utils</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\Session.cpp">
       <Filter>Source Files\Network\Session</Filter>
@@ -121,6 +130,15 @@
     </ClCompile>
     <ClCompile Include="Source\pch.cpp">
       <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DBConnection.cpp">
+      <Filter>Source Files\DB</Filter>
+    </ClCompile>
+    <ClCompile Include="DBConnectionPool.cpp">
+      <Filter>Source Files\DB</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\PacketQueue.cpp">
+      <Filter>Source Files\Network\Packet</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
