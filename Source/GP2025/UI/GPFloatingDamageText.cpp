@@ -51,7 +51,14 @@ void AGPFloatingDamageText::SetDamageText(float DamageAmount)
 {
 	if (DamageText)
 	{
-		DamageText->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), DamageAmount)));
+		if (DamageAmount <= 0.f)
+		{
+			DamageText->SetText(FText::FromString(TEXT("Miss")));
+		}
+		else
+		{
+			DamageText->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), DamageAmount)));
+		}
 	}
 }
 
