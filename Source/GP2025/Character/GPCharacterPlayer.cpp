@@ -80,11 +80,6 @@ void AGPCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// FInfoData 에 데미지 Hp 설정
-	CharacterInfo.MaxHp = Stat->GetMaxHp();
-	CharacterInfo.Hp = CharacterInfo.MaxHp;
-	CharacterInfo.Damage = Stat->GetDamage();
-
 	SetCharacterType(CurrentCharacterType);
 	EquipItemFromDataAsset(CharacterTypeManager[CurrentCharacterType]);
 
@@ -273,6 +268,9 @@ void AGPCharacterPlayer::SetCharacterType(ECharacterType NewCharacterType)
 void AGPCharacterPlayer::SetCharacterData(const UGPCharacterControlData* CharacterControlData)
 {
 	Super::SetCharacterData(CharacterControlData);
+
+	WalkSpeed = CharacterControlData->WalkSpeed;
+	SprintSpeed = CharacterControlData->SprintSpeed;
 }
 
 void AGPCharacterPlayer::Move(const FInputActionValue& Value)

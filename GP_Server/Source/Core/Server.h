@@ -36,5 +36,5 @@ private:
 	IOCP& _iocp = IOCP::GetInst();
 	SessionManager& _sessionMgr = SessionManager::GetInst();
 	GameManager& _gameMgr = GameManager::GetInst();
-	DBConnectionPool& _dbPool = DBConnectionPool::GetInst();
+	// DBConnectionPool& _dbPool = DBConnectionPool::GetInst();
 };

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/GPCharacterBase.h"
 #include "InputActionValue.h"
-#define PACKETSENDTIME 0.25
+#define PACKETSENDTIME 0.5
 #include "GPCharacterPlayer.generated.h"
 
 /**
@@ -78,10 +78,10 @@ protected:
 
 	// Sprint Speed 변수
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
-	float WalkSpeed = 300.f;
+	float WalkSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
-	float SprintSpeed = 600.f;
+	float SprintSpeed;
 
 	// 다른 뷰어 클라이언트들의 위치 동기화를 위해 위치를 계산하는 변수들
 public:

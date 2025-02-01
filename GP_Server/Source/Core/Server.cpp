@@ -5,11 +5,11 @@ bool Server::Init()
 {
 	std::wcout.imbue(std::locale("korean"));
 
-	if (!_dbPool.InitPool(L"GP2025", 10))
-	{
-		LOG(LogType::Warning, "DB");
-		return false;
-	}
+	//if (!_dbPool.InitPool(L"GP2025", 10))
+	//{
+	//	LOG(LogType::Warning, "DB");
+	//	return false;
+	//}
 
 	WSADATA wsa_data;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
