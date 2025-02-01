@@ -23,7 +23,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SetDamageText(float DamageAmount);
+	void SetDamageText(float DamageAmount , bool bIsCrt);
 
 	UPROPERTY(VisibleAnywhere)
 	class UWidgetComponent* DamageWidgetComponent;

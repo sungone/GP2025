@@ -47,7 +47,7 @@ void AGPFloatingDamageText::Tick(float DeltaTime)
 	SetActorLocation(NewLocation);
 }
 
-void AGPFloatingDamageText::SetDamageText(float DamageAmount)
+void AGPFloatingDamageText::SetDamageText(float DamageAmount , bool bIsCrt)
 {
 	if (DamageText)
 	{
@@ -58,6 +58,15 @@ void AGPFloatingDamageText::SetDamageText(float DamageAmount)
 		else
 		{
 			DamageText->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), DamageAmount)));
+
+			if (bIsCrt)
+			{
+				DamageText->SetColorAndOpacity(FSlateColor(FLinearColor::Red));
+			}
+			else
+			{
+				DamageText->SetColorAndOpacity(FSlateColor(FLinearColor::White));
+			}
 		}
 	}
 }

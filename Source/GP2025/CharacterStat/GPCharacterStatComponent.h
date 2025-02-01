@@ -39,8 +39,16 @@ public :
 	FORCEINLINE void SetCurrentHp(float Hp) { CurrentHp = Hp; }
 	void SetHp(float NewHp);
 
-protected :
 
+	FORCEINLINE float GetCrtRate() { return CrtRate; }
+	FORCEINLINE void SetCrtRate(float crtRate) { CrtRate = crtRate; }
+
+	FORCEINLINE float GetCrtValue() { return CrtValue; }
+	FORCEINLINE void SetCrtValue(float crtValue) { CrtValue = crtValue; }
+
+	FORCEINLINE float GetDodge() { return Dodge; }
+	FORCEINLINE void SetDodge(float dodge) { Dodge = dodge; }
+protected :
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Stat")
 	int Lv;

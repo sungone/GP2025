@@ -6,8 +6,11 @@ void Character::Init()
 	SetBunkerRandomLocation();
 	_info.MaxHp = 100.f;
 	_info.Hp = _info.MaxHp;
-	_info.Speed = 200.f;
 	_info.Damage = 50.f;
+	_info.CrtRate = 0.25f;
+	_info.CrtValue = 1.5f;
+	_info.Dodge = 0.25f;
+	_info.Speed = 200.f;
 	_info.State = ECharacterStateType::STATE_IDLE;
 }
 

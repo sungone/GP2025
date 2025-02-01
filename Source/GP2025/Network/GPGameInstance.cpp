@@ -210,8 +210,8 @@ void UGPGameInstance::AddPlayer(FInfoData& PlayerInfo, bool isMyPlayer)
 		MyPlayer->SetCharacterInfoFromServer(PlayerInfo);
 		MyPlayer->SetActorLocation(FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z));
 
-		// 여기서 다시 데미지를 넣어줘야 됬음
-		MyPlayer->CharacterInfo.Damage = 50.f;
+		//// 여기서 다시 데미지를 넣어줘야 됬음
+		//MyPlayer->CharacterInfo.Damage = 50.f;
 
 		Players.Add(PlayerInfo.ID, MyPlayer);
 	}

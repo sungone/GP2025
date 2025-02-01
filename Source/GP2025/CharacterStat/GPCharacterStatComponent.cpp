@@ -6,11 +6,10 @@
 // Sets default values for this component's properties
 UGPCharacterStatComponent::UGPCharacterStatComponent()
 {
-	MaxHp = 200.f;
+	MaxHp = 100.f;
 	Attack = 50.f;
 	CurrentHp = MaxHp;
 }
-
 
 // Called when the game starts
 void UGPCharacterStatComponent::BeginPlay()

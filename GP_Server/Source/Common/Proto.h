@@ -147,6 +147,9 @@ struct FInfoData
 	float MaxHp;
 	float Hp;
 	float Damage;
+	float CrtRate;
+	float CrtValue;
+	float Dodge;
 	float Speed;
 	uint32 State;
 

@@ -86,4 +86,24 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Equipment")
 	USkeletalMesh* PantsMesh;
+
+
+	// 플레이어 스탯 설정
+	UPROPERTY(EditAnywhere, Category = "Stat")
+	float MaxHp;
+
+	UPROPERTY(EditAnywhere, Category = "Stat")
+	float Hp;
+
+	UPROPERTY(EditAnywhere, Category = "Stat")
+	float Attack;
+
+	UPROPERTY(EditAnywhere, Category = "Stat")
+	float CrtRate;
+
+	UPROPERTY(EditAnywhere, Category = "Stat")
+	float CrtValue;
+
+	UPROPERTY(EditAnywhere, Category = "Stat")
+	float Dodge;
 };

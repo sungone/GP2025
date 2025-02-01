@@ -13,6 +13,10 @@
 #include "UI/GPHpBarWidget.h"
 #include "UI/GPFloatingDamageText.h"
 
+#include <random>
+static std::random_device rd;
+static std::mt19937 gen(rd());
+
 AGPCharacterBase::AGPCharacterBase()
 {
 
@@ -110,7 +114,7 @@ AGPCharacterBase::AGPCharacterBase()
 	// Widget Component
 	HpBar = CreateDefaultSubobject<UGPWidgetComponent>(TEXT("Widget"));
 	HpBar->SetupAttachment(GetMesh());
-	HpBar->SetRelativeLocation(FVector(0.f, 0.f, 180.f));
+	HpBar->SetRelativeLocation(FVector(0.f, 0.f, 250.f));
 	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/UI/WBP_CharacterHpBar.WBP_CharacterHpBar_C"));
 	if (HpBarWidgetRef.Class)
 	{
@@ -243,6 +247,25 @@ void AGPCharacterBase::SetCharacterData(const UGPCharacterControlData* Character
 
 	// 애니메이션 몽타주 (Dead)
 	DeadMontage = CharacterData->DeadAnimMontage;
+
+	// 캐릭터 스탯 설정
+	CharacterInfo.MaxHp = CharacterData->MaxHp;
+	Stat->SetMaxHp(CharacterInfo.MaxHp);
+
+	CharacterInfo.Hp = CharacterInfo.MaxHp;
+	Stat->SetHp(CharacterInfo.Hp);
+
+	CharacterInfo.Damage = CharacterData->Attack;
+	Stat->SetDamage(CharacterInfo.Damage);
+
+	CharacterInfo.CrtRate = CharacterData->CrtRate;
+	Stat->SetCrtRate(CharacterInfo.CrtRate);
+
+	CharacterInfo.CrtValue = CharacterData->CrtValue;
+	Stat->SetCrtValue(CharacterInfo.CrtValue);
+
+	CharacterInfo.Dodge = CharacterData->Dodge;
+	Stat->SetDodge(CharacterInfo.Dodge);
 }
 
 void AGPCharacterBase::SetCharacterType(ECharacterType NewCharacterType)
@@ -262,7 +285,7 @@ void AGPCharacterBase::AttackHitCheck()
 	
 	const float AttackRange = 40.f;
 	const float AttackRadius = 50.f;
-	const float AttackDamage = CharacterInfo.Damage;
+	const float AttackDamage = CalculateDamage();
 
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
@@ -288,29 +311,41 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	// Floating Damage UI
-	{
-		FVector SpawnLocation = GetActorLocation() + FVector(0, 0, 100);
-		FActorSpawnParameters SpawnParams;
-		AGPFloatingDamageText* DamageText = GetWorld()->SpawnActor<AGPFloatingDamageText>(AGPFloatingDamageText::StaticClass(), 
-			SpawnLocation, FRotator::ZeroRotator, SpawnParams);
-
-		if (DamageText)
-		{
-			DamageText->SetDamageText(DamageAmount);
-		}
-	}
-
 	AGPCharacterBase* AttackerCharacter = CastChecked<AGPCharacterBase>(DamageCauser);
 
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 	if (!GameInstance) return DamageAmount;
 
 	bool bIsPlayer = (AttackerCharacter == GameInstance->MyPlayer);
+
+	std::uniform_real_distribution<float> dist(0.f, 1.f);
+	float RandomValue = dist(gen);
+	bool bIsDodge = RandomValue < CharacterInfo.Dodge;
+	if (bIsDodge)
+	{
+		DamageAmount = 0.f;
+	}
+
+	// Floating Damage UI
+	{
+		FVector SpawnLocation = GetActorLocation() + FVector(0, 0, 100);
+		FActorSpawnParameters SpawnParams;
+		AGPFloatingDamageText* DamageText = GetWorld()->SpawnActor<AGPFloatingDamageText>(AGPFloatingDamageText::StaticClass(),
+			SpawnLocation, FRotator::ZeroRotator, SpawnParams);
+
+		bool isCrt;
+		if (AttackerCharacter->CharacterInfo.Damage < DamageAmount)
+			isCrt = true;
+
+		if (DamageText)
+		{
+			DamageText->SetDamageText(DamageAmount, isCrt);
+		}
+	}
 	
-	if(bIsPlayer)
+	if(bIsPlayer) // 공격자가 플레이어
 		GameInstance->SendPlayerAttackPacket(this->CharacterInfo);
-	else
+	else // 공격자가 몬스터
 	{
 		//todo: send mons atk pkt
 		Stat->ApplyDamage(DamageAmount);
@@ -322,6 +357,21 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	}
 
 	return DamageAmount;
+}
+
+float AGPCharacterBase::CalculateDamage()
+{
+	float BaseDamage = CharacterInfo.Damage;
+	float CrtRate = CharacterInfo.CrtRate;
+	float CrtValue = CharacterInfo.CrtValue;
+
+	std::uniform_real_distribution<float> dist(0.f, 1.f);
+	float RandomValue = dist(gen);
+
+	bool bIsCritical = RandomValue < CrtRate;
+
+	float FinalDamage = bIsCritical ? BaseDamage * CrtValue : BaseDamage;
+	return FinalDamage;
 }
 
 void AGPCharacterBase::SetupCharacterWidget(UGPUserWidget* InUserWidget)

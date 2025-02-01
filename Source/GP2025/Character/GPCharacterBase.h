@@ -48,6 +48,7 @@ public :
 protected :
 	virtual void AttackHitCheck() override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	float CalculateDamage();
 
 // Stat Section
 public :
@@ -68,7 +69,7 @@ public :
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> DeadMontage;
-	float DeadEventDelayTime = 3.f;
+	float DeadEventDelayTime = 0.5f;
 
 // Equip Item Section
 public : 

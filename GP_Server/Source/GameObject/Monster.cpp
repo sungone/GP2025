@@ -10,7 +10,7 @@ static std::mt19937 gen(rd());
 void Monster::Init()
 {
     Character::Init();
-    _info.CharacterType = M_MOUSE;
+    _info.CharacterType = M_ENERGYDRINK;
 }
 
 void Monster::Update()
