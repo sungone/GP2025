@@ -16,7 +16,18 @@
 #include <functional>
 #include <random>
 #include <sqlext.h>
+#include <chrono>
 
 #include "Proto.h"
 #include "Loger.h"
 #include "ExpOver.h"
+
+enum CompType
+{
+	RECV,
+	SEND,
+	ACCEPT,
+
+	MOVE,
+	ATTACK,
+};
