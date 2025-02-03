@@ -11,6 +11,7 @@
 #include "CharacterStat/GPCharacterStatComponent.h"
 #include "UI/GPWidgetComponent.h"
 #include "UI/GPHpBarWidget.h"
+#include "UI/GPExpBarWidget.h"
 #include "UI/GPFloatingDamageText.h"
 
 #include <random>
@@ -118,9 +119,9 @@ AGPCharacterBase::AGPCharacterBase()
 	Stat = CreateDefaultSubobject<UGPCharacterStatComponent>(TEXT("Stat"));
 
 	// Widget Component
-	HpBar = CreateDefaultSubobject<UGPWidgetComponent>(TEXT("Widget"));
+	HpBar = CreateDefaultSubobject<UGPWidgetComponent>(TEXT("HpWidget"));
 	HpBar->SetupAttachment(GetMesh());
-	HpBar->SetRelativeLocation(FVector(0.f, 0.f, 250.f));
+	HpBar->SetRelativeLocation(FVector(0.f, 0.f, 300.f));
 	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/UI/WBP_CharacterHpBar.WBP_CharacterHpBar_C"));
 	if (HpBarWidgetRef.Class)
 	{
@@ -128,6 +129,18 @@ AGPCharacterBase::AGPCharacterBase()
 		HpBar->SetWidgetSpace(EWidgetSpace::Screen);
 		HpBar->SetDrawSize(FVector2D(150.f , 15.f));
 		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
+	ExpBar = CreateDefaultSubobject<UGPWidgetComponent>(TEXT("ExpWidget"));
+	ExpBar->SetupAttachment(GetMesh());
+	ExpBar->SetRelativeLocation(FVector(0.f, 0.f, 310.f));
+	static ConstructorHelpers::FClassFinder<UUserWidget> ExpBarWidgetRef(TEXT("/Game/UI/WBP_ExpBar.WBP_ExpBar_C"));
+	if (ExpBarWidgetRef.Class)
+	{
+		ExpBar->SetWidgetClass(ExpBarWidgetRef.Class);
+		ExpBar->SetWidgetSpace(EWidgetSpace::Screen);
+		ExpBar->SetDrawSize(FVector2D(150.f, 15.f));
+		ExpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 
@@ -195,6 +208,7 @@ void AGPCharacterBase::Tick(float DeltaTime)
 void AGPCharacterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+	Stat->OnHpZero.AddUObject(this, &AGPCharacterBase::SetDead);
 }
 
 void AGPCharacterBase::SetCharacterInfoFromServer(FInfoData& CharacterInfo_)
@@ -387,6 +401,14 @@ void AGPCharacterBase::SetupCharacterWidget(UGPUserWidget* InUserWidget)
 		HpBarWidget->SetMaxHp(Stat->GetMaxHp());
 		HpBarWidget->UpdateHpBar(Stat->GetCurrentHp());
 		Stat->OnHpChanged.AddUObject(HpBarWidget, &UGPHpBarWidget::UpdateHpBar);
+	}
+
+	UGPExpBarWidget* ExpBarWidget = Cast<UGPExpBarWidget>(InUserWidget);
+	if (ExpBarWidget)
+	{
+		ExpBarWidget->SetMaxExp(Stat->GetMaxExp());
+		ExpBarWidget->UpdateExpBar(Stat->GetCurrentExp());
+		Stat->OnExpChanged.AddUObject(ExpBarWidget, &UGPExpBarWidget::UpdateExpBar);
 	}
 }
 

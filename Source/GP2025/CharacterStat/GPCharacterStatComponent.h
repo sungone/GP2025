@@ -10,6 +10,9 @@
 DECLARE_MULTICAST_DELEGATE(FOnHpZeroDelegate);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHpChangedDelegate, float);
 
+DECLARE_MULTICAST_DELEGATE(FOnExpFullDelegete);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnExpChangedDelegate, float);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class GP2025_API UGPCharacterStatComponent : public UActorComponent
 {
@@ -27,6 +30,9 @@ public :
 
 	FOnHpZeroDelegate OnHpZero;
 	FOnHpChangedDelegate OnHpChanged;
+
+	FOnExpFullDelegete OnExpFull;
+	FOnExpChangedDelegate OnExpChanged;
 
 	FORCEINLINE float GetMaxHp() { return MaxHp; }
 	FORCEINLINE float GetCurrentHp() { return CurrentHp; }
@@ -48,6 +54,16 @@ public :
 
 	FORCEINLINE float GetDodge() { return Dodge; }
 	FORCEINLINE void SetDodge(float dodge) { Dodge = dodge; }
+
+	FORCEINLINE float GetMaxExp() { return MaxExp; }
+	FORCEINLINE void SetMaxExp(float Exp) { MaxExp = Exp; }
+
+	FORCEINLINE float GetCurrentExp() { return CurrentExp; }
+	FORCEINLINE void SetCurrentExp(float Exp) { CurrentHp = Exp; }
+	float AddExp(float InExp);
+
+	void SetExp(float NewExp);
+
 protected :
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Stat")
@@ -73,4 +89,11 @@ protected :
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = "Stat")
 	float CurrentHp;
+
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Stat")
+	float MaxExp;
+
+	UPROPERTY(Transient, VisibleInstanceOnly, Category = "Stat")
+	float CurrentExp;
 };

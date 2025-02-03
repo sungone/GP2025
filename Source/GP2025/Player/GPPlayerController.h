@@ -15,5 +15,12 @@ class GP2025_API AGPPlayerController : public APlayerController
 	GENERATED_BODY()
 	
 protected :
+	AGPPlayerController();
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly , Category = "UI")
+	TSubclassOf<UUserWidget> PlayerMainWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* PlayerMainWidget;
 };

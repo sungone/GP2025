@@ -60,6 +60,9 @@ public :
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UGPWidgetComponent> HpBar;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UGPWidgetComponent> ExpBar;
+
 	virtual void SetupCharacterWidget(class UGPUserWidget* InUserWidget) override;
 
 // Dead Section
