@@ -4,8 +4,8 @@
 bool GameManager::Init()
 {
 	CreateMonster();
-	StartMonsterStateBroadcast();
-	StartMonsterAIUpdate();
+	//StartMonsterStateBroadcast();
+	//StartMonsterAIUpdate();
 	return true;
 }
 

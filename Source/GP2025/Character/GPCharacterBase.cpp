@@ -291,7 +291,7 @@ void AGPCharacterBase::AttackHitCheck()
 	
 	const float AttackRange = 40.f;
 	const float AttackRadius = 50.f;
-	const float AttackDamage = this->CharacterInfo.Damage;
+	const float AttackDamage = CalculateDamage();
 
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
@@ -324,14 +324,6 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 	bool bIsPlayer = (AttackerCharacter == GameInstance->MyPlayer);
 
-	std::uniform_real_distribution<float> dist(0.f, 1.f);
-	float RandomValue = dist(gen);
-	bool bIsDodge = RandomValue < CharacterInfo.Dodge;
-	if (bIsDodge)
-	{
-		DamageAmount = 0.f;
-	}
-
 	// Floating Damage UI
 	{
 		FVector SpawnLocation = GetActorLocation() + FVector(0, 0, 100);
@@ -339,9 +331,9 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		AGPFloatingDamageText* DamageText = GetWorld()->SpawnActor<AGPFloatingDamageText>(AGPFloatingDamageText::StaticClass(),
 			SpawnLocation, FRotator::ZeroRotator, SpawnParams);
 
-		bool isCrt;
-		if (AttackerCharacter->CharacterInfo.Damage < DamageAmount)
-			isCrt = true;
+		bool isCrt = true;
+		if (AttackerCharacter->CharacterInfo.Damage == DamageAmount)
+			isCrt = false;
 
 		if (DamageText)
 		{
@@ -350,7 +342,7 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	}
 	
 	if(bIsPlayer) // 공격자가 플레이어
-		GameInstance->SendPlayerAttackPacket(this->CharacterInfo);
+		GameInstance->SendPlayerAttackPacket(this->CharacterInfo , DamageAmount);
 	else // 공격자가 몬스터
 	{
 		//todo: send mons atk pkt
@@ -367,12 +359,19 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 float AGPCharacterBase::CalculateDamage()
 {
+	std::uniform_real_distribution<float> dist(0.f, 1.f);
+	float RandomValue = dist(gen);
+	bool bIsDodge = RandomValue < CharacterInfo.Dodge;
+	if (bIsDodge)
+	{
+		return 0.f;
+	}
+
 	float BaseDamage = CharacterInfo.Damage;
 	float CrtRate = CharacterInfo.CrtRate;
 	float CrtValue = CharacterInfo.CrtValue;
 
-	std::uniform_real_distribution<float> dist(0.f, 1.f);
-	float RandomValue = dist(gen);
+	RandomValue = dist(gen);
 
 	bool bIsCritical = RandomValue < CrtRate;
 

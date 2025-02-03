@@ -89,9 +89,9 @@ void UGPGameInstance::SendPlayerAttackPacket()
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(InfoPacket), BytesSent);
 }
 
-void UGPGameInstance::SendPlayerAttackPacket(FInfoData& Attacked)
+void UGPGameInstance::SendPlayerAttackPacket(FInfoData& Attacked , float AttackerDamage)
 {
-	AttackPacket Packet(EPacketType::C_ATTACK, { MyPlayer->CharacterInfo, Attacked });
+	AttackPacket Packet(EPacketType::C_ATTACK, { MyPlayer->CharacterInfo, Attacked , AttackerDamage});
 	int32 BytesSent = 0;
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(AttackPacket), BytesSent);
 }

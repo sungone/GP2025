@@ -90,27 +90,27 @@ void PacketManager::HandleAttackPacket(Session& session, BYTE* packet)
 
 		AttackPacket* p = reinterpret_cast<AttackPacket*>(packet);
 		FAttackData data = p->Data;
-		LOG(LogType::Log, std::format("Attacker[{}] -> Attacked[{}]", data.Attacker.ID, data.Attacked.ID));
+		LOG(LogType::Log, std::format("Attacker[{}] -> Attacked[{}] : AttackerDamage : [{}]", data.Attacker.ID, data.Attacked.ID , data.AttackerDamage));
 
 		// for anim 동기화
 		playerInfo = data.Attacker;
 		auto pkt1 = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, playerInfo);
 		_sessionMgr.Broadcast(&pkt1);
 		 
-		// hp 감소
-		float BaseDamage = playerInfo.Damage;
-		float CrtRate = playerInfo.CrtRate;
-		float CrtValue = playerInfo.CrtValue;
+		//// hp 감소
+		//float BaseDamage = playerInfo.Damage;
+		//float CrtRate = playerInfo.CrtRate;
+		//float CrtValue = playerInfo.CrtValue;
 
-		static std::default_random_engine dre;
-		static std::uniform_real_distribution<float>  dist(0.f, 1.f);
-		float RandomValue = dist(dre);
+		//static std::default_random_engine dre;
+		//static std::uniform_real_distribution<float>  dist(0.f, 1.f);
+		//float RandomValue = dist(dre);
 
-		bool bIsCritical = RandomValue < CrtRate;
+		//bool bIsCritical = RandomValue < CrtRate;
 
-		float FinalDamage = bIsCritical ? BaseDamage * CrtValue : BaseDamage;
+		//float FinalDamage = bIsCritical ? BaseDamage * CrtValue : BaseDamage;
 
-		if(_gameMgr.OnDamaged(playerInfo.Damage, data.Attacked))
+		if(_gameMgr.OnDamaged(data.AttackerDamage, data.Attacked))
 		{
 			auto monster = _gameMgr.GetInfo(data.Attacked.ID);
 			auto pkt2 = InfoPacket(EPacketType::S_MONSTER_STATUS_UPDATE, monster);

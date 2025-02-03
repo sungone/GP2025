@@ -170,6 +170,7 @@ struct FAttackData
 {
 	FInfoData Attacker;
 	FInfoData Attacked;
+	float AttackerDamage;
 };
 
 #pragma pack(push, 1)

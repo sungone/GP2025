@@ -30,7 +30,7 @@ public :
 
 	void SendPlayerMovePacket();
 	void SendPlayerAttackPacket();
-	void SendPlayerAttackPacket(FInfoData& Attacker);
+	void SendPlayerAttackPacket(FInfoData& Attacker , float AttackerDamage);
 
 	void ReceiveData();
 	void ProcessPacket();
