@@ -5,7 +5,7 @@
 
 void Session::DoRecv()
 {
-	RWLock::WriteGuard guard(_sLock);
+	std::lock_guard<std::mutex> lock(_sMutex);
 	ZeroMemory(&_recvOver._wsaover, sizeof(_recvOver._wsaover));
 	DWORD recv_flag = 0;
 	_recvOver._wsabuf.len = BUFSIZE - _remain;
@@ -14,7 +14,7 @@ void Session::DoRecv()
 }
 void Session::DoSend(Packet* packet)
 {
-	RWLock::WriteGuard guard(_sLock);
+	std::lock_guard<std::mutex> lock(_sMutex);
 
 #pragma region //Log
 	switch (packet->Header.PacketType)
@@ -51,7 +51,7 @@ void Session::DoSend(Packet* packet)
 
 void Session::Connect(SOCKET& socket, int32 id)
 {
-	RWLock::WriteGuard guard(_sLock);
+	std::lock_guard<std::mutex> lock(_sMutex);
 	this->_id = id;
 	this->_socket = socket;
 
@@ -62,43 +62,43 @@ void Session::Connect(SOCKET& socket, int32 id)
 
 void Session::Disconnect()
 {
-	RWLock::WriteGuard guard(_sLock);
+	std::lock_guard<std::mutex> lock(_sMutex);
 	_bLogin = false;
 	closesocket(_socket);
 }
 
 void Session::SetLogin()
 {
-	RWLock::WriteGuard guard(_sLock);
+	std::lock_guard<std::mutex> lock(_sMutex);
 	_bLogin = true;
 }
 
 bool Session::IsLogin()
 {
-	RWLock::ReadGuard guard(_sLock);
+	std::lock_guard<std::mutex> lock(_sMutex);
 	return _bLogin;
 }
 
 int32 Session::GetId()
 {
-	RWLock::ReadGuard guard(_sLock);
+	std::lock_guard<std::mutex> lock(_sMutex);
 	return _id;
 }
 
 int32 Session::GetRemainSize()
 {
-	RWLock::ReadGuard guard(_sLock);
+	std::lock_guard<std::mutex> lock(_sMutex);
 	return _remain;
 }
 
 void Session::SetRemainSize(int32 size)
 {
-	RWLock::WriteGuard guard(_sLock);
+	std::lock_guard<std::mutex> lock(_sMutex);
 	_remain = size;
 }
 
 FInfoData& Session::GetPlayerInfo()
 {
-	RWLock::ReadGuard guard(_sLock);
+	std::lock_guard<std::mutex> lock(_sMutex);
 	return _player->GetInfo();
 }

@@ -27,5 +27,6 @@ private:
 	SOCKET _socket = INVALID_SOCKET;
 	ExpOver _recvOver;
 	int32 _remain;
-	RWLock _sLock;
+
+	std::mutex _sMutex;
 };

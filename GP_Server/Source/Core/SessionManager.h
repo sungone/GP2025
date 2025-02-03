@@ -22,6 +22,7 @@ public:
 private:
 	std::array<Session, MAX_CLIENT> _sessions;
 	IOCP& _iocp = IOCP::GetInst();
-	RWLock _smgrLock;
+
+	std::mutex _smgrMutex;
 };
 

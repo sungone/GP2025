@@ -98,6 +98,18 @@ void PacketManager::HandleAttackPacket(Session& session, BYTE* packet)
 		_sessionMgr.Broadcast(&pkt1);
 
 		// hp °¨¼Ò
+		float BaseDamage = playerInfo.Damage;
+		float CrtRate = playerInfo.CrtRate;
+		float CrtValue = playerInfo.CrtValue;
+
+		static std::default_random_engine dre;
+		static std::uniform_real_distribution<float>  dist(0.f, 1.f);
+		float RandomValue = dist(dre);
+
+		bool bIsCritical = RandomValue < CrtRate;
+
+		float FinalDamage = bIsCritical ? BaseDamage * CrtValue : BaseDamage;
+
 		if(_gameMgr.OnDamaged(playerInfo.Damage, data.Attacked))
 		{
 			auto monster = _gameMgr.GetInfo(data.Attacked.ID);

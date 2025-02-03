@@ -32,11 +32,11 @@ public:
 private:
 	std::array<std::shared_ptr<Character>, MAX_CHARACTER> _characters;
 
-#pragma region AI작업
 public:
+	std::shared_mutex _carrMutex;
+#pragma region AI작업
 	Timer _MonsterStateBroadcastTimer;
 	Timer _MonsterAIUpdateTimer;
-	std::mutex _monsterMutex;
 
 	void StartMonsterStateBroadcast()
 	{
@@ -52,7 +52,7 @@ public:
 
 	void BroadcastMonsterStates()
 	{
-		std::lock_guard<std::mutex> lock(_monsterMutex);
+		std::shared_lock<std::shared_mutex> lock(_carrMutex);
 
 		for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 		{
@@ -77,6 +77,7 @@ public:
 	void StartMonsterAIUpdate()
 	{
 		_MonsterAIUpdateTimer.Start(4000, [this]() {
+			std::unique_lock<std::shared_mutex> lock(_carrMutex);
 			for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 			{
 				if (_characters[i] && _characters[i]->IsValid())

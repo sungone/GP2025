@@ -11,12 +11,16 @@ bool GameManager::Init()
 
 void GameManager::AddPlayer(int32 id, std::shared_ptr<Character> player)
 {
+	std::unique_lock<std::shared_mutex> lock(_carrMutex);
+
 	_characters[id] = player;
 	_characters[id]->GetInfo().ID = id;
 }
 
 void GameManager::RemoveCharacter(int32 id)
 {
+	std::unique_lock<std::shared_mutex> lock(_carrMutex);
+
 	if (id < 0 || id >= MAX_CHARACTER || !_characters[id])
 	{
 		LOG(Warning, "Invalid");
@@ -49,6 +53,8 @@ void GameManager::CreateMonster()
 
 void GameManager::SpawnMonster(Session& session)
 {
+	std::shared_lock<std::shared_mutex> lock(_carrMutex);
+
 	for (int32 i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{
 		if (_characters[i] && _characters[i]->IsValid())
@@ -61,19 +67,23 @@ void GameManager::SpawnMonster(Session& session)
 
 bool GameManager::OnDamaged(float damage, FInfoData& damaged)
 {
+	std::unique_lock<std::shared_mutex> lock(_carrMutex);
+
 	if (damaged.ID < MAX_PLAYER || damaged.ID >= MAX_CHARACTER || !_characters[damaged.ID] || !_characters[damaged.ID]->IsValid())
 	{
 		LOG(Warning, "Invalid");
 		return false;
 	}
 
-	auto& charater = _characters[damaged.ID];
-	charater->OnDamaged(damage);
+	auto& character = _characters[damaged.ID];
+	character->OnDamaged(damage);
 	return true;
 }
 
 std::shared_ptr<Character> GameManager::GetCharacterByID(int32 id)
 {
+	std::shared_lock<std::shared_mutex> lock(_carrMutex);
+
 	if (id < 0 || id >= MAX_CHARACTER || !_characters[id] || !_characters[id]->IsValid())
 	{
 		LOG(Warning, "Invalid");

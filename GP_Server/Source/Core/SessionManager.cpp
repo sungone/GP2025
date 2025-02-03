@@ -4,7 +4,8 @@
 
 void SessionManager::Connect(SOCKET& socket)
 {
-	RWLock::WriteGuard guard(_smgrLock);
+	std::lock_guard<std::mutex> lock(_smgrMutex);
+
 	int32 _id = GenerateId();
 	if (_id != -1) {
 		_sessions[_id].Connect(socket,_id);
@@ -15,19 +16,18 @@ void SessionManager::Connect(SOCKET& socket)
 
 void SessionManager::Disconnect(int32 id)
 {
-	RWLock::ReadGuard guard(_smgrLock);
 	_sessions[id].Disconnect();
 }
 
 void SessionManager::DoRecv(int32 id)
 {
-	RWLock::ReadGuard guard(_smgrLock);
 	_sessions[id].DoRecv();
 }
 
 void SessionManager::HandleRecvBuffer(int32 id, int32 recvByte, ExpOver* expOver)
 {
-	RWLock::ReadGuard guard(_smgrLock);
+	std::lock_guard<std::mutex> lock(_smgrMutex);
+
 	Session& session = _sessions[id];
 	int32 dataSize = recvByte + session.GetRemainSize();
 	BYTE* packet = reinterpret_cast<BYTE*>(expOver->_buf);
@@ -47,7 +47,6 @@ void SessionManager::HandleRecvBuffer(int32 id, int32 recvByte, ExpOver* expOver
 
 void SessionManager::Broadcast(Packet* packet, int32 exptId)
 {
-	RWLock::ReadGuard guard(_smgrLock);
 	for (auto& session : _sessions)
 	{
 		if (!session.IsLogin() || exptId == session.GetId())

@@ -17,5 +17,5 @@ private:
     ~DBConnectionPool() = default;
 
     std::queue<std::unique_ptr<DBConnection>> _pool;
-    RWLock _dbLock;
+    std::mutex _dMutex;
 };

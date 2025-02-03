@@ -3,7 +3,7 @@
 
 bool DBConnectionPool::InitPool(const std::wstring& dsn, size_t poolSize)
 {
-	RWLock::WriteGuard guard(_dbLock);
+	std::lock_guard<std::mutex> lock(_dMutex);
 
 	for (size_t i = 0; i < poolSize; ++i) {
 		std::unique_ptr<DBConnection> conn = std::make_unique<DBConnection>();
@@ -16,7 +16,8 @@ bool DBConnectionPool::InitPool(const std::wstring& dsn, size_t poolSize)
 
 std::unique_ptr<DBConnection> DBConnectionPool::GetConnection()
 {
-	RWLock::ReadGuard guard(_dbLock);
+	std::lock_guard<std::mutex> lock(_dMutex);
+
 	if (_pool.empty()) {
 		return nullptr;
 	}
@@ -28,6 +29,7 @@ std::unique_ptr<DBConnection> DBConnectionPool::GetConnection()
 
 void DBConnectionPool::ReturnConnection(std::unique_ptr<DBConnection> conn)
 {
-	RWLock::WriteGuard guard(_dbLock);
+	std::lock_guard<std::mutex> lock(_dMutex);
+
 	_pool.push(std::move(conn));
 }
