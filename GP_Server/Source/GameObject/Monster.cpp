@@ -15,6 +15,7 @@ void Monster::Init()
 
 void Monster::Update()
 {
+    std::lock_guard<std::mutex> lock(_cMutex);
     switch (_info.State)
     {
     case ECharacterStateType::STATE_IDLE:
@@ -50,7 +51,7 @@ void Monster::Update()
 
 void Monster::ChangeState(ECharacterStateType newState)
 {
-    std::lock_guard<std::mutex> lock(GameManager::GetInst()._monsterMutex);
+    std::lock_guard<std::mutex> lock(_cMutex);
 
     if (_info.State != newState)
     {
@@ -65,6 +66,7 @@ void Monster::ChangeState(ECharacterStateType newState)
 
 bool Monster::ShouldStartWalking()
 {
+    std::lock_guard<std::mutex> lock(_cMutex);
     static std::uniform_int_distribution<int> dist(0, 2);
     static std::uniform_real_distribution<float> distX(-1000.0f, 1000.0f); 
     static std::uniform_real_distribution<float> distY(-1000.0f, 1000.0f); 
