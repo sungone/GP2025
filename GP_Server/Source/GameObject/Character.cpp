@@ -22,6 +22,8 @@ bool Character::IsDead()
 void Character::OnDamaged(float damage)
 {
 	auto& hp = _info.Hp;
+
+
 	if ((hp - damage) <= 0)
 		hp = 0;
 	else

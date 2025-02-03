@@ -281,7 +281,7 @@ void UGPGameInstance::AddMonster(FInfoData& MonsterInfo)
 		MonsterInfo.ID, SpawnLocation.X, SpawnLocation.Y, SpawnLocation.Z, SpawnRotation.Yaw);
 
 	Monster->SetActorLocation(FVector(MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z));
-	Monster->SetCharacterType(ECharacterType::M_ENERGYDRINK);
+	Monster->SetCharacterType(ECharacterType::M_MOUSE);
 	Monster->CharacterInfo = MonsterInfo;
 	Monster->Stat->SetMaxHp(MonsterInfo.MaxHp);
 	Monster->Stat->SetCurrentHp(MonsterInfo.Hp);

@@ -108,6 +108,12 @@ AGPCharacterBase::AGPCharacterBase()
 		CharacterTypeManager.Add(ECharacterType::M_COFFEE, CoffeeDataRef.Object);
 	}
 
+	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> MouseDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_Mouse.GPC_Mouse'"));
+	if (MouseDataRef.Object)
+	{
+		CharacterTypeManager.Add(ECharacterType::M_MOUSE, MouseDataRef.Object);
+	}
+
 	// Stat Component
 	Stat = CreateDefaultSubobject<UGPCharacterStatComponent>(TEXT("Stat"));
 
@@ -285,7 +291,7 @@ void AGPCharacterBase::AttackHitCheck()
 	
 	const float AttackRange = 40.f;
 	const float AttackRadius = 50.f;
-	const float AttackDamage = CalculateDamage();
+	const float AttackDamage = this->CharacterInfo.Damage;
 
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;

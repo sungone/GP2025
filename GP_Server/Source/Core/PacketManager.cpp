@@ -96,7 +96,7 @@ void PacketManager::HandleAttackPacket(Session& session, BYTE* packet)
 		playerInfo = data.Attacker;
 		auto pkt1 = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, playerInfo);
 		_sessionMgr.Broadcast(&pkt1);
-
+		 
 		// hp °¨¼Ò
 		if(_gameMgr.OnDamaged(playerInfo.Damage, data.Attacked))
 		{

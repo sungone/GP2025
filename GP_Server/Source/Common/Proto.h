@@ -1,4 +1,5 @@
 #pragma once
+
 using BYTE = unsigned char;
 using int16 = __int16;
 using int32 = __int32;
