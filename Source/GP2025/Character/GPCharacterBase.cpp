@@ -415,10 +415,11 @@ void AGPCharacterBase::EquipHelmet(USkeletalMesh* HelmetMesh)
 	{
 		HelmetMeshComp = NewObject<USkeletalMeshComponent>(this);
 		HelmetMeshComp->RegisterComponent();
-		HelmetMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("HelmetSocket"));
+		HelmetMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
 	}
 
 	HelmetMeshComp->SetSkeletalMesh(HelmetMesh);
+	HelmetMeshComp->SetLeaderPoseComponent(GetMesh());
 }
 
 void AGPCharacterBase::UnequipHelmet()
@@ -438,9 +439,10 @@ void AGPCharacterBase::EquipChest(USkeletalMesh* ChestMesh)
 	{
 		ChestMeshComp = NewObject<USkeletalMeshComponent>(this);
 		ChestMeshComp->RegisterComponent();
-		ChestMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("ChestSocket"));
+		ChestMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
 	}
 	ChestMeshComp->SetSkeletalMesh(ChestMesh);
+	ChestMeshComp->SetLeaderPoseComponent(GetMesh());
 }
 
 void AGPCharacterBase::UnequipChest()
@@ -470,10 +472,11 @@ void AGPCharacterBase::EquipPants(USkeletalMesh* PantsMesh)
 	{
 		PantsMeshComp = NewObject<USkeletalMeshComponent>(this);
 		PantsMeshComp->RegisterComponent();
-		PantsMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("PantsSocket"));
+		PantsMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
 	}
 
 	PantsMeshComp->SetSkeletalMesh(PantsMesh);
+	PantsMeshComp->SetLeaderPoseComponent(GetMesh());
 }
 
 void AGPCharacterBase::UnequipPants()
