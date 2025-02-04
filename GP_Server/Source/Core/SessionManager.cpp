@@ -34,6 +34,7 @@ void SessionManager::HandleRecvBuffer(int32 id, int32 recvByte, ExpOver* expOver
 	while (dataSize > 0) {
 		int32 packetSize = packet[PKT_SIZE_INDEX];
 		if (packetSize <= dataSize) {
+			//Todo: 패킷 큐에 넣기 -> session_id랑 packet 쌍으로
 			PacketManager::GetInst().ProcessPacket(session, packet);
 			packet = packet + packetSize;
 			dataSize = dataSize - packetSize;

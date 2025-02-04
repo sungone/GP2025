@@ -196,7 +196,7 @@ void UGPGameInstance::AddPlayer(FInfoData& PlayerInfo, bool isMyPlayer)
 	if (World == nullptr)
 		return;
 
-	FVector SpawnLocation(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z);
+	FVector SpawnLocation(PlayerInfo.Pos);
 	FRotator SpawnRotation(0, PlayerInfo.Yaw, 0);
 
 	if (isMyPlayer)
@@ -205,10 +205,10 @@ void UGPGameInstance::AddPlayer(FInfoData& PlayerInfo, bool isMyPlayer)
 			return;
 
 		UE_LOG(LogTemp, Warning, TEXT("Add my player [%d] (%f,%f,%f)(%f)"),
-			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
+			PlayerInfo.ID, PlayerInfo.Pos.X, PlayerInfo.Pos.Y, PlayerInfo.Pos.Z, PlayerInfo.Yaw);
 
 		MyPlayer->SetCharacterInfoFromServer(PlayerInfo);
-		MyPlayer->SetActorLocation(FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z));
+		MyPlayer->SetActorLocation(PlayerInfo.Pos);
 
 		//// 여기서 다시 데미지를 넣어줘야 됬음
 		//MyPlayer->CharacterInfo.Damage = 50.f;
@@ -224,10 +224,10 @@ void UGPGameInstance::AddPlayer(FInfoData& PlayerInfo, bool isMyPlayer)
 		}
 
 		UE_LOG(LogTemp, Warning, TEXT("Add other player [%d] (%f,%f,%f)(%f)"),
-			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
+			PlayerInfo.ID, PlayerInfo.Pos.X, PlayerInfo.Pos.Y, PlayerInfo.Pos.Z, PlayerInfo.Yaw);
 
 		Player->SetCharacterInfoFromServer(PlayerInfo);
-		Player->SetActorLocation(FVector(PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z));
+		Player->SetActorLocation(PlayerInfo.Pos);
 
 		Players.Add(PlayerInfo.ID, Player);
 	}
@@ -252,7 +252,7 @@ void UGPGameInstance::UpdatePlayer(FInfoData& PlayerInfo)
 	{
 		(*Player)->SetCharacterInfoFromServer(PlayerInfo);
 		UE_LOG(LogTemp, Warning, TEXT("Update other player [%d] (%f,%f,%f)(%f)"),
-			PlayerInfo.ID, PlayerInfo.X, PlayerInfo.Y, PlayerInfo.Z, PlayerInfo.Yaw);
+			PlayerInfo.ID, PlayerInfo.Pos.X, PlayerInfo.Pos.Y, PlayerInfo.Pos.Z, PlayerInfo.Yaw);
 	}
 }
 
@@ -262,7 +262,7 @@ void UGPGameInstance::AddMonster(FInfoData& MonsterInfo)
 	if (World == nullptr)
 		return;
 
-	FVector SpawnLocation(MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z);
+	FVector SpawnLocation(MonsterInfo.Pos);
 	FRotator SpawnRotation(0, MonsterInfo.Yaw, 0);
 
 	FActorSpawnParameters SpawnParams;
@@ -280,11 +280,11 @@ void UGPGameInstance::AddMonster(FInfoData& MonsterInfo)
 	UE_LOG(LogTemp, Warning, TEXT("Spawned Monster [%d] at (%f, %f, %f) with rotation (%f)."),
 		MonsterInfo.ID, SpawnLocation.X, SpawnLocation.Y, SpawnLocation.Z, SpawnRotation.Yaw);
 
-	Monster->SetActorLocation(FVector(MonsterInfo.X, MonsterInfo.Y, MonsterInfo.Z));
+	Monster->SetActorLocation(MonsterInfo.Pos);
 	Monster->SetCharacterType(ECharacterType::M_MOUSE);
 	Monster->CharacterInfo = MonsterInfo;
-	Monster->Stat->SetMaxHp(MonsterInfo.MaxHp);
-	Monster->Stat->SetCurrentHp(MonsterInfo.Hp);
+	Monster->Stat->SetMaxHp(MonsterInfo.GetMaxHp());
+	Monster->Stat->SetCurrentHp(MonsterInfo.GetHp());
 	Monsters.Add(MonsterInfo.ID, Monster);
 }
 
@@ -312,9 +312,9 @@ void UGPGameInstance::UpdateMonster(FInfoData& MonsterInfo)
 		}
 
 		(*Monster)->CharacterInfo = MonsterInfo;
-		(*Monster)->Stat->SetMaxHp(MonsterInfo.MaxHp);
-		(*Monster)->Stat->SetCurrentHp(MonsterInfo.Hp);
-		(*Monster)->Stat->SetHp(MonsterInfo.Hp);
+		(*Monster)->Stat->SetMaxHp(MonsterInfo.GetMaxHp());
+		(*Monster)->Stat->SetCurrentHp(MonsterInfo.GetHp());
+		(*Monster)->Stat->SetHp(MonsterInfo.GetHp());
 		UE_LOG(LogTemp, Warning, TEXT("Update monster [%d]"), MonsterInfo.ID);
 	}
 }

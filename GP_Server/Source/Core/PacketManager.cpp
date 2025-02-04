@@ -61,7 +61,7 @@ void PacketManager::HandleMovePacket(Session& session, BYTE* packet)
 	auto& playerInfo = session.GetPlayerInfo();
 	int32 id = playerInfo.ID;
 	LOG(LogType::RecvLog, std::format("Move PKT [{}] ({:.2f}, {:.2f}, {:.2f} / Yaw: {:.2f}, State {})",
-		playerInfo.ID, playerInfo.X, playerInfo.Y, playerInfo.Z, playerInfo.Yaw, playerInfo.State));
+		playerInfo.ID, playerInfo.Pos.X, playerInfo.Pos.Y, playerInfo.Pos.Z, playerInfo.Yaw, playerInfo.State));
 
 	InfoPacket* p = reinterpret_cast<InfoPacket*>(packet);
 	playerInfo = p->Data;
@@ -71,7 +71,6 @@ void PacketManager::HandleMovePacket(Session& session, BYTE* packet)
 
 void PacketManager::HandleAttackPacket(Session& session, BYTE* packet)
 {
-	
 	auto& playerInfo = session.GetPlayerInfo();
 	int32 id = playerInfo.ID;
 	LOG(LogType::RecvLog, std::format("Attack PKT [{}]", id));

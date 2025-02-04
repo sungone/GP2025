@@ -102,6 +102,7 @@ void GameManager::StartMonsterStateBroadcast()
 void GameManager::BroadcastMonsterStates()
 {
 	std::lock_guard<std::mutex> lock(_carrMutex);
+	LOG(SendLog, std::format("Update monster"));
 
 	for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{
@@ -118,7 +119,6 @@ void GameManager::BroadcastMonsterStates()
 			FInfoData MonsterInfoData = monster->GetInfo();
 			MonsterInfoPacket packet(S_MONSTER_STATUS_UPDATE, MonsterInfoData);
 			SessionManager::GetInst().Broadcast(&packet);
-			LOG(SendLog, std::format("Update monster[{}]", monster->GetInfo().ID));
 		}
 	}
 }

@@ -149,9 +149,9 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 	const float AirThreshold = 10.f;
 	// 점프 후 착지를 안하고 플레이어가 계속 공중에 떠 있다면 떨어뜨리기 위해 패킷 전송
 	if (CharacterInfo.HasState(STATE_IDLE) && !CharacterInfo.HasState(STATE_JUMP) 
-		&& (LastSendPlayerInfo.Z - GroundZLocation) > AirThreshold)
+		&& (LastSendPlayerInfo.Pos.Z - GroundZLocation) > AirThreshold)
 	{
-		CharacterInfo.Z = GroundZLocation;
+		CharacterInfo.Pos.Z = GroundZLocation;
 		CharacterInfo.Speed = LastSendPlayerInfo.HasState(STATE_RUN) ? SprintSpeed : WalkSpeed;
 
 		GameInstance->SendPlayerMovePacket();

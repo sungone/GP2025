@@ -106,9 +106,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;SERVER_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\;$(SolutionDir)Source\Header;$(SolutionDir)Source\Common;$(SolutionDir)Source\GameObject;$(SolutionDir)Source\Core;$(SolutionDir)Source\Utils;$(SolutionDir)Source\DB;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;$(SolutionDir)Source\Header;$(SolutionDir)Source\Common;$(SolutionDir)Source\Game;$(SolutionDir)Source\Core;$(SolutionDir)Source\Utils;$(SolutionDir)Source\DB;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -148,14 +148,15 @@
     <ClInclude Include="Source\Common\Proto.h" />
     <ClInclude Include="Source\DB\DBConnection.h" />
     <ClInclude Include="Source\DB\DBConnectionPool.h" />
-    <ClInclude Include="Source\GameObject\Character.h" />
-    <ClInclude Include="Source\GameObject\GameManager.h" />
-    <ClInclude Include="Source\GameObject\Monster.h" />
-    <ClInclude Include="Source\GameObject\Player.h" />
+    <ClInclude Include="Source\Game\Character.h" />
+    <ClInclude Include="Source\Game\CollisionManager.h" />
+    <ClInclude Include="Source\Game\GameManager.h" />
+    <ClInclude Include="Source\Game\Monster.h" />
+    <ClInclude Include="Source\Game\Player.h" />
+    <ClInclude Include="Source\Game\TimerQueue.h" />
     <ClInclude Include="Source\pch.h" />
     <ClInclude Include="Source\Utils\Loger.h" />
     <ClInclude Include="Source\Utils\Timer.h" />
-    <ClInclude Include="TimerQueue.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Core\ExpOver.cpp" />
@@ -166,15 +167,16 @@
     <ClCompile Include="Source\Core\SessionManager.cpp" />
     <ClCompile Include="Source\DB\DBConnection.cpp" />
     <ClCompile Include="Source\DB\DBConnectionPool.cpp" />
-    <ClCompile Include="Source\GameObject\Character.cpp" />
-    <ClCompile Include="Source\GameObject\GameManager.cpp" />
-    <ClCompile Include="Source\GameObject\Monster.cpp" />
-    <ClCompile Include="Source\GameObject\Player.cpp" />
+    <ClCompile Include="Source\Game\Character.cpp" />
+    <ClCompile Include="Source\Game\CollisionManager.cpp" />
+    <ClCompile Include="Source\Game\GameManager.cpp" />
+    <ClCompile Include="Source\Game\Monster.cpp" />
+    <ClCompile Include="Source\Game\Player.cpp" />
+    <ClCompile Include="Source\Game\TimerQueue.cpp" />
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="TimerQueue.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -24,7 +24,6 @@ DEFINE_LOG_CATEGORY(LogGPCharacter);
 
 AGPCharacterBase::AGPCharacterBase()
 {
-
 	// 캐릭터 스켈레탈 매쉬 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/qudgus/chracter/mesh/main_man.main_man'"));
 	if (CharacterMeshRef.Object)
@@ -211,7 +210,7 @@ void AGPCharacterBase::Tick(float DeltaTime)
 
 	/// Other Client 위치 및 회전 동기화 ///
 	FVector Location = GetActorLocation();
-	FVector DestLocation = FVector(CharacterInfo.X, CharacterInfo.Y, CharacterInfo.Z);
+	FVector DestLocation = CharacterInfo.Pos;
 	float Speed = CharacterInfo.Speed;
 
 	FVector MoveDir = (DestLocation - Location);
@@ -304,24 +303,7 @@ void AGPCharacterBase::SetCharacterData(const UGPCharacterControlData* Character
 	// 애니메이션 몽타주 (Dead)
 	DeadMontage = CharacterData->DeadAnimMontage;
 
-	// 캐릭터 스탯 설정
-	CharacterInfo.MaxHp = CharacterData->MaxHp;
-	Stat->SetMaxHp(CharacterInfo.MaxHp);
-
-	CharacterInfo.Hp = CharacterInfo.MaxHp;
-	Stat->SetHp(CharacterInfo.Hp);
-
-	CharacterInfo.Damage = CharacterData->Attack;
-	Stat->SetDamage(CharacterInfo.Damage);
-
-	CharacterInfo.CrtRate = CharacterData->CrtRate;
-	Stat->SetCrtRate(CharacterInfo.CrtRate);
-
-	CharacterInfo.CrtValue = CharacterData->CrtValue;
-	Stat->SetCrtValue(CharacterInfo.CrtValue);
-
-	CharacterInfo.Dodge = CharacterData->Dodge;
-	Stat->SetDodge(CharacterInfo.Dodge);
+	// Todo: 캐릭터 스탯 설정-> 서버에서 받은거로
 }
 
 void AGPCharacterBase::SetCharacterType(ECharacterType NewCharacterType)
@@ -339,9 +321,9 @@ void AGPCharacterBase::AttackHitCheck()
 	FHitResult OutHitResult;
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
 	
-	const float AttackRange = 40.f;
-	const float AttackRadius = 50.f;
-	const float AttackDamage = CalculateDamage();
+	const float AttackRange = 100.f;
+	const float AttackRadius = 70.f;
+	const float AttackDamage = 0;
 
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
@@ -382,7 +364,7 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 			SpawnLocation, FRotator::ZeroRotator, SpawnParams);
 
 		bool isCrt = true;
-		if (AttackerCharacter->CharacterInfo.Damage == DamageAmount)
+		if (AttackerCharacter->CharacterInfo.GetDamage() == DamageAmount)
 			isCrt = false;
 
 		if (DamageText)
@@ -405,28 +387,6 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	}
 
 	return DamageAmount;
-}
-
-float AGPCharacterBase::CalculateDamage()
-{
-	std::uniform_real_distribution<float> dist(0.f, 1.f);
-	float RandomValue = dist(gen);
-	bool bIsDodge = RandomValue < CharacterInfo.Dodge;
-	if (bIsDodge)
-	{
-		return 0.f;
-	}
-
-	float BaseDamage = CharacterInfo.Damage;
-	float CrtRate = CharacterInfo.CrtRate;
-	float CrtValue = CharacterInfo.CrtValue;
-
-	RandomValue = dist(gen);
-
-	bool bIsCritical = RandomValue < CrtRate;
-
-	float FinalDamage = bIsCritical ? BaseDamage * CrtValue : BaseDamage;
-	return FinalDamage;
 }
 
 void AGPCharacterBase::SetupCharacterWidget(UGPUserWidget* InUserWidget)

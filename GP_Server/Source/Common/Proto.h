@@ -137,34 +137,104 @@ enum ECharacterStateType : uint8
 	STATE_WALK = 1 << 5,
 };
 
-struct FInfoData
+#ifdef SERVER_BUILD
+struct FVector
 {
-	int32 ID;
-	ECharacterType CharacterType;
-	float X;
-	float Y;
-	float Z;
-	float Yaw;
+	float X, Y, Z;
+
+	FVector() : X(0), Y(0), Z(0) {}
+	FVector(float x, float y, float z) : X(x), Y(y), Z(z) {}
+
+	float DistanceSquared(const FVector& Other) const
+	{
+		return (X - Other.X) * (X - Other.X) +
+			(Y - Other.Y) * (Y - Other.Y) +
+			(Z - Other.Z) * (Z - Other.Z);
+	}
+
+	bool IsInRange(const FVector& Other, float Range) const
+	{
+		return DistanceSquared(Other) <= (Range * Range);
+	}
+};
+#endif
+
+struct FStatData
+{
 	float MaxHp;
 	float Hp;
 	float Damage;
 	float CrtRate;
 	float CrtValue;
 	float Dodge;
+
+	FStatData()
+		: MaxHp(100.0f), Hp(100.0f), Damage(10.0f),
+		CrtRate(0.1f), CrtValue(1.5f), Dodge(0.1f) {
+	}
+
+#ifdef SERVER_BUILD
+	void SetHp(float NewHp) { Hp = std::clamp(NewHp, 0.0f, MaxHp); }
+	void SetMaxHp(float NewMaxHp) { MaxHp = std::max(0.0f, NewMaxHp); }
+	void TakeDamage(float Amount) { SetHp(Hp - Amount); }
+	void Heal(float Amount) { SetHp(Hp + Amount); }
+
+	bool IsDead() const { return Hp <= 0; }
+#endif
+};
+
+struct FInfoData
+{
+	int32 ID;
+	ECharacterType CharacterType;
+
+	FVector Pos;
+	float Yaw;
+	float CollisionRadius;
+	float AttackRange;
+
+	FStatData Stats;
 	float Speed;
 	uint32 State;
 
-	void SetLocation(float X_, float Y_, float Z_)
+	void InitStats(float MaxHp, float Damage, float CrtRate, float CrtValue, float Dodge, float Speed_)
 	{
-		X = X_;
-		Y = Y_;
-		Z = Z_;
-	};
+		Stats.MaxHp = MaxHp;
+		Stats.Hp = MaxHp;
+		Stats.Damage = Damage;
+		Stats.CrtRate = CrtRate;
+		Stats.CrtValue = CrtValue;
+		Stats.Dodge = Dodge;
+		Speed = Speed_;
+		State = STATE_IDLE;
+	}
 
+	void SetLocation(float X_, float Y_, float Z_) { Pos = FVector(X_, Y_, Z_); }
 	void AddState(ECharacterStateType NewState) { State |= NewState; }
 	void RemoveState(ECharacterStateType RemoveState) { State &= ~RemoveState; }
 	bool HasState(ECharacterStateType CheckState) const { return (State & CheckState) != 0; }
+
+	float GetHp() const { return Stats.Hp; }
+	float GetMaxHp() const { return Stats.MaxHp; }
+	float GetDamage() const { return Stats.Damage; }
+	float GetCrtRate() const { return Stats.CrtRate; }
+	float GetCrtValue() const { return Stats.CrtValue; }
+	float GetDodge() const { return Stats.Dodge; }
+
+#ifdef SERVER_BUILD
+	void SetHp(float NewHp) { Stats.SetHp(NewHp); }
+	void Heal(float Amount) { Stats.Heal(Amount); }
+	void TakeDamage(float Damage) { Stats.TakeDamage(Damage); }
+	void SetDamage(float NewDamage) { Stats.Damage = std::max(0.0f, NewDamage); }
+	bool IsDead() const { return Stats.IsDead(); }
+	bool IsInAttackRange(const FInfoData& Target) const
+	{
+		return Pos.IsInRange(Target.Pos, AttackRange + Target.CollisionRadius);
+	}
+#endif
+
 };
+
 
 struct FAttackData
 {
@@ -183,13 +253,15 @@ struct Packet
 		uint8_t PacketSize;
 
 		PacketHeader(EPacketType type, uint8_t size)
-			: PacketType(type), PacketSize(size) {}
+			: PacketType(type), PacketSize(size) {
+		}
 	};
 
 	PacketHeader Header;
 
 	Packet(EPacketType type)
-		: Header(type, sizeof(PacketHeader)) {}
+		: Header(type, sizeof(PacketHeader)) {
+	}
 };
 
 template<typename T>

@@ -1,4 +1,5 @@
 #pragma once
+#define NOMINMAX
 #include <WS2tcpip.h>
 #include <MSWSock.h>
 #pragma comment(lib, "WS2_32.lib")
@@ -17,6 +18,7 @@
 #include <random>
 #include <sqlext.h>
 #include <chrono>
+#include <algorithm>
 
 #include "Proto.h"
 #include "Loger.h"

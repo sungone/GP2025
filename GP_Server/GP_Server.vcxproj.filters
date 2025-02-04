@@ -40,6 +40,12 @@
     <Filter Include="Source Files\Network\IOCP">
       <UniqueIdentifier>{fae4c54b-3902-48a0-9f6b-e04620347384}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Game\Timer">
+      <UniqueIdentifier>{51b495f3-3a90-4b27-849d-85a68ddde618}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\GameManager">
+      <UniqueIdentifier>{bd1d6e82-bb96-43a4-90bc-30181f976c65}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Common\Proto.h">
@@ -60,20 +66,8 @@
     <ClInclude Include="Source\Core\PacketManager.h">
       <Filter>Source Files\Network\Packet</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\Character.h">
-      <Filter>Source Files\Game\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameObject\Monster.h">
-      <Filter>Source Files\Game\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameObject\Player.h">
-      <Filter>Source Files\Game\Character</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Utils\Timer.h">
       <Filter>Source Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameObject\GameManager.h">
-      <Filter>Source Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="Source\pch.h">
       <Filter>Header Files</Filter>
@@ -90,8 +84,23 @@
     <ClInclude Include="Source\Core\IOCP.h">
       <Filter>Source Files\Network\IOCP</Filter>
     </ClInclude>
-    <ClInclude Include="TimerQueue.h">
-      <Filter>Source Files\Utils</Filter>
+    <ClInclude Include="Source\Game\Character.h">
+      <Filter>Source Files\Game\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\Monster.h">
+      <Filter>Source Files\Game\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\Player.h">
+      <Filter>Source Files\Game\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\TimerQueue.h">
+      <Filter>Source Files\Game\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\CollisionManager.h">
+      <Filter>Source Files\Game\GameManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\GameManager.h">
+      <Filter>Source Files\Game\GameManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -106,18 +115,6 @@
     </ClCompile>
     <ClCompile Include="Source\Core\PacketManager.cpp">
       <Filter>Source Files\Network\Packet</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GameObject\Character.cpp">
-      <Filter>Source Files\Game\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GameObject\Monster.cpp">
-      <Filter>Source Files\Game\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GameObject\Player.cpp">
-      <Filter>Source Files\Game\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GameObject\GameManager.cpp">
-      <Filter>Source Files\Game</Filter>
     </ClCompile>
     <ClCompile Include="Source\pch.cpp">
       <Filter>Header Files</Filter>
@@ -137,8 +134,23 @@
     <ClCompile Include="Source\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TimerQueue.cpp">
-      <Filter>Source Files\Utils</Filter>
+    <ClCompile Include="Source\Game\Character.cpp">
+      <Filter>Source Files\Game\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Monster.cpp">
+      <Filter>Source Files\Game\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Player.cpp">
+      <Filter>Source Files\Game\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\TimerQueue.cpp">
+      <Filter>Source Files\Game\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\CollisionManager.cpp">
+      <Filter>Source Files\Game\GameManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\GameManager.cpp">
+      <Filter>Source Files\Game\GameManager</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -15,7 +15,6 @@ void Monster::Init()
 
 void Monster::Update()
 {
-   // std::lock_guard<std::mutex> lock(_cMutex);
     switch (_info.State)
     {
     case ECharacterStateType::STATE_IDLE:
@@ -55,10 +54,6 @@ void Monster::ChangeState(ECharacterStateType newState)
 
     if (_info.State != newState)
     {
-        LOG(Log, std::format("monster [{}] - state from {} to {}",
-            _info.ID,
-            static_cast<uint32_t>(_info.State),
-            static_cast<uint32_t>(newState)));
         _info.State = newState;
         _info.State = static_cast<uint32_t>(_info.State);
     }
@@ -72,17 +67,16 @@ bool Monster::ShouldStartWalking()
     static std::uniform_real_distribution<float> distY(-1000.0f, 1000.0f); 
     if (dist(gen) == 0)
     {
-        float newX = _info.X + distX(gen);
-        float newY = _info.Y + distY(gen);
+        float newX = _info.Pos.X + distX(gen);
+        float newY = _info.Pos.Y + distY(gen);
 
-        float deltaX = newX - _info.X;
-        float deltaY = newY - _info.Y;
+        float deltaX = newX - _info.Pos.X;
+        float deltaY = newY - _info.Pos.Y;
         float newYaw = std::atan2(deltaY, deltaX) * (180.0f / 3.14159265f); 
 
-        _info.SetLocation(newX, newY, _info.Z);
+        _info.SetLocation(newX, newY, _info.Pos.Z);
         _info.Yaw = newYaw;
 
-        LOG(Log, std::format("Monster move ({}, {}, {})", newX, newY, _info.Z));
         return true;
     }
     

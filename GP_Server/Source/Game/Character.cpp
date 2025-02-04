@@ -4,32 +4,24 @@
 void Character::Init()
 {
 	SetBunkerRandomLocation();
-	_info.MaxHp = 100.f;
-	_info.Hp = _info.MaxHp;
-	_info.Damage = 50.f;
-	_info.CrtRate = 0.25f;
-	_info.CrtValue = 1.5f;
-	_info.Dodge = 0.25f;
-	_info.Speed = 200.f;
-	_info.State = ECharacterStateType::STATE_IDLE;
+	_info.InitStats(
+		100.f,    // MaxHp
+		50.f,     // Damage
+		0.25f,    // CrtRate
+		1.5f,     // CrtValue
+		0.25f,    // Dodge
+		200.f     // Speed
+	);
 }
 
 bool Character::IsDead()
 {
-	return (_info.Hp <= 0);
+	return _info.IsDead();
 }
 
 void Character::OnDamaged(float damage)
 {
-	auto& hp = _info.Hp;
-
-
-	if ((hp - damage) <= 0)
-		hp = 0;
-	else
-	{
-		hp -= damage;
-	}
+	_info.TakeDamage(damage);
 }
 
 void Character::SetBunkerRandomLocation()
