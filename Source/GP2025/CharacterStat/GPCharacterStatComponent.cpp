@@ -8,15 +8,15 @@ UGPCharacterStatComponent::UGPCharacterStatComponent()
 {
 	MaxHp = 100.f;
 	Attack = 50.f;
-	CurrentHp = MaxHp;
+	CurrentHp = 50.f;
 	MaxExp = 100.f;
+	CurrentExp = 0.f;
 }
 
 // Called when the game starts
 void UGPCharacterStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	CurrentHp = MaxHp;
 }
 
 float UGPCharacterStatComponent::ApplyDamage(float InDamage)
@@ -31,6 +31,20 @@ float UGPCharacterStatComponent::ApplyDamage(float InDamage)
 	}
 
 	return ActualDamage;
+}
+
+float UGPCharacterStatComponent::AddHp(float Hp)
+{
+	const float PrevHp = CurrentHp;
+	const float ActualHp = FMath::Clamp<float>(Hp, 0, Hp);
+
+	SetHp(PrevHp + ActualHp);
+	if (CurrentHp >= MaxHp)
+	{
+		CurrentHp = MaxHp;
+	}
+
+	return ActualHp;
 }
 
 void UGPCharacterStatComponent::SetHp(float NewHp)

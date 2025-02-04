@@ -13,10 +13,13 @@
 #include "UI/GPHpBarWidget.h"
 #include "UI/GPExpBarWidget.h"
 #include "UI/GPFloatingDamageText.h"
+#include "Item/GPEquipItemData.h"
 
 #include <random>
 static std::random_device rd;
 static std::mt19937 gen(rd());
+
+DEFINE_LOG_CATEGORY(LogGPCharacter);
 
 AGPCharacterBase::AGPCharacterBase()
 {
@@ -121,7 +124,7 @@ AGPCharacterBase::AGPCharacterBase()
 	// Widget Component
 	HpBar = CreateDefaultSubobject<UGPWidgetComponent>(TEXT("HpWidget"));
 	HpBar->SetupAttachment(GetMesh());
-	HpBar->SetRelativeLocation(FVector(0.f, 0.f, 300.f));
+	HpBar->SetRelativeLocation(FVector(0.f, 0.f, 250.f));
 	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/UI/WBP_CharacterHpBar.WBP_CharacterHpBar_C"));
 	if (HpBarWidgetRef.Class)
 	{
@@ -133,7 +136,7 @@ AGPCharacterBase::AGPCharacterBase()
 
 	ExpBar = CreateDefaultSubobject<UGPWidgetComponent>(TEXT("ExpWidget"));
 	ExpBar->SetupAttachment(GetMesh());
-	ExpBar->SetRelativeLocation(FVector(0.f, 0.f, 310.f));
+	ExpBar->SetRelativeLocation(FVector(0.f, 0.f, 258.f));
 	static ConstructorHelpers::FClassFinder<UUserWidget> ExpBarWidgetRef(TEXT("/Game/UI/WBP_ExpBar.WBP_ExpBar_C"));
 	if (ExpBarWidgetRef.Class)
 	{
@@ -142,6 +145,20 @@ AGPCharacterBase::AGPCharacterBase()
 		ExpBar->SetDrawSize(FVector2D(150.f, 15.f));
 		ExpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+
+	// Item Actions
+	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterBase::EquipHelmet)));
+	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterBase::EquipChest)));
+	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterBase::DrinkPotion)));
+	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterBase::AddExp)));
+
+	// Weapon Component
+	Chest = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Chest"));
+	Chest->SetupAttachment(GetMesh(), TEXT("ChestSocket"));
+
+	Helmet = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Helmet"));
+	Helmet->SetupAttachment(GetMesh(), TEXT("HelmetSocket"));
+
 }
 
 void AGPCharacterBase::BeginPlay()
@@ -434,128 +451,177 @@ void AGPCharacterBase::PlayDeadAnimation()
 	AnimInstance->Montage_Play(DeadMontage, 1.f);
 }
 
-void AGPCharacterBase::EquipHelmet(USkeletalMesh* HelmetMesh)
+// Item System
+/////////////////////////////////////////////////////////////
+
+void AGPCharacterBase::TakeItem(UGPItemData* InItemData)
 {
-	if (!GetMesh() || !HelmetMesh) return;
-
-	if (!HelmetMeshComp)
+	if (InItemData)
 	{
-		HelmetMeshComp = NewObject<USkeletalMeshComponent>(this);
-		HelmetMeshComp->RegisterComponent();
-		HelmetMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	}
-
-	HelmetMeshComp->SetSkeletalMesh(HelmetMesh);
-	HelmetMeshComp->SetLeaderPoseComponent(GetMesh());
-}
-
-void AGPCharacterBase::UnequipHelmet()
-{
-	if (HelmetMeshComp)
-	{
-		HelmetMeshComp->DestroyComponent();
-		HelmetMeshComp = nullptr;
+		TakeItemActions[(uint8)InItemData->Type].ItemDelegate.ExecuteIfBound(InItemData);
 	}
 }
 
-void AGPCharacterBase::EquipChest(USkeletalMesh* ChestMesh)
+void AGPCharacterBase::DrinkPotion(UGPItemData* InItemData)
 {
-	if (!GetMesh() || !ChestMesh) return;
-
-	if (!ChestMeshComp)
-	{
-		ChestMeshComp = NewObject<USkeletalMeshComponent>(this);
-		ChestMeshComp->RegisterComponent();
-		ChestMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	}
-	ChestMeshComp->SetSkeletalMesh(ChestMesh);
-	ChestMeshComp->SetLeaderPoseComponent(GetMesh());
+	UE_LOG(LogGPCharacter, Log, TEXT("Drink Potion"));
+	Stat->AddHp(10.f);
 }
 
-void AGPCharacterBase::UnequipChest()
+void AGPCharacterBase::EquipChest(UGPItemData* InItemData)
 {
-	if (ChestMeshComp)
+	UE_LOG(LogGPCharacter, Log, TEXT("Equip Chest"));
+	UGPEquipItemData* ChestItemData = Cast<UGPEquipItemData>(InItemData);
+	if (ChestItemData)
 	{
-		ChestMeshComp->DestroyComponent();
-		ChestMeshComp = nullptr;
+		Chest->SetSkeletalMesh(ChestItemData->EquipMesh);
 	}
 }
 
-void AGPCharacterBase::EquipWeapon(USkeletalMesh* WeaponMesh)
+void AGPCharacterBase::EquipHelmet(UGPItemData* InItemData)
 {
-	 
-}
-
-void AGPCharacterBase::UnequipWeapon()
-{
-
-}
-
-void AGPCharacterBase::EquipPants(USkeletalMesh* PantsMesh)
-{
-	if (!GetMesh() || !PantsMesh) return;
-
-	if (!PantsMeshComp)
+	UE_LOG(LogGPCharacter, Log, TEXT("Equip Helmet"));
+	UGPEquipItemData* HelmetItemData = Cast<UGPEquipItemData>(InItemData);
+	if (HelmetItemData)
 	{
-		PantsMeshComp = NewObject<USkeletalMeshComponent>(this);
-		PantsMeshComp->RegisterComponent();
-		PantsMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	}
-
-	PantsMeshComp->SetSkeletalMesh(PantsMesh);
-	PantsMeshComp->SetLeaderPoseComponent(GetMesh());
-}
-
-void AGPCharacterBase::UnequipPants()
-{
-	if (PantsMeshComp)
-	{
-		PantsMeshComp->DestroyComponent();
-		PantsMeshComp = nullptr;
+		Helmet->SetSkeletalMesh(HelmetItemData->EquipMesh);
 	}
 }
 
-void AGPCharacterBase::EquipItemFromDataAsset(UGPCharacterControlData* CharacterData)
+void AGPCharacterBase::AddExp(UGPItemData* InItemData)
 {
-	if (!CharacterData) return;
-
-	if (CharacterData->HelmetMesh)
-	{
-		EquipHelmet(CharacterData->HelmetMesh);
-	}
-	else
-	{
-		UnequipHelmet();
-	}
-
-	if (CharacterData->ChestMesh)
-	{
-		EquipChest(CharacterData->ChestMesh);
-	}
-	else
-	{
-		UnequipChest();
-	}
-
-	if (CharacterData->WeaponMesh)
-	{
-		EquipWeapon(CharacterData->WeaponMesh);
-	}
-	else
-	{
-		UnequipWeapon();
-	}
-
-	if (CharacterData->PantsMesh)
-	{
-		EquipPants(CharacterData->PantsMesh);
-	}
-	else
-	{
-		UnequipPants();
-	}
-
-	UE_LOG(LogTemp, Log, TEXT("Equipped!!!"));
+	UE_LOG(LogGPCharacter, Log, TEXT("Add Exp"));
+	Stat->AddExp(10.f);
 }
 
+/////////////////////////////////////////////////////////////////
 
+
+
+
+///////////////////////////////////////////////////
+//void AGPCharacterBase::EquipHelmet(USkeletalMesh* HelmetMesh)
+//{
+//	if (!GetMesh() || !HelmetMesh) return;
+//
+//	if (!HelmetMeshComp)
+//	{
+//		HelmetMeshComp = NewObject<USkeletalMeshComponent>(this);
+//		HelmetMeshComp->RegisterComponent();
+//		HelmetMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+//	}
+//
+//	HelmetMeshComp->SetSkeletalMesh(HelmetMesh);
+//	HelmetMeshComp->SetLeaderPoseComponent(GetMesh());
+//}
+//
+//void AGPCharacterBase::UnequipHelmet()
+//{
+//	if (HelmetMeshComp)
+//	{
+//		HelmetMeshComp->DestroyComponent();
+//		HelmetMeshComp = nullptr;
+//	}
+//}
+//
+//void AGPCharacterBase::EquipChest(USkeletalMesh* ChestMesh)
+//{
+//	if (!GetMesh() || !ChestMesh) return;
+//
+//	if (!ChestMeshComp)
+//	{
+//		ChestMeshComp = NewObject<USkeletalMeshComponent>(this);
+//		ChestMeshComp->RegisterComponent();
+//		ChestMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+//	}
+//	ChestMeshComp->SetSkeletalMesh(ChestMesh);
+//	ChestMeshComp->SetLeaderPoseComponent(GetMesh());
+//}
+//
+//void AGPCharacterBase::UnequipChest()
+//{
+//	if (ChestMeshComp)
+//	{
+//		ChestMeshComp->DestroyComponent();
+//		ChestMeshComp = nullptr;
+//	}
+//}
+//
+//void AGPCharacterBase::EquipWeapon(USkeletalMesh* WeaponMesh)
+//{
+//	 
+//}
+//
+//void AGPCharacterBase::UnequipWeapon()
+//{
+//
+//}
+//
+//void AGPCharacterBase::EquipPants(USkeletalMesh* PantsMesh)
+//{
+//	if (!GetMesh() || !PantsMesh) return;
+//
+//	if (!PantsMeshComp)
+//	{
+//		PantsMeshComp = NewObject<USkeletalMeshComponent>(this);
+//		PantsMeshComp->RegisterComponent();
+//		PantsMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+//	}
+//
+//	PantsMeshComp->SetSkeletalMesh(PantsMesh);
+//	PantsMeshComp->SetLeaderPoseComponent(GetMesh());
+//}
+//
+//void AGPCharacterBase::UnequipPants()
+//{
+//	if (PantsMeshComp)
+//	{
+//		PantsMeshComp->DestroyComponent();
+//		PantsMeshComp = nullptr;
+//	}
+//}
+//
+//void AGPCharacterBase::EquipItemFromDataAsset(UGPCharacterControlData* CharacterData)
+//{
+//	if (!CharacterData) return;
+//
+//	if (CharacterData->HelmetMesh)
+//	{
+//		EquipHelmet(CharacterData->HelmetMesh);
+//	}
+//	else
+//	{
+//		UnequipHelmet();
+//	}
+//
+//	if (CharacterData->ChestMesh)
+//	{
+//		EquipChest(CharacterData->ChestMesh);
+//	}
+//	else
+//	{
+//		UnequipChest();
+//	}
+//
+//	if (CharacterData->WeaponMesh)
+//	{
+//		EquipWeapon(CharacterData->WeaponMesh);
+//	}
+//	else
+//	{
+//		UnequipWeapon();
+//	}
+//
+//	if (CharacterData->PantsMesh)
+//	{
+//		EquipPants(CharacterData->PantsMesh);
+//	}
+//	else
+//	{
+//		UnequipPants();
+//	}
+//
+//	UE_LOG(LogTemp, Log, TEXT("Equipped!!!"));
+//}
+//
+//

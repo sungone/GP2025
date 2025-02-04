@@ -37,6 +37,7 @@ public :
 	FORCEINLINE float GetMaxHp() { return MaxHp; }
 	FORCEINLINE float GetCurrentHp() { return CurrentHp; }
 	float ApplyDamage(float InDamage);
+	float AddHp(float Hp);
 
 	FORCEINLINE float GetDamage() { return Attack; }
 	FORCEINLINE void SetDamage(float attack) { Attack = attack; }

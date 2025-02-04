@@ -6,12 +6,23 @@
 #include "GameFramework/Character.h"
 #include "Interface/GPAnimationAttackInterface.h"
 #include "Interface/GPCharacterWidgetInterface.h"
+#include "Interface/GPCharacterItemInterface.h"
 #include "../../GP_Server/Source/Common/Proto.h"
 #include "GPCharacterBase.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogGPCharacter, Log, All);
+DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, class UGPItemData*);
+USTRUCT(BlueprintType)
+struct FTakeItemDelegateWrapper
+{
+	GENERATED_BODY()
+	FTakeItemDelegateWrapper() {}
+	FTakeItemDelegateWrapper(const FOnTakeItemDelegate& InItemDelegate) : ItemDelegate(InItemDelegate) {}
+	FOnTakeItemDelegate ItemDelegate;
+};
 
 UCLASS()
-class GP2025_API AGPCharacterBase : public ACharacter , public IGPAnimationAttackInterface ,public IGPCharacterWidgetInterface
+class GP2025_API AGPCharacterBase : public ACharacter , public IGPAnimationAttackInterface ,public IGPCharacterWidgetInterface , public IGPCharacterItemInterface
 {
 	GENERATED_BODY()
 
@@ -74,31 +85,53 @@ public :
 	TObjectPtr<class UAnimMontage> DeadMontage;
 	float DeadEventDelayTime = 0.5f;
 
+
+// Item Section
+protected :
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment" , Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class USkeletalMeshComponent> Chest;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class USkeletalMeshComponent> Helmet;
+
+	UPROPERTY()
+	TArray<FTakeItemDelegateWrapper> TakeItemActions;
+
+	virtual void TakeItem(class UGPItemData* InItemData) override;
+	virtual void DrinkPotion(class UGPItemData* InItemData);
+	virtual void EquipChest(class UGPItemData* InItemData);
+	virtual void EquipHelmet(class UGPItemData* InItemData);
+	virtual void AddExp(class UGPItemData* InItemData);
+
+
 // Equip Item Section
 public : 
-	void EquipHelmet(USkeletalMesh* HelmetMesh);
-	void UnequipHelmet();
+	//void EquipHelmet(USkeletalMesh* HelmetMesh);
+	//void UnequipHelmet();
 
-	void EquipChest(USkeletalMesh* ChestMesh);
-	void UnequipChest();
+	//void EquipChest(USkeletalMesh* ChestMesh);
+	//void UnequipChest();
 
-	void EquipWeapon(USkeletalMesh* WeaponMesh);
-	void UnequipWeapon();
+	//void EquipWeapon(USkeletalMesh* WeaponMesh);
+	//void UnequipWeapon();
 
-	void EquipPants(USkeletalMesh* PantsMesh);
-	void UnequipPants();
+	//void EquipPants(USkeletalMesh* PantsMesh);
+	//void UnequipPants();
 
-	void EquipItemFromDataAsset(UGPCharacterControlData* CharacterData);
+	//void EquipItemFromDataAsset(UGPCharacterControlData* CharacterData);
 
-	UPROPERTY(VisibleAnywhere, Category = "Equip")
-	TObjectPtr<USkeletalMeshComponent> HelmetMeshComp;
+	//UPROPERTY(VisibleAnywhere, Category = "Equip")
+	//TObjectPtr<USkeletalMeshComponent> HelmetMeshComp;
 
-	UPROPERTY(VisibleAnywhere, Category = "Equip")
-	TObjectPtr<USkeletalMeshComponent> ChestMeshComp;
+	//UPROPERTY(VisibleAnywhere, Category = "Equip")
+	//TObjectPtr<USkeletalMeshComponent> ChestMeshComp;
 
-	UPROPERTY(VisibleAnywhere, Category = "Equip")
-	TObjectPtr<USkeletalMeshComponent> WeaponMeshComp;
+	//UPROPERTY(VisibleAnywhere, Category = "Equip")
+	//TObjectPtr<USkeletalMeshComponent> WeaponMeshComp;
 
-	UPROPERTY(VisibleAnywhere, Category = "Equip")
-	TObjectPtr<USkeletalMeshComponent> PantsMeshComp;
+	//UPROPERTY(VisibleAnywhere, Category = "Equip")
+	//TObjectPtr<USkeletalMeshComponent> PantsMeshComp;
+
+
 };
