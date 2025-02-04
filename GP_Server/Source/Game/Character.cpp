@@ -29,6 +29,8 @@ void Character::SetBunkerRandomLocation()
 	static std::default_random_engine dre;
 	static std::uniform_real_distribution<float> ud_x(-3000, -1000);
 	static std::uniform_real_distribution<float> ud_y(-3500, -1500);
+	static std::uniform_real_distribution<float> ud_yaw(-180.0f, 180.0f);
 
 	_info.SetLocation(ud_x(dre), ud_y(dre), 116);
+	_info.Yaw = ud_yaw(dre);
 }

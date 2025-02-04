@@ -89,9 +89,9 @@ void UGPGameInstance::SendPlayerAttackPacket()
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(InfoPacket), BytesSent);
 }
 
-void UGPGameInstance::SendPlayerAttackPacket(FInfoData& Attacked , float AttackerDamage)
+void UGPGameInstance::SendPlayerAttackPacket(FInfoData& Attacked, float AttackerDamage)
 {
-	AttackPacket Packet(EPacketType::C_ATTACK, { MyPlayer->CharacterInfo, Attacked , AttackerDamage});
+	AttackPacket Packet(EPacketType::C_ATTACK, { MyPlayer->CharacterInfo, Attacked , AttackerDamage });
 	int32 BytesSent = 0;
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(AttackPacket), BytesSent);
 }
@@ -207,12 +207,9 @@ void UGPGameInstance::AddPlayer(FInfoData& PlayerInfo, bool isMyPlayer)
 		UE_LOG(LogTemp, Warning, TEXT("Add my player [%d] (%f,%f,%f)(%f)"),
 			PlayerInfo.ID, PlayerInfo.Pos.X, PlayerInfo.Pos.Y, PlayerInfo.Pos.Z, PlayerInfo.Yaw);
 
-		MyPlayer->SetCharacterInfoFromServer(PlayerInfo);
-		MyPlayer->SetActorLocation(PlayerInfo.Pos);
-
-		//// 여기서 다시 데미지를 넣어줘야 됬음
-		//MyPlayer->CharacterInfo.Damage = 50.f;
-
+		MyPlayer->SetCharacterInfo(PlayerInfo);
+		MyPlayer->SetCharacterStats();
+		MyPlayer->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
 		Players.Add(PlayerInfo.ID, MyPlayer);
 	}
 	else
@@ -226,9 +223,9 @@ void UGPGameInstance::AddPlayer(FInfoData& PlayerInfo, bool isMyPlayer)
 		UE_LOG(LogTemp, Warning, TEXT("Add other player [%d] (%f,%f,%f)(%f)"),
 			PlayerInfo.ID, PlayerInfo.Pos.X, PlayerInfo.Pos.Y, PlayerInfo.Pos.Z, PlayerInfo.Yaw);
 
-		Player->SetCharacterInfoFromServer(PlayerInfo);
-		Player->SetActorLocation(PlayerInfo.Pos);
-
+		Player->SetCharacterInfo(PlayerInfo);
+		Player->SetCharacterStats();
+		Player->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
 		Players.Add(PlayerInfo.ID, Player);
 	}
 }
@@ -250,7 +247,7 @@ void UGPGameInstance::UpdatePlayer(FInfoData& PlayerInfo)
 	auto Player = Players.Find(PlayerInfo.ID);
 	if (Player)
 	{
-		(*Player)->SetCharacterInfoFromServer(PlayerInfo);
+		(*Player)->SetCharacterInfo(PlayerInfo);
 		UE_LOG(LogTemp, Warning, TEXT("Update other player [%d] (%f,%f,%f)(%f)"),
 			PlayerInfo.ID, PlayerInfo.Pos.X, PlayerInfo.Pos.Y, PlayerInfo.Pos.Z, PlayerInfo.Yaw);
 	}
@@ -280,11 +277,10 @@ void UGPGameInstance::AddMonster(FInfoData& MonsterInfo)
 	UE_LOG(LogTemp, Warning, TEXT("Spawned Monster [%d] at (%f, %f, %f) with rotation (%f)."),
 		MonsterInfo.ID, SpawnLocation.X, SpawnLocation.Y, SpawnLocation.Z, SpawnRotation.Yaw);
 
-	Monster->SetActorLocation(MonsterInfo.Pos);
-	Monster->SetCharacterType(ECharacterType::M_MOUSE);
-	Monster->CharacterInfo = MonsterInfo;
-	Monster->Stat->SetMaxHp(MonsterInfo.GetMaxHp());
-	Monster->Stat->SetCurrentHp(MonsterInfo.GetHp());
+	Monster->SetCharacterInfo(MonsterInfo);
+	Monster->SetCharacterStats();
+	Monster->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
+	Monster->SetCharacterType(MonsterInfo.CharacterType);
 	Monsters.Add(MonsterInfo.ID, Monster);
 }
 
@@ -310,11 +306,7 @@ void UGPGameInstance::UpdateMonster(FInfoData& MonsterInfo)
 			(*Monster)->SetDead();
 			return;
 		}
-
-		(*Monster)->CharacterInfo = MonsterInfo;
-		(*Monster)->Stat->SetMaxHp(MonsterInfo.GetMaxHp());
-		(*Monster)->Stat->SetCurrentHp(MonsterInfo.GetHp());
-		(*Monster)->Stat->SetHp(MonsterInfo.GetHp());
+		(*Monster)->SetCharacterInfo(MonsterInfo);
 		UE_LOG(LogTemp, Warning, TEXT("Update monster [%d]"), MonsterInfo.ID);
 	}
 }

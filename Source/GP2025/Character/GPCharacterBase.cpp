@@ -21,65 +21,58 @@ static std::random_device rd;
 static std::mt19937 gen(rd());
 
 DEFINE_LOG_CATEGORY(LogGPCharacter);
+namespace
+{
+	template <typename T>
+	T* LoadAsset(const FString& Path)
+	{
+		static ConstructorHelpers::FObjectFinder<T> AssetRef(*Path);
+		return AssetRef.Object;
+	}
 
+	template <typename T>
+	TSubclassOf<T> LoadClass(const FString& Path)
+	{
+		static ConstructorHelpers::FClassFinder<T> ClassRef(*Path);
+		return ClassRef.Class;
+	}
+}
 AGPCharacterBase::AGPCharacterBase()
 {
-	// 캐릭터 스켈레탈 매쉬 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/qudgus/chracter/mesh/main_man.main_man'"));
-	if (CharacterMeshRef.Object)
-	{
-		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
-	}
+	// 캐릭터 스켈레탈 메시
+    GetMesh()->SetSkeletalMesh(LoadAsset<USkeletalMesh>(TEXT("/Game/qudgus/chracter/mesh/main_man.main_man")));
 
-	// 캐릭터 애니메이션 블루프린트
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Animation/P_Warrior/ABP_Warrior.ABP_Warrior_C"));
-	if (AnimInstanceClassRef.Class)
-	{
-		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
-	}
+    // 캐릭터 애니메이션 블루프린트
+    GetMesh()->SetAnimInstanceClass(LoadClass<UAnimInstance>(TEXT("/Game/Animation/P_Warrior/ABP_Warrior.ABP_Warrior_C")));
 
-	// 캐릭터 애니메이션 몽타주
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> AutoAttackMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/P_Warrior/AM_Attack.AM_Attack'"));
-	if (AutoAttackMontageRef.Object)
-	{
-		AttackActionMontage = AutoAttackMontageRef.Object;
-	}
+    // 캐릭터 애니메이션 몽타주
+    AttackActionMontage = LoadAsset<UAnimMontage>(TEXT("/Game/Animation/P_Warrior/AM_Attack.AM_Attack"));
+    DeadMontage = LoadAsset<UAnimMontage>(TEXT("/Game/Animation/P_Warrior/AM_Dead.AM_Dead"));
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/P_Warrior/AM_Dead.AM_Dead'"));
-	if (DeadMontageRef.Object)
-	{
-		DeadMontage = DeadMontageRef.Object;
-	}
+    // 폰 회전 설정
+    bUseControllerRotationPitch = false;
+    bUseControllerRotationYaw = false;
+    bUseControllerRotationRoll = false;
 
-	// 폰 회전을 컨트롤러 회전과 똑같이 사용
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
-	bUseControllerRotationRoll = false;
+    // 캡슐 컴포넌트 설정
+    GetCapsuleComponent()->InitCapsuleSize(42.f, 96.f);
+    GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_GPCAPSULE);
 
-	// 캡슐 컴포넌트 설정
-	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.f);
-	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_GPCAPSULE);
+    // 무브먼트 컴포넌트 설정
+    auto* MovementComp = GetCharacterMovement();
+    MovementComp->bOrientRotationToMovement = true;
+    MovementComp->RotationRate = FRotator(0.f, 500.f, 0.f);
+    MovementComp->JumpZVelocity = 300.f;
+    MovementComp->AirControl = 0.35f;
+    MovementComp->GravityScale = 1.f;
+    MovementComp->MaxWalkSpeed = 300.f;
+    MovementComp->MinAnalogWalkSpeed = 20.f;
+    MovementComp->BrakingDecelerationWalking = 2000.f;
 
-	// 무브먼트 컴포넌트 설정
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 500.f, 0.f);
-	GetCharacterMovement()->JumpZVelocity = 300.f;
-	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->GravityScale = 1.f;
-	GetCharacterMovement()->MaxWalkSpeed = 300.f;
-	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
-	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
-
-	// 매쉬 설정
-	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
-
-	// CharacterInfo 설정
-	{
-		CharacterInfo.AddState(STATE_IDLE);
-		CharacterInfo.State = 1; // IDLE
-	}
+    // 매쉬 설정
+    GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
+    GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+    GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
 	// 캐릭터 타입 설정
 	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> WarriorDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_Warrior.GPC_Warrior'"));
@@ -130,7 +123,7 @@ AGPCharacterBase::AGPCharacterBase()
 	{
 		HpBar->SetWidgetClass(HpBarWidgetRef.Class);
 		HpBar->SetWidgetSpace(EWidgetSpace::Screen);
-		HpBar->SetDrawSize(FVector2D(150.f , 15.f));
+		HpBar->SetDrawSize(FVector2D(150.f, 15.f));
 		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
@@ -246,9 +239,21 @@ void AGPCharacterBase::PostInitializeComponents()
 	Stat->OnHpZero.AddUObject(this, &AGPCharacterBase::SetDead);
 }
 
-void AGPCharacterBase::SetCharacterInfoFromServer(FInfoData& CharacterInfo_)
+void AGPCharacterBase::SetCharacterInfo(FInfoData& CharacterInfo_)
 {
 	CharacterInfo = CharacterInfo_;
+}
+
+void AGPCharacterBase::SetCharacterStats()
+{
+	if (!Stat) return;
+
+	Stat->SetMaxHp(CharacterInfo.GetMaxHp());
+	Stat->SetHp(CharacterInfo.GetHp());
+	Stat->SetDamage(CharacterInfo.GetDamage());
+	Stat->SetCrtRate(CharacterInfo.GetCrtRate());
+	Stat->SetCrtValue(CharacterInfo.GetCrtValue());
+	Stat->SetDodge(CharacterInfo.GetDodge());
 }
 
 void AGPCharacterBase::ProcessAutoAttackCommand()
@@ -264,7 +269,7 @@ void AGPCharacterBase::ProcessAutoAttackCommand()
 
 	FOnMontageEnded MontageEndedDelegate;
 	MontageEndedDelegate.BindUObject(this, &AGPCharacterBase::OnAutoAttackMontageEnded);
-	AnimInstance->Montage_Play(AttackActionMontage , 1.f);
+	AnimInstance->Montage_Play(AttackActionMontage, 1.f);
 	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, AttackActionMontage);
 }
 
@@ -302,8 +307,6 @@ void AGPCharacterBase::SetCharacterData(const UGPCharacterControlData* Character
 
 	// 애니메이션 몽타주 (Dead)
 	DeadMontage = CharacterData->DeadAnimMontage;
-
-	// Todo: 캐릭터 스탯 설정-> 서버에서 받은거로
 }
 
 void AGPCharacterBase::SetCharacterType(ECharacterType NewCharacterType)
@@ -320,7 +323,7 @@ void AGPCharacterBase::AttackHitCheck()
 {
 	FHitResult OutHitResult;
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
-	
+
 	const float AttackRange = 100.f;
 	const float AttackRadius = 70.f;
 	const float AttackDamage = 0;
@@ -372,9 +375,9 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 			DamageText->SetDamageText(DamageAmount, isCrt);
 		}
 	}
-	
-	if(bIsPlayer) // 공격자가 플레이어
-		GameInstance->SendPlayerAttackPacket(this->CharacterInfo , DamageAmount);
+
+	if (bIsPlayer) // 공격자가 플레이어
+		GameInstance->SendPlayerAttackPacket(this->CharacterInfo, DamageAmount);
 	else // 공격자가 몬스터
 	{
 		//todo: send mons atk pkt

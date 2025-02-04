@@ -140,46 +140,55 @@ enum ECharacterStateType : uint8
 #ifdef SERVER_BUILD
 struct FVector
 {
-	float X, Y, Z;
+	double X, Y, Z;
 
 	FVector() : X(0), Y(0), Z(0) {}
-	FVector(float x, float y, float z) : X(x), Y(y), Z(z) {}
+	FVector(double x, double y, double z) : X(x), Y(y), Z(z) {}
 
-	float DistanceSquared(const FVector& Other) const
+	double DistanceSquared(const FVector& Other) const
 	{
 		return (X - Other.X) * (X - Other.X) +
 			(Y - Other.Y) * (Y - Other.Y) +
 			(Z - Other.Z) * (Z - Other.Z);
 	}
 
-	bool IsInRange(const FVector& Other, float Range) const
+	bool IsInRange(const FVector& Other, double Range) const
 	{
 		return DistanceSquared(Other) <= (Range * Range);
 	}
 };
 #endif
 
+#pragma pack(push, 1)
+
 struct FStatData
 {
-	float MaxHp;
+	int32_t Level;
+	float Exp;
+	float MaxExp;
 	float Hp;
+	float MaxHp;
 	float Damage;
 	float CrtRate;
 	float CrtValue;
 	float Dodge;
 
 	FStatData()
-		: MaxHp(100.0f), Hp(100.0f), Damage(10.0f),
-		CrtRate(0.1f), CrtValue(1.5f), Dodge(0.1f) {
+		: Level(1), Exp(0.0f), MaxExp(100.0f),
+		Hp(100.0f), MaxHp(100.0f),
+		Damage(10.0f), CrtRate(0.1f), CrtValue(1.5f),
+		Dodge(0.1f)
+	{
 	}
-
 #ifdef SERVER_BUILD
 	void SetHp(float NewHp) { Hp = std::clamp(NewHp, 0.0f, MaxHp); }
 	void SetMaxHp(float NewMaxHp) { MaxHp = std::max(0.0f, NewMaxHp); }
 	void TakeDamage(float Amount) { SetHp(Hp - Amount); }
 	void Heal(float Amount) { SetHp(Hp + Amount); }
-
 	bool IsDead() const { return Hp <= 0; }
+
+	void SetLevel(int32_t NewLevel) { Level = std::max(1, NewLevel); }
+	void SetExp(float NewExp) { Exp = std::clamp(NewExp, 0.0f, MaxExp); }
 #endif
 };
 
@@ -187,14 +196,12 @@ struct FInfoData
 {
 	int32 ID;
 	ECharacterType CharacterType;
-
 	FVector Pos;
 	float Yaw;
 	float CollisionRadius;
 	float AttackRange;
-
-	FStatData Stats;
 	float Speed;
+	FStatData Stats;
 	uint32 State;
 
 	void InitStats(float MaxHp, float Damage, float CrtRate, float CrtValue, float Dodge, float Speed_)
@@ -242,8 +249,6 @@ struct FAttackData
 	FInfoData Attacked;
 	float AttackerDamage;
 };
-
-#pragma pack(push, 1)
 
 struct Packet
 {
