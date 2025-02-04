@@ -12,6 +12,7 @@
 #include "UI/GPWidgetComponent.h"
 #include "UI/GPHpBarWidget.h"
 #include "UI/GPExpBarWidget.h"
+#include "UI/GPLevelWidget.h"
 #include "UI/GPFloatingDamageText.h"
 #include "Item/GPEquipItemData.h"
 
@@ -146,6 +147,19 @@ AGPCharacterBase::AGPCharacterBase()
 		ExpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
+	LevelText = CreateDefaultSubobject<UGPWidgetComponent>(TEXT("LevelWidget"));
+	LevelText->SetupAttachment(GetMesh());
+	LevelText->SetRelativeLocation(FVector(0.f, 0.f, 266.f));
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> LevelTextWidgetRef(TEXT("/Game/UI/WBP_LevelText.WBP_LevelText_C"));
+	if (LevelTextWidgetRef.Class)
+	{
+		LevelText->SetWidgetClass(LevelTextWidgetRef.Class);
+		LevelText->SetWidgetSpace(EWidgetSpace::Screen);
+		LevelText->SetDrawSize(FVector2D(50.f, 20.f)); // 텍스트 크기
+		LevelText->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
 	// Item Actions
 	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterBase::EquipHelmet)));
 	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterBase::EquipChest)));
@@ -164,6 +178,11 @@ AGPCharacterBase::AGPCharacterBase()
 void AGPCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (Stat)
+	{
+		Stat->OnLevelUp.AddUObject(this, &AGPCharacterBase::OnLevelUp);
+	}
 }
 
 void AGPCharacterBase::Tick(float DeltaTime)
@@ -426,6 +445,29 @@ void AGPCharacterBase::SetupCharacterWidget(UGPUserWidget* InUserWidget)
 		ExpBarWidget->SetMaxExp(Stat->GetMaxExp());
 		ExpBarWidget->UpdateExpBar(Stat->GetCurrentExp());
 		Stat->OnExpChanged.AddUObject(ExpBarWidget, &UGPExpBarWidget::UpdateExpBar);
+	}
+
+	UGPLevelWidget* LevelWidget = Cast<UGPLevelWidget>(InUserWidget);
+	if (LevelWidget)
+	{
+		LevelWidget->SetLevelText(Stat->GetLevel());
+	}
+}
+
+void AGPCharacterBase::OnLevelUp(int32 NewLevel)
+{
+	UpdateLevelUI();
+}
+
+void AGPCharacterBase::UpdateLevelUI()
+{
+	if (LevelText)
+	{
+		UGPLevelWidget* LevelWidget = Cast<UGPLevelWidget>(LevelText->GetUserWidgetObject());
+		if (LevelWidget)
+		{
+			LevelWidget->SetLevelText(Stat->GetLevel());
+		}
 	}
 }
 

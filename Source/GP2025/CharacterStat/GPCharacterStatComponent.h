@@ -10,8 +10,9 @@
 DECLARE_MULTICAST_DELEGATE(FOnHpZeroDelegate);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHpChangedDelegate, float);
 
-DECLARE_MULTICAST_DELEGATE(FOnExpFullDelegete);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnExpChangedDelegate, float);
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelUpDelegate, int32);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class GP2025_API UGPCharacterStatComponent : public UActorComponent
@@ -31,8 +32,13 @@ public :
 	FOnHpZeroDelegate OnHpZero;
 	FOnHpChangedDelegate OnHpChanged;
 
-	FOnExpFullDelegete OnExpFull;
 	FOnExpChangedDelegate OnExpChanged;
+
+	FOnLevelUpDelegate OnLevelUp;
+
+	FORCEINLINE int32 GetLevel() { return Level; }
+	FORCEINLINE void SetLevel(int32 NewLevel) { Level = NewLevel; }
+	void LevelUp();
 
 	FORCEINLINE float GetMaxHp() { return MaxHp; }
 	FORCEINLINE float GetCurrentHp() { return CurrentHp; }
@@ -68,7 +74,7 @@ public :
 protected :
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Stat")
-	int Lv;
+	int32 Level;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Stat")
 	float MaxHp;

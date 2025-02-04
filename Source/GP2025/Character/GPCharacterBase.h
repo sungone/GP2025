@@ -74,8 +74,13 @@ public :
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UGPWidgetComponent> ExpBar;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UGPWidgetComponent> LevelText;
+
 	virtual void SetupCharacterWidget(class UGPUserWidget* InUserWidget) override;
 
+	void OnLevelUp(int32 NewLevel);
+	void UpdateLevelUI();
 // Dead Section
 public :
 	virtual void SetDead();

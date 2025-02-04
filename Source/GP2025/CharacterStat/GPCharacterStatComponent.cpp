@@ -6,10 +6,11 @@
 // Sets default values for this component's properties
 UGPCharacterStatComponent::UGPCharacterStatComponent()
 {
+	Level = 1;
 	MaxHp = 100.f;
 	Attack = 50.f;
 	CurrentHp = 50.f;
-	MaxExp = 100.f;
+	MaxExp = 30.f;
 	CurrentExp = 0.f;
 }
 
@@ -17,6 +18,20 @@ UGPCharacterStatComponent::UGPCharacterStatComponent()
 void UGPCharacterStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void UGPCharacterStatComponent::LevelUp()
+{
+
+	SetExp(0.f);
+	++Level;
+
+	OnLevelUp.Broadcast(Level);
+
+	//MaxExp *= 2.f;
+	//MaxHp += 10.f;
+	//CurrentHp = MaxHp;
+	//Attack += 5.f;
 }
 
 float UGPCharacterStatComponent::ApplyDamage(float InDamage)
@@ -60,9 +75,10 @@ float UGPCharacterStatComponent::AddExp(float InExp)
 	const float ActualExp = FMath::Clamp<float>(InExp, 0, InExp);
 
 	SetExp(PrevExp + ActualExp);
-	if (CurrentExp >= MaxExp)
+
+	while (CurrentExp >= MaxExp)
 	{
-		OnExpFull.Broadcast();
+		LevelUp();
 	}
 
 	return CurrentExp;
