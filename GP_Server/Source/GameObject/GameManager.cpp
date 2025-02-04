@@ -4,14 +4,14 @@
 bool GameManager::Init()
 {
 	CreateMonster();
-	//StartMonsterStateBroadcast();
-	//StartMonsterAIUpdate();
+	StartMonsterStateBroadcast();
+	StartMonsterAIUpdate();
 	return true;
 }
 
 void GameManager::AddPlayer(int32 id, std::shared_ptr<Character> player)
 {
-	std::unique_lock<std::shared_mutex> lock(_carrMutex);
+	std::unique_lock<std::mutex> lock(_carrMutex);
 
 	_characters[id] = player;
 	_characters[id]->GetInfo().ID = id;
@@ -19,7 +19,7 @@ void GameManager::AddPlayer(int32 id, std::shared_ptr<Character> player)
 
 void GameManager::RemoveCharacter(int32 id)
 {
-	std::unique_lock<std::shared_mutex> lock(_carrMutex);
+	std::unique_lock<std::mutex> lock(_carrMutex);
 
 	if (id < 0 || id >= MAX_CHARACTER || !_characters[id])
 	{
@@ -53,7 +53,7 @@ void GameManager::CreateMonster()
 
 void GameManager::SpawnMonster(Session& session)
 {
-	std::shared_lock<std::shared_mutex> lock(_carrMutex);
+	std::lock_guard<std::mutex> lock(_carrMutex);
 
 	for (int32 i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{
@@ -67,7 +67,7 @@ void GameManager::SpawnMonster(Session& session)
 
 bool GameManager::OnDamaged(float damage, FInfoData& damaged)
 {
-	std::unique_lock<std::shared_mutex> lock(_carrMutex);
+	std::unique_lock<std::mutex> lock(_carrMutex);
 
 	if (damaged.ID < MAX_PLAYER || damaged.ID >= MAX_CHARACTER || !_characters[damaged.ID] || !_characters[damaged.ID]->IsValid())
 	{
@@ -82,7 +82,7 @@ bool GameManager::OnDamaged(float damage, FInfoData& damaged)
 
 std::shared_ptr<Character> GameManager::GetCharacterByID(int32 id)
 {
-	std::shared_lock<std::shared_mutex> lock(_carrMutex);
+	std::lock_guard<std::mutex> lock(_carrMutex);
 
 	if (id < 0 || id >= MAX_CHARACTER || !_characters[id] || !_characters[id]->IsValid())
 	{
@@ -90,4 +90,49 @@ std::shared_ptr<Character> GameManager::GetCharacterByID(int32 id)
 		return nullptr;
 	}
 	return _characters[id];
+}
+
+void GameManager::StartMonsterStateBroadcast()
+{
+	_MonsterStateBroadcastTimer.Start(3000, [this]() {
+		BroadcastMonsterStates();
+		});
+}
+
+void GameManager::BroadcastMonsterStates()
+{
+	std::lock_guard<std::mutex> lock(_carrMutex);
+
+	for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
+	{
+		if (_characters[i] && _characters[i]->IsValid())
+		{
+			auto& monster = _characters[i];
+			if (monster->IsDead())
+			{
+				LOG(SendLog, std::format("Remove monster[{}]", monster->GetInfo().ID));
+				monster->GetInfo().State = ECharacterStateType::STATE_DIE;
+				RemoveCharacter(i);
+				continue;
+			}
+			FInfoData MonsterInfoData = monster->GetInfo();
+			MonsterInfoPacket packet(S_MONSTER_STATUS_UPDATE, MonsterInfoData);
+			SessionManager::GetInst().Broadcast(&packet);
+			LOG(SendLog, std::format("Update monster[{}]", monster->GetInfo().ID));
+		}
+	}
+}
+
+void GameManager::StartMonsterAIUpdate()
+{
+	_MonsterAIUpdateTimer.Start(4000, [this]() {
+		std::unique_lock<std::mutex> lock(_carrMutex);
+		for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
+		{
+			if (_characters[i] && _characters[i]->IsValid())
+			{
+				_characters[i]->Update();
+			}
+		}
+		});
 }

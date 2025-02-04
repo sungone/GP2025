@@ -62,15 +62,13 @@ bool Server::Init()
 void Server::Run()
 {
 	DoAccept();
-	WorkerThreadLoop();
+	//WorkerThreadLoop();
+	CreateWokerThreads();
 }
 
 void Server::Close()
 {
 	_bRunning = false;
-
-	_gameMgr.StopMonsterStateBroadcast();
-	_gameMgr.StopMonsterAIUpdate();
 
 	if (_listenSocket != INVALID_SOCKET) {
 		closesocket(_listenSocket);

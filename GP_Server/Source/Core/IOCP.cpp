@@ -4,10 +4,7 @@
 bool IOCP::Init()
 {
 	_hIOCP = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0);
-	if (_hIOCP == nullptr) {
-		return false;
-	}
-	return true;
+	return _hIOCP != nullptr;
 }
 
 void IOCP::RegisterSocket(SOCKET& _socket, ULONG_PTR key)
@@ -18,4 +15,9 @@ void IOCP::RegisterSocket(SOCKET& _socket, ULONG_PTR key)
 bool IOCP::GetCompletion(DWORD& rw_byte, ULONG_PTR& key, LPWSAOVERLAPPED& over)
 {
 	return GetQueuedCompletionStatus(_hIOCP, &rw_byte, &key, &over, INFINITE);
+}
+
+void IOCP::PostCompletion(ULONG_PTR key, DWORD bytesTransferred, LPWSAOVERLAPPED over)
+{
+	PostQueuedCompletionStatus(_hIOCP, bytesTransferred, key, over);
 }

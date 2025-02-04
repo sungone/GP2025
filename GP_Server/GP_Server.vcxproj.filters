@@ -37,13 +37,13 @@
     <Filter Include="Source Files\DB">
       <UniqueIdentifier>{279a80cf-c6df-44b5-834c-3bb024f4dc75}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Network\IOCP">
+      <UniqueIdentifier>{fae4c54b-3902-48a0-9f6b-e04620347384}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Common\Proto.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Core\ExpOver.h">
-      <Filter>Source Files\Network\Server</Filter>
     </ClInclude>
     <ClInclude Include="Source\Utils\Loger.h">
       <Filter>Source Files\Utils</Filter>
@@ -53,9 +53,6 @@
     </ClInclude>
     <ClInclude Include="Source\Core\SessionManager.h">
       <Filter>Source Files\Network\Session</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Core\IOCP.h">
-      <Filter>Source Files\Network\Server</Filter>
     </ClInclude>
     <ClInclude Include="Source\Core\Server.h">
       <Filter>Source Files\Network\Server</Filter>
@@ -87,22 +84,22 @@
     <ClInclude Include="Source\DB\DBConnectionPool.h">
       <Filter>Source Files\DB</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Core\ExpOver.h">
+      <Filter>Source Files\Network\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\IOCP.h">
+      <Filter>Source Files\Network\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="TimerQueue.h">
+      <Filter>Source Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\ExpOver.cpp">
-      <Filter>Source Files\Network\Server</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Core\Session.cpp">
       <Filter>Source Files\Network\Session</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\SessionManager.cpp">
       <Filter>Source Files\Network\Session</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\IOCP.cpp">
-      <Filter>Source Files\Network\Server</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\Server.cpp">
       <Filter>Source Files\Network\Server</Filter>
@@ -130,6 +127,18 @@
     </ClCompile>
     <ClCompile Include="Source\DB\DBConnectionPool.cpp">
       <Filter>Source Files\DB</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ExpOver.cpp">
+      <Filter>Source Files\Network\IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\IOCP.cpp">
+      <Filter>Source Files\Network\IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TimerQueue.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

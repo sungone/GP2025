@@ -15,7 +15,7 @@ void Monster::Init()
 
 void Monster::Update()
 {
-    std::lock_guard<std::mutex> lock(_cMutex);
+   // std::lock_guard<std::mutex> lock(_cMutex);
     switch (_info.State)
     {
     case ECharacterStateType::STATE_IDLE:
