@@ -22,6 +22,10 @@ bool Character::IsDead()
 void Character::OnDamaged(float damage)
 {
 	_info.TakeDamage(damage);
+	if (IsDead())
+	{
+		_info.AddState(ECharacterStateType::STATE_DIE);
+	}
 }
 
 void Character::SetBunkerRandomLocation()

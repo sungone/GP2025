@@ -29,8 +29,7 @@ public :
 	void SendPlayerLogoutPacket();
 
 	void SendPlayerMovePacket();
-	void SendPlayerAttackPacket();
-	void SendPlayerAttackPacket(FInfoData& Attacker , float AttackerDamage);
+	void SendPlayerAttackPacket(int32 TargetID = -1);
 
 	void ReceiveData();
 	void ProcessPacket();
@@ -42,7 +41,7 @@ public :
 	void AddMonster(FInfoData& MonsterInfo);
 	void RemoveMonster(int32 MonsterID);
 	void UpdateMonster(FInfoData& MonsterInfo);
-
+	void DamagedMonster(FInfoData& MonsterInfo, float Damage);
 public :
 	class FSocket* Socket;
 	FString IpAddress = TEXT("127.0.0.1");

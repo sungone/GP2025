@@ -3,6 +3,7 @@
 #include "Session.h"
 #include "Timer.h"
 #include "SessionManager.h"
+#include "CollisionManager.h"
 
 constexpr size_t MAX_PLAYER = MAX_CLIENT;
 constexpr size_t MAX_MONSTER = 10;
@@ -18,26 +19,27 @@ public:
 	}
 
 	bool Init();
-	void AddPlayer(int32 id, std::shared_ptr<Character> player);
+	void AddPlayer(std::shared_ptr<Character> player);
 	void RemoveCharacter(int32 id);
 
 	void CreateMonster();
 	void SpawnMonster(Session& session);
 
-	bool OnDamaged(float damage, FInfoData& damaged);
-
+	void ProcessAttack(int32 attackerId, int32 attackedId);
 	std::shared_ptr<Character> GetCharacterByID(int32 id);
 	FInfoData& GetInfo(int32 id) { return GetCharacterByID(id).get()->GetInfo(); }
 
 	void StartMonsterStateBroadcast();
 	void BroadcastMonsterStates();
-	void StartMonsterAIUpdate();
+	void UpdateMonster();
 
 public:
 	Timer _MonsterStateBroadcastTimer;
 	Timer _MonsterAIUpdateTimer;
 	std::mutex _carrMutex;
+
 private:
+	CollisionManager& _collisionMgr = CollisionManager::GetInst();
 	std::array<std::shared_ptr<Character>, MAX_CHARACTER> _characters;
 };
 

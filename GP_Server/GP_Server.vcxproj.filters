@@ -66,9 +66,6 @@
     <ClInclude Include="Source\Core\PacketManager.h">
       <Filter>Source Files\Network\Packet</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Utils\Timer.h">
-      <Filter>Source Files\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Source\pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -101,6 +98,12 @@
     </ClInclude>
     <ClInclude Include="Source\Game\GameManager.h">
       <Filter>Source Files\Game\GameManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Utils\Timer.h">
+      <Filter>Source Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Utils\FVector.h">
+      <Filter>Source Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

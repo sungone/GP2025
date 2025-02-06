@@ -26,11 +26,12 @@ void PacketManager::ProcessPacket(Session& session, BYTE* packet)
 
 void PacketManager::HandleLoginPacket(Session& session)
 {
+	session.SetLogin();
+
 	auto playerInfo = session.GetPlayerInfo();
 	int32 id = playerInfo.ID;
 	LOG(LogType::RecvLog, std::format("Login PKT [{}]", id));
 
-	session.SetLogin();
 	auto loginPkt = InfoPacket(EPacketType::S_LOGIN_SUCCESS, playerInfo);
 	session.DoSend(&loginPkt);
 
@@ -74,46 +75,9 @@ void PacketManager::HandleAttackPacket(Session& session, BYTE* packet)
 	auto& playerInfo = session.GetPlayerInfo();
 	int32 id = playerInfo.ID;
 	LOG(LogType::RecvLog, std::format("Attack PKT [{}]", id));
+	AttackPacket* p = reinterpret_cast<AttackPacket*>(packet);
+	_gameMgr.ProcessAttack(id, p->TargetID);
+	auto pkt1 = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, playerInfo);
+	_sessionMgr.Broadcast(&pkt1);
 
-	uint8_t packetSize = static_cast<EPacketType>(packet[PKT_SIZE_INDEX]);
-	if (packetSize == sizeof(InfoPacket))
-	{
-		InfoPacket* p = reinterpret_cast<InfoPacket*>(packet);
-		playerInfo = p->Data;
-		auto pkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, playerInfo);
-		_sessionMgr.Broadcast(&pkt, id);
-	}
-	else
-	{
-		//todo: 충돌처리 서버에서 하도록
-
-		AttackPacket* p = reinterpret_cast<AttackPacket*>(packet);
-		FAttackData data = p->Data;
-		LOG(LogType::Log, std::format("Attacker[{}] -> Attacked[{}] : AttackerDamage : [{}]", data.Attacker.ID, data.Attacked.ID , data.AttackerDamage));
-
-		// for anim 동기화
-		playerInfo = data.Attacker;
-		auto pkt1 = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, playerInfo);
-		_sessionMgr.Broadcast(&pkt1);
-		 
-		//// hp 감소
-		//float BaseDamage = playerInfo.Damage;
-		//float CrtRate = playerInfo.CrtRate;
-		//float CrtValue = playerInfo.CrtValue;
-
-		//static std::default_random_engine dre;
-		//static std::uniform_real_distribution<float>  dist(0.f, 1.f);
-		//float RandomValue = dist(dre);
-
-		//bool bIsCritical = RandomValue < CrtRate;
-
-		//float FinalDamage = bIsCritical ? BaseDamage * CrtValue : BaseDamage;
-
-		if(_gameMgr.OnDamaged(data.AttackerDamage, data.Attacked))
-		{
-			auto monster = _gameMgr.GetInfo(data.Attacked.ID);
-			auto pkt2 = InfoPacket(EPacketType::S_MONSTER_STATUS_UPDATE, monster);
-			_sessionMgr.Broadcast(&pkt2);
-		}
-	}
 }

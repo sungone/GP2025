@@ -20,6 +20,7 @@
 #include <chrono>
 #include <algorithm>
 
+#include "FVector.h"
 #include "Proto.h"
 #include "Loger.h"
 #include "ExpOver.h"

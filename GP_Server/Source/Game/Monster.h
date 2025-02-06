@@ -8,6 +8,7 @@ public:
     void Init() override;
 
     void Update();
+    void BehaviorTree();
 	void ChangeState(ECharacterStateType newState);
 
     uint32_t GetState() const { return _info.State; }

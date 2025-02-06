@@ -3,6 +3,7 @@
 #include <functional>
 #include <atomic>
 
+//Todo: 이 방식과 TimerQueue(PQCP) 성능 비교하기
 class Timer
 {
 public:

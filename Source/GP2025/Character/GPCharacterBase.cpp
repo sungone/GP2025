@@ -40,39 +40,39 @@ namespace
 AGPCharacterBase::AGPCharacterBase()
 {
 	// 캐릭터 스켈레탈 메시
-    GetMesh()->SetSkeletalMesh(LoadAsset<USkeletalMesh>(TEXT("/Game/qudgus/chracter/mesh/main_man.main_man")));
+	GetMesh()->SetSkeletalMesh(LoadAsset<USkeletalMesh>(TEXT("/Game/qudgus/chracter/mesh/main_man.main_man")));
 
-    // 캐릭터 애니메이션 블루프린트
-    GetMesh()->SetAnimInstanceClass(LoadClass<UAnimInstance>(TEXT("/Game/Animation/P_Warrior/ABP_Warrior.ABP_Warrior_C")));
+	// 캐릭터 애니메이션 블루프린트
+	GetMesh()->SetAnimInstanceClass(LoadClass<UAnimInstance>(TEXT("/Game/Animation/P_Warrior/ABP_Warrior.ABP_Warrior_C")));
 
-    // 캐릭터 애니메이션 몽타주
-    AttackActionMontage = LoadAsset<UAnimMontage>(TEXT("/Game/Animation/P_Warrior/AM_Attack.AM_Attack"));
-    DeadMontage = LoadAsset<UAnimMontage>(TEXT("/Game/Animation/P_Warrior/AM_Dead.AM_Dead"));
+	// 캐릭터 애니메이션 몽타주
+	AttackActionMontage = LoadAsset<UAnimMontage>(TEXT("/Game/Animation/P_Warrior/AM_Attack.AM_Attack"));
+	DeadMontage = LoadAsset<UAnimMontage>(TEXT("/Game/Animation/P_Warrior/AM_Dead.AM_Dead"));
 
-    // 폰 회전 설정
-    bUseControllerRotationPitch = false;
-    bUseControllerRotationYaw = false;
-    bUseControllerRotationRoll = false;
+	// 폰 회전 설정
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
 
-    // 캡슐 컴포넌트 설정
-    GetCapsuleComponent()->InitCapsuleSize(42.f, 96.f);
-    GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_GPCAPSULE);
+	// 캡슐 컴포넌트 설정
+	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.f);
+	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_GPCAPSULE);
 
-    // 무브먼트 컴포넌트 설정
-    auto* MovementComp = GetCharacterMovement();
-    MovementComp->bOrientRotationToMovement = true;
-    MovementComp->RotationRate = FRotator(0.f, 500.f, 0.f);
-    MovementComp->JumpZVelocity = 300.f;
-    MovementComp->AirControl = 0.35f;
-    MovementComp->GravityScale = 1.f;
-    MovementComp->MaxWalkSpeed = 300.f;
-    MovementComp->MinAnalogWalkSpeed = 20.f;
-    MovementComp->BrakingDecelerationWalking = 2000.f;
+	// 무브먼트 컴포넌트 설정
+	auto* MovementComp = GetCharacterMovement();
+	MovementComp->bOrientRotationToMovement = true;
+	MovementComp->RotationRate = FRotator(0.f, 500.f, 0.f);
+	MovementComp->JumpZVelocity = 300.f;
+	MovementComp->AirControl = 0.35f;
+	MovementComp->GravityScale = 1.f;
+	MovementComp->MaxWalkSpeed = 300.f;
+	MovementComp->MinAnalogWalkSpeed = 20.f;
+	MovementComp->BrakingDecelerationWalking = 2000.f;
 
-    // 매쉬 설정
-    GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
-    GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-    GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
+	// 매쉬 설정
+	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
 	// 캐릭터 타입 설정
 	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> WarriorDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_Warrior.GPC_Warrior'"));
@@ -288,24 +288,16 @@ void AGPCharacterBase::OnAutoAttackMontageEnded(UAnimMontage* Montage, bool bInt
 
 void AGPCharacterBase::SetCharacterData(const UGPCharacterControlData* CharacterData)
 {
-	// 폰 
 	bUseControllerRotationYaw = CharacterData->bUseControllerRotationYaw;
 
-	// 캐릭터 무브먼트 
 	GetCharacterMovement()->bOrientRotationToMovement = CharacterData->bOrientRotationToMovement;
 	GetCharacterMovement()->bUseControllerDesiredRotation = CharacterData->bUseControllerDesiredRotation;
 	GetCharacterMovement()->RotationRate = CharacterData->RotationRate;
 
-	// 스켈레탈 메시
 	GetMesh()->SetSkeletalMesh(CharacterData->SkeletalMesh);
-
-	// 애니메이션 블루프린트
 	GetMesh()->SetAnimInstanceClass(CharacterData->AnimBlueprint);
 
-	// 애니메이션 몽타주 (Attack)
 	AttackActionMontage = CharacterData->AttackAnimMontage;
-
-	// 애니메이션 몽타주 (Dead)
 	DeadMontage = CharacterData->DeadAnimMontage;
 }
 
@@ -324,29 +316,42 @@ void AGPCharacterBase::AttackHitCheck()
 	FHitResult OutHitResult;
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
 
-	const float AttackRange = 100.f;
-	const float AttackRadius = 70.f;
-	const float AttackDamage = 0;
+	const float AttackRange = CharacterInfo.AttackRange;
+	const float AttackRadius = CharacterInfo.AttackRadius;
 
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
 
-	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, CCHANNEL_GPACTION, FCollisionShape::MakeSphere(AttackRadius), Params);
+	bool HitDetected = GetWorld()->SweepSingleByChannel(
+		OutHitResult, Start, End, FQuat::Identity, CCHANNEL_GPACTION,
+		FCollisionShape::MakeSphere(AttackRadius), Params);
+
 	if (HitDetected)
 	{
-		FDamageEvent DamageEvent;
-		OutHitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
+		AActor* HitActor = OutHitResult.GetActor();
+		if (!HitActor) return;
+
+		AGPCharacterBase* TargetCharacter = Cast<AGPCharacterBase>(HitActor);
+		if (!TargetCharacter) return;
+
+		UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
+		if (GameInstance && this == GameInstance->MyPlayer)
+		{
+			GameInstance->SendPlayerAttackPacket(TargetCharacter->CharacterInfo.ID);
+		}
 	}
 
 #if ENABLE_DRAW_DEBUG
-
 	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
 	float CapsuleHalfHeight = AttackRange * 0.5f;
 	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
 
-	DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 5.f);
+	DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius,
+		FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(),
+		DrawColor, false, 5.f);
 #endif
 }
+
 
 float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
@@ -357,37 +362,8 @@ float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 	if (!GameInstance) return DamageAmount;
 
-	bool bIsPlayer = (AttackerCharacter == GameInstance->MyPlayer);
-
-	// Floating Damage UI
-	{
-		FVector SpawnLocation = GetActorLocation() + FVector(0, 0, 100);
-		FActorSpawnParameters SpawnParams;
-		AGPFloatingDamageText* DamageText = GetWorld()->SpawnActor<AGPFloatingDamageText>(AGPFloatingDamageText::StaticClass(),
-			SpawnLocation, FRotator::ZeroRotator, SpawnParams);
-
-		bool isCrt = true;
-		if (AttackerCharacter->CharacterInfo.GetDamage() == DamageAmount)
-			isCrt = false;
-
-		if (DamageText)
-		{
-			DamageText->SetDamageText(DamageAmount, isCrt);
-		}
-	}
-
-	if (bIsPlayer) // 공격자가 플레이어
-		GameInstance->SendPlayerAttackPacket(this->CharacterInfo, DamageAmount);
-	else // 공격자가 몬스터
-	{
-		//todo: send mons atk pkt
-		Stat->ApplyDamage(DamageAmount);
-
-		if (Stat->GetCurrentHp() <= 0)
-		{
-			SetDead();
-		}
-	}
+	if (AttackerCharacter == GameInstance->MyPlayer)
+		GameInstance->SendPlayerAttackPacket(this->CharacterInfo.ID);
 
 	return DamageAmount;
 }

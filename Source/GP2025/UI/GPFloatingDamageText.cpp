@@ -10,7 +10,7 @@
 // Sets default values
 AGPFloatingDamageText::AGPFloatingDamageText()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	DamageWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("DamageWidget"));
@@ -27,7 +27,7 @@ AGPFloatingDamageText::AGPFloatingDamageText()
 void AGPFloatingDamageText::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	UUserWidget* Widget = Cast<UUserWidget>(DamageWidgetComponent->GetWidget());
 	if (Widget)
 	{
@@ -47,7 +47,7 @@ void AGPFloatingDamageText::Tick(float DeltaTime)
 	SetActorLocation(NewLocation);
 }
 
-void AGPFloatingDamageText::SetDamageText(float DamageAmount , bool bIsCrt)
+void AGPFloatingDamageText::SetDamageText(float DamageAmount, bool bIsCrt)
 {
 	if (DamageText)
 	{
@@ -58,14 +58,15 @@ void AGPFloatingDamageText::SetDamageText(float DamageAmount , bool bIsCrt)
 		else
 		{
 			DamageText->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), DamageAmount)));
+			DamageText->SetColorAndOpacity(FSlateColor(FLinearColor::Red));
 
 			if (bIsCrt)
 			{
-				DamageText->SetColorAndOpacity(FSlateColor(FLinearColor::Red));
+				DamageText->SetRenderScale(FVector2D(1.5f, 1.5f)); // 크리티컬일 때 크기 증가
 			}
 			else
 			{
-				DamageText->SetColorAndOpacity(FSlateColor(FLinearColor::White));
+				DamageText->SetRenderScale(FVector2D(1.0f, 1.0f)); // 기본 크기 유지
 			}
 		}
 	}

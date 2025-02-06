@@ -8,6 +8,7 @@
 #include "SocketSubsystem.h"
 #include "CharacterStat/GPCharacterStatComponent.h"
 #include "Character/GPCharacterPlayer.h"
+#include "UI/GPFloatingDamageText.h"
 
 void UGPGameInstance::Init()
 {
@@ -81,21 +82,13 @@ void UGPGameInstance::SendPlayerMovePacket()
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(InfoPacket), BytesSent);
 }
 
-void UGPGameInstance::SendPlayerAttackPacket()
+void UGPGameInstance::SendPlayerAttackPacket(int32 TargetID)
 {
-	InfoPacket Packet(EPacketType::C_ATTACK, MyPlayer->CharacterInfo);
+	AttackPacket Packet(TargetID);
 	int32 BytesSent = 0;
-	UE_LOG(LogTemp, Warning, TEXT("SendPlayerMovePacket : Send [%d]"), Packet.Data.ID);
-	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(InfoPacket), BytesSent);
-}
-
-void UGPGameInstance::SendPlayerAttackPacket(FInfoData& Attacked, float AttackerDamage)
-{
-	AttackPacket Packet(EPacketType::C_ATTACK, { MyPlayer->CharacterInfo, Attacked , AttackerDamage });
-	int32 BytesSent = 0;
+	UE_LOG(LogTemp, Warning, TEXT("SendPlayerAttackPacket : Send [%d]"), MyPlayer->CharacterInfo.ID);
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(AttackPacket), BytesSent);
 }
-
 
 void UGPGameInstance::ReceiveData()
 {
@@ -173,6 +166,11 @@ void UGPGameInstance::ProcessPacket()
 				{
 					InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
 					UpdateMonster(Pkt->Data);
+					break;
+				}case EPacketType::S_DAMAGED_MONSTER:
+				{
+					DamagePacket* Pkt = reinterpret_cast<DamagePacket*>(RemainingData.GetData());
+					DamagedMonster(Pkt->Target,Pkt->Damage);
 					break;
 				}
 				default:
@@ -307,6 +305,37 @@ void UGPGameInstance::UpdateMonster(FInfoData& MonsterInfo)
 			return;
 		}
 		(*Monster)->SetCharacterInfo(MonsterInfo);
+		UE_LOG(LogTemp, Warning, TEXT("Update monster [%d]"), MonsterInfo.ID);
+	}
+}
+
+void UGPGameInstance::DamagedMonster(FInfoData& MonsterInfo, float Damage)
+{
+	auto Monster = Monsters.Find(MonsterInfo.ID);
+
+	if (Monster)
+	{
+		if (MonsterInfo.HasState(ECharacterStateType::STATE_DIE))
+		{
+			(*Monster)->SetDead();
+			return;
+		}
+		(*Monster)->SetCharacterInfo(MonsterInfo);
+
+		// Floating Damage UI
+		{
+			FVector SpawnLocation = (*Monster)->GetActorLocation() + FVector(0, 0, 100);
+			FActorSpawnParameters SpawnParams;
+			AGPFloatingDamageText* DamageText = GetWorld()->SpawnActor<AGPFloatingDamageText>(AGPFloatingDamageText::StaticClass(),
+				SpawnLocation, FRotator::ZeroRotator, SpawnParams);
+
+			bool isCrt = (MyPlayer->CharacterInfo.GetDamage() != Damage);
+
+			if (DamageText)
+			{
+				DamageText->SetDamageText(Damage, isCrt);
+			}
+		}
 		UE_LOG(LogTemp, Warning, TEXT("Update monster [%d]"), MonsterInfo.ID);
 	}
 }

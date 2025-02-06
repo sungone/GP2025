@@ -54,10 +54,6 @@ void Session::Connect(SOCKET& socket, int32 id)
 	std::lock_guard<std::mutex> lock(_sMutex);
 	this->_id = id;
 	this->_socket = socket;
-
-	_player = std::make_shared<Player>();
-	_player->Init();
-	_player->GetInfo().ID = id;
 }
 
 void Session::Disconnect()
@@ -71,6 +67,10 @@ void Session::SetLogin()
 {
 	std::lock_guard<std::mutex> lock(_sMutex);
 	_bLogin = true;
+	_player = std::make_shared<Player>();
+	_player->Init();
+	_player->GetInfo().ID = _id;
+	GameManager::GetInst().AddPlayer(_player);
 }
 
 bool Session::IsLogin()

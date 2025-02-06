@@ -31,10 +31,13 @@ enum EPacketType : uint8
 	S_ADD_MONSTER,
 	S_REMOVE_MONSTER,
 	S_MONSTER_STATUS_UPDATE,
+
+	S_DAMAGED_MONSTER
 };
 
 enum ECharacterType : uint8
 {
+	NONE,
 	P_WARRIOR,
 	P_GUNNER,
 
@@ -137,28 +140,6 @@ enum ECharacterStateType : uint8
 	STATE_WALK = 1 << 5,
 };
 
-#ifdef SERVER_BUILD
-struct FVector
-{
-	double X, Y, Z;
-
-	FVector() : X(0), Y(0), Z(0) {}
-	FVector(double x, double y, double z) : X(x), Y(y), Z(z) {}
-
-	double DistanceSquared(const FVector& Other) const
-	{
-		return (X - Other.X) * (X - Other.X) +
-			(Y - Other.Y) * (Y - Other.Y) +
-			(Z - Other.Z) * (Z - Other.Z);
-	}
-
-	bool IsInRange(const FVector& Other, double Range) const
-	{
-		return DistanceSquared(Other) <= (Range * Range);
-	}
-};
-#endif
-
 #pragma pack(push, 1)
 
 struct FStatData
@@ -180,16 +161,6 @@ struct FStatData
 		Dodge(0.1f)
 	{
 	}
-#ifdef SERVER_BUILD
-	void SetHp(float NewHp) { Hp = std::clamp(NewHp, 0.0f, MaxHp); }
-	void SetMaxHp(float NewMaxHp) { MaxHp = std::max(0.0f, NewMaxHp); }
-	void TakeDamage(float Amount) { SetHp(Hp - Amount); }
-	void Heal(float Amount) { SetHp(Hp + Amount); }
-	bool IsDead() const { return Hp <= 0; }
-
-	void SetLevel(int32_t NewLevel) { Level = std::max(1, NewLevel); }
-	void SetExp(float NewExp) { Exp = std::clamp(NewExp, 0.0f, MaxExp); }
-#endif
 };
 
 struct FInfoData
@@ -199,10 +170,20 @@ struct FInfoData
 	FVector Pos;
 	float Yaw;
 	float CollisionRadius;
+	float AttackRadius;
 	float AttackRange;
 	float Speed;
 	FStatData Stats;
 	uint32 State;
+
+	FInfoData()
+		: ID(0), CharacterType(ECharacterType::NONE),
+		Pos(FVector(0.0f, 0.0f, 0.0f)), Yaw(0.0f),
+		CollisionRadius(50.0f), AttackRadius(100.0f),
+		AttackRange(150.0f), Speed(0.0f),
+		Stats(), State(STATE_IDLE)
+	{
+	}
 
 	void InitStats(float MaxHp, float Damage, float CrtRate, float CrtValue, float Dodge, float Speed_)
 	{
@@ -229,26 +210,26 @@ struct FInfoData
 	float GetDodge() const { return Stats.Dodge; }
 
 #ifdef SERVER_BUILD
-	void SetHp(float NewHp) { Stats.SetHp(NewHp); }
-	void Heal(float Amount) { Stats.Heal(Amount); }
-	void TakeDamage(float Damage) { Stats.TakeDamage(Damage); }
+	void SetHp(float NewHp) { Stats.Hp = std::clamp(NewHp, 0.0f, Stats.MaxHp); }
+	void Heal(float Amount) { SetHp(Stats.Hp + Amount); }
+	void TakeDamage(float Amount) { SetHp(Stats.Hp - Amount); }
+	bool IsDead() const { return Stats.Hp <= 0; }
 	void SetDamage(float NewDamage) { Stats.Damage = std::max(0.0f, NewDamage); }
-	bool IsDead() const { return Stats.IsDead(); }
 	bool IsInAttackRange(const FInfoData& Target) const
 	{
-		return Pos.IsInRange(Target.Pos, AttackRange + Target.CollisionRadius);
+		return Pos.IsInRange(Target.Pos, AttackRange + Target.AttackRadius);
+	}
+	float GetAttackDamage() const
+	{
+		static std::default_random_engine dre;
+		static std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+		float RandomValue = dist(dre);
+		bool bIsCritical = RandomValue < Stats.CrtRate;
+		return bIsCritical ? Stats.Damage * Stats.CrtValue : Stats.Damage;
 	}
 #endif
-
 };
 
-
-struct FAttackData
-{
-	FInfoData Attacker;
-	FInfoData Attacked;
-	float AttackerDamage;
-};
 
 struct Packet
 {
@@ -284,6 +265,25 @@ struct TPacket : public Packet
 using FPacketHeader = Packet::PacketHeader;
 using InfoPacket = TPacket<FInfoData>;
 using IDPacket = TPacket<int32>;
-using AttackPacket = TPacket<FAttackData>;
-using MonsterInfoPacket = TPacket<FInfoData>;
+struct AttackPacket : public Packet
+{
+	int32 TargetID;
+
+	AttackPacket(int32 TargetID)
+		: Packet(EPacketType::C_ATTACK), TargetID(TargetID)
+	{
+		Header.PacketSize = sizeof(AttackPacket);
+	}
+};
+struct DamagePacket : public Packet
+{
+	FInfoData Target;
+	float Damage;
+
+	DamagePacket(const FInfoData& Target_, float Damage_)
+		: Packet(EPacketType::S_DAMAGED_MONSTER), Target(Target_), Damage(Damage_)
+	{
+		Header.PacketSize = sizeof(DamagePacket);
+	}
+};
 #pragma pack(pop)
