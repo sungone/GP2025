@@ -10,7 +10,9 @@ static std::mt19937 gen(rd());
 void Monster::Init()
 {
 	Character::Init();
-	_info.CharacterType = M_MOUSE;
+	static std::uniform_int_distribution<int> randomType(M_MOUSE, M_COFFEE);
+
+	_info.CharacterType = static_cast<ECharacterType>(randomType(gen));
 }
 
 void Monster::Update()

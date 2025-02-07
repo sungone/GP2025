@@ -1,18 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "UI/GPHpBarWidget.h"
 #include "Components/ProgressBar.h"
 #include "Character/GPCharacterBase.h"
 #include "Interface/GPCharacterWidgetInterface.h"
-
-void UGPHpBarWidget::UpdateHpBar(float HpRatio)
-{
-    if (HpProgressBar)
-    {
-        HpProgressBar->SetPercent(HpRatio);
-    }
-}
 
 void UGPHpBarWidget::NativeConstruct()
 {
@@ -20,10 +9,22 @@ void UGPHpBarWidget::NativeConstruct()
 
     HpProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("PbHpBar")));
     ensure(HpProgressBar);
+}
 
-    AGPCharacterBase* Character = Cast<AGPCharacterBase>(OwningActor);
+void UGPHpBarWidget::BindToCharacter(AGPCharacterBase* Character)
+{
     if (Character)
     {
-        Character->SetupCharacterWidget(this);
+        // 델리게이트 중복 바인딩 방지
+        Character->OnHpChanged.RemoveDynamic(this, &UGPHpBarWidget::UpdateHpBar);
+        Character->OnHpChanged.AddDynamic(this, &UGPHpBarWidget::UpdateHpBar);
+    }
+}
+
+void UGPHpBarWidget::UpdateHpBar(float HpRatio)
+{
+    if (HpProgressBar)
+    {
+        HpProgressBar->SetPercent(HpRatio);
     }
 }

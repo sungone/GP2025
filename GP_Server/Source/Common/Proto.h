@@ -202,8 +202,11 @@ struct FInfoData
 	void RemoveState(ECharacterStateType RemoveState) { State &= ~RemoveState; }
 	bool HasState(ECharacterStateType CheckState) const { return (State & CheckState) != 0; }
 
+	int32 GetLevel() const { return Stats.Level; }
 	float GetHp() const { return Stats.Hp; }
 	float GetMaxHp() const { return Stats.MaxHp; }
+	float GetExp() const { return Stats.Exp; }
+	float GetMaxExp() const { return Stats.MaxExp; }
 	float GetDamage() const { return Stats.Damage; }
 	float GetCrtRate() const { return Stats.CrtRate; }
 	float GetCrtValue() const { return Stats.CrtValue; }

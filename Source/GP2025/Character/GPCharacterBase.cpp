@@ -111,42 +111,9 @@ AGPCharacterBase::AGPCharacterBase()
 	}
 
 	// Widget Component
-	HpBar = CreateDefaultSubobject<UGPWidgetComponent>(TEXT("HpWidget"));
-	HpBar->SetupAttachment(GetMesh());
-	HpBar->SetRelativeLocation(FVector(0.f, 0.f, 250.f));
-	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/UI/WBP_CharacterHpBar.WBP_CharacterHpBar_C"));
-	if (HpBarWidgetRef.Class)
-	{
-		HpBar->SetWidgetClass(HpBarWidgetRef.Class);
-		HpBar->SetWidgetSpace(EWidgetSpace::Screen);
-		HpBar->SetDrawSize(FVector2D(150.f, 15.f));
-		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
-
-	ExpBar = CreateDefaultSubobject<UGPWidgetComponent>(TEXT("ExpWidget"));
-	ExpBar->SetupAttachment(GetMesh());
-	ExpBar->SetRelativeLocation(FVector(0.f, 0.f, 258.f));
-	static ConstructorHelpers::FClassFinder<UUserWidget> ExpBarWidgetRef(TEXT("/Game/UI/WBP_ExpBar.WBP_ExpBar_C"));
-	if (ExpBarWidgetRef.Class)
-	{
-		ExpBar->SetWidgetClass(ExpBarWidgetRef.Class);
-		ExpBar->SetWidgetSpace(EWidgetSpace::Screen);
-		ExpBar->SetDrawSize(FVector2D(150.f, 15.f));
-		ExpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
-
-	LevelText = CreateDefaultSubobject<UGPWidgetComponent>(TEXT("LevelWidget"));
-	LevelText->SetupAttachment(GetMesh());
-	LevelText->SetRelativeLocation(FVector(0.f, 0.f, 266.f));
-
-	static ConstructorHelpers::FClassFinder<UUserWidget> LevelTextWidgetRef(TEXT("/Game/UI/WBP_LevelText.WBP_LevelText_C"));
-	if (LevelTextWidgetRef.Class)
-	{
-		LevelText->SetWidgetClass(LevelTextWidgetRef.Class);
-		LevelText->SetWidgetSpace(EWidgetSpace::Screen);
-		LevelText->SetDrawSize(FVector2D(50.f, 20.f)); // 텍스트 크기
-		LevelText->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
+	HpBar = CreateWidgetComponent(TEXT("HpWidget"), TEXT("/Game/UI/WBP_CharacterHpBar.WBP_CharacterHpBar_C"), FVector(0.f, 0.f, 300.f), FVector2D(150.f, 15.f));
+	ExpBar = CreateWidgetComponent(TEXT("ExpWidget"), TEXT("/Game/UI/WBP_ExpBar.WBP_ExpBar_C"), FVector(0.f, 0.f, 308.f), FVector2D(150.f, 15.f));
+	LevelText = CreateWidgetComponent(TEXT("LevelWidget"), TEXT("/Game/UI/WBP_LevelText.WBP_LevelText_C"), FVector(0.f, 0.f, 350.f), FVector2D(40.f, 10.f));
 
 	// Item Actions
 	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterBase::EquipHelmet)));
@@ -348,31 +315,24 @@ void AGPCharacterBase::AttackHitCheck()
 #endif
 }
 
-void AGPCharacterBase::SetupCharacterWidget(UGPUserWidget* InUserWidget)
+UGPWidgetComponent* AGPCharacterBase::CreateWidgetComponent(const FString& Name, const FString& WidgetPath, FVector Location, FVector2D Size)
 {
-	if (!InUserWidget)
+	UGPWidgetComponent* WidgetComp = CreateDefaultSubobject<UGPWidgetComponent>(*Name);
+	WidgetComp->SetupAttachment(GetMesh());
+	WidgetComp->SetRelativeLocation(Location);
+	WidgetComp->SetWidgetSpace(EWidgetSpace::Screen);
+	WidgetComp->SetPivot(FVector2D(0.5f, 0.5f));
+	WidgetComp->SetOwnerNoSee(true);
+	WidgetComp->SetDrawSize(Size);
+	WidgetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	ConstructorHelpers::FClassFinder<UUserWidget> WidgetRef(*WidgetPath);
+	if (WidgetRef.Class)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SetupCharacterWidget: Widget is NULL"));
-		return;
+		WidgetComp->SetWidgetClass(WidgetRef.Class);
 	}
 
-	UGPHpBarWidget* HpBarWidget = Cast<UGPHpBarWidget>(InUserWidget);
-	if (HpBarWidget)
-	{
-		OnHpChanged.AddDynamic(HpBarWidget, &UGPHpBarWidget::UpdateHpBar);
-	}
-
-	UGPExpBarWidget* ExpBarWidget = Cast<UGPExpBarWidget>(InUserWidget);
-	if (ExpBarWidget)
-	{
-		OnExpChanged.AddDynamic(ExpBarWidget, &UGPExpBarWidget::UpdateExpBar);
-	}
-
-	UGPLevelWidget* LevelWidget = Cast<UGPLevelWidget>(InUserWidget);
-	if (LevelWidget)
-	{
-		OnLevelChanged.AddDynamic(LevelWidget, &UGPLevelWidget::UpdateLevelText);
-	}
+	return WidgetComp;
 }
 
 void AGPCharacterBase::SetDead()

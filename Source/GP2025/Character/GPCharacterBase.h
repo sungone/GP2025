@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interface/GPAnimationAttackInterface.h"
-#include "Interface/GPCharacterWidgetInterface.h"
 #include "Interface/GPCharacterItemInterface.h"
 #include "../../GP_Server/Source/Common/Proto.h"
 #include "GPCharacterBase.generated.h"
@@ -27,7 +26,7 @@ struct FTakeItemDelegateWrapper
 };
 
 UCLASS()
-class GP2025_API AGPCharacterBase : public ACharacter , public IGPAnimationAttackInterface ,public IGPCharacterWidgetInterface , public IGPCharacterItemInterface
+class GP2025_API AGPCharacterBase : public ACharacter ,public IGPAnimationAttackInterface , public IGPCharacterItemInterface
 {
 	GENERATED_BODY()
 
@@ -78,7 +77,7 @@ public:
 	FOnExpChanged OnExpChanged;
 	FOnLevelChanged OnLevelChanged;
 
-	virtual void SetupCharacterWidget(UGPUserWidget* Widget) override;
+	UGPWidgetComponent* CreateWidgetComponent(const FString& Name, const FString& WidgetPath, FVector Location, FVector2D Size);
 
 // Dead Section
 public :
