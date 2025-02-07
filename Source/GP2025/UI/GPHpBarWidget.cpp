@@ -6,10 +6,6 @@
 #include "Character/GPCharacterBase.h"
 #include "Interface/GPCharacterWidgetInterface.h"
 
-UGPHpBarWidget::UGPHpBarWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
-{
-}
-
 void UGPHpBarWidget::UpdateHpBar(float HpRatio)
 {
     if (HpProgressBar)

@@ -5,9 +5,12 @@
 #include "Components/ProgressBar.h"
 #include "Interface/GPCharacterWidgetInterface.h"
 
-UGPExpBarWidget::UGPExpBarWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+void UGPExpBarWidget::UpdateExpBar(float ExpRatio)
 {
-	MaxExp = -1.0f;
+	if (ExpProgressBar)
+	{
+		ExpProgressBar->SetPercent(ExpRatio);
+	}
 }
 
 void UGPExpBarWidget::NativeConstruct()
@@ -21,14 +24,5 @@ void UGPExpBarWidget::NativeConstruct()
 	if (CharacterWidget)
 	{
 		CharacterWidget->SetupCharacterWidget(this);
-	}
-}
-
-void UGPExpBarWidget::UpdateExpBar(float NewCurrentExp)
-{
-	ensure(MaxExp > 0.f);
-	if (ExpProgressBar)
-	{
-		ExpProgressBar->SetPercent(NewCurrentExp / MaxExp);
 	}
 }

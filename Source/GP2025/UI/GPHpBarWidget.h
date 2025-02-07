@@ -15,15 +15,11 @@ class GP2025_API UGPHpBarWidget : public UGPUserWidget
 {
 	GENERATED_BODY()
 public:
-	UGPHpBarWidget(const FObjectInitializer& ObjectInitializer);
+	virtual void NativeConstruct() override;
 
 	UFUNCTION()
 	void UpdateHpBar(float HpRatio);
 
-protected:
-	virtual void NativeConstruct() override;
-
-protected:
 	UPROPERTY()
 	TObjectPtr<class UProgressBar> HpProgressBar;
 

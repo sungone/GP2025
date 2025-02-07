@@ -365,11 +365,13 @@ void AGPCharacterBase::SetupCharacterWidget(UGPUserWidget* InUserWidget)
 	UGPExpBarWidget* ExpBarWidget = Cast<UGPExpBarWidget>(InUserWidget);
 	if (ExpBarWidget)
 	{
+		OnExpChanged.AddDynamic(ExpBarWidget, &UGPExpBarWidget::UpdateExpBar);
 	}
 
 	UGPLevelWidget* LevelWidget = Cast<UGPLevelWidget>(InUserWidget);
 	if (LevelWidget)
 	{
+		OnLevelChanged.AddDynamic(LevelWidget, &UGPLevelWidget::UpdateLevelText);
 	}
 }
 

@@ -14,19 +14,12 @@ UCLASS()
 class GP2025_API UGPExpBarWidget : public UGPUserWidget
 {
 	GENERATED_BODY()
-	
 public :
-	UGPExpBarWidget(const FObjectInitializer& ObjectInitializer);
-
-protected :
 	virtual void NativeConstruct() override;
-public :
-	FORCEINLINE void SetMaxExp(float NewMaxExp) { MaxExp = NewMaxExp; }
-	void UpdateExpBar(float NewCurrentExp);
-protected :
+	
+	UFUNCTION()
+	void UpdateExpBar(float ExpRatio);
+
 	UPROPERTY()
 	TObjectPtr<class UProgressBar> ExpProgressBar;
-
-	UPROPERTY()
-	float MaxExp;
 };

@@ -4,7 +4,7 @@
 #include "UI/GPLevelWidget.h"
 #include "Components/TextBlock.h"
 
-void UGPLevelWidget::SetLevelText(int32 Level)
+void UGPLevelWidget::UpdateLevelText(int32 Level)
 {
 	if (TextLevel)
 	{
@@ -16,9 +16,5 @@ void UGPLevelWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	if (TextLevel)
-	{
-		TextLevel->SetText(FText::FromString("1"));
-	}
-}
 
+}
