@@ -19,8 +19,6 @@ void GameManager::AddPlayer(std::shared_ptr<Character> player)
 
 void GameManager::RemoveCharacter(int32 id)
 {
-	std::unique_lock<std::mutex> lock(_carrMutex);
-
 	if (id < 0 || id >= MAX_CHARACTER || !_characters[id])
 	{
 		LOG(Warning, "Invalid");
@@ -69,16 +67,15 @@ void GameManager::ProcessAttack(int32 attackerID, int32 targetID)
 {
 	std::unique_lock<std::mutex> lock(_carrMutex);
 	if (targetID == -1) 
-	{
 		return;
-	}
 	
 	LOG(Log, std::format("Attacked monster[{}]", targetID));
 
 	auto& Attacker = _characters[attackerID];
 	std::shared_ptr<Monster> Target = static_pointer_cast<Monster>(_characters[targetID]);
 
-	if (!_collisionMgr.CanAttack(Attacker->GetInfo(), Target->GetInfo())) return;
+	if (!_collisionMgr.CanAttack(Attacker->GetInfo(), Target->GetInfo())) 
+		return;
 
 	float atkDamage = Attacker->OnAttacked();
 	Target->OnDamaged(atkDamage);

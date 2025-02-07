@@ -12,7 +12,6 @@
 #include "Network/GPGameInstance.h"
 #include "GPCharacterNonPlayer.h"
 #include "Inventory/GPInventoryMoney.h"
-#include "CharacterStat/GPCharacterStatComponent.h"
 
 AGPCharacterPlayer::AGPCharacterPlayer()
 {

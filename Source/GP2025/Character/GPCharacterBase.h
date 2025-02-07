@@ -12,6 +12,11 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogGPCharacter, Log, All);
 DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, class UGPItemData*);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHpChanged, float, NewHpRatio);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnExpChanged, float, NewExpRatio);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelChanged, int32, NewLevel);
+
 USTRUCT(BlueprintType)
 struct FTakeItemDelegateWrapper
 {
@@ -35,7 +40,6 @@ public:
 	// 서버에서 받은 다른 클라이언트 정보를 업데이트
 	void SetCharacterInfo(FInfoData& CharacterInfo_);
 	FInfoData CharacterInfo;
-	void SetCharacterStats();
 
 // 기본 공격 애니메이션 및 공격 애니메이션 몽타주 코드
 public :
@@ -58,15 +62,9 @@ public :
 // Attack Hit Section
 protected :
 	virtual void AttackHitCheck() override;
-	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
-
-// Stat Section
-public :
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat" , Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UGPCharacterStatComponent> Stat;
-
 
 // UI Widget Section
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UGPWidgetComponent> HpBar;
 
@@ -76,10 +74,12 @@ public :
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UGPWidgetComponent> LevelText;
 
-	virtual void SetupCharacterWidget(class UGPUserWidget* InUserWidget) override;
+	FOnHpChanged OnHpChanged;
+	FOnExpChanged OnExpChanged;
+	FOnLevelChanged OnLevelChanged;
 
-	void OnLevelUp(int32 NewLevel);
-	void UpdateLevelUI();
+	virtual void SetupCharacterWidget(UGPUserWidget* Widget) override;
+
 // Dead Section
 public :
 	virtual void SetDead();
@@ -107,35 +107,4 @@ protected :
 	virtual void EquipChest(class UGPItemData* InItemData);
 	virtual void EquipHelmet(class UGPItemData* InItemData);
 	virtual void AddExp(class UGPItemData* InItemData);
-
-
-// Equip Item Section
-public : 
-	//void EquipHelmet(USkeletalMesh* HelmetMesh);
-	//void UnequipHelmet();
-
-	//void EquipChest(USkeletalMesh* ChestMesh);
-	//void UnequipChest();
-
-	//void EquipWeapon(USkeletalMesh* WeaponMesh);
-	//void UnequipWeapon();
-
-	//void EquipPants(USkeletalMesh* PantsMesh);
-	//void UnequipPants();
-
-	//void EquipItemFromDataAsset(UGPCharacterControlData* CharacterData);
-
-	//UPROPERTY(VisibleAnywhere, Category = "Equip")
-	//TObjectPtr<USkeletalMeshComponent> HelmetMeshComp;
-
-	//UPROPERTY(VisibleAnywhere, Category = "Equip")
-	//TObjectPtr<USkeletalMeshComponent> ChestMeshComp;
-
-	//UPROPERTY(VisibleAnywhere, Category = "Equip")
-	//TObjectPtr<USkeletalMeshComponent> WeaponMeshComp;
-
-	//UPROPERTY(VisibleAnywhere, Category = "Equip")
-	//TObjectPtr<USkeletalMeshComponent> PantsMeshComp;
-
-
 };

@@ -8,7 +8,6 @@
 #include "Animation/AnimMontage.h"
 #include "Physics/GPCollision.h"
 #include "Engine/DamageEvents.h"
-#include "CharacterStat/GPCharacterStatComponent.h"
 #include "UI/GPWidgetComponent.h"
 #include "UI/GPHpBarWidget.h"
 #include "UI/GPExpBarWidget.h"
@@ -111,9 +110,6 @@ AGPCharacterBase::AGPCharacterBase()
 		CharacterTypeManager.Add(ECharacterType::M_MOUSE, MouseDataRef.Object);
 	}
 
-	// Stat Component
-	Stat = CreateDefaultSubobject<UGPCharacterStatComponent>(TEXT("Stat"));
-
 	// Widget Component
 	HpBar = CreateDefaultSubobject<UGPWidgetComponent>(TEXT("HpWidget"));
 	HpBar->SetupAttachment(GetMesh());
@@ -171,10 +167,6 @@ void AGPCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (Stat)
-	{
-		Stat->OnLevelUp.AddUObject(this, &AGPCharacterBase::OnLevelUp);
-	}
 }
 
 void AGPCharacterBase::Tick(float DeltaTime)
@@ -236,24 +228,28 @@ void AGPCharacterBase::Tick(float DeltaTime)
 void AGPCharacterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	Stat->OnHpZero.AddUObject(this, &AGPCharacterBase::SetDead);
 }
 
 void AGPCharacterBase::SetCharacterInfo(FInfoData& CharacterInfo_)
 {
+	bool bHpChanged = CharacterInfo.Stats.Hp != CharacterInfo_.Stats.Hp;
+	bool bExpChanged = CharacterInfo.Stats.Exp != CharacterInfo_.Stats.Exp;
+	bool bLevelChanged = CharacterInfo.Stats.Level != CharacterInfo_.Stats.Level;
+
 	CharacterInfo = CharacterInfo_;
-}
 
-void AGPCharacterBase::SetCharacterStats()
-{
-	if (!Stat) return;
-
-	Stat->SetMaxHp(CharacterInfo.GetMaxHp());
-	Stat->SetHp(CharacterInfo.GetHp());
-	Stat->SetDamage(CharacterInfo.GetDamage());
-	Stat->SetCrtRate(CharacterInfo.GetCrtRate());
-	Stat->SetCrtValue(CharacterInfo.GetCrtValue());
-	Stat->SetDodge(CharacterInfo.GetDodge());
+	if (bHpChanged)
+	{
+		OnHpChanged.Broadcast(CharacterInfo.Stats.Hp / CharacterInfo.Stats.MaxHp);
+	}
+	if (bExpChanged)
+	{
+		OnExpChanged.Broadcast(CharacterInfo.Stats.Exp / CharacterInfo.Stats.MaxExp);
+	}
+	if (bLevelChanged)
+	{
+		OnLevelChanged.Broadcast(CharacterInfo.Stats.Level);
+	}
 }
 
 void AGPCharacterBase::ProcessAutoAttackCommand()
@@ -352,61 +348,28 @@ void AGPCharacterBase::AttackHitCheck()
 #endif
 }
 
-
-float AGPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
-	AGPCharacterBase* AttackerCharacter = CastChecked<AGPCharacterBase>(DamageCauser);
-
-	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
-	if (!GameInstance) return DamageAmount;
-
-	if (AttackerCharacter == GameInstance->MyPlayer)
-		GameInstance->SendPlayerAttackPacket(this->CharacterInfo.ID);
-
-	return DamageAmount;
-}
-
 void AGPCharacterBase::SetupCharacterWidget(UGPUserWidget* InUserWidget)
 {
+	if (!InUserWidget)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SetupCharacterWidget: Widget is NULL"));
+		return;
+	}
+
 	UGPHpBarWidget* HpBarWidget = Cast<UGPHpBarWidget>(InUserWidget);
 	if (HpBarWidget)
 	{
-		HpBarWidget->SetMaxHp(Stat->GetMaxHp());
-		HpBarWidget->UpdateHpBar(Stat->GetCurrentHp());
-		Stat->OnHpChanged.AddUObject(HpBarWidget, &UGPHpBarWidget::UpdateHpBar);
+		OnHpChanged.AddDynamic(HpBarWidget, &UGPHpBarWidget::UpdateHpBar);
 	}
 
 	UGPExpBarWidget* ExpBarWidget = Cast<UGPExpBarWidget>(InUserWidget);
 	if (ExpBarWidget)
 	{
-		ExpBarWidget->SetMaxExp(Stat->GetMaxExp());
-		ExpBarWidget->UpdateExpBar(Stat->GetCurrentExp());
-		Stat->OnExpChanged.AddUObject(ExpBarWidget, &UGPExpBarWidget::UpdateExpBar);
 	}
 
 	UGPLevelWidget* LevelWidget = Cast<UGPLevelWidget>(InUserWidget);
 	if (LevelWidget)
 	{
-		LevelWidget->SetLevelText(Stat->GetLevel());
-	}
-}
-
-void AGPCharacterBase::OnLevelUp(int32 NewLevel)
-{
-	UpdateLevelUI();
-}
-
-void AGPCharacterBase::UpdateLevelUI()
-{
-	if (LevelText)
-	{
-		UGPLevelWidget* LevelWidget = Cast<UGPLevelWidget>(LevelText->GetUserWidgetObject());
-		if (LevelWidget)
-		{
-			LevelWidget->SetLevelText(Stat->GetLevel());
-		}
 	}
 }
 
@@ -446,7 +409,6 @@ void AGPCharacterBase::TakeItem(UGPItemData* InItemData)
 void AGPCharacterBase::DrinkPotion(UGPItemData* InItemData)
 {
 	UE_LOG(LogGPCharacter, Log, TEXT("Drink Potion"));
-	Stat->AddHp(10.f);
 }
 
 void AGPCharacterBase::EquipChest(UGPItemData* InItemData)
@@ -472,137 +434,4 @@ void AGPCharacterBase::EquipHelmet(UGPItemData* InItemData)
 void AGPCharacterBase::AddExp(UGPItemData* InItemData)
 {
 	UE_LOG(LogGPCharacter, Log, TEXT("Add Exp"));
-	Stat->AddExp(10.f);
 }
-
-/////////////////////////////////////////////////////////////////
-
-
-
-
-///////////////////////////////////////////////////
-//void AGPCharacterBase::EquipHelmet(USkeletalMesh* HelmetMesh)
-//{
-//	if (!GetMesh() || !HelmetMesh) return;
-//
-//	if (!HelmetMeshComp)
-//	{
-//		HelmetMeshComp = NewObject<USkeletalMeshComponent>(this);
-//		HelmetMeshComp->RegisterComponent();
-//		HelmetMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-//	}
-//
-//	HelmetMeshComp->SetSkeletalMesh(HelmetMesh);
-//	HelmetMeshComp->SetLeaderPoseComponent(GetMesh());
-//}
-//
-//void AGPCharacterBase::UnequipHelmet()
-//{
-//	if (HelmetMeshComp)
-//	{
-//		HelmetMeshComp->DestroyComponent();
-//		HelmetMeshComp = nullptr;
-//	}
-//}
-//
-//void AGPCharacterBase::EquipChest(USkeletalMesh* ChestMesh)
-//{
-//	if (!GetMesh() || !ChestMesh) return;
-//
-//	if (!ChestMeshComp)
-//	{
-//		ChestMeshComp = NewObject<USkeletalMeshComponent>(this);
-//		ChestMeshComp->RegisterComponent();
-//		ChestMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-//	}
-//	ChestMeshComp->SetSkeletalMesh(ChestMesh);
-//	ChestMeshComp->SetLeaderPoseComponent(GetMesh());
-//}
-//
-//void AGPCharacterBase::UnequipChest()
-//{
-//	if (ChestMeshComp)
-//	{
-//		ChestMeshComp->DestroyComponent();
-//		ChestMeshComp = nullptr;
-//	}
-//}
-//
-//void AGPCharacterBase::EquipWeapon(USkeletalMesh* WeaponMesh)
-//{
-//	 
-//}
-//
-//void AGPCharacterBase::UnequipWeapon()
-//{
-//
-//}
-//
-//void AGPCharacterBase::EquipPants(USkeletalMesh* PantsMesh)
-//{
-//	if (!GetMesh() || !PantsMesh) return;
-//
-//	if (!PantsMeshComp)
-//	{
-//		PantsMeshComp = NewObject<USkeletalMeshComponent>(this);
-//		PantsMeshComp->RegisterComponent();
-//		PantsMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-//	}
-//
-//	PantsMeshComp->SetSkeletalMesh(PantsMesh);
-//	PantsMeshComp->SetLeaderPoseComponent(GetMesh());
-//}
-//
-//void AGPCharacterBase::UnequipPants()
-//{
-//	if (PantsMeshComp)
-//	{
-//		PantsMeshComp->DestroyComponent();
-//		PantsMeshComp = nullptr;
-//	}
-//}
-//
-//void AGPCharacterBase::EquipItemFromDataAsset(UGPCharacterControlData* CharacterData)
-//{
-//	if (!CharacterData) return;
-//
-//	if (CharacterData->HelmetMesh)
-//	{
-//		EquipHelmet(CharacterData->HelmetMesh);
-//	}
-//	else
-//	{
-//		UnequipHelmet();
-//	}
-//
-//	if (CharacterData->ChestMesh)
-//	{
-//		EquipChest(CharacterData->ChestMesh);
-//	}
-//	else
-//	{
-//		UnequipChest();
-//	}
-//
-//	if (CharacterData->WeaponMesh)
-//	{
-//		EquipWeapon(CharacterData->WeaponMesh);
-//	}
-//	else
-//	{
-//		UnequipWeapon();
-//	}
-//
-//	if (CharacterData->PantsMesh)
-//	{
-//		EquipPants(CharacterData->PantsMesh);
-//	}
-//	else
-//	{
-//		UnequipPants();
-//	}
-//
-//	UE_LOG(LogTemp, Log, TEXT("Equipped!!!"));
-//}
-//
-//

@@ -8,25 +8,23 @@
 #include "GPHpBarWidget.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class GP2025_API UGPHpBarWidget : public UGPUserWidget
 {
 	GENERATED_BODY()
-public :
+public:
 	UGPHpBarWidget(const FObjectInitializer& ObjectInitializer);
 
-	FORCEINLINE void SetMaxHp(float NewMaxHp) { MaxHp = NewMaxHp; }
-	void UpdateHpBar(float NewCurrentHp);
+	UFUNCTION()
+	void UpdateHpBar(float HpRatio);
 
-protected :
+protected:
 	virtual void NativeConstruct() override;
 
-protected :
+protected:
 	UPROPERTY()
 	TObjectPtr<class UProgressBar> HpProgressBar;
 
-	UPROPERTY()
-	float MaxHp;
 };

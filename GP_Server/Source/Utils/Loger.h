@@ -47,8 +47,8 @@ private:
 		{
 		case LogType::Warning: return "[Warning] ";
 		case LogType::Log: return "[Log] ";
-		case LogType::SendLog: return "[SendLog] >>>>";
-		case LogType::RecvLog: return "[RecvLog] <<<<";
+		case LogType::SendLog: return "[SendLog] >>>> ";
+		case LogType::RecvLog: return "[RecvLog] <<<< ";
 		default: return "Unknown";
 		}
 	}

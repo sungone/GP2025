@@ -6,7 +6,6 @@
 #include "Common/TcpSocketBuilder.h"
 #include "Serialization/ArrayWriter.h"
 #include "SocketSubsystem.h"
-#include "CharacterStat/GPCharacterStatComponent.h"
 #include "Character/GPCharacterPlayer.h"
 #include "UI/GPFloatingDamageText.h"
 
@@ -206,7 +205,6 @@ void UGPGameInstance::AddPlayer(FInfoData& PlayerInfo, bool isMyPlayer)
 			PlayerInfo.ID, PlayerInfo.Pos.X, PlayerInfo.Pos.Y, PlayerInfo.Pos.Z, PlayerInfo.Yaw);
 
 		MyPlayer->SetCharacterInfo(PlayerInfo);
-		MyPlayer->SetCharacterStats();
 		MyPlayer->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
 		Players.Add(PlayerInfo.ID, MyPlayer);
 	}
@@ -222,7 +220,6 @@ void UGPGameInstance::AddPlayer(FInfoData& PlayerInfo, bool isMyPlayer)
 			PlayerInfo.ID, PlayerInfo.Pos.X, PlayerInfo.Pos.Y, PlayerInfo.Pos.Z, PlayerInfo.Yaw);
 
 		Player->SetCharacterInfo(PlayerInfo);
-		Player->SetCharacterStats();
 		Player->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
 		Players.Add(PlayerInfo.ID, Player);
 	}
@@ -276,7 +273,6 @@ void UGPGameInstance::AddMonster(FInfoData& MonsterInfo)
 		MonsterInfo.ID, SpawnLocation.X, SpawnLocation.Y, SpawnLocation.Z, SpawnRotation.Yaw);
 
 	Monster->SetCharacterInfo(MonsterInfo);
-	Monster->SetCharacterStats();
 	Monster->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
 	Monster->SetCharacterType(MonsterInfo.CharacterType);
 	Monsters.Add(MonsterInfo.ID, Monster);
@@ -317,9 +313,9 @@ void UGPGameInstance::DamagedMonster(FInfoData& MonsterInfo, float Damage)
 	{
 		if (MonsterInfo.HasState(ECharacterStateType::STATE_DIE))
 		{
-			(*Monster)->SetDead();
 			return;
 		}
+
 		(*Monster)->SetCharacterInfo(MonsterInfo);
 
 		// Floating Damage UI
@@ -336,6 +332,6 @@ void UGPGameInstance::DamagedMonster(FInfoData& MonsterInfo, float Damage)
 				DamageText->SetDamageText(Damage, isCrt);
 			}
 		}
-		UE_LOG(LogTemp, Warning, TEXT("Update monster [%d]"), MonsterInfo.ID);
+		UE_LOG(LogTemp, Warning, TEXT("Damaged monster [%d]"), MonsterInfo.ID);
 	}
 }

@@ -3,32 +3,31 @@
 
 #include "UI/GPHpBarWidget.h"
 #include "Components/ProgressBar.h"
+#include "Character/GPCharacterBase.h"
 #include "Interface/GPCharacterWidgetInterface.h"
 
 UGPHpBarWidget::UGPHpBarWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	MaxHp = -1.f;
 }
 
-void UGPHpBarWidget::UpdateHpBar(float NewCurrentHp)
+void UGPHpBarWidget::UpdateHpBar(float HpRatio)
 {
-	ensure(MaxHp > 0.f);
-	if (HpProgressBar)
-	{
-		HpProgressBar->SetPercent(NewCurrentHp / MaxHp);
-	}
+    if (HpProgressBar)
+    {
+        HpProgressBar->SetPercent(HpRatio);
+    }
 }
 
 void UGPHpBarWidget::NativeConstruct()
 {
-	Super::NativeConstruct();
+    Super::NativeConstruct();
 
-	HpProgressBar = Cast<UProgressBar>(GetWidgetFromName("PbHpBar"));
-	ensure(HpProgressBar);
+    HpProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("PbHpBar")));
+    ensure(HpProgressBar);
 
-	IGPCharacterWidgetInterface* CharacterWidget = Cast<IGPCharacterWidgetInterface>(OwningActor);
-	if (CharacterWidget)
-	{
-		CharacterWidget->SetupCharacterWidget(this);
-	}
+    AGPCharacterBase* Character = Cast<AGPCharacterBase>(OwningActor);
+    if (Character)
+    {
+        Character->SetupCharacterWidget(this);
+    }
 }

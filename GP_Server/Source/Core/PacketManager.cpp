@@ -77,6 +77,7 @@ void PacketManager::HandleAttackPacket(Session& session, BYTE* packet)
 	LOG(LogType::RecvLog, std::format("Attack PKT [{}]", id));
 	AttackPacket* p = reinterpret_cast<AttackPacket*>(packet);
 	_gameMgr.ProcessAttack(id, p->TargetID);
+	playerInfo.AddState(ECharacterStateType::STATE_AUTOATTACK);
 	auto pkt1 = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, playerInfo);
 	_sessionMgr.Broadcast(&pkt1);
 
