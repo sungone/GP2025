@@ -17,5 +17,6 @@ public:
 public :
     bool ShouldStartWalking();
     bool ShouldAttack();
+
 }; 
 

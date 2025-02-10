@@ -20,3 +20,12 @@ void UGPWidgetComponent::InitWidget()
         }
     }
 }
+
+void UGPWidgetComponent::SetComponent(FVector Location, FVector2D Size)
+{
+    SetRelativeLocation(Location);
+    SetWidgetSpace(EWidgetSpace::Screen);
+    SetDrawSize(Size);
+    SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+

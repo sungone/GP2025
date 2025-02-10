@@ -38,7 +38,7 @@ void Session::DoSend(Packet* packet)
 		LOG(LogType::SendLog, std::format("RemoveMonster PKT to [{}]", _id));
 		break;
 	case S_MONSTER_STATUS_UPDATE:
-		LOG(LogType::SendLog, std::format("MonsterUpdate PKT to [{}]", _id));
+		//LOG(LogType::SendLog, std::format("MonsterUpdate PKT to [{}]", _id));
 		break;
 	default:
 		LOG(LogType::SendLog, "Unknown Packet Type");

@@ -35,67 +35,56 @@ enum EPacketType : uint8
 	S_DAMAGED_MONSTER
 };
 
-enum ECharacterType : uint8
-{
-	NONE,
-	P_WARRIOR,
-	P_GUNNER,
-
-	M_MOUSE,
-	M_BUBBLETEA,
-	M_ENERGYDRINK,
-	M_COFFEE,
-};
+//enum ECharacterType : uint8
+//{
+//	NONE,
+//	P_WARRIOR,
+//	P_GUNNER,
+//
+//	M_MOUSE,
+//	M_BUBBLETEA,
+//	M_ENERGYDRINK,
+//	M_COFFEE,
+//};
 
 #pragma region ObjectType
+using ECharacterType = uint8;
 
-namespace CharacterType
+namespace Type
 {
-	enum class ECharacterType : uint8
-	{
-		PLAYER,
-		MONSTER,
-		NPC
-	};
-
-	enum class EPlayerType : uint8
+	enum EPlayer : uint8
 	{
 		WARRIOR,
-		GUNNER
+		GUNNER,
+
+		PEND
 	};
 
-	enum class EMonsterType : uint8
+	enum EMonster : uint8
 	{
-		ENERGY_DRINK,
+		ENERGY_DRINK = PEND,
 		BUBBLE_TEA,
 		COFFEE,
+
 		MOUSE,
 		KEYBOARD,
 		DESKTOP,
+
 		COGWHEEL,
 		BOLT_NUT,
 		DRILL,
-		TINO
+
+		TINO,
 	};
 
-	enum class ENPCType : uint8
+	enum ENpc : uint8
 	{
 		PROFESSOR,
 		GUARD,
-		STUDENT
-	};
-}
-
-namespace ItemType
-{
-	enum class EItemType : uint8
-	{
-		WEAPON,
-		ARMOR,
-		CONSUMABLE,
+		STUDENT,
 	};
 
-	enum class EWeaponType : uint8
+	enum class EWeapon : uint8
 	{
 		BIRD_GUN,
 		PULSE_GUN,
@@ -105,7 +94,7 @@ namespace ItemType
 		ENERGY_SWORD,
 	};
 
-	enum class EArmorType : uint8
+	enum class EArmor : uint8
 	{
 		ALLOY_HELMET,
 		ENHANCED_HELMET,
@@ -116,7 +105,7 @@ namespace ItemType
 		TUCLOTHES
 	};
 
-	enum class EConsumableType : uint8
+	enum class EConsumable : uint8
 	{
 		HPKIT_LOW,
 		HPKIT_MID,
@@ -144,7 +133,7 @@ enum ECharacterStateType : uint8
 
 struct FStatData
 {
-	int32_t Level;
+	uint32 Level;
 	float Exp;
 	float MaxExp;
 	float Hp;
@@ -166,7 +155,7 @@ struct FStatData
 struct FInfoData
 {
 	int32 ID;
-	ECharacterType CharacterType;
+	uint8 CharacterType;
 	FVector Pos;
 	float Yaw;
 	float CollisionRadius;
@@ -177,10 +166,10 @@ struct FInfoData
 	uint32 State;
 
 	FInfoData()
-		: ID(0), CharacterType(ECharacterType::NONE),
+		: ID(0), CharacterType(),
 		Pos(FVector(0.0f, 0.0f, 0.0f)), Yaw(0.0f),
-		CollisionRadius(50.0f), AttackRadius(100.0f),
-		AttackRange(150.0f), Speed(0.0f),
+		CollisionRadius(100.0f), AttackRadius(100.0f),
+		AttackRange(200.0f), Speed(0.0f),
 		Stats(), State(STATE_IDLE)
 	{
 	}
@@ -220,7 +209,7 @@ struct FInfoData
 	void SetDamage(float NewDamage) { Stats.Damage = std::max(0.0f, NewDamage); }
 	bool IsInAttackRange(const FInfoData& Target) const
 	{
-		return Pos.IsInRange(Target.Pos, AttackRange + Target.AttackRadius);
+		return Pos.IsInRange(Target.Pos, AttackRange + Target.CollisionRadius);
 	}
 	float GetAttackDamage() const
 	{

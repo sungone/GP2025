@@ -18,6 +18,8 @@ void UGPHpBarWidget::BindToCharacter(AGPCharacterBase* Character)
         // 델리게이트 중복 바인딩 방지
         Character->OnHpChanged.RemoveDynamic(this, &UGPHpBarWidget::UpdateHpBar);
         Character->OnHpChanged.AddDynamic(this, &UGPHpBarWidget::UpdateHpBar);
+        float HpRatio = Character->CharacterInfo.GetHp() / Character->CharacterInfo.GetMaxHp();
+        UpdateHpBar(HpRatio);
     }
 }
 

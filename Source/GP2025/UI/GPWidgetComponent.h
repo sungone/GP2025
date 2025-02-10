@@ -7,14 +7,14 @@
 #include "GPWidgetComponent.generated.h"
 
 /**
- * 
+ * 3D 공간에서 UI를 배치할 때
  */
 UCLASS()
 class GP2025_API UGPWidgetComponent : public UWidgetComponent
 {
 	GENERATED_BODY()
-	
+public:
+	void SetComponent(FVector Location, FVector2D Size);
 protected :
 	virtual void InitWidget() override;
-
 };

@@ -25,15 +25,28 @@ namespace
 	template <typename T>
 	T* LoadAsset(const FString& Path)
 	{
-		static ConstructorHelpers::FObjectFinder<T> AssetRef(*Path);
+		ConstructorHelpers::FObjectFinder<T> AssetRef(*Path);
 		return AssetRef.Object;
 	}
 
 	template <typename T>
 	TSubclassOf<T> LoadClass(const FString& Path)
 	{
-		static ConstructorHelpers::FClassFinder<T> ClassRef(*Path);
+		ConstructorHelpers::FClassFinder<T> ClassRef(*Path);
 		return ClassRef.Class;
+	}
+
+	template <typename EnumType>
+	void LoadCharacterData(TMap<EnumType, UGPCharacterControlData*>& Manager, const TArray<TTuple<EnumType, FString>>& DataArray)
+	{
+		for (const auto& Data : DataArray)
+		{
+			ConstructorHelpers::FObjectFinder<UGPCharacterControlData> DataRef(*Data.Value);
+			if (DataRef.Object)
+			{
+				Manager.Add(Data.Key, DataRef.Object);
+			}
+		}
 	}
 }
 AGPCharacterBase::AGPCharacterBase()
@@ -74,46 +87,21 @@ AGPCharacterBase::AGPCharacterBase()
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
 	// 캐릭터 타입 설정
-	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> WarriorDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_Warrior.GPC_Warrior'"));
-	if (WarriorDataRef.Object)
-	{
-		CharacterTypeManager.Add(ECharacterType::P_WARRIOR, WarriorDataRef.Object);
-	}
+	static const TArray<TTuple<ECharacterType, FString>> CharacterTypes = {
+		MakeTuple(Type::EPlayer::WARRIOR, TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_Warrior.GPC_Warrior'")),
+		MakeTuple(Type::EPlayer::GUNNER, TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_Gunner.GPC_Gunner'")),
+		MakeTuple(Type::EMonster::BUBBLE_TEA, TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_BubbleTea.GPC_BubbleTea'")),
+		MakeTuple(Type::EMonster::ENERGY_DRINK, TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_EnergyDrink.GPC_EnergyDrink'")),
+		MakeTuple(Type::EMonster::COFFEE, TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_Coffee.GPC_Coffee'")),
+		MakeTuple(Type::EMonster::MOUSE, TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_Mouse.GPC_Mouse'"))
+	};
 
-	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> GunnerDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_Gunner.GPC_Gunner'"));
-	if (GunnerDataRef.Object)
-	{
-		CharacterTypeManager.Add(ECharacterType::P_GUNNER, GunnerDataRef.Object);
-	}
-
-	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> BubbleTeaDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_BubbleTea.GPC_BubbleTea'"));
-	if (BubbleTeaDataRef.Object)
-	{
-		CharacterTypeManager.Add(ECharacterType::M_BUBBLETEA, BubbleTeaDataRef.Object);
-	}
-
-	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> EnergydrinkDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_EnergyDrink.GPC_EnergyDrink'"));
-	if (EnergydrinkDataRef.Object)
-	{
-		CharacterTypeManager.Add(ECharacterType::M_ENERGYDRINK, EnergydrinkDataRef.Object);
-	}
-
-	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> CoffeeDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_Coffee.GPC_Coffee'"));
-	if (CoffeeDataRef.Object)
-	{
-		CharacterTypeManager.Add(ECharacterType::M_COFFEE, CoffeeDataRef.Object);
-	}
-
-	static ConstructorHelpers::FObjectFinder<UGPCharacterControlData> MouseDataRef(TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_Mouse.GPC_Mouse'"));
-	if (MouseDataRef.Object)
-	{
-		CharacterTypeManager.Add(ECharacterType::M_MOUSE, MouseDataRef.Object);
-	}
+	LoadCharacterData(CharacterTypeManager, CharacterTypes);
 
 	// Widget Component
 	HpBar = CreateWidgetComponent(TEXT("HpWidget"), TEXT("/Game/UI/WBP_CharacterHpBar.WBP_CharacterHpBar_C"), FVector(0.f, 0.f, 300.f), FVector2D(150.f, 15.f));
-	ExpBar = CreateWidgetComponent(TEXT("ExpWidget"), TEXT("/Game/UI/WBP_ExpBar.WBP_ExpBar_C"), FVector(0.f, 0.f, 308.f), FVector2D(150.f, 15.f));
-	LevelText = CreateWidgetComponent(TEXT("LevelWidget"), TEXT("/Game/UI/WBP_LevelText.WBP_LevelText_C"), FVector(0.f, 0.f, 350.f), FVector2D(40.f, 10.f));
+	//ExpBar = CreateWidgetComponent(TEXT("ExpWidget"), TEXT("/Game/UI/WBP_ExpBar.WBP_ExpBar_C"), FVector(0.f, 0.f, 308.f), FVector2D(150.f, 15.f));
+	LevelText = CreateWidgetComponent(TEXT("LevelWidget"), TEXT("/Game/UI/WBP_LevelText.WBP_LevelText_C"), FVector(0.f, 0.f, 340.f), FVector2D(40.f, 10.f));
 
 	// Item Actions
 	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterBase::EquipHelmet)));
@@ -199,24 +187,11 @@ void AGPCharacterBase::PostInitializeComponents()
 
 void AGPCharacterBase::SetCharacterInfo(FInfoData& CharacterInfo_)
 {
-	bool bHpChanged = CharacterInfo.Stats.Hp != CharacterInfo_.Stats.Hp;
-	bool bExpChanged = CharacterInfo.Stats.Exp != CharacterInfo_.Stats.Exp;
-	bool bLevelChanged = CharacterInfo.Stats.Level != CharacterInfo_.Stats.Level;
-
 	CharacterInfo = CharacterInfo_;
 
-	if (bHpChanged)
-	{
-		OnHpChanged.Broadcast(CharacterInfo.Stats.Hp / CharacterInfo.Stats.MaxHp);
-	}
-	if (bExpChanged)
-	{
-		OnExpChanged.Broadcast(CharacterInfo.Stats.Exp / CharacterInfo.Stats.MaxExp);
-	}
-	if (bLevelChanged)
-	{
-		OnLevelChanged.Broadcast(CharacterInfo.Stats.Level);
-	}
+	OnHpChanged.Broadcast(CharacterInfo.Stats.Hp / CharacterInfo.Stats.MaxHp);
+	OnExpChanged.Broadcast(CharacterInfo.Stats.Exp / CharacterInfo.Stats.MaxExp);
+	OnLevelChanged.Broadcast(CharacterInfo.Stats.Level);
 }
 
 void AGPCharacterBase::ProcessAutoAttackCommand()
@@ -297,6 +272,17 @@ void AGPCharacterBase::AttackHitCheck()
 		AGPCharacterBase* TargetCharacter = Cast<AGPCharacterBase>(HitActor);
 		if (!TargetCharacter) return;
 
+		const FInfoData& TargetInfo = TargetCharacter->CharacterInfo; // FInfoData 가져오기
+
+		// 충돌한 대상의 위치 및 충돌 반경 가져오기
+		FVector TargetLocation = TargetCharacter->GetActorLocation();
+		float TargetCollisionRadius = TargetInfo.CollisionRadius;
+		float TargetHalfHeight = TargetCollisionRadius * 2.0f; // 임의로 높이 설정
+
+		// 충돌한 대상의 캡슐을 파란색으로 그리기
+		DrawDebugCapsule(GetWorld(), TargetLocation, TargetHalfHeight, TargetCollisionRadius,
+			FQuat::Identity, FColor::Blue, false, 5.f);
+
 		UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 		if (GameInstance && this == GameInstance->MyPlayer)
 		{
@@ -305,6 +291,7 @@ void AGPCharacterBase::AttackHitCheck()
 	}
 
 #if ENABLE_DRAW_DEBUG
+	// 공격 범위를 캡슐 형태로 그리기
 	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
 	float CapsuleHalfHeight = AttackRange * 0.5f;
 	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
@@ -315,22 +302,13 @@ void AGPCharacterBase::AttackHitCheck()
 #endif
 }
 
+
 UGPWidgetComponent* AGPCharacterBase::CreateWidgetComponent(const FString& Name, const FString& WidgetPath, FVector Location, FVector2D Size)
 {
 	UGPWidgetComponent* WidgetComp = CreateDefaultSubobject<UGPWidgetComponent>(*Name);
 	WidgetComp->SetupAttachment(GetMesh());
-	WidgetComp->SetRelativeLocation(Location);
-	WidgetComp->SetWidgetSpace(EWidgetSpace::Screen);
-	WidgetComp->SetPivot(FVector2D(0.5f, 0.5f));
-	WidgetComp->SetOwnerNoSee(true);
-	WidgetComp->SetDrawSize(Size);
-	WidgetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	ConstructorHelpers::FClassFinder<UUserWidget> WidgetRef(*WidgetPath);
-	if (WidgetRef.Class)
-	{
-		WidgetComp->SetWidgetClass(WidgetRef.Class);
-	}
+	WidgetComp->SetComponent(Location, Size);
+	WidgetComp->SetWidgetClass(LoadClass<UUserWidget>(WidgetPath));
 
 	return WidgetComp;
 }

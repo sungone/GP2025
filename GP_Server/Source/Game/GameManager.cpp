@@ -19,6 +19,7 @@ void GameManager::AddPlayer(std::shared_ptr<Character> player)
 
 void GameManager::RemoveCharacter(int32 id)
 {
+	LOG(Log, std::format("Remove Character"));
 	if (id < 0 || id >= MAX_CHARACTER || !_characters[id])
 	{
 		LOG(Warning, "Invalid");

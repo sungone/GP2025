@@ -7,7 +7,7 @@
 #include "GPHpBarWidget.generated.h"
 
 /**
- *
+ *¤¤
  */
 UCLASS()
 class GP2025_API UGPHpBarWidget : public UGPUserWidget, public IGPCharacterWidgetInterface

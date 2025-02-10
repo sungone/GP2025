@@ -6,7 +6,7 @@ void Character::Init()
 	SetBunkerRandomLocation();
 	_info.InitStats(
 		100.f,    // MaxHp
-		50.f,     // Damage
+		20.f,     // Damage
 		0.25f,    // CrtRate
 		1.5f,     // CrtValue
 		0.25f,    // Dodge
