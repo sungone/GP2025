@@ -32,6 +32,7 @@ void AGPFloatingDamageText::BeginPlay()
 	if (Widget)
 	{
 		DamageText = Cast<UTextBlock>(Widget->GetWidgetFromName(TEXT("DamageText")));
+		DamageText->SetColorAndOpacity(FSlateColor(FLinearColor::Red));
 	}
 
 	GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &AGPFloatingDamageText::DestroySelf, 1.0f, false);
@@ -58,7 +59,6 @@ void AGPFloatingDamageText::SetDamageText(float DamageAmount, bool bIsCrt)
 		else
 		{
 			DamageText->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), DamageAmount)));
-			DamageText->SetColorAndOpacity(FSlateColor(FLinearColor::Red));
 
 			if (bIsCrt)
 			{
@@ -66,7 +66,7 @@ void AGPFloatingDamageText::SetDamageText(float DamageAmount, bool bIsCrt)
 			}
 			else
 			{
-				DamageText->SetRenderScale(FVector2D(1.0f, 1.0f)); // 기본 크기 유지
+				DamageText->SetRenderScale(FVector2D(0.5f, 0.5f)); // 기본 크기 유지
 			}
 		}
 	}

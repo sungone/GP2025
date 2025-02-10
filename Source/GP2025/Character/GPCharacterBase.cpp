@@ -109,13 +109,6 @@ AGPCharacterBase::AGPCharacterBase()
 	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterBase::DrinkPotion)));
 	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterBase::AddExp)));
 
-	// Weapon Component
-	Chest = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Chest"));
-	Chest->SetupAttachment(GetMesh(), TEXT("ChestSocket"));
-
-	Helmet = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Helmet"));
-	Helmet->SetupAttachment(GetMesh(), TEXT("HelmetSocket"));
-
 }
 
 void AGPCharacterBase::BeginPlay()
@@ -248,57 +241,62 @@ void AGPCharacterBase::SetCharacterType(ECharacterType NewCharacterType)
 
 	CurrentCharacterType = NewCharacterType;
 }
-
+ 
 void AGPCharacterBase::AttackHitCheck()
 {
 	FHitResult OutHitResult;
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
 
+	// 공격 범위 및 반경 가져오기
 	const float AttackRange = CharacterInfo.AttackRange;
 	const float AttackRadius = CharacterInfo.AttackRadius;
 
+	// 공격 시작점과 끝점 계산
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
 
-	bool HitDetected = GetWorld()->SweepSingleByChannel(
+	// 스피어(구형) 충돌 검사 수행
+	bool bHitDetected = GetWorld()->SweepSingleByChannel(
 		OutHitResult, Start, End, FQuat::Identity, CCHANNEL_GPACTION,
 		FCollisionShape::MakeSphere(AttackRadius), Params);
 
-	if (HitDetected)
+	if (bHitDetected && IsValid(OutHitResult.GetActor()))
 	{
-		AActor* HitActor = OutHitResult.GetActor();
-		if (!HitActor) return;
-
-		AGPCharacterBase* TargetCharacter = Cast<AGPCharacterBase>(HitActor);
-		if (!TargetCharacter) return;
-
-		const FInfoData& TargetInfo = TargetCharacter->CharacterInfo; // FInfoData 가져오기
-
-		// 충돌한 대상의 위치 및 충돌 반경 가져오기
-		FVector TargetLocation = TargetCharacter->GetActorLocation();
-		float TargetCollisionRadius = TargetInfo.CollisionRadius;
-		float TargetHalfHeight = TargetCollisionRadius * 2.0f; // 임의로 높이 설정
-
-		// 충돌한 대상의 캡슐을 파란색으로 그리기
-		DrawDebugCapsule(GetWorld(), TargetLocation, TargetHalfHeight, TargetCollisionRadius,
-			FQuat::Identity, FColor::Blue, false, 5.f);
-
-		UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
-		if (GameInstance && this == GameInstance->MyPlayer)
+		AGPCharacterBase* TargetCharacter = Cast<AGPCharacterBase>(OutHitResult.GetActor());
+		if (IsValid(TargetCharacter))
 		{
-			GameInstance->SendPlayerAttackPacket(TargetCharacter->CharacterInfo.ID);
+			const FInfoData& TargetInfo = TargetCharacter->CharacterInfo;
+
+			const FVector TargetLocation = TargetCharacter->GetActorLocation();
+			const float TargetCollisionRadius = TargetInfo.CollisionRadius;
+			const float TargetHalfHeight = TargetCollisionRadius;
+
+#if ENABLE_DRAW_DEBUG
+			DrawDebugCapsule(GetWorld(), TargetLocation, TargetHalfHeight, TargetCollisionRadius,
+				FQuat::Identity, FColor::Yellow, false, 5.f);
+#endif
+
+			// 공격 패킷 전송 (클라이언트 본인 캐릭터만)
+			UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
+			if (IsValid(GameInstance) && this == GameInstance->MyPlayer)
+			{
+				GameInstance->SendPlayerAttackPacket(TargetCharacter->CharacterInfo.ID);
+			}
 		}
 	}
 
 #if ENABLE_DRAW_DEBUG
-	// 공격 범위를 캡슐 형태로 그리기
-	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
-	float CapsuleHalfHeight = AttackRange * 0.5f;
-	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
-
-	DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius,
-		FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(),
-		DrawColor, false, 5.f);
+	// 공격 범위를 캡슐 형태로 시각화
+	const FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
+	const float CapsuleHalfHeight = AttackRange * 0.5f;
+	//const FColor DrawColor = bHitDetected ? FColor::Green : FColor::Red;
+	const FColor DrawColor = FColor::Red;
+	if (bHitDetected)
+	{
+		DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius,
+			FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(),
+			DrawColor, false, 5.f);
+	}
 #endif
 }
 
@@ -331,6 +329,7 @@ void AGPCharacterBase::SetDead()
 void AGPCharacterBase::PlayDeadAnimation()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (!AnimInstance) return;
 	AnimInstance->StopAllMontages(0.f);
 	AnimInstance->Montage_Play(DeadMontage, 1.f);
 }
@@ -357,6 +356,7 @@ void AGPCharacterBase::EquipChest(UGPItemData* InItemData)
 	UGPEquipItemData* ChestItemData = Cast<UGPEquipItemData>(InItemData);
 	if (ChestItemData)
 	{
+		Chest->SetLeaderPoseComponent(GetMesh());
 		Chest->SetSkeletalMesh(ChestItemData->EquipMesh);
 	}
 }
@@ -368,6 +368,7 @@ void AGPCharacterBase::EquipHelmet(UGPItemData* InItemData)
 	if (HelmetItemData)
 	{
 		Helmet->SetSkeletalMesh(HelmetItemData->EquipMesh);
+		Helmet->SetLeaderPoseComponent(GetMesh());
 	}
 }
 

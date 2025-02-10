@@ -80,7 +80,7 @@ void AGPCharacterPlayer::BeginPlay()
 	Super::BeginPlay();
 	GetMesh()->SetWorldScale3D(FVector(1.0f));
 	SetCharacterType(CurrentCharacterType);
-	// EquipItemFromDataAsset(CharacterTypeManager[CurrentCharacterType]);
+	//EquipItemFromDataAsset(CharacterTypeManager[CurrentCharacterType]);
 
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 	if (GameInstance)

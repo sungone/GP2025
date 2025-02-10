@@ -285,6 +285,7 @@ void UGPGameInstance::RemoveMonster(int32 MonsterID)
 
 	if (Monster)
 	{
+		(*Monster) ->OnHpChanged.Broadcast(0);
 		(*Monster)->SetDead();
 		return;
 	}
@@ -297,7 +298,6 @@ void UGPGameInstance::UpdateMonster(FInfoData& MonsterInfo)
 	{
 		if (MonsterInfo.HasState(ECharacterStateType::STATE_DIE))
 		{
-			(*Monster)->SetDead();
 			return;
 		}
 		(*Monster)->SetCharacterInfo(MonsterInfo);

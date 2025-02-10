@@ -62,7 +62,6 @@ bool Server::Init()
 void Server::Run()
 {
 	DoAccept();
-	//WorkerThreadLoop();
 	CreateWokerThreads();
 }
 

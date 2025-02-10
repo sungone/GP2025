@@ -8,7 +8,7 @@ void Character::Init()
 		100.f,    // MaxHp
 		20.f,     // Damage
 		0.25f,    // CrtRate
-		1.5f,     // CrtValue
+		2.0f,     // CrtValue
 		0.25f,    // Dodge
 		200.f     // Speed
 	);

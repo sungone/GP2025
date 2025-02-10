@@ -67,20 +67,23 @@ void GameManager::SpawnMonster(Session& session)
 void GameManager::ProcessAttack(int32 attackerID, int32 targetID)
 {
 	std::unique_lock<std::mutex> lock(_carrMutex);
-	if (targetID == -1) 
+	if (targetID == -1)
 		return;
-	
+
 	LOG(Log, std::format("Attacked monster[{}]", targetID));
 
 	auto& Attacker = _characters[attackerID];
 	std::shared_ptr<Monster> Target = static_pointer_cast<Monster>(_characters[targetID]);
 
-	if (!_collisionMgr.CanAttack(Attacker->GetInfo(), Target->GetInfo())) 
+	if (!_collisionMgr.CanAttack(Attacker->GetInfo(), Target->GetInfo()))
 		return;
 
 	float atkDamage = Attacker->OnAttacked();
-	Target->OnDamaged(atkDamage);
+	if (atkDamage > 0.0f)
+		Target->OnDamaged(atkDamage);
 
+	InfoPacket packet(S_MONSTER_STATUS_UPDATE, Target->GetInfo());
+	SessionManager::GetInst().Broadcast(&packet);
 	auto pkt = DamagePacket(Target->GetInfo(), atkDamage);
 	SessionManager::GetInst().Broadcast(&pkt);
 }
@@ -127,10 +130,9 @@ void GameManager::UpdateMonster()
 		std::unique_lock<std::mutex> lock(_carrMutex);
 		for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 		{
-			if (_characters[i])
-			{
-				_characters[i]->Update();
-			}
+			if (!_characters[i]) return;
+
+			_characters[i]->Update();
 
 			if (_characters[i]->IsDead())
 			{

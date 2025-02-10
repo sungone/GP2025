@@ -159,8 +159,10 @@ struct FInfoData
 	FVector Pos;
 	float Yaw;
 	float CollisionRadius;
+
 	float AttackRadius;
 	float AttackRange;
+
 	float Speed;
 	FStatData Stats;
 	uint32 State;
@@ -168,7 +170,7 @@ struct FInfoData
 	FInfoData()
 		: ID(0), CharacterType(),
 		Pos(FVector(0.0f, 0.0f, 0.0f)), Yaw(0.0f),
-		CollisionRadius(100.0f), AttackRadius(100.0f),
+		CollisionRadius(100.0f), AttackRadius(200.0f),
 		AttackRange(200.0f), Speed(0.0f),
 		Stats(), State(STATE_IDLE)
 	{
@@ -200,13 +202,17 @@ struct FInfoData
 	float GetCrtRate() const { return Stats.CrtRate; }
 	float GetCrtValue() const { return Stats.CrtValue; }
 	float GetDodge() const { return Stats.Dodge; }
-
+	FVector GetAttackPos() const
+	{
+		return Pos + FVector(AttackRange * 0.5f, 0.0f, 0.0f);
+	}
 #ifdef SERVER_BUILD
 	void SetHp(float NewHp) { Stats.Hp = std::clamp(NewHp, 0.0f, Stats.MaxHp); }
 	void Heal(float Amount) { SetHp(Stats.Hp + Amount); }
 	void TakeDamage(float Amount) { SetHp(Stats.Hp - Amount); }
 	bool IsDead() const { return Stats.Hp <= 0; }
 	void SetDamage(float NewDamage) { Stats.Damage = std::max(0.0f, NewDamage); }
+
 	bool IsInAttackRange(const FInfoData& Target) const
 	{
 		return Pos.IsInRange(Target.Pos, AttackRange + Target.CollisionRadius);
@@ -216,6 +222,9 @@ struct FInfoData
 		static std::default_random_engine dre;
 		static std::uniform_real_distribution<float> dist(0.0f, 1.0f);
 		float RandomValue = dist(dre);
+		if (RandomValue < 0.1f)
+			return 0.0f;
+
 		bool bIsCritical = RandomValue < Stats.CrtRate;
 		return bIsCritical ? Stats.Damage * Stats.CrtValue : Stats.Damage;
 	}

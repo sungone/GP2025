@@ -40,6 +40,9 @@ void Session::DoSend(Packet* packet)
 	case S_MONSTER_STATUS_UPDATE:
 		//LOG(LogType::SendLog, std::format("MonsterUpdate PKT to [{}]", _id));
 		break;
+	case S_DAMAGED_MONSTER:
+		LOG(LogType::SendLog, std::format("DamagedMonster PKT to [{}]", _id));
+		break;
 	default:
 		LOG(LogType::SendLog, "Unknown Packet Type");
 		break;
