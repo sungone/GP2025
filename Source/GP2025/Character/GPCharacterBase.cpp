@@ -14,41 +14,14 @@
 #include "UI/GPLevelWidget.h"
 #include "UI/GPFloatingDamageText.h"
 #include "Item/GPEquipItemData.h"
+#include "TLoad.h"
 
 #include <random>
 static std::random_device rd;
 static std::mt19937 gen(rd());
 
 DEFINE_LOG_CATEGORY(LogGPCharacter);
-namespace
-{
-	template <typename T>
-	T* LoadAsset(const FString& Path)
-	{
-		ConstructorHelpers::FObjectFinder<T> AssetRef(*Path);
-		return AssetRef.Object;
-	}
 
-	template <typename T>
-	TSubclassOf<T> LoadClass(const FString& Path)
-	{
-		ConstructorHelpers::FClassFinder<T> ClassRef(*Path);
-		return ClassRef.Class;
-	}
-
-	template <typename EnumType>
-	void LoadCharacterData(TMap<EnumType, UGPCharacterControlData*>& Manager, const TArray<TTuple<EnumType, FString>>& DataArray)
-	{
-		for (const auto& Data : DataArray)
-		{
-			ConstructorHelpers::FObjectFinder<UGPCharacterControlData> DataRef(*Data.Value);
-			if (DataRef.Object)
-			{
-				Manager.Add(Data.Key, DataRef.Object);
-			}
-		}
-	}
-}
 AGPCharacterBase::AGPCharacterBase()
 {
 	// Ä³¸¯ÅÍ ½ºÄÌ·¹Å» ¸Þ½Ã

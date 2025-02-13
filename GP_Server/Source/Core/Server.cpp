@@ -18,7 +18,7 @@ bool Server::Init()
 		return false;
 	}
 
-	_listenSocket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
+	InitSocket(_listenSocket, WSA_FLAG_OVERLAPPED);
 	if (_listenSocket == INVALID_SOCKET)
 	{
 		LOG(LogType::Warning, "WSASocket");
@@ -62,7 +62,7 @@ bool Server::Init()
 void Server::Run()
 {
 	DoAccept();
-	CreateWokerThreads();
+	CreateThreads([this]() { WorkerThreadLoop(); }, std::thread::hardware_concurrency());
 }
 
 void Server::Close()
@@ -77,16 +77,21 @@ void Server::Close()
 	WSACleanup();
 }
 
-void Server::CreateWokerThreads()
+void Server::InitSocket(SOCKET& socket, DWORD dwFlags)
 {
-	int32 numThreads = std::thread::hardware_concurrency();
+	socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, dwFlags);
+}
+
+void Server::CreateThreads(std::function<void()> func, int32 numThreads)
+{
 	std::vector<std::thread> threads;
 	for (int32 i = 0; i < numThreads; ++i) {
-		threads.emplace_back(&Server::WorkerThreadLoop, this);
+		threads.emplace_back(func);
 	}
 	for (auto& thread : threads)
 		thread.join();
 }
+
 
 void Server::WorkerThreadLoop()
 {
@@ -137,8 +142,8 @@ void Server::HandleError(ExpOver* ex_over, int32 id)
 
 void Server::DoAccept()
 {
+	InitSocket(_acceptSocket, WSA_FLAG_OVERLAPPED);
 	ZeroMemory(&_acceptOver._wsaover, sizeof(_acceptOver._wsaover));
-	_acceptSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 	_acceptOver._compType = ACCEPT;
 	AcceptEx(_listenSocket, _acceptSocket, _acceptOver._buf, 0,
 		sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, 0, &_acceptOver._wsaover);
@@ -155,4 +160,3 @@ void Server::HandleRecv(int32 _id, int32 recvByte, ExpOver* expOver)
 	_sessionMgr.HandleRecvBuffer(_id, recvByte, expOver);
 	_sessionMgr.DoRecv(_id);
 }
-
