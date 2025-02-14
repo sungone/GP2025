@@ -6,7 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Interface/GPAnimationAttackInterface.h"
 #include "Interface/GPCharacterItemInterface.h"
-#include "../../GP_Server/Source/Common/Proto.h"
+#include "../../GP_Server/Source/Common/Common.h"
 #include "GPCharacterBase.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogGPCharacter, Log, All);

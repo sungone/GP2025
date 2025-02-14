@@ -20,7 +20,7 @@
 #include <algorithm>
 
 #include "FVector.h"
-#include "Proto.h"
+#include "Common.h"
 #include "Loger.h"
 #include "ExpOver.h"
 #include "CollisionUtils.h"

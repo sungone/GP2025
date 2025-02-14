@@ -1,5 +1,5 @@
 #pragma once
-#include "Proto.h"
+#include "Common.h"
 
 namespace CollisionUtils
 {

@@ -45,6 +45,9 @@
     <Filter Include="Source Files\Pch">
       <UniqueIdentifier>{3a7b361f-25be-42ce-99da-91564daa6b55}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Shared">
+      <UniqueIdentifier>{a7a69939-add0-4a56-b879-98677decfb9c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Utils\Loger.h">
@@ -98,14 +101,23 @@
     <ClInclude Include="Source\pch.h">
       <Filter>Source Files\Pch</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Common\Proto.h">
-      <Filter>Source Files\Network</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Game\CollisionUtils.h">
       <Filter>Source Files\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="RandomUtils.h">
+    <ClInclude Include="Source\Utils\RandomUtils.h">
       <Filter>Source Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\Common.h">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\DataStruct.h">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\Packet.h">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\Type.h">
+      <Filter>Source Files\Shared</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
