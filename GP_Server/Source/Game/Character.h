@@ -8,10 +8,7 @@ public:
 	virtual bool IsDead();
 
 	void OnDamaged(float damage);
-	float OnAttacked()
-	{
-		return _info.GetAttackDamage();
-	}
+	float GetAttackDamage();
 	void SetBunkerRandomLocation();
 	FInfoData& GetInfo() { return _info; }
 	bool IsValid() const { return _info.ID != -1; }

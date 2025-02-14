@@ -282,10 +282,8 @@ void UGPGameInstance::RemoveMonster(int32 MonsterID)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Remove monster [%d]"), MonsterID);
 	auto Monster = Monsters.Find(MonsterID);
-
 	if (Monster)
 	{
-		(*Monster) ->OnHpChanged.Broadcast(0);
 		(*Monster)->SetDead();
 		return;
 	}
@@ -311,11 +309,6 @@ void UGPGameInstance::DamagedMonster(FInfoData& MonsterInfo, float Damage)
 
 	if (Monster)
 	{
-		if (MonsterInfo.HasState(ECharacterStateType::STATE_DIE))
-		{
-			return;
-		}
-
 		(*Monster)->SetCharacterInfo(MonsterInfo);
 
 		// Floating Damage UI

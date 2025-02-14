@@ -3,7 +3,6 @@
 #include "Session.h"
 #include "Timer.h"
 #include "SessionManager.h"
-#include "CollisionManager.h"
 
 constexpr size_t MAX_PLAYER = MAX_CLIENT;
 constexpr size_t MAX_MONSTER = 8;
@@ -39,7 +38,6 @@ public:
 	std::mutex _carrMutex;
 
 private:
-	CollisionManager& _collisionMgr = CollisionManager::GetInst();
 	std::array<std::shared_ptr<Character>, MAX_CHARACTER> _characters;
 };
 

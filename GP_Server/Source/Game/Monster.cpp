@@ -33,7 +33,7 @@ void Monster::BehaviorTree()
 	switch (_info.State)
 	{
 	case ECharacterStateType::STATE_IDLE:
-		if (ShouldStartWalking())
+		if (ShouldWalking())
 		{
 			ChangeState(ECharacterStateType::STATE_WALK);
 		}
@@ -48,7 +48,7 @@ void Monster::BehaviorTree()
 		{
 			ChangeState(ECharacterStateType::STATE_AUTOATTACK);
 		}
-		else if (!ShouldStartWalking())
+		else if (!ShouldWalking())
 		{
 			ChangeState(ECharacterStateType::STATE_IDLE);
 		}
@@ -67,44 +67,38 @@ void Monster::ChangeState(ECharacterStateType newState)
 {
 	std::lock_guard<std::mutex> lock(_cMutex);
 
-	if (_info.State != newState)
+	if (!_info.HasState(newState))
 	{
-		_info.State = newState;
-		_info.State = static_cast<uint32_t>(_info.State);
+		_info.AddState(newState);
 	}
-}
-
-bool Monster::ShouldStartWalking()
-{
-	std::lock_guard<std::mutex> lock(_cMutex);
-	static std::uniform_int_distribution<int> dist(0, 2);
-	static std::uniform_real_distribution<float> distX(-1000.0f, 1000.0f);
-	static std::uniform_real_distribution<float> distY(-1000.0f, 1000.0f);
-	if (dist(gen) == 0)
-	{
-		float newX = _info.Pos.X + distX(gen);
-		float newY = _info.Pos.Y + distY(gen);
-
-		float deltaX = newX - _info.Pos.X;
-		float deltaY = newY - _info.Pos.Y;
-		float newYaw = std::atan2(deltaY, deltaX) * (180.0f / 3.14159265f);
-
-		_info.SetLocation(newX, newY, _info.Pos.Z);
-		_info.Yaw = newYaw;
-
-		return true;
-	}
-
-	return false;
 }
 
 bool Monster::ShouldAttack()
 {
+	//Todo: 공격 범위 안에 플레이어 있는지
 	static std::uniform_int_distribution<int> dist(0, 1);
+	return (dist(gen) == 0);
+}
+
+bool Monster::ShouldWalking()
+{
+	std::lock_guard<std::mutex> lock(_cMutex);
+	static std::uniform_int_distribution<int> dist(0, 2);
+
 	if (dist(gen) == 0)
 	{
+		FVector newPos = GenerateRandomNearbyPosition();
+
+		_info.SetLocationAndYaw(newPos);
 		return true;
 	}
-
 	return false;
+}
+
+FVector Monster::GenerateRandomNearbyPosition()
+{
+	static std::uniform_real_distribution<float> distX(-1000.0f, 1000.0f);
+	static std::uniform_real_distribution<float> distY(-1000.0f, 1000.0f);
+
+	return _info.Pos + FVector(distX(gen), distY(gen), 0);
 }

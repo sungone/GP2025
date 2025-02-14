@@ -189,6 +189,7 @@ struct FInfoData
 	}
 
 	void SetLocation(float X_, float Y_, float Z_) { Pos = FVector(X_, Y_, Z_); }
+	void SetLocation(FVector Pos_) { Pos = Pos_; }
 	void AddState(ECharacterStateType NewState) { State |= NewState; }
 	void RemoveState(ECharacterStateType RemoveState) { State &= ~RemoveState; }
 	bool HasState(ECharacterStateType CheckState) const { return (State & CheckState) != 0; }
@@ -210,24 +211,32 @@ struct FInfoData
 	void SetHp(float NewHp) { Stats.Hp = std::clamp(NewHp, 0.0f, Stats.MaxHp); }
 	void Heal(float Amount) { SetHp(Stats.Hp + Amount); }
 	void TakeDamage(float Amount) { SetHp(Stats.Hp - Amount); }
-	bool IsDead() const { return Stats.Hp <= 0; }
+	bool IsDead() const { return Stats.Hp < 1.0f; }
 	void SetDamage(float NewDamage) { Stats.Damage = std::max(0.0f, NewDamage); }
 
 	bool IsInAttackRange(const FInfoData& Target) const
 	{
 		return Pos.IsInRange(Target.Pos, AttackRange + Target.CollisionRadius);
 	}
-	float GetAttackDamage() const
+	float GetAttackDamage(float RandomValue) const
 	{
-		static std::default_random_engine dre;
-		static std::uniform_real_distribution<float> dist(0.0f, 1.0f);
-		float RandomValue = dist(dre);
 		if (RandomValue < 0.1f)
 			return 0.0f;
 
 		bool bIsCritical = RandomValue < Stats.CrtRate;
 		return bIsCritical ? Stats.Damage * Stats.CrtValue : Stats.Damage;
 	}
+	void SetLocationAndYaw(FVector NewPos)
+	{
+		Yaw = CalculateYaw(NewPos);
+		Pos = NewPos;
+	}
+	float CalculateYaw(FVector TargetPos) const
+	{
+		FVector Direction = (TargetPos - Pos).Normalize();
+		return std::atan2(Direction.Y, Direction.X) * (180.0f / 3.14159265f);
+	}
+
 #endif
 };
 

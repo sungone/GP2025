@@ -5,10 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -46,11 +42,11 @@
     <Filter Include="Source Files\Game\GameManager">
       <UniqueIdentifier>{bd1d6e82-bb96-43a4-90bc-30181f976c65}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Pch">
+      <UniqueIdentifier>{3a7b361f-25be-42ce-99da-91564daa6b55}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Common\Proto.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Utils\Loger.h">
       <Filter>Source Files\Utils</Filter>
     </ClInclude>
@@ -65,9 +61,6 @@
     </ClInclude>
     <ClInclude Include="Source\Core\PacketManager.h">
       <Filter>Source Files\Network\Packet</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\pch.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\DB\DBConnection.h">
       <Filter>Source Files\DB</Filter>
@@ -93,9 +86,6 @@
     <ClInclude Include="Source\Game\TimerQueue.h">
       <Filter>Source Files\Game\Timer</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Game\CollisionManager.h">
-      <Filter>Source Files\Game\GameManager</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Game\GameManager.h">
       <Filter>Source Files\Game\GameManager</Filter>
     </ClInclude>
@@ -103,6 +93,18 @@
       <Filter>Source Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="Source\Utils\FVector.h">
+      <Filter>Source Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\pch.h">
+      <Filter>Source Files\Pch</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\Proto.h">
+      <Filter>Source Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\CollisionUtils.h">
+      <Filter>Source Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="RandomUtils.h">
       <Filter>Source Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>
@@ -118,9 +120,6 @@
     </ClCompile>
     <ClCompile Include="Source\Core\PacketManager.cpp">
       <Filter>Source Files\Network\Packet</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\pch.cpp">
-      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\DB\DBConnection.cpp">
       <Filter>Source Files\DB</Filter>
@@ -149,11 +148,11 @@
     <ClCompile Include="Source\Game\TimerQueue.cpp">
       <Filter>Source Files\Game\Timer</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Game\CollisionManager.cpp">
-      <Filter>Source Files\Game\GameManager</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Game\GameManager.cpp">
       <Filter>Source Files\Game\GameManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\pch.cpp">
+      <Filter>Source Files\Pch</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

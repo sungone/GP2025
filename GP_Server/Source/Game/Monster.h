@@ -14,9 +14,9 @@ public:
     uint32_t GetState() const { return _info.State; }
     void SetState(ECharacterStateType newState) { _info.State = newState; }
 
-public :
-    bool ShouldStartWalking();
+private :
     bool ShouldAttack();
-
+    bool ShouldWalking();
+    FVector GenerateRandomNearbyPosition();
 }; 
 

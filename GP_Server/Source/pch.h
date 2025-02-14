@@ -15,7 +15,6 @@
 #include <queue>
 #include <unordered_map>
 #include <functional>
-#include <random>
 #include <sqlext.h>
 #include <chrono>
 #include <algorithm>
@@ -24,6 +23,8 @@
 #include "Proto.h"
 #include "Loger.h"
 #include "ExpOver.h"
+#include "CollisionUtils.h"
+#include "RandomUtils.h"
 
 enum CompType
 {

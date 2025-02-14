@@ -5,7 +5,7 @@ void TimerQueue::TimerThread()
 {
     while (true)
     {
-        DWORD now = GetTickCount();
+        DWORD now = GetTickCount64();
 
         std::unique_lock<std::mutex> lock(_TimerMutex);
         while (!_TimerQueue.empty() && _TimerQueue.top().wakeUpTime <= now)
@@ -29,7 +29,7 @@ void TimerQueue::TimerThread()
 void TimerQueue::AddTimerEvent(CompType type, DWORD delayMs, std::function<void()> callback)
 {
     std::lock_guard<std::mutex> lock(_TimerMutex);
-    DWORD executionTime = GetTickCount() + delayMs;
+    DWORD executionTime = GetTickCount64() + delayMs;
     _TimerQueue.push({ type, executionTime, callback });
 }
 

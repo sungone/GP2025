@@ -28,13 +28,21 @@ void Character::OnDamaged(float damage)
 	}
 }
 
+float Character::GetAttackDamage()
+{
+	return _info.GetAttackDamage(RandomUtils::GetRandomFloat(0.0f, 1.0f));
+}
+
 void Character::SetBunkerRandomLocation()
 {
-	static std::default_random_engine dre;
-	static std::uniform_real_distribution<float> ud_x(-3000, -1000);
-	static std::uniform_real_distribution<float> ud_y(-3500, -1500);
-	static std::uniform_real_distribution<float> ud_yaw(-180.0f, 180.0f);
+	static constexpr std::pair<float, float> BUNKER_X_RANGE = { -3000.0f, -1000.0f };
+	static constexpr std::pair<float, float> BUNKER_Y_RANGE = { -3500.0f, -1500.0f };
+	static constexpr float BUNKER_Z = 116.0f;
 
-	_info.SetLocation(ud_x(dre), ud_y(dre), 116);
-	_info.Yaw = ud_yaw(dre);
+	_info.SetLocation(
+		RandomUtils::GetRandomFloat(BUNKER_X_RANGE.first, BUNKER_X_RANGE.second),
+		RandomUtils::GetRandomFloat(BUNKER_Y_RANGE.first, BUNKER_Y_RANGE.second),
+		BUNKER_Z
+	);
+
 }

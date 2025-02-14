@@ -75,15 +75,13 @@ void GameManager::ProcessAttack(int32 attackerID, int32 targetID)
 	auto& Attacker = _characters[attackerID];
 	std::shared_ptr<Monster> Target = static_pointer_cast<Monster>(_characters[targetID]);
 
-	if (!_collisionMgr.CanAttack(Attacker->GetInfo(), Target->GetInfo()))
+	if (!CollisionUtils::CanAttack(Attacker->GetInfo(), Target->GetInfo()))
 		return;
 
-	float atkDamage = Attacker->OnAttacked();
+	float atkDamage = Attacker->GetAttackDamage();
 	if (atkDamage > 0.0f)
 		Target->OnDamaged(atkDamage);
 
-	InfoPacket packet(S_MONSTER_STATUS_UPDATE, Target->GetInfo());
-	SessionManager::GetInst().Broadcast(&packet);
 	auto pkt = DamagePacket(Target->GetInfo(), atkDamage);
 	SessionManager::GetInst().Broadcast(&pkt);
 }
