@@ -87,7 +87,6 @@ AGPCharacterBase::AGPCharacterBase()
 void AGPCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 void AGPCharacterBase::Tick(float DeltaTime)

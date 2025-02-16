@@ -11,7 +11,6 @@
 #include "GPCharacterControlData.h"
 #include "Network/GPGameInstance.h"
 #include "GPCharacterNonPlayer.h"
-#include "Inventory/GPInventoryMoney.h"
 
 AGPCharacterPlayer::AGPCharacterPlayer()
 {
@@ -70,9 +69,6 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 
 	// 기본 캐릭터 타입을 전사 캐릭터로
 	CurrentCharacterType = Type::EPlayer::WARRIOR;
-
-	// 충돌 함수 바인드
-	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AGPCharacterPlayer::OnCapsuleBeginOverlap);
 }
 
 void AGPCharacterPlayer::BeginPlay()
@@ -230,17 +226,6 @@ void AGPCharacterPlayer::ChangeCharacterControl()
 		{
 			bCanChangeCharacterControl = true;
 		});
-}
-
-void AGPCharacterPlayer::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	// 돈을 먹었을 때(충돌했을 때) 메세지 출력
-	AGPInventoryMoney* Money = Cast<AGPInventoryMoney>(OtherActor);
-	if (Money)
-	{
-		UE_LOG(LogTemp, Log, TEXT("We found money"));
-	}
 }
 
 void AGPCharacterPlayer::SetCharacterType(ECharacterType NewCharacterType)
