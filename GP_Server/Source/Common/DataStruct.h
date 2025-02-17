@@ -1,6 +1,7 @@
 #pragma once
 #include "Common.h"
 
+#pragma pack(push,1)
 struct FStatData
 {
 	uint32 Level;
@@ -109,3 +110,4 @@ struct FInfoData
 
 #endif
 };
+#pragma pack(pop)

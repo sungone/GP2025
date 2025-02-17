@@ -1,6 +1,7 @@
 #pragma once
 #include "Common.h"
 
+#pragma pack(push,1)
 struct Packet
 {
 	struct PacketHeader
@@ -56,3 +57,4 @@ struct DamagePacket : public Packet
 		Header.PacketSize = sizeof(DamagePacket);
 	}
 };
+#pragma pack(pop)
