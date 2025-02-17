@@ -208,8 +208,13 @@ void AGPCharacterBase::SetCharacterData(const UGPCharacterControlData* Character
 	GetCharacterMovement()->bUseControllerDesiredRotation = CharacterData->bUseControllerDesiredRotation;
 	GetCharacterMovement()->RotationRate = CharacterData->RotationRate;
 
-	GetMesh()->SetSkeletalMesh(CharacterData->SkeletalMesh);
-	GetMesh()->SetAnimInstanceClass(CharacterData->AnimBlueprint);
+	//GetMesh()->SetSkeletalMesh(CharacterData->SkeletalMesh);
+	//GetMesh()->SetAnimInstanceClass(CharacterData->AnimBlueprint);
+
+	if (CharacterData->AnimBlueprint)
+	{
+		BodyMesh->SetAnimInstanceClass(CharacterData->AnimBlueprint);
+	}
 
 	AttackActionMontage = CharacterData->AttackAnimMontage;
 	DeadMontage = CharacterData->DeadAnimMontage;
