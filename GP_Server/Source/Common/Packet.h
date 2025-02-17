@@ -57,4 +57,5 @@ struct DamagePacket : public Packet
 		Header.PacketSize = sizeof(DamagePacket);
 	}
 };
+
 #pragma pack(pop)

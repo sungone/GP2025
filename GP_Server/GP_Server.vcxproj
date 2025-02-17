@@ -154,12 +154,13 @@
     <ClInclude Include="Source\DB\DBConnection.h" />
     <ClInclude Include="Source\DB\DBConnectionPool.h" />
     <ClInclude Include="Source\Game\Character.h" />
-    <ClInclude Include="Source\Game\CollisionUtils.h" />
     <ClInclude Include="Source\Game\GameManager.h" />
+    <ClInclude Include="Source\Game\Inventory.h" />
     <ClInclude Include="Source\Game\Monster.h" />
     <ClInclude Include="Source\Game\Player.h" />
     <ClInclude Include="Source\Game\TimerQueue.h" />
     <ClInclude Include="Source\pch.h" />
+    <ClInclude Include="Source\Utils\CollisionUtils.h" />
     <ClInclude Include="Source\Utils\FVector.h" />
     <ClInclude Include="Source\Utils\Loger.h" />
     <ClInclude Include="Source\Utils\RandomUtils.h" />
@@ -176,6 +177,7 @@
     <ClCompile Include="Source\DB\DBConnectionPool.cpp" />
     <ClCompile Include="Source\Game\Character.cpp" />
     <ClCompile Include="Source\Game\GameManager.cpp" />
+    <ClCompile Include="Source\Game\Inventory.cpp" />
     <ClCompile Include="Source\Game\Monster.cpp" />
     <ClCompile Include="Source\Game\Player.cpp" />
     <ClCompile Include="Source\Game\TimerQueue.cpp" />
