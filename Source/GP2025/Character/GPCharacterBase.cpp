@@ -24,26 +24,13 @@ DEFINE_LOG_CATEGORY(LogGPCharacter);
 
 AGPCharacterBase::AGPCharacterBase()
 {
-	// 캐릭터 스켈레탈 메시
-	GetMesh()->SetSkeletalMesh(LoadAsset<USkeletalMesh>(TEXT("/Game/qudgus/chracter/mesh/main_man.main_man")));
-
-	// 캐릭터 애니메이션 블루프린트
-	GetMesh()->SetAnimInstanceClass(LoadClass<UAnimInstance>(TEXT("/Game/Animation/P_Warrior/ABP_Warrior.ABP_Warrior_C")));
-
-	// 캐릭터 애니메이션 몽타주
-	AttackActionMontage = LoadAsset<UAnimMontage>(TEXT("/Game/Animation/P_Warrior/AM_Attack.AM_Attack"));
-	DeadMontage = LoadAsset<UAnimMontage>(TEXT("/Game/Animation/P_Warrior/AM_Dead.AM_Dead"));
-
-	// 폰 회전 설정
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-	// 캡슐 컴포넌트 설정
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.f);
 	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_GPCAPSULE);
 
-	// 무브먼트 컴포넌트 설정
 	auto* MovementComp = GetCharacterMovement();
 	MovementComp->bOrientRotationToMovement = true;
 	MovementComp->RotationRate = FRotator(0.f, 500.f, 0.f);
@@ -54,12 +41,10 @@ AGPCharacterBase::AGPCharacterBase()
 	MovementComp->MinAnalogWalkSpeed = 20.f;
 	MovementComp->BrakingDecelerationWalking = 2000.f;
 
-	// 매쉬 설정
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
-	// 캐릭터 타입 설정
 	static const TArray<TTuple<ECharacterType, FString>> CharacterTypes = {
 		MakeTuple(Type::EPlayer::WARRIOR, TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_Warrior.GPC_Warrior'")),
 		MakeTuple(Type::EPlayer::GUNNER, TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_Gunner.GPC_Gunner'")),
@@ -71,22 +56,48 @@ AGPCharacterBase::AGPCharacterBase()
 
 	LoadCharacterData(CharacterTypeManager, CharacterTypes);
 
-	// Widget Component
 	HpBar = CreateWidgetComponent(TEXT("HpWidget"), TEXT("/Game/UI/WBP_CharacterHpBar.WBP_CharacterHpBar_C"), FVector(0.f, 0.f, 300.f), FVector2D(150.f, 15.f));
 	//ExpBar = CreateWidgetComponent(TEXT("ExpWidget"), TEXT("/Game/UI/WBP_ExpBar.WBP_ExpBar_C"), FVector(0.f, 0.f, 308.f), FVector2D(150.f, 15.f));
 	LevelText = CreateWidgetComponent(TEXT("LevelWidget"), TEXT("/Game/UI/WBP_LevelText.WBP_LevelText_C"), FVector(0.f, 0.f, 340.f), FVector2D(40.f, 10.f));
 
-	// Item Actions
 	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterBase::EquipHelmet)));
 	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterBase::EquipChest)));
 	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterBase::DrinkPotion)));
 	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterBase::AddExp)));
 
+	Chest = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Chest"));
+	Chest->SetupAttachment(GetMesh(), TEXT("ChestSocket"));
+	Chest->SetCollisionProfileName(TEXT("NoCollision"));
+	Chest->SetVisibility(true);
+
+	Helmet = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Helmet"));
+	Helmet->SetupAttachment(GetMesh(), TEXT("HelmetSocket"));
+	Helmet->SetCollisionProfileName(TEXT("NoCollision"));
+	Helmet->SetVisibility(true);
+
+	BodyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BodyMesh"));
+	BodyMesh->SetupAttachment(GetCapsuleComponent());
+	BodyMesh->SetCollisionProfileName(TEXT("NoCollision"));
+	BodyMesh->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f) , FRotator(0.f , -90.f , 0.f));
+
+	HeadMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HeadMesh"));
+	HeadMesh->SetupAttachment(BodyMesh);
+
+	LegMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LegMesh"));
+	LegMesh->SetupAttachment(BodyMesh);
 }
 
 void AGPCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// 런타임에 동적으로 Data Asset 로드
+	UGPCharacterControlData* LoadedCharacterData = LoadObject<UGPCharacterControlData>(nullptr, TEXT("/Game/CharacterType/GPC_Warrior.GPC_Warrior"));
+
+	if (LoadedCharacterData)
+	{
+		ApplyCharacterPartsFromData(LoadedCharacterData);
+	}
 }
 
 void AGPCharacterBase::Tick(float DeltaTime)
@@ -202,6 +213,7 @@ void AGPCharacterBase::SetCharacterData(const UGPCharacterControlData* Character
 
 	AttackActionMontage = CharacterData->AttackAnimMontage;
 	DeadMontage = CharacterData->DeadAnimMontage;
+
 }
 
 void AGPCharacterBase::SetCharacterType(ECharacterType NewCharacterType)
@@ -347,4 +359,69 @@ void AGPCharacterBase::EquipHelmet(UGPItemData* InItemData)
 void AGPCharacterBase::AddExp(UGPItemData* InItemData)
 {
 	UE_LOG(LogGPCharacter, Log, TEXT("Add Exp"));
+}
+
+void AGPCharacterBase::SetupMasterPose()
+{
+	if (BodyMesh)
+	{
+		if (HeadMesh)
+		{
+			HeadMesh->SetMasterPoseComponent(BodyMesh);
+		}
+		if (LegMesh)
+		{
+			LegMesh->SetMasterPoseComponent(BodyMesh);
+		}
+	}
+}
+
+void AGPCharacterBase::ApplyCharacterPartsFromData(const UGPCharacterControlData* CharacterData)
+{
+	if (!CharacterData) return;
+
+	if (CharacterData->BodyMesh)
+	{
+		BodyMesh->SetSkeletalMesh(CharacterData->BodyMesh);
+	}
+
+	if (CharacterData->HeadMesh)
+	{
+		HeadMesh->SetSkeletalMesh(CharacterData->HeadMesh);
+	}
+
+	if (CharacterData->LegMesh)
+	{
+		LegMesh->SetSkeletalMesh(CharacterData->LegMesh);
+	}
+
+	if (CharacterData->HelmetMesh)
+	{
+		Helmet->SetSkeletalMesh(CharacterData->HelmetMesh);
+		Helmet->AttachToComponent(HeadMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("HelmetSocket"));
+		Helmet->SetVisibility(true);
+
+		Helmet->SetMasterPoseComponent(HeadMesh);
+	}
+	else
+	{
+		Helmet->SetSkeletalMesh(nullptr);
+		Helmet->SetVisibility(false);
+	}
+
+	if (CharacterData->ChestMesh)
+	{
+		Chest->SetSkeletalMesh(CharacterData->ChestMesh);
+		Chest->AttachToComponent(BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("ChestSocket"));
+		Chest->SetVisibility(true);
+
+		Chest->SetMasterPoseComponent(BodyMesh);
+	}
+	else
+	{
+		Chest->SetSkeletalMesh(nullptr);
+		Chest->SetVisibility(false);
+	}
+
+	SetupMasterPose();
 }

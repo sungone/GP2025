@@ -86,4 +86,14 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Equipment")
 	USkeletalMesh* PantsMesh;
+
+	// 마스터 포즈 컴포넌트
+	UPROPERTY(EditAnywhere, Category = "Mesh")
+	USkeletalMesh* HeadMesh;
+
+	UPROPERTY(EditAnywhere, Category = "Mesh")
+	USkeletalMesh* BodyMesh;
+
+	UPROPERTY(EditAnywhere, Category = "Mesh")
+	USkeletalMesh* LegMesh;
 };

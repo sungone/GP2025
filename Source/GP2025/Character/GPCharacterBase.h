@@ -89,8 +89,19 @@ public :
 	float DeadEventDelayTime = 0.5f;
 
 
-// Item Section
+// Character Mesh Section
 protected :
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts")
+	TObjectPtr<USkeletalMeshComponent> HeadMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts")
+	TObjectPtr<USkeletalMeshComponent> BodyMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts")
+	TObjectPtr<USkeletalMeshComponent> LegMesh;
+
+	void SetupMasterPose();
+	void ApplyCharacterPartsFromData(const class UGPCharacterControlData* CharacterData);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment" , Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USkeletalMeshComponent> Chest;
@@ -98,6 +109,8 @@ protected :
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USkeletalMeshComponent> Helmet;
 
+// Item Section
+protected:
 	UPROPERTY()
 	TArray<FTakeItemDelegateWrapper> TakeItemActions;
 
@@ -106,4 +119,5 @@ protected :
 	virtual void EquipChest(class UGPItemData* InItemData);
 	virtual void EquipHelmet(class UGPItemData* InItemData);
 	virtual void AddExp(class UGPItemData* InItemData);
+
 };
