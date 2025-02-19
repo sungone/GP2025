@@ -23,7 +23,7 @@ protected:
 	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
 	
 // Character Mesh Section
-protected:
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts")
 	TObjectPtr<USkeletalMeshComponent> HeadMesh;
 
@@ -43,8 +43,9 @@ protected:
 	TObjectPtr<class USkeletalMeshComponent> Helmet;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UStaticMeshComponent> Weapon;
+	TObjectPtr<class AGPWeaponBase> WeaponActor;
 
+	void EquipWeaponFromData(const class UGPCharacterControlData* CharacterData);
 
 	// Attack Hit Section
 protected:

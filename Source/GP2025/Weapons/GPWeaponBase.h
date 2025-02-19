@@ -26,6 +26,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	TObjectPtr<class UStaticMeshComponent> WeaponMesh;
 
+	// 충돌 감지를 위한 콜리전
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	TObjectPtr<class UCapsuleComponent> CollisionComponent;
 

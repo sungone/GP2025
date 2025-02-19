@@ -96,4 +96,8 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "PlayerMesh")
 	USkeletalMesh* LegMesh;
+
+	// 무기 타입
+	UPROPERTY(EditAnywhere, Category = "WeaponType")
+	TSubclassOf<class AGPWeaponBase> WeaponClass;
 };

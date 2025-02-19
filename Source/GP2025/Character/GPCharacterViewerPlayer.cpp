@@ -6,6 +6,8 @@
 #include "Character/GPCharacterControlData.h"
 #include "Network/GPGameInstance.h"
 #include "Item/GPEquipItemData.h"
+#include "Weapons/GPWeaponBase.h"
+#include "Kismet/GameplayStatics.h"
 
 AGPCharacterViewerPlayer::AGPCharacterViewerPlayer()
 {
@@ -120,8 +122,35 @@ void AGPCharacterViewerPlayer::ApplyCharacterPartsFromData(const UGPCharacterCon
 		Chest->SetSkeletalMesh(nullptr);
 		Chest->SetVisibility(false);
 	}
-
+	
+	EquipWeaponFromData(CharacterData);
 	SetupMasterPose();
+}
+
+void AGPCharacterViewerPlayer::EquipWeaponFromData(const UGPCharacterControlData* CharacterData)
+{
+	if (CharacterData && CharacterData->WeaponClass)
+	{
+		// 기존 무기 제거
+		if (WeaponActor)
+		{
+			WeaponActor->Destroy();
+			WeaponActor = nullptr;
+		}
+
+		// 무기 스폰
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = GetInstigator();
+
+		WeaponActor = GetWorld()->SpawnActor<AGPWeaponBase>(CharacterData->WeaponClass, GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
+
+		if (WeaponActor)
+		{
+			// 무기를 캐릭터의 손에 부착
+			WeaponActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
+		}
+	}
 }
 
 void AGPCharacterViewerPlayer::AttackHitCheck()
