@@ -30,7 +30,7 @@ struct ItemMeta
 class Item
 {
 public:
-	EItemType _ItemType;
+	EItem _ItemType;
 };
 
 //world에 스폰될 아이템(다른 플레이어도 보이는)과 인벤토리 아이템 구분함

@@ -4,6 +4,4 @@
 
 class Player : public Character
 {
-public:
-    Inventory _inventory;
 };

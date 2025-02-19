@@ -28,7 +28,7 @@ enum EPacketType : uint8
 };
 
 using ECharacterType = uint8;
-using EItemType = uint8;
+using EItem = uint8;
 
 namespace Type
 {
@@ -78,34 +78,34 @@ namespace Type
 
 	enum class EArmor : uint8
 	{
-		ALLOY_HELMET = 7,
+		ALLOY_HELMET = 10,
 		ENHANCED_HELMET,
 		TITANIUM_ARMOR,
 		POWERED_ARMOR,
 
-		SUIT = 201,
-		TUCLOTHES = 202,
+		SUIT,
+		TUCLOTHES,
 	};
 
 	enum class EUseable : uint8
 	{
-		HPKIT_LOW = 101,
+		HPKIT_LOW = 20,
 		HPKIT_MID,
 		HPKIT_HIGH,
 
-		COFFEE = 203,
+		COFFEE,
 		DDALBA,
 		MANGBA,
 
-		GOLD_SMALL = 401,
-		GOLD_MEDIUM = 402,
-		GOLD_LARGE = 403
+		GOLD_SMALL,
+		GOLD_MEDIUM,
+		GOLD_LARGE,
 	};
 
 	enum class EQuestItem : uint8
 	{
-		KEY = 501,
-		DOCUMENT = 502
+		KEY = 50,
+		DOCUMENT,
 	};
 }
 
