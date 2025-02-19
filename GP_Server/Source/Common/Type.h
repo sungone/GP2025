@@ -65,7 +65,7 @@ namespace Type
 
 	enum class EWeapon : uint8
 	{
-		BIRD_GUN,
+		BIRD_GUN = 1,
 		PULSE_GUN,
 		POSITRON,
 		PRACS_WORD,
@@ -75,24 +75,42 @@ namespace Type
 
 	enum class EArmor : uint8
 	{
-		ALLOY_HELMET,
+		ALLOY_HELMET = 7,
 		ENHANCED_HELMET,
 		TITANIUM_ARMOR,
 		POWERED_ARMOR,
 
-		SUIT,
-		TUCLOTHES
+		SUIT = 201,
+		TUCLOTHES = 202,
 	};
 
-	enum class EConsumable : uint8
+	enum class EUseable : uint8
 	{
-		HPKIT_LOW,
+		HPKIT_LOW = 101,
 		HPKIT_MID,
 		HPKIT_HIGH,
 
-		COFFEE,
+		COFFEE = 203,
 		DDALBA,
 		MANGBA,
+
+		GOLD_SMALL = 401,
+		GOLD_MEDIUM = 402,
+		GOLD_LARGE = 403
+	};
+
+	enum class EExpItem : uint8
+	{
+		EXP_FIELD = 200,
+		EXP_SMALL = 301,
+		EXP_MEDIUM = 302,
+		EXP_LARGE = 303
+	};
+
+	enum class EQuestItem : uint8
+	{
+		KEY = 501,
+		DOCUMENT = 502
 	};
 }
 
