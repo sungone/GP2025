@@ -2,16 +2,14 @@
 #include "Character.h"
 #include "Inventory.h"
 
-constexpr int MAX_SLOT = 5;
 class Player : public Character
 {
 public:
-    Player(): inventory(MAX_SLOT) {}
+    Player(): inventory(MAX_INVENTORY_SLOT) {}
     Inventory& GetInventory() { return inventory; }
 
-    bool AddItemToInventory(const Item& item) { return inventory.AddItem(item); }
-    bool RemoveItemFromInventory(int itemId, int quantity) { return inventory.RemoveItem(itemId, quantity); }
-    Item* GetItemFromInventory(int slotIndex) { return inventory.GetItem(slotIndex); }
+    bool AddItemToInventory(const FItem& item) { return inventory.AddItem(item); }
+    bool RemoveItemFromInventory(uint32 itemId, uint32 quantity) { return inventory.RemoveItem(itemId, quantity); }
 private:
     Inventory inventory;
 };

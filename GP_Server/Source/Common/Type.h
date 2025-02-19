@@ -20,7 +20,7 @@ enum EPacketType : uint8
 
 	C_USE_ITEM,
 	C_DROP_ITEM,
-	S_INVENTORY,
+	S_ADD_ITEMS,
 	S_ADD_ITEM,
 	S_REMOVE_ITEM,
 };
@@ -34,12 +34,12 @@ namespace Type
 		WARRIOR,
 		GUNNER,
 
-		PEND
+		P_END
 	};
 
 	enum EMonster : uint8
 	{
-		ENERGY_DRINK = PEND,
+		ENERGY_DRINK = P_END,
 		BUBBLE_TEA,
 		COFFEE,
 
@@ -52,11 +52,13 @@ namespace Type
 		DRILL,
 
 		TINO,
+
+		M_END
 	};
 
 	enum ENpc : uint8
 	{
-		PROFESSOR,
+		PROFESSOR = M_END,
 		GUARD,
 		STUDENT,
 	};
