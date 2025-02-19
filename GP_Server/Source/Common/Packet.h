@@ -62,10 +62,10 @@ struct DamagePacket : public Packet
 struct ItemSpawnPacket : public Packet
 {
 	uint32 ItemID;
-	EItemType ItemType;
+	EItem ItemType;
 	FVector Pos;
 
-	ItemSpawnPacket(uint32 id, EItemType type, FVector pos)
+	ItemSpawnPacket(uint32 id, EItem type, FVector pos)
 		: Packet(EPacketType::S_ITEM_SPAWN), ItemID(id), ItemType(type), Pos(pos)
 	{
 		Header.PacketSize = sizeof(ItemSpawnPacket);
@@ -84,10 +84,10 @@ struct ItemDespawnPacket : public Packet
 
 struct AddInventoryItemPacket : public Packet
 {
-	EItemType ItemType;
+	EItem ItemType;
 	uint32 Quantity;
 
-	AddInventoryItemPacket(EItemType type, uint32 quantity)
+	AddInventoryItemPacket(EItem type, uint32 quantity)
 		: Packet(EPacketType::S_ADD_IVENTORY_ITEM), ItemType(type), Quantity(quantity)
 	{
 		Header.PacketSize = sizeof(AddInventoryItemPacket);
@@ -96,10 +96,10 @@ struct AddInventoryItemPacket : public Packet
 
 struct RemoveInventoryItemPacket : public Packet
 {
-	EItemType ItemType;
+	EItem ItemType;
 	uint32 Quantity;
 
-	RemoveInventoryItemPacket(EItemType type, uint32 quantity)
+	RemoveInventoryItemPacket(EItem type, uint32 quantity)
 		: Packet(EPacketType::S_REMOVE_IVENTORY_ITEM), ItemType(type), Quantity(quantity)
 	{
 		Header.PacketSize = sizeof(RemoveInventoryItemPacket);
