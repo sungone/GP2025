@@ -48,6 +48,9 @@
     <Filter Include="Source Files\Shared">
       <UniqueIdentifier>{a7a69939-add0-4a56-b879-98677decfb9c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Game\Item">
+      <UniqueIdentifier>{1abc2927-eb8d-4991-bc38-72092992a49a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Utils\Loger.h">
@@ -120,7 +123,10 @@
       <Filter>Source Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\Inventory.h">
-      <Filter>Source Files\Game\Character</Filter>
+      <Filter>Source Files\Game\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\Item.h">
+      <Filter>Source Files\Game\Item</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -170,7 +176,10 @@
       <Filter>Source Files\Pch</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Inventory.cpp">
-      <Filter>Source Files\Game\Character</Filter>
+      <Filter>Source Files\Game\Item</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Item.cpp">
+      <Filter>Source Files\Game\Item</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

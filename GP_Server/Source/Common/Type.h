@@ -19,13 +19,16 @@ enum EPacketType : uint8
 	S_DAMAGED_MONSTER,
 
 	C_USE_ITEM,
-	C_DROP_ITEM,
-	S_ADD_ITEMS,
-	S_ADD_ITEM,
-	S_REMOVE_ITEM,
+	
+	S_ITEM_SPAWN,
+	S_ITEM_DESPAWN,
+
+	S_ADD_IVENTORY_ITEM,
+	S_REMOVE_IVENTORY_ITEM,
 };
 
 using ECharacterType = uint8;
+using EItemType = uint8;
 
 namespace Type
 {
@@ -97,14 +100,6 @@ namespace Type
 		GOLD_SMALL = 401,
 		GOLD_MEDIUM = 402,
 		GOLD_LARGE = 403
-	};
-
-	enum class EExpItem : uint8
-	{
-		EXP_FIELD = 200,
-		EXP_SMALL = 301,
-		EXP_MEDIUM = 302,
-		EXP_LARGE = 303
 	};
 
 	enum class EQuestItem : uint8

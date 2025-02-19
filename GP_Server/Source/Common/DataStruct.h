@@ -2,14 +2,6 @@
 #include "Common.h"
 
 #pragma pack(push,1)
-
-struct FItem
-{
-	uint8 itemId;
-	uint32 quantity;
-	uint32 slotIndex;
-};
-
 struct FStatData
 {
 	uint32 Level;

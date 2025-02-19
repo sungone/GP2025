@@ -59,26 +59,50 @@ struct DamagePacket : public Packet
 	}
 };
 
-struct AddItemPacket : public Packet
+struct ItemSpawnPacket : public Packet
 {
-	FItem Item;
+	uint32 ItemID;
+	EItemType ItemType;
+	FVector Pos;
 
-	AddItemPacket(const FItem& item)
-		: Packet(EPacketType::S_ADD_ITEM), Item(item)
+	ItemSpawnPacket(uint32 id, EItemType type, FVector pos)
+		: Packet(EPacketType::S_ITEM_SPAWN), ItemID(id), ItemType(type), Pos(pos)
 	{
-		Header.PacketSize = sizeof(AddItemPacket);
+		Header.PacketSize = sizeof(ItemSpawnPacket);
 	}
 };
 
-struct RemoveItemPacket : public Packet
+struct ItemDespawnPacket : public Packet
 {
-	uint32 SlotIndex;
+	uint32 ItemID;
+	ItemDespawnPacket(uint32 id)
+		: Packet(EPacketType::S_ITEM_DESPAWN), ItemID(id)
+	{
+		Header.PacketSize = sizeof(ItemDespawnPacket);
+	}
+};
+
+struct AddInventoryItemPacket : public Packet
+{
+	EItemType ItemType;
 	uint32 Quantity;
 
-	RemoveItemPacket(uint32 slotIndex, uint32 quantity)
-		: Packet(EPacketType::S_REMOVE_ITEM), SlotIndex(slotIndex), Quantity(quantity)
+	AddInventoryItemPacket(EItemType type, uint32 quantity)
+		: Packet(EPacketType::S_ADD_IVENTORY_ITEM), ItemType(type), Quantity(quantity)
 	{
-		Header.PacketSize = sizeof(RemoveItemPacket);
+		Header.PacketSize = sizeof(AddInventoryItemPacket);
+	}
+};
+
+struct RemoveInventoryItemPacket : public Packet
+{
+	EItemType ItemType;
+	uint32 Quantity;
+
+	RemoveInventoryItemPacket(EItemType type, uint32 quantity)
+		: Packet(EPacketType::S_REMOVE_IVENTORY_ITEM), ItemType(type), Quantity(quantity)
+	{
+		Header.PacketSize = sizeof(RemoveInventoryItemPacket);
 	}
 };
 
