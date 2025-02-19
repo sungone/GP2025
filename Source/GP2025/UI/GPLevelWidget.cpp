@@ -1,6 +1,6 @@
 #include "UI/GPLevelWidget.h"
 #include "Components/TextBlock.h"
-#include "Character/GPCharacterBase.h"
+#include "Character/GPCharacterPlayer.h"
 
 void UGPLevelWidget::NativeConstruct()
 {

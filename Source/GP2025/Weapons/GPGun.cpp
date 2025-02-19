@@ -1,0 +1,16 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Weapons/GPGun.h"
+
+AGPGun::AGPGun()
+{
+}
+
+void AGPGun::StartAttack()
+{
+}
+
+void AGPGun::FireBullet()
+{
+}

@@ -7,8 +7,8 @@
 #include "../../GP_Server/Source/Common/Common.h"
 #include "GPGameInstance.generated.h"
 
-class AGPCharacterBase;
-class AGPCharacterNonPlayer;
+class AGPCharacterViewerPlayer;
+class AGPCharacterMonster;
 /**
  * 
  */
@@ -48,12 +48,12 @@ public :
 	int16 Port = 4000;
 
 public :
-	TSubclassOf<AGPCharacterBase> OtherPlayerClass;
-	TSubclassOf<AGPCharacterBase> MonsterClass;
+	TSubclassOf<AGPCharacterViewerPlayer> OtherPlayerClass;
+	TSubclassOf<AGPCharacterMonster> MonsterClass;
 
-	AGPCharacterBase* MyPlayer;
-	TMap<int32, AGPCharacterBase*> Players;
-	TMap<int32, AGPCharacterBase*> Monsters;
+	AGPCharacterViewerPlayer* MyPlayer;
+	TMap<int32, AGPCharacterViewerPlayer*> Players;
+	TMap<int32, AGPCharacterMonster*> Monsters;
 	
 	TArray<uint8> RemainingData;
 	TQueue<TArray<uint8>, EQueueMode::Mpsc> RecvQueue;

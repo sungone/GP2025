@@ -9,11 +9,17 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GPCharacterControlData.h"
+#include "Item/GPEquipItemData.h"
+#include "GPCharacterMonster.h"
 #include "Network/GPGameInstance.h"
-#include "GPCharacterNonPlayer.h"
 
 AGPCharacterPlayer::AGPCharacterPlayer()
 {
+	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterPlayer::EquipHelmet)));
+	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterPlayer::EquipChest)));
+	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterPlayer::DrinkPotion)));
+	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterPlayer::AddExp)));
+
 	// 카메라 세팅
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
@@ -61,12 +67,6 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 		AutoAttackAction = InputActionAutoAttackRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionChangeCharacterTypeRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_ChangeCharacterType.IA_ChangeCharacterType'"));
-	if (InputActionChangeCharacterTypeRef.Object)
-	{
-		ChangeCharacterTypeAction = InputActionChangeCharacterTypeRef.Object;
-	}
-
 	// 기본 캐릭터 타입을 전사 캐릭터로
 	CurrentCharacterType = Type::EPlayer::WARRIOR;
 }
@@ -82,8 +82,8 @@ void AGPCharacterPlayer::BeginPlay()
 	if (GameInstance)
 	{
 		GameInstance->MyPlayer = this;
-		GameInstance->OtherPlayerClass = AGPCharacterBase::StaticClass();
-		GameInstance->MonsterClass = AGPCharacterBase::StaticClass();
+		GameInstance->OtherPlayerClass = AGPCharacterViewerPlayer::StaticClass();
+		GameInstance->MonsterClass = AGPCharacterMonster::StaticClass();
 	}
 
 	LastLocation = GetActorLocation();
@@ -200,32 +200,6 @@ void AGPCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::StartSprinting);
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AGPCharacterPlayer::StopSprinting);
 	EnhancedInputComponent->BindAction(AutoAttackAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::AutoAttack);
-	EnhancedInputComponent->BindAction(ChangeCharacterTypeAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::ChangeCharacterControl);
-}
-
-bool bCanChangeCharacterControl = true;
-void AGPCharacterPlayer::ChangeCharacterControl()
-{
-	if (!bCanChangeCharacterControl)
-		return;
-	bCanChangeCharacterControl = false;
-
-	if (CurrentCharacterType == Type::EPlayer::WARRIOR)
-	{
-		SetCharacterType(Type::EPlayer::GUNNER);
-		UE_LOG(LogTemp, Log, TEXT("Change Gunner Control Type."));
-	}
-	else if (CurrentCharacterType == Type::EPlayer::GUNNER)
-	{
-		SetCharacterType(Type::EPlayer::WARRIOR);
-		UE_LOG(LogTemp, Log, TEXT("Change Warrior Control Type."));
-	}
-
-	// 일정 시간 후 플래그를 다시 활성화
-	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
-		{
-			bCanChangeCharacterControl = true;
-		});
 }
 
 void AGPCharacterPlayer::SetCharacterType(ECharacterType NewCharacterType)
@@ -256,6 +230,7 @@ void AGPCharacterPlayer::SetCharacterData(const UGPCharacterControlData* Charact
 	WalkSpeed = CharacterControlData->WalkSpeed;
 	SprintSpeed = CharacterControlData->SprintSpeed;
 }
+
 
 void AGPCharacterPlayer::Move(const FInputActionValue& Value)
 {
@@ -325,3 +300,49 @@ void AGPCharacterPlayer::AutoAttack()
 
 	ProcessAutoAttackCommand();
 }
+
+
+// Item System
+/////////////////////////////////////////////////////////////
+
+void AGPCharacterPlayer::TakeItem(UGPItemData* InItemData)
+{
+	if (InItemData)
+	{
+		TakeItemActions[(uint8)InItemData->Type].ItemDelegate.ExecuteIfBound(InItemData);
+	}
+}
+
+void AGPCharacterPlayer::DrinkPotion(UGPItemData* InItemData)
+{
+	UE_LOG(LogGPCharacter, Log, TEXT("Drink Potion"));
+}
+
+void AGPCharacterPlayer::EquipChest(UGPItemData* InItemData)
+{
+	UE_LOG(LogGPCharacter, Log, TEXT("Equip Chest"));
+	UGPEquipItemData* ChestItemData = Cast<UGPEquipItemData>(InItemData);
+	if (ChestItemData)
+	{
+		Chest->SetLeaderPoseComponent(GetMesh());
+		Chest->SetSkeletalMesh(ChestItemData->EquipMesh);
+	}
+}
+
+void AGPCharacterPlayer::EquipHelmet(UGPItemData* InItemData)
+{
+	UE_LOG(LogGPCharacter, Log, TEXT("Equip Helmet"));
+	UGPEquipItemData* HelmetItemData = Cast<UGPEquipItemData>(InItemData);
+	if (HelmetItemData)
+	{
+		Helmet->SetSkeletalMesh(HelmetItemData->EquipMesh);
+		Helmet->SetLeaderPoseComponent(GetMesh());
+	}
+}
+
+void AGPCharacterPlayer::AddExp(UGPItemData* InItemData)
+{
+	UE_LOG(LogGPCharacter, Log, TEXT("Add Exp"));
+}
+
+//////////////////////////////////////////////////////////////////////////////

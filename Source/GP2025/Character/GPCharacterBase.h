@@ -10,23 +10,14 @@
 #include "GPCharacterBase.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogGPCharacter, Log, All);
-DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, class UGPItemData*);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHpChanged, float, NewHpRatio);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnExpChanged, float, NewExpRatio);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelChanged, int32, NewLevel);
 
-USTRUCT(BlueprintType)
-struct FTakeItemDelegateWrapper
-{
-	GENERATED_BODY()
-	FTakeItemDelegateWrapper() {}
-	FTakeItemDelegateWrapper(const FOnTakeItemDelegate& InItemDelegate) : ItemDelegate(InItemDelegate) {}
-	FOnTakeItemDelegate ItemDelegate;
-};
 
 UCLASS()
-class GP2025_API AGPCharacterBase : public ACharacter ,public IGPAnimationAttackInterface , public IGPCharacterItemInterface
+class GP2025_API AGPCharacterBase : public ACharacter ,public IGPAnimationAttackInterface
 {
 	GENERATED_BODY()
 
@@ -87,37 +78,4 @@ public :
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> DeadMontage;
 	float DeadEventDelayTime = 0.5f;
-
-
-// Character Mesh Section
-protected :
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts")
-	TObjectPtr<USkeletalMeshComponent> HeadMesh;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts")
-	TObjectPtr<USkeletalMeshComponent> BodyMesh;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts")
-	TObjectPtr<USkeletalMeshComponent> LegMesh;
-
-	void SetupMasterPose();
-	void ApplyCharacterPartsFromData(const class UGPCharacterControlData* CharacterData);
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment" , Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class USkeletalMeshComponent> Chest;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class USkeletalMeshComponent> Helmet;
-
-// Item Section
-protected:
-	UPROPERTY()
-	TArray<FTakeItemDelegateWrapper> TakeItemActions;
-
-	virtual void TakeItem(class UGPItemData* InItemData) override;
-	virtual void DrinkPotion(class UGPItemData* InItemData);
-	virtual void EquipChest(class UGPItemData* InItemData);
-	virtual void EquipHelmet(class UGPItemData* InItemData);
-	virtual void AddExp(class UGPItemData* InItemData);
-
 };

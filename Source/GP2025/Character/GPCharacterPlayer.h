@@ -6,21 +6,26 @@
 #include "Character/GPCharacterBase.h"
 #include "InputActionValue.h"
 #define PACKETSENDTIME 0.5
+#include "GPCharacterViewerPlayer.h"
 #include "GPCharacterPlayer.generated.h"
 
 /**
  *
  */
+DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, class UGPItemData*);
 
-UENUM()
-enum class ECharacterPlayerControlType : uint8
+USTRUCT(BlueprintType)
+struct FTakeItemDelegateWrapper
 {
-	Default,
-	Aim
+	GENERATED_BODY()
+	FTakeItemDelegateWrapper() {}
+	FTakeItemDelegateWrapper(const FOnTakeItemDelegate& InItemDelegate) : ItemDelegate(InItemDelegate) {}
+	FOnTakeItemDelegate ItemDelegate;
 };
 
+
 UCLASS()
-class GP2025_API AGPCharacterPlayer : public AGPCharacterBase
+class GP2025_API AGPCharacterPlayer : public AGPCharacterViewerPlayer, public IGPCharacterItemInterface
 {
 	GENERATED_BODY()
 
@@ -44,7 +49,6 @@ protected:
 	void StartSprinting();
 	void StopSprinting();
 	void AutoAttack();
-	void ChangeCharacterControl();
 
 	// 카메라 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", Meta = (AllowPrivateAccess = "true"))
@@ -52,7 +56,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UCameraComponent> FollowCamera;
-
 
 	// Input 변수
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
@@ -73,9 +76,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> AutoAttackAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> ChangeCharacterTypeAction;
-
 	// Sprint Speed 변수
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
 	float WalkSpeed;
@@ -94,4 +94,16 @@ public:
 	float GroundZLocation = 147.7;
 	bool isJumpStart = false;
 	bool bWasJumping = false;
+
+
+// Item Section
+protected:
+	UPROPERTY()
+	TArray<FTakeItemDelegateWrapper> TakeItemActions;
+
+	virtual void TakeItem(class UGPItemData* InItemData) override;
+	virtual void DrinkPotion(class UGPItemData* InItemData);
+	virtual void EquipChest(class UGPItemData* InItemData);
+	virtual void EquipHelmet(class UGPItemData* InItemData);
+	virtual void AddExp(class UGPItemData* InItemData);
 };

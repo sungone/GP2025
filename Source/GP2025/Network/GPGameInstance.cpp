@@ -7,6 +7,7 @@
 #include "Serialization/ArrayWriter.h"
 #include "SocketSubsystem.h"
 #include "Character/GPCharacterPlayer.h"
+#include "Character/GPCharacterMonster.h"
 #include "UI/GPFloatingDamageText.h"
 
 void UGPGameInstance::Init()
@@ -210,10 +211,10 @@ void UGPGameInstance::AddPlayer(FInfoData& PlayerInfo, bool isMyPlayer)
 	}
 	else
 	{
-		AGPCharacterBase* Player = nullptr;
+		AGPCharacterViewerPlayer* Player = nullptr;
 		while (Player == nullptr)
 		{
-			Player = World->SpawnActor<AGPCharacterBase>(OtherPlayerClass, SpawnLocation, SpawnRotation);
+			Player = World->SpawnActor<AGPCharacterViewerPlayer>(OtherPlayerClass, SpawnLocation, SpawnRotation);
 		}
 
 		UE_LOG(LogTemp, Warning, TEXT("Add other player [%d] (%f,%f,%f)(%f)"),
@@ -260,7 +261,7 @@ void UGPGameInstance::AddMonster(FInfoData& MonsterInfo)
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	AGPCharacterBase* Monster = World->SpawnActor<AGPCharacterBase>(MonsterClass, SpawnLocation, SpawnRotation, SpawnParams);
+	AGPCharacterMonster* Monster = World->SpawnActor<AGPCharacterMonster>(MonsterClass, SpawnLocation, SpawnRotation, SpawnParams);
 
 	if (Monster == nullptr)
 	{

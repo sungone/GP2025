@@ -75,25 +75,25 @@ public:
 	UAnimMontage* DeadAnimMontage;
 
 	// 장비 아이템 설정
-	UPROPERTY(EditAnywhere, Category = "Equipment")
+	UPROPERTY(EditAnywhere, Category = "PlayerEquipment")
 	USkeletalMesh* HelmetMesh;
 
-	UPROPERTY(EditAnywhere, Category = "Equipment")
+	UPROPERTY(EditAnywhere, Category = "PlayerEquipment")
 	USkeletalMesh* ChestMesh;
 
-	UPROPERTY(EditAnywhere, Category = "Equipment")
-	USkeletalMesh* WeaponMesh;
-
-	UPROPERTY(EditAnywhere, Category = "Equipment")
+	UPROPERTY(EditAnywhere, Category = "PlayerEquipment")
 	USkeletalMesh* PantsMesh;
 
-	// 마스터 포즈 컴포넌트
-	UPROPERTY(EditAnywhere, Category = "Mesh")
+	UPROPERTY(EditAnywhere, Category = "PlayerEquipment")
+	USkeletalMesh* WeaponMesh;
+
+	// 플레이어 마스터 포즈 컴포넌트
+	UPROPERTY(EditAnywhere, Category = "PlayerMesh")
 	USkeletalMesh* HeadMesh;
 
-	UPROPERTY(EditAnywhere, Category = "Mesh")
+	UPROPERTY(EditAnywhere, Category = "PlayerMesh")
 	USkeletalMesh* BodyMesh;
 
-	UPROPERTY(EditAnywhere, Category = "Mesh")
+	UPROPERTY(EditAnywhere, Category = "PlayerMesh")
 	USkeletalMesh* LegMesh;
 };
