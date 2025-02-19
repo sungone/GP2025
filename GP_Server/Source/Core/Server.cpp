@@ -103,7 +103,7 @@ void Server::WorkerThreadLoop()
 		BOOL ret = _iocp.GetCompletion(recvByte, sessionId, over);
 		ExpOver* expOver = reinterpret_cast<ExpOver*>(over);
 		if (!ret) {
-			HandleError(expOver, sessionId);
+			HandleError(expOver, static_cast<int32>(sessionId));
 			continue;
 		}
 
@@ -112,7 +112,7 @@ void Server::WorkerThreadLoop()
 			HandleAccept();
 			break;
 		case RECV:
-			HandleRecv(sessionId, recvByte, expOver);
+			HandleRecv(static_cast<int32>(sessionId), recvByte, expOver);
 			break;
 		case SEND:
 			delete expOver;

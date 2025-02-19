@@ -36,6 +36,7 @@ struct TPacket : public Packet
 using FPacketHeader = Packet::PacketHeader;
 using InfoPacket = TPacket<FInfoData>;
 using IDPacket = TPacket<int32>;
+
 struct AttackPacket : public Packet
 {
 	int32 TargetID;
@@ -55,6 +56,53 @@ struct DamagePacket : public Packet
 		: Packet(EPacketType::S_DAMAGED_MONSTER), Target(Target_), Damage(Damage_)
 	{
 		Header.PacketSize = sizeof(DamagePacket);
+	}
+};
+
+struct ItemSpawnPacket : public Packet
+{
+	uint32 ItemID;
+	EItemType ItemType;
+	FVector Pos;
+
+	ItemSpawnPacket(uint32 id, EItemType type, FVector pos)
+		: Packet(EPacketType::S_ITEM_SPAWN), ItemID(id), ItemType(type), Pos(pos)
+	{
+		Header.PacketSize = sizeof(ItemSpawnPacket);
+	}
+};
+
+struct ItemDespawnPacket : public Packet
+{
+	uint32 ItemID;
+	ItemDespawnPacket(uint32 id)
+		: Packet(EPacketType::S_ITEM_DESPAWN), ItemID(id)
+	{
+		Header.PacketSize = sizeof(ItemDespawnPacket);
+	}
+};
+
+struct AddInventoryItemPacket : public Packet
+{
+	EItemType ItemType;
+	uint32 Quantity;
+
+	AddInventoryItemPacket(EItemType type, uint32 quantity)
+		: Packet(EPacketType::S_ADD_IVENTORY_ITEM), ItemType(type), Quantity(quantity)
+	{
+		Header.PacketSize = sizeof(AddInventoryItemPacket);
+	}
+};
+
+struct RemoveInventoryItemPacket : public Packet
+{
+	EItemType ItemType;
+	uint32 Quantity;
+
+	RemoveInventoryItemPacket(EItemType type, uint32 quantity)
+		: Packet(EPacketType::S_REMOVE_IVENTORY_ITEM), ItemType(type), Quantity(quantity)
+	{
+		Header.PacketSize = sizeof(RemoveInventoryItemPacket);
 	}
 };
 

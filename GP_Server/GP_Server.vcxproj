@@ -108,7 +108,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;SERVER_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source\Header;$(SolutionDir)Source\Common;$(SolutionDir)Source\Game;$(SolutionDir)Source\Core;$(SolutionDir)Source\Utils;$(SolutionDir)Source\DB;$(SolutionDir)Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Source\Common;$(SolutionDir)Source\Game;$(SolutionDir)Source\Core;$(SolutionDir)Source\Utils;$(SolutionDir)Source\DB;$(SolutionDir)Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -156,6 +156,7 @@
     <ClInclude Include="Source\Game\Character.h" />
     <ClInclude Include="Source\Game\GameManager.h" />
     <ClInclude Include="Source\Game\Inventory.h" />
+    <ClInclude Include="Source\Game\Item.h" />
     <ClInclude Include="Source\Game\Monster.h" />
     <ClInclude Include="Source\Game\Player.h" />
     <ClInclude Include="Source\Game\TimerQueue.h" />
@@ -178,6 +179,7 @@
     <ClCompile Include="Source\Game\Character.cpp" />
     <ClCompile Include="Source\Game\GameManager.cpp" />
     <ClCompile Include="Source\Game\Inventory.cpp" />
+    <ClCompile Include="Source\Game\Item.cpp" />
     <ClCompile Include="Source\Game\Monster.cpp" />
     <ClCompile Include="Source\Game\Player.cpp" />
     <ClCompile Include="Source\Game\TimerQueue.cpp" />

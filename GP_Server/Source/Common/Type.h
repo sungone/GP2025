@@ -19,13 +19,16 @@ enum EPacketType : uint8
 	S_DAMAGED_MONSTER,
 
 	C_USE_ITEM,
-	C_DROP_ITEM,
-	S_INVENTORY,
-	S_ADD_ITEM,
-	S_REMOVE_ITEM,
+	
+	S_ITEM_SPAWN,
+	S_ITEM_DESPAWN,
+
+	S_ADD_IVENTORY_ITEM,
+	S_REMOVE_IVENTORY_ITEM,
 };
 
 using ECharacterType = uint8;
+using EItemType = uint8;
 
 namespace Type
 {
@@ -34,12 +37,12 @@ namespace Type
 		WARRIOR,
 		GUNNER,
 
-		PEND
+		P_END
 	};
 
 	enum EMonster : uint8
 	{
-		ENERGY_DRINK = PEND,
+		ENERGY_DRINK = P_END,
 		BUBBLE_TEA,
 		COFFEE,
 
@@ -52,18 +55,20 @@ namespace Type
 		DRILL,
 
 		TINO,
+
+		M_END
 	};
 
 	enum ENpc : uint8
 	{
-		PROFESSOR,
+		PROFESSOR = M_END,
 		GUARD,
 		STUDENT,
 	};
 
 	enum class EWeapon : uint8
 	{
-		BIRD_GUN,
+		BIRD_GUN = 1,
 		PULSE_GUN,
 		POSITRON,
 		PRACS_WORD,
@@ -73,24 +78,34 @@ namespace Type
 
 	enum class EArmor : uint8
 	{
-		ALLOY_HELMET,
+		ALLOY_HELMET = 7,
 		ENHANCED_HELMET,
 		TITANIUM_ARMOR,
 		POWERED_ARMOR,
 
-		SUIT,
-		TUCLOTHES
+		SUIT = 201,
+		TUCLOTHES = 202,
 	};
 
-	enum class EConsumable : uint8
+	enum class EUseable : uint8
 	{
-		HPKIT_LOW,
+		HPKIT_LOW = 101,
 		HPKIT_MID,
 		HPKIT_HIGH,
 
-		COFFEE,
+		COFFEE = 203,
 		DDALBA,
 		MANGBA,
+
+		GOLD_SMALL = 401,
+		GOLD_MEDIUM = 402,
+		GOLD_LARGE = 403
+	};
+
+	enum class EQuestItem : uint8
+	{
+		KEY = 501,
+		DOCUMENT = 502
 	};
 }
 

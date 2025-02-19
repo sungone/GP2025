@@ -1,14 +1,10 @@
 #pragma once
-struct Item
-{
-    uint32 itemId;
-    int quantity;
-};
+#include "Item.h"
 
-struct InventorySlot
+struct ItemSlot
 {
-    int slotIndex;
     Item item;
+    uint32 quantity;
 };
 
 class Inventory 
@@ -19,10 +15,10 @@ public:
         slots.resize(maxSlots);
     }
 
-    bool AddItem(const Item& item);
-    bool RemoveItem(int itemId, int quantity);
-    Item* GetItem(int slotIndex);
+    bool AddInventoryItem(const Item& item) {};
+    bool RemoveInventoryItem(uint32 itemId, uint32 quantity) {};
+
 private:
     int maxSlots;
-    std::vector<InventorySlot> slots;
+    std::vector<ItemSlot> slots;
 };
