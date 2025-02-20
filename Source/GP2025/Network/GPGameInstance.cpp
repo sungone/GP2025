@@ -167,10 +167,35 @@ void UGPGameInstance::ProcessPacket()
 					InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
 					UpdateMonster(Pkt->Data);
 					break;
-				}case EPacketType::S_DAMAGED_MONSTER:
+				}
+				case EPacketType::S_DAMAGED_MONSTER:
 				{
 					DamagePacket* Pkt = reinterpret_cast<DamagePacket*>(RemainingData.GetData());
-					DamagedMonster(Pkt->Target,Pkt->Damage);
+					DamagedMonster(Pkt->Target, Pkt->Damage);
+					break;
+				}
+				case EPacketType::S_ITEM_SPAWN:
+				{
+					ItemSpawnPacket* Pkt = reinterpret_cast<ItemSpawnPacket*>(RemainingData.GetData());
+					ItemSpawn(Pkt->ItemID, Pkt->ItemType, Pkt->Pos);
+					break;
+				}
+				case EPacketType::S_ITEM_DESPAWN:
+				{
+					ItemDespawnPacket* Pkt = reinterpret_cast<ItemDespawnPacket*>(RemainingData.GetData());
+					ItemDespawn(Pkt->ItemID);
+					break;
+				}
+				case EPacketType::S_ADD_IVENTORY_ITEM:
+				{
+					AddInventoryItemPacket* Pkt = reinterpret_cast<AddInventoryItemPacket*>(RemainingData.GetData());
+					AddInventoryItem(Pkt->ItemType, Pkt->Quantity);
+					break;
+				}
+				case EPacketType::S_REMOVE_IVENTORY_ITEM:
+				{
+					RemoveInventoryItemPacket* Pkt = reinterpret_cast<RemoveInventoryItemPacket*>(RemainingData.GetData());
+					RemoveInventoryItem(Pkt->ItemType, Pkt->Quantity);
 					break;
 				}
 				default:
@@ -328,4 +353,26 @@ void UGPGameInstance::DamagedMonster(FInfoData& MonsterInfo, float Damage)
 		}
 		UE_LOG(LogTemp, Warning, TEXT("Damaged monster [%d]"), MonsterInfo.ID);
 	}
+}
+
+void UGPGameInstance::ItemSpawn(uint32 ItemID, EItem ItemType, FVector Pos)
+{
+	//Todo: 몬스터처럼 (추후 삭제를 위해 아이디 매핑해서) 
+	// 아이템 객체 저장하고 아이템 스폰시키기
+}
+
+void UGPGameInstance::ItemDespawn(uint32 ItemID)
+{
+	//Todo: 스폰된 아이템 중 식별 아이디의 아이템 제거하기
+}
+
+void UGPGameInstance::AddInventoryItem(EItem ItemType, uint32 Quantity)
+{
+	//Todo: myplayer인벤토리 업데이트
+}
+
+void UGPGameInstance::RemoveInventoryItem(EItem ItemType, uint32 Quantity)
+{
+	//Todo: myplayer인벤토리 업데이트
+
 }

@@ -10,7 +10,7 @@
 class AGPCharacterViewerPlayer;
 class AGPCharacterMonster;
 /**
- * 
+ *
  */
 
 UCLASS()
@@ -18,7 +18,7 @@ class GP2025_API UGPGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 
-public :
+public:
 	virtual void Init() override;
 	virtual void Shutdown() override;
 
@@ -42,19 +42,24 @@ public :
 	void RemoveMonster(int32 MonsterID);
 	void UpdateMonster(FInfoData& MonsterInfo);
 	void DamagedMonster(FInfoData& MonsterInfo, float Damage);
-public :
+
+	void ItemSpawn(uint32 ItemID, EItem ItemType, FVector Pos);
+	void ItemDespawn(uint32 ItemID);
+	void AddInventoryItem(EItem ItemType, uint32 Quantity);
+	void RemoveInventoryItem(EItem ItemType, uint32 Quantity);
+public:
 	class FSocket* Socket;
 	FString IpAddress = TEXT("127.0.0.1");
 	int16 Port = 4000;
 
-public :
+public:
 	TSubclassOf<AGPCharacterViewerPlayer> OtherPlayerClass;
 	TSubclassOf<AGPCharacterMonster> MonsterClass;
 
 	AGPCharacterViewerPlayer* MyPlayer;
 	TMap<int32, AGPCharacterViewerPlayer*> Players;
 	TMap<int32, AGPCharacterMonster*> Monsters;
-	
+
 	TArray<uint8> RemainingData;
 	TQueue<TArray<uint8>, EQueueMode::Mpsc> RecvQueue;
 };
