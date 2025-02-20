@@ -76,5 +76,4 @@ DerivedDataCache/*
 
 **/x64/*
 
-*.vcxproj.filters
 *.vcxproj.user
