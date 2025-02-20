@@ -277,7 +277,7 @@ void AGPCharacterBase::SetDead()
 		{
 			Destroy();
 		}
-	), DeadEventDelayTime, false);
+	), DeadEventDelayTime, false); 
 }
 
 void AGPCharacterBase::PlayDeadAnimation()
