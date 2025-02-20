@@ -64,6 +64,11 @@ void AGPCharacterViewerPlayer::SetCharacterType(ECharacterType NewCharacterContr
 	Super::SetCharacterType(NewCharacterControlType);
 }
 
+USkeletalMeshComponent* AGPCharacterViewerPlayer::GetCharacterMesh() const
+{
+	return BodyMesh;
+}
+
 
 void AGPCharacterViewerPlayer::SetupMasterPose()
 {

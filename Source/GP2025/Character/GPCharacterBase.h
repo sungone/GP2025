@@ -31,6 +31,9 @@ public:
 	void SetCharacterInfo(FInfoData& CharacterInfo_);
 	FInfoData CharacterInfo;
 
+	// 플레이어 -> 마스터 포즈 컴포넌트 (BodyMesh) , 몬스터 -> GetMesh()
+	virtual USkeletalMeshComponent* GetCharacterMesh() const;
+
 // 기본 공격 애니메이션 및 공격 애니메이션 몽타주 코드
 public :
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")

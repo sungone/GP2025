@@ -138,9 +138,14 @@ void AGPCharacterBase::SetCharacterInfo(FInfoData& CharacterInfo_)
 	OnLevelChanged.Broadcast(CharacterInfo.Stats.Level);
 }
 
+USkeletalMeshComponent* AGPCharacterBase::GetCharacterMesh() const
+{
+	return GetMesh();
+}
+
 void AGPCharacterBase::ProcessAutoAttackCommand()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
 	if (!AnimInstance || !AttackActionMontage)
 		return;
 
