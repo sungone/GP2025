@@ -20,7 +20,5 @@ public:
 private:
 	std::priority_queue<TimerEvent> _TimerQueue;
 	std::mutex _TimerMutex;
-
-	IOCP& _iocp = IOCP::GetInst();
 };
 

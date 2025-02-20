@@ -35,6 +35,8 @@ void SessionManager::HandleRecvBuffer(int32 id, int32 recvByte, ExpOver* expOver
 		int32 packetSize = packet[PKT_SIZE_INDEX];
 		if (packetSize <= dataSize) {
 			//Todo: 패킷 큐에 넣기 -> session_id랑 packet 쌍으로
+			// 게임데이터를 한번에 업데이트하고 뿌려주도록?
+			// 근데 게임서버도 프레임
 			PacketManager::GetInst().ProcessPacket(session, packet);
 			packet = packet + packetSize;
 			dataSize = dataSize - packetSize;

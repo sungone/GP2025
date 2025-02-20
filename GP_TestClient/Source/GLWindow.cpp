@@ -1,5 +1,4 @@
 #include "GLWindow.h"
-
 #pragma comment (lib, "opengl32.lib")
 #pragma comment (lib, "glu32.lib")
 
@@ -63,7 +62,7 @@ void GLWindow::Run()
         }
         else
         {
-            RenderScene();
+            Render();
             SwapBuffers(hDC);
         }
     }
@@ -101,7 +100,7 @@ void GLWindow::DisableOpenGL()
     ReleaseDC(hWnd, hDC);
 }
 
-void GLWindow::RenderScene()
+void GLWindow::Render()
 {
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();

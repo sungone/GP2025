@@ -15,7 +15,7 @@ void TimerQueue::TimerThread()
             lock.unlock();
 
             std::shared_ptr<std::function<void()>> callback = std::make_shared<std::function<void()>>(event.callback);
-            _iocp.PostCompletion(reinterpret_cast<ULONG_PTR>(callback.get()));
+            IOCP::GetInst().PostCompletion(reinterpret_cast<ULONG_PTR>(callback.get()));
 
             lock.lock();
         }

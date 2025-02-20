@@ -21,7 +21,7 @@
 
 #include "FVector.h"
 #include "Common.h"
-#include "Loger.h"
+#include "Logger.h"
 #include "ExpOver.h"
 #include "CollisionUtils.h"
 #include "RandomUtils.h"

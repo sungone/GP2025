@@ -108,7 +108,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;SERVER_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source\Common;$(SolutionDir)Source\Game;$(SolutionDir)Source\Core;$(SolutionDir)Source\Utils;$(SolutionDir)Source\DB;$(SolutionDir)Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Source;$(SolutionDir)Source\Common;$(SolutionDir)Source\Core;$(SolutionDir)Source\Game;$(SolutionDir)Source\DB;$(SolutionDir)Source\AI;$(SolutionDir)Source\Utils</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -129,7 +129,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;SERVER_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source\Header;$(SolutionDir)Source\Common;$(SolutionDir)Source\Game;$(SolutionDir)Source\Core;$(SolutionDir)Source\Utils;$(SolutionDir)Source\DB;$(SolutionDir)Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Source;$(SolutionDir)Source\Common;$(SolutionDir)Source\Core;$(SolutionDir)Source\Game;$(SolutionDir)Source\DB;$(SolutionDir)Source\AI;$(SolutionDir)Source\Utils</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -163,7 +163,7 @@
     <ClInclude Include="Source\pch.h" />
     <ClInclude Include="Source\Utils\CollisionUtils.h" />
     <ClInclude Include="Source\Utils\FVector.h" />
-    <ClInclude Include="Source\Utils\Loger.h" />
+    <ClInclude Include="Source\Utils\Logger.h" />
     <ClInclude Include="Source\Utils\RandomUtils.h" />
     <ClInclude Include="Source\Utils\Timer.h" />
   </ItemGroup>

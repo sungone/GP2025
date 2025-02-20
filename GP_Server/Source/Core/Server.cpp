@@ -5,7 +5,7 @@ bool Server::Init()
 {
 	std::wcout.imbue(std::locale("korean"));
 
-	//if (!_dbPool.InitPool(L"GP2025", 10))
+	//if (!DBConnectionPool::GetInst().InitPool(L"GP2025", 10))
 	//{
 	//	LOG(LogType::Warning, "DB");
 	//	return false;
@@ -42,14 +42,14 @@ bool Server::Init()
 		return false;
 	}
 
-	if (!_iocp.Init())
+	if (!IOCP::GetInst().Init())
 	{
 		LOG(LogType::Warning, "IOCP");
 		return false;
 	}
-	_iocp.RegisterSocket(_listenSocket);
+	IOCP::GetInst().RegisterSocket(_listenSocket);
 
-	if (!_gameMgr.Init())
+	if (!GameManager::GetInst().Init())
 	{
 		LOG(LogType::Warning, "GameMgr");
 		return false;
@@ -100,7 +100,7 @@ void Server::WorkerThreadLoop()
 	LPWSAOVERLAPPED over;
 
 	while (_bRunning) {
-		BOOL ret = _iocp.GetCompletion(recvByte, sessionId, over);
+		BOOL ret = IOCP::GetInst().GetCompletion(recvByte, sessionId, over);
 		ExpOver* expOver = reinterpret_cast<ExpOver*>(over);
 		if (!ret) {
 			HandleError(expOver, static_cast<int32>(sessionId));
@@ -130,11 +130,11 @@ void Server::HandleError(ExpOver* ex_over, int32 id)
 		break;
 	case RECV:
 		LOG(Warning, "CompType : RECV");
-		_sessionMgr.Disconnect(id);
+		SessionManager::GetInst().Disconnect(id);
 		break;
 	case SEND:
 		LOG(Warning, "CompType : SEND");
-		_sessionMgr.Disconnect(id);
+		SessionManager::GetInst().Disconnect(id);
 		delete ex_over;
 		break;
 	}
@@ -151,12 +151,12 @@ void Server::DoAccept()
 
 void Server::HandleAccept()
 {
-	_sessionMgr.Connect(_acceptSocket);
+	SessionManager::GetInst().Connect(_acceptSocket);
 	DoAccept();
 }
 
 void Server::HandleRecv(int32 _id, int32 recvByte, ExpOver* expOver)
 {
-	_sessionMgr.HandleRecvBuffer(_id, recvByte, expOver);
-	_sessionMgr.DoRecv(_id);
+	SessionManager::GetInst().HandleRecvBuffer(_id, recvByte, expOver);
+	SessionManager::GetInst().DoRecv(_id);
 }
