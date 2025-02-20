@@ -85,7 +85,7 @@ public:
 	USkeletalMesh* PantsMesh;
 
 	UPROPERTY(EditAnywhere, Category = "PlayerEquipment")
-	USkeletalMesh* WeaponMesh;
+	UStaticMesh* WeaponMesh;
 
 	// 플레이어 마스터 포즈 컴포넌트
 	UPROPERTY(EditAnywhere, Category = "PlayerMesh")

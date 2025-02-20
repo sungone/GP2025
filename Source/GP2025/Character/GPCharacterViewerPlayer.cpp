@@ -129,26 +129,38 @@ void AGPCharacterViewerPlayer::ApplyCharacterPartsFromData(const UGPCharacterCon
 
 void AGPCharacterViewerPlayer::EquipWeaponFromData(const UGPCharacterControlData* CharacterData)
 {
-	if (CharacterData && CharacterData->WeaponClass)
+	if (!CharacterData) return;
+	
+	if (WeaponActor)
 	{
-		// 기존 무기 제거
-		if (WeaponActor)
-		{
-			WeaponActor->Destroy();
-			WeaponActor = nullptr;
-		}
+		WeaponActor->Destroy();
+		WeaponActor = nullptr;
+	}
 
-		// 무기 스폰
+	if (CharacterData->WeaponClass)
+	{
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = this;
 		SpawnParams.Instigator = GetInstigator();
-
+		
+		if (BodyMesh == nullptr)
+			return;
+		
 		WeaponActor = GetWorld()->SpawnActor<AGPWeaponBase>(CharacterData->WeaponClass, GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
-
 		if (WeaponActor)
 		{
-			// 무기를 캐릭터의 손에 부착
-			WeaponActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
+			USkeletalMeshComponent* MeshComp = BodyMesh;
+
+			if (MeshComp && MeshComp->DoesSocketExist(TEXT("WeaponSocket")))
+			{
+				WeaponActor->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
+				UE_LOG(LogTemp, Warning, TEXT("Attached WeaponActor -> WeaponSocket!"));
+			}
+		}
+
+		if (CharacterData->WeaponMesh)
+		{
+			WeaponActor->SetWeaponMesh(CharacterData->WeaponMesh);
 		}
 	}
 }
@@ -156,6 +168,5 @@ void AGPCharacterViewerPlayer::EquipWeaponFromData(const UGPCharacterControlData
 void AGPCharacterViewerPlayer::AttackHitCheck()
 {
 	Super::AttackHitCheck();
-
 }
 

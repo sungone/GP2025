@@ -36,6 +36,8 @@ public:
 
 	virtual void EndAttack();
 
+	void SetWeaponMesh(UStaticMesh* NewWeaponMesh);
+
 	UFUNCTION()
 	virtual void OnWeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
