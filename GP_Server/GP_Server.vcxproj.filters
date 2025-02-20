@@ -154,7 +154,7 @@
     <ClCompile Include="Source\Core\IOCP.cpp">
       <Filter>Source Files\Network\IOCP</Filter>
     </ClCompile>
-    <ClCompile Include="Source\main.cpp">
+    <ClCompile Include="Source\ServerMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Character.cpp">
