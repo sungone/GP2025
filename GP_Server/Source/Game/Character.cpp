@@ -44,5 +44,4 @@ void Character::SetBunkerRandomLocation()
 		RandomUtils::GetRandomFloat(BUNKER_Y_RANGE.first, BUNKER_Y_RANGE.second),
 		BUNKER_Z
 	);
-
 }
