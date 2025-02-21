@@ -1,4 +1,4 @@
-ItemIndex,ItemName,Category,DetailType,Attack,Hp,CriticalRate,DodgeRate,MoveSpeed,AbilityType,AbilityValue,Grade,bIsMonster,ResellPrice,Price,bCanResell,bIsBuy
+Name,ItemName,Category,DetailType,Attack,Hp,CriticalRate,DodgeRate,MoveSpeed,AbilityType,AbilityValue,Grade,bIsMonster,ResellPrice,Price,bCanResell,bIsBuy
 1,BirdGun,weapon,bow,5,0,0,0,0,?,?,1,1,100,200,1,1
 2,PulseGun,weapon,bow,15,0,0.05,0,0,?,?,2,1,400,800,1,1
 3,Positron,weapon,bow,30,0,0.1,0,0,?,?,3,1,750,1500,1,1

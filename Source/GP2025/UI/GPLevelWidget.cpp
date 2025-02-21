@@ -27,3 +27,4 @@ void UGPLevelWidget::UpdateLevelText(int32 Level)
         TextLevel->SetText(FText::FromString(FString::Printf(TEXT("%dLv"), Level)));
     }
 }
+

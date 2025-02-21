@@ -261,10 +261,11 @@ void AGPCharacterBase::AttackHitCheck()
 }
 
 
+
 UGPWidgetComponent* AGPCharacterBase::CreateWidgetComponent(const FString& Name, const FString& WidgetPath, FVector Location, FVector2D Size)
 {
 	UGPWidgetComponent* WidgetComp = CreateDefaultSubobject<UGPWidgetComponent>(*Name);
-	WidgetComp->SetupAttachment(GetMesh());
+	WidgetComp->SetupAttachment(GetCharacterMesh());
 	WidgetComp->SetComponent(Location, Size);
 	WidgetComp->SetWidgetClass(LoadClass<UUserWidget>(WidgetPath));
 
