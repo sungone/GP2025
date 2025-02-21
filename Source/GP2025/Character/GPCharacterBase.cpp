@@ -288,7 +288,7 @@ void AGPCharacterBase::SetDead()
 
 void AGPCharacterBase::PlayDeadAnimation()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
 	if (!AnimInstance) return;
 	AnimInstance->StopAllMontages(0.f);
 	AnimInstance->Montage_Play(DeadMontage, 1.f);

@@ -18,6 +18,7 @@ public:
 	AGPCharacterViewerPlayer();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void PostInitializeComponents() override;
 protected:
 	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
 	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;

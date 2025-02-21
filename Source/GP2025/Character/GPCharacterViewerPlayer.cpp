@@ -36,17 +36,23 @@ AGPCharacterViewerPlayer::AGPCharacterViewerPlayer()
 void AGPCharacterViewerPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+	SetCharacterType(CurrentCharacterType);
+}
+
+void AGPCharacterViewerPlayer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+void AGPCharacterViewerPlayer::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
 
 	UGPCharacterControlData* LoadedCharacterData = LoadObject<UGPCharacterControlData>(nullptr, TEXT("/Game/CharacterType/GPC_Warrior.GPC_Warrior"));
 	if (LoadedCharacterData)
 	{
 		ApplyCharacterPartsFromData(LoadedCharacterData);
 	}
-}
-
-void AGPCharacterViewerPlayer::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }
 
 void AGPCharacterViewerPlayer::SetCharacterData(const UGPCharacterControlData* CharacterControlData)

@@ -49,7 +49,6 @@ public :
 	virtual void SetCharacterType(ECharacterType NewCharacterType);
 
 	TMap<ECharacterType, class UGPCharacterControlData*> CharacterTypeManager;
-
 	ECharacterType CurrentCharacterType;
 
 // Attack Hit Section
