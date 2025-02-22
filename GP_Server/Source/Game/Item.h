@@ -30,7 +30,7 @@ struct ItemMeta
 class Item
 {
 public:
-	EItem _ItemType;
+	EItem _itemType;
 };
 
 //world에 스폰될 아이템(다른 플레이어도 보이는)과 인벤토리 아이템 구분함
@@ -38,7 +38,14 @@ public:
 class WorldItem : Item
 {
 public:
-	uint32 _ItemId;
+    WorldItem(EItem itemType, uint32_t itemId, FVector pos)
+        : _itemId(itemId), _pos(pos)
+    {
+        _itemType = itemType;
+    }
+    uint32 GetItemId() { return _itemId; }
+private:
+	uint32 _itemId;
 	FVector _pos;
 };
 

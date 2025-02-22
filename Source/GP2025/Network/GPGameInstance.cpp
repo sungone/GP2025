@@ -359,6 +359,7 @@ void UGPGameInstance::ItemSpawn(uint32 ItemID, EItem ItemType, FVector Pos)
 {
 	//Todo: 몬스터처럼 (추후 삭제를 위해 아이디 매핑해서) 
 	// 아이템 객체 저장하고 아이템 스폰시키기
+	UE_LOG(LogTemp, Warning, TEXT("ItemSpawn [%d]"), ItemID);
 }
 
 void UGPGameInstance::ItemDespawn(uint32 ItemID)

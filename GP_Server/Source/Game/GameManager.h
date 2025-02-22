@@ -3,6 +3,7 @@
 #include "Session.h"
 #include "Timer.h"
 #include "SessionManager.h"
+#include "Item.h"
 
 constexpr size_t MAX_PLAYER = MAX_CLIENT;
 constexpr size_t MAX_MONSTER = 8;
@@ -32,6 +33,9 @@ public:
 	void BroadcastMonsterStates();
 	void UpdateMonster();
 
+	void SpawnItem(uint32_t itemId, EItem itemType, FVector position);
+	void RemoveItem(uint32_t itemId);
+
 public:
 	Timer _MonsterStateBroadcastTimer;
 	Timer _MonsterAIUpdateTimer;
@@ -39,5 +43,7 @@ public:
 
 private:
 	std::array<std::shared_ptr<Character>, MAX_CHARACTER> _characters;
+	std::vector<std::shared_ptr<WorldItem>> _worldItems;
+	std::mutex _iMutex;
 };
 

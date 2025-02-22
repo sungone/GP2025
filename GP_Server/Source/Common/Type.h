@@ -6,6 +6,7 @@ enum EPacketType : uint8
 	C_LOGOUT,
 	C_MOVE,
 	C_ATTACK,
+	C_USE_ITEM,
 
 	S_LOGIN_SUCCESS,
 
@@ -18,8 +19,6 @@ enum EPacketType : uint8
 	S_MONSTER_STATUS_UPDATE,
 	S_DAMAGED_MONSTER,
 
-	C_USE_ITEM,
-	
 	S_ITEM_SPAWN,
 	S_ITEM_DESPAWN,
 

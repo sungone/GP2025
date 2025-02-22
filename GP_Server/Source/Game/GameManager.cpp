@@ -84,6 +84,12 @@ void GameManager::ProcessAttack(int32 attackerID, int32 targetID)
 
 	auto pkt = DamagePacket(Target->GetInfo(), atkDamage);
 	SessionManager::GetInst().Broadcast(&pkt);
+	if (Target->IsDead())
+	{
+		EItem itemType = RandomUtils::GetRandomUint8((uint8)Type::EUseable::HPKIT_LOW, (uint8)Type::EUseable::GOLD_LARGE);
+		SpawnItem(targetID, itemType, Target->GetInfo().Pos);
+		RemoveCharacter(targetID);
+	}
 }
 
 std::shared_ptr<Character> GameManager::GetCharacterByID(int32 id)
@@ -131,11 +137,25 @@ void GameManager::UpdateMonster()
 			if (!_characters[i]) return;
 
 			_characters[i]->Update();
-
-			if (_characters[i]->IsDead())
-			{
-				RemoveCharacter(i);
-			}
 		}
 		});
+}
+
+void GameManager::SpawnItem(uint32_t itemId, EItem itemType, FVector position)
+{
+	std::lock_guard<std::mutex> lock(_iMutex);
+	_worldItems.emplace_back(std::make_shared<WorldItem>(itemType, itemId, position));
+	ItemSpawnPacket packet(itemId, itemType, position);
+	SessionManager::GetInst().Broadcast(&packet);
+}
+
+void GameManager::RemoveItem(uint32_t itemId)
+{
+	std::lock_guard<std::mutex> lock(_iMutex);
+	ItemDespawnPacket packet(itemId);
+	SessionManager::GetInst().Broadcast(&packet);
+	_worldItems.erase(
+		std::remove_if(_worldItems.begin(), _worldItems.end(),
+			[itemId](const std::shared_ptr<WorldItem>& item) { return item->GetItemId() == itemId; }),
+		_worldItems.end());
 }

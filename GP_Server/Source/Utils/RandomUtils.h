@@ -15,6 +15,12 @@ namespace RandomUtils
         return dist(GetRandomEngine());
     }
 
+    inline uint8 GetRandomUint8(uint8 min, uint8 max)
+    {
+        std::uniform_int_distribution<int> dist(min, max);
+        return static_cast<uint8>(dist(GetRandomEngine()));
+    }
+
     inline float GetRandomFloat(float min, float max)
     {
         std::uniform_real_distribution<float> dist(min, max);
