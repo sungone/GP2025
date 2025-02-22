@@ -26,7 +26,7 @@ void PacketManager::ProcessPacket(Session& session, BYTE* packet)
 
 void PacketManager::HandleLoginPacket(Session& session)
 {
-	session.SetLogin();
+	session.CreatePlayer();
 
 	auto playerInfo = session.GetPlayerInfo();
 	int32 id = playerInfo.ID;
@@ -37,15 +37,7 @@ void PacketManager::HandleLoginPacket(Session& session)
 
 	auto myInfoPkt = InfoPacket(EPacketType::S_ADD_PLAYER, playerInfo);
 	_sessionMgr.Broadcast(&myInfoPkt, id);
-
-	for (auto& cl : _sessions)
-	{
-		if (cl == nullptr) continue;
-		if (cl->GetId() == id || !cl->IsLogin())
-			continue;
-		auto otherInfoPkt = InfoPacket(EPacketType::S_ADD_PLAYER, cl->GetPlayerInfo());
-		session.DoSend(&otherInfoPkt);
-	}
+	_sessionMgr.HandleLogin(id);
 	_gameMgr.SpawnMonster(session);
 }
 
@@ -53,9 +45,10 @@ void PacketManager::HandleLogoutPacket(Session& session)
 {
 	int32 id = session.GetId();
 	LOG(LogType::RecvLog, std::format("Logout PKT [{}]", id));
-	session.Disconnect();
+	
 	auto pkt = IDPacket(EPacketType::S_REMOVE_PLAYER, id);
 	_sessionMgr.Broadcast(&pkt, id);
+	_sessionMgr.Disconnect(id);
 }
 
 void PacketManager::HandleMovePacket(Session& session, BYTE* packet)

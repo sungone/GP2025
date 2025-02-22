@@ -15,14 +15,12 @@ public:
 	void Connect(SOCKET socket, int32 id);
 	void Disconnect();
 
-	void SetLogin();
-	bool IsLogin();
+	void CreatePlayer();
 	int32 GetId();
 	FInfoData& GetPlayerInfo();
 	
 	void HandleRecvBuffer(int32 recvByte, ExpOver* expOver);
 private:
-	bool _bLogin = false;
 	int32 _id = -1;
 	std::shared_ptr<Player> _player;
 	std::unique_ptr<SessionSocket> _sSocket;

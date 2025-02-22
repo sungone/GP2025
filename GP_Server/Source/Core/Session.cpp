@@ -53,22 +53,15 @@ void Session::Connect(SOCKET socket, int32 id)
 
 void Session::Disconnect()
 {
-	_bLogin = false;
 	_sSocket->Close();
 }
 
-void Session::SetLogin()
+void Session::CreatePlayer()
 {
-	_bLogin = true;
 	_player = std::make_shared<Player>();
 	_player->Init();
 	_player->GetInfo().ID = _id;
 	GameManager::GetInst().AddPlayer(_player);
-}
-
-bool Session::IsLogin()
-{
-	return _bLogin;
 }
 
 int32 Session::GetId()
