@@ -79,12 +79,6 @@ public:
 	USkeletalMesh* HelmetMesh;
 
 	UPROPERTY(EditAnywhere, Category = "PlayerEquipment")
-	USkeletalMesh* ChestMesh;
-
-	UPROPERTY(EditAnywhere, Category = "PlayerEquipment")
-	USkeletalMesh* PantsMesh;
-
-	UPROPERTY(EditAnywhere, Category = "PlayerEquipment")
 	UStaticMesh* WeaponMesh;
 
 	// 플레이어 마스터 포즈 컴포넌트

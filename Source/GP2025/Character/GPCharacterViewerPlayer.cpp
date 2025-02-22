@@ -7,15 +7,11 @@
 #include "Network/GPGameInstance.h"
 #include "Item/GPEquipItemData.h"
 #include "Weapons/GPWeaponBase.h"
+#include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
 
 AGPCharacterViewerPlayer::AGPCharacterViewerPlayer()
 {
-	Chest = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Chest"));
-	Chest->SetupAttachment(GetMesh(), TEXT("ChestSocket"));
-	Chest->SetCollisionProfileName(TEXT("NoCollision"));
-	Chest->SetVisibility(true);
-
 	Helmet = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Helmet"));
 	Helmet->SetupAttachment(GetMesh(), TEXT("HelmetSocket"));
 	Helmet->SetCollisionProfileName(TEXT("NoCollision"));
@@ -97,7 +93,12 @@ void AGPCharacterViewerPlayer::ApplyCharacterPartsFromData(const UGPCharacterCon
 
 	if (CharacterData->BodyMesh)
 	{
+		TSubclassOf<UAnimInstance> PrevAnimBP = BodyMesh->GetAnimClass();
 		BodyMesh->SetSkeletalMesh(CharacterData->BodyMesh);
+		if (PrevAnimBP)
+		{
+			BodyMesh->SetAnimInstanceClass(PrevAnimBP);
+		}
 	}
 
 	if (CharacterData->HeadMesh)
@@ -120,18 +121,6 @@ void AGPCharacterViewerPlayer::ApplyCharacterPartsFromData(const UGPCharacterCon
 	{
 		Helmet->SetSkeletalMesh(nullptr);
 		Helmet->SetVisibility(false);
-	}
-
-	if (CharacterData->ChestMesh)
-	{
-		Chest->SetSkeletalMesh(CharacterData->ChestMesh);
-		Chest->AttachToComponent(BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("ChestSocket"));
-		Chest->SetVisibility(true);
-	}
-	else
-	{
-		Chest->SetSkeletalMesh(nullptr);
-		Chest->SetVisibility(false);
 	}
 	
 	EquipWeaponFromData(CharacterData);

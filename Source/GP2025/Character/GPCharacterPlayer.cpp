@@ -321,12 +321,12 @@ void AGPCharacterPlayer::DrinkPotion(UGPItemData* InItemData)
 void AGPCharacterPlayer::EquipChest(UGPItemData* InItemData)
 {
 	UE_LOG(LogGPCharacter, Log, TEXT("Equip Chest"));
-	UGPEquipItemData* ChestItemData = Cast<UGPEquipItemData>(InItemData);
-	if (ChestItemData)
-	{
-		Chest->SetLeaderPoseComponent(GetMesh());
-		Chest->SetSkeletalMesh(ChestItemData->EquipMesh);
-	}
+	//UGPEquipItemData* ChestItemData = Cast<UGPEquipItemData>(InItemData);
+	//if (ChestItemData)
+	//{
+	//	Chest->SetLeaderPoseComponent(GetMesh());
+	//	Chest->SetSkeletalMesh(ChestItemData->EquipMesh);
+	//}
 }
 
 void AGPCharacterPlayer::EquipHelmet(UGPItemData* InItemData)
