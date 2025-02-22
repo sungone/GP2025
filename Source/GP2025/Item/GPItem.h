@@ -23,4 +23,30 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	int32 ItemID;  
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+	UStaticMeshComponent* ItemStaticMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+	USkeletalMeshComponent* ItemSkeletalMesh;
+
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+	class UBoxComponent* TriggerBox;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	int32 Amount;
+
+	void SetupItem(int32 NewItemID, int32 NewMoneyAmount);
+	UDataTable* GetItemDataTable();
+
+	UFUNCTION()
+	void OnOverlapBegin(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
 };
