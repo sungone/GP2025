@@ -5,7 +5,6 @@
 void SessionManager::Connect(SOCKET& socket)
 {
 	std::lock_guard<std::mutex> lock(_smgrMutex);
-
 	int32 _id = GenerateId();
 	if (_id != -1) {
 		_sessions[_id].Connect(socket,_id);
@@ -28,24 +27,8 @@ void SessionManager::HandleRecvBuffer(int32 id, int32 recvByte, ExpOver* expOver
 {
 	std::lock_guard<std::mutex> lock(_smgrMutex);
 
-	Session& session = _sessions[id];
-	int32 dataSize = recvByte + session.GetRemainSize();
-	BYTE* packet = reinterpret_cast<BYTE*>(expOver->_buf);
-	while (dataSize > 0) {
-		int32 packetSize = packet[PKT_SIZE_INDEX];
-		if (packetSize <= dataSize) {
-			//Todo: 패킷 큐에 넣기 -> session_id랑 packet 쌍으로
-			// 게임데이터를 한번에 업데이트하고 뿌려주도록?
-			// 근데 게임서버도 프레임
-			PacketManager::GetInst().ProcessPacket(session, packet);
-			packet = packet + packetSize;
-			dataSize = dataSize - packetSize;
-		}
-		else break;
-	}
-	session.SetRemainSize(dataSize);
-	if (dataSize > 0)
-		memcpy(expOver->_buf, packet, dataSize);
+	_sessions[id].HandleRecvBuffer(recvByte,expOver);
+
 }
 
 void SessionManager::Broadcast(Packet* packet, int32 exptId)
