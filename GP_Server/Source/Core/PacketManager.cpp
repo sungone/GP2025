@@ -40,9 +40,10 @@ void PacketManager::HandleLoginPacket(Session& session)
 
 	for (auto& cl : _sessions)
 	{
-		if (cl.GetId() == id || !cl.IsLogin())
+		if (cl == nullptr) continue;
+		if (cl->GetId() == id || !cl->IsLogin())
 			continue;
-		auto otherInfoPkt = InfoPacket(EPacketType::S_ADD_PLAYER, cl.GetPlayerInfo());
+		auto otherInfoPkt = InfoPacket(EPacketType::S_ADD_PLAYER, cl->GetPlayerInfo());
 		session.DoSend(&otherInfoPkt);
 	}
 	_gameMgr.SpawnMonster(session);

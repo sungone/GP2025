@@ -18,9 +18,9 @@ public:
 	void Broadcast(Packet* packet, int32 exptId = -1);
 	int32 GenerateId();
 
-	std::array<Session, MAX_CLIENT>& GetSessions() { return _sessions; }
+	std::array<std::shared_ptr<Session>, MAX_CLIENT>& GetSessions() { return _sessions; }
 private:
-	std::array<Session, MAX_CLIENT> _sessions;
+	std::array<std::shared_ptr<Session>, MAX_CLIENT> _sessions;
 	IOCP& _iocp = IOCP::GetInst();
 
 	std::mutex _smgrMutex;

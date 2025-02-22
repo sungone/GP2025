@@ -10,8 +10,6 @@ void Session::DoRecv()
 }
 void Session::DoSend(Packet* packet)
 {
-	std::lock_guard<std::mutex> lock(_sMutex);
-
 #pragma region //Log
 	switch (packet->Header.PacketType)
 	{
@@ -49,21 +47,18 @@ void Session::DoSend(Packet* packet)
 
 void Session::Connect(SOCKET socket, int32 id)
 {
-	std::lock_guard<std::mutex> lock(_sMutex);
 	this->_id = id;
 	_sSocket = std::make_unique<SessionSocket>(socket);
 }
 
 void Session::Disconnect()
 {
-	std::lock_guard<std::mutex> lock(_sMutex);
 	_bLogin = false;
 	_sSocket->Close();
 }
 
 void Session::SetLogin()
 {
-	std::lock_guard<std::mutex> lock(_sMutex);
 	_bLogin = true;
 	_player = std::make_shared<Player>();
 	_player->Init();
@@ -73,19 +68,16 @@ void Session::SetLogin()
 
 bool Session::IsLogin()
 {
-	std::lock_guard<std::mutex> lock(_sMutex);
 	return _bLogin;
 }
 
 int32 Session::GetId()
 {
-	std::lock_guard<std::mutex> lock(_sMutex);
 	return _id;
 }
 
 FInfoData& Session::GetPlayerInfo()
 {
-	std::lock_guard<std::mutex> lock(_sMutex);
 	return _player->GetInfo();
 }
 
