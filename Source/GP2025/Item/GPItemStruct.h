@@ -2,6 +2,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "../../GP_Server/Source/Shared/Type.h"
+#include ""
 #include "GPItemStruct.generated.h"
 
 UENUM()

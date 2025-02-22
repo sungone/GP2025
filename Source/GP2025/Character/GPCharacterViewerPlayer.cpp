@@ -27,6 +27,8 @@ AGPCharacterViewerPlayer::AGPCharacterViewerPlayer()
 
 	LegMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LegMesh"));
 	LegMesh->SetupAttachment(BodyMesh);
+
+	ExpBar = CreateWidgetComponent(TEXT("ExpWidget"), TEXT("/Game/UI/WBP_ExpBar.WBP_ExpBar_C"), FVector(0.f, 0.f, 308.f), FVector2D(150.f, 15.f));
 }
 
 void AGPCharacterViewerPlayer::BeginPlay()
