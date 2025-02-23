@@ -72,6 +72,8 @@ void AGPItem::SetupItem(int32 NewItemID, int32 NewAmount)
 		ItemStaticMesh->SetStaticMesh(ItemData->ItemStaticMesh);
 		ItemStaticMesh->SetVisibility(true);
 		ItemSkeletalMesh->SetVisibility(false);
+
+		UE_LOG(LogTemp, Log, TEXT("Set Static Mesh"));
 	}
 	// Skeletal Mesh가 있는 경우 적용
 	else if (ItemData->ItemSkeletalMesh)
@@ -79,6 +81,8 @@ void AGPItem::SetupItem(int32 NewItemID, int32 NewAmount)
 		ItemSkeletalMesh->SetSkeletalMesh(ItemData->ItemSkeletalMesh);
 		ItemStaticMesh->SetVisibility(false);
 		ItemSkeletalMesh->SetVisibility(true);
+
+		UE_LOG(LogTemp, Log, TEXT("Set Skeletal Mesh"));
 	}
 }
 
