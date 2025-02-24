@@ -92,6 +92,13 @@ void UGPGameInstance::SendPlayerAttackPacket(int32 TargetID)
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(AttackPacket), BytesSent);
 }
 
+void UGPGameInstance::SendPlayerTakeItem(int32 ItemID)
+{
+	IDPacket Packet(EPacketType::C_TAKE_ITEM, ItemID);
+	int32 BytesSent = 0;
+	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(IDPacket), BytesSent);
+}
+
 void UGPGameInstance::ReceiveData()
 {
 	uint32 DataSize;
@@ -359,9 +366,6 @@ void UGPGameInstance::DamagedMonster(FInfoData& MonsterInfo, float Damage)
 
 void UGPGameInstance::ItemSpawn(uint32 ItemID, EItem ItemType, FVector Pos)
 {
-	//Todo: 몬스터처럼 (추후 삭제를 위해 아이디 매핑해서) 
-	// 아이템 객체 저장하고 아이템 스폰시키기
-
 	UE_LOG(LogTemp, Warning, TEXT("ItemSpawn [%d]"), ItemID);
 
 	static const FString DataTablePath = TEXT("/Game/Item/GPItemTable.GPItemTable");
@@ -398,6 +402,7 @@ void UGPGameInstance::ItemSpawn(uint32 ItemID, EItem ItemType, FVector Pos)
 
 	SpawnedItem->SetupItem(ItemType, 0);
 	SpawnedItem->ItemID = ItemType;
+	Items.Add(ItemID, SpawnedItem);
 
 	UE_LOG(LogTemp, Warning, TEXT("ItemSpawn success: Spawned Item ID [%d] at [%s]"), ItemID, *Pos.ToString());
 }
@@ -405,6 +410,8 @@ void UGPGameInstance::ItemSpawn(uint32 ItemID, EItem ItemType, FVector Pos)
 void UGPGameInstance::ItemDespawn(uint32 ItemID)
 {
 	//Todo: 스폰된 아이템 중 식별 아이디의 아이템 제거하기
+	auto Item = Items.Find(ItemID);
+	(*Item)->Destroy();
 }
 
 void UGPGameInstance::AddInventoryItem(EItem ItemType, uint32 Quantity)

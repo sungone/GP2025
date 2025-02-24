@@ -31,6 +31,8 @@ public:
 	void SendPlayerMovePacket();
 	void SendPlayerAttackPacket(int32 TargetID = -1);
 
+	void SendPlayerTakeItem(int32 ItemID);
+
 	void ReceiveData();
 	void ProcessPacket();
 
@@ -59,6 +61,7 @@ public:
 	AGPCharacterViewerPlayer* MyPlayer;
 	TMap<int32, AGPCharacterViewerPlayer*> Players;
 	TMap<int32, AGPCharacterMonster*> Monsters;
+	TMap<int32, class AGPItem*> Items;
 
 	TArray<uint8> RemainingData;
 	TQueue<TArray<uint8>, EQueueMode::Mpsc> RecvQueue;

@@ -6,7 +6,12 @@ enum EPacketType : uint8
 	C_LOGOUT,
 	C_MOVE,
 	C_ATTACK,
-	C_USE_ITEM,
+
+	C_TAKE_ITEM,
+	//C_DROP_ITEM,
+	//C_USE_ITEM,
+	//C_EQUIP_ITEM,
+	//C_UNEQUIP_ITEM,
 
 	S_LOGIN_SUCCESS,
 

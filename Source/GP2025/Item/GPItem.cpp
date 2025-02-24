@@ -7,7 +7,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/RotatingMovementComponent.h"
 #include "Network/GPGameInstance.h"
-#include "Character/GPCharacterMyPlayer.h"
+#include "Character/GPCharacterPlayer.h"
 #include "GPItemStruct.h"
 
 // Sets default values
@@ -111,23 +111,12 @@ void AGPItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 {
 	if (!OtherActor) return;
 
-	AGPCharacterMyPlayer* Player = Cast<AGPCharacterMyPlayer>(OtherActor);
+	AGPCharacterPlayer* Player = Cast<AGPCharacterPlayer>(OtherActor);
 	if (!Player) return;
 
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 	if (!GameInstance) return;
 
-	// 아이템 ID가 400 이상이면 골드 (Gold)
-	if (ItemID >= 400 && ItemID < 500)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Player picked up %d gold!"), Amount);
-	}
-	// 일반 아이템이면 인벤토리에 추가
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("Player picked up item ID: %d"), ItemID);
-	}
-
-	//Destroy();
+	GameInstance->SendPlayerTakeItem(ItemID);
 }
 
