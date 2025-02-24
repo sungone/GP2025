@@ -400,8 +400,7 @@ void UGPGameInstance::ItemSpawn(uint32 ItemID, EItem ItemType, FVector Pos)
 		return;
 	}
 
-	SpawnedItem->SetupItem(ItemType, 0);
-	SpawnedItem->ItemID = ItemType;
+	SpawnedItem->SetupItem(ItemID, ItemType, 0);
 	Items.Add(ItemID, SpawnedItem);
 
 	UE_LOG(LogTemp, Warning, TEXT("ItemSpawn success: Spawned Item ID [%d] at [%s]"), ItemID, *Pos.ToString());

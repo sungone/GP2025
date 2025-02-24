@@ -13,7 +13,7 @@
 // Sets default values
 AGPItem::AGPItem()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
@@ -43,7 +43,7 @@ AGPItem::AGPItem()
 void AGPItem::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -55,7 +55,7 @@ void AGPItem::Tick(float DeltaTime)
 	SetActorLocation(NewLocation);
 }
 
-void AGPItem::SetupItem(int32 NewItemID, int32 NewAmount)
+void AGPItem::SetupItem(int32 NewItemID, uint8 NewItemtype, int32 NewAmount)
 {
 	ItemID = NewItemID;
 	Amount = NewAmount;
@@ -67,7 +67,7 @@ void AGPItem::SetupItem(int32 NewItemID, int32 NewAmount)
 	UDataTable* ItemTable = GetItemDataTable();
 	if (!ItemTable) return;
 
-	FGPItemStruct* ItemData = ItemTable->FindRow<FGPItemStruct>(*FString::FromInt(ItemID), TEXT(""));
+	FGPItemStruct* ItemData = ItemTable->FindRow<FGPItemStruct>(*FString::FromInt(NewItemtype), TEXT(""));
 	if (!ItemData) return;
 
 	// 아이템 이름 설정 (디버깅용)
