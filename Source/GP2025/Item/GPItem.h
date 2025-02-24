@@ -38,6 +38,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	int32 Amount;
 
+	UPROPERTY(VisibleAnywhere, Category = "Movement")
+	class URotatingMovementComponent* RotatingMovement;
+
 	void SetupItem(int32 NewItemID, int32 NewMoneyAmount);
 	UDataTable* GetItemDataTable();
 

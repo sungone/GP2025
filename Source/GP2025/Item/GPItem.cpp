@@ -5,8 +5,9 @@
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/RotatingMovementComponent.h"
 #include "Network/GPGameInstance.h"
-#include "Character/GPCharacterPlayer.h"
+#include "Character/GPCharacterMyPlayer.h"
 #include "GPItemStruct.h"
 
 // Sets default values
@@ -32,6 +33,10 @@ AGPItem::AGPItem()
 	ItemSkeletalMesh->SetupAttachment(RootComponent);
 	ItemSkeletalMesh->SetCollisionProfileName(TEXT("NoCollision"));
 	ItemSkeletalMesh->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
+
+	// 회전하는 움직임 추가
+	RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("RotatingMovement"));
+	RotatingMovement->RotationRate = FRotator(0.f, 180.f, 0.f); // 초당 180도 회전
 }
 
 // Called when the game starts or when spawned
@@ -45,7 +50,9 @@ void AGPItem::BeginPlay()
 void AGPItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	FVector NewLocation = GetActorLocation();
+	NewLocation.Z += FMath::Sin(GetWorld()->TimeSeconds * 2) * 2;  // 위아래로 흔들리는 효과
+	SetActorLocation(NewLocation);
 }
 
 void AGPItem::SetupItem(int32 NewItemID, int32 NewAmount)
@@ -104,10 +111,9 @@ void AGPItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 {
 	if (!OtherActor) return;
 
-	AGPCharacterPlayer* Player = Cast<AGPCharacterPlayer>(OtherActor);
+	AGPCharacterMyPlayer* Player = Cast<AGPCharacterMyPlayer>(OtherActor);
 	if (!Player) return;
 
-	// 게임 인스턴스 가져오기
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 	if (!GameInstance) return;
 
@@ -122,6 +128,6 @@ void AGPItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 		UE_LOG(LogTemp, Log, TEXT("Player picked up item ID: %d"), ItemID);
 	}
 
-	Destroy();
+	//Destroy();
 }
 
