@@ -7,7 +7,7 @@
 #include "../../GP_Server/Source/Common/Common.h"
 #include "GPGameInstance.generated.h"
 
-class AGPCharacterViewerPlayer;
+class AGPCharacterPlayer;
 class AGPCharacterMonster;
 /**
  *
@@ -55,11 +55,11 @@ public:
 	int16 Port = 4000;
 
 public:
-	TSubclassOf<AGPCharacterViewerPlayer> OtherPlayerClass;
+	TSubclassOf<AGPCharacterPlayer> OtherPlayerClass;
 	TSubclassOf<AGPCharacterMonster> MonsterClass;
 
-	AGPCharacterViewerPlayer* MyPlayer;
-	TMap<int32, AGPCharacterViewerPlayer*> Players;
+	AGPCharacterPlayer* MyPlayer;
+	TMap<int32, AGPCharacterPlayer*> Players;
 	TMap<int32, AGPCharacterMonster*> Monsters;
 	TMap<int32, class AGPItem*> Items;
 

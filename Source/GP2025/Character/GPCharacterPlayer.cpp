@@ -1,348 +1,174 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+
 #include "Character/GPCharacterPlayer.h"
 #include "Components/CapsuleComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "Camera/CameraComponent.h"
-#include "InputMappingContext.h"
-#include "EnhancedInputComponent.h"
-#include "EnhancedInputSubsystems.h"
-#include "GPCharacterControlData.h"
-#include "Item/GPEquipItemData.h"
-#include "GPCharacterMonster.h"
+#include "Character/GPCharacterControlData.h"
 #include "Network/GPGameInstance.h"
+#include "Item/GPEquipItemData.h"
+#include "Weapons/GPWeaponBase.h"
+#include "Engine/SkeletalMeshSocket.h"
+#include "Kismet/GameplayStatics.h"
 
 AGPCharacterPlayer::AGPCharacterPlayer()
 {
-	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterPlayer::EquipHelmet)));
-	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterPlayer::EquipChest)));
-	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterPlayer::DrinkPotion)));
-	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterPlayer::AddExp)));
+    Helmet = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Helmet"));
+    Helmet->SetupAttachment(GetMesh(), TEXT("HelmetSocket"));
+    Helmet->SetCollisionProfileName(TEXT("NoCollision"));
+    Helmet->SetVisibility(true);
 
-	// 카메라 세팅
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 600.f;
-	CameraBoom->bUsePawnControlRotation = true;
+    BodyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BodyMesh"));
+    BodyMesh->SetupAttachment(GetCapsuleComponent());
+    BodyMesh->SetCollisionProfileName(TEXT("NoCollision"));
+    BodyMesh->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
 
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	FollowCamera->bUsePawnControlRotation = false;
+    HeadMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HeadMesh"));
+    HeadMesh->SetupAttachment(BodyMesh);
 
-	// Input 세팅
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/PlayerInput/IMC_PlayerIMC.IMC_PlayerIMC'"));
-	if (nullptr != InputMappingContextRef.Object)
-	{
-		DefaultMappingContext = InputMappingContextRef.Object;
-	}
+    LegMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LegMesh"));
+    LegMesh->SetupAttachment(BodyMesh);
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionJumpRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Jump.IA_Jump'"));
-	if (nullptr != InputActionJumpRef.Object)
-	{
-		JumpAction = InputActionJumpRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionMoveRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Move.IA_Move'"));
-	if (nullptr != InputActionMoveRef.Object)
-	{
-		MoveAction = InputActionMoveRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionLookRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Look.IA_Look'"));
-	if (nullptr != InputActionLookRef.Object)
-	{
-		LookAction = InputActionLookRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSprintRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Sprint.IA_Sprint'"));
-	if (InputActionSprintRef.Object)
-	{
-		SprintAction = InputActionSprintRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionAutoAttackRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_AutoAttack.IA_AutoAttack'"));
-	if (InputActionAutoAttackRef.Object)
-	{
-		AutoAttackAction = InputActionAutoAttackRef.Object;
-	}
-
-	// 기본 캐릭터 타입을 전사 캐릭터로
-	CurrentCharacterType = Type::EPlayer::WARRIOR;
+    ExpBar = CreateWidgetComponent(TEXT("ExpWidget"), TEXT("/Game/UI/WBP_ExpBar.WBP_ExpBar_C"), FVector(0.f, 0.f, 308.f), FVector2D(150.f, 15.f));
 }
 
 void AGPCharacterPlayer::BeginPlay()
 {
-	Super::BeginPlay();
-	GetMesh()->SetWorldScale3D(FVector(1.0f));
-	SetCharacterType(CurrentCharacterType);
-	//EquipItemFromDataAsset(CharacterTypeManager[CurrentCharacterType]);
-
-	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
-	if (GameInstance)
-	{
-		GameInstance->MyPlayer = this;
-		GameInstance->OtherPlayerClass = AGPCharacterViewerPlayer::StaticClass();
-		GameInstance->MonsterClass = AGPCharacterMonster::StaticClass();
-	}
-
-	LastLocation = GetActorLocation();
-	LastRotationYaw = GetActorRotation().Yaw;
-	LastSendPlayerInfo = CharacterInfo;
+    Super::BeginPlay();
+    SetCharacterType(CurrentCharacterType);
 }
 
 void AGPCharacterPlayer::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-
-	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
-	if (!GameInstance)
-		return;
-
-	MovePacketSendTimer -= DeltaTime;
-	FVector CurrentLocation = GetActorLocation();
-	float CurrentRotationYaw = GetActorRotation().Yaw;
-
-	CharacterInfo.SetLocation(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
-	CharacterInfo.Yaw = CurrentRotationYaw;
-	CharacterInfo.Speed = GetVelocity().Size();
-
-	float DistanceMoved = FVector::DistSquared(CurrentLocation, LastLocation);
-	LastLocation = CurrentLocation;
-
-	const float YawThreshold = 10.f;
-	float YawDifference = FMath::Abs(FMath::FindDeltaAngleDegrees(CurrentRotationYaw, LastRotationYaw));
-	bool bYawChanged = (YawDifference > YawThreshold);
-	LastRotationYaw = CurrentRotationYaw;
-
-	// IDLE 상태인지 아닌지 판단 - IDLE 조건 1 : 이동 거리가 0.5cm 이하
-	const float NotMovedThreshold = 2.f;
-	if ( (DistanceMoved >= NotMovedThreshold) )
-	{
-		CharacterInfo.RemoveState(STATE_IDLE);
-	}
-	else if ( (DistanceMoved < NotMovedThreshold) )
-	{
-		CharacterInfo.AddState(STATE_IDLE);
-	}
-
-	// Jump() 시 패킷 전송
-	if (isJumpStart && !bWasJumping)
-	{
-		isJumpStart = false;
-		bWasJumping = true;
-		GameInstance->SendPlayerMovePacket();
-		LastSendPlayerInfo = CharacterInfo;
-		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Jump Issue"));
-		return;
-	}
-
-	// 착지 시 bWasJumping 초기화
-	if (GetCharacterMovement()->IsMovingOnGround())
-		bWasJumping = false;
-
-	const float AirThreshold = 10.f;
-	// 점프 후 착지를 안하고 플레이어가 계속 공중에 떠 있다면 떨어뜨리기 위해 패킷 전송
-	if (CharacterInfo.HasState(STATE_IDLE) && !CharacterInfo.HasState(STATE_JUMP) 
-		&& (LastSendPlayerInfo.Pos.Z - GroundZLocation) > AirThreshold)
-	{
-		CharacterInfo.Pos.Z = GroundZLocation;
-		CharacterInfo.Speed = LastSendPlayerInfo.HasState(STATE_RUN) ? SprintSpeed : WalkSpeed;
-
-		GameInstance->SendPlayerMovePacket();
-		LastSendPlayerInfo = CharacterInfo;
-		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Air Fixed Issue"));
-		return;
-	}
-
-	// IDLE 상태에서 캐릭터의 회전이 변경되었을 때 패킷 전송
-	if (bYawChanged && CharacterInfo.HasState(STATE_IDLE))
-	{
-		GameInstance->SendPlayerMovePacket();
-		LastSendPlayerInfo = CharacterInfo;
-		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Rotation Issue"));
-		return;
-	}
-
-	// 일정 시간마다 서버에 패킷 전송
-	if (MovePacketSendTimer <= 0 || (CharacterInfo.HasState(STATE_IDLE) && DistanceMoved >= NotMovedThreshold))
-	{
-		MovePacketSendTimer = PACKETSENDTIME;
-
-		// IDLE 상태가 아니거나 일정 거리 이상 이동한 경우 패킷 전송
-		if (!CharacterInfo.HasState(STATE_IDLE) || DistanceMoved >= NotMovedThreshold)
-		{
-			GameInstance->SendPlayerMovePacket();
-			LastSendPlayerInfo = CharacterInfo;
-
-			if (MovePacketSendTimer <= 0)
-			{
-				UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : periodically"));
-			}
-			else
-			{
-				UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : I am Idle but when I moved"));
-			}
-		}
-	}
+    Super::Tick(DeltaTime);
 }
 
-void AGPCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AGPCharacterPlayer::PostInitializeComponents()
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+    Super::PostInitializeComponents();
 
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
-
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::Jump);
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AGPCharacterPlayer::StopJumping);
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::Move);
-	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::Look);
-	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::StartSprinting);
-	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AGPCharacterPlayer::StopSprinting);
-	EnhancedInputComponent->BindAction(AutoAttackAction, ETriggerEvent::Triggered, this, &AGPCharacterPlayer::AutoAttack);
-}
-
-void AGPCharacterPlayer::SetCharacterType(ECharacterType NewCharacterType)
-{
-	Super::SetCharacterType(NewCharacterType);
-
-	UGPCharacterControlData* NewCharacterData = CharacterTypeManager[NewCharacterType];
-	check(NewCharacterData);
-
-	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-	{
-		Subsystem->ClearAllMappings();
-		UInputMappingContext* NewMappingContext = NewCharacterData->InputMappingContext;
-		if (NewMappingContext)
-		{
-			Subsystem->AddMappingContext(NewMappingContext, 0);
-		}
-	}
-
-	CurrentCharacterType = NewCharacterType;
+    UGPCharacterControlData* LoadedCharacterData = LoadObject<UGPCharacterControlData>(nullptr, TEXT("/Game/CharacterType/GPC_Warrior.GPC_Warrior"));
+    if (LoadedCharacterData)
+    {
+        ApplyCharacterPartsFromData(LoadedCharacterData);
+    }
 }
 
 void AGPCharacterPlayer::SetCharacterData(const UGPCharacterControlData* CharacterControlData)
 {
-	Super::SetCharacterData(CharacterControlData);
+    Super::SetCharacterData(CharacterControlData);
 
-	WalkSpeed = CharacterControlData->WalkSpeed;
-	SprintSpeed = CharacterControlData->SprintSpeed;
+    if (CharacterControlData->AnimBlueprint)
+    {
+        BodyMesh->SetAnimInstanceClass(CharacterControlData->AnimBlueprint);
+    }
 }
 
-
-void AGPCharacterPlayer::Move(const FInputActionValue& Value)
+void AGPCharacterPlayer::SetCharacterType(ECharacterType NewCharacterControlType)
 {
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
-	{
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-		AddMovementInput(ForwardDirection, MovementVector.X);
-		AddMovementInput(RightDirection, MovementVector.Y);
-	}
+    Super::SetCharacterType(NewCharacterControlType);
 }
 
-void AGPCharacterPlayer::Look(const FInputActionValue& Value)
+USkeletalMeshComponent* AGPCharacterPlayer::GetCharacterMesh() const
 {
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
-	{
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
-	}
+    return BodyMesh;
 }
 
-void AGPCharacterPlayer::Jump()
+
+void AGPCharacterPlayer::SetupMasterPose()
 {
-	Super::Jump();
-	isJumpStart = true;
-	CharacterInfo.RemoveState(STATE_IDLE);
-	CharacterInfo.AddState(STATE_JUMP);
+    if (BodyMesh)
+    {
+        if (HeadMesh)
+        {
+            HeadMesh->SetMasterPoseComponent(BodyMesh);
+        }
+        if (LegMesh)
+        {
+            LegMesh->SetMasterPoseComponent(BodyMesh);
+        }
+    }
 }
 
-void AGPCharacterPlayer::StopJumping()
+void AGPCharacterPlayer::ApplyCharacterPartsFromData(const UGPCharacterControlData* CharacterData)
 {
-	Super::StopJumping();
-	CharacterInfo.RemoveState(STATE_JUMP);
+    if (!CharacterData) return;
+
+    if (CharacterData->BodyMesh)
+    {
+        TSubclassOf<UAnimInstance> PrevAnimBP = BodyMesh->GetAnimClass();
+        BodyMesh->SetSkeletalMesh(CharacterData->BodyMesh);
+        if (PrevAnimBP)
+        {
+            BodyMesh->SetAnimInstanceClass(PrevAnimBP);
+        }
+    }
+
+    if (CharacterData->HeadMesh)
+    {
+        HeadMesh->SetSkeletalMesh(CharacterData->HeadMesh);
+    }
+
+    if (CharacterData->LegMesh)
+    {
+        LegMesh->SetSkeletalMesh(CharacterData->LegMesh);
+    }
+
+    if (CharacterData->HelmetMesh)
+    {
+        Helmet->SetSkeletalMesh(CharacterData->HelmetMesh);
+        Helmet->AttachToComponent(HeadMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("HelmetSocket"));
+        Helmet->SetVisibility(true);
+    }
+    else
+    {
+        Helmet->SetSkeletalMesh(nullptr);
+        Helmet->SetVisibility(false);
+    }
+
+    EquipWeaponFromData(CharacterData);
+    SetupMasterPose();
 }
 
-void AGPCharacterPlayer::StartSprinting()
+void AGPCharacterPlayer::EquipWeaponFromData(const UGPCharacterControlData* CharacterData)
 {
-	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
-	CharacterInfo.AddState(STATE_RUN);
+    if (!CharacterData) return;
+
+    if (WeaponActor)
+    {
+        WeaponActor->Destroy();
+        WeaponActor = nullptr;
+    }
+
+    if (CharacterData->WeaponClass)
+    {
+        FActorSpawnParameters SpawnParams;
+        SpawnParams.Owner = this;
+        SpawnParams.Instigator = GetInstigator();
+
+        if (BodyMesh == nullptr)
+            return;
+
+        WeaponActor = GetWorld()->SpawnActor<AGPWeaponBase>(CharacterData->WeaponClass, GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
+        if (WeaponActor)
+        {
+            USkeletalMeshComponent* MeshComp = BodyMesh;
+
+            if (MeshComp && MeshComp->DoesSocketExist(TEXT("WeaponSocket")))
+            {
+                WeaponActor->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
+                UE_LOG(LogTemp, Warning, TEXT("Attached WeaponActor -> WeaponSocket!"));
+            }
+        }
+
+        if (CharacterData->WeaponMesh)
+        {
+            WeaponActor->SetWeaponMesh(CharacterData->WeaponMesh);
+        }
+    }
 }
 
-void AGPCharacterPlayer::StopSprinting()
+void AGPCharacterPlayer::AttackHitCheck()
 {
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-	CharacterInfo.RemoveState(STATE_RUN);
+    Super::AttackHitCheck();
 }
 
-void AGPCharacterPlayer::AutoAttack()
-{
-	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
-	if (!GameInstance)
-		return;
-
-	if (bIsAutoAttacking == false && !CharacterInfo.HasState(STATE_AUTOATTACK))
-	{
-		CharacterInfo.AddState(STATE_AUTOATTACK);
-		GameInstance->SendPlayerAttackPacket();
-	}
-
-	ProcessAutoAttackCommand();
-}
-
-
-// Item System
-/////////////////////////////////////////////////////////////
-
-void AGPCharacterPlayer::TakeItem(UGPItemData* InItemData)
-{
-	if (InItemData)
-	{
-		TakeItemActions[(uint8)InItemData->Type].ItemDelegate.ExecuteIfBound(InItemData);
-	}
-}
-
-void AGPCharacterPlayer::DrinkPotion(UGPItemData* InItemData)
-{
-	UE_LOG(LogGPCharacter, Log, TEXT("Drink Potion"));
-}
-
-void AGPCharacterPlayer::EquipChest(UGPItemData* InItemData)
-{
-	UE_LOG(LogGPCharacter, Log, TEXT("Equip Chest"));
-	//UGPEquipItemData* ChestItemData = Cast<UGPEquipItemData>(InItemData);
-	//if (ChestItemData)
-	//{
-	//	Chest->SetLeaderPoseComponent(GetMesh());
-	//	Chest->SetSkeletalMesh(ChestItemData->EquipMesh);
-	//}
-}
-
-void AGPCharacterPlayer::EquipHelmet(UGPItemData* InItemData)
-{
-	UE_LOG(LogGPCharacter, Log, TEXT("Equip Helmet"));
-	UGPEquipItemData* HelmetItemData = Cast<UGPEquipItemData>(InItemData);
-	if (HelmetItemData)
-	{
-		Helmet->SetSkeletalMesh(HelmetItemData->EquipMesh);
-		Helmet->SetLeaderPoseComponent(GetMesh());
-	}
-}
-
-void AGPCharacterPlayer::AddExp(UGPItemData* InItemData)
-{
-	UE_LOG(LogGPCharacter, Log, TEXT("Add Exp"));
-}
-
-//////////////////////////////////////////////////////////////////////////////

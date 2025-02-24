@@ -245,10 +245,10 @@ void UGPGameInstance::AddPlayer(FInfoData& PlayerInfo, bool isMyPlayer)
 	}
 	else
 	{
-		AGPCharacterViewerPlayer* Player = nullptr;
+		AGPCharacterPlayer* Player = nullptr;
 		while (Player == nullptr)
 		{
-			Player = World->SpawnActor<AGPCharacterViewerPlayer>(OtherPlayerClass, SpawnLocation, SpawnRotation);
+			Player = World->SpawnActor<AGPCharacterPlayer>(OtherPlayerClass, SpawnLocation, SpawnRotation);
 		}
 
 		UE_LOG(LogTemp, Warning, TEXT("Add other player [%d] (%f,%f,%f)(%f)"),
