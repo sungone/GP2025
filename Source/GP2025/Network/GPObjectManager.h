@@ -18,7 +18,6 @@ class GP2025_API UGPObjectManager : public UWorldSubsystem
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
-	static UGPObjectManager* GetInstance(UWorld* World);
 
 	void SetMyPlayer(AGPCharacterPlayer* InMyPlayer);
 

@@ -8,20 +8,15 @@
 
 void UGPObjectManager::Initialize(FSubsystemCollectionBase& Collection)
 {
-    Super::Initialize(Collection);
-    World = GetWorld();
+	Super::Initialize(Collection);
+	World = GetWorld();
 	OtherPlayerClass = AGPCharacterPlayer::StaticClass();
 	MonsterClass = AGPCharacterMonster::StaticClass();
 }
 
 void UGPObjectManager::Deinitialize()
 {
-    Super::Deinitialize();
-}
-
-UGPObjectManager* UGPObjectManager::GetInstance(UWorld* World)
-{
-    return World ? World->GetSubsystem<UGPObjectManager>() : nullptr;
+	Super::Deinitialize();
 }
 
 void UGPObjectManager::SetMyPlayer(AGPCharacterPlayer* InMyPlayer)
@@ -142,20 +137,16 @@ void UGPObjectManager::DamagedMonster(FInfoData& MonsterInfo, float Damage)
 	{
 		Monsters[MonsterInfo.ID]->SetCharacterInfo(MonsterInfo);
 
-		// Floating Damage UI
+		FVector SpawnLocation = Monsters[MonsterInfo.ID]->GetActorLocation() + FVector(0, 0, 100);
+		FActorSpawnParameters SpawnParams;
+		AGPFloatingDamageText* DamageText = World->SpawnActor<AGPFloatingDamageText>(AGPFloatingDamageText::StaticClass(),
+			SpawnLocation, FRotator::ZeroRotator, SpawnParams);
+		bool isCrt = (MyPlayer->CharacterInfo.GetDamage() != Damage);
+		if (DamageText)
 		{
-			FVector SpawnLocation = Monsters[MonsterInfo.ID]->GetActorLocation() + FVector(0, 0, 100);
-			FActorSpawnParameters SpawnParams;
-			AGPFloatingDamageText* DamageText = World->SpawnActor<AGPFloatingDamageText>(AGPFloatingDamageText::StaticClass(),
-				SpawnLocation, FRotator::ZeroRotator, SpawnParams);
-
-			bool isCrt = (MyPlayer->CharacterInfo.GetDamage() != Damage);
-
-			if (DamageText)
-			{
-				DamageText->SetDamageText(Damage, isCrt);
-			}
+			DamageText->SetDamageText(Damage, isCrt);
 		}
+
 		UE_LOG(LogTemp, Warning, TEXT("Damaged monster [%d]"), MonsterInfo.ID);
 	}
 }

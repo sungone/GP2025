@@ -61,7 +61,7 @@ void UGPGameInstance::DisconnectFromServer()
 void UGPGameInstance::SetMyPlayer(AGPCharacterPlayer* InMyPlayer)
 {
 	MyPlayer = InMyPlayer;
-	UGPObjectManager* ObjectMgr = UGPObjectManager::GetInstance(GetWorld());
+	UGPObjectManager* ObjectMgr = GetWorld()->GetSubsystem<UGPObjectManager>();
 	ObjectMgr->SetMyPlayer(InMyPlayer);
 }
 
@@ -124,7 +124,7 @@ void UGPGameInstance::ProcessPacket()
 {
 	ReceiveData();
 	TArray<uint8> PacketData;
-	UGPObjectManager* ObjectMgr = UGPObjectManager::GetInstance(GetWorld());
+	UGPObjectManager* ObjectMgr = GetWorld()->GetSubsystem<UGPObjectManager>();
 	while (RecvQueue.Dequeue(PacketData))
 	{
 		RemainingData.Append(PacketData);
