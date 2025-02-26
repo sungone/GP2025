@@ -7,7 +7,6 @@ void UGPLevelWidget::NativeConstruct()
     Super::NativeConstruct();
 
     TextLevel = Cast<UTextBlock>(GetWidgetFromName(TEXT("TxtLevel")));
-    ensure(TextLevel);
 }
 
 void UGPLevelWidget::BindToCharacter(AGPCharacterBase* Character)
