@@ -112,7 +112,7 @@ void UGPObjectManager::RemoveMonster(int32 MonsterID)
 	UE_LOG(LogTemp, Warning, TEXT("Remove monster [%d]"), MonsterID);
 	if (Monsters.Contains(MonsterID))
 	{
-		Monsters[MonsterID]->Destroy();
+		Monsters[MonsterID]->SetDead();
 		Monsters.Remove(MonsterID);
 	}
 }

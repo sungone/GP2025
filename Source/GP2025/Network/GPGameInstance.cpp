@@ -15,37 +15,6 @@ void UGPGameInstance::Shutdown()
 	Super::Shutdown();
 }
 
-void UGPGameInstance::SetMyPlayer(AGPCharacterPlayer* InMyPlayer)
-{
-	MyPlayer = InMyPlayer;
-	NetworkMgr->SetMyPlayer(InMyPlayer);
-}
-
-void UGPGameInstance::SendPlayerLoginPacket()
-{
-	NetworkMgr->SendPlayerLoginPacket();
-}
-
-void UGPGameInstance::SendPlayerLogoutPacket()
-{
-	NetworkMgr->SendPlayerLogoutPacket();
-}
-
-void UGPGameInstance::SendPlayerMovePacket()
-{
-	NetworkMgr->SendPlayerMovePacket();
-}
-
-void UGPGameInstance::SendPlayerAttackPacket(int32 TargetID)
-{
-	NetworkMgr->SendPlayerAttackPacket(TargetID);
-}
-
-void UGPGameInstance::SendPlayerTakeItem(int32 ItemID)
-{
-	NetworkMgr->SendPlayerTakeItem(ItemID);
-}
-
 void UGPGameInstance::ProcessPacket()
 {
 	NetworkMgr->ProcessPacket();

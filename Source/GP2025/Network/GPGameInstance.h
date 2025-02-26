@@ -17,17 +17,7 @@ public:
 	virtual void Init() override;
 	virtual void Shutdown() override;
 
-	void SetMyPlayer(AGPCharacterPlayer* InMyPlayer);
-
-	void SendPlayerLoginPacket();
-	void SendPlayerLogoutPacket();
-	void SendPlayerMovePacket();
-	void SendPlayerAttackPacket(int32 TargetID = -1);
-	void SendPlayerTakeItem(int32 ItemID);
-
 	void ProcessPacket();
-
-	AGPCharacterPlayer* MyPlayer;
 private:
 	class UGPNetworkManager* NetworkMgr;
 };

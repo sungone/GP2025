@@ -2,7 +2,7 @@
 
 #include "Game/GPGameMode.h"
 #include "Player/GPPlayerController.h"
-#include "Network/GPGameInstance.h"
+#include "Network/GPNetworkManager.h"
 #include "Engine/World.h"
 
 AGPGameMode::AGPGameMode()
@@ -27,12 +27,8 @@ AGPGameMode::AGPGameMode()
 void AGPGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	UGPGameInstance* GameInst = Cast<UGPGameInstance>(GWorld->GetGameInstance());
-	if (!GameInst)
-	{
-		UE_LOG(LogTemp, Error, TEXT("GameInstance cast failed"));
-	}
-
-	GameInst->ProcessPacket();
+	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+	if(NetworkMgr)
+		NetworkMgr->ProcessPacket();
 }
 

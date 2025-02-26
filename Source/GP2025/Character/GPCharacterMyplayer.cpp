@@ -1,17 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/GPCharacterMyplayer.h"
-#include "Components/CapsuleComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-#include "InputMappingContext.h"
+#include "Components/CapsuleComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "GPCharacterControlData.h"
-#include "Item/GPEquipItemData.h"
 #include "GPCharacterMonster.h"
-#include "Network/GPGameInstance.h"
+#include "InputMappingContext.h"
+#include "Item/GPEquipItemData.h"
+#include "Network/GPNetworkManager.h"
 
 AGPCharacterMyplayer::AGPCharacterMyplayer()
 {
@@ -76,13 +76,10 @@ void AGPCharacterMyplayer::BeginPlay()
 	Super::BeginPlay();
 	GetMesh()->SetWorldScale3D(FVector(1.0f));
 	SetCharacterType(CurrentCharacterType);
-	//EquipItemFromDataAsset(CharacterTypeManager[CurrentCharacterType]);
 
-	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
-	if (GameInstance)
-	{
-		GameInstance->SetMyPlayer(Cast<AGPCharacterPlayer>(this));
-	}
+	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+	if (NetworkMgr)
+		NetworkMgr->SetMyPlayer(Cast<AGPCharacterPlayer>(this));
 
 	LastLocation = GetActorLocation();
 	LastRotationYaw = GetActorRotation().Yaw;
@@ -92,10 +89,8 @@ void AGPCharacterMyplayer::BeginPlay()
 void AGPCharacterMyplayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
-	if (!GameInstance)
-		return;
+	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+	if (!NetworkMgr) return;
 
 	MovePacketSendTimer -= DeltaTime;
 	FVector CurrentLocation = GetActorLocation();
@@ -129,7 +124,7 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 	{
 		isJumpStart = false;
 		bWasJumping = true;
-		GameInstance->SendPlayerMovePacket();
+		NetworkMgr->SendPlayerMovePacket();
 		LastSendPlayerInfo = CharacterInfo;
 		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Jump Issue"));
 		return;
@@ -147,7 +142,7 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 		CharacterInfo.Pos.Z = GroundZLocation;
 		CharacterInfo.Speed = LastSendPlayerInfo.HasState(STATE_RUN) ? SprintSpeed : WalkSpeed;
 
-		GameInstance->SendPlayerMovePacket();
+		NetworkMgr->SendPlayerMovePacket();
 		LastSendPlayerInfo = CharacterInfo;
 		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Air Fixed Issue"));
 		return;
@@ -156,7 +151,7 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 	// IDLE 상태에서 캐릭터의 회전이 변경되었을 때 패킷 전송
 	if (bYawChanged && CharacterInfo.HasState(STATE_IDLE))
 	{
-		GameInstance->SendPlayerMovePacket();
+		NetworkMgr->SendPlayerMovePacket();
 		LastSendPlayerInfo = CharacterInfo;
 		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Rotation Issue"));
 		return;
@@ -170,7 +165,7 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 		// IDLE 상태가 아니거나 일정 거리 이상 이동한 경우 패킷 전송
 		if (!CharacterInfo.HasState(STATE_IDLE) || DistanceMoved >= NotMovedThreshold)
 		{
-			GameInstance->SendPlayerMovePacket();
+			NetworkMgr->SendPlayerMovePacket();
 			LastSendPlayerInfo = CharacterInfo;
 
 			if (MovePacketSendTimer <= 0)
@@ -286,14 +281,11 @@ void AGPCharacterMyplayer::StopSprinting()
 
 void AGPCharacterMyplayer::AutoAttack()
 {
-	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
-	if (!GameInstance)
-		return;
-
 	if (bIsAutoAttacking == false && !CharacterInfo.HasState(STATE_AUTOATTACK))
 	{
 		CharacterInfo.AddState(STATE_AUTOATTACK);
-		GameInstance->SendPlayerAttackPacket();
+		auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+		NetworkMgr->SendPlayerAttackPacket();
 	}
 
 	ProcessAutoAttackCommand();

@@ -1,25 +1,20 @@
 
 
 #include "Character/GPCharacterBase.h"
-#include "Components/CapsuleComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "Network/GPGameInstance.h"
 #include "Character/GPCharacterControlData.h"
-#include "Animation/AnimMontage.h"
-#include "Physics/GPCollision.h"
-#include "Engine/DamageEvents.h"
-#include "UI/GPWidgetComponent.h"
-#include "UI/GPHpBarWidget.h"
-#include "UI/GPExpBarWidget.h"
-#include "UI/GPLevelWidget.h"
-#include "UI/GPFloatingDamageText.h"
-#include "Item/GPEquipItemData.h"
-#include "GPCharacterPlayer.h"
-#include "Network/GPObjectManager.h"
 #include "Character/GPCharacterMyplayer.h"
-
+#include "Animation/AnimMontage.h"
+#include "Components/CapsuleComponent.h"
+#include "Engine/DamageEvents.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GPCharacterPlayer.h"
+#include "Item/GPEquipItemData.h"
+#include "Network/GPNetworkManager.h"
+#include "Physics/GPCollision.h"
+#include "UI/GPHpBarWidget.h"
+#include "UI/GPLevelWidget.h"
+#include "UI/GPWidgetComponent.h"
 #include "TLoad.h"
-
 #include <random>
 static std::random_device rd;
 static std::mt19937 gen(rd());
@@ -202,6 +197,9 @@ void AGPCharacterBase::SetCharacterType(ECharacterType NewCharacterType)
  
 void AGPCharacterBase::AttackHitCheck()
 {
+	//Todo: Myplayer만 사용하게 옮기자
+	if (!Cast<AGPCharacterMyplayer>(this)) return;
+
 	FHitResult OutHitResult;
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
 
@@ -230,22 +228,17 @@ void AGPCharacterBase::AttackHitCheck()
 			DrawDebugCapsule(GetWorld(), TargetLocation, TargetHalfHeight, TargetCollisionRadius,
 				FQuat::Identity, FColor::Yellow, false, 5.f);
 #endif
-
-			// 공격 패킷 전송 (클라이언트 본인 캐릭터만)
-			UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
-			AGPCharacterPlayer* ViewerPlayer = Cast<AGPCharacterPlayer>(this);
-			if (IsValid(GameInstance) && IsValid(ViewerPlayer) && ViewerPlayer == GameInstance->MyPlayer)
+			auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+			if (NetworkMgr)
 			{
-				GameInstance->SendPlayerAttackPacket(TargetCharacter->CharacterInfo.ID);
+				NetworkMgr->SendPlayerAttackPacket(TargetCharacter->CharacterInfo.ID);
 			}
 		}
 	}
 
 #if ENABLE_DRAW_DEBUG
-	// 공격 범위를 캡슐 형태로 시각화
 	const FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
 	const float CapsuleHalfHeight = AttackRange * 0.5f;
-	//const FColor DrawColor = bHitDetected ? FColor::Green : FColor::Red;
 	const FColor DrawColor = FColor::Red;
 	if (bHitDetected)
 	{

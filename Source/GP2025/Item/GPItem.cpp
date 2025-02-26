@@ -6,7 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/RotatingMovementComponent.h"
-#include "Network/GPGameInstance.h"
+#include "Network/GPNetworkManager.h"
 #include "Character/GPCharacterPlayer.h"
 #include "GPItemStruct.h"
 
@@ -60,10 +60,6 @@ void AGPItem::SetupItem(int32 NewItemID, uint8 NewItemtype, int32 NewAmount)
 	ItemID = NewItemID;
 	Amount = NewAmount;
 
-	// 게임 인스턴스를 통해 데이터 테이블을 가져오기
-	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
-	if (!GameInstance) return;
-
 	UDataTable* ItemTable = GetItemDataTable();
 	if (!ItemTable) return;
 
@@ -114,9 +110,7 @@ void AGPItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 	AGPCharacterPlayer* Player = Cast<AGPCharacterPlayer>(OtherActor);
 	if (!Player) return;
 
-	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
-	if (!GameInstance) return;
-
-	GameInstance->SendPlayerTakeItem(ItemID);
+	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+	NetworkMgr->SendPlayerTakeItem(ItemID);
 }
 
