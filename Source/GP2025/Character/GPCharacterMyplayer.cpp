@@ -81,9 +81,7 @@ void AGPCharacterMyplayer::BeginPlay()
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 	if (GameInstance)
 	{
-		GameInstance->MyPlayer = this;
-		GameInstance->OtherPlayerClass = AGPCharacterPlayer::StaticClass();
-		GameInstance->MonsterClass = AGPCharacterMonster::StaticClass();
+		GameInstance->SetMyPlayer(Cast<AGPCharacterPlayer>(this));
 	}
 
 	LastLocation = GetActorLocation();

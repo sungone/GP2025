@@ -2,20 +2,14 @@
 #include "Session.h"
 #include "SessionManager.h"
 #include "GameManager.h"
+#include "PacketManager.h"
 
 void Session::DoRecv()
 {
-	std::lock_guard<std::mutex> lock(_sMutex);
-	ZeroMemory(&_recvOver._wsaover, sizeof(_recvOver._wsaover));
-	DWORD recv_flag = 0;
-	_recvOver._wsabuf.len = BUFSIZE - _remain;
-	_recvOver._wsabuf.buf = _recvOver._buf + _remain;
-	WSARecv(_socket, &_recvOver._wsabuf, 1, 0, &recv_flag, &_recvOver._wsaover, 0);
+	_sSocket->DoRecv();
 }
 void Session::DoSend(Packet* packet)
 {
-	std::lock_guard<std::mutex> lock(_sMutex);
-
 #pragma region //Log
 	switch (packet->Header.PacketType)
 	{
@@ -48,60 +42,39 @@ void Session::DoSend(Packet* packet)
 		break;
 	}
 #pragma endregion
-	auto send_data = new ExpOver{ reinterpret_cast<BYTE*>(packet) };
-	WSASend(_socket, &send_data->_wsabuf, 1, nullptr, 0, &send_data->_wsaover, nullptr);
+	_sSocket->DoSend(packet);
 }
 
-void Session::Connect(SOCKET& socket, int32 id)
+void Session::Connect(SOCKET socket, int32 id)
 {
-	std::lock_guard<std::mutex> lock(_sMutex);
 	this->_id = id;
-	this->_socket = socket;
+	_sSocket = std::make_unique<SessionSocket>(socket);
 }
 
 void Session::Disconnect()
 {
-	std::lock_guard<std::mutex> lock(_sMutex);
-	_bLogin = false;
-	closesocket(_socket);
+	_sSocket->Close();
 }
 
-void Session::SetLogin()
+void Session::CreatePlayer()
 {
-	std::lock_guard<std::mutex> lock(_sMutex);
-	_bLogin = true;
 	_player = std::make_shared<Player>();
 	_player->Init();
 	_player->GetInfo().ID = _id;
 	GameManager::GetInst().AddPlayer(_player);
 }
 
-bool Session::IsLogin()
-{
-	std::lock_guard<std::mutex> lock(_sMutex);
-	return _bLogin;
-}
-
 int32 Session::GetId()
 {
-	std::lock_guard<std::mutex> lock(_sMutex);
 	return _id;
-}
-
-int32 Session::GetRemainSize()
-{
-	std::lock_guard<std::mutex> lock(_sMutex);
-	return _remain;
-}
-
-void Session::SetRemainSize(int32 size)
-{
-	std::lock_guard<std::mutex> lock(_sMutex);
-	_remain = size;
 }
 
 FInfoData& Session::GetPlayerInfo()
 {
-	std::lock_guard<std::mutex> lock(_sMutex);
 	return _player->GetInfo();
+}
+
+void Session::HandleRecvBuffer(int32 recvByte, ExpOver* expOver)
+{
+	_sSocket->HandleRecvBuffer(*this, recvByte, expOver);
 }

@@ -15,6 +15,9 @@
 #include "UI/GPFloatingDamageText.h"
 #include "Item/GPEquipItemData.h"
 #include "GPCharacterPlayer.h"
+#include "Network/GPObjectManager.h"
+#include "Character/GPCharacterMyplayer.h"
+
 #include "TLoad.h"
 
 #include <random>
@@ -77,10 +80,7 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// 내 플레이어의 위치를 설정하는 것이면 return
-	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
-	AGPCharacterPlayer* ViewerPlayer = Cast<AGPCharacterPlayer>(this);
-	if (IsValid(GameInstance) && IsValid(ViewerPlayer) && GameInstance->MyPlayer == ViewerPlayer)
-		return;
+	if (Cast<AGPCharacterMyplayer>(this)) return;
 
 	/// Other Client 공격 모션 동기화 ///
 	if (CharacterInfo.HasState(STATE_AUTOATTACK) && bIsAutoAttacking == false)
@@ -205,15 +205,12 @@ void AGPCharacterBase::AttackHitCheck()
 	FHitResult OutHitResult;
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
 
-	// 공격 범위 및 반경 가져오기
 	const float AttackRange = CharacterInfo.AttackRange;
 	const float AttackRadius = CharacterInfo.AttackRadius;
 
-	// 공격 시작점과 끝점 계산
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
 
-	// 스피어(구형) 충돌 검사 수행
 	bool bHitDetected = GetWorld()->SweepSingleByChannel(
 		OutHitResult, Start, End, FQuat::Identity, CCHANNEL_GPACTION,
 		FCollisionShape::MakeSphere(AttackRadius), Params);
