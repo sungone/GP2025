@@ -10,8 +10,8 @@ UCLASS()
 class GP2025_API AGPItem : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AGPItem();
 
@@ -19,12 +19,12 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	int32 ItemID;  
+	int32 ItemID;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	UStaticMeshComponent* ItemStaticMesh;
@@ -38,7 +38,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	int32 Amount;
 
-	void SetupItem(int32 NewItemID, int32 NewMoneyAmount);
+	UPROPERTY(VisibleAnywhere, Category = "Movement")
+	class URotatingMovementComponent* RotatingMovement;
+
+	void SetupItem(int32 NewItemID, uint8 NewItemtype, int32 NewMoneyAmount);
 	UDataTable* GetItemDataTable();
 
 	UFUNCTION()

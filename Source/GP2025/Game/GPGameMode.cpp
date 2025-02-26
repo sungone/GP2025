@@ -10,7 +10,7 @@ AGPGameMode::AGPGameMode()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Default Pawn Class ¼³Á¤
-	static ConstructorHelpers::FClassFinder<APawn> DefaultPawnClassRef(TEXT("/Script/GP2025.GPCharacterPlayer"));
+	static ConstructorHelpers::FClassFinder<APawn> DefaultPawnClassRef(TEXT("/Game/Blueprint/BP_MyPlayer"));
 	if (DefaultPawnClassRef.Class)
 	{
 		DefaultPawnClass = DefaultPawnClassRef.Class;

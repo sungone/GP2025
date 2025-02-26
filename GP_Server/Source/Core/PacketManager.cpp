@@ -19,6 +19,9 @@ void PacketManager::ProcessPacket(Session& session, BYTE* packet)
 	case EPacketType::C_ATTACK:
 		HandleAttackPacket(session, packet);
 		break;
+	case EPacketType::C_TAKE_ITEM:
+		HandleTakeItemPacket(session, packet);
+		break;
 	default:
 		LOG(LogType::RecvLog, "Unknown Packet Type");
 	}
@@ -75,4 +78,11 @@ void PacketManager::HandleAttackPacket(Session& session, BYTE* packet)
 	auto pkt1 = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, playerInfo);
 	_sessionMgr.Broadcast(&pkt1);
 
+}
+
+void PacketManager::HandleTakeItemPacket(Session& session, BYTE* packet)
+{
+	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
+	auto pkt1 = ItemDespawnPacket(p->Data);
+	_sessionMgr.Broadcast(&pkt1);
 }

@@ -4,106 +4,50 @@
 
 #include "CoreMinimal.h"
 #include "Character/GPCharacterBase.h"
-#include "InputActionValue.h"
-#define PACKETSENDTIME 0.5
-#include "GPCharacterViewerPlayer.h"
 #include "GPCharacterPlayer.generated.h"
 
 /**
  *
  */
-DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, class UGPItemData*);
-
-USTRUCT(BlueprintType)
-struct FTakeItemDelegateWrapper
-{
-	GENERATED_BODY()
-	FTakeItemDelegateWrapper() {}
-	FTakeItemDelegateWrapper(const FOnTakeItemDelegate& InItemDelegate) : ItemDelegate(InItemDelegate) {}
-	FOnTakeItemDelegate ItemDelegate;
-};
-
-
 UCLASS()
-class GP2025_API AGPCharacterPlayer : public AGPCharacterViewerPlayer, public IGPCharacterItemInterface
+class GP2025_API AGPCharacterPlayer : public AGPCharacterBase
 {
 	GENERATED_BODY()
 
 public:
 	AGPCharacterPlayer();
-
-protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
-	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
-
-	// Input 함수
-	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
-	virtual void Jump() override;
-	virtual void StopJumping() override;
-	void StartSprinting();
-	void StopSprinting();
-	void AutoAttack();
-
-	// 카메라 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class USpringArmComponent> CameraBoom;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UCameraComponent> FollowCamera;
-
-	// Input 변수
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputMappingContext> DefaultMappingContext;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> JumpAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> MoveAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> LookAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> SprintAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> AutoAttackAction;
-
-	// Sprint Speed 변수
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
-	float WalkSpeed;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
-	float SprintSpeed;
-
-	// 다른 뷰어 클라이언트들의 위치 동기화를 위해 위치를 계산하는 변수들
-public:
-	FVector LastLocation;
-	float LastRotationYaw;
-	FInfoData LastSendPlayerInfo;
-
-public:
-	float MovePacketSendTimer = PACKETSENDTIME; // 서버와의 패킷 교환 시간
-	float GroundZLocation = 147.7;
-	bool isJumpStart = false;
-	bool bWasJumping = false;
-
-
-// Item Section
+	virtual void PostInitializeComponents() override;
 protected:
-	UPROPERTY()
-	TArray<FTakeItemDelegateWrapper> TakeItemActions;
+	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
+	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
 
-	virtual void TakeItem(class UGPItemData* InItemData) override;
-	virtual void DrinkPotion(class UGPItemData* InItemData);
-	virtual void EquipChest(class UGPItemData* InItemData);
-	virtual void EquipHelmet(class UGPItemData* InItemData);
-	virtual void AddExp(class UGPItemData* InItemData);
+	virtual USkeletalMeshComponent* GetCharacterMesh() const override;
+
+	// Character Mesh Section
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts")
+	TObjectPtr<USkeletalMeshComponent> HeadMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts")
+	TObjectPtr<USkeletalMeshComponent> BodyMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts")
+	TObjectPtr<USkeletalMeshComponent> LegMesh;
+
+	void SetupMasterPose();
+	void ApplyCharacterPartsFromData(const class UGPCharacterControlData* CharacterData);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class USkeletalMeshComponent> Helmet;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class AGPWeaponBase> WeaponActor;
+
+	void EquipWeaponFromData(const class UGPCharacterControlData* CharacterData);
+
+	// Attack Hit Section
+protected:
+	virtual void AttackHitCheck() override;
 };

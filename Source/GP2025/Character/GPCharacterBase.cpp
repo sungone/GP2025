@@ -14,7 +14,7 @@
 #include "UI/GPLevelWidget.h"
 #include "UI/GPFloatingDamageText.h"
 #include "Item/GPEquipItemData.h"
-#include "GPCharacterViewerPlayer.h"
+#include "GPCharacterPlayer.h"
 #include "TLoad.h"
 
 #include <random>
@@ -78,7 +78,7 @@ void AGPCharacterBase::Tick(float DeltaTime)
 
 	// 내 플레이어의 위치를 설정하는 것이면 return
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
-	AGPCharacterViewerPlayer* ViewerPlayer = Cast<AGPCharacterViewerPlayer>(this);
+	AGPCharacterPlayer* ViewerPlayer = Cast<AGPCharacterPlayer>(this);
 	if (IsValid(GameInstance) && IsValid(ViewerPlayer) && GameInstance->MyPlayer == ViewerPlayer)
 		return;
 
@@ -236,7 +236,7 @@ void AGPCharacterBase::AttackHitCheck()
 
 			// 공격 패킷 전송 (클라이언트 본인 캐릭터만)
 			UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
-			AGPCharacterViewerPlayer* ViewerPlayer = Cast<AGPCharacterViewerPlayer>(this);
+			AGPCharacterPlayer* ViewerPlayer = Cast<AGPCharacterPlayer>(this);
 			if (IsValid(GameInstance) && IsValid(ViewerPlayer) && ViewerPlayer == GameInstance->MyPlayer)
 			{
 				GameInstance->SendPlayerAttackPacket(TargetCharacter->CharacterInfo.ID);

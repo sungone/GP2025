@@ -8,6 +8,8 @@
 #include "SocketSubsystem.h"
 #include "Character/GPCharacterPlayer.h"
 #include "Character/GPCharacterMonster.h"
+#include "Item/GPItemStruct.h"
+#include "Item/GPItem.h"
 #include "UI/GPFloatingDamageText.h"
 
 void UGPGameInstance::Init()
@@ -88,6 +90,13 @@ void UGPGameInstance::SendPlayerAttackPacket(int32 TargetID)
 	int32 BytesSent = 0;
 	UE_LOG(LogTemp, Warning, TEXT("SendPlayerAttackPacket : Send [%d]"), MyPlayer->CharacterInfo.ID);
 	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(AttackPacket), BytesSent);
+}
+
+void UGPGameInstance::SendPlayerTakeItem(int32 ItemID)
+{
+	IDPacket Packet(EPacketType::C_TAKE_ITEM, ItemID);
+	int32 BytesSent = 0;
+	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(IDPacket), BytesSent);
 }
 
 void UGPGameInstance::ReceiveData()
@@ -236,10 +245,10 @@ void UGPGameInstance::AddPlayer(FInfoData& PlayerInfo, bool isMyPlayer)
 	}
 	else
 	{
-		AGPCharacterViewerPlayer* Player = nullptr;
+		AGPCharacterPlayer* Player = nullptr;
 		while (Player == nullptr)
 		{
-			Player = World->SpawnActor<AGPCharacterViewerPlayer>(OtherPlayerClass, SpawnLocation, SpawnRotation);
+			Player = World->SpawnActor<AGPCharacterPlayer>(OtherPlayerClass, SpawnLocation, SpawnRotation);
 		}
 
 		UE_LOG(LogTemp, Warning, TEXT("Add other player [%d] (%f,%f,%f)(%f)"),
@@ -357,14 +366,51 @@ void UGPGameInstance::DamagedMonster(FInfoData& MonsterInfo, float Damage)
 
 void UGPGameInstance::ItemSpawn(uint32 ItemID, EItem ItemType, FVector Pos)
 {
-	//Todo: 몬스터처럼 (추후 삭제를 위해 아이디 매핑해서) 
-	// 아이템 객체 저장하고 아이템 스폰시키기
 	UE_LOG(LogTemp, Warning, TEXT("ItemSpawn [%d]"), ItemID);
+
+	static const FString DataTablePath = TEXT("/Game/Item/GPItemTable.GPItemTable");
+	UDataTable* DataTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath));
+	if (!DataTable)
+		return;
+
+	FString ContextString;
+	FGPItemStruct* ItemData = DataTable->FindRow<FGPItemStruct>(*FString::FromInt(ItemType), ContextString);
+
+	if (!ItemData)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ItemSpawn failed: No matching item found for ID [%d]"), ItemType);
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("matching item found for ID [%d]"), ItemType);
+
+	UWorld* World = GetWorld();
+	if (!World)
+		return;
+
+	Pos.Z += 200.f;
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	AGPItem* SpawnedItem = World->SpawnActor<AGPItem>(AGPItem::StaticClass(), Pos, FRotator::ZeroRotator, SpawnParams);
+
+	if (!SpawnedItem)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ItemSpawn failed: Could not spawn item actor"));
+		return;
+	}
+
+	SpawnedItem->SetupItem(ItemID, ItemType, 0);
+	Items.Add(ItemID, SpawnedItem);
+
+	UE_LOG(LogTemp, Warning, TEXT("ItemSpawn success: Spawned Item ID [%d] at [%s]"), ItemID, *Pos.ToString());
 }
 
 void UGPGameInstance::ItemDespawn(uint32 ItemID)
 {
 	//Todo: 스폰된 아이템 중 식별 아이디의 아이템 제거하기
+	auto Item = Items.Find(ItemID);
+	(*Item)->Destroy();
 }
 
 void UGPGameInstance::AddInventoryItem(EItem ItemType, uint32 Quantity)

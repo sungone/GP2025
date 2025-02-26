@@ -5,6 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/RotatingMovementComponent.h"
 #include "Network/GPGameInstance.h"
 #include "Character/GPCharacterPlayer.h"
 #include "GPItemStruct.h"
@@ -12,7 +13,7 @@
 // Sets default values
 AGPItem::AGPItem()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
@@ -32,23 +33,29 @@ AGPItem::AGPItem()
 	ItemSkeletalMesh->SetupAttachment(RootComponent);
 	ItemSkeletalMesh->SetCollisionProfileName(TEXT("NoCollision"));
 	ItemSkeletalMesh->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
+
+	// 회전하는 움직임 추가
+	RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("RotatingMovement"));
+	RotatingMovement->RotationRate = FRotator(0.f, 180.f, 0.f); // 초당 180도 회전
 }
 
 // Called when the game starts or when spawned
 void AGPItem::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
 void AGPItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	FVector NewLocation = GetActorLocation();
+	NewLocation.Z += FMath::Sin(GetWorld()->TimeSeconds * 2) * 2;  // 위아래로 흔들리는 효과
+	SetActorLocation(NewLocation);
 }
 
-void AGPItem::SetupItem(int32 NewItemID, int32 NewAmount)
+void AGPItem::SetupItem(int32 NewItemID, uint8 NewItemtype, int32 NewAmount)
 {
 	ItemID = NewItemID;
 	Amount = NewAmount;
@@ -60,7 +67,7 @@ void AGPItem::SetupItem(int32 NewItemID, int32 NewAmount)
 	UDataTable* ItemTable = GetItemDataTable();
 	if (!ItemTable) return;
 
-	FGPItemStruct* ItemData = ItemTable->FindRow<FGPItemStruct>(*FString::FromInt(ItemID), TEXT(""));
+	FGPItemStruct* ItemData = ItemTable->FindRow<FGPItemStruct>(*FString::FromInt(NewItemtype), TEXT(""));
 	if (!ItemData) return;
 
 	// 아이템 이름 설정 (디버깅용)
@@ -72,6 +79,8 @@ void AGPItem::SetupItem(int32 NewItemID, int32 NewAmount)
 		ItemStaticMesh->SetStaticMesh(ItemData->ItemStaticMesh);
 		ItemStaticMesh->SetVisibility(true);
 		ItemSkeletalMesh->SetVisibility(false);
+
+		UE_LOG(LogTemp, Log, TEXT("Set Static Mesh"));
 	}
 	// Skeletal Mesh가 있는 경우 적용
 	else if (ItemData->ItemSkeletalMesh)
@@ -79,6 +88,8 @@ void AGPItem::SetupItem(int32 NewItemID, int32 NewAmount)
 		ItemSkeletalMesh->SetSkeletalMesh(ItemData->ItemSkeletalMesh);
 		ItemStaticMesh->SetVisibility(false);
 		ItemSkeletalMesh->SetVisibility(true);
+
+		UE_LOG(LogTemp, Log, TEXT("Set Skeletal Mesh"));
 	}
 }
 
@@ -103,21 +114,9 @@ void AGPItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 	AGPCharacterPlayer* Player = Cast<AGPCharacterPlayer>(OtherActor);
 	if (!Player) return;
 
-	// 게임 인스턴스 가져오기
 	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
 	if (!GameInstance) return;
 
-	// 아이템 ID가 400 이상이면 골드 (Gold)
-	if (ItemID >= 400 && ItemID < 500)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Player picked up %d gold!"), Amount);
-	}
-	// 일반 아이템이면 인벤토리에 추가
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("Player picked up item ID: %d"), ItemID);
-	}
-
-	Destroy();
+	GameInstance->SendPlayerTakeItem(ItemID);
 }
 
