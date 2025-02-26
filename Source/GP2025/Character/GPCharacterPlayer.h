@@ -24,7 +24,7 @@ protected:
 	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
 
 	virtual USkeletalMeshComponent* GetCharacterMesh() const override;
-
+	
 	// Character Mesh Section
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts")
