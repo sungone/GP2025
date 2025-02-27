@@ -28,6 +28,7 @@ protected:
 	void InitSocket(SOCKET& socket, DWORD dwFlags);
 
 	void CreateThreads(std::function<void()> func, int32 numThreads = 1);
+	void JoinThreads();
 	void WorkerThreadLoop();
 	void HandleError(ExpOver* ex_over, int32 _id);
 
@@ -37,6 +38,8 @@ protected:
 	void HandleRecv(int32 _id, int32 recvByte, ExpOver* expOver);
 
 protected:
+	std::vector<std::thread> threads;
+
 	bool _bRunning = true;
 	SOCKET _listenSocket;
 	SOCKET _acceptSocket;

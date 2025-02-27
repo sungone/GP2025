@@ -5,7 +5,7 @@
 #include <mutex>
 #include <chrono>
 #include <iomanip>
-
+#include <sstream>
 #define LOG(...) Logger::GetInstance().LogMessage(__VA_ARGS__, __FUNCTION__)
 
 

@@ -1,6 +1,19 @@
 #include "pch.h"
 #include "DummyClinetManager.h"
 
+DummyClientManager::DummyClientManager()
+{
+}
+
+DummyClientManager::~DummyClientManager()
+{
+	for (int32 i = 0; i < CLIENT_NUM; ++i)
+	{
+		_clients[i].Disconnect();
+	}
+	WSACleanup();
+}
+
 bool DummyClientManager::Init()
 {
 	_hIocp.Init();
@@ -9,7 +22,7 @@ bool DummyClientManager::Init()
 	{
 		if (_clients[i].Connect())
 		{
-			_hIocp.RegisterSocket(_clients[i]._socket, i);
+			_hIocp.RegisterSocket(_clients[i].GetSocket(), i);
 
 			_clients[i].DoRecv();
 			_clients[i].DoSend(Packet(C_LOGIN));
@@ -21,7 +34,8 @@ bool DummyClientManager::Init()
 
 void DummyClientManager::Run()
 {
-	WorkerThread();
+	CreateThreads([this]() { WorkerThread(); }, 1);
+	JoinThreads();
 }
 
 void DummyClientManager::WorkerThread()
@@ -37,9 +51,10 @@ void DummyClientManager::WorkerThread()
 
 		if (!ret)
 		{
-			_clients[id].Disconnect();
+			HandleError(expOver, static_cast<int32>(id));
 			continue;
 		}
+
 		switch (expOver->_compType)
 		{
 		case RECV:
@@ -48,6 +63,7 @@ void DummyClientManager::WorkerThread()
 		case SEND:
 			delete over;
 			break;
+			break;
 		}
 	}
 }
@@ -55,4 +71,31 @@ void DummyClientManager::WorkerThread()
 void DummyClientManager::HandleRecv(int32 id, DWORD rbyte, LPWSAOVERLAPPED over)
 {
 	_clients[id].HandleRecvBuffer(rbyte, reinterpret_cast<ExpOver*>(over));
+}
+
+void DummyClientManager::CreateThreads(std::function<void()> func, int32 numThreads)
+{
+	for (int32 i = 0; i < numThreads; ++i)
+		threads.emplace_back(func);
+}
+
+void DummyClientManager::JoinThreads()
+{
+	for (auto& thread : threads)
+		thread.join();
+}
+
+void DummyClientManager::HandleError(ExpOver* ex_over, int32 id)
+{
+	switch (ex_over->_compType)
+	{
+	case RECV:
+		LOG(Warning, "CompType : RECV");
+		_clients[id].Disconnect();
+		break;
+	case SEND:
+		LOG(Warning, "CompType : SEND");
+		delete ex_over;
+		break;
+	}
 }
