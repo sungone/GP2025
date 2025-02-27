@@ -31,7 +31,7 @@ void PacketManager::HandleLoginPacket(Session& session)
 {
 	session.CreatePlayer();
 
-	auto playerInfo = session.GetPlayerInfo();
+	auto& playerInfo = session.GetPlayerInfo();
 	int32 id = playerInfo.ID;
 	LOG(LogType::RecvLog, std::format("Login PKT [{}]", id));
 

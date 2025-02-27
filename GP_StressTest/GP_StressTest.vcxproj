@@ -19,11 +19,29 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\GP_Server\Source\IOCP\ExpOver.cpp" />
+    <ClCompile Include="..\GP_Server\Source\IOCP\IOCP.cpp" />
+    <ClCompile Include="Source\DummyClient.cpp" />
+    <ClCompile Include="Source\DummyClinetManager.cpp" />
     <ClCompile Include="Source\GLWindow.cpp" />
     <ClCompile Include="Source\GLMain.cpp" />
+    <ClCompile Include="Source\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Source\TestMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\GP_Server\Source\Common\Common.h" />
+    <ClInclude Include="..\GP_Server\Source\Common\DataStruct.h" />
+    <ClInclude Include="..\GP_Server\Source\Common\Packet.h" />
+    <ClInclude Include="..\GP_Server\Source\Common\Type.h" />
+    <ClInclude Include="..\GP_Server\Source\IOCP\ExpOver.h" />
+    <ClInclude Include="..\GP_Server\Source\IOCP\IOCP.h" />
+    <ClInclude Include="Source\DummyClient.h" />
+    <ClInclude Include="Source\DummyClinetManager.h" />
     <ClInclude Include="Source\GLWindow.h" />
+    <ClInclude Include="Source\pch.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -79,10 +97,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ExternalIncludePath>$(SolutionDir)Source</ExternalIncludePath>
+    <ExternalIncludePath>$(SolutionDir)Source;$(SolutionDir)Source\Common;$(SolutionDir)Source\IOCP;$(SolutionDir)Source\Core;$(SolutionDir)Source\Game;$(SolutionDir)Source\DB;$(SolutionDir)Source\AI;$(SolutionDir)Source\Utils</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ExternalIncludePath>$(SolutionDir)Source</ExternalIncludePath>
+    <ExternalIncludePath>$(SolutionDir)Source;$(SolutionDir)Source\Common;$(SolutionDir)Source\IOCP;$(SolutionDir)Source\Core;$(SolutionDir)Source\Game;$(SolutionDir)Source\DB;$(SolutionDir)Source\AI;$(SolutionDir)Source\Utils</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -118,9 +136,11 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -132,6 +152,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

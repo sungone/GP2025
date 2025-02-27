@@ -1,4 +1,6 @@
+#include "pch.h"
 #include "GLWindow.h"
+
 #pragma comment (lib, "opengl32.lib")
 #pragma comment (lib, "glu32.lib")
 

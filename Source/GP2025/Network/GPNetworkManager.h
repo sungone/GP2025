@@ -30,8 +30,8 @@ public:
 
 private:
 	class FSocket* Socket;
-	FString IpAddress = TEXT("127.0.0.1");
-	int16 Port = 4000;
+	FString IpAddress = SERVER_IP;
+	int16 Port = SERVER_PORT;
 
 	AGPCharacterPlayer* MyPlayer;
 

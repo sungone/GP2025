@@ -41,11 +41,11 @@
     <Filter Include="Source Files\Pch">
       <UniqueIdentifier>{3a7b361f-25be-42ce-99da-91564daa6b55}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Shared">
-      <UniqueIdentifier>{a7a69939-add0-4a56-b879-98677decfb9c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Game\Item">
       <UniqueIdentifier>{1abc2927-eb8d-4991-bc38-72092992a49a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common">
+      <UniqueIdentifier>{a7a69939-add0-4a56-b879-98677decfb9c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -69,12 +69,6 @@
     </ClInclude>
     <ClInclude Include="Source\DB\DBConnectionPool.h">
       <Filter>Source Files\DB</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Core\ExpOver.h">
-      <Filter>Source Files\Network\IOCP</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Core\IOCP.h">
-      <Filter>Source Files\Network\IOCP</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\Character.h">
       <Filter>Source Files\Game\Character</Filter>
@@ -104,16 +98,16 @@
       <Filter>Source Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="Source\Common\Common.h">
-      <Filter>Source Files\Shared</Filter>
+      <Filter>Source Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="Source\Common\DataStruct.h">
-      <Filter>Source Files\Shared</Filter>
+      <Filter>Source Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="Source\Common\Packet.h">
-      <Filter>Source Files\Shared</Filter>
+      <Filter>Source Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="Source\Common\Type.h">
-      <Filter>Source Files\Shared</Filter>
+      <Filter>Source Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="Source\Utils\CollisionUtils.h">
       <Filter>Source Files\Utils</Filter>
@@ -126,6 +120,12 @@
     </ClInclude>
     <ClInclude Include="Source\Core\SessionSocket.h">
       <Filter>Source Files\Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\IOCP\ExpOver.h">
+      <Filter>Source Files\Network\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\IOCP\IOCP.h">
+      <Filter>Source Files\Network\IOCP</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -146,12 +146,6 @@
     </ClCompile>
     <ClCompile Include="Source\DB\DBConnectionPool.cpp">
       <Filter>Source Files\DB</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\ExpOver.cpp">
-      <Filter>Source Files\Network\IOCP</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\IOCP.cpp">
-      <Filter>Source Files\Network\IOCP</Filter>
     </ClCompile>
     <ClCompile Include="Source\ServerMain.cpp">
       <Filter>Source Files</Filter>
@@ -182,6 +176,12 @@
     </ClCompile>
     <ClCompile Include="Source\Core\SessionSocket.cpp">
       <Filter>Source Files\Network\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IOCP\ExpOver.cpp">
+      <Filter>Source Files\Network\IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IOCP\IOCP.cpp">
+      <Filter>Source Files\Network\IOCP</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

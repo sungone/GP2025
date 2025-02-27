@@ -108,7 +108,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;SERVER_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source;$(SolutionDir)Source\Common;$(SolutionDir)Source\Core;$(SolutionDir)Source\Game;$(SolutionDir)Source\DB;$(SolutionDir)Source\AI;$(SolutionDir)Source\Utils</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Source;$(SolutionDir)Source\Common;$(SolutionDir)Source\IOCP;$(SolutionDir)Source\Core;$(SolutionDir)Source\Game;$(SolutionDir)Source\DB;$(SolutionDir)Source\AI;$(SolutionDir)Source\Utils</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -129,7 +129,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;SERVER_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source;$(SolutionDir)Source\Common;$(SolutionDir)Source\Core;$(SolutionDir)Source\Game;$(SolutionDir)Source\DB;$(SolutionDir)Source\AI;$(SolutionDir)Source\Utils</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Source;$(SolutionDir)Source\Common;$(SolutionDir)Source\IOCP;$(SolutionDir)Source\Core;$(SolutionDir)Source\Game;$(SolutionDir)Source\DB;$(SolutionDir)Source\AI;$(SolutionDir)Source\Utils</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -145,8 +145,6 @@
     <ClInclude Include="Source\Common\DataStruct.h" />
     <ClInclude Include="Source\Common\Packet.h" />
     <ClInclude Include="Source\Common\Type.h" />
-    <ClInclude Include="Source\Core\ExpOver.h" />
-    <ClInclude Include="Source\Core\IOCP.h" />
     <ClInclude Include="Source\Core\PacketManager.h" />
     <ClInclude Include="Source\Core\Server.h" />
     <ClInclude Include="Source\Core\Session.h" />
@@ -161,6 +159,8 @@
     <ClInclude Include="Source\Game\Monster.h" />
     <ClInclude Include="Source\Game\Player.h" />
     <ClInclude Include="Source\Game\TimerQueue.h" />
+    <ClInclude Include="Source\IOCP\ExpOver.h" />
+    <ClInclude Include="Source\IOCP\IOCP.h" />
     <ClInclude Include="Source\pch.h" />
     <ClInclude Include="Source\Utils\CollisionUtils.h" />
     <ClInclude Include="Source\Utils\FVector.h" />
@@ -169,8 +169,6 @@
     <ClInclude Include="Source\Utils\Timer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Core\ExpOver.cpp" />
-    <ClCompile Include="Source\Core\IOCP.cpp" />
     <ClCompile Include="Source\Core\PacketManager.cpp" />
     <ClCompile Include="Source\Core\Server.cpp" />
     <ClCompile Include="Source\Core\Session.cpp" />
@@ -185,6 +183,8 @@
     <ClCompile Include="Source\Game\Monster.cpp" />
     <ClCompile Include="Source\Game\Player.cpp" />
     <ClCompile Include="Source\Game\TimerQueue.cpp" />
+    <ClCompile Include="Source\IOCP\ExpOver.cpp" />
+    <ClCompile Include="Source\IOCP\IOCP.cpp" />
     <ClCompile Include="Source\ServerMain.cpp" />
     <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
