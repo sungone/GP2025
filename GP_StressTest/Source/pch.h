@@ -8,6 +8,8 @@
 #include <vector>
 #include <mutex>
 #include <array>
+#include <queue>
+#include <functional>
 
 #include "IOCP.h"
 #include "FVector.h"
@@ -18,8 +20,6 @@ enum CompType
 {
 	RECV,
 	SEND,
-	ACCEPT,
 
 	MOVE,
-	ATTACK,
 };
