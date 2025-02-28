@@ -63,7 +63,6 @@ void Server::Run()
 {
 	DoAccept();
 	CreateThreads([this]() { WorkerThreadLoop(); }, std::thread::hardware_concurrency());
-	JoinThreads();
 }
 
 void Server::Close()
@@ -85,12 +84,10 @@ void Server::InitSocket(SOCKET& socket, DWORD dwFlags)
 
 void Server::CreateThreads(std::function<void()> func, int32 numThreads)
 {
-	for (int32 i = 0; i < numThreads; ++i)
+	std::vector<std::thread> threads;
+	for (int32 i = 0; i < numThreads; ++i) {
 		threads.emplace_back(func);
-}
-
-void Server::JoinThreads()
-{
+	}
 	for (auto& thread : threads)
 		thread.join();
 }

@@ -3,7 +3,7 @@
 
 void Character::Init()
 {
-	SetParkingGarageRandomLocation();
+	SetBunkerRandomLocation();
 	_info.InitStats(
 		100.f,    // MaxHp
 		20.f,     // Damage
@@ -38,19 +38,6 @@ void Character::SetBunkerRandomLocation()
 	static constexpr std::pair<float, float> BUNKER_X_RANGE = { -3000.0f, -1000.0f };
 	static constexpr std::pair<float, float> BUNKER_Y_RANGE = { -3500.0f, -1500.0f };
 	static constexpr float BUNKER_Z = 116.0f;
-
-	_info.SetLocation(
-		RandomUtils::GetRandomFloat(BUNKER_X_RANGE.first, BUNKER_X_RANGE.second),
-		RandomUtils::GetRandomFloat(BUNKER_Y_RANGE.first, BUNKER_Y_RANGE.second),
-		BUNKER_Z
-	);
-}
-
-void Character::SetParkingGarageRandomLocation()
-{
-	static constexpr std::pair<float, float> BUNKER_X_RANGE = { -2500.0f, 9000.0f };
-	static constexpr std::pair<float, float> BUNKER_Y_RANGE = { -20000.0f, -10000.0f };
-	static constexpr float BUNKER_Z = 150.0f;
 
 	_info.SetLocation(
 		RandomUtils::GetRandomFloat(BUNKER_X_RANGE.first, BUNKER_X_RANGE.second),

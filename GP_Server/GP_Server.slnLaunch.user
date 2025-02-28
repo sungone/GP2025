@@ -8,8 +8,7 @@
       },
       {
         "Path": "..\\GP_StressTest\\GP_StressTest.vcxproj",
-        "Action": "Start",
-        "DebugTarget": "로컬 Windows 디버거"
+        "Action": "StartWithoutDebugging"
       }
     ]
   }
