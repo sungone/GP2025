@@ -170,5 +170,6 @@ void AGPCharacterPlayer::EquipWeaponFromData(const UGPCharacterControlData* Char
 void AGPCharacterPlayer::AttackHitCheck()
 {
     Super::AttackHitCheck();
+
 }
 

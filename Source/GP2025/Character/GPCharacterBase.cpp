@@ -1,22 +1,20 @@
 
 
 #include "Character/GPCharacterBase.h"
-#include "Components/CapsuleComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "Network/GPGameInstance.h"
 #include "Character/GPCharacterControlData.h"
+#include "Character/GPCharacterMyplayer.h"
 #include "Animation/AnimMontage.h"
-#include "Physics/GPCollision.h"
+#include "Components/CapsuleComponent.h"
 #include "Engine/DamageEvents.h"
-#include "UI/GPWidgetComponent.h"
-#include "UI/GPHpBarWidget.h"
-#include "UI/GPExpBarWidget.h"
-#include "UI/GPLevelWidget.h"
-#include "UI/GPFloatingDamageText.h"
-#include "Item/GPEquipItemData.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GPCharacterPlayer.h"
+#include "Item/GPEquipItemData.h"
+#include "Network/GPNetworkManager.h"
+#include "Physics/GPCollision.h"
+#include "UI/GPHpBarWidget.h"
+#include "UI/GPLevelWidget.h"
+#include "UI/GPWidgetComponent.h"
 #include "TLoad.h"
-
 #include <random>
 static std::random_device rd;
 static std::mt19937 gen(rd());
@@ -77,10 +75,7 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// 내 플레이어의 위치를 설정하는 것이면 return
-	UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
-	AGPCharacterPlayer* ViewerPlayer = Cast<AGPCharacterPlayer>(this);
-	if (IsValid(GameInstance) && IsValid(ViewerPlayer) && GameInstance->MyPlayer == ViewerPlayer)
-		return;
+	if (Cast<AGPCharacterMyplayer>(this)) return;
 
 	/// Other Client 공격 모션 동기화 ///
 	if (CharacterInfo.HasState(STATE_AUTOATTACK) && bIsAutoAttacking == false)
@@ -202,18 +197,18 @@ void AGPCharacterBase::SetCharacterType(ECharacterType NewCharacterType)
  
 void AGPCharacterBase::AttackHitCheck()
 {
+	//Todo: Myplayer만 사용하게 옮기자
+	if (!Cast<AGPCharacterMyplayer>(this)) return;
+
 	FHitResult OutHitResult;
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
 
-	// 공격 범위 및 반경 가져오기
 	const float AttackRange = CharacterInfo.AttackRange;
 	const float AttackRadius = CharacterInfo.AttackRadius;
 
-	// 공격 시작점과 끝점 계산
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
 
-	// 스피어(구형) 충돌 검사 수행
 	bool bHitDetected = GetWorld()->SweepSingleByChannel(
 		OutHitResult, Start, End, FQuat::Identity, CCHANNEL_GPACTION,
 		FCollisionShape::MakeSphere(AttackRadius), Params);
@@ -233,22 +228,17 @@ void AGPCharacterBase::AttackHitCheck()
 			DrawDebugCapsule(GetWorld(), TargetLocation, TargetHalfHeight, TargetCollisionRadius,
 				FQuat::Identity, FColor::Yellow, false, 5.f);
 #endif
-
-			// 공격 패킷 전송 (클라이언트 본인 캐릭터만)
-			UGPGameInstance* GameInstance = Cast<UGPGameInstance>(GetGameInstance());
-			AGPCharacterPlayer* ViewerPlayer = Cast<AGPCharacterPlayer>(this);
-			if (IsValid(GameInstance) && IsValid(ViewerPlayer) && ViewerPlayer == GameInstance->MyPlayer)
+			auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+			if (NetworkMgr)
 			{
-				GameInstance->SendPlayerAttackPacket(TargetCharacter->CharacterInfo.ID);
+				NetworkMgr->SendPlayerAttackPacket(TargetCharacter->CharacterInfo.ID);
 			}
 		}
 	}
 
 #if ENABLE_DRAW_DEBUG
-	// 공격 범위를 캡슐 형태로 시각화
 	const FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
 	const float CapsuleHalfHeight = AttackRange * 0.5f;
-	//const FColor DrawColor = bHitDetected ? FColor::Green : FColor::Red;
 	const FColor DrawColor = FColor::Red;
 	if (bHitDetected)
 	{

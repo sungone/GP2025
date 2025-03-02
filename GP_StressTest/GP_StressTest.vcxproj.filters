@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="소스 파일\Network">
+      <UniqueIdentifier>{ed68e76c-1850-4d7c-a5e9-875606c5c28b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Render">
+      <UniqueIdentifier>{25c7d592-7816-4daa-ab6a-2febdc2e79fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Pch">
+      <UniqueIdentifier>{0198502e-1345-4340-ab7e-bead8a2df816}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Shared">
+      <UniqueIdentifier>{0b276779-f9e9-45a7-9f86-30e48612d8f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Shared\Common">
+      <UniqueIdentifier>{1c1598d2-38f3-4362-9d04-8597d59a3464}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\GLWindow.cpp">
+      <Filter>소스 파일\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GP_Server\Source\IOCP\ExpOver.cpp">
+      <Filter>소스 파일\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GP_Server\Source\IOCP\IOCP.cpp">
+      <Filter>소스 파일\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\pch.cpp">
+      <Filter>소스 파일\Pch</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DummyClient.cpp">
+      <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DummyClinetManager.cpp">
+      <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\TestMain.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GLMain.cpp">
+      <Filter>소스 파일\Render</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\GLWindow.h">
+      <Filter>소스 파일\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\Common\Common.h">
+      <Filter>소스 파일\Shared\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\Common\DataStruct.h">
+      <Filter>소스 파일\Shared\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\Common\Packet.h">
+      <Filter>소스 파일\Shared\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\Common\Type.h">
+      <Filter>소스 파일\Shared\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\IOCP\ExpOver.h">
+      <Filter>소스 파일\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\IOCP\IOCP.h">
+      <Filter>소스 파일\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\pch.h">
+      <Filter>소스 파일\Pch</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DummyClient.h">
+      <Filter>소스 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DummyClinetManager.h">
+      <Filter>소스 파일\Network</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
