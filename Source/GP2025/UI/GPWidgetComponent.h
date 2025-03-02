@@ -9,7 +9,8 @@
 /**
  * 3D 공간에서 UI를 배치할 때
  */
-UCLASS()
+
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class GP2025_API UGPWidgetComponent : public UWidgetComponent
 {
 	GENERATED_BODY()

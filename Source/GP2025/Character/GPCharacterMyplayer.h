@@ -49,6 +49,11 @@ protected:
 	void StartSprinting();
 	void StopSprinting();
 	void AutoAttack();
+	void ToggleInventory();
+	void OpenInventory();
+	void CloseInventory();
+	void ResetInventoryToggle();
+	bool bInventoryToggled = false;
 
 	// 카메라 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", Meta = (AllowPrivateAccess = "true"))
@@ -76,12 +81,22 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> AutoAttackAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> InventoryAction;
+
 	// Sprint Speed 변수
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
 	float WalkSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
 	float SprintSpeed;
+
+	// Inventory Widget
+	UPROPERTY()
+	TSubclassOf<UUserWidget> InventoryWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* InventoryWidget;
 
 	// 다른 뷰어 클라이언트들의 위치 동기화를 위해 위치를 계산하는 변수들
 public:
@@ -106,4 +121,10 @@ protected:
 	virtual void EquipChest(class UGPItemData* InItemData);
 	virtual void EquipHelmet(class UGPItemData* InItemData);
 	virtual void AddExp(class UGPItemData* InItemData);
+
+	// Money Section
+public :
+	// Sprint Speed 변수
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Money")
+	int32 MoneyAmount;
 };

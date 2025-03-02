@@ -253,7 +253,7 @@ void UGPGameInstance::AddPlayer(FInfoData& PlayerInfo, bool isMyPlayer)
 
 		UE_LOG(LogTemp, Warning, TEXT("Add other player [%d] (%f,%f,%f)(%f)"),
 			PlayerInfo.ID, PlayerInfo.Pos.X, PlayerInfo.Pos.Y, PlayerInfo.Pos.Z, PlayerInfo.Yaw);
-
+		                                                                                                                                                                
 		Player->SetCharacterInfo(PlayerInfo);
 		Player->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
 		Players.Add(PlayerInfo.ID, Player);
