@@ -12,6 +12,8 @@
 #include "InputMappingContext.h"
 #include "Item/GPEquipItemData.h"
 #include "Network/GPNetworkManager.h"
+#include "Blueprint/UserWidget.h"
+#include "Player/GPPlayerController.h"
 
 AGPCharacterMyplayer::AGPCharacterMyplayer()
 {
@@ -67,6 +69,19 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 		AutoAttackAction = InputActionAutoAttackRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionInventoryRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Inventory.IA_Inventory'"));
+	if (InputActionInventoryRef.Object)
+	{
+		InventoryAction = InputActionInventoryRef.Object;
+	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBPClass(TEXT("/Game/Inventory/Widgets/WBP_Inventory"));
+
+	if (WidgetBPClass.Succeeded())
+	{
+		InventoryWidgetClass = WidgetBPClass.Class;
+	}
+
 	// 기본 캐릭터 타입을 전사 캐릭터로
 	CurrentCharacterType = Type::EPlayer::WARRIOR;
 }
@@ -84,6 +99,11 @@ void AGPCharacterMyplayer::BeginPlay()
 	LastLocation = GetActorLocation();
 	LastRotationYaw = GetActorRotation().Yaw;
 	LastSendPlayerInfo = CharacterInfo;
+
+	if (InventoryWidgetClass)
+	{
+		InventoryWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryWidgetClass);
+	}
 }
 
 void AGPCharacterMyplayer::Tick(float DeltaTime)
@@ -193,6 +213,8 @@ void AGPCharacterMyplayer::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::StartSprinting);
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AGPCharacterMyplayer::StopSprinting);
 	EnhancedInputComponent->BindAction(AutoAttackAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::AutoAttack);
+	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::ToggleInventory);
+	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Completed, this, &AGPCharacterMyplayer::ResetInventoryToggle);
 }
 
 void AGPCharacterMyplayer::SetCharacterType(ECharacterType NewCharacterType)
@@ -289,6 +311,60 @@ void AGPCharacterMyplayer::AutoAttack()
 	}
 
 	ProcessAutoAttackCommand();
+}
+
+void AGPCharacterMyplayer::ToggleInventory()
+{
+	if (bInventoryToggled) return; 
+
+	bInventoryToggled = true;
+
+	if (InventoryWidget)
+	{
+		if (InventoryWidget->IsInViewport())
+		{
+			CloseInventory();
+		}
+		else
+		{
+			OpenInventory();
+		}
+	}
+}
+
+void AGPCharacterMyplayer::OpenInventory()
+{
+	if (InventoryWidget && !InventoryWidget->IsInViewport())
+	{
+		InventoryWidget->AddToViewport();
+
+		APlayerController* PC = Cast<AGPPlayerController>(GetController());
+		if (PC)
+		{
+			PC->SetShowMouseCursor(true);
+			PC->SetInputMode(FInputModeGameAndUI()); 
+		}
+	}
+}
+
+void AGPCharacterMyplayer::CloseInventory()
+{
+	if (InventoryWidget && InventoryWidget->IsInViewport())
+	{
+		InventoryWidget->RemoveFromParent();
+
+		APlayerController* PC = Cast<AGPPlayerController>(GetController());
+		if (PC)
+		{
+			PC->SetShowMouseCursor(false);
+			PC->SetInputMode(FInputModeGameOnly()); 
+		}
+	}
+}
+
+void AGPCharacterMyplayer::ResetInventoryToggle()
+{
+	bInventoryToggled = false; 
 }
 
 
