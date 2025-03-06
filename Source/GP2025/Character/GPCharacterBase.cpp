@@ -62,7 +62,7 @@ AGPCharacterBase::AGPCharacterBase()
 	LoadCharacterData(CharacterTypeManager, CharacterTypes);
 
 	HpBar = CreateWidgetComponent(TEXT("HpWidget"), TEXT("/Game/UI/WBP_CharacterHpBar.WBP_CharacterHpBar_C"), FVector(0.f, 0.f, 300.f), FVector2D(150.f, 15.f));
-	LevelText = CreateWidgetComponent(TEXT("LevelWidget"), TEXT("/Game/UI/WBP_LevelText.WBP_LevelText_C"), FVector(0.f, 0.f, 340.f), FVector2D(40.f, 10.f));
+	LevelText = CreateWidgetComponent(TEXT("LevelWidget"), TEXT("/Game/UI/WBP_LevelText.WBP_LevelText_C"), FVector(0.f, 0.f, 330.f), FVector2D(40.f, 10.f));
 }
 
 void AGPCharacterBase::BeginPlay()

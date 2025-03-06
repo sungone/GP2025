@@ -173,25 +173,27 @@ void AGPCharacterPlayer::AttackHitCheck()
     Super::AttackHitCheck();
 }
 
-void AGPCharacterPlayer::EquipItemOnCharacter(struct FGPItemStruct& ItemData)
+void AGPCharacterPlayer::EquipItemOnCharacter(FGPItemStruct& ItemData)
 {
     UE_LOG(LogTemp, Warning, TEXT("Equipped : %s"), *ItemData.ItemName.ToString());
 
     if (ItemData.Category == ECategory::helmet)
     {
-        if (Helmet)
+        if (!Helmet)
         {
-            Helmet->DestroyComponent();
-            Helmet = nullptr;
+            Helmet = NewObject<USkeletalMeshComponent>(this);
+            Helmet->SetupAttachment(HeadMesh);
+            Helmet->RegisterComponent();
         }
 
-        Helmet = NewObject<USkeletalMeshComponent>(this);
         Helmet->SetSkeletalMesh(ItemData.ItemSkeletalMesh);
-        Helmet->SetupAttachment(HeadMesh);  
-        Helmet->RegisterComponent();
 
-        
-        Helmet->SetMasterPoseComponent(HeadMesh);
+        if (BodyMesh)
+        {
+            Helmet->AttachToComponent(BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("HelmetSocket"));
+            Helmet->SetMasterPoseComponent(BodyMesh);
+            UE_LOG(LogTemp, Warning, TEXT("Helmet Re-Attached to BodyMesh"));
+        }
     }
 
 
@@ -211,33 +213,40 @@ void AGPCharacterPlayer::EquipItemOnCharacter(struct FGPItemStruct& ItemData)
             BodyMesh = nullptr;
         }
 
-       
         BodyMesh = NewObject<USkeletalMeshComponent>(this);
         BodyMesh->SetSkeletalMesh(ItemData.ItemSkeletalMesh);
         BodyMesh->SetupAttachment(GetCapsuleComponent());
         BodyMesh->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
         BodyMesh->RegisterComponent();
 
-        
         if (PreviousAnimBP)
         {
             BodyMesh->SetAnimInstanceClass(PreviousAnimBP);
-            UE_LOG(LogTemp, Warning, TEXT("Reassigned Previous Animation Blueprint to new BodyMesh"));
-        }
-        else
-        {
-            UE_LOG(LogTemp, Error, TEXT("Failed to retrieve previous Animation Blueprint for BodyMesh!"));
         }
 
-        HeadMesh->SetMasterPoseComponent(BodyMesh);
-        LegMesh->SetMasterPoseComponent(BodyMesh);
-        Helmet->SetMasterPoseComponent(BodyMesh);
+   
+        if (Helmet)
+        {
+            Helmet->AttachToComponent(BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("HelmetSocket"));
+            Helmet->SetMasterPoseComponent(BodyMesh);
+            UE_LOG(LogTemp, Warning, TEXT("Helmet Re-Attached to New BodyMesh"));
+        }
+
+
+        if (HeadMesh)
+        {
+            HeadMesh->SetMasterPoseComponent(BodyMesh);
+        }
+        if (LegMesh)
+        {
+            LegMesh->SetMasterPoseComponent(BodyMesh);
+        }
+
 
         if (WeaponActor)
         {
             WeaponActor->AttachToComponent(BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
         }
-
     }
 
 
@@ -245,7 +254,7 @@ void AGPCharacterPlayer::EquipItemOnCharacter(struct FGPItemStruct& ItemData)
     {
         if (WeaponActor)
         {
-            WeaponActor->Destroy(); 
+            WeaponActor->Destroy();
             WeaponActor = nullptr;
         }
 
@@ -275,5 +284,4 @@ void AGPCharacterPlayer::EquipItemOnCharacter(struct FGPItemStruct& ItemData)
             UE_LOG(LogTemp, Error, TEXT("Failed to spawn WeaponActor! Check if WeaponClass is valid."));
         }
     }
-
 }
