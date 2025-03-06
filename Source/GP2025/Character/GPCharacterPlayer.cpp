@@ -6,6 +6,7 @@
 #include "Character/GPCharacterControlData.h"
 #include "Network/GPGameInstance.h"
 #include "Item/GPEquipItemData.h"
+#include "Item/GPItemStruct.h"
 #include "Weapons/GPWeaponBase.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
@@ -170,6 +171,109 @@ void AGPCharacterPlayer::EquipWeaponFromData(const UGPCharacterControlData* Char
 void AGPCharacterPlayer::AttackHitCheck()
 {
     Super::AttackHitCheck();
-
 }
 
+void AGPCharacterPlayer::EquipItemOnCharacter(struct FGPItemStruct& ItemData)
+{
+    UE_LOG(LogTemp, Warning, TEXT("Equipped : %s"), *ItemData.ItemName.ToString());
+
+    if (ItemData.Category == ECategory::helmet)
+    {
+        if (Helmet)
+        {
+            Helmet->DestroyComponent();
+            Helmet = nullptr;
+        }
+
+        Helmet = NewObject<USkeletalMeshComponent>(this);
+        Helmet->SetSkeletalMesh(ItemData.ItemSkeletalMesh);
+        Helmet->SetupAttachment(HeadMesh);  
+        Helmet->RegisterComponent();
+
+        
+        Helmet->SetMasterPoseComponent(HeadMesh);
+    }
+
+
+    if (ItemData.Category == ECategory::chest)
+    {
+        if (!ItemData.ItemSkeletalMesh)
+        {
+            UE_LOG(LogTemp, Error, TEXT("ItemSkeletalMesh is NULL for chest armor!"));
+            return;
+        }
+
+        TSubclassOf<UAnimInstance> PreviousAnimBP = nullptr;
+        if (BodyMesh)
+        {
+            PreviousAnimBP = BodyMesh->GetAnimClass();
+            BodyMesh->DestroyComponent();
+            BodyMesh = nullptr;
+        }
+
+       
+        BodyMesh = NewObject<USkeletalMeshComponent>(this);
+        BodyMesh->SetSkeletalMesh(ItemData.ItemSkeletalMesh);
+        BodyMesh->SetupAttachment(GetCapsuleComponent());
+        BodyMesh->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
+        BodyMesh->RegisterComponent();
+
+        
+        if (PreviousAnimBP)
+        {
+            BodyMesh->SetAnimInstanceClass(PreviousAnimBP);
+            UE_LOG(LogTemp, Warning, TEXT("Reassigned Previous Animation Blueprint to new BodyMesh"));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed to retrieve previous Animation Blueprint for BodyMesh!"));
+        }
+
+        HeadMesh->SetMasterPoseComponent(BodyMesh);
+        LegMesh->SetMasterPoseComponent(BodyMesh);
+        Helmet->SetMasterPoseComponent(BodyMesh);
+
+        if (WeaponActor)
+        {
+            WeaponActor->AttachToComponent(BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
+        }
+
+    }
+
+
+    if (ItemData.Category == ECategory::sword || ItemData.Category == ECategory::bow)
+    {
+        if (WeaponActor)
+        {
+            WeaponActor->Destroy(); 
+            WeaponActor = nullptr;
+        }
+
+        if (!BodyMesh)
+        {
+            UE_LOG(LogTemp, Error, TEXT("BodyMesh is NULL! Weapon cannot be equipped."));
+            return;
+        }
+
+        if (!BodyMesh->DoesSocketExist(TEXT("WeaponSocket")))
+        {
+            UE_LOG(LogTemp, Error, TEXT("WeaponSocket does not exist on BodyMesh!"));
+            return;
+        }
+
+        FActorSpawnParameters SpawnParams;
+        SpawnParams.Owner = this;
+        WeaponActor = GetWorld()->SpawnActor<AGPWeaponBase>(ItemData.WeaponClass, GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
+
+        if (WeaponActor)
+        {
+            WeaponActor->AttachToComponent(BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
+            UE_LOG(LogTemp, Warning, TEXT("Weapon successfully equipped on BodyMesh: %s"), *ItemData.ItemName.ToString());
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed to spawn WeaponActor! Check if WeaponClass is valid."));
+        }
+    }
+
+}

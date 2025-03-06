@@ -22,6 +22,7 @@ FGPItemStruct::FGPItemStruct()
 	, ItemThumbnail(nullptr) // 기본 썸네일 없음
 	, ItemStaticMesh(nullptr) // 기본 StaticMesh 없음
 	, ItemSkeletalMesh(nullptr) // 기본 SkeletalMesh 없음
+	, WeaponClass(nullptr)
 {
 
 }

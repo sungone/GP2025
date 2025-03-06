@@ -6,10 +6,14 @@
 #include "Character/GPCharacterBase.h"
 #include "GPCharacterPlayer.generated.h"
 
+
+struct FGPItemStruct;
+
 /**
  *
  */
 UCLASS()
+
 class GP2025_API AGPCharacterPlayer : public AGPCharacterBase
 {
 	GENERATED_BODY()
@@ -50,4 +54,9 @@ public:
 	// Attack Hit Section
 protected:
 	virtual void AttackHitCheck() override;
+
+public :
+	// Inventory Equip Item Change
+	UFUNCTION(BlueprintCallable, Category = "Item")
+	void EquipItemOnCharacter(struct FGPItemStruct& ItemData);
 };

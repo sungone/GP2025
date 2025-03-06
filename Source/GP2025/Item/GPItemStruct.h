@@ -97,4 +97,8 @@ public :
 	// 아이템 스켈레탈 메시
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	USkeletalMesh* ItemSkeletalMesh;
+
+	// 무기 클래스일 때 지정
+	UPROPERTY(EditAnywhere , BlueprintReadWrite , Category = "Item")
+	TSubclassOf<class AGPWeaponBase> WeaponClass;
 };
