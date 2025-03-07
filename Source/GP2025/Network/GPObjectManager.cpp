@@ -201,6 +201,11 @@ void UGPObjectManager::ItemDespawn(uint32 ItemID)
 	}
 }
 
+void UGPObjectManager::DropItem(uint32 ItemID, EItem ItemType, FVector Pos)
+{
+	//Todo : ItemSpawn()과 비슷하지만 둥둥 뜨지 않고 땅바닥에 스폰하도록 
+}
+
 void UGPObjectManager::AddInventoryItem(EItem ItemType, uint32 Quantity)
 {
 	//Todo: myplayer인벤토리 업데이트

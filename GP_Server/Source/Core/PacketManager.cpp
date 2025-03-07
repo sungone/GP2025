@@ -83,6 +83,6 @@ void PacketManager::HandleAttackPacket(Session& session, BYTE* packet)
 void PacketManager::HandleTakeItemPacket(Session& session, BYTE* packet)
 {
 	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
-	auto pkt1 = ItemDespawnPacket(p->Data);
+	auto pkt1 = ItemPkt::DespawnPacket(p->Data);
 	_sessionMgr.Broadcast(&pkt1);
 }

@@ -32,6 +32,7 @@ public:
 
 	void ItemSpawn(uint32 ItemID, EItem ItemType, FVector Pos);
 	void ItemDespawn(uint32 ItemID);
+	void DropItem(uint32 ItemID, EItem ItemType, FVector Pos);
 	void AddInventoryItem(EItem ItemType, uint32 Quantity);
 	void RemoveInventoryItem(EItem ItemType, uint32 Quantity);
 private:

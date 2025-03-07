@@ -1,5 +1,4 @@
 #pragma once
-
 enum EPacketType : uint8
 {
 	C_LOGIN,
@@ -8,10 +7,10 @@ enum EPacketType : uint8
 	C_ATTACK,
 
 	C_TAKE_ITEM,
-	//C_DROP_ITEM,
-	//C_USE_ITEM,
-	//C_EQUIP_ITEM,
-	//C_UNEQUIP_ITEM,
+	C_DROP_ITEM,
+	C_USE_ITEM,
+	C_EQUIP_ITEM,
+	C_UNEQUIP_ITEM,
 
 	S_LOGIN_SUCCESS,
 
@@ -24,11 +23,15 @@ enum EPacketType : uint8
 	S_MONSTER_STATUS_UPDATE,
 	S_DAMAGED_MONSTER,
 
-	S_ITEM_SPAWN,
+	S_ITEM_SPAWN,//¸ó½ºÅÍ Á×À¸¸é µÕµÕ ¶ß°Ô ½ºÆù
 	S_ITEM_DESPAWN,
+	S_ITEM_PICKUP,// Todo : ÁÝ´Â ¾Ö´Ï¸ÞÀÌ¼Ç?
+	S_ITEM_DROP,//¶¥¹Ù´Ú¿¡ ½ºÆù
 
 	S_ADD_IVENTORY_ITEM,
 	S_REMOVE_IVENTORY_ITEM,
+	S_EQUIP_ITEM,
+	S_UNEQUIP_ITEM,
 };
 
 using ECharacterType = uint8;

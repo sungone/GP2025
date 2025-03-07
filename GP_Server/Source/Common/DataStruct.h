@@ -110,4 +110,5 @@ struct FInfoData
 
 #endif
 };
+
 #pragma pack(pop)

@@ -4,11 +4,11 @@
     "Projects": [
       {
         "Path": "GP_Server.vcxproj",
-        "Action": "StartWithoutDebugging"
+        "Action": "Start"
       },
       {
         "Path": "..\\GP_StressTest\\GP_StressTest.vcxproj",
-        "Action": "StartWithoutDebugging"
+        "Action": "Start"
       }
     ]
   }

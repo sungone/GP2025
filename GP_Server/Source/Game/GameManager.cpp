@@ -145,14 +145,14 @@ void GameManager::SpawnItem(uint32_t itemId, EItem itemType, FVector position)
 {
 	std::lock_guard<std::mutex> lock(_iMutex);
 	_worldItems.emplace_back(std::make_shared<WorldItem>(itemType, itemId, position));
-	ItemSpawnPacket packet(itemId, itemType, position);
+	ItemPkt::SpawnPacket packet(itemId, itemType, position);
 	SessionManager::GetInst().Broadcast(&packet);
 }
 
 void GameManager::RemoveItem(uint32_t itemId)
 {
 	std::lock_guard<std::mutex> lock(_iMutex);
-	ItemDespawnPacket packet(itemId);
+	ItemPkt::DespawnPacket packet(itemId);
 	SessionManager::GetInst().Broadcast(&packet);
 	_worldItems.erase(
 		std::remove_if(_worldItems.begin(), _worldItems.end(),
