@@ -16,7 +16,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelChanged, int32, NewLevel);
 
 
 UCLASS()
-class GP2025_API AGPCharacterBase : public ACharacter ,public IGPAnimationAttackInterface
+class GP2025_API AGPCharacterBase : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -49,10 +49,6 @@ public :
 
 	TMap<ECharacterType, class UGPCharacterControlData*> CharacterTypeManager;
 	ECharacterType CurrentCharacterType;
-
-// Attack Hit Section
-protected :
-	virtual void AttackHitCheck() override;
 
 // UI Widget Section
 public:

@@ -167,11 +167,6 @@ void AGPCharacterPlayer::EquipWeaponFromData(const UGPCharacterControlData* Char
     }
 }
 
-void AGPCharacterPlayer::AttackHitCheck()
-{
-    Super::AttackHitCheck();
-}
-
 void AGPCharacterPlayer::EquipItemOnCharacter(FGPItemStruct& ItemData)
 {
     UE_LOG(LogTemp, Warning, TEXT("Equipped : %s"), *ItemData.ItemName.ToString());

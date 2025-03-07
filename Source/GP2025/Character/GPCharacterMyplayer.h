@@ -15,7 +15,7 @@
  */
 
 UCLASS()
-class GP2025_API AGPCharacterMyplayer : public AGPCharacterPlayer
+class GP2025_API AGPCharacterMyplayer : public AGPCharacterPlayer, public IGPAnimationAttackInterface
 {
 	GENERATED_BODY()
 
@@ -87,6 +87,10 @@ protected:
 
 	UPROPERTY()
 	UUserWidget* InventoryWidget;
+
+	// Attack Hit Section
+protected:
+	virtual void AttackHitCheck() override;
 
 	// 다른 뷰어 클라이언트들의 위치 동기화를 위해 위치를 계산하는 변수들
 public:

@@ -51,10 +51,6 @@ public:
 
 	void EquipWeaponFromData(const class UGPCharacterControlData* CharacterData);
 
-	// Attack Hit Section
-protected:
-	virtual void AttackHitCheck() override;
-
 public :
 	// Inventory Equip Item Change
 	UFUNCTION(BlueprintCallable, Category = "Item")
