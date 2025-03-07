@@ -67,8 +67,8 @@ namespace ItemPkt
 		EItem ItemType;
 		FVector Pos;
 
-		SpawnPacket(uint32 id, EItem type, FVector pos)
-			: Packet(EPacketType::S_ITEM_SPAWN), ItemID(id), ItemType(type), Pos(pos)
+		SpawnPacket(uint32 itemId, EItem type, FVector pos)
+			: Packet(EPacketType::S_ITEM_SPAWN), ItemID(itemId), ItemType(type), Pos(pos)
 		{
 			Header.PacketSize = sizeof(SpawnPacket);
 		}
@@ -77,8 +77,8 @@ namespace ItemPkt
 	struct DespawnPacket : public Packet
 	{
 		uint32 ItemID;
-		DespawnPacket(uint32 id)
-			: Packet(EPacketType::S_ITEM_DESPAWN), ItemID(id)
+		DespawnPacket(uint32 itemId)
+			: Packet(EPacketType::S_ITEM_DESPAWN), ItemID(itemId)
 		{
 			Header.PacketSize = sizeof(DespawnPacket);
 		}
@@ -87,8 +87,8 @@ namespace ItemPkt
 	struct PickUpPacket : public Packet
 	{
 		uint32 ItemID;
-		PickUpPacket(uint32 id)
-			: Packet(EPacketType::S_ITEM_PICKUP), ItemID(id)
+		PickUpPacket(uint32 itemId)
+			: Packet(EPacketType::S_ITEM_PICKUP), ItemID(itemId)
 		{
 			Header.PacketSize = sizeof(PickUpPacket);
 		}
@@ -100,8 +100,8 @@ namespace ItemPkt
 		EItem ItemType;
 		FVector Pos;
 
-		DropPacket(uint32 id, EItem type, FVector pos)
-			: Packet(EPacketType::S_ITEM_SPAWN), ItemID(id), ItemType(type), Pos(pos)
+		DropPacket(uint32 itemId, EItem type, FVector pos)
+			: Packet(EPacketType::S_ITEM_SPAWN), ItemID(itemId), ItemType(type), Pos(pos)
 		{
 			Header.PacketSize = sizeof(DropPacket);
 		}

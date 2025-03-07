@@ -17,7 +17,12 @@ public:
 	void HandleLogoutPacket(Session& session);
 	void HandleMovePacket(Session& session, BYTE* packet);
 	void HandleAttackPacket(Session& session, BYTE* packet);
+
 	void HandleTakeItemPacket(Session& session, BYTE* packet);
+	void HandleDropItemPacket(Session& session, BYTE* packet);
+	void HandleUseItemPacket(Session& session, BYTE* packet);
+	void HandleEquipItemPacket(Session& session, BYTE* packet);
+	void HandleUnequipItemPacket(Session& session, BYTE* packet);
 
 private:
 	SessionManager& _sessionMgr = SessionManager::GetInst();
