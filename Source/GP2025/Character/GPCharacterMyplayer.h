@@ -9,23 +9,13 @@
 #include "GPCharacterPlayer.h"
 #include "GPCharacterMyplayer.generated.h"
 
+
 /**
  *
  */
-DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, class UGPItemData*);
-
-USTRUCT(BlueprintType)
-struct FTakeItemDelegateWrapper
-{
-	GENERATED_BODY()
-	FTakeItemDelegateWrapper() {}
-	FTakeItemDelegateWrapper(const FOnTakeItemDelegate& InItemDelegate) : ItemDelegate(InItemDelegate) {}
-	FOnTakeItemDelegate ItemDelegate;
-};
-
 
 UCLASS()
-class GP2025_API AGPCharacterMyplayer : public AGPCharacterPlayer, public IGPCharacterItemInterface
+class GP2025_API AGPCharacterMyplayer : public AGPCharacterPlayer
 {
 	GENERATED_BODY()
 
@@ -109,22 +99,4 @@ public:
 	float GroundZLocation = 147.7;
 	bool isJumpStart = false;
 	bool bWasJumping = false;
-
-
-	// Item Section
-protected:
-	UPROPERTY()
-	TArray<FTakeItemDelegateWrapper> TakeItemActions;
-
-	virtual void TakeItem(class UGPItemData* InItemData) override;
-	virtual void DrinkPotion(class UGPItemData* InItemData);
-	virtual void EquipChest(class UGPItemData* InItemData);
-	virtual void EquipHelmet(class UGPItemData* InItemData);
-	virtual void AddExp(class UGPItemData* InItemData);
-
-	// Money Section
-public :
-	// Sprint Speed º¯¼ö
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Money")
-	int32 MoneyAmount;
 };

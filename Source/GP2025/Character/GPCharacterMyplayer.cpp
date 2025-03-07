@@ -10,18 +10,12 @@
 #include "GPCharacterControlData.h"
 #include "GPCharacterMonster.h"
 #include "InputMappingContext.h"
-#include "Item/GPEquipItemData.h"
 #include "Network/GPNetworkManager.h"
 #include "Blueprint/UserWidget.h"
 #include "Player/GPPlayerController.h"
 
 AGPCharacterMyplayer::AGPCharacterMyplayer()
 {
-	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterMyplayer::EquipHelmet)));
-	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterMyplayer::EquipChest)));
-	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterMyplayer::DrinkPotion)));
-	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterMyplayer::AddExp)));
-
 	// 카메라 세팅
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
@@ -366,49 +360,3 @@ void AGPCharacterMyplayer::ResetInventoryToggle()
 {
 	bInventoryToggled = false; 
 }
-
-
-// Item System
-/////////////////////////////////////////////////////////////
-
-void AGPCharacterMyplayer::TakeItem(UGPItemData* InItemData)
-{
-	if (InItemData)
-	{
-		TakeItemActions[(uint8)InItemData->Type].ItemDelegate.ExecuteIfBound(InItemData);
-	}
-}
-
-void AGPCharacterMyplayer::DrinkPotion(UGPItemData* InItemData)
-{
-	UE_LOG(LogGPCharacter, Log, TEXT("Drink Potion"));
-}
-
-void AGPCharacterMyplayer::EquipChest(UGPItemData* InItemData)
-{
-	UE_LOG(LogGPCharacter, Log, TEXT("Equip Chest"));
-	//UGPEquipItemData* ChestItemData = Cast<UGPEquipItemData>(InItemData);
-	//if (ChestItemData)
-	//{
-	//	Chest->SetLeaderPoseComponent(GetMesh());
-	//	Chest->SetSkeletalMesh(ChestItemData->EquipMesh);
-	//}
-}
-
-void AGPCharacterMyplayer::EquipHelmet(UGPItemData* InItemData)
-{
-	UE_LOG(LogGPCharacter, Log, TEXT("Equip Helmet"));
-	UGPEquipItemData* HelmetItemData = Cast<UGPEquipItemData>(InItemData);
-	if (HelmetItemData)
-	{
-		Helmet->SetSkeletalMesh(HelmetItemData->EquipMesh);
-		Helmet->SetLeaderPoseComponent(GetMesh());
-	}
-}
-
-void AGPCharacterMyplayer::AddExp(UGPItemData* InItemData)
-{
-	UE_LOG(LogGPCharacter, Log, TEXT("Add Exp"));
-}
-
-//////////////////////////////////////////////////////////////////////////////

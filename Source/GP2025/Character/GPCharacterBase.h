@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interface/GPAnimationAttackInterface.h"
-#include "Interface/GPCharacterItemInterface.h"
 #include "../../GP_Server/Source/Common/Common.h"
 #include "GPCharacterBase.generated.h"
 

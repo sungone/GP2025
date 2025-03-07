@@ -5,7 +5,6 @@
 #include "Components/CapsuleComponent.h"
 #include "Character/GPCharacterControlData.h"
 #include "Network/GPGameInstance.h"
-#include "Item/GPEquipItemData.h"
 #include "Item/GPItemStruct.h"
 #include "Weapons/GPWeaponBase.h"
 #include "Engine/SkeletalMeshSocket.h"

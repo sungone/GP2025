@@ -8,7 +8,6 @@
 #include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GPCharacterPlayer.h"
-#include "Item/GPEquipItemData.h"
 #include "Network/GPNetworkManager.h"
 #include "Physics/GPCollision.h"
 #include "UI/GPHpBarWidget.h"
