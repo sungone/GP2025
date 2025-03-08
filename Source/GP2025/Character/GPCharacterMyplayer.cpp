@@ -10,18 +10,13 @@
 #include "GPCharacterControlData.h"
 #include "GPCharacterMonster.h"
 #include "InputMappingContext.h"
-#include "Item/GPEquipItemData.h"
+#include "Physics/GPCollision.h"
 #include "Network/GPNetworkManager.h"
 #include "Blueprint/UserWidget.h"
 #include "Player/GPPlayerController.h"
 
 AGPCharacterMyplayer::AGPCharacterMyplayer()
 {
-	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterMyplayer::EquipHelmet)));
-	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterMyplayer::EquipChest)));
-	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterMyplayer::DrinkPotion)));
-	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AGPCharacterMyplayer::AddExp)));
-
 	// 카메라 세팅
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
@@ -367,48 +362,57 @@ void AGPCharacterMyplayer::ResetInventoryToggle()
 	bInventoryToggled = false; 
 }
 
-
-// Item System
-/////////////////////////////////////////////////////////////
-
-void AGPCharacterMyplayer::TakeItem(UGPItemData* InItemData)
+void AGPCharacterMyplayer::AttackHitCheck()
 {
-	if (InItemData)
+	//Todo: Myplayer만 사용하게 옮기자
+	if (!Cast<AGPCharacterMyplayer>(this)) return;
+
+	FHitResult OutHitResult;
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
+
+	const float AttackRange = CharacterInfo.AttackRange;
+	const float AttackRadius = CharacterInfo.AttackRadius;
+
+	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
+	const FVector End = Start + GetActorForwardVector() * AttackRange;
+
+	bool bHitDetected = GetWorld()->SweepSingleByChannel(
+		OutHitResult, Start, End, FQuat::Identity, CCHANNEL_GPACTION,
+		FCollisionShape::MakeSphere(AttackRadius), Params);
+
+	if (bHitDetected && IsValid(OutHitResult.GetActor()))
 	{
-		TakeItemActions[(uint8)InItemData->Type].ItemDelegate.ExecuteIfBound(InItemData);
+		AGPCharacterBase* TargetCharacter = Cast<AGPCharacterBase>(OutHitResult.GetActor());
+		if (IsValid(TargetCharacter))
+		{
+			const FInfoData& TargetInfo = TargetCharacter->CharacterInfo;
+
+			const FVector TargetLocation = TargetCharacter->GetActorLocation();
+			const float TargetCollisionRadius = TargetInfo.CollisionRadius;
+			const float TargetHalfHeight = TargetCollisionRadius;
+
+#if ENABLE_DRAW_DEBUG
+			DrawDebugCapsule(GetWorld(), TargetLocation, TargetHalfHeight, TargetCollisionRadius,
+				FQuat::Identity, FColor::Yellow, false, 5.f);
+#endif
+			auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+			if (NetworkMgr)
+			{
+				NetworkMgr->SendPlayerAttackPacket(TargetCharacter->CharacterInfo.ID);
+			}
+		}
 	}
-}
 
-void AGPCharacterMyplayer::DrinkPotion(UGPItemData* InItemData)
-{
-	UE_LOG(LogGPCharacter, Log, TEXT("Drink Potion"));
-}
-
-void AGPCharacterMyplayer::EquipChest(UGPItemData* InItemData)
-{
-	UE_LOG(LogGPCharacter, Log, TEXT("Equip Chest"));
-	//UGPEquipItemData* ChestItemData = Cast<UGPEquipItemData>(InItemData);
-	//if (ChestItemData)
-	//{
-	//	Chest->SetLeaderPoseComponent(GetMesh());
-	//	Chest->SetSkeletalMesh(ChestItemData->EquipMesh);
-	//}
-}
-
-void AGPCharacterMyplayer::EquipHelmet(UGPItemData* InItemData)
-{
-	UE_LOG(LogGPCharacter, Log, TEXT("Equip Helmet"));
-	UGPEquipItemData* HelmetItemData = Cast<UGPEquipItemData>(InItemData);
-	if (HelmetItemData)
+#if ENABLE_DRAW_DEBUG
+	const FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
+	const float CapsuleHalfHeight = AttackRange * 0.5f;
+	const FColor DrawColor = FColor::Red;
+	if (bHitDetected)
 	{
-		Helmet->SetSkeletalMesh(HelmetItemData->EquipMesh);
-		Helmet->SetLeaderPoseComponent(GetMesh());
+		DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius,
+			FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(),
+			DrawColor, false, 5.f);
 	}
+#endif
 }
 
-void AGPCharacterMyplayer::AddExp(UGPItemData* InItemData)
-{
-	UE_LOG(LogGPCharacter, Log, TEXT("Add Exp"));
-}
-
-//////////////////////////////////////////////////////////////////////////////

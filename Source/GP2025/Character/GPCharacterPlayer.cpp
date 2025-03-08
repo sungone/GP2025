@@ -5,7 +5,6 @@
 #include "Components/CapsuleComponent.h"
 #include "Character/GPCharacterControlData.h"
 #include "Network/GPGameInstance.h"
-#include "Item/GPEquipItemData.h"
 #include "Item/GPItemStruct.h"
 #include "Weapons/GPWeaponBase.h"
 #include "Engine/SkeletalMeshSocket.h"
@@ -166,11 +165,6 @@ void AGPCharacterPlayer::EquipWeaponFromData(const UGPCharacterControlData* Char
             WeaponActor->SetWeaponMesh(CharacterData->WeaponMesh);
         }
     }
-}
-
-void AGPCharacterPlayer::AttackHitCheck()
-{
-    Super::AttackHitCheck();
 }
 
 void AGPCharacterPlayer::EquipItemOnCharacter(FGPItemStruct& ItemData)

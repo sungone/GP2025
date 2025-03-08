@@ -9,23 +9,13 @@
 #include "GPCharacterPlayer.h"
 #include "GPCharacterMyplayer.generated.h"
 
+
 /**
  *
  */
-DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, class UGPItemData*);
-
-USTRUCT(BlueprintType)
-struct FTakeItemDelegateWrapper
-{
-	GENERATED_BODY()
-	FTakeItemDelegateWrapper() {}
-	FTakeItemDelegateWrapper(const FOnTakeItemDelegate& InItemDelegate) : ItemDelegate(InItemDelegate) {}
-	FOnTakeItemDelegate ItemDelegate;
-};
-
 
 UCLASS()
-class GP2025_API AGPCharacterMyplayer : public AGPCharacterPlayer, public IGPCharacterItemInterface
+class GP2025_API AGPCharacterMyplayer : public AGPCharacterPlayer, public IGPAnimationAttackInterface
 {
 	GENERATED_BODY()
 
@@ -98,6 +88,10 @@ protected:
 	UPROPERTY()
 	UUserWidget* InventoryWidget;
 
+	// Attack Hit Section
+protected:
+	virtual void AttackHitCheck() override;
+
 	// 다른 뷰어 클라이언트들의 위치 동기화를 위해 위치를 계산하는 변수들
 public:
 	FVector LastLocation;
@@ -109,22 +103,4 @@ public:
 	float GroundZLocation = 147.7;
 	bool isJumpStart = false;
 	bool bWasJumping = false;
-
-
-	// Item Section
-protected:
-	UPROPERTY()
-	TArray<FTakeItemDelegateWrapper> TakeItemActions;
-
-	virtual void TakeItem(class UGPItemData* InItemData) override;
-	virtual void DrinkPotion(class UGPItemData* InItemData);
-	virtual void EquipChest(class UGPItemData* InItemData);
-	virtual void EquipHelmet(class UGPItemData* InItemData);
-	virtual void AddExp(class UGPItemData* InItemData);
-
-	// Money Section
-public :
-	// Sprint Speed 변수
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Money")
-	int32 MoneyAmount;
 };
