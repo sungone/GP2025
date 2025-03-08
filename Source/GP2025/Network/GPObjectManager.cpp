@@ -208,6 +208,9 @@ void UGPObjectManager::DropItem(uint32 ItemID, uint8 ItemType, FVector Pos)
 
 void UGPObjectManager::AddInventoryItem(uint32 ItemID, uint8 ItemType)
 {
+	// 디버깅: 아이템 ID 및 타입 확인
+	UE_LOG(LogTemp, Warning, TEXT("AddInventoryItem - ItemID: %d | ItemType: %d"), ItemID, ItemType);
+
 	AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	if (!LocalMyPlayer)
 	{
@@ -228,8 +231,13 @@ void UGPObjectManager::AddInventoryItem(uint32 ItemID, uint8 ItemType)
 		return;
 	}
 
+	// 디버깅: 인벤토리 위젯에 추가 시도
+	UE_LOG(LogTemp, Warning, TEXT("Attempting to Add Item - ItemType: %d to Inventory"), ItemType);
+
 	LocalInventoryWidget->AddItemToInventory(ItemType, 1);
 
+	// 디버깅: 아이템 추가 성공 여부 확인
+	UE_LOG(LogTemp, Warning, TEXT("Item Successfully Added to Inventory!"));
 }
 
 void UGPObjectManager::RemoveInventoryItem(uint32 ItemID)

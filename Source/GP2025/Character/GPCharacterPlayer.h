@@ -55,4 +55,5 @@ public :
 	// Inventory Equip Item Change
 	UFUNCTION(BlueprintCallable, Category = "Item")
 	void EquipItemOnCharacter(struct FGPItemStruct& ItemData);
+
 };

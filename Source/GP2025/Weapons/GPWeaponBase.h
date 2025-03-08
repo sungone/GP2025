@@ -41,4 +41,7 @@ public:
 	UFUNCTION()
 	virtual void OnWeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	UStaticMeshComponent* GetWeaponMesh() const { return Cast<UStaticMeshComponent>(WeaponMesh); }
 };

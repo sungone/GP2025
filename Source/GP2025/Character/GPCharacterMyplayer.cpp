@@ -277,24 +277,29 @@ void AGPCharacterMyplayer::Jump()
 	isJumpStart = true;
 	CharacterInfo.RemoveState(STATE_IDLE);
 	CharacterInfo.AddState(STATE_JUMP);
+	SetupMasterPose();
+
 }
 
 void AGPCharacterMyplayer::StopJumping()
 {
 	Super::StopJumping();
 	CharacterInfo.RemoveState(STATE_JUMP);
+	SetupMasterPose();
 }
 
 void AGPCharacterMyplayer::StartSprinting()
 {
 	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
 	CharacterInfo.AddState(STATE_RUN);
+	SetupMasterPose();
 }
 
 void AGPCharacterMyplayer::StopSprinting()
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	CharacterInfo.RemoveState(STATE_RUN);
+	SetupMasterPose();
 }
 
 void AGPCharacterMyplayer::AutoAttack()
@@ -307,6 +312,7 @@ void AGPCharacterMyplayer::AutoAttack()
 	}
 
 	ProcessAutoAttackCommand();
+	SetupMasterPose();
 }
 
 void AGPCharacterMyplayer::ToggleInventory()

@@ -86,7 +86,23 @@ void AGPCharacterPlayer::SetupMasterPose()
         {
             LegMesh->SetMasterPoseComponent(BodyMesh);
         }
+
+        if (Helmet)
+        {
+            Helmet->AttachToComponent(BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("HelmetSocket"));
+            Helmet->SetMasterPoseComponent(BodyMesh);
+            UE_LOG(LogTemp, Warning, TEXT("MasterPose Applied to Helmet"));
+        }
+
+        if (WeaponActor && WeaponActor->GetWeaponMesh())
+        {
+            UStaticMeshComponent* WeaponMesh = WeaponActor->GetWeaponMesh();
+            WeaponMesh->AttachToComponent(BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
+            UE_LOG(LogTemp, Warning, TEXT("Weapon Attached to BodyMesh -> WeaponSocket"));
+        }
     }
+
+    UE_LOG(LogTemp, Log, TEXT("SetupMasterPose() Completed"));
 }
 
 void AGPCharacterPlayer::ApplyCharacterPartsFromData(const UGPCharacterControlData* CharacterData)
@@ -218,6 +234,9 @@ void AGPCharacterPlayer::EquipItemOnCharacter(FGPItemStruct& ItemData)
             BodyMesh->SetAnimInstanceClass(PreviousAnimBP);
         }
 
+        SetupMasterPose();
+
+
         if (HeadMesh)
         {
             HeadMesh->SetMasterPoseComponent(BodyMesh);
@@ -228,17 +247,30 @@ void AGPCharacterPlayer::EquipItemOnCharacter(FGPItemStruct& ItemData)
             LegMesh->SetMasterPoseComponent(BodyMesh);
         }
 
-
         if (Helmet)
         {
-            Helmet->AttachToComponent(HeadMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("HelmetSocket"));
-            Helmet->SetVisibility(true);
-            UE_LOG(LogTemp, Warning, TEXT("Helmet Re-Attached to New BodyMesh"));
+            Helmet->SetMasterPoseComponent(BodyMesh);
+
+            if (BodyMesh->DoesSocketExist(TEXT("HelmetSocket")))
+            {
+                Helmet->AttachToComponent(BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("HelmetSocket"));
+                Helmet->SetVisibility(true);
+                UE_LOG(LogTemp, Warning, TEXT("Helmet Re-Attached to New BodyMesh"));
+            }
+            else
+            {
+                UE_LOG(LogTemp, Error, TEXT("HelmetSocket does not exist on new BodyMesh!"));
+            }
         }
 
         if (WeaponActor)
         {
             WeaponActor->AttachToComponent(BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
+            UE_LOG(LogTemp, Warning, TEXT("Weapon successfully equipped on BodyMesh: %s"), *ItemData.ItemName.ToString());
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed to spawn WeaponActor! Check if WeaponClass is valid."));
         }
     }
 
