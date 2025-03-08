@@ -48,4 +48,9 @@ private:
     TMap<int32, AGPItem*> Items;
 
     UWorld* World;
+
+
+private :
+	UPROPERTY()
+	class UGPInventory* InventoryWidget;
 };

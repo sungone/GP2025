@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Item/GPItem.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -103,14 +100,26 @@ UDataTable* AGPItem::GetItemDataTable()
 	return DataTable;
 }
 
-void AGPItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AGPItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+	bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!OtherActor) return;
 
 	AGPCharacterPlayer* Player = Cast<AGPCharacterPlayer>(OtherActor);
 	if (!Player) return;
 
-	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-	NetworkMgr->SendPlayerTakeItem(ItemID);
-}
+	UE_LOG(LogTemp, Warning, TEXT("Item Overlap Detected! ItemID: %d | Player: %s"),
+		ItemID, *Player->GetName());
 
+	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+	if (NetworkMgr)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Sending PlayerTakeItem Packet for ItemID: %d"), ItemID);
+		NetworkMgr->SendPlayerTakeItem(ItemID);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Network Manager is NULL - Failed to Send Item Pickup Packet."));
+	}
+}

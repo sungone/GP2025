@@ -4,6 +4,8 @@
 #include "Item/GPItemStruct.h"
 #include "Item/GPItem.h"
 #include "UI/GPFloatingDamageText.h"
+#include "Character/GPCharacterMyplayer.h"
+#include "Inventory/GPInventory.h"
 #include "Kismet/GameplayStatics.h"
 
 void UGPObjectManager::Initialize(FSubsystemCollectionBase& Collection)
@@ -174,7 +176,7 @@ void UGPObjectManager::ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos)
 	if (!World)
 		return;
 
-	Pos.Z += 200.f;
+	Pos.Z += 100.f;
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -208,11 +210,30 @@ void UGPObjectManager::DropItem(uint32 ItemID, uint8 ItemType, FVector Pos)
 
 void UGPObjectManager::AddInventoryItem(uint8 ItemType, uint32 Quantity)
 {
-	//Todo: myplayer인벤토리 업데이트
+	AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (!LocalMyPlayer)
+	{
+		UE_LOG(LogTemp, Error, TEXT("No Player..."));
+		return;
+	}
+
+	if (!LocalMyPlayer->InventoryWidget)
+	{
+		UE_LOG(LogTemp, Error, TEXT("InventoryWidget not found!"));
+		return;
+	}
+
+	UGPInventory* LocalInventoryWidget = Cast<UGPInventory>(LocalMyPlayer->InventoryWidget);
+	if (!LocalInventoryWidget)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to Cast InventoryWidget to UGPInventory"));
+		return;
+	}
+
+	LocalInventoryWidget->AddItemToInventory(ItemType, Quantity);
 }
 
 void UGPObjectManager::RemoveInventoryItem(uint8 ItemType, uint32 Quantity)
 {
 	//Todo: myplayer인벤토리 업데이트
-
 }

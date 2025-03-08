@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Inventory/GPItemSlot.h"
 #include "Item/GPItemStruct.h"
+#include "../../GP_Server/Source/Common/Common.h"
 #include "GPInventory.generated.h"
 
 
@@ -18,9 +19,7 @@ class GP2025_API UGPInventory : public UUserWidget
 	GENERATED_BODY()
 	
 public :
-
-	//UFUNCTION(BlueprintCallable)
-	//void AddItemToInventory(EItem ItemType , uint32 Quantity);
+	void AddItemToInventory(uint8 ItemType , uint32 Quantity);
 
 	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "UI")
 	class UWidgetSwitcher* TabWidgetSwitcher;

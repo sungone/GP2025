@@ -13,6 +13,7 @@
 #include "Physics/GPCollision.h"
 #include "Network/GPNetworkManager.h"
 #include "Blueprint/UserWidget.h"
+#include "Inventory/GPInventory.h"
 #include "Player/GPPlayerController.h"
 
 AGPCharacterMyplayer::AGPCharacterMyplayer()

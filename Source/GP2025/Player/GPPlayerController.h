@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Network/GPObjectManager.h"
 #include "GPPlayerController.generated.h"
 
 /**
@@ -15,12 +16,5 @@ class GP2025_API AGPPlayerController : public APlayerController
 	GENERATED_BODY()
 	
 protected :
-	AGPPlayerController();
 	virtual void BeginPlay() override;
-
-	UPROPERTY(EditDefaultsOnly , Category = "UI")
-	TSubclassOf<UUserWidget> PlayerMainWidgetClass;
-
-	UPROPERTY()
-	UUserWidget* PlayerMainWidget;
 };

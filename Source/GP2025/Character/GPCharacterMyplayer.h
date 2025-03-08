@@ -81,6 +81,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
 	float SprintSpeed;
 
+public :
 	// Inventory Widget
 	UPROPERTY()
 	TSubclassOf<UUserWidget> InventoryWidgetClass;
