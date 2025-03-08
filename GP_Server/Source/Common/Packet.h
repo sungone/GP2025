@@ -109,11 +109,11 @@ namespace ItemPkt
 
 	struct AddInventoryPacket : public Packet
 	{
+		uint32 ItemID;
 		uint8 ItemType;
-		uint32 Quantity;
 
-		AddInventoryPacket(uint8 type, uint32 quantity)
-			: Packet(EPacketType::S_ADD_IVENTORY_ITEM), ItemType(type), Quantity(quantity)
+		AddInventoryPacket(uint32 itemId, uint8 type)
+			: Packet(EPacketType::S_ADD_IVENTORY_ITEM), ItemID(itemId),ItemType(type)
 		{
 			Header.PacketSize = sizeof(AddInventoryPacket);
 		}
@@ -121,11 +121,10 @@ namespace ItemPkt
 
 	struct RemoveInventoryPacket : public Packet
 	{
-		uint8 ItemType;
-		uint32 Quantity;
+		uint32 ItemID;
 
-		RemoveInventoryPacket(uint8 type, uint32 quantity)
-			: Packet(EPacketType::S_REMOVE_IVENTORY_ITEM), ItemType(type), Quantity(quantity)
+		RemoveInventoryPacket(uint32 itemId)
+			: Packet(EPacketType::S_REMOVE_IVENTORY_ITEM), ItemID(itemId)
 		{
 			Header.PacketSize = sizeof(RemoveInventoryPacket);
 		}

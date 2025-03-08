@@ -11,11 +11,12 @@ public:
 		return inst;
 	}
 	void Connect(SOCKET& socket);
-	void Disconnect(int32 id);
+	void Disconnect(int32 sessionId);
 
-	void DoRecv(int32 id);
-	void HandleRecvBuffer(int32 id, int32 recvByte, ExpOver* expOver);
-	void HandleLogin(int32 id);
+	void DoRecv(int32 sessionId);
+	void HandleRecvBuffer(int32 sessionId, int32 recvByte, ExpOver* expOver);
+	void HandleLogin(int32 sessionId);
+	void SendPacket(int32 sessionId, Packet* packet);
 	void Broadcast(Packet* packet, int32 exptId = -1);
 	std::array<std::shared_ptr<Session>, MAX_CLIENT>& GetSessions() { return _sessions; }
 private:

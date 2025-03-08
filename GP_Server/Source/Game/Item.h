@@ -1,6 +1,5 @@
 #pragma once
 
-//Todo: 일단 몬스터 죽으면 아이템 스폰되게 해보자
 struct ItemStats
 {
 	int damage;        // 공격력
@@ -30,24 +29,26 @@ struct ItemMeta
 class Item
 {
 public:
-	uint8 GetItemType() { return _itemType; }
+	Item() {};
+	Item(uint32 itemId, uint8 itemType) : _itemId(itemId), _itemType(itemType) {}
+	uint8 GetItemType() const { return _itemType; }
+	uint8 GetItemID() const { return _itemId; }
 protected:
+	uint32 _itemId;
 	uint8 _itemType;
 };
 
-//world에 스폰될 아이템(다른 플레이어도 보이는)과 인벤토리 아이템 구분함
-// -> world스폰 아이템은 id 통해 구분
-
-
-enum EItemCategory
+class InventoryItem : public Item
 {
-	Weapon,
-	Armor,
-	Useable,
-	Quest
+public:
+	InventoryItem() {};
+	InventoryItem(uint32 itemId, uint8 itemType) : Item(itemId, itemType) {}
+private:
+	ItemStats _stats;
+	ItemMeta _meta;
 };
 
-class WorldItem : Item
+class WorldItem : public Item
 {
 public:
 	WorldItem(FVector pos)
@@ -103,16 +104,12 @@ public:
 			);
 	}
 
-	uint32 GetItemId() { return _itemId; }
+	InventoryItem ToInventoryItem() const
+	{
+		InventoryItem invItem(_itemId, _itemType);
+		return invItem;
+	}
 
 private:
-	uint32 _itemId;
 	FVector _pos;
-};
-
-class InventoryItem :Item
-{
-public:
-	ItemStats _stats;
-	ItemMeta _meta;
 };

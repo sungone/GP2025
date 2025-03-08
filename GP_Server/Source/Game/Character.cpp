@@ -3,7 +3,6 @@
 
 void Character::Init()
 {
-	SetParkingGarageRandomLocation();
 	_info.InitStats(
 		100.f,    // MaxHp
 		20.f,     // Damage
@@ -48,13 +47,26 @@ void Character::SetBunkerRandomLocation()
 
 void Character::SetParkingGarageRandomLocation()
 {
-	static constexpr std::pair<float, float> BUNKER_X_RANGE = { -2500.0f, 9000.0f };
-	static constexpr std::pair<float, float> BUNKER_Y_RANGE = { -20000.0f, -10000.0f };
-	static constexpr float BUNKER_Z = 150.0f;
+	static constexpr std::pair<float, float> X_RANGE = { -2500.0f, 9000.0f };
+	static constexpr std::pair<float, float> Y_RANGE = { -20000.0f, -10000.0f };
+	static constexpr float TEST_Z = 150.0f;
 
 	_info.SetLocation(
-		RandomUtils::GetRandomFloat(BUNKER_X_RANGE.first, BUNKER_X_RANGE.second),
-		RandomUtils::GetRandomFloat(BUNKER_Y_RANGE.first, BUNKER_Y_RANGE.second),
-		BUNKER_Z
+		RandomUtils::GetRandomFloat(X_RANGE.first, X_RANGE.second),
+		RandomUtils::GetRandomFloat(Y_RANGE.first, Y_RANGE.second),
+		TEST_Z
+	);
+}
+
+void Character::SetTestRandomLocation()
+{
+	static constexpr std::pair<float, float> X_RANGE = { 0, 2000.0f };
+	static constexpr std::pair<float, float> Y_RANGE = { -15000.0f, -13000.0f };
+	static constexpr float TEST_Z = 150.0f;
+
+	_info.SetLocation(
+		RandomUtils::GetRandomFloat(X_RANGE.first, X_RANGE.second),
+		RandomUtils::GetRandomFloat(Y_RANGE.first, Y_RANGE.second),
+		TEST_Z
 	);
 }

@@ -3,22 +3,36 @@
 
 struct ItemSlot
 {
-    Item item;
-    uint32 quantity;
+    std::vector<InventoryItem> items;
 };
 
-class Inventory 
+class Inventory
 {
 public:
-    explicit Inventory(int maxSlots) : maxSlots(maxSlots)
+    bool AddInventoryItem(const InventoryItem& item)
     {
-        slots.resize(maxSlots);
+        int itemType = item.GetItemType();
+        _slots[itemType].items.emplace_back(std::move(item));
+        return true;
     }
 
-    bool AddInventoryItem(const Item& item) {};
-    bool RemoveInventoryItem(uint32 itemId, uint32 quantity) {};
+    bool RemoveInventoryItem(uint32 itemId)
+    {
+        for (auto& [itemType, slot] : _slots)
+        {
+            auto& items = slot.items;
+            for (auto it = items.begin(); it != items.end(); ++it)
+            {
+                if (it->GetItemID() == itemId)
+                {
+                    items.erase(it);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
 private:
-    int maxSlots;
-    std::vector<ItemSlot> slots;
+    std::unordered_map<int, ItemSlot> _slots;
 };

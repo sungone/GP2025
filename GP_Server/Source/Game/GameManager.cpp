@@ -86,7 +86,7 @@ void GameManager::ProcessAttack(int32 attackerID, int32 targetID)
 	SessionManager::GetInst().Broadcast(&pkt);
 	if (Target->IsDead())
 	{
-		SpawnItem(Target->GetInfo().Pos);
+		SpawnItem({ Target->GetInfo().Pos.X,Target->GetInfo().Pos.Y,Target->GetInfo().Pos.Z + 120 });
 		RemoveCharacter(targetID);
 	}
 }
@@ -145,17 +145,86 @@ void GameManager::SpawnItem(FVector position)
 	std::lock_guard<std::mutex> lock(_iMutex);
 	auto newItem = std::make_shared<WorldItem>(position);
 	_worldItems.emplace_back(newItem);
-	ItemPkt::SpawnPacket packet(newItem->GetItemId(), newItem->GetRandomItemType(), position);
+	ItemPkt::SpawnPacket packet(newItem->GetItemID(), newItem->GetRandomItemType(), position);
 	SessionManager::GetInst().Broadcast(&packet);
 }
 
-void GameManager::RemoveItem(uint32_t itemId)
+void GameManager::RemoveItemById(uint32 itemId)
 {
-	std::lock_guard<std::mutex> lock(_iMutex);
 	ItemPkt::DespawnPacket packet(itemId);
 	SessionManager::GetInst().Broadcast(&packet);
 	_worldItems.erase(
 		std::remove_if(_worldItems.begin(), _worldItems.end(),
-			[itemId](const std::shared_ptr<WorldItem>& item) { return item->GetItemId() == itemId; }),
+			[itemId](const std::shared_ptr<WorldItem>& item) { return item->GetItemID() == itemId; }),
 		_worldItems.end());
+}
+
+bool GameManager::RemoveItem(std::shared_ptr<WorldItem> item)
+{
+	if (!item) return false;
+
+	auto it = std::remove_if(_worldItems.begin(), _worldItems.end(),
+		[&item](const std::shared_ptr<WorldItem>& worldItem) {
+			return worldItem == item;
+		});
+
+	if (it != _worldItems.end())
+	{
+		_worldItems.erase(it, _worldItems.end());
+		return true;
+	}
+	return false;
+}
+
+
+std::shared_ptr<WorldItem> GameManager::FindItemById(uint32_t itemId)
+{
+	auto it = std::find_if(_worldItems.begin(), _worldItems.end(),
+		[itemId](const std::shared_ptr<WorldItem>& item) {
+			return item->GetItemID() == itemId;
+		});
+
+	if (it != _worldItems.end())
+	{
+		return *it;
+	}
+	return nullptr;
+}
+
+
+void GameManager::PickUpItem(int32 playerId, uint32 itemId)
+ {
+	std::lock_guard<std::mutex> lock(_iMutex);
+
+	if (playerId < 0 || playerId >= MAX_PLAYER || !_characters[playerId])
+	{
+		LOG(Warning, "Invalid");
+		return;
+	}
+
+	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	if (!player)
+	{
+		LOG(Warning, "Invalid");
+		return;
+	}
+
+	auto targetItem = FindItemById(itemId);
+	if (!targetItem)
+	{
+		LOG(Warning, "Invalid");
+		return;
+	}
+
+	auto invItem = targetItem->ToInventoryItem();
+	if (player->TakeItem(invItem))
+	{
+		RemoveItem(targetItem);
+		auto pkt = ItemPkt::AddInventoryPacket(invItem.GetItemID(), invItem.GetItemType());
+		SessionManager::GetInst().SendPacket(playerId, &pkt);
+	}
+	else
+	{
+		LOG(Warning, "Failed TakeItem");
+	}
 }

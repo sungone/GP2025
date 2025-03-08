@@ -15,7 +15,6 @@ constexpr BYTE PKT_SIZE_INDEX = 1;
 constexpr const char* SERVER_IP = "127.0.0.1";
 constexpr int16 SERVER_PORT = 4000;
 constexpr uint32 BUFSIZE = 1024;
-constexpr int MAX_INVENTORY_SLOT = 5;
 
 #include "Type.h"
 #include "DataStruct.h"

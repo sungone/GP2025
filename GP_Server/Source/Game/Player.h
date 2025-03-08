@@ -5,18 +5,19 @@
 class Player : public Character
 {
 public:
-	Player() : _inventory(MAX_INVENTORY_SLOT) {};
-	bool TakeItem(Item item)
+	virtual void Init() override;
+
+	bool TakeItem(const InventoryItem& item)
 	{
 		return _inventory.AddInventoryItem(item);
 	}
-	bool DropItem(uint32 itemId, uint32 quantity = 1)
+	bool DropItem(uint32 itemId)
 	{
-		return _inventory.RemoveInventoryItem(itemId, quantity);
+		return _inventory.RemoveInventoryItem(itemId);
 	};
-	void UseItem(Item item) {};
-	void EquipItem(Item item) {};
-	void UnequipItem(Item item) {};
+	void UseItem(InventoryItem item) {};
+	void EquipItem(InventoryItem item) {};
+	void UnequipItem(InventoryItem item) {};
 private:
 	Inventory _inventory;
 };

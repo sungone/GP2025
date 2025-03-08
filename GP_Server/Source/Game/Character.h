@@ -11,6 +11,8 @@ public:
 	float GetAttackDamage();
 	void SetBunkerRandomLocation();
 	void SetParkingGarageRandomLocation();
+	void SetTestRandomLocation();
+
 	FInfoData& GetInfo() { return _info; }
 	bool IsValid() const { return _info.ID != -1; }
 protected:
