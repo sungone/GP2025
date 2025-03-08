@@ -1,5 +1,4 @@
-   #pragma once
-
+#pragma once
 enum EPacketType : uint8
 {
 	C_LOGIN,
@@ -8,10 +7,10 @@ enum EPacketType : uint8
 	C_ATTACK,
 
 	C_TAKE_ITEM,
-	//C_DROP_ITEM,
-	//C_USE_ITEM,
-	//C_EQUIP_ITEM,
-	//C_UNEQUIP_ITEM,
+	C_DROP_ITEM,
+	C_USE_ITEM,
+	C_EQUIP_ITEM,
+	C_UNEQUIP_ITEM,
 
 	S_LOGIN_SUCCESS,
 
@@ -24,29 +23,34 @@ enum EPacketType : uint8
 	S_MONSTER_STATUS_UPDATE,
 	S_DAMAGED_MONSTER,
 
-	S_ITEM_SPAWN,
+	S_ITEM_SPAWN,//¸ó½ºÅÍ Á×À¸¸é µÕµÕ ¶ß°Ô ½ºÆù
 	S_ITEM_DESPAWN,
+	S_ITEM_PICKUP,// Todo : ÁÝ´Â ¾Ö´Ï¸ÞÀÌ¼Ç?
+	S_ITEM_DROP,//¶¥¹Ù´Ú¿¡ ½ºÆù
 
 	S_ADD_IVENTORY_ITEM,
 	S_REMOVE_IVENTORY_ITEM,
+	S_EQUIP_ITEM,
+	S_UNEQUIP_ITEM,
 };
 
 using ECharacterType = uint8;
-using EItem = uint8;
 
 namespace Type
 {
-	enum EPlayer : uint8
+	enum class EPlayer : uint8
 	{
-		WARRIOR,
+		START,
+		WARRIOR = START,
 		GUNNER,
 
-		P_END
+		END
 	};
 
-	enum EMonster : uint8
+	enum class EMonster : uint8
 	{
-		ENERGY_DRINK = P_END,
+		START = EPlayer::END,
+		ENERGY_DRINK = START,
 		BUBBLE_TEA,
 		COFFEE,
 
@@ -59,41 +63,48 @@ namespace Type
 		DRILL,
 
 		TINO,
-
-		M_END
+		END
 	};
 
-	enum ENpc : uint8
+	enum class ENpc : uint8
 	{
-		PROFESSOR = M_END,
+		START = EMonster::END,
+		PROFESSOR = START,
 		GUARD,
 		STUDENT,
+		END
 	};
 
 	enum class EWeapon : uint8
 	{
-		BIRD_GUN = 1,
+		START = 1,
+		BIRD_GUN = START,
 		PULSE_GUN,
 		POSITRON,
 		PRACS_WORD,
 		PULSE_SWORD,
 		ENERGY_SWORD,
+
+		END
 	};
 
 	enum class EArmor : uint8
 	{
-		ALLOY_HELMET = 10,
+		START = 10,
+		ALLOY_HELMET = START,
 		ENHANCED_HELMET,
 		TITANIUM_ARMOR,
 		POWERED_ARMOR,
 
 		SUIT,
 		TUCLOTHES,
+		END
 	};
 
 	enum class EUseable : uint8
 	{
-		HPKIT_LOW = 20,
+		START = 20,
+		HPKIT_LOW = START,
 		HPKIT_MID,
 		HPKIT_HIGH,
 
@@ -104,12 +115,15 @@ namespace Type
 		GOLD_SMALL,
 		GOLD_MEDIUM,
 		GOLD_LARGE,
+		END
 	};
 
-	enum class EQuestItem : uint8
+	enum EQuestItem : uint8
 	{
-		KEY = 50,
+		START = 50,
+		KEY = START,
 		DOCUMENT,
+		END
 	};
 }
 

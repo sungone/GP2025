@@ -22,6 +22,18 @@ void PacketManager::ProcessPacket(Session& session, BYTE* packet)
 	case EPacketType::C_TAKE_ITEM:
 		HandleTakeItemPacket(session, packet);
 		break;
+	case EPacketType::C_DROP_ITEM:
+		HandleDropItemPacket(session, packet);
+		break;
+	case EPacketType::C_USE_ITEM:
+		HandleUseItemPacket(session, packet);
+		break;
+	case EPacketType::C_EQUIP_ITEM:
+		HandleEquipItemPacket(session, packet);
+		break;
+	case EPacketType::C_UNEQUIP_ITEM:
+		HandleUnequipItemPacket(session, packet);
+		break;
 	default:
 		LOG(LogType::RecvLog, "Unknown Packet Type");
 	}
@@ -83,6 +95,37 @@ void PacketManager::HandleAttackPacket(Session& session, BYTE* packet)
 void PacketManager::HandleTakeItemPacket(Session& session, BYTE* packet)
 {
 	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
-	auto pkt1 = ItemDespawnPacket(p->Data);
+
+	//Todo: 아이템아이디로 아이템컨테이너에서 찾아 플레이어 인벤토리에 추가
+
+	auto pkt1 = ItemPkt::DespawnPacket(p->Data);
 	_sessionMgr.Broadcast(&pkt1);
+}
+
+void PacketManager::HandleDropItemPacket(Session& session, BYTE* packet)
+{
+	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
+	//Todo: 아이템아이디로 플레이어 인벤토리에서 꺼내서 월드에 스폰
+}
+
+void PacketManager::HandleUseItemPacket(Session& session, BYTE* packet)
+{
+	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
+	//Todo: 아이템아이디로 플레이어 인벤토리에서 찾아
+	// 타입(EUseable type)에 따른 값 스텟에 적용
+}
+
+void PacketManager::HandleEquipItemPacket(Session& session, BYTE* packet)
+{
+	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
+	//Todo: 다른플레이어에게 착용한 아이템타입 전송
+}
+
+void PacketManager::HandleUnequipItemPacket(Session& session, BYTE* packet)
+{
+	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
+	//Todo: 다른플레이어에게 착용한 아이템타입 전송
+	// -> 근데 착용 아이템 교체일텐데 unequip도 필요할까나..?
+	//  아무것도 착용 안할 때만 보내는 거로 해야하나
+
 }

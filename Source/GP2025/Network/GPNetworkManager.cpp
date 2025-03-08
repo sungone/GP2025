@@ -54,41 +54,66 @@ void UGPNetworkManager::SetMyPlayer(AGPCharacterPlayer* InMyPlayer)
 	ObjectMgr->SetMyPlayer(InMyPlayer);
 }
 
+void UGPNetworkManager::SendPacket(uint8* Buf, int32 Size)
+{
+	int32 BytesSent = 0;
+	Socket->Send(Buf, Size, BytesSent);
+}
+
 void UGPNetworkManager::SendPlayerLoginPacket()
 {
 	Packet Packet(EPacketType::C_LOGIN);
-	int32 BytesSent = 0;
-	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(Packet), BytesSent);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
 void UGPNetworkManager::SendPlayerLogoutPacket()
 {
 	IDPacket Packet(EPacketType::C_LOGOUT, MyPlayer->CharacterInfo.ID);
-	int32 BytesSent = 0;
-	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(IDPacket), BytesSent);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
 void UGPNetworkManager::SendPlayerMovePacket()
 {
 	InfoPacket Packet(EPacketType::C_MOVE, MyPlayer->CharacterInfo);
-	int32 BytesSent = 0;
 	UE_LOG(LogTemp, Warning, TEXT("SendPlayerMovePacket : Send [%d]"), Packet.Data.ID);
-	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(InfoPacket), BytesSent);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
 void UGPNetworkManager::SendPlayerAttackPacket(int32 TargetID)
 {
 	AttackPacket Packet(TargetID);
-	int32 BytesSent = 0;
 	UE_LOG(LogTemp, Warning, TEXT("SendPlayerAttackPacket : Send [%d]"), MyPlayer->CharacterInfo.ID);
-	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(AttackPacket), BytesSent);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
 void UGPNetworkManager::SendPlayerTakeItem(int32 ItemID)
 {
 	IDPacket Packet(EPacketType::C_TAKE_ITEM, ItemID);
-	int32 BytesSent = 0;
-	Socket->Send(reinterpret_cast<uint8*>(&Packet), sizeof(IDPacket), BytesSent);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendPlayerDropItem(int32 ItemID)
+{
+	IDPacket Packet(EPacketType::C_DROP_ITEM, ItemID);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendPlayerUseItem(int32 ItemID)
+{
+	IDPacket Packet(EPacketType::C_USE_ITEM, ItemID);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendPlayerEquipItem(int32 ItemID)
+{
+	IDPacket Packet(EPacketType::C_EQUIP_ITEM, ItemID);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendPlayerUnequipItem(int32 ItemID)
+{
+	IDPacket Packet(EPacketType::C_UNEQUIP_ITEM, ItemID);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
 void UGPNetworkManager::ReceiveData()
@@ -126,6 +151,7 @@ void UGPNetworkManager::ProcessPacket()
 
 			switch (PacketHeader->PacketType)
 			{
+#pragma region Player
 			case EPacketType::S_LOGIN_SUCCESS:
 			{
 				InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
@@ -150,6 +176,8 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->UpdatePlayer(Pkt->Data);
 				break;
 			}
+#pragma endregion
+#pragma region Monster
 			case EPacketType::S_ADD_MONSTER:
 			{
 				InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
@@ -174,30 +202,46 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->DamagedMonster(Pkt->Target, Pkt->Damage);
 				break;
 			}
+#pragma endregion
+#pragma region Item
 			case EPacketType::S_ITEM_SPAWN:
 			{
-				ItemSpawnPacket* Pkt = reinterpret_cast<ItemSpawnPacket*>(RemainingData.GetData());
+				ItemPkt::SpawnPacket* Pkt = reinterpret_cast<ItemPkt::SpawnPacket*>(RemainingData.GetData());
 				ObjectMgr->ItemSpawn(Pkt->ItemID, Pkt->ItemType, Pkt->Pos);
 				break;
 			}
 			case EPacketType::S_ITEM_DESPAWN:
 			{
-				ItemDespawnPacket* Pkt = reinterpret_cast<ItemDespawnPacket*>(RemainingData.GetData());
+				ItemPkt::DespawnPacket* Pkt = reinterpret_cast<ItemPkt::DespawnPacket*>(RemainingData.GetData());
 				ObjectMgr->ItemDespawn(Pkt->ItemID);
+				break;
+			}
+			case EPacketType::S_ITEM_PICKUP:
+			{
+				ItemPkt::PickUpPacket* Pkt = reinterpret_cast<ItemPkt::PickUpPacket*>(RemainingData.GetData());
+				//Todo: 추후 pick up이랑 despawn 구분하기
+				ObjectMgr->ItemDespawn(Pkt->ItemID);
+				break;
+			}
+			case EPacketType::S_ITEM_DROP:
+			{
+				ItemPkt::DropPacket* Pkt = reinterpret_cast<ItemPkt::DropPacket*>(RemainingData.GetData());
+				ObjectMgr->DropItem(Pkt->ItemID, Pkt->ItemType, Pkt->Pos);
 				break;
 			}
 			case EPacketType::S_ADD_IVENTORY_ITEM:
 			{
-				AddInventoryItemPacket* Pkt = reinterpret_cast<AddInventoryItemPacket*>(RemainingData.GetData());
+				ItemPkt::AddInventoryPacket* Pkt = reinterpret_cast<ItemPkt::AddInventoryPacket*>(RemainingData.GetData());
 				ObjectMgr->AddInventoryItem(Pkt->ItemType, Pkt->Quantity);
 				break;
 			}
 			case EPacketType::S_REMOVE_IVENTORY_ITEM:
 			{
-				RemoveInventoryItemPacket* Pkt = reinterpret_cast<RemoveInventoryItemPacket*>(RemainingData.GetData());
+				ItemPkt::RemoveInventoryPacket* Pkt = reinterpret_cast<ItemPkt::RemoveInventoryPacket*>(RemainingData.GetData());
 				ObjectMgr->RemoveInventoryItem(Pkt->ItemType, Pkt->Quantity);
 				break;
 			}
+#pragma endregion
 			default:
 				UE_LOG(LogTemp, Warning, TEXT("Unknown Packet Type received."));
 				break;

@@ -78,7 +78,7 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 	}
 
 	// 기본 캐릭터 타입을 전사 캐릭터로
-	CurrentCharacterType = Type::EPlayer::WARRIOR;
+	CurrentCharacterType = (uint8)Type::EPlayer::WARRIOR;
 }
 
 void AGPCharacterMyplayer::BeginPlay()
