@@ -26,7 +26,7 @@ AGPCharacterBase::AGPCharacterBase()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-	GetCapsuleComponent()->InitCapsuleSize(50.f, 130.f);
+	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.f);
 	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_GPCAPSULE);
 
 	auto* MovementComp = GetCharacterMovement();

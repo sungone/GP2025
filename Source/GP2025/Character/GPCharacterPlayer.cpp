@@ -218,24 +218,23 @@ void AGPCharacterPlayer::EquipItemOnCharacter(FGPItemStruct& ItemData)
             BodyMesh->SetAnimInstanceClass(PreviousAnimBP);
         }
 
-   
-        if (Helmet)
-        {
-            Helmet->AttachToComponent(BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("HelmetSocket"));
-            Helmet->SetMasterPoseComponent(BodyMesh);
-            UE_LOG(LogTemp, Warning, TEXT("Helmet Re-Attached to New BodyMesh"));
-        }
-
-
         if (HeadMesh)
         {
             HeadMesh->SetMasterPoseComponent(BodyMesh);
         }
+
         if (LegMesh)
         {
             LegMesh->SetMasterPoseComponent(BodyMesh);
         }
 
+
+        if (Helmet)
+        {
+            Helmet->AttachToComponent(HeadMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("HelmetSocket"));
+            Helmet->SetVisibility(true);
+            UE_LOG(LogTemp, Warning, TEXT("Helmet Re-Attached to New BodyMesh"));
+        }
 
         if (WeaponActor)
         {
