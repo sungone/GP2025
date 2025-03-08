@@ -35,6 +35,9 @@ public:
 	void DropItem(uint32 ItemID, uint8 ItemType, FVector Pos);
 	void AddInventoryItem(uint32 ItemID, uint8 ItemType);
 	void RemoveInventoryItem(uint32 ItemID);
+	void EquipItem(int32 PlayerID, uint8 ItemType);
+	void UnequipItem(int32 PlayerID, uint8 ItemType);
+
 private:
     UPROPERTY()
     TSubclassOf<AGPCharacterPlayer> OtherPlayerClass;

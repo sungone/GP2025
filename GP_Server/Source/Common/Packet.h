@@ -113,7 +113,7 @@ namespace ItemPkt
 		uint8 ItemType;
 
 		AddInventoryPacket(uint32 itemId, uint8 type)
-			: Packet(EPacketType::S_ADD_IVENTORY_ITEM), ItemID(itemId),ItemType(type)
+			: Packet(EPacketType::S_ADD_IVENTORY_ITEM), ItemID(itemId), ItemType(type)
 		{
 			Header.PacketSize = sizeof(AddInventoryPacket);
 		}
@@ -132,8 +132,10 @@ namespace ItemPkt
 
 	struct EquipItemPacket : public Packet
 	{
-		EquipItemPacket()
-			: Packet(EPacketType::S_EQUIP_ITEM)
+		int32 PlayerID;
+		uint8 ItemType;
+		EquipItemPacket(int32 playerId, uint8 type)
+			: Packet(EPacketType::S_EQUIP_ITEM), PlayerID(playerId), ItemType(type)
 		{
 			Header.PacketSize = sizeof(EquipItemPacket);
 		}
@@ -141,8 +143,10 @@ namespace ItemPkt
 
 	struct UnequipItemPacket : public Packet
 	{
-		UnequipItemPacket()
-			: Packet(EPacketType::S_UNEQUIP_ITEM)
+		int32 PlayerID;
+		uint8 ItemType;
+		UnequipItemPacket(int32 playerId, uint8 type)
+			: Packet(EPacketType::S_UNEQUIP_ITEM), PlayerID(playerId), ItemType(type)
 		{
 			Header.PacketSize = sizeof(UnequipItemPacket);
 		}

@@ -245,3 +245,13 @@ void UGPObjectManager::RemoveInventoryItem(uint32 ItemID)
 	//Todo: myplayer인벤토리 업데이트
 
 }
+
+void UGPObjectManager::EquipItem(int32 PlayerID, uint8 ItemType)
+{
+	//Todo: 다른 플레이어 착용 아이템 업데이트
+}
+
+void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType)
+{
+	//Todo: 다른 플레이어 착용 아이템 업데이트
+}

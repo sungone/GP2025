@@ -33,12 +33,16 @@ public:
 	void BroadcastMonsterStates();
 	void UpdateMonster();
 
-	void SpawnItem(FVector position);
-	void RemoveItemById(uint32 itemId);
-	bool RemoveItem(std::shared_ptr<WorldItem> item);
-	void FindItem(uint32 itemId);
-	std::shared_ptr<WorldItem> FindItemById(uint32_t itemId);
-	void PickUpItem(int32 playerId, uint32 itemId);
+	bool RemoveWorldItem(std::shared_ptr<WorldItem> item);
+	std::shared_ptr<WorldItem> FindWorldItemById(uint32 itemId);
+	void SpawnWorldItem(FVector position);
+	void SpawnWorldItem(WorldItem newItem);
+
+	void PickUpWorldItem(int32 playerId, uint32 itemId);
+	void DropInventoryItem(int32 playerId, uint32 itemId);
+	void UseInventoryItem(int32 playerId, uint32 itemId);
+	void EquipInventoryItem(int32 playerId, uint32 itemId);
+	void UnequipInventoryItem(int32 playerId, uint32 itemId);
 
 public:
 	Timer _MonsterStateBroadcastTimer;
