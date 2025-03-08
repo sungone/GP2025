@@ -60,7 +60,7 @@ void PacketManager::HandleLogoutPacket(Session& session)
 {
 	int32 id = session.GetId();
 	LOG(LogType::RecvLog, std::format("Logout PKT [{}]", id));
-	
+
 	auto pkt = IDPacket(EPacketType::S_REMOVE_PLAYER, id);
 	_sessionMgr.Broadcast(&pkt, id);
 	_sessionMgr.Disconnect(id);
@@ -96,8 +96,7 @@ void PacketManager::HandleTakeItemPacket(Session& session, BYTE* packet)
 {
 	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
 	auto itemid = p->Data;
-	//Todo: 아이템아이디로 아이템컨테이너에서 찾아 플레이어 인벤토리에 추가
-	_gameMgr.PickUpItem(session.GetId() , itemid);
+	_gameMgr.PickUpItem(session.GetId(), itemid);
 	auto pkt1 = ItemPkt::PickUpPacket(p->Data);
 	_sessionMgr.Broadcast(&pkt1);
 }
@@ -105,7 +104,13 @@ void PacketManager::HandleTakeItemPacket(Session& session, BYTE* packet)
 void PacketManager::HandleDropItemPacket(Session& session, BYTE* packet)
 {
 	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
-	//Todo: 아이템아이디로 플레이어 인벤토리에서 꺼내서 월드에 스폰
+	auto itemid = p->Data;
+	auto targetItem = _gameMgr.DropItem(session.GetId(), itemid);
+
+	FVector& playerPos = session.GetPlayerInfo().Pos;
+	FVector pos = { playerPos.X + 100, playerPos.Y,playerPos.Z };
+	auto pkt1 = ItemPkt::DropPacket(targetItem->GetItemID(), targetItem->GetItemType(),pos);
+	_sessionMgr.Broadcast(&pkt1);
 }
 
 void PacketManager::HandleUseItemPacket(Session& session, BYTE* packet)

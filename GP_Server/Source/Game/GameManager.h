@@ -39,6 +39,7 @@ public:
 	void FindItem(uint32 itemId);
 	std::shared_ptr<WorldItem> FindItemById(uint32_t itemId);
 	void PickUpItem(int32 playerId, uint32 itemId);
+	std::shared_ptr<WorldItem> DropItem(int32 playerId, uint32 itemId);
 
 public:
 	Timer _MonsterStateBroadcastTimer;
