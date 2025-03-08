@@ -86,8 +86,7 @@ void GameManager::ProcessAttack(int32 attackerID, int32 targetID)
 	SessionManager::GetInst().Broadcast(&pkt);
 	if (Target->IsDead())
 	{
-		EItem itemType = RandomUtils::GetRandomUint8((uint8)Type::EUseable::HPKIT_LOW, (uint8)Type::EUseable::GOLD_LARGE);
-		SpawnItem(targetID, itemType, Target->GetInfo().Pos);
+		SpawnItem(Target->GetInfo().Pos);
 		RemoveCharacter(targetID);
 	}
 }
@@ -141,11 +140,12 @@ void GameManager::UpdateMonster()
 		});
 }
 
-void GameManager::SpawnItem(uint32_t itemId, EItem itemType, FVector position)
+void GameManager::SpawnItem(FVector position)
 {
 	std::lock_guard<std::mutex> lock(_iMutex);
-	_worldItems.emplace_back(std::make_shared<WorldItem>(itemType, itemId, position));
-	ItemPkt::SpawnPacket packet(itemId, itemType, position);
+	auto newItem = std::make_shared<WorldItem>(position);
+	_worldItems.emplace_back(newItem);
+	ItemPkt::SpawnPacket packet(newItem->GetItemId(), newItem->GetRandomItemType(), position);
 	SessionManager::GetInst().Broadcast(&packet);
 }
 

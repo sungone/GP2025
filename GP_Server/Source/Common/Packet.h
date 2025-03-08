@@ -64,10 +64,10 @@ namespace ItemPkt
 	struct SpawnPacket : public Packet
 	{
 		uint32 ItemID;
-		EItem ItemType;
+		uint8 ItemType;
 		FVector Pos;
 
-		SpawnPacket(uint32 itemId, EItem type, FVector pos)
+		SpawnPacket(uint32 itemId, uint8 type, FVector pos)
 			: Packet(EPacketType::S_ITEM_SPAWN), ItemID(itemId), ItemType(type), Pos(pos)
 		{
 			Header.PacketSize = sizeof(SpawnPacket);
@@ -97,10 +97,10 @@ namespace ItemPkt
 	struct DropPacket : public Packet
 	{
 		uint32 ItemID;
-		EItem ItemType;
+		uint8 ItemType;
 		FVector Pos;
 
-		DropPacket(uint32 itemId, EItem type, FVector pos)
+		DropPacket(uint32 itemId, uint8 type, FVector pos)
 			: Packet(EPacketType::S_ITEM_SPAWN), ItemID(itemId), ItemType(type), Pos(pos)
 		{
 			Header.PacketSize = sizeof(DropPacket);
@@ -109,10 +109,10 @@ namespace ItemPkt
 
 	struct AddInventoryPacket : public Packet
 	{
-		EItem ItemType;
+		uint8 ItemType;
 		uint32 Quantity;
 
-		AddInventoryPacket(EItem type, uint32 quantity)
+		AddInventoryPacket(uint8 type, uint32 quantity)
 			: Packet(EPacketType::S_ADD_IVENTORY_ITEM), ItemType(type), Quantity(quantity)
 		{
 			Header.PacketSize = sizeof(AddInventoryPacket);
@@ -121,10 +121,10 @@ namespace ItemPkt
 
 	struct RemoveInventoryPacket : public Packet
 	{
-		EItem ItemType;
+		uint8 ItemType;
 		uint32 Quantity;
 
-		RemoveInventoryPacket(EItem type, uint32 quantity)
+		RemoveInventoryPacket(uint8 type, uint32 quantity)
 			: Packet(EPacketType::S_REMOVE_IVENTORY_ITEM), ItemType(type), Quantity(quantity)
 		{
 			Header.PacketSize = sizeof(RemoveInventoryPacket);

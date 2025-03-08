@@ -33,7 +33,7 @@ public:
 	void BroadcastMonsterStates();
 	void UpdateMonster();
 
-	void SpawnItem(uint32_t itemId, EItem itemType, FVector position);
+	void SpawnItem(FVector position);
 	void RemoveItem(uint32_t itemId);
 
 public:
