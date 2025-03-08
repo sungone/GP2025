@@ -86,7 +86,7 @@ void GameManager::ProcessAttack(int32 attackerID, int32 targetID)
 	SessionManager::GetInst().Broadcast(&pkt);
 	if (Target->IsDead())
 	{
-		SpawnItem({ Target->GetInfo().Pos.X,Target->GetInfo().Pos.Y,Target->GetInfo().Pos.Z + 120 });
+		SpawnWorldItem({ Target->GetInfo().Pos.X,Target->GetInfo().Pos.Y,Target->GetInfo().Pos.Z + 120 });
 		RemoveCharacter(targetID);
 	}
 }
@@ -140,26 +140,7 @@ void GameManager::UpdateMonster()
 		});
 }
 
-void GameManager::SpawnItem(FVector position)
-{
-	std::lock_guard<std::mutex> lock(_iMutex);
-	auto newItem = std::make_shared<WorldItem>(position);
-	_worldItems.emplace_back(newItem);
-	ItemPkt::SpawnPacket packet(newItem->GetItemID(), newItem->GetRandomItemType(), position);
-	SessionManager::GetInst().Broadcast(&packet);
-}
-
-void GameManager::RemoveItemById(uint32 itemId)
-{
-	ItemPkt::DespawnPacket packet(itemId);
-	SessionManager::GetInst().Broadcast(&packet);
-	_worldItems.erase(
-		std::remove_if(_worldItems.begin(), _worldItems.end(),
-			[itemId](const std::shared_ptr<WorldItem>& item) { return item->GetItemID() == itemId; }),
-		_worldItems.end());
-}
-
-bool GameManager::RemoveItem(std::shared_ptr<WorldItem> item)
+bool GameManager::RemoveWorldItem(std::shared_ptr<WorldItem> item)
 {
 	if (!item) return false;
 
@@ -176,8 +157,7 @@ bool GameManager::RemoveItem(std::shared_ptr<WorldItem> item)
 	return false;
 }
 
-
-std::shared_ptr<WorldItem> GameManager::FindItemById(uint32_t itemId)
+std::shared_ptr<WorldItem> GameManager::FindWorldItemById(uint32 itemId)
 {
 	auto it = std::find_if(_worldItems.begin(), _worldItems.end(),
 		[itemId](const std::shared_ptr<WorldItem>& item) {
@@ -191,9 +171,26 @@ std::shared_ptr<WorldItem> GameManager::FindItemById(uint32_t itemId)
 	return nullptr;
 }
 
+void GameManager::SpawnWorldItem(FVector position)
+{
+	std::lock_guard<std::mutex> lock(_iMutex);
+	auto newItem = std::make_shared<WorldItem>(position);
+	_worldItems.emplace_back(newItem);
+	ItemPkt::SpawnPacket packet(newItem->GetItemID(), newItem->GetRandomItemType(), position);
+	SessionManager::GetInst().Broadcast(&packet);
+}
 
-void GameManager::PickUpItem(int32 playerId, uint32 itemId)
- {
+void GameManager::SpawnWorldItem(WorldItem dropedItem)
+{
+	std::lock_guard<std::mutex> lock(_iMutex);
+	auto newItem = std::make_shared<WorldItem>(dropedItem);
+	_worldItems.emplace_back(newItem);
+	ItemPkt::DropPacket packet(newItem->GetItemID(), newItem->GetRandomItemType(), newItem->GetPos());
+	SessionManager::GetInst().Broadcast(&packet);
+}
+
+void GameManager::PickUpWorldItem(int32 playerId, uint32 itemId)
+{
 	std::lock_guard<std::mutex> lock(_iMutex);
 
 	if (playerId < 0 || playerId >= MAX_PLAYER || !_characters[playerId])
@@ -209,22 +206,73 @@ void GameManager::PickUpItem(int32 playerId, uint32 itemId)
 		return;
 	}
 
-	auto targetItem = FindItemById(itemId);
+	auto targetItem = FindWorldItemById(itemId);
 	if (!targetItem)
 	{
 		LOG(Warning, "Invalid");
 		return;
 	}
 
-	auto invItem = targetItem->ToInventoryItem();
-	if (player->TakeItem(invItem))
+	if (player->TakeWorldItem(targetItem))
 	{
-		RemoveItem(targetItem);
-		auto pkt = ItemPkt::AddInventoryPacket(invItem.GetItemID(), invItem.GetItemType());
+		RemoveWorldItem(targetItem);
+		auto pkt = ItemPkt::AddInventoryPacket(targetItem->GetItemID(), targetItem->GetItemType());
 		SessionManager::GetInst().SendPacket(playerId, &pkt);
+		auto pkt1 = ItemPkt::PickUpPacket(itemId);
+		SessionManager::GetInst().Broadcast(&pkt1);
 	}
 	else
 	{
 		LOG(Warning, "Failed TakeItem");
 	}
+}
+
+void GameManager::DropInventoryItem(int32 playerId, uint32 itemId)
+{
+	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	if (!player)
+	{
+		LOG(Warning, "Invalid");
+		return;
+	}
+
+	WorldItem dropedItem = player->DropItem(itemId);
+	SpawnWorldItem(dropedItem);
+}
+
+void GameManager::UseInventoryItem(int32 playerId, uint32 itemId)
+{
+	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	if (!player)
+	{
+		LOG(Warning, "Invalid");
+		return;
+	}
+	player->UseItem(itemId);
+}
+
+void GameManager::EquipInventoryItem(int32 playerId, uint32 itemId)
+{
+	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	if (!player)
+	{
+		LOG(Warning, "Invalid");
+		return;
+	}
+	uint8 itemType = player->EquipItem(itemId);
+	auto pkt1 = ItemPkt::EquipItemPacket(playerId, itemType);
+	SessionManager::GetInst().Broadcast(&pkt1);
+}
+
+void GameManager::UnequipInventoryItem(int32 playerId, uint32 itemId)
+{
+	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	if (!player)
+	{
+		LOG(Warning, "Invalid");
+		return;
+	}
+	uint8 itemType = player->UnequipItem(itemId);
+	auto pkt1 = ItemPkt::UnequipItemPacket(playerId, itemType);
+	SessionManager::GetInst().Broadcast(&pkt1);
 }

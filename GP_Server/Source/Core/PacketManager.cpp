@@ -96,41 +96,33 @@ void PacketManager::HandleTakeItemPacket(Session& session, BYTE* packet)
 {
 	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
 	auto itemid = p->Data;
-	_gameMgr.PickUpItem(session.GetId(), itemid);
-	auto pkt1 = ItemPkt::PickUpPacket(p->Data);
-	_sessionMgr.Broadcast(&pkt1);
+	_gameMgr.PickUpWorldItem(session.GetId(), itemid);
 }
 
 void PacketManager::HandleDropItemPacket(Session& session, BYTE* packet)
 {
 	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
 	auto itemid = p->Data;
-	auto targetItem = _gameMgr.DropItem(session.GetId(), itemid);
-
-	FVector& playerPos = session.GetPlayerInfo().Pos;
-	FVector pos = { playerPos.X + 100, playerPos.Y,playerPos.Z };
-	auto pkt1 = ItemPkt::DropPacket(targetItem->GetItemID(), targetItem->GetItemType(),pos);
-	_sessionMgr.Broadcast(&pkt1);
+	_gameMgr.DropInventoryItem(session.GetId(), itemid);
 }
 
 void PacketManager::HandleUseItemPacket(Session& session, BYTE* packet)
 {
 	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
-	//Todo: 아이템아이디로 플레이어 인벤토리에서 찾아
-	// 타입(EUseable type)에 따른 값 스텟에 적용
+	auto itemid = p->Data;
+	_gameMgr.UseInventoryItem(session.GetId(), itemid);
 }
 
 void PacketManager::HandleEquipItemPacket(Session& session, BYTE* packet)
 {
 	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
-	//Todo: 다른플레이어에게 착용한 아이템타입 전송
+	auto itemid = p->Data;
+	_gameMgr.EquipInventoryItem(session.GetId(), itemid);
 }
 
 void PacketManager::HandleUnequipItemPacket(Session& session, BYTE* packet)
 {
 	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
-	//Todo: 다른플레이어에게 착용한 아이템타입 전송
-	// -> 근데 착용 아이템 교체일텐데 unequip도 필요할까나..?
-	//  아무것도 착용 안할 때만 보내는 거로 해야하나
-
+	auto itemid = p->Data;
+	_gameMgr.UnequipInventoryItem(session.GetId(), itemid);
 }

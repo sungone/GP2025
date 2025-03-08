@@ -127,6 +127,7 @@
     <ClInclude Include="Source\IOCP\IOCP.h">
       <Filter>Source Files\Network\IOCP</Filter>
     </ClInclude>
+    <ClInclude Include="worldItem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Core\Session.cpp">
