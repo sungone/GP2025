@@ -2,16 +2,11 @@
 #include "Monster.h"
 #include "SessionManager.h"
 #include "GameManager.h"
-#include <random>
-static std::random_device rd;
-static std::mt19937 gen(rd());
 
 void Monster::Init()
 {
 	Character::Init();
-	static std::uniform_int_distribution<int> randomType(Type::EMonster::ENERGY_DRINK, Type::EMonster::TINO);
-
-	_info.CharacterType = static_cast<ECharacterType>(randomType(gen));
+	_info.CharacterType = RandomUtils::GetRandomUint8((uint8)Type::EMonster::ENERGY_DRINK, (uint8)Type::EMonster::TINO);
 	_info.Stats.Level = _info.CharacterType;
 }
 
@@ -75,16 +70,14 @@ void Monster::ChangeState(ECharacterStateType newState)
 bool Monster::ShouldAttack()
 {
 	//Todo: 공격 범위 안에 플레이어 있는지
-	static std::uniform_int_distribution<int> dist(0, 1);
-	return (dist(gen) == 0);
+	return RandomUtils::Chance(50);
 }
 
 bool Monster::ShouldWalking()
 {
 	std::lock_guard<std::mutex> lock(_cMutex);
-	static std::uniform_int_distribution<int> dist(0, 2);
 
-	if (dist(gen) == 0)
+	if (RandomUtils::Chance(50))
 	{
 		FVector newPos = GenerateRandomNearbyPosition();
 
@@ -96,8 +89,7 @@ bool Monster::ShouldWalking()
 
 FVector Monster::GenerateRandomNearbyPosition()
 {
-	static std::uniform_real_distribution<float> distX(-1000.0f, 1000.0f);
-	static std::uniform_real_distribution<float> distY(-1000.0f, 1000.0f);
-
-	return _info.Pos + FVector(distX(gen), distY(gen), 0);
+	auto distX = RandomUtils::GetRandomFloat(-1000.0f, 1000.0f);
+	auto distY = RandomUtils::GetRandomFloat(-1000.0f, 1000.0f);
+	return _info.Pos + FVector(distX, distY, 0);
 }

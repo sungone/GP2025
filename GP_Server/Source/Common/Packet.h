@@ -59,51 +59,94 @@ struct DamagePacket : public Packet
 	}
 };
 
-struct ItemSpawnPacket : public Packet
+namespace ItemPkt
 {
-	uint32 ItemID;
-	EItem ItemType;
-	FVector Pos;
-
-	ItemSpawnPacket(uint32 id, EItem type, FVector pos)
-		: Packet(EPacketType::S_ITEM_SPAWN), ItemID(id), ItemType(type), Pos(pos)
+	struct SpawnPacket : public Packet
 	{
-		Header.PacketSize = sizeof(ItemSpawnPacket);
-	}
-};
+		uint32 ItemID;
+		uint8 ItemType;
+		FVector Pos;
 
-struct ItemDespawnPacket : public Packet
-{
-	uint32 ItemID;
-	ItemDespawnPacket(uint32 id)
-		: Packet(EPacketType::S_ITEM_DESPAWN), ItemID(id)
+		SpawnPacket(uint32 itemId, uint8 type, FVector pos)
+			: Packet(EPacketType::S_ITEM_SPAWN), ItemID(itemId), ItemType(type), Pos(pos)
+		{
+			Header.PacketSize = sizeof(SpawnPacket);
+		}
+	};
+
+	struct DespawnPacket : public Packet
 	{
-		Header.PacketSize = sizeof(ItemDespawnPacket);
-	}
-};
+		uint32 ItemID;
+		DespawnPacket(uint32 itemId)
+			: Packet(EPacketType::S_ITEM_DESPAWN), ItemID(itemId)
+		{
+			Header.PacketSize = sizeof(DespawnPacket);
+		}
+	};
 
-struct AddInventoryItemPacket : public Packet
-{
-	EItem ItemType;
-	uint32 Quantity;
-
-	AddInventoryItemPacket(EItem type, uint32 quantity)
-		: Packet(EPacketType::S_ADD_IVENTORY_ITEM), ItemType(type), Quantity(quantity)
+	struct PickUpPacket : public Packet
 	{
-		Header.PacketSize = sizeof(AddInventoryItemPacket);
-	}
-};
+		uint32 ItemID;
+		PickUpPacket(uint32 itemId)
+			: Packet(EPacketType::S_ITEM_PICKUP), ItemID(itemId)
+		{
+			Header.PacketSize = sizeof(PickUpPacket);
+		}
+	};
 
-struct RemoveInventoryItemPacket : public Packet
-{
-	EItem ItemType;
-	uint32 Quantity;
-
-	RemoveInventoryItemPacket(EItem type, uint32 quantity)
-		: Packet(EPacketType::S_REMOVE_IVENTORY_ITEM), ItemType(type), Quantity(quantity)
+	struct DropPacket : public Packet
 	{
-		Header.PacketSize = sizeof(RemoveInventoryItemPacket);
-	}
-};
+		uint32 ItemID;
+		uint8 ItemType;
+		FVector Pos;
 
+		DropPacket(uint32 itemId, uint8 type, FVector pos)
+			: Packet(EPacketType::S_ITEM_SPAWN), ItemID(itemId), ItemType(type), Pos(pos)
+		{
+			Header.PacketSize = sizeof(DropPacket);
+		}
+	};
+
+	struct AddInventoryPacket : public Packet
+	{
+		uint8 ItemType;
+		uint32 Quantity;
+
+		AddInventoryPacket(uint8 type, uint32 quantity)
+			: Packet(EPacketType::S_ADD_IVENTORY_ITEM), ItemType(type), Quantity(quantity)
+		{
+			Header.PacketSize = sizeof(AddInventoryPacket);
+		}
+	};
+
+	struct RemoveInventoryPacket : public Packet
+	{
+		uint8 ItemType;
+		uint32 Quantity;
+
+		RemoveInventoryPacket(uint8 type, uint32 quantity)
+			: Packet(EPacketType::S_REMOVE_IVENTORY_ITEM), ItemType(type), Quantity(quantity)
+		{
+			Header.PacketSize = sizeof(RemoveInventoryPacket);
+		}
+	};
+
+	struct EquipItemPacket : public Packet
+	{
+		EquipItemPacket()
+			: Packet(EPacketType::S_EQUIP_ITEM)
+		{
+			Header.PacketSize = sizeof(EquipItemPacket);
+		}
+	};
+
+	struct UnequipItemPacket : public Packet
+	{
+		UnequipItemPacket()
+			: Packet(EPacketType::S_UNEQUIP_ITEM)
+		{
+			Header.PacketSize = sizeof(UnequipItemPacket);
+		}
+	};
+}// namespace Item
 #pragma pack(pop)

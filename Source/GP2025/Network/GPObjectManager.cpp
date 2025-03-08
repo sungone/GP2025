@@ -151,7 +151,7 @@ void UGPObjectManager::DamagedMonster(FInfoData& MonsterInfo, float Damage)
 	}
 }
 
-void UGPObjectManager::ItemSpawn(uint32 ItemID, EItem ItemType, FVector Pos)
+void UGPObjectManager::ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos)
 {
 	UE_LOG(LogTemp, Warning, TEXT("ItemSpawn [%d]"), ItemID);
 
@@ -201,12 +201,17 @@ void UGPObjectManager::ItemDespawn(uint32 ItemID)
 	}
 }
 
-void UGPObjectManager::AddInventoryItem(EItem ItemType, uint32 Quantity)
+void UGPObjectManager::DropItem(uint32 ItemID, uint8 ItemType, FVector Pos)
+{
+	//Todo : ItemSpawn()과 비슷하지만 둥둥 뜨지 않고 땅바닥에 스폰하도록 
+}
+
+void UGPObjectManager::AddInventoryItem(uint8 ItemType, uint32 Quantity)
 {
 	//Todo: myplayer인벤토리 업데이트
 }
 
-void UGPObjectManager::RemoveInventoryItem(EItem ItemType, uint32 Quantity)
+void UGPObjectManager::RemoveInventoryItem(uint8 ItemType, uint32 Quantity)
 {
 	//Todo: myplayer인벤토리 업데이트
 
