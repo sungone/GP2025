@@ -3,8 +3,8 @@
 #include "Character/GPCharacterMonster.h"
 #include "Item/GPItemStruct.h"
 #include "Item/GPItem.h"
-#include "UI/GPFloatingDamageText.h"
 #include "Character/GPCharacterMyplayer.h"
+#include "UI/GPFloatingDamageText.h"
 #include "Inventory/GPInventory.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -176,8 +176,6 @@ void UGPObjectManager::ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos)
 	if (!World)
 		return;
 
-	Pos.Z += 100.f;
-
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	AGPItem* SpawnedItem = World->SpawnActor<AGPItem>(AGPItem::StaticClass(), Pos, FRotator::ZeroRotator, SpawnParams);
@@ -208,7 +206,7 @@ void UGPObjectManager::DropItem(uint32 ItemID, uint8 ItemType, FVector Pos)
 	//Todo : ItemSpawn()과 비슷하지만 둥둥 뜨지 않고 땅바닥에 스폰하도록 
 }
 
-void UGPObjectManager::AddInventoryItem(uint8 ItemType, uint32 Quantity)
+void UGPObjectManager::AddInventoryItem(uint32 ItemID, uint8 ItemType)
 {
 	AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	if (!LocalMyPlayer)
@@ -230,10 +228,12 @@ void UGPObjectManager::AddInventoryItem(uint8 ItemType, uint32 Quantity)
 		return;
 	}
 
-	LocalInventoryWidget->AddItemToInventory(ItemType, Quantity);
+	LocalInventoryWidget->AddItemToInventory(ItemType, 1);
+
 }
 
-void UGPObjectManager::RemoveInventoryItem(uint8 ItemType, uint32 Quantity)
+void UGPObjectManager::RemoveInventoryItem(uint32 ItemID)
 {
 	//Todo: myplayer인벤토리 업데이트
+
 }
