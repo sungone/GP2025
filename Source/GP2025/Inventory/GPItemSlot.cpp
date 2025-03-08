@@ -65,3 +65,4 @@ void UGPItemSlot::EquipItem()
         UE_LOG(LogTemp, Warning, TEXT("can't equip item"));
     }
 }
+
