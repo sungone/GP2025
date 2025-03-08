@@ -34,16 +34,20 @@ public:
 	void UpdateMonster();
 
 	void SpawnItem(FVector position);
-	void RemoveItem(uint32_t itemId);
+	void RemoveItemById(uint32 itemId);
+	bool RemoveItem(std::shared_ptr<WorldItem> item);
+	void FindItem(uint32 itemId);
+	std::shared_ptr<WorldItem> FindItemById(uint32_t itemId);
+	void PickUpItem(int32 playerId, uint32 itemId);
 
 public:
 	Timer _MonsterStateBroadcastTimer;
 	Timer _MonsterAIUpdateTimer;
-	std::mutex _carrMutex;
 
 private:
 	std::array<std::shared_ptr<Character>, MAX_CHARACTER> _characters;
 	std::vector<std::shared_ptr<WorldItem>> _worldItems;
+	std::mutex _carrMutex;
 	std::mutex _iMutex;
 };
 

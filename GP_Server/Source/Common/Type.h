@@ -127,6 +127,14 @@ namespace Type
 	};
 }
 
+enum EItemCategory
+{
+	Weapon,
+	Armor,
+	Useable,
+	Quest
+};
+
 enum ECharacterStateType : uint8
 {
 	STATE_NONE = 0, // 2^0

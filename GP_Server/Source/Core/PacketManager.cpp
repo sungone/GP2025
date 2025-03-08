@@ -95,10 +95,10 @@ void PacketManager::HandleAttackPacket(Session& session, BYTE* packet)
 void PacketManager::HandleTakeItemPacket(Session& session, BYTE* packet)
 {
 	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
-
+	auto itemid = p->Data;
 	//Todo: 아이템아이디로 아이템컨테이너에서 찾아 플레이어 인벤토리에 추가
-
-	auto pkt1 = ItemPkt::DespawnPacket(p->Data);
+	_gameMgr.PickUpItem(session.GetId() , itemid);
+	auto pkt1 = ItemPkt::PickUpPacket(p->Data);
 	_sessionMgr.Broadcast(&pkt1);
 }
 

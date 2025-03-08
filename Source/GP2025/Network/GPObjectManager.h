@@ -33,8 +33,8 @@ public:
 	void ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos);
 	void ItemDespawn(uint32 ItemID);
 	void DropItem(uint32 ItemID, uint8 ItemType, FVector Pos);
-	void AddInventoryItem(uint8 ItemType, uint32 Quantity);
-	void RemoveInventoryItem(uint8 ItemType, uint32 Quantity);
+	void AddInventoryItem(uint32 ItemID, uint8 ItemType);
+	void RemoveInventoryItem(uint32 ItemID);
 private:
     UPROPERTY()
     TSubclassOf<AGPCharacterPlayer> OtherPlayerClass;

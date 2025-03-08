@@ -232,13 +232,13 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_ADD_IVENTORY_ITEM:
 			{
 				ItemPkt::AddInventoryPacket* Pkt = reinterpret_cast<ItemPkt::AddInventoryPacket*>(RemainingData.GetData());
-				ObjectMgr->AddInventoryItem(Pkt->ItemType, Pkt->Quantity);
+				ObjectMgr->AddInventoryItem(Pkt->ItemID,Pkt->ItemType);
 				break;
 			}
 			case EPacketType::S_REMOVE_IVENTORY_ITEM:
 			{
 				ItemPkt::RemoveInventoryPacket* Pkt = reinterpret_cast<ItemPkt::RemoveInventoryPacket*>(RemainingData.GetData());
-				ObjectMgr->RemoveInventoryItem(Pkt->ItemType, Pkt->Quantity);
+				ObjectMgr->RemoveInventoryItem(Pkt->ItemID);
 				break;
 			}
 #pragma endregion

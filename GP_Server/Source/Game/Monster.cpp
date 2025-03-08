@@ -6,6 +6,7 @@
 void Monster::Init()
 {
 	Character::Init();
+	SetParkingGarageRandomLocation();
 	_info.CharacterType = RandomUtils::GetRandomUint8((uint8)Type::EMonster::ENERGY_DRINK, (uint8)Type::EMonster::TINO);
 	_info.Stats.Level = _info.CharacterType;
 }

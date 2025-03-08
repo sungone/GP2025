@@ -45,6 +45,12 @@ void SessionManager::HandleLogin(int32 id)
 	}
 }
 
+void SessionManager::SendPacket(int32 sessionId, Packet* packet)
+{
+	std::lock_guard<std::mutex> lock(_smgrMutex);
+	_sessions[sessionId]->DoSend(packet);
+}
+
 void SessionManager::Broadcast(Packet* packet, int32 exptId)
 {
 	std::lock_guard<std::mutex> lock(_smgrMutex);
