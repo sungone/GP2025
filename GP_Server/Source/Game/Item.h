@@ -32,7 +32,7 @@ public:
 	Item() {};
 	Item(uint32 itemId, uint8 itemType) : _itemId(itemId), _itemType(itemType) {}
 	uint8 GetItemType() const { return _itemType; }
-	uint8 GetItemID() const { return _itemId; }
+	uint32 GetItemID() const { return _itemId; }
 protected:
 	uint32 _itemId;
 	uint8 _itemType;
