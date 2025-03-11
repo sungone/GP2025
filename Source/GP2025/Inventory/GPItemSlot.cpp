@@ -3,14 +3,16 @@
 
 #include "Inventory/GPItemSlot.h"
 #include "Character/GPCharacterPlayer.h"
+#include "Inventory/GPInventory.h"
 #include "Kismet/GameplayStatics.h"
 
 void UGPItemSlot::NativeConstruct()
 {
     Super::NativeConstruct();
-
     CurrentItem = GetItemData();
 }
+
+
 
 FGPItemStruct& UGPItemSlot::GetItemData()
 {

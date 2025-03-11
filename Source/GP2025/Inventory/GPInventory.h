@@ -19,7 +19,10 @@ class GP2025_API UGPInventory : public UUserWidget
 	GENERATED_BODY()
 	
 public :
+	virtual void NativeConstruct() override;
+
 	void AddItemToInventory(uint8 ItemType , uint32 Quantity);
+	void RemoveItemFromInventory(uint8 ItemType);
 
 	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "UI")
 	class UWidgetSwitcher* TabWidgetSwitcher;
@@ -38,4 +41,13 @@ public :
 
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UGPItemSlot> SlotClass;
+
+	UPROPERTY()
+	TArray<UGPItemSlot*> WeaponSlots;
+
+	UPROPERTY()
+	TArray<UGPItemSlot*> ArmorSlots;
+
+	UPROPERTY()
+	TArray<UGPItemSlot*> EatableSlots;
 };

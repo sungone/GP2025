@@ -20,8 +20,8 @@ class GP2025_API UGPItemSlot : public UUserWidget
 public:
     virtual void NativeConstruct() override;
 
-    /** 현재 슬롯이 나타내는 아이템 정보 */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+    // Expose on Spawn 매개변수 추가
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item", meta = (ExposeOnSpawn = "true"))
     FSlotStruct SlotData;
 
     /** 현재 슬롯의 아이템 데이터를 가져오는 함수 */
@@ -33,6 +33,4 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
     FGPItemStruct CurrentItem;
-
-
 };
