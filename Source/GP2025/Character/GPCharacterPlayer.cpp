@@ -78,6 +78,7 @@ void AGPCharacterPlayer::SetupMasterPose()
 {
     if (BodyMesh)
     {
+
         if (HeadMesh)
         {
             HeadMesh->SetMasterPoseComponent(BodyMesh);
