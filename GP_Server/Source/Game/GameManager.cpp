@@ -19,6 +19,7 @@ void GameManager::AddPlayer(std::shared_ptr<Character> player)
 
 void GameManager::RemoveCharacter(int32 id)
 {
+	LOG(Log, std::format("Remove Character"));
 	if (id < 0 || id >= MAX_CHARACTER || !_characters[id])
 	{
 		LOG(Warning, "Invalid");
@@ -27,13 +28,11 @@ void GameManager::RemoveCharacter(int32 id)
 
 	if (id < MAX_PLAYER)
 	{
-		LOG(Log, std::format("Remove Player"));
 		auto Pkt = InfoPacket(EPacketType::S_REMOVE_PLAYER, _characters[id]->GetInfo());
 		SessionManager::GetInst().Broadcast(&Pkt);
 	}
 	else
 	{
-		LOG(Log, std::format("Remove Monster"));
 		auto Pkt = InfoPacket(EPacketType::S_REMOVE_MONSTER, _characters[id]->GetInfo());
 		SessionManager::GetInst().Broadcast(&Pkt);
 	}
@@ -79,11 +78,7 @@ void GameManager::ProcessAttack(int32 attackerID, int32 targetID)
 	if (!CollisionUtils::CanAttack(Attacker->GetInfo(), Target->GetInfo()))
 		return;
 
-#ifdef _DEBUG
-	float atkDamage = 50;
-#else
 	float atkDamage = Attacker->GetAttackDamage();
-#endif // TEST
 	if (atkDamage > 0.0f)
 		Target->OnDamaged(atkDamage);
 
@@ -180,8 +175,8 @@ void GameManager::SpawnWorldItem(FVector position)
 {
 	std::lock_guard<std::mutex> lock(_iMutex);
 	auto newItem = std::make_shared<WorldItem>(position);
-	ItemPkt::SpawnPacket packet(newItem->GetItemID(), newItem->GetItemType(), position);
 	_worldItems.emplace_back(newItem);
+	ItemPkt::SpawnPacket packet(newItem->GetItemID(), newItem->GetRandomItemType(), position);
 	SessionManager::GetInst().Broadcast(&packet);
 }
 
@@ -190,7 +185,7 @@ void GameManager::SpawnWorldItem(WorldItem dropedItem)
 	std::lock_guard<std::mutex> lock(_iMutex);
 	auto newItem = std::make_shared<WorldItem>(dropedItem);
 	_worldItems.emplace_back(newItem);
-	ItemPkt::DropPacket packet(newItem->GetItemID(), newItem->GetItemType(), newItem->GetPos());
+	ItemPkt::DropPacket packet(newItem->GetItemID(), newItem->GetRandomItemType(), newItem->GetPos());
 	SessionManager::GetInst().Broadcast(&packet);
 }
 

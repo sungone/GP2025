@@ -37,30 +37,6 @@ void Session::DoSend(Packet* packet)
 	case S_DAMAGED_MONSTER:
 		LOG(LogType::SendLog, std::format("DamagedMonster PKT to [{}]", _id));
 		break;
-	case S_ITEM_SPAWN:
-		LOG(LogType::SendLog, std::format("ItemSpawn PKT to [{}]", _id));
-		break;
-	case S_ITEM_DESPAWN:
-		LOG(LogType::SendLog, std::format("ItemDespawn PKT to [{}]", _id));
-		break;
-	case S_ITEM_PICKUP:
-		LOG(LogType::SendLog, std::format("ItemPickUp PKT to [{}]", _id));
-		break;
-	case S_ITEM_DROP:
-		LOG(LogType::SendLog, std::format("ItemDrop PKT to [{}]", _id));
-		break;
-	case S_ADD_IVENTORY_ITEM:
-		LOG(LogType::SendLog, std::format("AddInventory PKT to [{}]", _id));
-		break;
-	case S_REMOVE_IVENTORY_ITEM:
-		LOG(LogType::SendLog, std::format("RemoveInventory PKT to [{}]", _id));
-		break;
-	case S_EQUIP_ITEM:
-		LOG(LogType::SendLog, std::format("EquipItem PKT to [{}]", _id));
-		break;
-	case S_UNEQUIP_ITEM:
-		LOG(LogType::SendLog, std::format("UnequipItem PKT to [{}]", _id));
-		break;
 	default:
 		LOG(LogType::SendLog, "Unknown Packet Type");
 		break;
