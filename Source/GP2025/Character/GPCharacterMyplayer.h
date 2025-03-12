@@ -86,7 +86,7 @@ public :
 	UPROPERTY()
 	TSubclassOf<UUserWidget> InventoryWidgetClass;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	UUserWidget* InventoryWidget;
 
 	// Attack Hit Section
