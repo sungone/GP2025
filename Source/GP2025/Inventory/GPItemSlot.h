@@ -38,7 +38,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
     FGPItemStruct CurrentItem;
 
-    UPROPERTY()
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
     UGPInventory* InventoryWidget;
 
     void InitializeInventoryWidget();
