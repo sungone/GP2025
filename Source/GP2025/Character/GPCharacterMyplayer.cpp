@@ -369,9 +369,16 @@ void AGPCharacterMyplayer::ResetInventoryToggle()
 	bInventoryToggled = false; 
 }
 
-UUserWidget* AGPCharacterMyplayer::GetInventoryWidget()
+UGPInventory* AGPCharacterMyplayer::GetInventoryWidget()
 {
-	return InventoryWidget;
+	UGPInventory* CastInventory = Cast<UGPInventory>(InventoryWidget);
+	if (!CastInventory)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to cast InventoryWidget to UGPInventory"));
+		return nullptr;
+	}
+
+	return CastInventory;
 }
 
 void AGPCharacterMyplayer::AttackHitCheck()

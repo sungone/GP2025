@@ -8,9 +8,9 @@
 #include "Item/GPItemStruct.h"
 #include "GPItemSlot.generated.h"
 
-class UUserWidget;
-class AGPCharacterMyplayer;
 
+class UGPInventory;
+class AGPCharacterMyplayer;
 
 /**
  * 
@@ -32,15 +32,14 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Item")
     FGPItemStruct& GetItemData();
 
-    UFUNCTION(BlueprintCallable, Category = "Item")
-    void EquipItem();
+    //UFUNCTION(BlueprintCallable, Category = "Item")
+    //void EquipItem();
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
     FGPItemStruct CurrentItem;
 
-
     UPROPERTY()
-    UUserWidget* InventoryWidget;
+    UGPInventory* InventoryWidget;
 
     void InitializeInventoryWidget();
 };

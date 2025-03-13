@@ -89,8 +89,8 @@ public :
 	UPROPERTY()
 	UUserWidget* InventoryWidget;
 
-	UFUNCTION()
-	UUserWidget* GetInventoryWidget();
+	UFUNCTION()                      
+	UGPInventory* GetInventoryWidget();
 
 	// Attack Hit Section
 protected:
