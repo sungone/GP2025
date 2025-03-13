@@ -89,6 +89,9 @@ public :
 	UPROPERTY()
 	UUserWidget* InventoryWidget;
 
+	UFUNCTION()
+	UUserWidget* GetInventoryWidget();
+
 	// Attack Hit Section
 protected:
 	virtual void AttackHitCheck() override;

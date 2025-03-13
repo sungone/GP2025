@@ -8,6 +8,10 @@
 #include "Item/GPItemStruct.h"
 #include "GPItemSlot.generated.h"
 
+class UUserWidget;
+class AGPCharacterMyplayer;
+
+
 /**
  * 
  */
@@ -33,4 +37,10 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
     FGPItemStruct CurrentItem;
+
+
+    UPROPERTY()
+    UUserWidget* InventoryWidget;
+
+    void InitializeInventoryWidget();
 };

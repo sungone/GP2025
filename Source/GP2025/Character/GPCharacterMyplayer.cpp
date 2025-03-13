@@ -369,6 +369,11 @@ void AGPCharacterMyplayer::ResetInventoryToggle()
 	bInventoryToggled = false; 
 }
 
+UUserWidget* AGPCharacterMyplayer::GetInventoryWidget()
+{
+	return InventoryWidget;
+}
+
 void AGPCharacterMyplayer::AttackHitCheck()
 {
 	//Todo: Myplayer만 사용하게 옮기자

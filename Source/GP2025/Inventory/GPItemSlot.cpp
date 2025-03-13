@@ -2,13 +2,14 @@
 
 
 #include "Inventory/GPItemSlot.h"
-#include "Character/GPCharacterPlayer.h"
+#include "Character/GPCharacterMyPlayer.h"
 #include "Inventory/GPInventory.h"
 #include "Kismet/GameplayStatics.h"
 
 void UGPItemSlot::NativeConstruct()
 {
     Super::NativeConstruct();
+    InitializeInventoryWidget();
     CurrentItem = GetItemData();
 }
 
@@ -65,6 +66,31 @@ void UGPItemSlot::EquipItem()
     else
     {
         UE_LOG(LogTemp, Warning, TEXT("can't equip item"));
+    }
+}
+
+void UGPItemSlot::InitializeInventoryWidget()
+{
+    // 플레이어 찾기
+    APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+    if (!PlayerController) return;
+
+    AGPCharacterMyplayer* Player = Cast<AGPCharacterMyplayer>(PlayerController->GetPawn());
+    if (!Player)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to Cast to GPCharacterMyPlayer in GPItemSlot"));
+        return;
+    }
+
+    // InventoryWidget 참조
+    InventoryWidget = Player->GetInventoryWidget();
+    if (InventoryWidget)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Successfully Referenced InventoryWidget in GPItemSlot"));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to Reference InventoryWidget in GPItemSlot"));
     }
 }
 
