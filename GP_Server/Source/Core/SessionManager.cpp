@@ -8,7 +8,7 @@ void SessionManager::Connect(SOCKET& socket)
 	int32 _id = GenerateId();
 	if (_id != -1) {
 		_sessions[_id] = std::make_shared<Session>();
-		_sessions[_id]->Connect(socket,_id);
+		_sessions[_id]->Connect(socket, _id);
 		_iocp.RegisterSocket(socket, _id);
 		_sessions[_id]->DoRecv();
 	}
@@ -30,11 +30,18 @@ void SessionManager::DoRecv(int32 id)
 
 void SessionManager::HandleRecvBuffer(int32 id, int32 recvByte, ExpOver* expOver)
 {
-	_sessions[id]->HandleRecvBuffer(recvByte,expOver);
+	_sessions[id]->HandleRecvBuffer(recvByte, expOver);
 }
 
 void SessionManager::HandleLogin(int32 id)
 {
+	_sessions[id]->Login();
+	auto& playerInfo = _sessions[id]->GetPlayerInfo();
+	auto loginPkt = InfoPacket(EPacketType::S_LOGIN_SUCCESS, playerInfo);
+	_sessions[id]->DoSend(&loginPkt);
+	auto myInfoPkt = InfoPacket(EPacketType::S_ADD_PLAYER, playerInfo);
+	Broadcast(&myInfoPkt, id);
+
 	for (auto& cl : _sessions)
 	{
 		if (cl == nullptr) continue;
@@ -47,7 +54,6 @@ void SessionManager::HandleLogin(int32 id)
 
 void SessionManager::SendPacket(int32 sessionId, Packet* packet)
 {
-	std::lock_guard<std::mutex> lock(_smgrMutex);
 	_sessions[sessionId]->DoSend(packet);
 }
 

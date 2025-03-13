@@ -35,14 +35,14 @@ void SessionSocket::Close()
 	closesocket(_socket);
 }
 
-void SessionSocket::HandleRecvBuffer(Session& session, int32 recvByte, ExpOver* expOver)
+void SessionSocket::HandleRecvBuffer(int32 id, int32 recvByte, ExpOver* expOver)
 {
 	int32 dataSize = recvByte + _remain;
 	BYTE* packet = reinterpret_cast<BYTE*>(expOver->_buf);
 	while (dataSize > 0) {
 		int32 packetSize = packet[PKT_SIZE_INDEX];
 		if (packetSize <= dataSize) {
-			PacketManager::GetInst().ProcessPacket(session, packet);
+			PacketManager::GetInst().ProcessPacket(id, packet);
 			packet = packet + packetSize;
 			dataSize = dataSize - packetSize;
 		}

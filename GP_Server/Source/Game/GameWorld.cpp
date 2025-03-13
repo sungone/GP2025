@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "GameManager.h"
+#include "GameWorld.h"
 
-bool GameManager::Init()
+bool GameWorld::Init()
 {
 	CreateMonster();
 	StartMonsterStateBroadcast();
@@ -9,7 +9,7 @@ bool GameManager::Init()
 	return true;
 }
 
-void GameManager::AddPlayer(std::shared_ptr<Character> player)
+void GameWorld::AddPlayer(std::shared_ptr<Character> player)
 {
 	std::unique_lock<std::mutex> lock(_carrMutex);
 	int32 id = player->GetInfo().ID;
@@ -17,7 +17,7 @@ void GameManager::AddPlayer(std::shared_ptr<Character> player)
 
 }
 
-void GameManager::RemoveCharacter(int32 id)
+void GameWorld::RemoveCharacter(int32 id)
 {
 	if (id < 0 || id >= MAX_CHARACTER || !_characters[id])
 	{
@@ -41,7 +41,7 @@ void GameManager::RemoveCharacter(int32 id)
 	_characters[id] = nullptr;
 }
 
-void GameManager::CreateMonster()
+void GameWorld::CreateMonster()
 {
 	for (int32 i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{
@@ -51,7 +51,7 @@ void GameManager::CreateMonster()
 	}
 }
 
-void GameManager::SpawnMonster(Session& session)
+void GameWorld::SpawnMonster(Session& session)
 {
 	std::lock_guard<std::mutex> lock(_carrMutex);
 
@@ -65,18 +65,30 @@ void GameManager::SpawnMonster(Session& session)
 	}
 }
 
-void GameManager::ProcessAttack(int32 attackerID, int32 targetID)
+void GameWorld::PlayerMove(int32 playerId, FInfoData& info)
+{
+	_characters[playerId]->SetInfo(info);
+	auto pkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, info);
+	SessionManager::GetInst().Broadcast(&pkt, playerId);
+}
+
+void GameWorld::PlayerAttack(int32 attackerID, int32 targetID)
 {
 	std::unique_lock<std::mutex> lock(_carrMutex);
+	auto& Attacker = _characters[attackerID];
+	auto& atkInfo = Attacker->GetInfo();
+	atkInfo.AddState(ECharacterStateType::STATE_AUTOATTACK);
+	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, atkInfo);
+	SessionManager::GetInst().Broadcast(&infopkt);
+
 	if (targetID == -1)
 		return;
 
 	LOG(Log, std::format("Attacked monster[{}]", targetID));
 
-	auto& Attacker = _characters[attackerID];
 	std::shared_ptr<Monster> Target = static_pointer_cast<Monster>(_characters[targetID]);
 
-	if (!CollisionUtils::CanAttack(Attacker->GetInfo(), Target->GetInfo()))
+	if (!CollisionUtils::CanAttack(atkInfo, Target->GetInfo()))
 		return;
 
 #ifdef _DEBUG
@@ -96,7 +108,7 @@ void GameManager::ProcessAttack(int32 attackerID, int32 targetID)
 	}
 }
 
-std::shared_ptr<Character> GameManager::GetCharacterByID(int32 id)
+std::shared_ptr<Character> GameWorld::GetCharacterByID(int32 id)
 {
 	std::lock_guard<std::mutex> lock(_carrMutex);
 
@@ -108,14 +120,14 @@ std::shared_ptr<Character> GameManager::GetCharacterByID(int32 id)
 	return _characters[id];
 }
 
-void GameManager::StartMonsterStateBroadcast()
+void GameWorld::StartMonsterStateBroadcast()
 {
 	_MonsterStateBroadcastTimer.Start(3000, [this]() {
 		BroadcastMonsterStates();
 		});
 }
 
-void GameManager::BroadcastMonsterStates()
+void GameWorld::BroadcastMonsterStates()
 {
 	std::lock_guard<std::mutex> lock(_carrMutex);
 	LOG(SendLog, std::format("Broadcast monster"));
@@ -132,7 +144,7 @@ void GameManager::BroadcastMonsterStates()
 	}
 }
 
-void GameManager::UpdateMonster()
+void GameWorld::UpdateMonster()
 {
 	_MonsterAIUpdateTimer.Start(4000, [this]() {
 		std::unique_lock<std::mutex> lock(_carrMutex);
@@ -145,7 +157,7 @@ void GameManager::UpdateMonster()
 		});
 }
 
-bool GameManager::RemoveWorldItem(std::shared_ptr<WorldItem> item)
+bool GameWorld::RemoveWorldItem(std::shared_ptr<WorldItem> item)
 {
 	if (!item) return false;
 
@@ -162,7 +174,7 @@ bool GameManager::RemoveWorldItem(std::shared_ptr<WorldItem> item)
 	return false;
 }
 
-std::shared_ptr<WorldItem> GameManager::FindWorldItemById(uint32 itemId)
+std::shared_ptr<WorldItem> GameWorld::FindWorldItemById(uint32 itemId)
 {
 	auto it = std::find_if(_worldItems.begin(), _worldItems.end(),
 		[itemId](const std::shared_ptr<WorldItem>& item) {
@@ -176,7 +188,7 @@ std::shared_ptr<WorldItem> GameManager::FindWorldItemById(uint32 itemId)
 	return nullptr;
 }
 
-void GameManager::SpawnWorldItem(FVector position)
+void GameWorld::SpawnWorldItem(FVector position)
 {
 	std::lock_guard<std::mutex> lock(_iMutex);
 	auto newItem = std::make_shared<WorldItem>(position);
@@ -185,7 +197,7 @@ void GameManager::SpawnWorldItem(FVector position)
 	SessionManager::GetInst().Broadcast(&packet);
 }
 
-void GameManager::SpawnWorldItem(WorldItem dropedItem)
+void GameWorld::SpawnWorldItem(WorldItem dropedItem)
 {
 	std::lock_guard<std::mutex> lock(_iMutex);
 	auto newItem = std::make_shared<WorldItem>(dropedItem);
@@ -194,7 +206,7 @@ void GameManager::SpawnWorldItem(WorldItem dropedItem)
 	SessionManager::GetInst().Broadcast(&packet);
 }
 
-void GameManager::PickUpWorldItem(int32 playerId, uint32 itemId)
+void GameWorld::PickUpWorldItem(int32 playerId, uint32 itemId)
 {
 	std::lock_guard<std::mutex> lock(_iMutex);
 
@@ -232,7 +244,7 @@ void GameManager::PickUpWorldItem(int32 playerId, uint32 itemId)
 	}
 }
 
-void GameManager::DropInventoryItem(int32 playerId, uint32 itemId)
+void GameWorld::DropInventoryItem(int32 playerId, uint32 itemId)
 {
 	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
 	if (!player)
@@ -245,7 +257,7 @@ void GameManager::DropInventoryItem(int32 playerId, uint32 itemId)
 	SpawnWorldItem(dropedItem);
 }
 
-void GameManager::UseInventoryItem(int32 playerId, uint32 itemId)
+void GameWorld::UseInventoryItem(int32 playerId, uint32 itemId)
 {
 	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
 	if (!player)
@@ -256,7 +268,7 @@ void GameManager::UseInventoryItem(int32 playerId, uint32 itemId)
 	player->UseItem(itemId);
 }
 
-void GameManager::EquipInventoryItem(int32 playerId, uint32 itemId)
+void GameWorld::EquipInventoryItem(int32 playerId, uint32 itemId)
 {
 	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
 	if (!player)
@@ -269,7 +281,7 @@ void GameManager::EquipInventoryItem(int32 playerId, uint32 itemId)
 	SessionManager::GetInst().Broadcast(&pkt1);
 }
 
-void GameManager::UnequipInventoryItem(int32 playerId, uint32 itemId)
+void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
 {
 	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
 	if (!player)

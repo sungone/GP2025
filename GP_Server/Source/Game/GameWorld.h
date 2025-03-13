@@ -9,12 +9,12 @@ constexpr size_t MAX_PLAYER = MAX_CLIENT;
 constexpr size_t MAX_MONSTER = 50;
 constexpr size_t MAX_CHARACTER = MAX_PLAYER + MAX_MONSTER;
 
-class GameManager
+class GameWorld
 {
 public:
-	static GameManager& GetInst()
+	static GameWorld& GetInst()
 	{
-		static GameManager inst;
+		static GameWorld inst;
 		return inst;
 	}
 
@@ -25,7 +25,8 @@ public:
 	void CreateMonster();
 	void SpawnMonster(Session& session);
 
-	void ProcessAttack(int32 attackerId, int32 attackedId);
+	void PlayerMove(int32 playerId, FInfoData& info);
+	void PlayerAttack(int32 attackerId, int32 attackedId);
 	std::shared_ptr<Character> GetCharacterByID(int32 id);
 	FInfoData& GetInfo(int32 id) { return GetCharacterByID(id).get()->GetInfo(); }
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "IOCP.h"
 #include "SessionManager.h"
-#include "GameManager.h"
+#include "GameWorld.h"
 #include "DBConnectionPool.h"
 
 class IOModule

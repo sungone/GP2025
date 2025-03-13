@@ -49,7 +49,7 @@ bool Server::Init()
 	}
 	IOCP::GetInst().RegisterSocket(_listenSocket);
 
-	if (!GameManager::GetInst().Init())
+	if (!GameWorld::GetInst().Init())
 	{
 		LOG(LogType::Warning, "GameMgr");
 		return false;

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Session.h"
 #include "SessionManager.h"
-#include "GameManager.h"
+#include "GameWorld.h"
 #include "PacketManager.h"
 
 void Session::DoRecv()
@@ -80,12 +80,18 @@ void Session::Disconnect()
 	_sSocket->Close();
 }
 
+void Session::Login()
+{
+	CreatePlayer();
+	GameWorld::GetInst().SpawnMonster(*this);
+}
+
 void Session::CreatePlayer()
 {
 	_player = std::make_shared<Player>();
 	_player->Init();
 	_player->GetInfo().ID = _id;
-	GameManager::GetInst().AddPlayer(_player);
+	GameWorld::GetInst().AddPlayer(_player);
 }
 
 int32 Session::GetId()
@@ -100,5 +106,5 @@ FInfoData& Session::GetPlayerInfo()
 
 void Session::HandleRecvBuffer(int32 recvByte, ExpOver* expOver)
 {
-	_sSocket->HandleRecvBuffer(*this, recvByte, expOver);
+	_sSocket->HandleRecvBuffer(_id, recvByte, expOver);
 }
