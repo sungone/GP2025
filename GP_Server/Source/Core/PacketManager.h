@@ -12,18 +12,18 @@ public:
 		return inst;
 	}
 
-	void ProcessPacket(int32 sessionId, BYTE* packet);
+	void ProcessPacket(int32 sessionId, Packet* packet);
 
 	void HandleLoginPacket(int32 sessionId);
 	void HandleLogoutPacket(int32 sessionId);
-	void HandleMovePacket(int32 sessionId, BYTE* packet);
-	void HandleAttackPacket(int32 sessionId, BYTE* packet);
+	void HandleMovePacket(int32 sessionId, Packet* packet);
+	void HandleAttackPacket(int32 sessionId, Packet* packet);
 
-	void HandlePickUpItemPacket(int32 sessionId, BYTE* packet);
-	void HandleDropItemPacket(int32 sessionId, BYTE* packet);
-	void HandleUseItemPacket(int32 sessionId, BYTE* packet);
-	void HandleEquipItemPacket(int32 sessionId, BYTE* packet);
-	void HandleUnequipItemPacket(int32 sessionId, BYTE* packet);
+	void HandlePickUpItemPacket(int32 sessionId, Packet* packet);
+	void HandleDropItemPacket(int32 sessionId, Packet* packet);
+	void HandleUseItemPacket(int32 sessionId, Packet* packet);
+	void HandleEquipItemPacket(int32 sessionId, Packet* packet);
+	void HandleUnequipItemPacket(int32 sessionId, Packet* packet);
 
 private:
 	SessionManager& _sessionMgr = SessionManager::GetInst();

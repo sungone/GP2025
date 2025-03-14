@@ -1,19 +1,19 @@
 #include "pch.h"
 #include "ExpOver.h"
 
-ExpOver::ExpOver(unsigned char* packet)
+ExpOver::ExpOver(const Packet* packet)
 {
 	ZeroMemory(&_wsaover, sizeof(_wsaover));
-	_wsabuf.len = packet[1];
-	_wsabuf.buf = _buf;
+	_wsabuf.len = packet->Header.PacketSize;
+	_wsabuf.buf = reinterpret_cast<CHAR*>(_buf);
 	_compType = SEND;
-	memcpy(_buf, packet, packet[1]);
+	memcpy(_wsabuf.buf, packet, _wsabuf.len);
 }
 
 ExpOver::ExpOver()
 {
 	ZeroMemory(&_wsaover, sizeof(_wsaover));
-	_wsabuf.buf = _buf;
+	_wsabuf.buf = reinterpret_cast<CHAR*>(_buf);
 	_wsabuf.len = BUFSIZE;
 	_compType = RECV;
 }

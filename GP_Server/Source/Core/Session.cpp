@@ -8,7 +8,7 @@ void Session::DoRecv()
 {
 	_sSocket->DoRecv();
 }
-void Session::DoSend(Packet* packet)
+void Session::DoSend(const Packet* packet)
 {
 #pragma region //Log
 	switch (packet->Header.PacketType)

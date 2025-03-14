@@ -7,7 +7,7 @@ public:
 	~SessionSocket();
 
 	void DoRecv();
-	void DoSend(Packet* packet);
+	void DoSend(const Packet* packet);
 
 	void Init(SOCKET& socket);
 	void Close();
@@ -16,5 +16,5 @@ public:
 private:
 	SOCKET _socket = INVALID_SOCKET;
 	ExpOver _recvOver;
-	int32 _remain = 0;
+	uint32 _remain = 0;
 };

@@ -39,20 +39,22 @@ void SessionManager::HandleLogin(int32 id)
 	auto& playerInfo = _sessions[id]->GetPlayerInfo();
 	auto loginPkt = InfoPacket(EPacketType::S_LOGIN_SUCCESS, playerInfo);
 	_sessions[id]->DoSend(&loginPkt);
-	auto myInfoPkt = InfoPacket(EPacketType::S_ADD_PLAYER, playerInfo);
-	Broadcast(&myInfoPkt, id);
+	auto newPlayerPkt = InfoPacket(EPacketType::S_ADD_PLAYER, playerInfo);
+	Broadcast(&newPlayerPkt, id);
+	std::lock_guard<std::mutex> lock(_smgrMutex);
 
-	for (auto& cl : _sessions)
+	for (int32 i = 0; i < MAX_CLIENT; ++i)
 	{
-		if (cl == nullptr) continue;
-		if (cl->GetId() == id)
-			continue;
-		auto otherInfoPkt = InfoPacket(EPacketType::S_ADD_PLAYER, cl->GetPlayerInfo());
-		_sessions[id]->DoSend(&otherInfoPkt);
+		if (i == id) continue;
+
+		const auto& otherPlayer = _sessions[i];
+		if (otherPlayer == nullptr) continue;
+		const auto otherPlayerPkt = InfoPacket(EPacketType::S_ADD_PLAYER, otherPlayer->GetPlayerInfo());
+		_sessions[id]->DoSend(&otherPlayerPkt);
 	}
 }
 
-void SessionManager::SendPacket(int32 sessionId, Packet* packet)
+void SessionManager::SendPacket(int32 sessionId, const Packet* packet)
 {
 	_sessions[sessionId]->DoSend(packet);
 }

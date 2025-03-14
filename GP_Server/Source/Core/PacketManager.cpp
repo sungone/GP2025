@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "PacketManager.h"
 
-void PacketManager::ProcessPacket(int32 sessionId, BYTE* packet)
+void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 {
-	EPacketType packetType = static_cast<EPacketType>(packet[PKT_TYPE_INDEX]);
+	EPacketType packetType = static_cast<EPacketType>(packet->Header.PacketType);
 
 	switch (packetType)
 	{
@@ -60,50 +60,50 @@ void PacketManager::HandleLogoutPacket(int32 sessionId)
 	_sessionMgr.Disconnect(sessionId);
 }
 
-void PacketManager::HandleMovePacket(int32 sessionId, BYTE* packet)
+void PacketManager::HandleMovePacket(int32 sessionId, Packet* packet)
 {
-	InfoPacket* p = reinterpret_cast<InfoPacket*>(packet);
+	InfoPacket* p = static_cast<InfoPacket*>(packet);
 	auto& playerInfo = p->Data;
 	_gameWorld.PlayerMove(sessionId, p->Data);
 }
 
-void PacketManager::HandleAttackPacket(int32 sessionId, BYTE* packet)
+void PacketManager::HandleAttackPacket(int32 sessionId, Packet* packet)
 {
-	AttackPacket* p = reinterpret_cast<AttackPacket*>(packet);
+	AttackPacket* p = static_cast<AttackPacket*>(packet);
 	_gameWorld.PlayerAttack(sessionId, p->TargetID);
 }
 
-void PacketManager::HandlePickUpItemPacket(int32 sessionId, BYTE* packet)
+void PacketManager::HandlePickUpItemPacket(int32 sessionId, Packet* packet)
 {
-	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
+	IDPacket* p = static_cast<IDPacket*>(packet);
 	auto itemid = p->Data;
 	_gameWorld.PickUpWorldItem(sessionId, itemid);
 }
 
-void PacketManager::HandleDropItemPacket(int32 sessionId, BYTE* packet)
+void PacketManager::HandleDropItemPacket(int32 sessionId, Packet* packet)
 {
-	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
+	IDPacket* p = static_cast<IDPacket*>(packet);
 	auto itemid = p->Data;
 	_gameWorld.DropInventoryItem(sessionId, itemid);
 }
 
-void PacketManager::HandleUseItemPacket(int32 sessionId, BYTE* packet)
+void PacketManager::HandleUseItemPacket(int32 sessionId, Packet* packet)
 {
-	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
+	IDPacket* p = static_cast<IDPacket*>(packet);
 	auto itemid = p->Data;
 	_gameWorld.UseInventoryItem(sessionId, itemid);
 }
 
-void PacketManager::HandleEquipItemPacket(int32 sessionId, BYTE* packet)
+void PacketManager::HandleEquipItemPacket(int32 sessionId, Packet* packet)
 {
-	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
+	IDPacket* p = static_cast<IDPacket*>(packet);
 	auto itemid = p->Data;
 	_gameWorld.EquipInventoryItem(sessionId, itemid);
 }
 
-void PacketManager::HandleUnequipItemPacket(int32 sessionId, BYTE* packet)
+void PacketManager::HandleUnequipItemPacket(int32 sessionId, Packet* packet)
 {
-	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
+	IDPacket* p = static_cast<IDPacket*>(packet);
 	auto itemid = p->Data;
 	_gameWorld.UnequipInventoryItem(sessionId, itemid);
 }
