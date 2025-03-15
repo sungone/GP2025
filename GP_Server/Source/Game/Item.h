@@ -29,7 +29,7 @@ struct ItemMeta
 class Item
 {
 public:
-	Item() {};
+	Item(): _itemId(0),_itemType(0) {};
 	Item(uint32 itemId, uint8 itemType) : _itemId(itemId), _itemType(itemType) {}
 	uint8 GetItemType() const { return _itemType; }
 	uint32 GetItemID() const { return _itemId; }
