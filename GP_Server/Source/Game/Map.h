@@ -12,13 +12,15 @@ public:
 
 	bool Init()
 	{
-		if (!_tukMap.LoadFromJSON("MapData.json", false))
+		if (!_tukMap.LoadFromJSON("TUK.json", true))
 		{
 			LOG(LogType::Warning, "Failed to load MapData");
 			return false;
 		}
 		return true;
 	}
+
+
 public:
 	BoundingBoxManager _tukMap;
 };

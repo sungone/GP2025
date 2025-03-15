@@ -18,6 +18,10 @@ public:
 	virtual void Shutdown() override;
 
 	void ProcessPacket();
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void SaveMapData(ULevel* Level, const FString& PathName);
 private:
 	class UGPNetworkManager* NetworkMgr;
 };

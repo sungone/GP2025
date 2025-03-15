@@ -8,7 +8,6 @@ void UGPGameInstance::Init()
 	Super::Init();
 	NetworkMgr = GetSubsystem<UGPNetworkManager>();
 	NetworkMgr->ConnectToServer();
-	ExportLevelBoundingBoxData(GetWorld());
 }
 
 void UGPGameInstance::Shutdown()
@@ -20,4 +19,9 @@ void UGPGameInstance::Shutdown()
 void UGPGameInstance::ProcessPacket()
 {
 	NetworkMgr->ProcessPacket();
+}
+
+void UGPGameInstance::SaveMapData(ULevel* Level, const FString& PathName)
+{
+	ExportLevelBoundingBoxData(Level, PathName);
 }

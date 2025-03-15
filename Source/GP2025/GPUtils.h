@@ -17,19 +17,11 @@ struct FBoundingBoxData
 /**
  * Static Mesh의 바운딩 박스(AABB) 데이터 추출 함수
  */
-TArray<FBoundingBoxData> ExtractBoundingBoxData(UWorld* World)
+TArray<FBoundingBoxData> ExtractBoundingBoxData(ULevel* Level)
 {
     TArray<FBoundingBoxData> BoundingBoxDataArray;
 
-    if (!World)
-    {
-        UE_LOG(LogTemp, Error, TEXT("월드가 존재하지 않습니다!"));
-        return BoundingBoxDataArray;
-    }
-
-    ULevel* PersistentLevel = World->PersistentLevel;
-
-    for (AActor* Actor : PersistentLevel->Actors)
+    for (AActor* Actor : Level->Actors)
     {
         AStaticMeshActor* StaticMeshActor = Cast<AStaticMeshActor>(Actor);
         if (!StaticMeshActor) continue;
@@ -111,10 +103,10 @@ void SaveBoundingBoxDataToJson(const TArray<FBoundingBoxData>& BoundingBoxData, 
 /**
  * 실행 함수: 바운딩 박스 데이터 추출 및 저장
  */
-void ExportLevelBoundingBoxData(UWorld* World)
+void ExportLevelBoundingBoxData(ULevel* Level, const FString& PathName)
 {
-    FString SavePath = FPaths::ProjectDir() + TEXT("Saved/BoundingBoxData.json");
+    FString SavePath = FPaths::ProjectDir() + PathName;
 
-    TArray<FBoundingBoxData> BoundingBoxData = ExtractBoundingBoxData(World);
+    TArray<FBoundingBoxData> BoundingBoxData = ExtractBoundingBoxData(Level);
     SaveBoundingBoxDataToJson(BoundingBoxData, SavePath);
 }
