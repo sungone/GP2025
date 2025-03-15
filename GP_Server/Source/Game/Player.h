@@ -15,4 +15,5 @@ public:
 	uint8 UnequipItem(uint32 itemId);
 private:
 	Inventory _inventory;
+	std::unordered_set<int32> _viewList;
 };

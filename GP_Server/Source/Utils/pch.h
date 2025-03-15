@@ -13,11 +13,13 @@
 #include <memory>
 #include <array>
 #include <queue>
-#include <unordered_map>
+#include <unordered_set>
 #include <functional>
 #include <sqlext.h>
 #include <chrono>
 #include <algorithm>
+#include <fstream>
+#include <filesystem>
 
 #include "FVector.h"
 #include "Common.h"

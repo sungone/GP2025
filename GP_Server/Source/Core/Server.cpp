@@ -1,5 +1,10 @@
 #include "pch.h"
 #include "Server.h"
+#include "IOCP.h"
+#include "SessionManager.h"
+#include "GameWorld.h"
+#include "DBConnectionPool.h"
+#include "Map.h"
 
 bool Server::Init()
 {
@@ -52,6 +57,12 @@ bool Server::Init()
 	if (!GameWorld::GetInst().Init())
 	{
 		LOG(LogType::Warning, "GameMgr");
+		return false;
+	}
+
+	if(!Map::GetInst().Init())
+	{
+		LOG(LogType::Warning, "Map");
 		return false;
 	}
 

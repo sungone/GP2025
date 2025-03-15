@@ -68,6 +68,7 @@ void GameWorld::SpawnMonster(Session& session)
 void GameWorld::PlayerMove(int32 playerId, FInfoData& info)
 {
 	_characters[playerId]->SetInfo(info);
+	LOG(std::format("Player[{}] Move to {}", playerId, info.Pos));
 	auto pkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, info);
 	SessionManager::GetInst().Broadcast(&pkt, playerId);
 }

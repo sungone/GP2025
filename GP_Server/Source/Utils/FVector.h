@@ -1,6 +1,7 @@
 #pragma once
 #include <cmath>
 #include <iostream>
+#include <format>
 
 struct FVector
 {
@@ -49,5 +50,16 @@ struct FVector
     {
         os << "(" << v.X << ", " << v.Y << ", " << v.Z << ")";
         return os;
+    }
+
+};
+
+template <>
+struct std::formatter<FVector> {
+    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+
+    template <typename FormatContext>
+    auto format(const FVector& obj, FormatContext& ctx) const {
+        return std::format_to(ctx.out(), "FVector({}, {}, {})", obj.X, obj.Y, obj.Z);
     }
 };
