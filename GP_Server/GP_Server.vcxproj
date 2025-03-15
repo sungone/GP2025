@@ -162,7 +162,6 @@
     <ClInclude Include="Source\IOCP\ExpOver.h" />
     <ClInclude Include="Source\IOCP\IOCP.h" />
     <ClInclude Include="Source\pch.h" />
-    <ClInclude Include="Source\Utils\CollisionUtils.h" />
     <ClInclude Include="Source\Utils\FVector.h" />
     <ClInclude Include="Source\Utils\Logger.h" />
     <ClInclude Include="Source\Utils\RandomUtils.h" />

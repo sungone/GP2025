@@ -88,7 +88,7 @@ void GameWorld::PlayerAttack(int32 attackerID, int32 targetID)
 
 	std::shared_ptr<Monster> Target = static_pointer_cast<Monster>(_characters[targetID]);
 
-	if (!CollisionUtils::CanAttack(atkInfo, Target->GetInfo()))
+	if (!Attacker->IsInAttackRange(Target->GetInfo()))
 		return;
 
 #ifdef _DEBUG

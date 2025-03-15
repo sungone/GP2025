@@ -23,7 +23,6 @@
 #include "Common.h"
 #include "Logger.h"
 #include "ExpOver.h"
-#include "CollisionUtils.h"
 #include "RandomUtils.h"
 
 enum CompType

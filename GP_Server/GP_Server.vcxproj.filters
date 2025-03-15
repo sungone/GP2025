@@ -106,9 +106,6 @@
     <ClInclude Include="Source\Common\Type.h">
       <Filter>Source Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Utils\CollisionUtils.h">
-      <Filter>Source Files\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Game\Inventory.h">
       <Filter>Source Files\Game\GameObjects\Item</Filter>
     </ClInclude>
