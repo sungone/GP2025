@@ -1,128 +1,109 @@
 #include "pch.h"
 #include "PacketManager.h"
 
-void PacketManager::ProcessPacket(Session& session, BYTE* packet)
+void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 {
-	EPacketType packetType = static_cast<EPacketType>(packet[PKT_TYPE_INDEX]);
+	EPacketType packetType = static_cast<EPacketType>(packet->Header.PacketType);
 
 	switch (packetType)
 	{
 	case EPacketType::C_LOGIN:
-		HandleLoginPacket(session);
+		LOG(LogType::RecvLog, std::format("LoginPacket from [{}]", sessionId));
+		HandleLoginPacket(sessionId);
 		break;
 	case EPacketType::C_LOGOUT:
-		HandleLogoutPacket(session);
+		LOG(LogType::RecvLog, std::format("LogoutPacket from [{}]", sessionId));
+		HandleLogoutPacket(sessionId);
 		break;
 	case EPacketType::C_MOVE:
-		HandleMovePacket(session, packet);
+		LOG(LogType::RecvLog, std::format("MovePacket from [{}]", sessionId));
+		HandleMovePacket(sessionId, packet);
 		break;
 	case EPacketType::C_ATTACK:
-		HandleAttackPacket(session, packet);
+		LOG(LogType::RecvLog, std::format("AttackPacket from [{}]", sessionId));
+		HandleAttackPacket(sessionId, packet);
 		break;
 	case EPacketType::C_TAKE_ITEM:
-		HandleTakeItemPacket(session, packet);
+		LOG(LogType::RecvLog, std::format("PickUpItemPacket from [{}]", sessionId));
+		HandlePickUpItemPacket(sessionId, packet);
 		break;
 	case EPacketType::C_DROP_ITEM:
-		HandleDropItemPacket(session, packet);
+		LOG(LogType::RecvLog, std::format("DropItemPacket from [{}]", sessionId));
+		HandleDropItemPacket(sessionId, packet);
 		break;
 	case EPacketType::C_USE_ITEM:
-		HandleUseItemPacket(session, packet);
+		LOG(LogType::RecvLog, std::format("UseItemPacket from [{}]", sessionId));
+		HandleUseItemPacket(sessionId, packet);
 		break;
 	case EPacketType::C_EQUIP_ITEM:
-		HandleEquipItemPacket(session, packet);
+		LOG(LogType::RecvLog, std::format("EquipItemPacket from [{}]", sessionId));
+		HandleEquipItemPacket(sessionId, packet);
 		break;
 	case EPacketType::C_UNEQUIP_ITEM:
-		HandleUnequipItemPacket(session, packet);
+		LOG(LogType::RecvLog, std::format("UnequipItemPacket from [{}]", sessionId));
+		HandleUnequipItemPacket(sessionId, packet);
 		break;
 	default:
 		LOG(LogType::RecvLog, "Unknown Packet Type");
 	}
 }
 
-void PacketManager::HandleLoginPacket(Session& session)
+void PacketManager::HandleLoginPacket(int32 sessionId)
 {
-	session.CreatePlayer();
-
-	auto& playerInfo = session.GetPlayerInfo();
-	int32 id = playerInfo.ID;
-	LOG(LogType::RecvLog, std::format("Login PKT [{}]", id));
-
-	auto loginPkt = InfoPacket(EPacketType::S_LOGIN_SUCCESS, playerInfo);
-	session.DoSend(&loginPkt);
-
-	auto myInfoPkt = InfoPacket(EPacketType::S_ADD_PLAYER, playerInfo);
-	_sessionMgr.Broadcast(&myInfoPkt, id);
-	_sessionMgr.HandleLogin(id);
-	_gameMgr.SpawnMonster(session);
+	_sessionMgr.HandleLogin(sessionId);
 }
 
-void PacketManager::HandleLogoutPacket(Session& session)
+void PacketManager::HandleLogoutPacket(int32 sessionId)
 {
-	int32 id = session.GetId();
-	LOG(LogType::RecvLog, std::format("Logout PKT [{}]", id));
-
-	auto pkt = IDPacket(EPacketType::S_REMOVE_PLAYER, id);
-	_sessionMgr.Broadcast(&pkt, id);
-	_sessionMgr.Disconnect(id);
+	auto pkt = IDPacket(EPacketType::S_REMOVE_PLAYER, sessionId);
+	_sessionMgr.Broadcast(&pkt, sessionId);
+	_sessionMgr.Disconnect(sessionId);
 }
 
-void PacketManager::HandleMovePacket(Session& session, BYTE* packet)
+void PacketManager::HandleMovePacket(int32 sessionId, Packet* packet)
 {
-	auto& playerInfo = session.GetPlayerInfo();
-	int32 id = playerInfo.ID;
-	LOG(LogType::RecvLog, std::format("Move PKT [{}] ({:.2f}, {:.2f}, {:.2f} / Yaw: {:.2f}, State {})",
-		playerInfo.ID, playerInfo.Pos.X, playerInfo.Pos.Y, playerInfo.Pos.Z, playerInfo.Yaw, playerInfo.State));
-
-	InfoPacket* p = reinterpret_cast<InfoPacket*>(packet);
-	playerInfo = p->Data;
-	auto pkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, playerInfo);
-	_sessionMgr.Broadcast(&pkt, id);
+	InfoPacket* p = static_cast<InfoPacket*>(packet);
+	auto& playerInfo = p->Data;
+	_gameWorld.PlayerMove(sessionId, p->Data);
 }
 
-void PacketManager::HandleAttackPacket(Session& session, BYTE* packet)
+void PacketManager::HandleAttackPacket(int32 sessionId, Packet* packet)
 {
-	auto& playerInfo = session.GetPlayerInfo();
-	int32 id = playerInfo.ID;
-	LOG(LogType::RecvLog, std::format("Attack PKT [{}]", id));
-	AttackPacket* p = reinterpret_cast<AttackPacket*>(packet);
-	_gameMgr.ProcessAttack(id, p->TargetID);
-	playerInfo.AddState(ECharacterStateType::STATE_AUTOATTACK);
-	auto pkt1 = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, playerInfo);
-	_sessionMgr.Broadcast(&pkt1);
-
+	AttackPacket* p = static_cast<AttackPacket*>(packet);
+	_gameWorld.PlayerAttack(sessionId, p->TargetID);
 }
 
-void PacketManager::HandleTakeItemPacket(Session& session, BYTE* packet)
+void PacketManager::HandlePickUpItemPacket(int32 sessionId, Packet* packet)
 {
-	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
+	IDPacket* p = static_cast<IDPacket*>(packet);
 	auto itemid = p->Data;
-	_gameMgr.PickUpWorldItem(session.GetId(), itemid);
+	_gameWorld.PickUpWorldItem(sessionId, itemid);
 }
 
-void PacketManager::HandleDropItemPacket(Session& session, BYTE* packet)
+void PacketManager::HandleDropItemPacket(int32 sessionId, Packet* packet)
 {
-	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
+	IDPacket* p = static_cast<IDPacket*>(packet);
 	auto itemid = p->Data;
-	_gameMgr.DropInventoryItem(session.GetId(), itemid);
+	_gameWorld.DropInventoryItem(sessionId, itemid);
 }
 
-void PacketManager::HandleUseItemPacket(Session& session, BYTE* packet)
+void PacketManager::HandleUseItemPacket(int32 sessionId, Packet* packet)
 {
-	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
+	IDPacket* p = static_cast<IDPacket*>(packet);
 	auto itemid = p->Data;
-	_gameMgr.UseInventoryItem(session.GetId(), itemid);
+	_gameWorld.UseInventoryItem(sessionId, itemid);
 }
 
-void PacketManager::HandleEquipItemPacket(Session& session, BYTE* packet)
+void PacketManager::HandleEquipItemPacket(int32 sessionId, Packet* packet)
 {
-	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
+	IDPacket* p = static_cast<IDPacket*>(packet);
 	auto itemid = p->Data;
-	_gameMgr.EquipInventoryItem(session.GetId(), itemid);
+	_gameWorld.EquipInventoryItem(sessionId, itemid);
 }
 
-void PacketManager::HandleUnequipItemPacket(Session& session, BYTE* packet)
+void PacketManager::HandleUnequipItemPacket(int32 sessionId, Packet* packet)
 {
-	IDPacket* p = reinterpret_cast<IDPacket*>(packet);
+	IDPacket* p = static_cast<IDPacket*>(packet);
 	auto itemid = p->Data;
-	_gameMgr.UnequipInventoryItem(session.GetId(), itemid);
+	_gameWorld.UnequipInventoryItem(sessionId, itemid);
 }

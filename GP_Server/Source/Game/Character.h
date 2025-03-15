@@ -14,6 +14,7 @@ public:
 	void SetTestRandomLocation();
 
 	FInfoData& GetInfo() { return _info; }
+	void SetInfo(FInfoData& info) { _info = info; }
 	bool IsValid() const { return _info.ID != -1; }
 protected:
 	std::mutex _cMutex;

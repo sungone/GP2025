@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Monster.h"
 #include "SessionManager.h"
-#include "GameManager.h"
+#include "GameWorld.h"
 
 void Monster::Init()
 {

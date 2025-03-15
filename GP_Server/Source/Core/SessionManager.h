@@ -16,7 +16,7 @@ public:
 	void DoRecv(int32 sessionId);
 	void HandleRecvBuffer(int32 sessionId, int32 recvByte, ExpOver* expOver);
 	void HandleLogin(int32 sessionId);
-	void SendPacket(int32 sessionId, Packet* packet);
+	void SendPacket(int32 sessionId, const Packet* packet);
 	void Broadcast(Packet* packet, int32 exptId = -1);
 	std::array<std::shared_ptr<Session>, MAX_CLIENT>& GetSessions() { return _sessions; }
 private:

@@ -1,7 +1,7 @@
 #pragma once
 #include "Session.h"
 #include "SessionManager.h"
-#include "GameManager.h"
+#include "GameWorld.h"
 
 class PacketManager
 {
@@ -12,20 +12,21 @@ public:
 		return inst;
 	}
 
-	void ProcessPacket(Session& session, BYTE* packet);
-	void HandleLoginPacket(Session& session);
-	void HandleLogoutPacket(Session& session);
-	void HandleMovePacket(Session& session, BYTE* packet);
-	void HandleAttackPacket(Session& session, BYTE* packet);
+	void ProcessPacket(int32 sessionId, Packet* packet);
 
-	void HandleTakeItemPacket(Session& session, BYTE* packet);
-	void HandleDropItemPacket(Session& session, BYTE* packet);
-	void HandleUseItemPacket(Session& session, BYTE* packet);
-	void HandleEquipItemPacket(Session& session, BYTE* packet);
-	void HandleUnequipItemPacket(Session& session, BYTE* packet);
+	void HandleLoginPacket(int32 sessionId);
+	void HandleLogoutPacket(int32 sessionId);
+	void HandleMovePacket(int32 sessionId, Packet* packet);
+	void HandleAttackPacket(int32 sessionId, Packet* packet);
+
+	void HandlePickUpItemPacket(int32 sessionId, Packet* packet);
+	void HandleDropItemPacket(int32 sessionId, Packet* packet);
+	void HandleUseItemPacket(int32 sessionId, Packet* packet);
+	void HandleEquipItemPacket(int32 sessionId, Packet* packet);
+	void HandleUnequipItemPacket(int32 sessionId, Packet* packet);
 
 private:
 	SessionManager& _sessionMgr = SessionManager::GetInst();
-	GameManager& _gameMgr = GameManager::GetInst();
+	GameWorld& _gameWorld = GameWorld::GetInst();
 };
 

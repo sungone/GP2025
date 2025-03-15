@@ -14,22 +14,22 @@ public:
 		ZeroMemory(&_recvOver._wsaover, sizeof(_recvOver._wsaover));
 		DWORD recv_flag = 0;
 		_recvOver._wsabuf.len = BUFSIZE - _remain;
-		_recvOver._wsabuf.buf = _recvOver._buf + _remain;
+		_recvOver._wsabuf.buf = reinterpret_cast<CHAR*>(_recvOver._buf) + _remain;
 		WSARecv(_socket, &_recvOver._wsabuf, 1, 0, &recv_flag, &_recvOver._wsaover, 0);
 	}
 
 	void DoSend(Packet&& packet)
 	{
-		auto send_data = new ExpOver{ reinterpret_cast<BYTE*>(new Packet(std::move(packet))) };
+		auto send_data = new ExpOver{new Packet(std::move(packet)) };
 		WSASend(_socket, &send_data->_wsabuf, 1, nullptr, 0, &send_data->_wsaover, nullptr);
 	}
 
 	void HandleRecvBuffer(int32 recvByte, ExpOver* expOver)
 	{
 		int32 dataSize = recvByte + _remain;
-		BYTE* packet = reinterpret_cast<BYTE*>(expOver->_buf);
+		Packet* packet = reinterpret_cast<Packet*>(expOver->_buf);
 		while (dataSize > 0) {
-			int32 packetSize = packet[PKT_SIZE_INDEX];
+			int32 packetSize = packet->Header.PacketSize;
 			if (packetSize <= dataSize) {
 				ProcessPacket(packet);
 				packet = packet + packetSize;
@@ -42,10 +42,10 @@ public:
 			memcpy(expOver->_buf, packet, dataSize);
 	}
 
-	void ProcessPacket(BYTE* packet)
+	void ProcessPacket(Packet* packet)
 	{
-		FPacketHeader* ph = reinterpret_cast<FPacketHeader*>(packet);
-		switch (ph->PacketType)
+		auto type = packet->Header.PacketType;
+		switch (type)
 		{
 		case EPacketType::S_LOGIN_SUCCESS:
 		{

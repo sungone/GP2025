@@ -4,12 +4,12 @@ enum CompType;
 class ExpOver
 {
 public:
-	ExpOver(unsigned char* packet);
+	ExpOver(const Packet* packet);
 	ExpOver();
 
 public:
 	WSAOVERLAPPED _wsaover;
 	WSABUF _wsabuf;
-	char	_buf[BUFSIZE];
+	uint8	_buf[BUFSIZE];
 	CompType _compType;
 };

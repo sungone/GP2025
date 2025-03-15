@@ -10,11 +10,12 @@ public:
 
 public:
 	void DoRecv();
-	void DoSend(Packet* packet);
+	void DoSend(const Packet* packet);
 
 	void Connect(SOCKET socket, int32 id);
 	void Disconnect();
 
+	void Login();
 	void CreatePlayer();
 	int32 GetId();
 	FInfoData& GetPlayerInfo();
