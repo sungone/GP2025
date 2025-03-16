@@ -24,6 +24,9 @@ public :
 	void AddItemToInventory(uint8 ItemType , uint32 Quantity);
 	void RemoveItemFromInventory(uint8 ItemType);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
+	int32 PlayerMoney;
+
 	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "UI")
 	class UWidgetSwitcher* TabWidgetSwitcher;
 

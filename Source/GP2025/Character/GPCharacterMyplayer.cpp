@@ -71,11 +71,25 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 		InventoryAction = InputActionInventoryRef.Object;
 	}
 
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSettingRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_ESC.IA_ESC'"));
+	if (InputActionSettingRef.Object)
+	{
+		SettingAction = InputActionSettingRef.Object;
+	}
+
 	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBPClass(TEXT("/Game/Inventory/Widgets/WBP_Inventory"));
 
 	if (WidgetBPClass.Succeeded())
 	{
 		InventoryWidgetClass = WidgetBPClass.Class;
+	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> SettingWidgetBPClass(TEXT("/Game/Inventory/Widgets/WBP_PauseScreen"));
+
+	if (SettingWidgetBPClass.Succeeded())
+	{
+		SettingWidgetClass = SettingWidgetBPClass.Class;
 	}
 
 	// 기본 캐릭터 타입을 전사 캐릭터로
@@ -99,6 +113,11 @@ void AGPCharacterMyplayer::BeginPlay()
 	if (InventoryWidgetClass)
 	{
 		InventoryWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryWidgetClass);
+	}
+
+	if (SettingWidgetClass)
+	{
+		SettingWidget = CreateWidget<UUserWidget>(GetWorld(), SettingWidgetClass);
 	}
 }
 
@@ -211,6 +230,7 @@ void AGPCharacterMyplayer::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	EnhancedInputComponent->BindAction(AutoAttackAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::AutoAttack);
 	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::ToggleInventory);
 	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Completed, this, &AGPCharacterMyplayer::ResetInventoryToggle);
+	EnhancedInputComponent->BindAction(SettingAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::OpenSettingWidget);
 }
 
 void AGPCharacterMyplayer::SetCharacterType(ECharacterType NewCharacterType)
@@ -369,6 +389,21 @@ void AGPCharacterMyplayer::ResetInventoryToggle()
 	bInventoryToggled = false; 
 }
 
+void AGPCharacterMyplayer::OpenSettingWidget()
+{
+	if (SettingWidget && !SettingWidget->IsInViewport())
+	{
+		SettingWidget->AddToViewport();
+
+		APlayerController* PC = Cast<AGPPlayerController>(GetController());
+		if (PC)
+		{
+			PC->SetShowMouseCursor(true);
+			PC->SetInputMode(FInputModeGameAndUI());
+		}
+	}
+}
+
 UGPInventory* AGPCharacterMyplayer::GetInventoryWidget()
 {
 	UGPInventory* CastInventory = Cast<UGPInventory>(InventoryWidget);
@@ -383,7 +418,6 @@ UGPInventory* AGPCharacterMyplayer::GetInventoryWidget()
 
 void AGPCharacterMyplayer::AttackHitCheck()
 {
-	//Todo: Myplayer만 사용하게 옮기자
 	if (!Cast<AGPCharacterMyplayer>(this)) return;
 
 	FHitResult OutHitResult;

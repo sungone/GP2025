@@ -43,6 +43,7 @@ protected:
 	void OpenInventory();
 	void CloseInventory();
 	void ResetInventoryToggle();
+	void OpenSettingWidget();
 	bool bInventoryToggled = false;
 
 	// 카메라 
@@ -74,6 +75,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> InventoryAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> SettingAction;
+
 	// Sprint Speed 변수
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
 	float WalkSpeed;
@@ -88,6 +92,13 @@ public :
 
 	UPROPERTY()
 	UUserWidget* InventoryWidget;
+
+	// Setting Widget
+	UPROPERTY()
+	TSubclassOf<UUserWidget> SettingWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* SettingWidget;
 
 	UFUNCTION()                      
 	UGPInventory* GetInventoryWidget();
