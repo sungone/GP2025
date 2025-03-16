@@ -36,7 +36,7 @@ void UGPLoginWidget::NativeConstruct()
 		TBInputPW->OnTextCommitted.AddDynamic(this, &UGPLoginWidget::OnEntered);
 
 	SetEnable(TextError, false);
-	SetEnable(TextCreateAccount, false);
+	SetEnable(TextCreateAccount, true);
 	SetEnable(TextLogin, true);
 }
 

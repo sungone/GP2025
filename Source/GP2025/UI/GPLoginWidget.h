@@ -36,14 +36,23 @@ public :
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* TextCreateAccount;
 
+
+
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* TextLogin;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* TextExit;
 
 	UPROPERTY(meta = (BindWidget))
 	UButton* ButtonLogin;
 
 	UPROPERTY(meta = (BindWidget))
 	UButton* ButtonCreateAccount;
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* ButtonExit;
+
 
 	UPROPERTY(meta = (BindWidget))
 	UEditableTextBox* TBInputID;
