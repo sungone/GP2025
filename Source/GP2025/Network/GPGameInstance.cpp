@@ -21,7 +21,15 @@ void UGPGameInstance::ProcessPacket()
 	NetworkMgr->ProcessPacket();
 }
 
-void UGPGameInstance::SaveMapData(ULevel* Level, const FString& PathName)
+//AABB박스 추출 -> TUK level BP에서 호출하고 있음
+void UGPGameInstance::SaveBoundingBoxData(ULevel* Level)
 {
-	ExportLevelBoundingBoxData(Level, PathName);
+	ExportLevelBoundingBoxData(Level, TEXT("GP_Server/BoundingBoxData.json"));
+}
+
+//NavMesh 추출 -> BP_MyPlayer에서 호출하고 있음
+void UGPGameInstance::SaveNavData()
+{
+	ExtractNavMeshData(GetWorld(), TEXT("GP_Server/NavMeshData.json"));
+
 }

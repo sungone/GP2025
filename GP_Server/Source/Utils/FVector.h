@@ -52,6 +52,12 @@ struct FVector
         return os;
     }
 
+    std::string ToString() const
+    {
+        std::ostringstream oss;
+        oss << *this;
+        return oss.str();
+    }
 };
 
 template <>

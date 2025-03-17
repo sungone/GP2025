@@ -130,10 +130,10 @@
     <ClInclude Include="Source\Game\BoundingBox.h">
       <Filter>Source Files\Game\GameObjects\Map</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Game\BoundingBoxManager.h">
+    <ClInclude Include="Source\Game\Map.h">
       <Filter>Source Files\Game\GameObjects\Map</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Game\Map.h">
+    <ClInclude Include="Source\Game\NavMesh.h">
       <Filter>Source Files\Game\GameObjects\Map</Filter>
     </ClInclude>
   </ItemGroup>
@@ -192,18 +192,18 @@
     <ClCompile Include="Source\Game\TimerQueue.cpp">
       <Filter>Source Files\Utils\Timer</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Game\BoundingBox.cpp">
-      <Filter>Source Files\Game\GameObjects\Map</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Game\BoundingBoxManager.cpp">
-      <Filter>Source Files\Game\GameObjects\Map</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Game\Map.cpp">
+      <Filter>Source Files\Game\GameObjects\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\NavMesh.cpp">
+      <Filter>Source Files\Game\GameObjects\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\BoundingBox.cpp">
       <Filter>Source Files\Game\GameObjects\Map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="MapData.json">
+    <None Include="NavMeshData.json">
       <Filter>Source Files\Game\GameObjects\Map</Filter>
     </None>
   </ItemGroup>

@@ -21,7 +21,9 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void SaveMapData(ULevel* Level, const FString& PathName);
+	void SaveBoundingBoxData(ULevel* Level);
+	UFUNCTION(BlueprintCallable)
+	void SaveNavData();
 private:
 	class UGPNetworkManager* NetworkMgr;
 };

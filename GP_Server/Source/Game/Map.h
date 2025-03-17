@@ -1,5 +1,5 @@
 #pragma once
-#include "BoundingBoxManager.h"
+#include "NavMesh.h"
 
 class Map
 {
@@ -12,16 +12,13 @@ public:
 
 	bool Init()
 	{
-		if (!_tukMap.LoadFromJSON("TUK.json", true))
+		NavMeshData test;
+		if (!LoadNavMeshFromJson("NavMeshData.json", test, true))
 		{
-			LOG(LogType::Warning, "Failed to load MapData");
 			return false;
 		}
+		LOG("NavMeshData loaded successfully!");
 		return true;
 	}
-
-
-public:
-	BoundingBoxManager _tukMap;
 };
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "FVector.h"
+#include <rapidjson/document.h>
 
 struct BoundingBox
 {
@@ -20,3 +20,5 @@ struct BoundingBox
         return os;
     }
 };
+
+bool LoadBoundingBoxFromJSON(const std::string& filePath, std::vector<BoundingBox>& BoundingBoxes, bool isPrint);
