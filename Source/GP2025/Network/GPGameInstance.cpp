@@ -27,9 +27,8 @@ void UGPGameInstance::SaveBoundingBoxData(ULevel* Level)
 	ExportLevelBoundingBoxData(Level, TEXT("GP_Server/BoundingBoxData.json"));
 }
 
-//NavMesh 추출 -> BP_MyPlayer에서 호출하고 있음
+//NavMesh 추출 -> BP_MyPlayer에서 호출하고 있음(World생성 후 호출)
 void UGPGameInstance::SaveNavData()
 {
 	ExtractNavMeshData(GetWorld(), TEXT("GP_Server/NavMeshData.json"));
-
 }

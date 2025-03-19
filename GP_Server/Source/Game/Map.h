@@ -12,12 +12,13 @@ public:
 
 	bool Init()
 	{
-		NavMeshData test;
-		if (!LoadNavMeshFromJson("NavMeshData.json", test, true))
+		NavMesh test;
+		if (!NavMesh::LoadFromJson("NavMeshData.json", test, false))
 		{
 			return false;
 		}
-		LOG("NavMeshData loaded successfully!");
+		NavMesh::BuildPolygonGraph(true);
+		LOG("NavMesh loaded successfully!");
 		return true;
 	}
 };

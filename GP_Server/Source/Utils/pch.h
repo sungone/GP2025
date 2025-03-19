@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <fstream>
 #include <filesystem>
+#include <sstream>
 
 #include "FVector.h"
 #include "Common.h"
