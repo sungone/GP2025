@@ -42,10 +42,10 @@ void UGPLoginWidget::NativeConstruct()
 	SetEnable(TextCreateAccount, true);
 	SetEnable(TextLogin, true);
 
-	if (ButtonLogin)
-	{
-		ButtonLogin->OnClicked.AddDynamic(this, &UGPLoginWidget::OnLoginClicked);
-	}
+	//if (ButtonLogin)
+	//{
+	//	ButtonLogin->OnClicked.AddDynamic(this, &UGPLoginWidget::OnLoginClicked);
+	//}
 
 	if (ButtonExit)
 	{
@@ -69,13 +69,18 @@ void UGPLoginWidget::CancleCreateAccount()
 
 void UGPLoginWidget::OnEntered(const FText& Text, ETextCommit::Type CommitMethod)
 {
-	if (CommitMethod == ETextCommit::OnEnter)
+	if (CommitMethod == ETextCommit::OnEnter) 
 	{
 		ID_Str = TBInputID->GetText().ToString();
 		PW_Str = TBInputPW->GetText().ToString();
 
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *ID_Str);
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *PW_Str);
+		if (ID_Str.IsEmpty() || PW_Str.IsEmpty()) 
+		{
+			UE_LOG(LogTemp, Error, TEXT("ID or Password is Empty!"));
+			return;
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("ID: %s | PW: %s"), *ID_Str, *PW_Str);
 
 		if (isCreate)
 			SendLoginDBPacket(isCreate);
@@ -89,18 +94,18 @@ void UGPLoginWidget::SetEnable(UWidget* widget, bool b)
 	b ? widget->SetVisibility(ESlateVisibility::Visible) : widget->SetVisibility(ESlateVisibility::Hidden);
 }
 
-void UGPLoginWidget::OnLoginClicked()
-{
-	APlayerController* PC = GetOwningPlayer();
-	if (PC)
-	{
-		AGPPlayerController* GPPC = Cast<AGPPlayerController>(PC);
-		if (GPPC)
-		{
-			GPPC->ShowLobbyUI();  // 로비 UI 표시
-		}
-	}
-}
+//void UGPLoginWidget::OnLoginClicked()
+//{
+//	APlayerController* PC = GetOwningPlayer();
+//	if (PC)
+//	{
+//		AGPPlayerController* GPPC = Cast<AGPPlayerController>(PC);
+//		if (GPPC)
+//		{
+//			GPPC->ShowLobbyUI();  // 로비 UI 표시
+//		}
+//	}
+//}
 
 void UGPLoginWidget::OnExitClicked()
 {
