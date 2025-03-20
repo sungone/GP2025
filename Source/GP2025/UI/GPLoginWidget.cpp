@@ -5,8 +5,11 @@
 #include "Components/EditableTextBox.h"
 #include "Components/TextBlock.h"      
 #include "Components/Widget.h"                        
-#include "Kismet/GameplayStatics.h"     
-#include "Logging/LogMacros.h"        
+#include "Kismet/GameplayStatics.h"  
+#include "Kismet/KismetSystemLibrary.h"
+#include "Components/Button.h"
+#include "Logging/LogMacros.h"      
+#include "Player/GPPlayerController.h"
 
 
 void UGPLoginWidget::SendLoginDBPacket(bool isCA)
@@ -38,6 +41,16 @@ void UGPLoginWidget::NativeConstruct()
 	SetEnable(TextError, false);
 	SetEnable(TextCreateAccount, true);
 	SetEnable(TextLogin, true);
+
+	if (ButtonLogin)
+	{
+		ButtonLogin->OnClicked.AddDynamic(this, &UGPLoginWidget::OnLoginClicked);
+	}
+
+	if (ButtonExit)
+	{
+		ButtonExit->OnClicked.AddDynamic(this, &UGPLoginWidget::OnExitClicked);
+	}
 }
 
 void UGPLoginWidget::CreateAccount()
@@ -76,6 +89,27 @@ void UGPLoginWidget::SetEnable(UWidget* widget, bool b)
 	b ? widget->SetVisibility(ESlateVisibility::Visible) : widget->SetVisibility(ESlateVisibility::Hidden);
 }
 
+void UGPLoginWidget::OnLoginClicked()
+{
+	APlayerController* PC = GetOwningPlayer();
+	if (PC)
+	{
+		AGPPlayerController* GPPC = Cast<AGPPlayerController>(PC);
+		if (GPPC)
+		{
+			GPPC->ShowLobbyUI();  // 로비 UI 표시
+		}
+	}
+}
+
+void UGPLoginWidget::OnExitClicked()
+{
+	APlayerController* PC = GetOwningPlayer();
+	if (PC && GetWorld())
+	{
+		UKismetSystemLibrary::QuitGame(GetWorld(), PC, EQuitPreference::Quit, false);
+	}
+}
 // 서버 패킷 예
 //message S_LOGIN_DB
 //{

@@ -53,7 +53,6 @@ public :
 	UPROPERTY(meta = (BindWidget))
 	UButton* ButtonExit;
 
-
 	UPROPERTY(meta = (BindWidget))
 	UEditableTextBox* TBInputID;
 
@@ -71,4 +70,10 @@ public :
 
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void SetEnable(UWidget* widget, bool b);
+
+	UFUNCTION()
+	void OnLoginClicked();
+
+	UFUNCTION()
+	void OnExitClicked();
 };
