@@ -85,7 +85,7 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 		InventoryWidgetClass = WidgetBPClass.Class;
 	}
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> SettingWidgetBPClass(TEXT("/Game/Inventory/Widgets/WBP_PauseScreen"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> SettingWidgetBPClass(TEXT("/Game/UI/WBP_PauseScreen"));
 
 	if (SettingWidgetBPClass.Succeeded())
 	{
