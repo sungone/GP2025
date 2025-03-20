@@ -65,14 +65,15 @@ public :
 	UFUNCTION(BlueprintCallable)
 	void CancleCreateAccount();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnEntered(const FText& Text, ETextCommit::Type CommitMethod);
 
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void SetEnable(UWidget* widget, bool b);
 
-	UFUNCTION()
-	void OnLoginClicked();
+	// C++ 코드로 안되서 블프에서 일단 처리함
+	//UFUNCTION()
+	//void OnLoginClicked();
 
 	UFUNCTION()
 	void OnExitClicked();

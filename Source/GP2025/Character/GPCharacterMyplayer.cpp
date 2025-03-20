@@ -92,6 +92,12 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 		SettingWidgetClass = SettingWidgetBPClass.Class;
 	}
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> InGameWidgetBPClass(TEXT("/Game/UI/WBP_InGame"));
+	if (InGameWidgetBPClass.Succeeded())
+	{
+		InGameWidgetClass = InGameWidgetBPClass.Class;
+	}
+
 	// 기본 캐릭터 타입을 전사 캐릭터로
 	CurrentCharacterType = (uint8)Type::EPlayer::WARRIOR;
 }
@@ -118,6 +124,26 @@ void AGPCharacterMyplayer::BeginPlay()
 	if (SettingWidgetClass)
 	{
 		SettingWidget = CreateWidget<UUserWidget>(GetWorld(), SettingWidgetClass);
+	}
+
+	if (InGameWidgetClass)
+	{
+		InGameWidget = CreateWidget<UUserWidget>(GetWorld(), InGameWidgetClass);
+		if (InGameWidget)
+		{
+			InGameWidget->AddToViewport();
+			APlayerController* PC = Cast<AGPPlayerController>(GetController());
+			if (PC)
+			{
+				PC->SetShowMouseCursor(false);
+				PC->SetInputMode(FInputModeGameOnly());
+			}
+			UE_LOG(LogTemp, Warning, TEXT("InGameWidget successfully added to viewport."));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to create InGameWidget."));
+		}
 	}
 }
 
@@ -366,6 +392,12 @@ void AGPCharacterMyplayer::OpenInventory()
 			PC->SetShowMouseCursor(true);
 			PC->SetInputMode(FInputModeGameAndUI()); 
 		}
+	}
+
+	// InGameWidget 유지
+	if (InGameWidget && !InGameWidget->IsInViewport())
+	{
+		InGameWidget->AddToViewport();
 	}
 }
 

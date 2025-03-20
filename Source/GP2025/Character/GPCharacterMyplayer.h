@@ -93,6 +93,9 @@ public :
 	UPROPERTY()
 	UUserWidget* InventoryWidget;
 
+	UFUNCTION()
+	UGPInventory* GetInventoryWidget();
+
 	// Setting Widget
 	UPROPERTY()
 	TSubclassOf<UUserWidget> SettingWidgetClass;
@@ -100,8 +103,13 @@ public :
 	UPROPERTY()
 	UUserWidget* SettingWidget;
 
-	UFUNCTION()                      
-	UGPInventory* GetInventoryWidget();
+	// InGame Widget
+	UPROPERTY()
+	TSubclassOf<UUserWidget> InGameWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* InGameWidget;
+
 
 	// Attack Hit Section
 protected:
