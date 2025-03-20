@@ -28,7 +28,6 @@ void UGPNetworkManager::ConnectToServer()
 	if (Socket->GetConnectionState() == SCS_Connected)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Connection Success")));
-		SendPlayerLoginPacket();
 	}
 	else
 	{
@@ -60,9 +59,9 @@ void UGPNetworkManager::SendPacket(uint8* Buf, int32 Size)
 	Socket->Send(Buf, Size, BytesSent);
 }
 
-void UGPNetworkManager::SendPlayerLoginPacket()
+void UGPNetworkManager::SendPlayerLoginPacket(const char* AccountID, const char* AccountPW, bool isCreate)
 {
-	Packet Packet(EPacketType::C_LOGIN);
+	LoginPacket Packet(AccountID, AccountPW, isCreate);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
@@ -232,7 +231,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_ADD_IVENTORY_ITEM:
 			{
 				ItemPkt::AddInventoryPacket* Pkt = reinterpret_cast<ItemPkt::AddInventoryPacket*>(RemainingData.GetData());
-				ObjectMgr->AddInventoryItem(Pkt->ItemID,Pkt->ItemType);
+				ObjectMgr->AddInventoryItem(Pkt->ItemID, Pkt->ItemType);
 				break;
 			}
 			case EPacketType::S_REMOVE_IVENTORY_ITEM:
@@ -244,7 +243,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_EQUIP_ITEM:
 			{
 				ItemPkt::EquipItemPacket* Pkt = reinterpret_cast<ItemPkt::EquipItemPacket*>(RemainingData.GetData());
-				ObjectMgr->EquipItem(Pkt->PlayerID,Pkt->ItemType);
+				ObjectMgr->EquipItem(Pkt->PlayerID, Pkt->ItemType);
 				break;
 			}
 			case EPacketType::S_UNEQUIP_ITEM:

@@ -46,10 +46,10 @@ struct LoginPacket : public Packet
 	LoginPacket(const char* AccountID_, const char* AccountPW_ , bool isCreate_)
 		: Packet(EPacketType::C_LOGIN), isCreate(isCreate_)
 	{
-		strncpy(AccountID, AccountID_, LOGIN_STR_LEN - 1);
+		strncpy_s(AccountID, AccountID_, LOGIN_STR_LEN - 1);
 		AccountID[LOGIN_STR_LEN - 1] = '\0';
 
-		strncpy(AccountPW, AccountPW_, LOGIN_STR_LEN - 1);
+		strncpy_s(AccountPW, AccountPW_, LOGIN_STR_LEN - 1);
 		AccountPW[LOGIN_STR_LEN - 1] = '\0';
 
 		Header.PacketSize = sizeof(LoginPacket);
