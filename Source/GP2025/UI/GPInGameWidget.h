@@ -14,6 +14,18 @@ class GP2025_API UGPInGameWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+public :
+	virtual void NativeConstruct() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	float HpPercent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	float ExpPercent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	FString LevelText;
+
 //public :
 //public:
 //    virtual void NativeConstruct() override;
