@@ -7,6 +7,8 @@
 #include "Inventory/SlotStruct.h"
 #include "Engine/DataTable.h"
 
+
+
 void UGPInventory::NativeConstruct()
 {
     Super::NativeConstruct();
