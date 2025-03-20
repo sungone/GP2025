@@ -56,16 +56,16 @@ public:
 	TObjectPtr<class UGPWidgetComponent> HpBar;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UGPWidgetComponent> ExpBar;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UGPWidgetComponent> LevelText;
+
+	UUserWidget* HpBarWidget;
+	UUserWidget* LevelTextWidget;
 
 	FOnHpChanged OnHpChanged;
 	FOnExpChanged OnExpChanged;
 	FOnLevelChanged OnLevelChanged;
 
-	UGPWidgetComponent* CreateWidgetComponent(const FString& Name, const FString& WidgetPath, FVector Location, FVector2D Size);
+	UGPWidgetComponent* CreateWidgetComponent(const FString& Name, const FString& WidgetPath, FVector Location, FVector2D Size, UUserWidget*& OutUserWidget);
 
 // Dead Section
 public :

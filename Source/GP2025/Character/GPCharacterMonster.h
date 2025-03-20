@@ -17,8 +17,14 @@ class GP2025_API AGPCharacterMonster : public AGPCharacterBase
 public:
 	AGPCharacterMonster();
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 public:
 	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
 	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
 	
+public :
+	void UpdateWidgetVisibility();
+
+	UPROPERTY(EditAnywhere, Category = "Visibility")
+	float VisibilityDistance = 1000.0f;  
 };

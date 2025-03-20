@@ -16,6 +16,6 @@ class GP2025_API UGPWidgetComponent : public UWidgetComponent
 	GENERATED_BODY()
 public:
 	void SetComponent(FVector Location, FVector2D Size);
-protected :
+public :
 	virtual void InitWidget() override;
 };

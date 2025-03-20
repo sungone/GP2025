@@ -223,12 +223,29 @@ void AGPCharacterBase::SetCharacterType(ECharacterType NewCharacterType)
 	CurrentCharacterType = NewCharacterType;
 }
 
-UGPWidgetComponent* AGPCharacterBase::CreateWidgetComponent(const FString& Name, const FString& WidgetPath, FVector Location, FVector2D Size)
+UGPWidgetComponent* AGPCharacterBase::CreateWidgetComponent(const FString& Name, const FString& WidgetPath, FVector Location, FVector2D Size , UUserWidget*& OutUserWidget)
 {
 	UGPWidgetComponent* WidgetComp = CreateDefaultSubobject<UGPWidgetComponent>(*Name);
 	WidgetComp->SetupAttachment(GetCharacterMesh());
 	WidgetComp->SetComponent(Location, Size);
-	WidgetComp->SetWidgetClass(LoadClass<UUserWidget>(WidgetPath));
+
+
+	TSubclassOf<UUserWidget> WidgetClass = LoadClass<UUserWidget>(nullptr, *WidgetPath);
+	if (!WidgetClass)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[CreateWidgetComponent] Failed to load widget class at path: %s"), *WidgetPath);
+		return nullptr;
+	}
+
+	WidgetComp->SetWidgetClass(WidgetClass);
+	WidgetComp->InitWidget();
+
+	OutUserWidget = WidgetComp->GetUserWidgetObject();
+
+	if (!OutUserWidget)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[CreateWidgetComponent] Failed to create UserWidget at path: %s"), *WidgetPath);
+	}
 
 	return WidgetComp;
 }
