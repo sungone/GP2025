@@ -37,6 +37,25 @@ using FPacketHeader = Packet::PacketHeader;
 using InfoPacket = TPacket<FInfoData>;
 using IDPacket = TPacket<int32>;
 
+constexpr int LOGIN_STR_LEN = 20 + 1;
+struct LoginPacket : public Packet
+{
+	char AccountID[LOGIN_STR_LEN];
+	char AccountPW[LOGIN_STR_LEN];
+	bool isCreate;
+	LoginPacket(const char* AccountID_, const char* AccountPW_ , bool isCreate_)
+		: Packet(EPacketType::C_LOGIN), isCreate(isCreate_)
+	{
+		strncpy(AccountID, AccountID_, LOGIN_STR_LEN - 1);
+		AccountID[LOGIN_STR_LEN - 1] = '\0';
+
+		strncpy(AccountPW, AccountPW_, LOGIN_STR_LEN - 1);
+		AccountPW[LOGIN_STR_LEN - 1] = '\0';
+
+		Header.PacketSize = sizeof(LoginPacket);
+	}
+};
+
 struct AttackPacket : public Packet
 {
 	int32 TargetID;

@@ -14,7 +14,7 @@ public:
 
 	void ProcessPacket(int32 sessionId, Packet* packet);
 
-	void HandleLoginPacket(int32 sessionId);
+	void HandleLoginPacket(int32 sessionId, Packet* packet);
 	void HandleLogoutPacket(int32 sessionId);
 	void HandleMovePacket(int32 sessionId, Packet* packet);
 	void HandleAttackPacket(int32 sessionId, Packet* packet);
