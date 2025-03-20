@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
+using UnrealBuildTool.Rules;
 
 public class GP2025 : ModuleRules
 {
@@ -10,7 +11,11 @@ public class GP2025 : ModuleRules
 
         PublicIncludePaths.AddRange(new string[] { "GP2025" });
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG", "Sockets", "Networking", "Json", "JsonUtilities", "PhysicsCore" , "Slate" , "SlateCore" });
+        PublicDependencyModuleNames.AddRange(new string[] { 
+            "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG", 
+            "Sockets", "Networking", "Json", "JsonUtilities", "PhysicsCore" , "Slate" , "SlateCore" ,
+            "NavigationSystem"
+        });
 
         PrivateDependencyModuleNames.AddRange(new string[] { });
 

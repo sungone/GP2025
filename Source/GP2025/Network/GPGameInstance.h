@@ -18,6 +18,12 @@ public:
 	virtual void Shutdown() override;
 
 	void ProcessPacket();
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void SaveBoundingBoxData(ULevel* Level);
+	UFUNCTION(BlueprintCallable)
+	void SaveNavData();
 private:
 	class UGPNetworkManager* NetworkMgr;
 };

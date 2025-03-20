@@ -17,19 +17,11 @@ struct FBoundingBoxData
 /**
  * Static Mesh의 바운딩 박스(AABB) 데이터 추출 함수
  */
-TArray<FBoundingBoxData> ExtractBoundingBoxData(UWorld* World)
+TArray<FBoundingBoxData> ExtractBoundingBoxData(ULevel* Level)
 {
     TArray<FBoundingBoxData> BoundingBoxDataArray;
 
-    if (!World)
-    {
-        UE_LOG(LogTemp, Error, TEXT("월드가 존재하지 않습니다!"));
-        return BoundingBoxDataArray;
-    }
-
-    ULevel* PersistentLevel = World->PersistentLevel;
-
-    for (AActor* Actor : PersistentLevel->Actors)
+    for (AActor* Actor : Level->Actors)
     {
         AStaticMeshActor* StaticMeshActor = Cast<AStaticMeshActor>(Actor);
         if (!StaticMeshActor) continue;
@@ -111,10 +103,115 @@ void SaveBoundingBoxDataToJson(const TArray<FBoundingBoxData>& BoundingBoxData, 
 /**
  * 실행 함수: 바운딩 박스 데이터 추출 및 저장
  */
-void ExportLevelBoundingBoxData(UWorld* World)
+void ExportLevelBoundingBoxData(ULevel* Level, const FString& PathName)
 {
-    FString SavePath = FPaths::ProjectDir() + TEXT("Saved/BoundingBoxData.json");
+    FString SavePath = FPaths::ProjectDir() + PathName;
 
-    TArray<FBoundingBoxData> BoundingBoxData = ExtractBoundingBoxData(World);
+    TArray<FBoundingBoxData> BoundingBoxData = ExtractBoundingBoxData(Level);
     SaveBoundingBoxDataToJson(BoundingBoxData, SavePath);
+}
+
+#include "NavMesh/RecastNavMesh.h"
+#include "NavigationSystem.h"
+
+void SaveRecastDebugGeometryToJson(const FRecastDebugGeometry& NavMeshGeometry, int32 NumTiles, const FString& FilePath);
+void ExtractNavMeshData(UWorld* World, const FString& PathName)
+{
+    auto* NavigationSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(World);
+	if (!NavigationSys) {
+		UE_LOG(LogTemp, Error, TEXT("NavigationSystem not found!"));
+		return;
+	}
+    auto* NavData = NavigationSys->GetMainNavData();
+    if (!NavData) {
+        UE_LOG(LogTemp, Error, TEXT("NavData not found!"));
+        return;
+    }
+    ARecastNavMesh* NavMesh = Cast<ARecastNavMesh>(NavData);
+
+    if (!NavMesh) {
+        UE_LOG(LogTemp, Error, TEXT("NavMesh not found!"));
+        return;
+    }
+
+    int32 NumTiles = NavMesh->GetNavMeshTilesCount();
+    UE_LOG(LogTemp, Log, TEXT("NavMesh Tiles: %d"), NumTiles);
+
+    FRecastDebugGeometry NavMeshGeometry;
+    NavMesh->GetDebugGeometry(NavMeshGeometry);
+
+    FString FullSavePath = FPaths::ProjectDir() + PathName;
+
+    SaveRecastDebugGeometryToJson(NavMeshGeometry, NumTiles, FullSavePath);
+}
+
+void SaveRecastDebugGeometryToJson(const FRecastDebugGeometry& NavMeshGeometry, int32 NumTiles, const FString& FilePath)
+{
+    // 1) 최상위 JSON 오브젝트 생성
+    TSharedPtr<FJsonObject> RootObject = MakeShared<FJsonObject>();
+    // NavMesh 타일 개수 기록
+    RootObject->SetNumberField(TEXT("NumTiles"), NumTiles);
+
+    //
+    // 2) 버텍스 배열 (MeshVerts)
+    //
+    TArray<TSharedPtr<FJsonValue>> VerticesArray;
+    VerticesArray.Reserve(NavMeshGeometry.MeshVerts.Num());
+
+    for (const FVector& V : NavMeshGeometry.MeshVerts)
+    {
+        // 예: [ X, Y, Z ] 형태로 기록
+        TArray<TSharedPtr<FJsonValue>> VertexTriple;
+        VertexTriple.Add(MakeShared<FJsonValueNumber>(V.X));
+        VertexTriple.Add(MakeShared<FJsonValueNumber>(V.Y));
+        VertexTriple.Add(MakeShared<FJsonValueNumber>(V.Z));
+
+        VerticesArray.Add(MakeShared<FJsonValueArray>(VertexTriple));
+    }
+    // JSON 필드: "Vertices"
+    RootObject->SetArrayField(TEXT("Vertices"), VerticesArray);
+
+    //
+    // 3) 삼각형 인덱스 (AreaIndices)
+    //
+    // NavMesh에서는 영역(Area)마다 인덱스가 분리되어 있습니다.
+    // 각 AreaID마다 3개씩 묶어 삼각형을 구성하므로, Triangles 배열로 모아서 저장하겠습니다.
+    TArray<TSharedPtr<FJsonValue>> TrianglesArray;
+
+    // RECAST_MAX_AREAS = 64(기본값)  
+    // 에디터에서 등록되는 NavArea (DefaultArea, Jump, Lava 등)에 해당하는 인덱스 목록이 각각 들어있음.
+    for (int32 AreaID = 0; AreaID < RECAST_MAX_AREAS; ++AreaID)
+    {
+        const TArray<int32>& IndicesInArea = NavMeshGeometry.AreaIndices[AreaID];
+        // 인덱스는 3개씩 하나의 삼각형
+        for (int32 i = 0; i + 2 < IndicesInArea.Num(); i += 3)
+        {
+            TSharedPtr<FJsonObject> TriObject = MakeShared<FJsonObject>();
+            TriObject->SetNumberField(TEXT("IndexA"), IndicesInArea[i]);
+            TriObject->SetNumberField(TEXT("IndexB"), IndicesInArea[i + 1]);
+            TriObject->SetNumberField(TEXT("IndexC"), IndicesInArea[i + 2]);
+            TriObject->SetNumberField(TEXT("AreaID"), AreaID);
+
+            TrianglesArray.Add(MakeShared<FJsonValueObject>(TriObject));
+        }
+    }
+    RootObject->SetArrayField(TEXT("Triangles"), TrianglesArray);
+
+    // (옵션) OffMeshLinks, PolyEdges, NavMeshEdges 등도 필요하다면 추가 직렬화 가능
+
+    //
+    // 4) JSON → 문자열 변환 후 파일로 저장
+    //
+    FString OutputString;
+    TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
+    FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
+
+    if (FFileHelper::SaveStringToFile(OutputString, *FilePath))
+    {
+        UE_LOG(LogTemp, Log, TEXT("NavMesh debug geometry saved to: %s"), *FilePath);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to save NavMesh debug geometry to: %s"), *FilePath);
+    }
 }

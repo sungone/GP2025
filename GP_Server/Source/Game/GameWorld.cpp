@@ -68,6 +68,7 @@ void GameWorld::SpawnMonster(Session& session)
 void GameWorld::PlayerMove(int32 playerId, FInfoData& info)
 {
 	_characters[playerId]->SetInfo(info);
+	LOG(std::format("Player[{}] Move to {}", playerId, info.Pos));
 	auto pkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, info);
 	SessionManager::GetInst().Broadcast(&pkt, playerId);
 }
@@ -88,7 +89,7 @@ void GameWorld::PlayerAttack(int32 attackerID, int32 targetID)
 
 	std::shared_ptr<Monster> Target = static_pointer_cast<Monster>(_characters[targetID]);
 
-	if (!CollisionUtils::CanAttack(atkInfo, Target->GetInfo()))
+	if (!Attacker->IsInAttackRange(Target->GetInfo()))
 		return;
 
 #ifdef _DEBUG

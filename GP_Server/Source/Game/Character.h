@@ -1,4 +1,5 @@
 #pragma once
+#include "Common.h"
 
 class Character
 {
@@ -9,6 +10,12 @@ public:
 
 	void OnDamaged(float damage);
 	float GetAttackDamage();
+
+    bool IsInAttackRange(const FInfoData& target);
+    bool IsInViewDistance(const FVector& targetPos, float viewDist);
+	bool IsInFieldOfView(const FInfoData& target, float fovAngle);
+	bool HasLineOfSight(const FVector& targetPos, const std::vector<FVector>& obstacles);
+
 	void SetBunkerRandomLocation();
 	void SetParkingGarageRandomLocation();
 	void SetTestRandomLocation();

@@ -10,23 +10,7 @@
 #include "Components/Button.h"
 #include "Logging/LogMacros.h"      
 #include "Player/GPPlayerController.h"
-
-
-void UGPLoginWidget::SendLoginDBPacket(bool isCA)
-{
-	// To Do : 패킷 처리하기 !!
-
-// Protocol::C_LOGIN_DB Login_Pkt;
-
-	auto ID = TCHAR_TO_UTF8(*ID_Str);
-	auto PW = TCHAR_TO_UTF8(*PW_Str);
-
-	// Login_Pkt.set_id(ID);
-	// Login_Pkt.set_pw(PW);
-	// Login_Pkt.set_iscreateaccount(isCA);
-
-	// SEND_PACKET(Login_Pkt);
-}
+#include "Network/GPNetworkManager.h"
 
 void UGPLoginWidget::NativeConstruct()
 {
@@ -69,23 +53,21 @@ void UGPLoginWidget::CancleCreateAccount()
 
 void UGPLoginWidget::OnEntered(const FText& Text, ETextCommit::Type CommitMethod)
 {
-	if (CommitMethod == ETextCommit::OnEnter) 
+	if (CommitMethod == ETextCommit::OnEnter)
 	{
 		ID_Str = TBInputID->GetText().ToString();
 		PW_Str = TBInputPW->GetText().ToString();
 
-		if (ID_Str.IsEmpty() || PW_Str.IsEmpty()) 
+		if (ID_Str.IsEmpty() || PW_Str.IsEmpty())
 		{
 			UE_LOG(LogTemp, Error, TEXT("ID or Password is Empty!"));
 			return;
 		}
 
-		UE_LOG(LogTemp, Warning, TEXT("ID: %s | PW: %s"), *ID_Str, *PW_Str);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("ID: %s | PW: %s"), *ID_Str, *PW_Str));
 
-		if (isCreate)
-			SendLoginDBPacket(isCreate);
-		else
-			SendLoginDBPacket(isCreate);
+		auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+		NetworkMgr->SendPlayerLoginPacket(TCHAR_TO_UTF8(*ID_Str), TCHAR_TO_UTF8(*PW_Str), isCreate);
 	}
 }
 
@@ -115,15 +97,3 @@ void UGPLoginWidget::OnExitClicked()
 		UKismetSystemLibrary::QuitGame(GetWorld(), PC, EQuitPreference::Quit, false);
 	}
 }
-// 서버 패킷 예
-//message S_LOGIN_DB
-//{
-//	bool succes = 1;
-//}
-//
-//message C_LOGIN_DB
-//{
-//	bool IsCreateAccount = 1;
-//	string id = 2;
-//	string pw = 3;
-//}

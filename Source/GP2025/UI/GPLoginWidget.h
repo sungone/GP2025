@@ -19,7 +19,6 @@ class GP2025_API UGPLoginWidget : public UUserWidget
 	GENERATED_BODY()
 	
 private :
-	void SendLoginDBPacket(bool isCA);
 	bool isCreate = false;
 
 protected :

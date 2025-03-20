@@ -8,7 +8,7 @@
 #include <sstream>
 
 #define LOG(...) Logger::GetInstance().LogMessage(__VA_ARGS__, __FUNCTION__)
-
+#define PRINT(message) Logger::GetInstance().PrintNavMesh(message)
 
 enum LogType
 {
@@ -26,6 +26,12 @@ public:
         static Logger instance;
         return instance;
     }
+
+	void PrintNavMesh(const std::string& message)
+	{
+		std::lock_guard<std::mutex> lock(_logLock);
+		std::cout << message << '\n';
+	}
 
     void LogMessage(const std::string& message, const char* functionName)
     {

@@ -9,7 +9,7 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 	{
 	case EPacketType::C_LOGIN:
 		LOG(LogType::RecvLog, std::format("LoginPacket from [{}]", sessionId));
-		HandleLoginPacket(sessionId);
+		HandleLoginPacket(sessionId, packet);
 		break;
 	case EPacketType::C_LOGOUT:
 		LOG(LogType::RecvLog, std::format("LogoutPacket from [{}]", sessionId));
@@ -48,8 +48,13 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 	}
 }
 
-void PacketManager::HandleLoginPacket(int32 sessionId)
+void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 {
+	auto pkt = static_cast<LoginPacket*>(packet);
+	LOG(std::format("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW));
+	{
+		//Todo: DB Ã³¸®
+	}
 	_sessionMgr.HandleLogin(sessionId);
 }
 
