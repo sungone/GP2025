@@ -26,7 +26,32 @@ void UGPObjectManager::SetMyPlayer(AGPCharacterPlayer* InMyPlayer)
 	MyPlayer = InMyPlayer;
 }
 
-void UGPObjectManager::AddPlayer(FInfoData& PlayerInfo, bool isMyPlayer)
+void UGPObjectManager::Login(FInfoData& PlayerInfo)
+{
+	if (World == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Invaild World"));
+		FGenericPlatformMisc::RequestExit(false);
+	}
+
+	FVector SpawnLocation(PlayerInfo.Pos);
+	FRotator SpawnRotation(0, PlayerInfo.Yaw, 0);
+
+	if (MyPlayer == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Invaild MyPlayer"));
+		FGenericPlatformMisc::RequestExit(false);
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Login Success [%d] (%f,%f,%f)(%f)"),
+		PlayerInfo.ID, PlayerInfo.Pos.X, PlayerInfo.Pos.Y, PlayerInfo.Pos.Z, PlayerInfo.Yaw);
+
+	MyPlayer->SetCharacterInfo(PlayerInfo);
+	MyPlayer->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
+
+}
+
+void UGPObjectManager::AddPlayer(FInfoData& PlayerInfo)
 {
 	if (World == nullptr)
 		return;
@@ -34,49 +59,35 @@ void UGPObjectManager::AddPlayer(FInfoData& PlayerInfo, bool isMyPlayer)
 	FVector SpawnLocation(PlayerInfo.Pos);
 	FRotator SpawnRotation(0, PlayerInfo.Yaw, 0);
 
-	if (isMyPlayer)
+	AGPCharacterPlayer* Player = nullptr;
+	while (Player == nullptr)
 	{
-		if (MyPlayer == nullptr)
-			return;
-
-		UE_LOG(LogTemp, Warning, TEXT("Add my player [%d] (%f,%f,%f)(%f)"),
-			PlayerInfo.ID, PlayerInfo.Pos.X, PlayerInfo.Pos.Y, PlayerInfo.Pos.Z, PlayerInfo.Yaw);
-
-		MyPlayer->SetCharacterInfo(PlayerInfo);
-		MyPlayer->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
-		Players.Add(PlayerInfo.ID, MyPlayer);
+		//이렇게 처리한 이유가 뭐지? 이 방식이 알맞나? 고민해보자
+		Player = World->SpawnActor<AGPCharacterPlayer>(OtherPlayerClass, SpawnLocation, SpawnRotation);
 	}
-	else
-	{
-		AGPCharacterPlayer* Player = nullptr;
-		while (Player == nullptr)
-		{
-			Player = World->SpawnActor<AGPCharacterPlayer>(OtherPlayerClass, SpawnLocation, SpawnRotation);
-		}
 
-		UE_LOG(LogTemp, Warning, TEXT("Add other player [%d] (%f,%f,%f)(%f)"),
-			PlayerInfo.ID, PlayerInfo.Pos.X, PlayerInfo.Pos.Y, PlayerInfo.Pos.Z, PlayerInfo.Yaw);
+	UE_LOG(LogTemp, Warning, TEXT("Add other player [%d] (%f,%f,%f)(%f)"),
+		PlayerInfo.ID, PlayerInfo.Pos.X, PlayerInfo.Pos.Y, PlayerInfo.Pos.Z, PlayerInfo.Yaw);
 
-		Player->SetCharacterInfo(PlayerInfo);
-		Player->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
-		Players.Add(PlayerInfo.ID, Player);
-	}
+	Player->SetCharacterInfo(PlayerInfo);
+	Player->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
+	OtherPlayers.Add(PlayerInfo.ID, Player);
 }
 
 void UGPObjectManager::RemovePlayer(int32 PlayerID)
 {
-	if (Players.Contains(PlayerID))
+	if (OtherPlayers.Contains(PlayerID))
 	{
-		Players[PlayerID]->Destroy();
-		Players.Remove(PlayerID);
+		OtherPlayers[PlayerID]->Destroy();
+		OtherPlayers.Remove(PlayerID);
 	}
 }
 
 void UGPObjectManager::UpdatePlayer(FInfoData& PlayerInfo)
 {
-	if (Players.Contains(PlayerInfo.ID))
+	if (OtherPlayers.Contains(PlayerInfo.ID))
 	{
-		Players[PlayerInfo.ID]->SetCharacterInfo(PlayerInfo);
+		OtherPlayers[PlayerInfo.ID]->SetCharacterInfo(PlayerInfo);
 	}
 }
 
@@ -208,7 +219,6 @@ void UGPObjectManager::DropItem(uint32 ItemID, uint8 ItemType, FVector Pos)
 
 void UGPObjectManager::AddInventoryItem(uint32 ItemID, uint8 ItemType)
 {
-	// 디버깅: 아이템 ID 및 타입 확인
 	UE_LOG(LogTemp, Warning, TEXT("AddInventoryItem - ItemID: %d | ItemType: %d"), ItemID, ItemType);
 
 	AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
@@ -231,12 +241,10 @@ void UGPObjectManager::AddInventoryItem(uint32 ItemID, uint8 ItemType)
 		return;
 	}
 
-	// 디버깅: 인벤토리 위젯에 추가 시도
 	UE_LOG(LogTemp, Warning, TEXT("Attempting to Add Item - ItemType: %d to Inventory"), ItemType);
 
 	LocalInventoryWidget->AddItemToInventory(ItemType, 1);
 
-	// 디버깅: 아이템 추가 성공 여부 확인
 	UE_LOG(LogTemp, Warning, TEXT("Item Successfully Added to Inventory!"));
 }
 

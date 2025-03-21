@@ -52,9 +52,6 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 {
 	auto pkt = static_cast<LoginPacket*>(packet);
 	LOG(std::format("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW));
-	{
-		//Todo: DB Ã³¸®
-	}
 	_sessionMgr.HandleLogin(sessionId);
 }
 

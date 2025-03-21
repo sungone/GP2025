@@ -154,13 +154,20 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_LOGIN_SUCCESS:
 			{
 				InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
-				ObjectMgr->AddPlayer(Pkt->Data, true);
+				ObjectMgr->Login(Pkt->Data);
+				break;
+			}
+			case EPacketType::S_LOGIN_FAIL:
+			{
+				InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
+				//Todo:
+				//ObjectMgr->PrintFailMessege(Pkt->Data);
 				break;
 			}
 			case EPacketType::S_ADD_PLAYER:
 			{
 				InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
-				ObjectMgr->AddPlayer(Pkt->Data, false);
+				ObjectMgr->AddPlayer(Pkt->Data);
 				break;
 			}
 			case EPacketType::S_REMOVE_PLAYER:
