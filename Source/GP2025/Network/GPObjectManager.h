@@ -21,7 +21,8 @@ public:
 
 	void SetMyPlayer(AGPCharacterPlayer* InMyPlayer);
 
-	void AddPlayer(FInfoData& PlayerInfo, bool isMyPlayer);
+	void Login(FInfoData& PlayerInfo);
+	void AddPlayer(FInfoData& PlayerInfo);
 	void RemovePlayer(int32 PlayerID);
 	void UpdatePlayer(FInfoData& PlayerInfo);
 
@@ -46,7 +47,7 @@ private:
     TSubclassOf<AGPCharacterMonster> MonsterClass;
 
 	AGPCharacterPlayer* MyPlayer;
-	TMap<int32, AGPCharacterPlayer*> Players;
+	TMap<int32, AGPCharacterPlayer*> OtherPlayers;
     TMap<int32, AGPCharacterMonster*> Monsters;
     TMap<int32, AGPItem*> Items;
 
