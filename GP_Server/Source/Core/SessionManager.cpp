@@ -10,6 +10,7 @@ void SessionManager::Connect(SOCKET& socket)
 		_sessions[_id] = std::make_shared<Session>();
 		_sessions[_id]->Connect(socket, _id);
 		_iocp.RegisterSocket(socket, _id);
+		LOG("Start Recv");
 		_sessions[_id]->DoRecv();
 	}
 }
@@ -35,22 +36,24 @@ void SessionManager::HandleRecvBuffer(int32 id, int32 recvByte, ExpOver* expOver
 
 void SessionManager::HandleLogin(int32 id)
 {
-	_sessions[id]->Login();
+	auto session = _sessions[id];
+	session->Login();
 	auto& playerInfo = _sessions[id]->GetPlayerInfo();
 	auto loginPkt = InfoPacket(EPacketType::S_LOGIN_SUCCESS, playerInfo);
-	_sessions[id]->DoSend(&loginPkt);
+	session->DoSend(&loginPkt);
+
 	auto newPlayerPkt = InfoPacket(EPacketType::S_ADD_PLAYER, playerInfo);
 	Broadcast(&newPlayerPkt, id);
-	std::lock_guard<std::mutex> lock(_smgrMutex);
 
+	std::lock_guard<std::mutex> lock(_smgrMutex);
 	for (int32 i = 0; i < MAX_CLIENT; ++i)
 	{
-		if (i == id) continue;
-
+		if (i == id)continue;
 		const auto& otherPlayer = _sessions[i];
-		if (otherPlayer == nullptr) continue;
-		const auto otherPlayerPkt = InfoPacket(EPacketType::S_ADD_PLAYER, otherPlayer->GetPlayerInfo());
-		_sessions[id]->DoSend(&otherPlayerPkt);
+		if (otherPlayer == nullptr|| !otherPlayer->IsLogin()) continue;
+		const auto& otherInfo = otherPlayer->GetPlayerInfo();
+		const auto otherPlayerPkt = InfoPacket(EPacketType::S_ADD_PLAYER, otherInfo);
+		session->DoSend(&otherPlayerPkt);
 	}
 }
 
@@ -64,8 +67,10 @@ void SessionManager::Broadcast(Packet* packet, int32 exptId)
 	std::lock_guard<std::mutex> lock(_smgrMutex);
 	for (auto& session : _sessions)
 	{
-		if (session == nullptr || exptId == session->GetId())
+		if (session == nullptr)continue;
+		if (!session->IsLogin() || exptId == session->GetId())
 			continue;
+
 		session->DoSend(packet);
 	}
 }
