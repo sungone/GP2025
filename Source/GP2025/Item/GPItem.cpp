@@ -5,6 +5,7 @@
 #include "GameFramework/RotatingMovementComponent.h"
 #include "Network/GPNetworkManager.h"
 #include "Character/GPCharacterPlayer.h"
+#include "Engine/World.h"
 #include "GPItemStruct.h"
 
 // Sets default values
@@ -41,6 +42,15 @@ void AGPItem::BeginPlay()
 {
 	Super::BeginPlay();
 
+	TriggerBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	GetWorld()->GetTimerManager().SetTimer(
+		OverlapEnableTimerHandle,
+		this,
+		&AGPItem::EnableOverlap,
+		OverlapDelay, 
+		false 
+	);
 }
 
 // Called every frame
@@ -121,4 +131,10 @@ void AGPItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 	{
 		UE_LOG(LogTemp, Error, TEXT("Network Manager is NULL - Failed to Send Item Pickup Packet."));
 	}
+}
+
+void AGPItem::EnableOverlap()
+{
+	TriggerBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	UE_LOG(LogTemp, Warning, TEXT("Overlap Enabled for Item ID: %d"), ItemID);
 }
