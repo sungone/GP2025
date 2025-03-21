@@ -17,9 +17,9 @@ public:
 	}
 
 	bool Init();
-	void RegisterSocket(SOCKET& _socket, ULONG_PTR key = NULL);
+	void RegisterSocket(SOCKET _socket, ULONG_PTR key = NULL);
 	bool GetCompletion(DWORD& rw_byte, ULONG_PTR& key, LPWSAOVERLAPPED& over);
-	void PostCompletion(ULONG_PTR key, DWORD bytesTransferred = 0, LPWSAOVERLAPPED over = nullptr);
+	void PostCompletion(ULONG_PTR key, LPWSAOVERLAPPED over);
 private:
 	HANDLE _hIOCP;
 };

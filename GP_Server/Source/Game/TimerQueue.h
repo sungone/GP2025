@@ -1,12 +1,12 @@
 #pragma once
 #include "IOCP.h"
 
-enum CompType;
+enum EventType {RandomMove,Chase};
 struct TimerEvent
 {
-	CompType type;
-	DWORD wakeUpTime;
-	std::function<void()> callback;
+	int32 id;
+	EventType type;
+	std::chrono::system_clock::time_point wakeUpTime;
 	bool operator<(const TimerEvent& other) const {
 		return wakeUpTime > other.wakeUpTime;
 	}
@@ -15,10 +15,9 @@ struct TimerEvent
 class TimerQueue
 {
 public:
-	void TimerThread();
-	void AddTimerEvent(CompType type, DWORD delayMs, std::function<void()> callback);
-private:
-	std::priority_queue<TimerEvent> _TimerQueue;
-	std::mutex _TimerMutex;
+	static void TimerThread();
+	static void AddTimerEvent(int32 id, EventType type, DWORD delayMs);
+	static std::priority_queue<TimerEvent> _TimerQueue;
+	static std::mutex _TimerMutex;
 };
 

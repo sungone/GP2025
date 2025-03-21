@@ -60,7 +60,7 @@ bool Server::Init()
 		return false;
 	}
 
-	if(!Map::GetInst().Init())
+	if (!Map::GetInst().Init())
 	{
 		LOG(LogType::Warning, "Map");
 		return false;
@@ -73,7 +73,18 @@ bool Server::Init()
 void Server::Run()
 {
 	DoAccept();
-	CreateThreads([this]() { WorkerThreadLoop(); }, std::thread::hardware_concurrency());
+
+	static std::vector<std::thread> threads;
+	int32 numThreads = std::thread::hardware_concurrency();
+	for (int32 i = 0; i < numThreads; ++i) {
+		threads.emplace_back([this]() {WorkerThreadLoop(); });
+	}
+	threads.emplace_back(TimerQueue::TimerThread);
+
+	for (auto& thread : threads)
+	{
+		thread.join();
+	}
 }
 
 void Server::Close()
@@ -93,60 +104,58 @@ void Server::InitSocket(SOCKET& socket, DWORD dwFlags)
 	socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, dwFlags);
 }
 
-void Server::CreateThreads(std::function<void()> func, int32 numThreads)
-{
-	std::vector<std::thread> threads;
-	for (int32 i = 0; i < numThreads; ++i) {
-		threads.emplace_back(func);
-	}
-	for (auto& thread : threads)
-		thread.join();
-}
-
-
 void Server::WorkerThreadLoop()
 {
 	DWORD recvByte;
 	ULONG_PTR sessionId;
 	LPWSAOVERLAPPED over;
 
-	while (_bRunning) {
+	while (_bRunning)
+	{
 		BOOL ret = IOCP::GetInst().GetCompletion(recvByte, sessionId, over);
 		ExpOver* expOver = reinterpret_cast<ExpOver*>(over);
-		if (!ret) {
-			HandleError(expOver, static_cast<int32>(sessionId));
+		if (!ret)
+		{
+			HandleCompletionError(expOver, static_cast<int32>(sessionId));
 			continue;
 		}
 
-		switch (expOver->_compType) {
-		case ACCEPT:
+		switch (expOver->_compType)
+		{
+		case ::ACCEPT:
 			HandleAccept();
 			break;
-		case RECV:
+		case ::RECV:
 			HandleRecv(static_cast<int32>(sessionId), recvByte, expOver);
 			break;
-		case SEND:
+		case ::SEND:
 			delete expOver;
+			break;
+		case ::MOVE:
+			LOG("Move Event!!!!!!!!!!!!!!!!");
 			break;
 		}
 	}
 }
 
-void Server::HandleError(ExpOver* ex_over, int32 id)
+void Server::HandleCompletionError(ExpOver* ex_over, int32 id)
 {
 	switch (ex_over->_compType)
 	{
-	case ACCEPT:
+	case ::ACCEPT:
 		LOG(Warning, "CompType : ACCEPT");
 		break;
-	case RECV:
+	case ::RECV:
 		LOG(Warning, "CompType : RECV");
 		SessionManager::GetInst().Disconnect(id);
 		break;
-	case SEND:
+	case ::SEND:
 		LOG(Warning, "CompType : SEND");
 		SessionManager::GetInst().Disconnect(id);
 		delete ex_over;
+		break;
+	case ::MOVE:
+		LOG(Warning, "CompType : MOVE");
 		break;
 	}
 }
@@ -158,6 +167,7 @@ void Server::DoAccept()
 	_acceptOver._compType = ACCEPT;
 	AcceptEx(_listenSocket, _acceptSocket, _acceptOver._buf, 0,
 		sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, 0, &_acceptOver._wsaover);
+	TimerQueue::AddTimerEvent(0, ::RandomMove, 5000);
 }
 
 void Server::HandleAccept()

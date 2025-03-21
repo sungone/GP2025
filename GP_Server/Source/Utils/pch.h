@@ -27,6 +27,7 @@
 #include "Logger.h"
 #include "ExpOver.h"
 #include "RandomUtils.h"
+#include "TimerQueue.h"
 
 enum CompType
 {
@@ -35,5 +36,4 @@ enum CompType
 	ACCEPT,
 
 	MOVE,
-	ATTACK,
 };
