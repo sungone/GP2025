@@ -35,5 +35,5 @@ enum CompType
 	SEND,
 	ACCEPT,
 
-	MOVE,
+	TEST,
 };

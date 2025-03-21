@@ -16,7 +16,7 @@ struct BoundingBox
 
     friend std::ostream& operator<<(std::ostream& os, const BoundingBox& bbox)
     {
-        os << "*** "<< bbox.Name << " -  Min" << bbox.Min << " Max" << bbox.Max;
+        os << "*** "<< bbox.Name << " -  Min" << bbox.Min.ToString() << " Max" << bbox.Max.ToString();
         return os;
     }
 };

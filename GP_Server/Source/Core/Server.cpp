@@ -131,8 +131,8 @@ void Server::WorkerThreadLoop()
 		case ::SEND:
 			delete expOver;
 			break;
-		case ::MOVE:
-			LOG("Move Event!!!!!!!!!!!!!!!!");
+		case ::TEST:
+			LOG("TEST Event!!!!!!!!!!!!!!!!");
 			break;
 		}
 	}
@@ -154,8 +154,8 @@ void Server::HandleCompletionError(ExpOver* ex_over, int32 id)
 		SessionManager::GetInst().Disconnect(id);
 		delete ex_over;
 		break;
-	case ::MOVE:
-		LOG(Warning, "CompType : MOVE");
+	case ::TEST:
+		LOG(Warning, "CompType : TEST");
 		break;
 	}
 }
@@ -167,7 +167,7 @@ void Server::DoAccept()
 	_acceptOver._compType = ACCEPT;
 	AcceptEx(_listenSocket, _acceptSocket, _acceptOver._buf, 0,
 		sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, 0, &_acceptOver._wsaover);
-	TimerQueue::AddTimerEvent(0, ::RandomMove, 5000);
+	TimerQueue::AddTimerEvent(10, ::IocpTimerTest, std::chrono::seconds(2));
 }
 
 void Server::HandleAccept()

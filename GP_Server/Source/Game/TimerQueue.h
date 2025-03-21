@@ -1,7 +1,7 @@
 #pragma once
 #include "IOCP.h"
 
-enum EventType {RandomMove,Chase};
+enum EventType {IocpTimerTest,Chase};
 struct TimerEvent
 {
 	int32 id;
@@ -16,7 +16,7 @@ class TimerQueue
 {
 public:
 	static void TimerThread();
-	static void AddTimerEvent(int32 id, EventType type, DWORD delayMs);
+	static void AddTimerEvent(int32 id, EventType type, std::chrono::seconds delaySec);
 	static std::priority_queue<TimerEvent> _TimerQueue;
 	static std::mutex _TimerMutex;
 };

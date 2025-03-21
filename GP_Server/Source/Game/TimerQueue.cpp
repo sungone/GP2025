@@ -20,13 +20,12 @@ void TimerQueue::TimerThread()
 			auto over = std::make_shared<ExpOver>();
 			switch (event.type)
 			{
-			case ::RandomMove:
-				over->_compType = ::MOVE;
+			case ::IocpTimerTest:
+				over->_compType = ::TEST;
 				IOCP::GetInst().PostCompletion(event.id, &over->_wsaover);
+				LOG("To PostQueue!!");
 				break;
 			case ::Chase:
-				over->_compType = ::MOVE;
-				IOCP::GetInst().PostCompletion(event.id, &over->_wsaover);
 				break;
 			}
 
@@ -38,10 +37,9 @@ void TimerQueue::TimerThread()
 }
 
 
-void TimerQueue::AddTimerEvent(int32 id, EventType type, DWORD delayMs)
+void TimerQueue::AddTimerEvent(int32 id, EventType type, std::chrono::seconds delaySec)
 {
 	std::lock_guard<std::mutex> lock(_TimerMutex);
-	auto executionTime = std::chrono::system_clock::now() + std::chrono::milliseconds(delayMs);
-	_TimerQueue.push({ id, type, executionTime });
+	_TimerQueue.push({ id, type, std::chrono::system_clock::now() + delaySec });
 }
 

@@ -26,7 +26,7 @@ void Session::DoSend(const Packet* packet)
 		LOG(LogType::SendLog, std::format("PlayerUpdate PKT to [{}]", _id));
 		break;
 	case S_ADD_MONSTER:
-		LOG(LogType::SendLog, std::format("AddMonster PKT to [{}]", _id));
+		//LOG(LogType::SendLog, std::format("AddMonster PKT to [{}]", _id));
 		break;
 	case S_REMOVE_MONSTER:
 		LOG(LogType::SendLog, std::format("RemoveMonster PKT to [{}]", _id));
