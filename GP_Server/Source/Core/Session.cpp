@@ -77,11 +77,13 @@ void Session::Connect(SOCKET socket, int32 id)
 
 void Session::Disconnect()
 {
+	_loginState = false;
 	_sSocket->Close();
 }
 
 void Session::Login()
 {
+	_loginState = true;
 	CreatePlayer();
 	GameWorld::GetInst().SpawnMonster(*this);
 }
