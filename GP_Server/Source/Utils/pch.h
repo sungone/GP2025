@@ -35,5 +35,5 @@ enum CompType
 	SEND,
 	ACCEPT,
 
-	TEST,
+	EVENT_PATROL,
 };

@@ -121,9 +121,6 @@
     <ClInclude Include="Source\Utils\pch.h">
       <Filter>Source Files\Utils\Pch</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Utils\Timer.h">
-      <Filter>Source Files\Utils\Timer</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Game\TimerQueue.h">
       <Filter>Source Files\Utils\Timer</Filter>
     </ClInclude>

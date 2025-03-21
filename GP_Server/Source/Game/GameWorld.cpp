@@ -4,8 +4,6 @@
 bool GameWorld::Init()
 {
 	CreateMonster();
-	//StartMonsterStateBroadcast();
-	//UpdateMonster();
 	return true;
 }
 
@@ -49,6 +47,7 @@ void GameWorld::CreateMonster()
 		_characters[i]->Init();
 		_characters[i]->GetInfo().ID = i;
 	}
+	TimerQueue::AddTimerEvent(TimerEvent(0, ::AI_Patrol, 2000));
 }
 
 void GameWorld::SpawnMonster(Session& session)
@@ -121,16 +120,8 @@ std::shared_ptr<Character> GameWorld::GetCharacterByID(int32 id)
 	return _characters[id];
 }
 
-void GameWorld::StartMonsterStateBroadcast()
-{
-	_MonsterStateBroadcastTimer.Start(3000, [this]() {
-		BroadcastMonsterStates();
-		});
-}
-
 void GameWorld::BroadcastMonsterStates()
 {
-	std::lock_guard<std::mutex> lock(_carrMutex);
 	LOG(SendLog, std::format("Broadcast monster"));
 
 	for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
@@ -147,15 +138,14 @@ void GameWorld::BroadcastMonsterStates()
 
 void GameWorld::UpdateMonster()
 {
-	_MonsterAIUpdateTimer.Start(4000, [this]() {
-		std::unique_lock<std::mutex> lock(_carrMutex);
-		for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
-		{
-			if (!_characters[i]) return;
+	std::unique_lock<std::mutex> lock(_carrMutex);
+	for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
+	{
+		if (!_characters[i]) return;
 
-			_characters[i]->Update();
-		}
-		});
+		_characters[i]->Update();
+	}
+	BroadcastMonsterStates();
 }
 
 bool GameWorld::RemoveWorldItem(std::shared_ptr<WorldItem> item)

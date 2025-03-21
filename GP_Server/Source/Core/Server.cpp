@@ -131,8 +131,9 @@ void Server::WorkerThreadLoop()
 		case ::SEND:
 			delete expOver;
 			break;
-		case ::TEST:
-			LOG("TEST Event!!!!!!!!!!!!!!!!");
+		case ::EVENT_PATROL:
+			LOG("EVENT_PATROL!!");
+			GameWorld::GetInst().UpdateMonster();
 			break;
 		}
 	}
@@ -154,8 +155,8 @@ void Server::HandleCompletionError(ExpOver* ex_over, int32 id)
 		SessionManager::GetInst().Disconnect(id);
 		delete ex_over;
 		break;
-	case ::TEST:
-		LOG(Warning, "CompType : TEST");
+	case ::EVENT_PATROL:
+		LOG(Warning, "CompType : EVENT_PATROL");
 		break;
 	}
 }
@@ -167,7 +168,6 @@ void Server::DoAccept()
 	_acceptOver._compType = ACCEPT;
 	AcceptEx(_listenSocket, _acceptSocket, _acceptOver._buf, 0,
 		sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, 0, &_acceptOver._wsaover);
-	TimerQueue::AddTimerEvent(10, ::IocpTimerTest, std::chrono::seconds(2));
 }
 
 void Server::HandleAccept()

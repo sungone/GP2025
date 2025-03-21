@@ -11,21 +11,19 @@ void TimerQueue::TimerThread()
 		auto now = std::chrono::system_clock::now();
 
 		std::unique_lock<std::mutex> lock(_TimerMutex);
-		while (!_TimerQueue.empty() && _TimerQueue.top().wakeUpTime <= now)
+		while (!_TimerQueue.empty() && _TimerQueue.top()._wakeUpTime <= now)
 		{
 			TimerEvent event = _TimerQueue.top();
 			_TimerQueue.pop();
 			lock.unlock();
 
 			auto over = std::make_shared<ExpOver>();
-			switch (event.type)
+			switch (event._type)
 			{
-			case ::IocpTimerTest:
-				over->_compType = ::TEST;
-				IOCP::GetInst().PostCompletion(event.id, &over->_wsaover);
-				LOG("To PostQueue!!");
-				break;
-			case ::Chase:
+			case ::AI_Patrol:
+				over->_compType = ::EVENT_PATROL;
+				IOCP::GetInst().PostCompletion(event._id, &over->_wsaover);
+				AddTimerEvent(TimerEvent(0, ::AI_Patrol, 2000));
 				break;
 			}
 
@@ -37,9 +35,15 @@ void TimerQueue::TimerThread()
 }
 
 
-void TimerQueue::AddTimerEvent(int32 id, EventType type, std::chrono::seconds delaySec)
+void TimerQueue::AddTimerEvent(TimerEvent timerEvent)
 {
 	std::lock_guard<std::mutex> lock(_TimerMutex);
-	_TimerQueue.push({ id, type, std::chrono::system_clock::now() + delaySec });
+	_TimerQueue.push(timerEvent);
+}
+
+void TimerQueue::AddTimerEvent(TimerType type, uint32 intervalMs)
+{
+	std::lock_guard<std::mutex> lock(_TimerMutex);
+	_TimerQueue.push(TimerEvent(0, type, intervalMs));
 }
 
