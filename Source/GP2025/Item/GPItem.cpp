@@ -75,7 +75,6 @@ void AGPItem::SetupItem(int32 NewItemID, uint8 NewItemtype, int32 NewAmount)
 
 		UE_LOG(LogTemp, Log, TEXT("Set Static Mesh"));
 	}
-	// Skeletal Mesh가 있는 경우 적용
 	else if (ItemData->ItemSkeletalMesh)
 	{
 		ItemSkeletalMesh->SetSkeletalMesh(ItemData->ItemSkeletalMesh);
