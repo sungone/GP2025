@@ -90,9 +90,6 @@ public :
 	UPROPERTY()
 	TSubclassOf<UUserWidget> InventoryWidgetClass;
 
-	UPROPERTY()
-	UUserWidget* InventoryWidget;
-
 	UFUNCTION()
 	UGPInventory* GetInventoryWidget();
 

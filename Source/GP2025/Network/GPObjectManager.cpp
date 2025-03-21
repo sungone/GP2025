@@ -187,7 +187,7 @@ void UGPObjectManager::ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos)
 	if (!World)
 		return;
 
-	Pos.Z -= 70.f; // 아이템 위치 약간 내리기
+	Pos.Z -= 100.f; // 아이템 위치 약간 내리기
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -221,33 +221,42 @@ void UGPObjectManager::DropItem(uint32 ItemID, uint8 ItemType, FVector Pos)
 
 void UGPObjectManager::AddInventoryItem(uint32 ItemID, uint8 ItemType)
 {
-	UE_LOG(LogTemp, Warning, TEXT("AddInventoryItem - ItemID: %d | ItemType: %d"), ItemID, ItemType);
-
-	AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	if (!LocalMyPlayer)
-	{
-		UE_LOG(LogTemp, Error, TEXT("No Player..."));
+	if (!MyPlayer)
 		return;
-	}
 
-	if (!LocalMyPlayer->InventoryWidget)
-	{
-		UE_LOG(LogTemp, Error, TEXT("InventoryWidget not found!"));
-		return;
-	}
+	UGPInventory* Inventory = Cast<UGPInventory>(MyPlayer->InventoryWidget);
+	if (Inventory)
+		Inventory->AddItemToInventory(ItemType, 1);
 
-	UGPInventory* LocalInventoryWidget = Cast<UGPInventory>(LocalMyPlayer->InventoryWidget);
-	if (!LocalInventoryWidget)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to Cast InventoryWidget to UGPInventory"));
-		return;
-	}
+	// 구버전
+	//UE_LOG(LogTemp, Warning, TEXT("AddInventoryItem - ItemID: %d | ItemType: %d"), ItemID, ItemType);
 
-	UE_LOG(LogTemp, Warning, TEXT("Attempting to Add Item - ItemType: %d to Inventory"), ItemType);
+	//AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	//if (!LocalMyPlayer)
+	//{
+	//	UE_LOG(LogTemp, Error, TEXT("No Player..."));
+	//	return;
+	//}
 
-	LocalInventoryWidget->AddItemToInventory(ItemType, 1);
+	//if (!LocalMyPlayer->InventoryWidget)
+	//{
+	//	UE_LOG(LogTemp, Error, TEXT("InventoryWidget not found!"));
+	//	return;
+	//}
 
-	UE_LOG(LogTemp, Warning, TEXT("Item Successfully Added to Inventory!"));
+	//UGPInventory* LocalInventoryWidget = Cast<UGPInventory>(LocalMyPlayer->InventoryWidget);
+
+	//if (!LocalInventoryWidget)
+	//{
+	//	UE_LOG(LogTemp, Error, TEXT("Failed to Cast InventoryWidget to UGPInventory"));
+	//	return;
+	//}
+
+	//UE_LOG(LogTemp, Warning, TEXT("Attempting to Add Item - ItemType: %d to Inventory"), ItemType);
+
+	//LocalInventoryWidget->AddItemToInventory(ItemType, 1);
+
+	//UE_LOG(LogTemp, Warning, TEXT("Item Successfully Added to Inventory!"));
 }
 
 void UGPObjectManager::RemoveInventoryItem(uint32 ItemID)
