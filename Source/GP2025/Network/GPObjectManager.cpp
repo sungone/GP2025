@@ -267,7 +267,38 @@ void UGPObjectManager::RemoveInventoryItem(uint32 ItemID)
 
 void UGPObjectManager::EquipItem(int32 PlayerID, uint8 ItemType)
 {
-	//Todo: 다른 플레이어 착용 아이템 업데이트
+	if (!OtherPlayers.Contains(PlayerID))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("EquipItem Failed: PlayerID [%d] not found"), PlayerID);
+		return;
+	}
+
+	AGPCharacterPlayer* TargetPlayer = OtherPlayers[PlayerID];
+	if (!TargetPlayer)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UGPObjectManager::EquipItem , TargetPlayer Not Found"));
+		return;
+	}
+
+	static const FString DataTablePath = TEXT("/Game/Item/GPItemTable.GPItemTable");
+	UDataTable* DataTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath));
+	if (!DataTable)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UGPObjectManager::EquipItem , DataTable Not Found"));
+		return;
+	}
+	FString ContextString;
+	FGPItemStruct* ItemData = DataTable->FindRow<FGPItemStruct>(*FString::FromInt(ItemType), ContextString);
+
+	if (!ItemData)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("EquipItem Failed: No matching item found for ItemType [%d]"), ItemType);
+		return;
+	}
+
+	TargetPlayer->EquipItemOnCharacter(*ItemData);
+
+	UE_LOG(LogTemp, Warning, TEXT("Player [%d] equipped item: %s"), PlayerID, *ItemData->ItemName.ToString());
 }
 
 void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType)

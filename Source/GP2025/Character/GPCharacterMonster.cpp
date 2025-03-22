@@ -42,19 +42,17 @@ void AGPCharacterMonster::UpdateWidgetVisibility()
     APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
     if (!PlayerController)
     {
-        UE_LOG(LogTemp, Error, TEXT("[UpdateWidgetVisibility] PlayerController is NULL!"));
         return;
     }
 
     APawn* PlayerPawn = PlayerController->GetPawn();
     if (!PlayerPawn)
     {
-        UE_LOG(LogTemp, Error, TEXT("[UpdateWidgetVisibility] PlayerPawn is NULL!"));
         return;
     }
 
     float Distance = FVector::Dist(GetActorLocation(), PlayerPawn->GetActorLocation());
-    UE_LOG(LogTemp, Warning, TEXT("[UpdateWidgetVisibility] Distance to Player: %.2f"), Distance);
+
 
     ESlateVisibility VisibilityState = (Distance > 300.f)
         ? ESlateVisibility::Hidden
@@ -63,22 +61,10 @@ void AGPCharacterMonster::UpdateWidgetVisibility()
     if (HpBarWidget)
     {
         HpBarWidget->SetVisibility(VisibilityState);
-        UE_LOG(LogTemp, Warning, TEXT("[UpdateWidgetVisibility] HpBar Visibility: %s"),
-            VisibilityState == ESlateVisibility::Hidden ? TEXT("Hidden") : TEXT("Visible"));
-    }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("[UpdateWidgetVisibility] HpBarWidget is NULL!"));
     }
 
     if (LevelTextWidget)
     {
         LevelTextWidget->SetVisibility(VisibilityState);
-        UE_LOG(LogTemp, Warning, TEXT("[UpdateWidgetVisibility] LevelText Visibility: %s"),
-            VisibilityState == ESlateVisibility::Hidden ? TEXT("Hidden") : TEXT("Visible"));
-    }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("[UpdateWidgetVisibility] LevelTextWidget is NULL!"));
     }
 }
