@@ -41,13 +41,14 @@ void GameWorld::RemoveCharacter(int32 id)
 
 void GameWorld::CreateMonster()
 {
+	LOG("CreateMonster!");
 	for (int32 i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{
 		_characters[i] = std::make_shared<Monster>();
 		_characters[i]->Init();
 		_characters[i]->GetInfo().ID = i;
 	}
-	TimerQueue::AddTimerEvent(TimerEvent(0, ::AI_Patrol, 2000));
+	TimerQueue::AddTimerEvent(TimerEvent(0, ::MONSTER_UPDATE, 2000));
 }
 
 void GameWorld::SpawnMonster(Session& session)
@@ -122,8 +123,7 @@ std::shared_ptr<Character> GameWorld::GetCharacterByID(int32 id)
 
 void GameWorld::BroadcastMonsterStates()
 {
-	LOG(SendLog, std::format("Broadcast monster"));
-
+	LOG("Broadcast Monster States!");
 	for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{
 		if (_characters[i] && _characters[i]->IsValid())
@@ -138,6 +138,7 @@ void GameWorld::BroadcastMonsterStates()
 
 void GameWorld::UpdateMonster()
 {
+	LOG("Update Monster!");
 	std::unique_lock<std::mutex> lock(_carrMutex);
 	for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{

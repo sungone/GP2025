@@ -131,10 +131,6 @@ void Server::WorkerThreadLoop()
 		case ::SEND:
 			delete expOver;
 			break;
-		case ::EVENT_PATROL:
-			LOG("EVENT_PATROL!!");
-			GameWorld::GetInst().UpdateMonster();
-			break;
 		}
 	}
 }
@@ -154,9 +150,6 @@ void Server::HandleCompletionError(ExpOver* ex_over, int32 id)
 		LOG(Warning, "CompType : SEND");
 		SessionManager::GetInst().Disconnect(id);
 		delete ex_over;
-		break;
-	case ::EVENT_PATROL:
-		LOG(Warning, "CompType : EVENT_PATROL");
 		break;
 	}
 }

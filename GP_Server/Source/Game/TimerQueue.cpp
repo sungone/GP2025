@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "TimerQueue.h"
-
+#include "GameWorld.h"
 std::priority_queue<TimerEvent> TimerQueue::_TimerQueue;
 std::mutex TimerQueue::_TimerMutex;
 
@@ -20,10 +20,10 @@ void TimerQueue::TimerThread()
 			auto over = std::make_shared<ExpOver>();
 			switch (event._type)
 			{
-			case ::AI_Patrol:
-				over->_compType = ::EVENT_PATROL;
-				IOCP::GetInst().PostCompletion(event._id, &over->_wsaover);
-				AddTimerEvent(TimerEvent(0, ::AI_Patrol, 2000));
+			case ::MONSTER_UPDATE:
+				LOG("Monsters Update Event");
+				GameWorld::GetInst().UpdateMonster();
+				AddTimerEvent(TimerEvent(0, ::MONSTER_UPDATE, 2000));
 				break;
 			}
 
@@ -41,7 +41,7 @@ void TimerQueue::AddTimerEvent(TimerEvent timerEvent)
 	_TimerQueue.push(timerEvent);
 }
 
-void TimerQueue::AddTimerEvent(TimerType type, uint32 intervalMs)
+void TimerQueue::AddTimerEvent(EventType type, uint32 intervalMs)
 {
 	std::lock_guard<std::mutex> lock(_TimerMutex);
 	_TimerQueue.push(TimerEvent(0, type, intervalMs));

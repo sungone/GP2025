@@ -34,6 +34,9 @@ enum CompType
 	RECV,
 	SEND,
 	ACCEPT,
+};
 
-	EVENT_PATROL,
+enum EventType
+{
+	MONSTER_UPDATE
 };

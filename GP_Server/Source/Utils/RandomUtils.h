@@ -31,4 +31,10 @@ namespace RandomUtils
     {
         return GetRandomFloat(0.0f, 1.0f) < probability;
     }
+
+    inline bool GetRandomBool()
+    {
+        std::uniform_int_distribution<int> dist(0, 1);
+        return dist(GetRandomEngine()) == 1;
+    }
 }
