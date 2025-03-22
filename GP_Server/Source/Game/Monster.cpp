@@ -6,7 +6,6 @@
 void Monster::Init()
 {
 	Character::Init();
-	_pos = NavMesh::GetRandomPosition();
 	_info.CharacterType = RandomUtils::GetRandomUint8((uint8)Type::EMonster::ENERGY_DRINK, (uint8)Type::EMonster::TINO);
 	_info.Stats.Level = _info.CharacterType;
 }
@@ -106,14 +105,14 @@ bool Monster::DetectTarget()
 {
 	// Todo:
 
-	return false;
+	return true;
 }
 
 bool Monster::IsTargetInRange()
 {
 	// Todo:
 
-	return false;
+	return true;
 }
 
 bool Monster::IsPathComplete()

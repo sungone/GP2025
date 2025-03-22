@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Character.h"
+#include "NavMesh.h"
 
 void Character::Init()
 {
@@ -11,6 +12,8 @@ void Character::Init()
 		0.25f,    // Dodge
 		200.f     // Speed
 	);
+	_info.SetLocation(NavMesh::GetRandomPosition());
+	_info.SetYaw(RandomUtils::GetRandomFloat(-180, 180));
 }
 
 bool Character::IsDead()

@@ -58,7 +58,7 @@ struct FInfoData
 		Speed = Speed_;
 		State = STATE_IDLE;
 	}
-
+	void SetYaw(float Yaw_) { Yaw = Yaw_; }
 	void SetLocation(float X_, float Y_, float Z_) { Pos = FVector(X_, Y_, Z_); }
 	void SetLocation(FVector Pos_) { Pos = Pos_; }
 	void AddState(ECharacterStateType NewState) { State |= NewState; }
