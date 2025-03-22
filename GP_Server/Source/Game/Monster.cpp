@@ -6,7 +6,7 @@
 void Monster::Init()
 {
 	Character::Init();
-	SetParkingGarageRandomLocation();
+	_pos = NavMesh::GetRandomPosition();
 	_info.CharacterType = RandomUtils::GetRandomUint8((uint8)Type::EMonster::ENERGY_DRINK, (uint8)Type::EMonster::TINO);
 	_info.Stats.Level = _info.CharacterType;
 }
@@ -71,27 +71,19 @@ void Monster::ChangeState(ECharacterStateType newState)
 	}
 }
 
-void Monster::SetTargetIdx(const FVector& TargetPosition)
+void Monster::SetTarget(const FVector& TargetPos)
 {
-	int TargetPolygon = NavMesh::FindIdxFromPos(TargetPosition);
-	_navPath = NavMesh::FindPath(_curPolyIdx, TargetPolygon);
-	_curPathIndex = 0;
-}
-
-void Monster::SetTarget(const FVector& TargetPosition)
-{
-	_targetPos = TargetPosition;
+	_targetPos = TargetPos;
 	_hasTarget = true;
 
-	int TargetPolygon = NavMesh::FindIdxFromPos(TargetPosition);
+	int TargetPolygon = NavMesh::FindIdxFromPos(TargetPos);
 	_navPath = NavMesh::FindPath(_curPolyIdx, TargetPolygon);
 	_curPathIndex = 0;
 }
 
 void Monster::SetRandomPatrol()
 {
-	FVector RandomTarget = _pos + FVector(RandomUtils::GetRandomFloat(-1000, 1000), RandomUtils::GetRandomFloat(-1000, 1000), 0);
-	SetTarget(RandomTarget);
+	//Todo
 }
 
 void Monster::Move()
@@ -106,19 +98,21 @@ void Monster::Move()
 
 void Monster::Attack()
 {
-	// 타겟에게 데미지를 입히거나 공격을 수행하는 코드 작성
+	// Todo:
 }
 
 
 bool Monster::DetectTarget()
 {
-	// 타겟 감지 로직을 추가
+	// Todo:
+
 	return false;
 }
 
 bool Monster::IsTargetInRange()
 {
-	// 실제 타겟과의 거리를 계산하여 공격 범위 안에 있는지 확인
+	// Todo:
+
 	return false;
 }
 

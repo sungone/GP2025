@@ -11,7 +11,6 @@ public:
     void BehaviorTree();
 	void ChangeState(ECharacterStateType newState);
 
-    void SetTargetIdx(const FVector& TargetPosition);
     void SetTarget(const FVector& TargetPosition);
     void SetRandomPatrol();
 private:

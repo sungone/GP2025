@@ -94,48 +94,13 @@ void NavMesh::PrintPolygonGraph()
 
 std::vector<int> NavMesh::FindPath(int StartPolyIdx, int GoalPolyIdx)
 {
-	std::priority_queue<PolygonNodeState, std::vector<PolygonNodeState>, std::greater<>> OpenSet;
-	std::unordered_map<int, float> CostSoFar;
-	std::unordered_map<int, int> CameFrom;
-	std::unordered_set<int> Visited;
-
-	FVector GoalCenter = Vertices[Triangles[GoalPolyIdx].IndexA];
-
-	OpenSet.push({ StartPolyIdx, 0, Vertices[Triangles[StartPolyIdx].IndexA].DistanceTo(GoalCenter), -1 });
-	CostSoFar[StartPolyIdx] = 0;
-
-	while (!OpenSet.empty()) {
-		PolygonNodeState Current = OpenSet.top();
-		OpenSet.pop();
-
-		if (Current.PolygonIndex == GoalPolyIdx) {
-			std::vector<int> Path;
-			for (int i = Current.PolygonIndex; i != -1; i = CameFrom[i]) {
-				Path.push_back(i);
-			}
-			std::reverse(Path.begin(), Path.end());
-			return Path;
-		}
-
-		if (!Visited.insert(Current.PolygonIndex).second) continue;
-
-		for (int Neighbor : PolygonGraph[Current.PolygonIndex].Neighbors) {
-			if (Visited.find(Neighbor) != Visited.end()) continue;
-
-			float NewCost = CostSoFar[Current.PolygonIndex] + Vertices[Triangles[Neighbor].IndexA].DistanceTo(Vertices[Triangles[Current.PolygonIndex].IndexA]);
-
-			if (CostSoFar.find(Neighbor) == CostSoFar.end() || NewCost < CostSoFar[Neighbor]) {
-				CostSoFar[Neighbor] = NewCost;
-				OpenSet.push({ Neighbor, NewCost, Vertices[Triangles[Neighbor].IndexA].DistanceTo(GoalCenter), Current.PolygonIndex });
-				CameFrom[Neighbor] = Current.PolygonIndex;
-			}
-		}
-	}
+	//Todo:
 	return {};
 }
 
 bool NavMesh::LoadFromJson(const std::string& filePath, NavMesh& OutNavMeshData, bool isPrint)
 {
+	isPrint = true;
 	std::ifstream file(filePath);
 	if (!file.is_open())
 	{
@@ -174,4 +139,31 @@ bool NavMesh::LoadFromJson(const std::string& filePath, NavMesh& OutNavMeshData,
 	}
 
 	return true;
+}
+
+FVector NavMesh::GetRandomPosition()
+{
+	if (Triangles.empty() || Vertices.empty())
+	{
+		return FVector(0, 0, 0);
+	}
+
+	int RandomTriangleIndex = RandomUtils::GetRandomInt(0, Triangles.size() - 1);
+	const Triangle& SelectedTriangle = Triangles[RandomTriangleIndex];
+
+	const FVector& A = Vertices[SelectedTriangle.IndexA];
+	const FVector& B = Vertices[SelectedTriangle.IndexB];
+	const FVector& C = Vertices[SelectedTriangle.IndexC];
+
+	float r1 = RandomUtils::GetRandomFloat(0.0f, 1.0f);
+	float r2 = RandomUtils::GetRandomFloat(0.0f, 1.0f);
+
+	if (r1 + r2 > 1.0f)
+	{
+		r1 = 1.0f - r1;
+		r2 = 1.0f - r2;
+	}
+
+	FVector SpawnPosition = A + (B - A) * r1 + (C - A) * r2;
+	return SpawnPosition;
 }

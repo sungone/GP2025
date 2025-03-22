@@ -36,7 +36,7 @@ struct PolygonNode
 
 	std::string ToString() const {
 		std::ostringstream oss;
-		oss <<TriangleIndex << " -> ";
+		oss << TriangleIndex << " -> ";
 		for (int neighbor : Neighbors) {
 			oss << neighbor << " ";
 		}
@@ -69,4 +69,5 @@ public:
 	static void PrintPolygonGraph();
 	static std::vector<int> FindPath(int StartPolygon, int GoalPolygon);
 	static bool LoadFromJson(const std::string& filePath, NavMesh& OutNavMeshData, bool isPrint);
+	static FVector GetRandomPosition();
 };

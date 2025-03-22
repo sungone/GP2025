@@ -54,15 +54,15 @@ bool Server::Init()
 	}
 	IOCP::GetInst().RegisterSocket(_listenSocket);
 
-	if (!GameWorld::GetInst().Init())
-	{
-		LOG(LogType::Warning, "GameMgr");
-		return false;
-	}
-
 	if (!Map::GetInst().Init())
 	{
 		LOG(LogType::Warning, "Map");
+		return false;
+	}
+
+	if (!GameWorld::GetInst().Init())
+	{
+		LOG(LogType::Warning, "GameMgr");
 		return false;
 	}
 

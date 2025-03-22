@@ -79,34 +79,35 @@ void GameWorld::PlayerAttack(int32 attackerID, int32 targetID)
 	auto& Attacker = _characters[attackerID];
 	auto& atkInfo = Attacker->GetInfo();
 	atkInfo.AddState(ECharacterStateType::STATE_AUTOATTACK);
+	if (targetID != -1)
+	{
+
+		LOG(Log, std::format("Attacked monster[{}]", targetID));
+		std::shared_ptr<Monster> Target = static_pointer_cast<Monster>(_characters[targetID]);
+		if (Attacker->IsInAttackRange(Target->GetInfo()))
+		{
+#ifdef _DEBUG
+			float atkDamage = 50;
+#else
+			float atkDamage = Attacker->GetAttackDamage();
+#endif // TEST
+			if (atkDamage > 0.0f)
+			{
+				Target->OnDamaged(atkDamage);
+			}
+
+			auto pkt = DamagePacket(Target->GetInfo(), atkDamage);
+			SessionManager::GetInst().Broadcast(&pkt);
+			if (Target->IsDead())
+			{
+				atkInfo.AddExp(10);
+				SpawnWorldItem({ Target->GetInfo().Pos.X,Target->GetInfo().Pos.Y,Target->GetInfo().Pos.Z + 120 });
+				RemoveCharacter(targetID);
+			}
+		}
+	}
 	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, atkInfo);
 	SessionManager::GetInst().Broadcast(&infopkt);
-
-	if (targetID == -1)
-		return;
-
-	LOG(Log, std::format("Attacked monster[{}]", targetID));
-
-	std::shared_ptr<Monster> Target = static_pointer_cast<Monster>(_characters[targetID]);
-
-	if (!Attacker->IsInAttackRange(Target->GetInfo()))
-		return;
-
-#ifdef _DEBUG
-	float atkDamage = 50;
-#else
-	float atkDamage = Attacker->GetAttackDamage();
-#endif // TEST
-	if (atkDamage > 0.0f)
-		Target->OnDamaged(atkDamage);
-
-	auto pkt = DamagePacket(Target->GetInfo(), atkDamage);
-	SessionManager::GetInst().Broadcast(&pkt);
-	if (Target->IsDead())
-	{
-		SpawnWorldItem({ Target->GetInfo().Pos.X,Target->GetInfo().Pos.Y,Target->GetInfo().Pos.Z + 120 });
-		RemoveCharacter(targetID);
-	}
 }
 
 std::shared_ptr<Character> GameWorld::GetCharacterByID(int32 id)
