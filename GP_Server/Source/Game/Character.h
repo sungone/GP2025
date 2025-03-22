@@ -8,6 +8,7 @@ public:
 	virtual void Update() {};
 	virtual bool IsDead();
 
+	void Attack(const FInfoData& target);
 	void OnDamaged(float damage);
 	float GetAttackDamage();
 

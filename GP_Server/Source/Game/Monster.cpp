@@ -21,7 +21,6 @@ void Monster::Update()
 	}
 
 	BehaviorTree();
-	Move();
 }
 
 void Monster::BehaviorTree()
@@ -35,7 +34,6 @@ void Monster::BehaviorTree()
 		}
 		else if (RandomUtils::GetRandomBool())
 		{
-			SetRandomPatrol();
 			ChangeState(ECharacterStateType::STATE_WALK);
 		}
 		break;
@@ -44,21 +42,13 @@ void Monster::BehaviorTree()
 		{
 			ChangeState(ECharacterStateType::STATE_AUTOATTACK);
 		}
-		else if (IsPathComplete())
+		break;
+	case ECharacterStateType::STATE_AUTOATTACK:
+		if (!IsTargetInRange())
 		{
 			ChangeState(ECharacterStateType::STATE_IDLE);
 		}
 		break;
-	case ECharacterStateType::STATE_AUTOATTACK:
-        if (!IsTargetInRange())
-        {
-            ChangeState(ECharacterStateType::STATE_IDLE);
-        }
-        else
-        {
-            Attack();
-        }
-        break;
 	}
 }
 
@@ -70,52 +60,17 @@ void Monster::ChangeState(ECharacterStateType newState)
 	}
 }
 
-void Monster::SetTarget(const FVector& TargetPos)
-{
-	_targetPos = TargetPos;
-	_hasTarget = true;
-
-	int TargetPolygon = NavMesh::FindIdxFromPos(TargetPos);
-	_navPath = NavMesh::FindPath(_curPolyIdx, TargetPolygon);
-	_curPathIndex = 0;
-}
-
-void Monster::SetRandomPatrol()
-{
-	//Todo
-}
-
-void Monster::Move()
-{
-	if (_curPathIndex < _navPath.size()) {
-		int NextPolygonIndex = _navPath[_curPathIndex];
-		_pos = NavMesh::Vertices[NavMesh::Triangles[NextPolygonIndex].IndexA];
-		_curPolyIdx = NextPolygonIndex;
-		_curPathIndex++;
-	}
-}
-
-void Monster::Attack()
-{
-	// Todo:
-}
-
-
 bool Monster::DetectTarget()
 {
-	// Todo:
 
-	return true;
+	return false;
 }
 
 bool Monster::IsTargetInRange()
 {
-	// Todo:
-
-	return true;
-}
-
-bool Monster::IsPathComplete()
-{
-	return _curPathIndex >= _navPath.size();
+	if (_target != nullptr)
+	{
+		return this->IsInAttackRange(_target->GetInfo());
+	}
+	return false;
 }

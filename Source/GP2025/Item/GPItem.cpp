@@ -25,12 +25,10 @@ AGPItem::AGPItem()
 	ItemStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemStaticMesh"));
 	ItemStaticMesh->SetupAttachment(RootComponent);
 	ItemStaticMesh->SetCollisionProfileName(TEXT("NoCollision"));
-	ItemStaticMesh->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
 
 	ItemSkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ItemSkeletalMesh"));
 	ItemSkeletalMesh->SetupAttachment(RootComponent);
 	ItemSkeletalMesh->SetCollisionProfileName(TEXT("NoCollision"));
-	ItemSkeletalMesh->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
 
 	// 회전하는 움직임 추가
 	RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("RotatingMovement"));
