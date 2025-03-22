@@ -187,7 +187,7 @@ void UGPObjectManager::ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos)
 	if (!World)
 		return;
 
-	Pos.Z -= 100.f; // 아이템 위치 약간 내리기
+	Pos.Z -= 70.f; // 아이템 위치 약간 내리기
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
