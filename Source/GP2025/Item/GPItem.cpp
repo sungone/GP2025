@@ -4,7 +4,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/RotatingMovementComponent.h"
 #include "Network/GPNetworkManager.h"
-#include "Character/GPCharacterPlayer.h"
+#include "Character/GPCharacterMyplayer.h"
 #include "Engine/World.h"
 #include "GPItemStruct.h"
 
@@ -115,7 +115,7 @@ void AGPItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 {
 	if (!OtherActor) return;
 
-	AGPCharacterPlayer* Player = Cast<AGPCharacterPlayer>(OtherActor);
+	AGPCharacterMyplayer* Player = Cast<AGPCharacterMyplayer>(OtherActor);
 	if (!Player) return;
 
 	UE_LOG(LogTemp, Warning, TEXT("Item Overlap Detected! ItemID: %d | Player: %s"),
