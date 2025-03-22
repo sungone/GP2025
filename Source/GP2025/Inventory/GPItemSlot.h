@@ -32,6 +32,8 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Item")
     FGPItemStruct& GetItemData();
 
+
+
     UFUNCTION(BlueprintCallable, Category = "Item")
     void EquipItem();
 

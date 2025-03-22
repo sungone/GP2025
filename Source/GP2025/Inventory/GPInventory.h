@@ -21,7 +21,7 @@ class GP2025_API UGPInventory : public UUserWidget
 public :
 	virtual void NativeConstruct() override;
 
-	void AddItemToInventory(uint8 ItemType , uint32 Quantity);
+	void AddItemToInventory(uint32 ItemID , uint8 ItemType , uint32 Quantity);
 	void RemoveItemFromInventory(uint8 ItemType);
 
 	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "UI")

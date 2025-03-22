@@ -13,6 +13,8 @@ struct FSlotStruct
     GENERATED_BODY()
 
 public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+    int32 ItemUniqueID;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
     FDataTableRowHandle ItemID;
@@ -24,5 +26,5 @@ public:
     EItemTypes ItemType;
 
     FSlotStruct()
-        : Quantity(0), ItemType(EItemTypes::Weapon) {}
+        : Quantity(0), ItemType(EItemTypes::Weapon), ItemUniqueID(-1) {}
 };

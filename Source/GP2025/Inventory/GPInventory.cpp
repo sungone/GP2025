@@ -14,7 +14,7 @@ void UGPInventory::NativeConstruct()
     Super::NativeConstruct();
 }
 
-void UGPInventory::AddItemToInventory(uint8 ItemType, uint32 Quantity)
+void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Quantity)
 {
     if (!ItemDataTable)
     {
@@ -92,6 +92,7 @@ void UGPInventory::AddItemToInventory(uint8 ItemType, uint32 Quantity)
     NewSlot->SlotData.ItemID.RowName = RowName;
     NewSlot->SlotData.Quantity = Quantity;
     NewSlot->CurrentItem = *ItemData;
+    NewSlot->SlotData.ItemUniqueID = ItemID;
 
     TargetArray->Add(NewSlot);
 

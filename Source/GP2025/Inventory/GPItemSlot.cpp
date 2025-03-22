@@ -4,6 +4,7 @@
 #include "Inventory/GPItemSlot.h"
 #include "Character/GPCharacterMyPlayer.h"
 #include "Inventory/GPInventory.h"
+#include "Network/GPNetworkManager.h"
 #include "Kismet/GameplayStatics.h"
 
 void UGPItemSlot::NativeConstruct()
@@ -62,6 +63,17 @@ void UGPItemSlot::EquipItem()
         CurrentItem.Category == ECategory::bow)
     {
         Player->EquipItemOnCharacter(GetItemData());
+        
+        UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+        if (NetworkManager)
+        {
+            NetworkManager->SendPlayerEquipItem(SlotData.ItemUniqueID);
+            UE_LOG(LogTemp, Warning, TEXT("EquipItem: Sent UniqueID [%d] to Server"), SlotData.ItemUniqueID);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("EquipItem: NetworkManager is NULL"));
+        }
     }
     else
     {

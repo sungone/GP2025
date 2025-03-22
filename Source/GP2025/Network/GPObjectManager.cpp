@@ -226,7 +226,7 @@ void UGPObjectManager::AddInventoryItem(uint32 ItemID, uint8 ItemType)
 
 	UGPInventory* Inventory = Cast<UGPInventory>(MyPlayer->InventoryWidget);
 	if (Inventory)
-		Inventory->AddItemToInventory(ItemType, 1);
+		Inventory->AddItemToInventory(ItemID , ItemType, 1);
 
 	// ±¸¹öÀü
 	//UE_LOG(LogTemp, Warning, TEXT("AddInventoryItem - ItemID: %d | ItemType: %d"), ItemID, ItemType);
