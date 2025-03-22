@@ -114,9 +114,9 @@ void AGPCharacterBase::Tick(float DeltaTime)
 
 	/// 미끄러지는 문제 해결하기 ///
 	{
-		if (CharacterInfo.Speed < 200.f)
+		if (CharacterInfo.Speed < 400.f)
 		{
-			CharacterInfo.Speed = 300.f;
+			CharacterInfo.Speed = 500.f;
 		}
 	}
 
