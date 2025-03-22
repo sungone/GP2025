@@ -29,7 +29,8 @@ void UGPGameInstance::SaveBoundingBoxData(ULevel* Level)
 }
 
 //NavMesh √ﬂ√‚
-void UGPGameInstance::SaveNavData()
+void UGPGameInstance::SaveNavData(bool IsSave)
 {
-	ExtractNavMeshData(GetWorld(), TEXT("GP_Server/NavMeshData.json"));
+	if (IsSave)
+		ExtractNavMeshData(GetWorld(), TEXT("GP_Server/NavMeshData.json"));
 }

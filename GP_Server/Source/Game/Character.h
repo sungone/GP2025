@@ -16,10 +16,6 @@ public:
 	bool IsInFieldOfView(const FInfoData& target, float fovAngle);
 	bool HasLineOfSight(const FVector& targetPos, const std::vector<FVector>& obstacles);
 
-	void SetBunkerRandomLocation();
-	void SetParkingGarageRandomLocation();
-	void SetTestRandomLocation();
-
 	FInfoData& GetInfo() { return _info; }
 	void SetInfo(FInfoData& info) { _info = info; }
 	bool IsValid() const { return _info.ID != -1; }

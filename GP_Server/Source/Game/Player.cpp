@@ -1,10 +1,11 @@
 #include "pch.h"
 #include "Player.h"
+#include "NavMesh.h"
 
 void Player::Init()
 {
 	Character::Init();
-	SetTestRandomLocation();
+	_info.SetLocation(NavMesh::GetRandomPosition());
 }
 
 bool Player::TakeWorldItem(const std::shared_ptr<WorldItem> item)
