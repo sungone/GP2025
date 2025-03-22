@@ -168,7 +168,6 @@
     <ClInclude Include="Source\Utils\Logger.h" />
     <ClInclude Include="Source\Utils\pch.h" />
     <ClInclude Include="Source\Utils\RandomUtils.h" />
-    <ClInclude Include="Source\Utils\Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Core\PacketManager.cpp" />

@@ -27,13 +27,16 @@
 #include "Logger.h"
 #include "ExpOver.h"
 #include "RandomUtils.h"
+#include "TimerQueue.h"
 
 enum CompType
 {
 	RECV,
 	SEND,
 	ACCEPT,
+};
 
-	MOVE,
-	ATTACK,
+enum EventType
+{
+	MONSTER_UPDATE
 };

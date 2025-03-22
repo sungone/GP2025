@@ -6,7 +6,7 @@
 void Monster::Init()
 {
 	Character::Init();
-	SetParkingGarageRandomLocation();
+	_pos = NavMesh::GetRandomPosition();
 	_info.CharacterType = RandomUtils::GetRandomUint8((uint8)Type::EMonster::ENERGY_DRINK, (uint8)Type::EMonster::TINO);
 	_info.Stats.Level = _info.CharacterType;
 }
@@ -14,13 +14,15 @@ void Monster::Init()
 void Monster::Update()
 {
 	if (!IsValid()) return;
+
 	if (IsDead())
 	{
-		_info.AddState(ECharacterStateType::STATE_DIE);
+		ChangeState(ECharacterStateType::STATE_DIE);
 		return;
 	}
 
 	BehaviorTree();
+	Move();
 }
 
 void Monster::BehaviorTree()
@@ -28,69 +30,93 @@ void Monster::BehaviorTree()
 	switch (_info.State)
 	{
 	case ECharacterStateType::STATE_IDLE:
-		if (ShouldWalking())
+		if (DetectTarget())
 		{
+			ChangeState(ECharacterStateType::STATE_AUTOATTACK);
+		}
+		else if (RandomUtils::GetRandomBool())
+		{
+			SetRandomPatrol();
 			ChangeState(ECharacterStateType::STATE_WALK);
 		}
-		else if (ShouldAttack())
-		{
-			ChangeState(ECharacterStateType::STATE_AUTOATTACK);
-		}
 		break;
-
 	case ECharacterStateType::STATE_WALK:
-		if (ShouldAttack())
+		if (IsTargetInRange())
 		{
 			ChangeState(ECharacterStateType::STATE_AUTOATTACK);
 		}
-		else if (!ShouldWalking())
+		else if (IsPathComplete())
 		{
 			ChangeState(ECharacterStateType::STATE_IDLE);
 		}
 		break;
-
 	case ECharacterStateType::STATE_AUTOATTACK:
-		if (!ShouldAttack())
-		{
-			ChangeState(ECharacterStateType::STATE_IDLE);
-		}
-		break;
+        if (!IsTargetInRange())
+        {
+            ChangeState(ECharacterStateType::STATE_IDLE);
+        }
+        else
+        {
+            Attack();
+        }
+        break;
 	}
 }
 
 void Monster::ChangeState(ECharacterStateType newState)
 {
-	std::lock_guard<std::mutex> lock(_cMutex);
-
 	if (!_info.HasState(newState))
 	{
 		_info.AddState(newState);
 	}
 }
 
-bool Monster::ShouldAttack()
+void Monster::SetTarget(const FVector& TargetPos)
 {
-	//Todo: 공격 범위 안에 플레이어 있는지
-	return RandomUtils::Chance(50);
+	_targetPos = TargetPos;
+	_hasTarget = true;
+
+	int TargetPolygon = NavMesh::FindIdxFromPos(TargetPos);
+	_navPath = NavMesh::FindPath(_curPolyIdx, TargetPolygon);
+	_curPathIndex = 0;
 }
 
-bool Monster::ShouldWalking()
+void Monster::SetRandomPatrol()
 {
-	std::lock_guard<std::mutex> lock(_cMutex);
+	//Todo
+}
 
-	if (RandomUtils::Chance(50))
-	{
-		FVector newPos = GenerateRandomNearbyPosition();
-
-		_info.SetLocationAndYaw(newPos);
-		return true;
+void Monster::Move()
+{
+	if (_curPathIndex < _navPath.size()) {
+		int NextPolygonIndex = _navPath[_curPathIndex];
+		_pos = NavMesh::Vertices[NavMesh::Triangles[NextPolygonIndex].IndexA];
+		_curPolyIdx = NextPolygonIndex;
+		_curPathIndex++;
 	}
+}
+
+void Monster::Attack()
+{
+	// Todo:
+}
+
+
+bool Monster::DetectTarget()
+{
+	// Todo:
+
 	return false;
 }
 
-FVector Monster::GenerateRandomNearbyPosition()
+bool Monster::IsTargetInRange()
 {
-	auto distX = RandomUtils::GetRandomFloat(-1000.0f, 1000.0f);
-	auto distY = RandomUtils::GetRandomFloat(-1000.0f, 1000.0f);
-	return _info.Pos + FVector(distX, distY, 0);
+	// Todo:
+
+	return false;
+}
+
+bool Monster::IsPathComplete()
+{
+	return _curPathIndex >= _navPath.size();
 }

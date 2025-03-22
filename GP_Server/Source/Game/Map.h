@@ -17,7 +17,7 @@ public:
 		{
 			return false;
 		}
-		NavMesh::BuildPolygonGraph(true);
+		NavMesh::BuildPolygonGraph(false);
 		LOG("NavMesh loaded successfully!");
 		return true;
 	}

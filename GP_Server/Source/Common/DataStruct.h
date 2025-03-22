@@ -84,7 +84,6 @@ struct FInfoData
 	void TakeDamage(float Amount) { SetHp(Stats.Hp - Amount); }
 	bool IsDead() const { return Stats.Hp < 1.0f; }
 	void SetDamage(float NewDamage) { Stats.Damage = std::max(0.0f, NewDamage); }
-
 	bool IsInAttackRange(const FInfoData& Target) const
 	{
 		return Pos.IsInRange(Target.Pos, AttackRange + Target.CollisionRadius);
@@ -107,7 +106,20 @@ struct FInfoData
 		FVector Direction = (TargetPos - Pos).Normalize();
 		return std::atan2(Direction.Y, Direction.X) * (180.0f / 3.14159265f);
 	}
+	void AddExp(float Amount)
+	{
+		Stats.Exp += Amount;
 
+		while (Stats.Exp >= Stats.MaxExp)
+		{
+			Stats.Exp -= Stats.MaxExp;
+			Stats.Level++;
+			Stats.MaxExp *= 1.5f;
+			Stats.MaxHp += 20.0f;
+			Stats.Hp = Stats.MaxHp;
+			Stats.Damage += 5.0f;
+		}
+	}
 #endif
 };
 

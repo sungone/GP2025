@@ -1,7 +1,6 @@
 #pragma once
 #include "Monster.h"
 #include "Session.h"
-#include "Timer.h"
 #include "SessionManager.h"
 #include "Item.h"
 
@@ -30,7 +29,6 @@ public:
 	std::shared_ptr<Character> GetCharacterByID(int32 id);
 	FInfoData& GetInfo(int32 id) { return GetCharacterByID(id).get()->GetInfo(); }
 
-	void StartMonsterStateBroadcast();
 	void BroadcastMonsterStates();
 	void UpdateMonster();
 
@@ -44,10 +42,6 @@ public:
 	void UseInventoryItem(int32 playerId, uint32 itemId);
 	void EquipInventoryItem(int32 playerId, uint32 itemId);
 	void UnequipInventoryItem(int32 playerId, uint32 itemId);
-
-public:
-	Timer _MonsterStateBroadcastTimer;
-	Timer _MonsterAIUpdateTimer;
 
 private:
 	std::array<std::shared_ptr<Character>, MAX_CHARACTER> _characters;

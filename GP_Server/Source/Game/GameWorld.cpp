@@ -4,8 +4,6 @@
 bool GameWorld::Init()
 {
 	CreateMonster();
-	StartMonsterStateBroadcast();
-	UpdateMonster();
 	return true;
 }
 
@@ -43,12 +41,14 @@ void GameWorld::RemoveCharacter(int32 id)
 
 void GameWorld::CreateMonster()
 {
+	LOG("CreateMonster!");
 	for (int32 i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{
 		_characters[i] = std::make_shared<Monster>();
 		_characters[i]->Init();
 		_characters[i]->GetInfo().ID = i;
 	}
+	TimerQueue::AddTimerEvent(TimerEvent(0, ::MONSTER_UPDATE, 2000));
 }
 
 void GameWorld::SpawnMonster(Session& session)
@@ -68,7 +68,7 @@ void GameWorld::SpawnMonster(Session& session)
 void GameWorld::PlayerMove(int32 playerId, FInfoData& info)
 {
 	_characters[playerId]->SetInfo(info);
-	LOG(std::format("Player[{}] Move to {}", playerId, info.Pos));
+	LOG(std::format("Player[{}] Move to {}", playerId, info.Pos.ToString()));
 	auto pkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, info);
 	SessionManager::GetInst().Broadcast(&pkt, playerId);
 }
@@ -79,34 +79,35 @@ void GameWorld::PlayerAttack(int32 attackerID, int32 targetID)
 	auto& Attacker = _characters[attackerID];
 	auto& atkInfo = Attacker->GetInfo();
 	atkInfo.AddState(ECharacterStateType::STATE_AUTOATTACK);
+	if (targetID != -1)
+	{
+
+		LOG(Log, std::format("Attacked monster[{}]", targetID));
+		std::shared_ptr<Monster> Target = static_pointer_cast<Monster>(_characters[targetID]);
+		if (Attacker->IsInAttackRange(Target->GetInfo()))
+		{
+#ifdef _DEBUG
+			float atkDamage = 50;
+#else
+			float atkDamage = Attacker->GetAttackDamage();
+#endif // TEST
+			if (atkDamage > 0.0f)
+			{
+				Target->OnDamaged(atkDamage);
+			}
+
+			auto pkt = DamagePacket(Target->GetInfo(), atkDamage);
+			SessionManager::GetInst().Broadcast(&pkt);
+			if (Target->IsDead())
+			{
+				atkInfo.AddExp(10);
+				SpawnWorldItem({ Target->GetInfo().Pos.X,Target->GetInfo().Pos.Y,Target->GetInfo().Pos.Z + 120 });
+				RemoveCharacter(targetID);
+			}
+		}
+	}
 	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, atkInfo);
 	SessionManager::GetInst().Broadcast(&infopkt);
-
-	if (targetID == -1)
-		return;
-
-	LOG(Log, std::format("Attacked monster[{}]", targetID));
-
-	std::shared_ptr<Monster> Target = static_pointer_cast<Monster>(_characters[targetID]);
-
-	if (!Attacker->IsInAttackRange(Target->GetInfo()))
-		return;
-
-#ifdef _DEBUG
-	float atkDamage = 50;
-#else
-	float atkDamage = Attacker->GetAttackDamage();
-#endif // TEST
-	if (atkDamage > 0.0f)
-		Target->OnDamaged(atkDamage);
-
-	auto pkt = DamagePacket(Target->GetInfo(), atkDamage);
-	SessionManager::GetInst().Broadcast(&pkt);
-	if (Target->IsDead())
-	{
-		SpawnWorldItem({ Target->GetInfo().Pos.X,Target->GetInfo().Pos.Y,Target->GetInfo().Pos.Z + 120 });
-		RemoveCharacter(targetID);
-	}
 }
 
 std::shared_ptr<Character> GameWorld::GetCharacterByID(int32 id)
@@ -121,18 +122,9 @@ std::shared_ptr<Character> GameWorld::GetCharacterByID(int32 id)
 	return _characters[id];
 }
 
-void GameWorld::StartMonsterStateBroadcast()
-{
-	_MonsterStateBroadcastTimer.Start(3000, [this]() {
-		BroadcastMonsterStates();
-		});
-}
-
 void GameWorld::BroadcastMonsterStates()
 {
-	std::lock_guard<std::mutex> lock(_carrMutex);
-	LOG(SendLog, std::format("Broadcast monster"));
-
+	LOG("Broadcast Monster States!");
 	for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{
 		if (_characters[i] && _characters[i]->IsValid())
@@ -147,15 +139,15 @@ void GameWorld::BroadcastMonsterStates()
 
 void GameWorld::UpdateMonster()
 {
-	_MonsterAIUpdateTimer.Start(4000, [this]() {
-		std::unique_lock<std::mutex> lock(_carrMutex);
-		for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
-		{
-			if (!_characters[i]) return;
+	LOG("Update Monster!");
+	std::unique_lock<std::mutex> lock(_carrMutex);
+	for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
+	{
+		if (!_characters[i]) return;
 
-			_characters[i]->Update();
-		}
-		});
+		_characters[i]->Update();
+	}
+	BroadcastMonsterStates();
 }
 
 bool GameWorld::RemoveWorldItem(std::shared_ptr<WorldItem> item)

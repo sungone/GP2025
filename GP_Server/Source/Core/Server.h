@@ -17,12 +17,9 @@ public:
 protected:
 	void InitSocket(SOCKET& socket, DWORD dwFlags);
 
-	void CreateThreads(std::function<void()> func, int32 numThreads = 1);
 	void WorkerThreadLoop();
-	void HandleError(ExpOver* ex_over, int32 _id);
-
+	void HandleCompletionError(ExpOver* ex_over, int32 _id);
 	void DoAccept();
-
 	void HandleAccept();
 	void HandleRecv(int32 _id, int32 recvByte, ExpOver* expOver);
 

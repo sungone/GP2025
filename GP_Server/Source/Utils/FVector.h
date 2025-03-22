@@ -51,26 +51,13 @@ struct FVector
         return std::atan2(Direction.Y, Direction.X) * (180.0f / 3.14159265f);
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const FVector& v)
-    {
-        os << "(" << v.X << ", " << v.Y << ", " << v.Z << ")";
-        return os;
-    }
-
     std::string ToString() const
     {
         std::ostringstream oss;
-        oss << *this;
+        oss << "("
+            << std::format("{:.2f}", X) << ", "
+            << std::format("{:.2f}", Y) << ", "
+            << std::format("{:.2f}", Z) << ")";
         return oss.str();
-    }
-};
-
-template <>
-struct std::formatter<FVector> {
-    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
-
-    template <typename FormatContext>
-    auto format(const FVector& obj, FormatContext& ctx) const {
-        return std::format_to(ctx.out(), "FVector({}, {}, {})", obj.X, obj.Y, obj.Z);
     }
 };
