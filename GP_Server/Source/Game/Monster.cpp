@@ -6,14 +6,29 @@
 void Monster::Init()
 {
 	Character::Init();
+	_characterType = CharacterType::Monster;
 	_info.CharacterType = RandomUtils::GetRandomUint8((uint8)Type::EMonster::ENERGY_DRINK, (uint8)Type::EMonster::TINO);
 	_info.Stats.Level = _info.CharacterType;
 }
 
+void Monster::UpdateViewList(std::shared_ptr<Character> other)
+{
+	if (!other) { LOG(Warning, "Invaild!"); return; }
+
+	auto otherId = other->GetInfo().ID;
+
+	if (IsInViewDistance(other->GetInfo().Pos, VIEW_DIST))
+	{
+		AddToViewList(otherId);
+	}
+	else
+	{
+		RemoveFromViewList(other->GetInfo().ID);
+	}
+}
+
 void Monster::Update()
 {
-	if (!IsValid()) return;
-
 	if (IsDead())
 	{
 		ChangeState(ECharacterStateType::STATE_DIE);

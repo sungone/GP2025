@@ -58,7 +58,7 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 void PacketManager::HandleLogoutPacket(int32 sessionId)
 {
 	auto pkt = IDPacket(EPacketType::S_REMOVE_PLAYER, sessionId);
-	_sessionMgr.Broadcast(&pkt, sessionId);
+	_sessionMgr.BroadcastToViewList(&pkt, sessionId);
 	_sessionMgr.Disconnect(sessionId);
 }
 

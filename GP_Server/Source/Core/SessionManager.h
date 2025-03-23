@@ -17,7 +17,8 @@ public:
 	void HandleRecvBuffer(int32 sessionId, int32 recvByte, ExpOver* expOver);
 	void HandleLogin(int32 sessionId);
 	void SendPacket(int32 sessionId, const Packet* packet);
-	void Broadcast(Packet* packet, int32 exptId = -1);
+	void BroadcastToAll(Packet* packet);
+	void BroadcastToViewList(Packet* packet, int32 senderId);
 	std::array<std::shared_ptr<Session>, MAX_CLIENT>& GetSessions() { return _sessions; }
 private:
 	int32 GenerateId();

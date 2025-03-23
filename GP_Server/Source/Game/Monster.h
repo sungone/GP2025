@@ -8,9 +8,9 @@ class Monster : public Character
 public:
 	Monster() { Init(); }
     void Init() override;
+    void UpdateViewList(std::shared_ptr<Character> other) override;
     void Update();
     void BehaviorTree();
-
 private:
 	void ChangeState(ECharacterStateType newState);
     bool DetectTarget();

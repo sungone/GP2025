@@ -80,3 +80,23 @@ bool Character::HasLineOfSight(const FVector& targetPos, const std::vector<FVect
 	}
 	return true;
 }
+
+bool Character::AddToViewList(int32 CharacterId)
+{
+	if (!_viewList.contains(CharacterId))
+	{
+		_viewList.insert(CharacterId);
+		return true;
+	}
+	return false;
+}
+
+bool Character::RemoveFromViewList(int32 CharacterId)
+{
+	if (_viewList.contains(CharacterId))
+	{
+		_viewList.erase(CharacterId);
+		return true;
+	}
+	return false;
+}

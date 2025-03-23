@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "GameWorld.h"
 
+
 bool GameWorld::Init()
 {
 	CreateMonster();
@@ -12,7 +13,6 @@ void GameWorld::AddPlayer(std::shared_ptr<Character> player)
 	std::unique_lock<std::mutex> lock(_carrMutex);
 	int32 id = player->GetInfo().ID;
 	_characters[id] = player;
-
 }
 
 void GameWorld::RemoveCharacter(int32 id)
@@ -27,15 +27,16 @@ void GameWorld::RemoveCharacter(int32 id)
 	{
 		LOG(Log, std::format("Remove Player"));
 		auto Pkt = InfoPacket(EPacketType::S_REMOVE_PLAYER, _characters[id]->GetInfo());
-		SessionManager::GetInst().Broadcast(&Pkt);
+		SessionManager::GetInst().BroadcastToViewList(&Pkt, id);
 	}
 	else
 	{
 		LOG(Log, std::format("Remove Monster"));
 		auto Pkt = InfoPacket(EPacketType::S_REMOVE_MONSTER, _characters[id]->GetInfo());
-		SessionManager::GetInst().Broadcast(&Pkt);
+		SessionManager::GetInst().BroadcastToViewList(&Pkt, id);
 	}
 
+	std::unique_lock<std::mutex> lock(_carrMutex);
 	_characters[id] = nullptr;
 }
 
@@ -53,37 +54,46 @@ void GameWorld::CreateMonster()
 
 void GameWorld::SpawnMonster(Session& session)
 {
-	std::lock_guard<std::mutex> lock(_carrMutex);
+	int32 playerId = session.GetId();
+	std::shared_ptr<Character> playerCharacter = GetCharacterByID(playerId);
+
+	if (!playerCharacter) return;
+	const auto& viewList = playerCharacter->GetViewList();
 
 	for (int32 i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{
-		if (_characters[i] && _characters[i]->IsValid())
+		if (_characters[i]) continue;
+		auto& monster = _characters[i];
+		int32 monsterId = monster->GetInfo().ID;
+		if (viewList.find(monsterId) != viewList.end())
 		{
-			auto Pkt = InfoPacket(EPacketType::S_ADD_MONSTER, _characters[i]->GetInfo());
+			auto Pkt = InfoPacket(EPacketType::S_ADD_MONSTER, monster->GetInfo());
 			session.DoSend(&Pkt);
 		}
 	}
 }
 
+
 void GameWorld::PlayerMove(int32 playerId, FInfoData& info)
 {
-	_characters[playerId]->SetInfo(info);
+	auto player = _characters[playerId];
+	player->SetInfo(info);
 	LOG(std::format("Player[{}] Move to {}", playerId, info.Pos.ToString()));
 	auto pkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, info);
-	SessionManager::GetInst().Broadcast(&pkt, playerId);
+	SessionManager::GetInst().BroadcastToViewList(&pkt, playerId);
 }
 
-void GameWorld::PlayerAttack(int32 attackerID, int32 targetID)
+void GameWorld::PlayerAttack(int32 playerId, int32 monsterId)
 {
 	std::unique_lock<std::mutex> lock(_carrMutex);
-	auto& Attacker = _characters[attackerID];
+	auto& Attacker = _characters[playerId];
 	auto& atkInfo = Attacker->GetInfo();
 	atkInfo.AddState(ECharacterStateType::STATE_AUTOATTACK);
-	if (targetID != -1)
+	if (monsterId != -1)
 	{
 
-		LOG(Log, std::format("Attacked monster[{}]", targetID));
-		std::shared_ptr<Monster> Target = static_pointer_cast<Monster>(_characters[targetID]);
+		LOG(Log, std::format("Attacked monster[{}]", monsterId));
+		std::shared_ptr<Monster> Target = static_pointer_cast<Monster>(_characters[monsterId]);
 		if (Attacker->IsInAttackRange(Target->GetInfo()))
 		{
 #ifdef _DEBUG
@@ -97,44 +107,19 @@ void GameWorld::PlayerAttack(int32 attackerID, int32 targetID)
 			}
 
 			auto pkt = DamagePacket(Target->GetInfo(), atkDamage);
-			SessionManager::GetInst().Broadcast(&pkt);
+			SessionManager::GetInst().SendPacket(playerId, &pkt);
+			SessionManager::GetInst().BroadcastToViewList(&pkt, playerId);
 			if (Target->IsDead())
 			{
 				atkInfo.AddExp(10);
 				SpawnWorldItem({ Target->GetInfo().Pos.X,Target->GetInfo().Pos.Y,Target->GetInfo().Pos.Z + 120 });
-				RemoveCharacter(targetID);
+				RemoveCharacter(monsterId);
 			}
 		}
 	}
 	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, atkInfo);
-	SessionManager::GetInst().Broadcast(&infopkt);
-}
-
-std::shared_ptr<Character> GameWorld::GetCharacterByID(int32 id)
-{
-	std::lock_guard<std::mutex> lock(_carrMutex);
-
-	if (id < 0 || id >= MAX_CHARACTER || !_characters[id] || !_characters[id]->IsValid())
-	{
-		LOG(Warning, "Invalid");
-		return nullptr;
-	}
-	return _characters[id];
-}
-
-void GameWorld::BroadcastMonsterStates()
-{
-	LOG("Broadcast Monster States!");
-	for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
-	{
-		if (_characters[i] && _characters[i]->IsValid())
-		{
-			auto& monster = _characters[i];
-			FInfoData MonsterInfoData = monster->GetInfo();
-			InfoPacket packet(S_MONSTER_STATUS_UPDATE, MonsterInfoData);
-			SessionManager::GetInst().Broadcast(&packet);
-		}
-	}
+	SessionManager::GetInst().SendPacket(playerId, &infopkt);
+	SessionManager::GetInst().BroadcastToViewList(&infopkt, playerId);
 }
 
 void GameWorld::UpdateMonster()
@@ -145,9 +130,24 @@ void GameWorld::UpdateMonster()
 	{
 		if (!_characters[i]) return;
 
+		UpdateViewList(_characters[i]);
 		_characters[i]->Update();
 	}
 	BroadcastMonsterStates();
+}
+
+void GameWorld::BroadcastMonsterStates()
+{
+	LOG("BroadcastToViewList Monster States!");
+	for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
+	{
+		if (!_characters[i]) continue;
+		auto& monster = _characters[i];
+		FInfoData MonsterInfoData = monster->GetInfo();
+		InfoPacket packet(S_MONSTER_STATUS_UPDATE, MonsterInfoData);
+		const auto& viewList = monster->GetViewList();
+		SessionManager::GetInst().BroadcastToViewList(&packet, i);
+	}
 }
 
 bool GameWorld::RemoveWorldItem(std::shared_ptr<WorldItem> item)
@@ -187,7 +187,7 @@ void GameWorld::SpawnWorldItem(FVector position)
 	auto newItem = std::make_shared<WorldItem>(position);
 	ItemPkt::SpawnPacket packet(newItem->GetItemID(), newItem->GetItemType(), position);
 	_worldItems.emplace_back(newItem);
-	SessionManager::GetInst().Broadcast(&packet);
+	SessionManager::GetInst().BroadcastToAll(&packet);
 }
 
 void GameWorld::SpawnWorldItem(WorldItem dropedItem)
@@ -196,7 +196,7 @@ void GameWorld::SpawnWorldItem(WorldItem dropedItem)
 	auto newItem = std::make_shared<WorldItem>(dropedItem);
 	_worldItems.emplace_back(newItem);
 	ItemPkt::DropPacket packet(newItem->GetItemID(), newItem->GetItemType(), newItem->GetPos());
-	SessionManager::GetInst().Broadcast(&packet);
+	SessionManager::GetInst().BroadcastToAll(&packet);
 }
 
 void GameWorld::PickUpWorldItem(int32 playerId, uint32 itemId)
@@ -229,7 +229,7 @@ void GameWorld::PickUpWorldItem(int32 playerId, uint32 itemId)
 		auto pkt = ItemPkt::AddInventoryPacket(targetItem->GetItemID(), targetItem->GetItemType());
 		SessionManager::GetInst().SendPacket(playerId, &pkt);
 		auto pkt1 = ItemPkt::PickUpPacket(itemId);
-		SessionManager::GetInst().Broadcast(&pkt1);
+		SessionManager::GetInst().BroadcastToAll(&pkt1);
 	}
 	else
 	{
@@ -271,7 +271,7 @@ void GameWorld::EquipInventoryItem(int32 playerId, uint32 itemId)
 	}
 	uint8 itemType = player->EquipItem(itemId);
 	auto pkt1 = ItemPkt::EquipItemPacket(playerId, itemType);
-	SessionManager::GetInst().Broadcast(&pkt1);
+	SessionManager::GetInst().BroadcastToViewList(&pkt1, playerId);
 }
 
 void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
@@ -284,5 +284,18 @@ void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
 	}
 	uint8 itemType = player->UnequipItem(itemId);
 	auto pkt1 = ItemPkt::UnequipItemPacket(playerId, itemType);
-	SessionManager::GetInst().Broadcast(&pkt1);
+	SessionManager::GetInst().BroadcastToViewList(&pkt1, playerId);
+}
+
+void GameWorld::UpdateViewList(std::shared_ptr<Character> listOwner)
+{
+	int32 ownerId = listOwner->GetInfo().ID;
+	
+	for (int32 otherId = 1; otherId < MAX_CHARACTER; ++otherId)
+	{
+		auto other = _characters[otherId];
+		if (!other)continue;
+		if (otherId == ownerId) continue;
+		listOwner->UpdateViewList(other);
+	}
 }

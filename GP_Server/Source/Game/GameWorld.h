@@ -26,11 +26,9 @@ public:
 
 	void PlayerMove(int32 playerId, FInfoData& info);
 	void PlayerAttack(int32 attackerId, int32 attackedId);
-	std::shared_ptr<Character> GetCharacterByID(int32 id);
-	FInfoData& GetInfo(int32 id) { return GetCharacterByID(id).get()->GetInfo(); }
 
-	void BroadcastMonsterStates();
 	void UpdateMonster();
+	void BroadcastMonsterStates();
 
 	bool RemoveWorldItem(std::shared_ptr<WorldItem> item);
 	std::shared_ptr<WorldItem> FindWorldItemById(uint32 itemId);
@@ -43,6 +41,20 @@ public:
 	void EquipInventoryItem(int32 playerId, uint32 itemId);
 	void UnequipInventoryItem(int32 playerId, uint32 itemId);
 
+	void UpdateViewList(std::shared_ptr<Character> character);
+
+	std::shared_ptr<Character> GetCharacterByID(int32 id)
+	{
+		if (id < 0 || id >= MAX_CHARACTER || !_characters[id])
+		{
+			LOG(Warning, "Invalid");
+			return nullptr;
+		}
+		return _characters[id];
+	}
+
+	FInfoData& GetInfo(int32 id) { return GetCharacterByID(id).get()->GetInfo(); }
+	bool IsMonster(int32 id) { return _characters[id]->IsMonster(); }
 private:
 	std::array<std::shared_ptr<Character>, MAX_CHARACTER> _characters;
 	std::vector<std::shared_ptr<WorldItem>> _worldItems;

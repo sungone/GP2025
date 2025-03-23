@@ -42,18 +42,32 @@ void SessionManager::HandleLogin(int32 id)
 	auto loginPkt = InfoPacket(EPacketType::S_LOGIN_SUCCESS, playerInfo);
 	session->DoSend(&loginPkt);
 
-	auto newPlayerPkt = InfoPacket(EPacketType::S_ADD_PLAYER, playerInfo);
-	Broadcast(&newPlayerPkt, id);
+	std::shared_ptr<Character> newPlayer = GameWorld::GetInst().GetCharacterByID(id);
+	if (newPlayer)
+	{
+		GameWorld::GetInst().UpdateViewList(newPlayer);
+	}
+	GameWorld::GetInst().SpawnMonster(*session);
+
+	//auto addPkt = InfoPacket(EPacketType::S_ADD_PLAYER, playerInfo);
+	//BroadcastToViewList(&addPkt, id);
 
 	std::lock_guard<std::mutex> lock(_smgrMutex);
-	for (int32 i = 0; i < MAX_CLIENT; ++i)
+	for (int32 otherId = 0; otherId < MAX_CLIENT; ++otherId)
 	{
-		if (i == id)continue;
-		const auto& otherPlayer = _sessions[i];
-		if (otherPlayer == nullptr|| !otherPlayer->IsLogin()) continue;
-		const auto& otherInfo = otherPlayer->GetPlayerInfo();
-		const auto otherPlayerPkt = InfoPacket(EPacketType::S_ADD_PLAYER, otherInfo);
-		session->DoSend(&otherPlayerPkt);
+		if (otherId == id)continue;
+		const auto& otherPlayerSession = _sessions[otherId];
+		if (otherPlayerSession == nullptr || !otherPlayerSession->IsLogin()) continue;
+
+		int32 otherPlayerId = otherPlayerSession->GetId();
+		std::shared_ptr<Character> otherPlayer = GameWorld::GetInst().GetCharacterByID(otherPlayerId);
+
+		if (otherPlayer && newPlayer->GetViewList().find(otherPlayerId) != newPlayer->GetViewList().end())
+		{
+			const auto& otherInfo = otherPlayerSession->GetPlayerInfo();
+			const auto otherPlayerPkt = InfoPacket(EPacketType::S_ADD_PLAYER, otherInfo);
+			session->DoSend(&otherPlayerPkt);
+		}
 	}
 }
 
@@ -62,18 +76,35 @@ void SessionManager::SendPacket(int32 sessionId, const Packet* packet)
 	_sessions[sessionId]->DoSend(packet);
 }
 
-void SessionManager::Broadcast(Packet* packet, int32 exptId)
+void SessionManager::BroadcastToAll(Packet* packet)
 {
+}
+
+void SessionManager::BroadcastToViewList(Packet* packet, int32 senderId)
+{
+	std::shared_ptr<Character> senderCharacter = GameWorld::GetInst().GetCharacterByID(senderId);
+	if (!senderCharacter) return;
+	GameWorld::GetInst().UpdateViewList(senderCharacter);
+	const std::unordered_set<int32>& viewList = senderCharacter->GetViewList();
+
 	std::lock_guard<std::mutex> lock(_smgrMutex);
 	for (auto& session : _sessions)
 	{
-		if (session == nullptr)continue;
-		if (!session->IsLogin() || exptId == session->GetId())
+		if (session == nullptr || !session->IsLogin())
 			continue;
 
-		session->DoSend(packet);
+		int32 sessionId = session->GetId();
+
+		if (sessionId == senderId)
+			continue;
+
+		if (viewList.find(sessionId) != viewList.end())
+		{
+			session->DoSend(packet);
+		}
 	}
 }
+
 
 int SessionManager::GenerateId()
 {

@@ -5,7 +5,8 @@
 class Player : public Character
 {
 public:
-	virtual void Init() override;
+	void Init() override;
+	void UpdateViewList(std::shared_ptr<Character> other) override;
 
 	bool TakeWorldItem(const std::shared_ptr<WorldItem> item);
 	WorldItem DropItem(uint32 itemId);

@@ -26,13 +26,13 @@ void Session::DoSend(const Packet* packet)
 		LOG(LogType::SendLog, std::format("PlayerUpdate PKT to [{}]", _id));
 		break;
 	case S_ADD_MONSTER:
-		//LOG(LogType::SendLog, std::format("AddMonster PKT to [{}]", _id));
+		LOG(LogType::SendLog, std::format("AddMonster PKT to [{}]", _id));
 		break;
 	case S_REMOVE_MONSTER:
 		LOG(LogType::SendLog, std::format("RemoveMonster PKT to [{}]", _id));
 		break;
 	case S_MONSTER_STATUS_UPDATE:
-		//LOG(LogType::SendLog, std::format("MonsterUpdate PKT to [{}]", _id));
+		LOG(LogType::SendLog, std::format("MonsterUpdate PKT to [{}]", _id));
 		break;
 	case S_DAMAGED_MONSTER:
 		LOG(LogType::SendLog, std::format("DamagedMonster PKT to [{}]", _id));
@@ -85,7 +85,6 @@ void Session::Login()
 {
 	_loginState = true;
 	CreatePlayer();
-	GameWorld::GetInst().SpawnMonster(*this);
 }
 
 void Session::CreatePlayer()
