@@ -8,8 +8,8 @@ public:
 	ExpOver();
 
 public:
-	WSAOVERLAPPED _wsaover;
-	WSABUF _wsabuf;
-	uint8	_buf[BUFSIZE];
-	CompType _compType;
+	WSAOVERLAPPED _wsaover{};
+	WSABUF _wsabuf{};
+	uint8	_buf[BUFSIZE]{};
+	CompType _compType{};
 };
