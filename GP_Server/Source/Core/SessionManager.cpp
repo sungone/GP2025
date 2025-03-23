@@ -73,6 +73,7 @@ void SessionManager::HandleLogin(int32 id)
 
 void SessionManager::SendPacket(int32 sessionId, const Packet* packet)
 {
+	if (!_sessions[sessionId]) { LOG(Warning, "Invalid!"); return; };
 	_sessions[sessionId]->DoSend(packet);
 }
 

@@ -13,6 +13,7 @@ public:
 	void OnDamaged(float damage);
 	float GetAttackDamage();
 
+	bool IsColision(const FVector& pos);
     bool IsInAttackRange(const FInfoData& target);
     bool IsInViewDistance(const FVector& targetPos, float viewDist);
 	bool IsInFieldOfView(const FInfoData& target, float fovAngle);
@@ -26,7 +27,7 @@ public:
 	FInfoData& GetInfo() { return _info; }
 	void SetInfo(FInfoData& info) { _info = info; }
 	bool IsMonster() { return _characterType == CharacterType::Monster; }
-	
+
 	void Lock() { _mutex.lock(); }
 	void Unlock() { _mutex.unlock(); }
 protected:

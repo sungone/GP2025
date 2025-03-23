@@ -1,7 +1,7 @@
 #pragma once
 #include "DummyClient.h"
 
-constexpr int32 CLIENT_NUM = 50;
+constexpr int32 CLIENT_NUM = 100;
 class DummyClientManager
 {
 public:

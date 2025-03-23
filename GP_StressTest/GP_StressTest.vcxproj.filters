@@ -8,9 +8,6 @@
     <Filter Include="소스 파일\Network">
       <UniqueIdentifier>{ed68e76c-1850-4d7c-a5e9-875606c5c28b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\Render">
-      <UniqueIdentifier>{25c7d592-7816-4daa-ab6a-2febdc2e79fa}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\Pch">
       <UniqueIdentifier>{0198502e-1345-4340-ab7e-bead8a2df816}</UniqueIdentifier>
     </Filter>
@@ -22,9 +19,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\GLWindow.cpp">
-      <Filter>소스 파일\Render</Filter>
-    </ClCompile>
     <ClCompile Include="..\GP_Server\Source\IOCP\ExpOver.cpp">
       <Filter>소스 파일\Shared</Filter>
     </ClCompile>
@@ -43,14 +37,8 @@
     <ClCompile Include="Source\TestMain.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GLMain.cpp">
-      <Filter>소스 파일\Render</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\GLWindow.h">
-      <Filter>소스 파일\Render</Filter>
-    </ClInclude>
     <ClInclude Include="..\GP_Server\Source\Common\Common.h">
       <Filter>소스 파일\Shared\Common</Filter>
     </ClInclude>

@@ -20,7 +20,7 @@ AGPCharacterPlayer::AGPCharacterPlayer()
     BodyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BodyMesh"));
     BodyMesh->SetupAttachment(GetCapsuleComponent());
     BodyMesh->SetCollisionProfileName(TEXT("NoCollision"));
-    BodyMesh->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
+    BodyMesh->SetRelativeLocationAndRotation(FVector(0.f, 0.f, 0.f), FRotator(0.f, -90.f, 0.f));
 
     HeadMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HeadMesh"));
     HeadMesh->SetupAttachment(BodyMesh);

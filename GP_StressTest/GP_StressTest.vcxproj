@@ -23,8 +23,6 @@
     <ClCompile Include="..\GP_Server\Source\IOCP\IOCP.cpp" />
     <ClCompile Include="Source\DummyClient.cpp" />
     <ClCompile Include="Source\DummyClinetManager.cpp" />
-    <ClCompile Include="Source\GLWindow.cpp" />
-    <ClCompile Include="Source\GLMain.cpp" />
     <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -40,7 +38,6 @@
     <ClInclude Include="..\GP_Server\Source\IOCP\IOCP.h" />
     <ClInclude Include="Source\DummyClient.h" />
     <ClInclude Include="Source\DummyClinetManager.h" />
-    <ClInclude Include="Source\GLWindow.h" />
     <ClInclude Include="Source\pch.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -138,6 +135,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -154,6 +152,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

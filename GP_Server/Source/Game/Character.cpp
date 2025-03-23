@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Character.h"
+#include "GameWorld.h"
 #include "NavMesh.h"
 
 void Character::Init()
@@ -12,7 +13,9 @@ void Character::Init()
 		0.25f,    // Dodge
 		200.f     // Speed
 	);
-	_info.SetLocation(NavMesh::GetRandomPosition());
+	FVector newPos{};
+	do { newPos = NavMesh::GetRandomPosition(); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
+	_info.SetLocation(newPos);
 	_info.SetYaw(RandomUtils::GetRandomFloat(-180, 180));
 }
 
@@ -33,6 +36,11 @@ void Character::OnDamaged(float damage)
 float Character::GetAttackDamage()
 {
 	return _info.GetAttackDamage(RandomUtils::GetRandomFloat(0.0f, 1.0f));
+}
+
+bool Character::IsColision(const FVector& pos)
+{
+	return _info.IsColision(pos);
 }
 
 bool Character::IsInAttackRange(const FInfoData& target)

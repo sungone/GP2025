@@ -8,6 +8,7 @@
 #include <vector>
 #include <mutex>
 #include <array>
+#include <sstream>
 
 #include "IOCP.h"
 #include "FVector.h"

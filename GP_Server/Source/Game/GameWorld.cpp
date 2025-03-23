@@ -299,3 +299,14 @@ void GameWorld::UpdateViewList(std::shared_ptr<Character> listOwner)
 		listOwner->UpdateViewList(other);
 	}
 }
+
+bool GameWorld::IsCollisionDetected(const FVector& pos)
+{
+	std::unique_lock<std::mutex> lock(_carrMutex);
+	for (auto other : _characters)
+	{
+		if (!other) continue;
+		if (other->IsColision(pos)) return true;
+	}
+	return false;
+}

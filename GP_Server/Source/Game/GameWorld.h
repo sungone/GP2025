@@ -42,6 +42,7 @@ public:
 	void UnequipInventoryItem(int32 playerId, uint32 itemId);
 
 	void UpdateViewList(std::shared_ptr<Character> character);
+	bool IsCollisionDetected(const FVector& pos);
 
 	std::shared_ptr<Character> GetCharacterByID(int32 id)
 	{

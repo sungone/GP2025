@@ -84,6 +84,7 @@ struct FInfoData
 	void TakeDamage(float Amount) { SetHp(Stats.Hp - Amount); }
 	bool IsDead() const { return Stats.Hp < 1.0f; }
 	void SetDamage(float NewDamage) { Stats.Damage = std::max(0.0f, NewDamage); }
+	bool IsColision(const FVector& TargetPos) { return Pos.IsInRange(TargetPos, CollisionRadius); }
 	bool IsInAttackRange(const FInfoData& Target) const
 	{
 		return Pos.IsInRange(Target.Pos, AttackRange + Target.CollisionRadius);
