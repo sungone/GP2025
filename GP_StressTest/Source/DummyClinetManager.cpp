@@ -12,7 +12,10 @@ bool DummyClientManager::Init()
 			_hIocp.RegisterSocket(_clients[i]._socket, i);
 
 			_clients[i].DoRecv();
-			_clients[i].DoSend(Packet(C_LOGIN));
+			auto accountID = std::format("Test{}", i);
+			auto accountPW = std::format("1234");
+			auto pkt = LoginPacket(accountID.c_str(), accountPW.c_str(), false);
+			_clients[i].DoSend(&pkt);
 		}
 	}
 	LOG("Success Init!");

@@ -18,9 +18,10 @@ public:
 		WSARecv(_socket, &_recvOver._wsabuf, 1, 0, &recv_flag, &_recvOver._wsaover, 0);
 	}
 
-	void DoSend(Packet&& packet)
+	void DoSend(Packet* packet)
 	{
-		auto send_data = new ExpOver{new Packet(std::move(packet)) };
+		auto send_data = new ExpOver{ packet };
+		std::cout << send_data->_buf;
 		WSASend(_socket, &send_data->_wsabuf, 1, nullptr, 0, &send_data->_wsaover, nullptr);
 	}
 

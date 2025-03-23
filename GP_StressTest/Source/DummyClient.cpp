@@ -41,6 +41,7 @@ bool DummyClient::Connect()
 
 void DummyClient::Disconnect()
 {
-    DoSend(Packet(C_LOGIN));
+    auto pkt = IDPacket(EPacketType::C_LOGOUT, _info.ID);
+    DoSend(&pkt);
     closesocket(_socket);
 }
