@@ -7,8 +7,8 @@
 #include <iomanip>
 #include <sstream>
 
-#define LOG(...) Logger::GetInstance().LogMessage(__VA_ARGS__, __FUNCTION__)
-#define PRINT(message) Logger::GetInstance().PrintNavMesh(message)
+#define LOG(...) Logger::GetInst().LogMessage(__VA_ARGS__, __FUNCTION__)
+#define PRINT(message) Logger::GetInst().PrintNavMesh(message)
 
 enum LogType
 {
@@ -21,7 +21,7 @@ enum LogType
 class Logger
 {
 public:
-    static Logger& GetInstance()
+    static Logger& GetInst()
     {
         static Logger instance;
         return instance;

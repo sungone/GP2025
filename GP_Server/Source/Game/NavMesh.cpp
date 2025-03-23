@@ -100,7 +100,6 @@ std::vector<int> NavMesh::FindPath(int StartPolyIdx, int GoalPolyIdx)
 
 bool NavMesh::LoadFromJson(const std::string& filePath, NavMesh& OutNavMeshData, bool isPrint)
 {
-	isPrint = true;
 	std::ifstream file(filePath);
 	if (!file.is_open())
 	{

@@ -138,7 +138,6 @@ void GameWorld::UpdateMonster()
 
 void GameWorld::BroadcastMonsterStates()
 {
-	LOG("BroadcastToViewList Monster States!");
 	for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{
 		if (!_characters[i]) continue;

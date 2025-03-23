@@ -9,7 +9,7 @@
 bool Server::Init()
 {
 	std::wcout.imbue(std::locale("korean"));
-
+	Logger::GetInst().OpenLogFile("gp_server_log.txt");
 	//if (!DBConnectionPool::GetInst().InitPool(L"GP2025", 10))
 	//{
 	//	LOG(LogType::Warning, "DB");
@@ -140,14 +140,14 @@ void Server::HandleCompletionError(ExpOver* ex_over, int32 id)
 	switch (ex_over->_compType)
 	{
 	case ::ACCEPT:
-		LOG(Warning, "CompType : ACCEPT");
+		LOG(Warning, std::format("CompType : ACCEPT[{}]", id));
 		break;
 	case ::RECV:
-		LOG(Warning, "CompType : RECV");
+		LOG(Warning, std::format("CompType : RECV[{}]", id));
 		SessionManager::GetInst().Disconnect(id);
 		break;
 	case ::SEND:
-		LOG(Warning, "CompType : SEND");
+		LOG(Warning, std::format("CompType : SEND[{}]", id));
 		SessionManager::GetInst().Disconnect(id);
 		delete ex_over;
 		break;
