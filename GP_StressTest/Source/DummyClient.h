@@ -52,6 +52,7 @@ public:
 		{
 			InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(packet);
 			_info = Pkt->Data;
+			LOG(RecvLog, std::format("Login Success! [{}]", _id));
 			break;
 		}
 		case EPacketType::S_PLAYER_STATUS_UPDATE:
@@ -70,5 +71,6 @@ private:
 	ExpOver _recvOver;
 	int32 _remain = 0;
 	FInfoData _info;
+	int32& _id = _info.ID;
 };
 

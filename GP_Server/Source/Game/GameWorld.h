@@ -55,7 +55,7 @@ public:
 	}
 
 	FInfoData& GetInfo(int32 id) { return GetCharacterByID(id).get()->GetInfo(); }
-	bool IsMonster(int32 id) { return _characters[id]->IsMonster(); }
+	bool IsMonster(int32 id) { return id >= MAX_PLAYER && id < MAX_CHARACTER; }
 private:
 	std::array<std::shared_ptr<Character>, MAX_CHARACTER> _characters;
 	std::vector<std::shared_ptr<WorldItem>> _worldItems;

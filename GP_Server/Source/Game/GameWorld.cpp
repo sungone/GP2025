@@ -36,7 +36,6 @@ void GameWorld::RemoveCharacter(int32 id)
 		SessionManager::GetInst().BroadcastToViewList(&Pkt, id);
 	}
 
-	std::unique_lock<std::mutex> lock(_carrMutex);
 	_characters[id] = nullptr;
 }
 
@@ -89,7 +88,7 @@ void GameWorld::PlayerAttack(int32 playerId, int32 monsterId)
 	auto& Attacker = _characters[playerId];
 	auto& atkInfo = Attacker->GetInfo();
 	atkInfo.AddState(ECharacterStateType::STATE_AUTOATTACK);
-	if (monsterId != -1)
+	if (IsMonster(monsterId))
 	{
 
 		LOG(Log, std::format("Attacked monster[{}]", monsterId));
