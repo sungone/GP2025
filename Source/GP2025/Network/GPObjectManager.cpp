@@ -59,11 +59,13 @@ void UGPObjectManager::AddPlayer(FInfoData& PlayerInfo)
 	FVector SpawnLocation(PlayerInfo.Pos);
 	FRotator SpawnRotation(0, PlayerInfo.Yaw, 0);
 
-	AGPCharacterPlayer* Player = nullptr;
-	while (Player == nullptr)
+	AGPCharacterPlayer* Player = World->SpawnActor<AGPCharacterPlayer>(OtherPlayerClass, SpawnLocation, SpawnRotation);
+	
+	if (Player == nullptr)
 	{
-		//이렇게 처리한 이유가 뭐지? 이 방식이 알맞나? 고민해보자
-		Player = World->SpawnActor<AGPCharacterPlayer>(OtherPlayerClass, SpawnLocation, SpawnRotation);
+		UE_LOG(LogTemp, Warning, TEXT("Failed Add other player [%d] (%f,%f,%f)(%f)"),
+			PlayerInfo.ID, PlayerInfo.Pos.X, PlayerInfo.Pos.Y, PlayerInfo.Pos.Z, PlayerInfo.Yaw);
+		return;
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Add other player [%d] (%f,%f,%f)(%f)"),

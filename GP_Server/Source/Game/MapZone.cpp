@@ -3,7 +3,8 @@
 
 bool MapZone::Init()
 {
-	_playground = NavMesh("playground.json");
+	_default = NavMesh("NavMeshData.json");
+	_playground = NavMesh("PlaygroundNavData.json");
 	return true;
 }
 
@@ -11,6 +12,8 @@ FVector MapZone::GetRandomPos(ZoneType type) const
 {
 	switch (type)
 	{
+	case ZoneType::DEFAULT:
+		return _default.GetRandomPosition();
 	case ZoneType::PLAYGROUND:
 		return _playground.GetRandomPosition();
 	}

@@ -64,13 +64,13 @@ public:
 			LOG("NavMesh loaded successfully!");
 	}
 
-	void BuildPolygonGraph(bool isPrint);
+	void BuildPolygonGraph();
 	int FindIdxFromPos(const FVector& _pos);
 
 	void PrintNavMesh();
 	void PrintPolygonGraph();
 	std::vector<int> FindPath(int StartPolygon, int GoalPolygon);
-	bool LoadFromJson(const std::string& filePath, bool isPrint = true);
+	bool LoadFromJson(const std::string& filePath);
 	FVector GetRandomPosition() const;
 
 public:

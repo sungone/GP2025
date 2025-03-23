@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "NavMesh.h"
 
-void NavMesh::BuildPolygonGraph(bool isPrint)
+void NavMesh::BuildPolygonGraph()
 {
 	PolygonGraph.clear();
 
@@ -27,11 +27,6 @@ void NavMesh::BuildPolygonGraph(bool isPrint)
 				}
 			}
 		}
-	}
-
-	if (isPrint)
-	{
-		PrintPolygonGraph();
 	}
 }
 
@@ -94,7 +89,7 @@ std::vector<int> NavMesh::FindPath(int StartPolyIdx, int GoalPolyIdx)
 	return {};
 }
 
-bool NavMesh::LoadFromJson(const std::string& filePath, bool isPrint)
+bool NavMesh::LoadFromJson(const std::string& filePath)
 {
 	std::ifstream file(filePath);
 	if (!file.is_open())
@@ -128,11 +123,7 @@ bool NavMesh::LoadFromJson(const std::string& filePath, bool isPrint)
 		}
 	}
 
-	if (isPrint)
-	{
-		PrintNavMesh();
-	}
-	BuildPolygonGraph(isPrint);
+	BuildPolygonGraph();
 	return true;
 }
 

@@ -13,7 +13,7 @@ void Character::Init()
 		200.f     // Speed
 	);
 	FVector newPos{};
-	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
+	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::DEFAULT); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
 	_info.SetLocation(newPos);
 	_info.SetYaw(RandomUtils::GetRandomFloat(-180, 180));
 }

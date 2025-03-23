@@ -3,6 +3,7 @@
 
 enum class ZoneType
 {
+	DEFAULT,
 	PLAYGROUND,
 };
 
@@ -18,6 +19,7 @@ public:
 	bool Init();
 	FVector GetRandomPos(ZoneType type) const;
 public:
+	NavMesh _default;
 	NavMesh _playground;
 };
 

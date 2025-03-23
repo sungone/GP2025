@@ -200,7 +200,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="playground.json">
+    <None Include="PlaygroundNavData.json">
+      <Filter>Source Files\Game\GameObjects\Map</Filter>
+    </None>
+    <None Include="NavMeshData.json">
       <Filter>Source Files\Game\GameObjects\Map</Filter>
     </None>
   </ItemGroup>
