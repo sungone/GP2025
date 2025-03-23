@@ -1,10 +1,6 @@
 #include "pch.h"
 #include "NavMesh.h"
 
-std::vector<FVector> NavMesh::Vertices;
-std::vector<Triangle> NavMesh::Triangles;
-std::unordered_map<int, PolygonNode> NavMesh::PolygonGraph;
-
 void NavMesh::BuildPolygonGraph(bool isPrint)
 {
 	PolygonGraph.clear();
@@ -98,7 +94,7 @@ std::vector<int> NavMesh::FindPath(int StartPolyIdx, int GoalPolyIdx)
 	return {};
 }
 
-bool NavMesh::LoadFromJson(const std::string& filePath, NavMesh& OutNavMeshData, bool isPrint)
+bool NavMesh::LoadFromJson(const std::string& filePath, bool isPrint)
 {
 	std::ifstream file(filePath);
 	if (!file.is_open())
@@ -118,29 +114,29 @@ bool NavMesh::LoadFromJson(const std::string& filePath, NavMesh& OutNavMeshData,
 
 	if (doc.HasMember("Vertices") && doc["Vertices"].IsArray()) {
 		const auto& verts = doc["Vertices"];
-		OutNavMeshData.Vertices.reserve(verts.Size());
+		Vertices.reserve(verts.Size());
 		for (const auto& vertVal : verts.GetArray()) {
-			OutNavMeshData.Vertices.emplace_back(vertVal[0].GetFloat(), vertVal[1].GetFloat(), vertVal[2].GetFloat());
+			Vertices.emplace_back(vertVal[0].GetFloat(), vertVal[1].GetFloat(), vertVal[2].GetFloat());
 		}
 	}
 
 	if (doc.HasMember("Triangles") && doc["Triangles"].IsArray()) {
 		const auto& tris = doc["Triangles"];
-		OutNavMeshData.Triangles.reserve(tris.Size());
+		Triangles.reserve(tris.Size());
 		for (const auto& triVal : tris.GetArray()) {
-			OutNavMeshData.Triangles.emplace_back(triVal["IndexA"].GetInt(), triVal["IndexB"].GetInt(), triVal["IndexC"].GetInt());
+			Triangles.emplace_back(triVal["IndexA"].GetInt(), triVal["IndexB"].GetInt(), triVal["IndexC"].GetInt());
 		}
 	}
 
 	if (isPrint)
 	{
-		OutNavMeshData.PrintNavMesh();
+		PrintNavMesh();
 	}
-
+	BuildPolygonGraph(isPrint);
 	return true;
 }
 
-FVector NavMesh::GetRandomPosition()
+FVector NavMesh::GetRandomPosition() const
 {
 	if (Triangles.empty() || Vertices.empty())
 	{

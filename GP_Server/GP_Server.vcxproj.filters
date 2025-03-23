@@ -127,7 +127,7 @@
     <ClInclude Include="Source\Game\BoundingBox.h">
       <Filter>Source Files\Game\GameObjects\Map</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Game\Map.h">
+    <ClInclude Include="Source\Game\MapZone.h">
       <Filter>Source Files\Game\GameObjects\Map</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\NavMesh.h">
@@ -189,7 +189,7 @@
     <ClCompile Include="Source\Game\TimerQueue.cpp">
       <Filter>Source Files\Utils\Timer</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Game\Map.cpp">
+    <ClCompile Include="Source\Game\MapZone.cpp">
       <Filter>Source Files\Game\GameObjects\Map</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\NavMesh.cpp">
@@ -200,7 +200,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="NavMeshData.json">
+    <None Include="playground.json">
       <Filter>Source Files\Game\GameObjects\Map</Filter>
     </None>
   </ItemGroup>

@@ -90,16 +90,11 @@ void GameWorld::PlayerAttack(int32 playerId, int32 monsterId)
 	atkInfo.AddState(ECharacterStateType::STATE_AUTOATTACK);
 	if (IsMonster(monsterId))
 	{
-
 		LOG(Log, std::format("Attacked monster[{}]", monsterId));
 		std::shared_ptr<Monster> Target = static_pointer_cast<Monster>(_characters[monsterId]);
 		if (Attacker->IsInAttackRange(Target->GetInfo()))
 		{
-#ifdef _DEBUG
-			float atkDamage = 50;
-#else
 			float atkDamage = Attacker->GetAttackDamage();
-#endif // TEST
 			if (atkDamage > 0.0f)
 			{
 				Target->OnDamaged(atkDamage);

@@ -57,17 +57,24 @@ struct PolygonNodeState {
 class NavMesh
 {
 public:
-	static std::vector<FVector> Vertices;
-	static std::vector<Triangle> Triangles;
-	static std::unordered_map<int, PolygonNode> PolygonGraph;
+	NavMesh() {}
+	NavMesh(const std::string& filePath)
+	{
+		if (LoadFromJson(filePath))
+			LOG("NavMesh loaded successfully!");
+	}
+
+	void BuildPolygonGraph(bool isPrint);
+	int FindIdxFromPos(const FVector& _pos);
+
+	void PrintNavMesh();
+	void PrintPolygonGraph();
+	std::vector<int> FindPath(int StartPolygon, int GoalPolygon);
+	bool LoadFromJson(const std::string& filePath, bool isPrint = true);
+	FVector GetRandomPosition() const;
 
 public:
-	static void BuildPolygonGraph(bool isPrint);
-	static int FindIdxFromPos(const FVector& _pos);
-
-	static void PrintNavMesh();
-	static void PrintPolygonGraph();
-	static std::vector<int> FindPath(int StartPolygon, int GoalPolygon);
-	static bool LoadFromJson(const std::string& filePath, NavMesh& OutNavMeshData, bool isPrint);
-	static FVector GetRandomPosition();
+	std::vector<FVector> Vertices;
+	std::vector<Triangle> Triangles;
+	std::unordered_map<int, PolygonNode> PolygonGraph;
 };

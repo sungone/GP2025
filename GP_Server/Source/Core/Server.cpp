@@ -4,7 +4,6 @@
 #include "SessionManager.h"
 #include "GameWorld.h"
 #include "DBConnectionPool.h"
-#include "Map.h"
 
 bool Server::Init()
 {
@@ -54,9 +53,9 @@ bool Server::Init()
 	}
 	IOCP::GetInst().RegisterSocket(_listenSocket);
 
-	if (!Map::GetInst().Init())
+	if (!MapZone::GetInst().Init())
 	{
-		LOG(LogType::Warning, "Map");
+		LOG(LogType::Warning, "MapZone");
 		return false;
 	}
 

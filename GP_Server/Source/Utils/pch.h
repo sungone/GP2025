@@ -29,6 +29,8 @@
 #include "RandomUtils.h"
 #include "TimerQueue.h"
 
+#include "MapZone.h"
+
 enum CompType
 {
 	RECV,

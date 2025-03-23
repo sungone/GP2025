@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Character.h"
 #include "GameWorld.h"
-#include "NavMesh.h"
 
 void Character::Init()
 {
@@ -14,7 +13,7 @@ void Character::Init()
 		200.f     // Speed
 	);
 	FVector newPos{};
-	do { newPos = NavMesh::GetRandomPosition(); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
+	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
 	_info.SetLocation(newPos);
 	_info.SetYaw(RandomUtils::GetRandomFloat(-180, 180));
 }

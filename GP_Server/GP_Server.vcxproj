@@ -157,7 +157,7 @@
     <ClInclude Include="Source\Game\GameWorld.h" />
     <ClInclude Include="Source\Game\Inventory.h" />
     <ClInclude Include="Source\Game\Item.h" />
-    <ClInclude Include="Source\Game\Map.h" />
+    <ClInclude Include="Source\Game\MapZone.h" />
     <ClInclude Include="Source\Game\Monster.h" />
     <ClInclude Include="Source\Game\NavMesh.h" />
     <ClInclude Include="Source\Game\Player.h" />
@@ -182,7 +182,7 @@
     <ClCompile Include="Source\Game\GameWorld.cpp" />
     <ClCompile Include="Source\Game\Inventory.cpp" />
     <ClCompile Include="Source\Game\Item.cpp" />
-    <ClCompile Include="Source\Game\Map.cpp" />
+    <ClCompile Include="Source\Game\MapZone.cpp" />
     <ClCompile Include="Source\Game\Monster.cpp" />
     <ClCompile Include="Source\Game\NavMesh.cpp" />
     <ClCompile Include="Source\Game\Player.cpp" />
@@ -196,7 +196,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="NavMeshData.json" />
+    <None Include="playground.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
