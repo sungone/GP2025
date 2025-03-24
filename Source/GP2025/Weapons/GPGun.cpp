@@ -4,6 +4,7 @@
 #include "Weapons/GPGun.h"
 #include "GameFramework/Actor.h"
 #include "Character/GPCharacterBase.h"
+#include "Network/GPNetworkManager.h"
 #include "Kismet/GameplayStatics.h"
 
 AGPGun::AGPGun()
@@ -13,29 +14,40 @@ AGPGun::AGPGun()
 
 void AGPGun::StartAttack()
 {
-	FireBullet();
+	// AttackHitCheck();
 }
 
-void AGPGun::FireBullet()
+void AGPGun::AttackHitCheck()
 {
-	// 총알 발사
 	FVector StartLocation = GetActorLocation();
-	FVector ForwardVector = GetActorForwardVector();
-	FVector EndLocation = StartLocation + (ForwardVector * 5000.f);
+	FVector EndLocation = StartLocation + GetActorForwardVector() * 5000.f;
 
 	FHitResult HitResult;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
 
-	if (GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, Params))
-	{
-		AGPCharacterBase* HitCharacter = Cast<AGPCharacterBase>(HitResult.GetActor());
-		if (HitCharacter)
-		{
-			UE_LOG(LogTemp, Log, TEXT("총알이 %s에게 적중!"), *HitResult.GetActor()->GetName());
+	bool bHit = GetWorld()->LineTraceSingleByChannel(
+		HitResult, StartLocation, EndLocation, ECC_Visibility, Params);
 
-			// 데미지 적용 (예제)
-			// HitCharacter->TakeDamage(10.0f, FDamageEvent(), nullptr, this);
+	DrawDebugLine(
+		GetWorld(),
+		StartLocation,
+		bHit ? HitResult.ImpactPoint : EndLocation,
+		FColor::Red,
+		false, 2.0f, 0, 2.0f);
+
+	if (bHit)
+	{
+		AGPCharacterBase* TargetCharacter = Cast<AGPCharacterBase>(HitResult.GetActor());
+		if (TargetCharacter)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("총 공격 성공!"));
+
+			auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+			if (NetworkMgr)
+			{
+				NetworkMgr->SendPlayerAttackPacket(TargetCharacter->CharacterInfo.ID);
+			}
 		}
 	}
 }

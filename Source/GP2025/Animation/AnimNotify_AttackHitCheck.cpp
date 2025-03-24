@@ -18,17 +18,13 @@ void UAnimNotify_AttackHitCheck::Notify(USkeletalMeshComponent* MeshComp, UAnimS
 
 	if (CharacterPlayer->WeaponActor)
 	{
-		if (Cast<AGPSword>(CharacterPlayer->WeaponActor))
+		if (Cast<AGPSword>(CharacterPlayer->WeaponActor) || Cast<AGPGun>(CharacterPlayer->WeaponActor))
 		{
 			IGPAnimationAttackInterface* AttackPawn = Cast<IGPAnimationAttackInterface>(CharacterPlayer);
 			if (AttackPawn)
 			{
 				AttackPawn->AttackHitCheck();
 			}
-		}
-		else if (Cast<AGPGun>(CharacterPlayer->WeaponActor))
-		{
-			Cast<AGPGun>(CharacterPlayer->WeaponActor)->FireBullet();
 		}
 	}
 }

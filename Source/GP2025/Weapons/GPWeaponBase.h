@@ -44,4 +44,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	UStaticMeshComponent* GetWeaponMesh() const { return Cast<UStaticMeshComponent>(WeaponMesh); }
+
+public :
+	virtual void AttackHitCheck() PURE_VIRTUAL(AGPWeaponBase::AttackHitCheck, );
 };

@@ -6,6 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Actor.h"
 #include "Character/GPCharacterBase.h"
+#include "Network/GPNetworkManager.h"
 
 AGPSword::AGPSword()
 {
@@ -41,6 +42,58 @@ void AGPSword::OnWeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 
 			// 데미지 적용 (예제)
 			// HitCharacter->TakeDamage(20.0f, FDamageEvent(), nullptr, this);
+		}
+	}
+}
+
+void AGPSword::AttackHitCheck()
+{
+	FHitResult OutHitResult;
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
+
+	const float AttackRange = 200.f;
+	const float AttackRadius = 100.f;
+
+	const FVector Start = GetActorLocation();
+	const FVector End = Start + GetActorForwardVector() * AttackRange;
+
+	bool bHitDetected = GetWorld()->SweepSingleByChannel(
+		OutHitResult, Start, End, FQuat::Identity, ECC_Visibility,
+		FCollisionShape::MakeSphere(AttackRadius), Params);
+
+	DrawDebugLine(
+		GetWorld(),
+		Start,
+		End,
+		FColor::Red,         
+		false,              
+		2.0f,             
+		0,                 
+		2.0f              
+	);
+
+	DrawDebugSphere(
+		GetWorld(),
+		Start,              
+		AttackRadius,      
+		12,                 
+		FColor::Yellow,     
+		false,             
+		2.0f              
+	);
+
+	if (bHitDetected)
+	{
+		AGPCharacterBase* TargetCharacter = Cast<AGPCharacterBase>(OutHitResult.GetActor());
+		if (TargetCharacter)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Sword Attack Success"));
+
+			auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+			if (NetworkMgr)
+			{
+				NetworkMgr->SendPlayerAttackPacket(TargetCharacter->CharacterInfo.ID);
+			}
 		}
 	}
 }

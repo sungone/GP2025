@@ -19,6 +19,5 @@ public:
 
 	virtual void StartAttack() override;
 
-	// 총알 발사 기능
-	void FireBullet();
+	virtual void AttackHitCheck() override;
 };
