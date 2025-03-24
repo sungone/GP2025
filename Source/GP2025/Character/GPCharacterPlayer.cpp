@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description p age of Project Settings.
 
 
 #include "Character/GPCharacterPlayer.h"
@@ -46,10 +46,16 @@ void AGPCharacterPlayer::PostInitializeComponents()
 {
     Super::PostInitializeComponents();
 
-    UGPCharacterControlData* LoadedCharacterData = LoadObject<UGPCharacterControlData>(nullptr, TEXT("/Game/CharacterType/GPC_Warrior.GPC_Warrior"));
-    if (LoadedCharacterData)
+    //UGPCharacterControlData* LoadedCharacterData = LoadObject<UGPCharacterControlData>(nullptr, TEXT("/Game/CharacterType/GPC_Gunner.GPC_Gunner"));
+    //if (LoadedCharacterData)
+    //{
+    //    ApplyCharacterPartsFromData(LoadedCharacterData);
+    //}
+
+    UGPCharacterControlData** FoundData = CharacterTypeManager.Find(CurrentCharacterType);
+    if (FoundData && *FoundData)
     {
-        ApplyCharacterPartsFromData(LoadedCharacterData);
+        ApplyCharacterPartsFromData(*FoundData);
     }
 }
 
