@@ -77,6 +77,12 @@ void SessionManager::SendPacket(int32 sessionId, const Packet* packet)
 
 void SessionManager::BroadcastToAll(Packet* packet)
 {
+	for (auto& session : _sessions)
+	{
+		if (session == nullptr || !session->IsLogin())
+			continue;
+		session->DoSend(packet);
+	}
 }
 
 void SessionManager::BroadcastToViewList(Packet* packet, int32 senderId)
