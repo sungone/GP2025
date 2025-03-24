@@ -3,9 +3,11 @@
 
 #include "Weapons/GPGun.h"
 #include "GameFramework/Actor.h"
-#include "Character/GPCharacterBase.h"
+#include "Character/GPCharacterPlayer.h"
 #include "Network/GPNetworkManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
+#include "Physics/GPCollision.h"
 
 AGPGun::AGPGun()
 {
@@ -19,35 +21,55 @@ void AGPGun::StartAttack()
 
 void AGPGun::AttackHitCheck()
 {
-	FVector StartLocation = GetActorLocation();
-	FVector EndLocation = StartLocation + GetActorForwardVector() * 5000.f;
+    AGPCharacterPlayer* PlayerCharacter = Cast<AGPCharacterPlayer>(GetOwner());
+    if (!PlayerCharacter) return;
 
-	FHitResult HitResult;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
+    USkeletalMeshComponent* BodyMesh = PlayerCharacter->GetCharacterMesh(); 
+    if (!BodyMesh) return;
 
-	bool bHit = GetWorld()->LineTraceSingleByChannel(
-		HitResult, StartLocation, EndLocation, ECC_Visibility, Params);
+	const FTransform SocketTransform = BodyMesh->GetSocketTransform(TEXT("WeaponSocket"));
+	FVector StartLocation = SocketTransform.GetLocation();
+	FVector ForwardVector = SocketTransform.GetRotation().GetAxisY();
 
-	DrawDebugLine(
-		GetWorld(),
-		StartLocation,
-		bHit ? HitResult.ImpactPoint : EndLocation,
-		FColor::Red,
-		false, 2.0f, 0, 2.0f);
 
-	if (bHit)
-	{
-		AGPCharacterBase* TargetCharacter = Cast<AGPCharacterBase>(HitResult.GetActor());
-		if (TargetCharacter)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("ÃÑ °ø°Ý ¼º°ø!"));
+    FVector EndLocation = StartLocation + ForwardVector * ValidRange;
 
-			auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-			if (NetworkMgr)
-			{
-				NetworkMgr->SendPlayerAttackPacket(TargetCharacter->CharacterInfo.ID);
-			}
-		}
-	}
+    FHitResult HitResult;
+    FCollisionQueryParams Params;
+    Params.AddIgnoredActor(this);
+    Params.AddIgnoredActor(GetOwner());
+
+    bool bHit = GetWorld()->LineTraceSingleByChannel(
+        HitResult, StartLocation, EndLocation, CCHANNEL_GPACTION, Params);
+
+    DrawDebugLine(
+        GetWorld(),
+        StartLocation,
+        EndLocation,
+        FColor::Red,
+        false,
+        2.0f,
+        0,
+        2.0f
+    );
+
+    if (bHit)
+    {
+        if (HitResult.GetActor())
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Hitted Actor: %s"), *HitResult.GetActor()->GetName());
+        }
+
+        AGPCharacterBase* TargetCharacter = Cast<AGPCharacterBase>(HitResult.GetActor());
+        if (TargetCharacter)
+        {         
+            auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+            if (NetworkMgr)
+            {
+                NetworkMgr->SendPlayerAttackPacket(TargetCharacter->CharacterInfo.ID);
+                UE_LOG(LogTemp, Warning, TEXT("SendPlayerAttackPacket Completed / Gun.."));
+            }
+        }
+    }
+
 }

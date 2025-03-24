@@ -20,4 +20,6 @@ public:
 	virtual void StartAttack() override;
 
 	virtual void AttackHitCheck() override;
+
+	float ValidRange = 5000.f;
 };

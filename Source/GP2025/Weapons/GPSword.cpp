@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "Character/GPCharacterBase.h"
 #include "Network/GPNetworkManager.h"
+#include "Physics/GPCollision.h"
 
 AGPSword::AGPSword()
 {
@@ -58,7 +59,7 @@ void AGPSword::AttackHitCheck()
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
 
 	bool bHitDetected = GetWorld()->SweepSingleByChannel(
-		OutHitResult, Start, End, FQuat::Identity, ECC_Visibility,
+		OutHitResult, Start, End, FQuat::Identity, CCHANNEL_GPACTION,
 		FCollisionShape::MakeSphere(AttackRadius), Params);
 
 	DrawDebugLine(

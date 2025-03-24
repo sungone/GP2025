@@ -30,6 +30,7 @@ void AGPWeaponBase::Tick(float DeltaTime)
 
 void AGPWeaponBase::StartAttack()
 {
+
 }
 
 void AGPWeaponBase::EndAttack()
