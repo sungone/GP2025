@@ -6,9 +6,17 @@
 #include "UI/GPHpBarWidget.h"
 #include "UI/GPLevelWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/CapsuleComponent.h"
 
 AGPCharacterMonster::AGPCharacterMonster()
 {
+    auto* Capsule = GetCapsuleComponent();
+    if (Capsule)
+    {
+        float CapsuleHalfHeight = Capsule->GetScaledCapsuleHalfHeight();
+        Capsule->SetRelativeLocation(FVector(0.f, 0.f, CapsuleHalfHeight));
+    }
+
 	HpBar = CreateWidgetComponent(TEXT("HpWidget"), TEXT("/Game/UI/WBP_CharacterHpBar.WBP_CharacterHpBar_C"), FVector(0.f, 0.f, 300.f), FVector2D(150.f, 15.f) , HpBarWidget);
 	LevelText = CreateWidgetComponent(TEXT("LevelWidget"), TEXT("/Game/UI/WBP_LevelText.WBP_LevelText_C"), FVector(0.f, 0.f, 330.f), FVector2D(40.f, 10.f) , LevelTextWidget);
 }

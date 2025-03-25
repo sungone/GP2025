@@ -58,8 +58,14 @@ AGPCharacterBase::AGPCharacterBase()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.f);
-	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_GPCAPSULE);
+	auto* Capsule = GetCapsuleComponent();
+	if(Capsule)
+	{
+		Capsule->SetHiddenInGame(false);
+		Capsule->SetVisibility(true);
+		float CapsuleHalfHeight = Capsule->GetScaledCapsuleHalfHeight();
+		Capsule->SetRelativeLocation(FVector(0.f, 0.f, CapsuleHalfHeight));
+	}
 
 	auto* MovementComp = GetCharacterMovement();
 	MovementComp->bOrientRotationToMovement = true;
@@ -101,7 +107,7 @@ void AGPCharacterBase::BeginPlay()
 void AGPCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	DrawDebugCollisionAndAttackRadius(GetWorld(), CharacterInfo);
 	// 내 플레이어의 위치를 설정하는 것이면 return
 	if (Cast<AGPCharacterMyplayer>(this)) return;
 

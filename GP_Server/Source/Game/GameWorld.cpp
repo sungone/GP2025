@@ -82,36 +82,39 @@ void GameWorld::PlayerMove(int32 playerId, FInfoData& info)
 	SessionManager::GetInst().BroadcastToViewList(&pkt, playerId);
 }
 
-void GameWorld::PlayerAttack(int32 playerId, int32 monsterId)
+void GameWorld::PlayerAttack(int32 playerId)
 {
-	std::unique_lock<std::mutex> lock(_carrMutex);
-	auto& Attacker = _characters[playerId];
-	auto& atkInfo = Attacker->GetInfo();
-	atkInfo.AddState(ECharacterStateType::STATE_AUTOATTACK);
-	if (IsMonster(monsterId))
+	auto player = _characters[playerId];
+	player->GetInfo().AddState(ECharacterStateType::STATE_AUTOATTACK);
+
+	for (auto& monsterId : player->GetViewList())
 	{
-		LOG(Log, std::format("Attacked monster[{}]", monsterId));
-		std::shared_ptr<Monster> Target = static_pointer_cast<Monster>(_characters[monsterId]);
-		if (Attacker->IsInAttackRange(Target->GetInfo()))
+		if (monsterId < MAX_PLAYER) continue;
+
+		auto monster = _characters[monsterId];
+		if (!monster) continue;
+		if (player->IsInAttackRange(monster->GetInfo()))
 		{
-			float atkDamage = Attacker->GetAttackDamage();
+			float atkDamage = player->GetAttackDamage();
 			if (atkDamage > 0.0f)
 			{
-				Target->OnDamaged(atkDamage);
+				monster->OnDamaged(atkDamage);
 			}
 
-			auto pkt = DamagePacket(Target->GetInfo(), atkDamage);
+			auto pkt = DamagePacket(player->GetInfo(), atkDamage);
 			SessionManager::GetInst().SendPacket(playerId, &pkt);
 			SessionManager::GetInst().BroadcastToViewList(&pkt, playerId);
-			if (Target->IsDead())
+
+			if (monster->IsDead())
 			{
-				atkInfo.AddExp(10);
-				SpawnWorldItem({ Target->GetInfo().Pos.X,Target->GetInfo().Pos.Y,Target->GetInfo().Pos.Z + 120 });
+				player->GetInfo().AddExp(10);
+				SpawnWorldItem({ monster->GetInfo().Pos.X, monster->GetInfo().Pos.Y, monster->GetInfo().Pos.Z + 120 });
 				RemoveCharacter(monsterId);
 			}
 		}
 	}
-	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, atkInfo);
+
+	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
 	SessionManager::GetInst().SendPacket(playerId, &infopkt);
 	SessionManager::GetInst().BroadcastToViewList(&infopkt, playerId);
 }
@@ -283,7 +286,7 @@ void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
 void GameWorld::UpdateViewList(std::shared_ptr<Character> listOwner)
 {
 	int32 ownerId = listOwner->GetInfo().ID;
-	
+
 	for (int32 otherId = 1; otherId < MAX_CHARACTER; ++otherId)
 	{
 		auto other = _characters[otherId];

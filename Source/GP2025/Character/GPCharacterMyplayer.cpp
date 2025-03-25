@@ -450,7 +450,7 @@ UGPInventory* AGPCharacterMyplayer::GetInventoryWidget()
 
 void AGPCharacterMyplayer::AttackHitCheck()
 {
-	if (!Cast<AGPCharacterMyplayer>(this)) return;
+	/*if (!Cast<AGPCharacterMyplayer>(this)) return;
 
 	FHitResult OutHitResult;
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
@@ -480,11 +480,6 @@ void AGPCharacterMyplayer::AttackHitCheck()
 			DrawDebugCapsule(GetWorld(), TargetLocation, TargetHalfHeight, TargetCollisionRadius,
 				FQuat::Identity, FColor::Yellow, false, 5.f);
 #endif
-			auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-			if (NetworkMgr)
-			{
-				NetworkMgr->SendPlayerAttackPacket(TargetCharacter->CharacterInfo.ID);
-			}
 		}
 	}
 
@@ -498,6 +493,6 @@ void AGPCharacterMyplayer::AttackHitCheck()
 			FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(),
 			DrawColor, false, 5.f);
 	}
-#endif
+#endif*/
 }
 

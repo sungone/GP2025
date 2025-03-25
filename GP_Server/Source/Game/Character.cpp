@@ -44,7 +44,10 @@ bool Character::IsColision(const FVector& pos)
 
 bool Character::IsInAttackRange(const FInfoData& target)
 {
-	return _info.Pos.IsInRange(target.Pos, target.CollisionRadius + _info.AttackRange);
+	return IsInViewDistance(target.Pos, target.CollisionRadius + _info.AttackRange);
+	//static float fovAngle = 90.f;
+	//return (IsInViewDistance(target.Pos, target.CollisionRadius + _info.AttackRange)
+	//	&& IsInFieldOfView(target, fovAngle));
 }
 
 bool Character::IsInViewDistance(const FVector& targetPos, float viewDist)

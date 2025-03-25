@@ -25,7 +25,7 @@ public:
 	void SpawnMonster(Session& session);
 
 	void PlayerMove(int32 playerId, FInfoData& info);
-	void PlayerAttack(int32 attackerId, int32 attackedId);
+	void PlayerAttack(int32 playerId);
 
 	void UpdateMonster();
 	void BroadcastMonsterStates();
