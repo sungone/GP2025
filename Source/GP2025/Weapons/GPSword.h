@@ -17,10 +17,5 @@ class GP2025_API AGPSword : public AGPWeaponBase
 public:
 	AGPSword();
 
-	virtual void StartAttack() override;
-	virtual void EndAttack() override;
-	virtual void OnWeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
-
 	virtual void AttackHitCheck() override;
 };

@@ -100,7 +100,7 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 	}
 
 	// 기본 캐릭터 타입
-	CurrentCharacterType = (uint8)Type::EPlayer::GUNNER;
+	CurrentCharacterType = (uint8)Type::EPlayer::WARRIOR;
 }
 
 void AGPCharacterMyplayer::BeginPlay()
@@ -455,57 +455,5 @@ void AGPCharacterMyplayer::AttackHitCheck()
 	{
 		WeaponActor->AttackHitCheck();
 	}
-
-//	if (!Cast<AGPCharacterMyplayer>(this)) return;
-//
-//	FHitResult OutHitResult;
-//	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
-//
-//	const float AttackRange = CharacterInfo.AttackRange;
-//	const float AttackRadius = CharacterInfo.AttackRadius;
-//
-//	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
-//	const FVector End = Start + GetActorForwardVector() * AttackRange;
-//
-//	bool bHitDetected = GetWorld()->SweepSingleByChannel(
-//		OutHitResult, Start, End, FQuat::Identity, CCHANNEL_GPACTION,
-//		FCollisionShape::MakeSphere(AttackRadius), Params);
-//
-//	if (bHitDetected && IsValid(OutHitResult.GetActor()))
-//	{
-//		AGPCharacterBase* TargetCharacter = Cast<AGPCharacterBase>(OutHitResult.GetActor());
-//		if (IsValid(TargetCharacter))
-//		{
-//			const FInfoData& TargetInfo = TargetCharacter->CharacterInfo;
-//
-//			const FVector TargetLocation = TargetCharacter->GetActorLocation();
-//			const float TargetCollisionRadius = TargetInfo.CollisionRadius;
-//			const float TargetHalfHeight = TargetCollisionRadius;
-//
-//#if ENABLE_DRAW_DEBUG
-//			DrawDebugCapsule(GetWorld(), TargetLocation, TargetHalfHeight, TargetCollisionRadius,
-//				FQuat::Identity, FColor::Yellow, false, 5.f);
-//#endif
-//			auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-//			if (NetworkMgr)
-//			{
-//				NetworkMgr->SendPlayerAttackPacket(TargetCharacter->CharacterInfo.ID);
-//			}
-//		}
-//	}
-//
-//#if ENABLE_DRAW_DEBUG
-//	const FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
-//	const float CapsuleHalfHeight = AttackRange * 0.5f;
-//	const FColor DrawColor = FColor::Red;
-//	if (bHitDetected)
-//	{
-//		DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius,
-//			FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(),
-//			DrawColor, false, 5.f);
-//	}
-//#endif
-
-
 }
 

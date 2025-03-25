@@ -5,7 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Actor.h"
-#include "Character/GPCharacterBase.h"
+#include "Character/GPCharacterMyplayer.h"
 #include "Network/GPNetworkManager.h"
 #include "Physics/GPCollision.h"
 
@@ -16,80 +16,41 @@ AGPSword::AGPSword()
 	CollisionComponent->SetupAttachment(WeaponMesh);
 	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CollisionComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AGPSword::OnWeaponOverlap);
-}
-
-void AGPSword::StartAttack()
-{
-	bIsAttacking = true;
-	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-}
-
-void AGPSword::EndAttack()
-{
-	bIsAttacking = false;
-	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-}
-
-void AGPSword::OnWeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (bIsAttacking && OtherActor && OtherActor != this)
-	{
-		AGPCharacterBase* HitCharacter = Cast<AGPCharacterBase>(OtherActor);
-		if (HitCharacter)
-		{
-			UE_LOG(LogTemp, Log, TEXT("검이 %s에게 적중!"), *OtherActor->GetName());
-
-			// 데미지 적용 (예제)
-			// HitCharacter->TakeDamage(20.0f, FDamageEvent(), nullptr, this);
-		}
-	}
 }
 
 void AGPSword::AttackHitCheck()
 {
+	AGPCharacterMyplayer* PlayerCharacter = Cast<AGPCharacterMyplayer>(GetOwner());
+	if (!PlayerCharacter) return;
+
 	FHitResult OutHitResult;
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
 
-	const float AttackRange = 200.f;
-	const float AttackRadius = 100.f;
+	const float AttackRange = PlayerCharacter->CharacterInfo.AttackRange;
+	const float AttackRadius = PlayerCharacter->CharacterInfo.AttackRadius;
 
-	const FVector Start = GetActorLocation();
+	const FVector Start = GetActorLocation() + GetActorForwardVector() * PlayerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
 
 	bool bHitDetected = GetWorld()->SweepSingleByChannel(
 		OutHitResult, Start, End, FQuat::Identity, CCHANNEL_GPACTION,
 		FCollisionShape::MakeSphere(AttackRadius), Params);
 
-	DrawDebugLine(
-		GetWorld(),
-		Start,
-		End,
-		FColor::Red,         
-		false,              
-		2.0f,             
-		0,                 
-		2.0f              
-	);
-
-	DrawDebugSphere(
-		GetWorld(),
-		Start,              
-		AttackRadius,      
-		12,                 
-		FColor::Yellow,     
-		false,             
-		2.0f              
-	);
-
-	if (bHitDetected)
+	if (bHitDetected && IsValid(OutHitResult.GetActor()))
 	{
 		AGPCharacterBase* TargetCharacter = Cast<AGPCharacterBase>(OutHitResult.GetActor());
-		if (TargetCharacter)
+		if (IsValid(TargetCharacter))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Sword Attack Success"));
+			const FInfoData& TargetInfo = TargetCharacter->CharacterInfo;
 
+			const FVector TargetLocation = TargetCharacter->GetActorLocation();
+			const float TargetCollisionRadius = TargetInfo.CollisionRadius;
+			const float TargetHalfHeight = TargetCollisionRadius;
+
+#if ENABLE_DRAW_DEBUG
+			DrawDebugCapsule(GetWorld(), TargetLocation, TargetHalfHeight, TargetCollisionRadius,
+				FQuat::Identity, FColor::Yellow, false, 5.f);
+#endif
 			auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
 			if (NetworkMgr)
 			{
@@ -97,4 +58,17 @@ void AGPSword::AttackHitCheck()
 			}
 		}
 	}
+
+#if ENABLE_DRAW_DEBUG
+	const FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
+	const float CapsuleHalfHeight = AttackRange * 0.5f;
+	const FColor DrawColor = FColor::Red;
+	if (bHitDetected)
+	{
+		DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius,
+			FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(),
+			DrawColor, false, 5.f);
+	}
+#endif
+
 }

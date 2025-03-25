@@ -14,11 +14,6 @@ AGPGun::AGPGun()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-void AGPGun::StartAttack()
-{
-	// AttackHitCheck();
-}
-
 void AGPGun::AttackHitCheck()
 {
     AGPCharacterPlayer* PlayerCharacter = Cast<AGPCharacterPlayer>(GetOwner());
@@ -30,8 +25,6 @@ void AGPGun::AttackHitCheck()
 	const FTransform SocketTransform = BodyMesh->GetSocketTransform(TEXT("WeaponSocket"));
 	FVector StartLocation = SocketTransform.GetLocation();
 	FVector ForwardVector = SocketTransform.GetRotation().GetAxisY();
-
-
     FVector EndLocation = StartLocation + ForwardVector * ValidRange;
 
     FHitResult HitResult;
