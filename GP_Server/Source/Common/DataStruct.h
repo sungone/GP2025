@@ -39,7 +39,7 @@ struct FInfoData
 	FInfoData()
 		: ID(0), CharacterType(),
 		Pos(FVector(0.0f, 0.0f, 0.0f)), Yaw(0.0f),
-		CollisionRadius(50.0f), AttackRadius(200.0f),
+		CollisionRadius(50.0f), AttackRadius(100.0f),
 		Speed(0.0f),
 		Stats(), State(STATE_IDLE)
 	{

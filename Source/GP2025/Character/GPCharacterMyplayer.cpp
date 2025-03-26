@@ -22,9 +22,9 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 	// 카메라 세팅
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 600.f;
+	CameraBoom->TargetArmLength = 400.f;
 	CameraBoom->bUsePawnControlRotation = true;
-	CameraBoom->SetRelativeLocation(FVector(0.f, 0.f, 150.f));
+	CameraBoom->SetRelativeLocation(FVector(0.f, 0.f, 100.f));
 	CameraBoom->SetRelativeRotation(FRotator(-15.f, 0.f, 0.f));
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));

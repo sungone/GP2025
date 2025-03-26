@@ -54,13 +54,20 @@ AGPCharacterBase::AGPCharacterBase()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
+	auto* Capsule = GetCapsuleComponent();
+	if (Capsule)
+	{
+		Capsule->InitCapsuleSize(42.f, 96.f);
+		Capsule->SetHiddenInGame(false);
+		Capsule->SetVisibility(true);
+	}
 
 	auto* MovementComp = GetCharacterMovement();
 	MovementComp->bOrientRotationToMovement = true;
 	MovementComp->RotationRate = FRotator(0.f, 500.f, 0.f);
 
-	GetMesh()->SetWorldScale3D(FVector(0.7f));
-	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -90.f), FRotator(0.f, -90.f, 0.f));
+	GetMesh()->SetWorldScale3D(FVector(0.65f));
+	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
@@ -85,12 +92,6 @@ AGPCharacterBase::AGPCharacterBase()
 void AGPCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	auto* Capsule = GetCapsuleComponent();
-	if (Capsule)
-	{
-		Capsule->SetHiddenInGame(false);
-		Capsule->SetVisibility(true);
-	}
 }
 
 void AGPCharacterBase::Tick(float DeltaTime)

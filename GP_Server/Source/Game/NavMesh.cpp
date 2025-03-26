@@ -151,5 +151,6 @@ FVector NavMesh::GetRandomPosition() const
 	}
 
 	FVector SpawnPosition = A + (B - A) * r1 + (C - A) * r2;
+	SpawnPosition.Z += 90.0f;
 	return SpawnPosition;
 }
