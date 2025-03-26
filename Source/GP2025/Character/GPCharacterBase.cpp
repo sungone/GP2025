@@ -21,9 +21,6 @@ static std::mt19937 gen(rd());
 DEFINE_LOG_CATEGORY(LogGPCharacter);
 namespace
 {
-	// 공통 사용으로 static 제거했는데 그러면 같은 작업도 또 불러오느라 성능 떨어질 수 있을 듯 함 -> 그래서 처음에 로딩 느려진건가..?
-	// (CSV + DataTable 활용) DataTable로 csv파일 파싱해서 쓰는 방법으로 연구해보쟈
-
 	template <typename T>
 	T* LoadAsset(const FString& Path)
 	{
@@ -58,26 +55,12 @@ AGPCharacterBase::AGPCharacterBase()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-	auto* Capsule = GetCapsuleComponent();
-	if(Capsule)
-	{
-		Capsule->SetHiddenInGame(false);
-		Capsule->SetVisibility(true);
-		float CapsuleHalfHeight = Capsule->GetScaledCapsuleHalfHeight();
-		Capsule->SetRelativeLocation(FVector(0.f, 0.f, CapsuleHalfHeight));
-	}
-
 	auto* MovementComp = GetCharacterMovement();
 	MovementComp->bOrientRotationToMovement = true;
 	MovementComp->RotationRate = FRotator(0.f, 500.f, 0.f);
-	MovementComp->JumpZVelocity = 300.f;
-	MovementComp->AirControl = 0.35f;
-	MovementComp->GravityScale = 1.f;
-	MovementComp->MaxWalkSpeed = 300.f;
-	MovementComp->MinAnalogWalkSpeed = 20.f;
-	MovementComp->BrakingDecelerationWalking = 2000.f;
 
-	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, 0.f), FRotator(0.f, -90.f, 0.f));
+	GetMesh()->SetWorldScale3D(FVector(0.7f));
+	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -90.f), FRotator(0.f, -90.f, 0.f));
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
@@ -102,33 +85,34 @@ AGPCharacterBase::AGPCharacterBase()
 void AGPCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+	auto* Capsule = GetCapsuleComponent();
+	if (Capsule)
+	{
+		Capsule->SetHiddenInGame(false);
+		Capsule->SetVisibility(true);
+	}
 }
 
 void AGPCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	DrawDebugCollisionAndAttackRadius(GetWorld(), CharacterInfo);
-	// 내 플레이어의 위치를 설정하는 것이면 return
+
 	if (Cast<AGPCharacterMyplayer>(this)) return;
 
-	/// Other Client 공격 모션 동기화 ///
 	if (CharacterInfo.HasState(STATE_AUTOATTACK) && bIsAutoAttacking == false)
 	{
 		ProcessAutoAttackCommand();
 		return;
 	}
 
-	/// 미끄러지는 문제 해결하기 ///
-	{
-		if (CharacterInfo.Speed < 400.f)
-		{
-			CharacterInfo.Speed = 500.f;
-		}
-	}
-
 	/// Other Client 위치 및 회전 동기화 ///
 	FVector Location = GetActorLocation();
 	FVector DestLocation = CharacterInfo.Pos;
+	if (CharacterInfo.Speed < 400.f)
+	{
+		CharacterInfo.Speed = 500.f;
+	}
 	float Speed = CharacterInfo.Speed;
 
 	FVector MoveDir = (DestLocation - Location);
@@ -139,10 +123,12 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	MoveDist = FMath::Min(MoveDist, DistToDest);
 	FVector NextLocation = Location + MoveDir * MoveDist;
 
-	FRotator Rotation = GetActorRotation();
-	Rotation.Yaw = CharacterInfo.Yaw;
+	// 회전 보간 추가
+	FRotator CurrentRotation = GetActorRotation();
+	FRotator TargetRotation(0.f, CharacterInfo.Yaw, 0.f);
+	FRotator InterpolatedRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, 10.0f);
 
-	SetActorLocationAndRotation(NextLocation, Rotation);
+	SetActorLocationAndRotation(NextLocation, InterpolatedRotation);
 
 	/// Ohter Client 속도 동기화 ///
 	GetCharacterMovement()->Velocity = MoveDir * Speed;
@@ -229,7 +215,7 @@ void AGPCharacterBase::SetCharacterType(ECharacterType NewCharacterType)
 	CurrentCharacterType = NewCharacterType;
 }
 
-UGPWidgetComponent* AGPCharacterBase::CreateWidgetComponent(const FString& Name, const FString& WidgetPath, FVector Location, FVector2D Size , UUserWidget*& OutUserWidget)
+UGPWidgetComponent* AGPCharacterBase::CreateWidgetComponent(const FString& Name, const FString& WidgetPath, FVector Location, FVector2D Size, UUserWidget*& OutUserWidget)
 {
 	UGPWidgetComponent* WidgetComp = CreateDefaultSubobject<UGPWidgetComponent>(*Name);
 	WidgetComp->SetupAttachment(GetCharacterMesh());
@@ -268,7 +254,7 @@ void AGPCharacterBase::SetDead()
 		{
 			Destroy();
 		}
-	), DeadEventDelayTime, false); 
+	), DeadEventDelayTime, false);
 }
 
 void AGPCharacterBase::PlayDeadAnimation()

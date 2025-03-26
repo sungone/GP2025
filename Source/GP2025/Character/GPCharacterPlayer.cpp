@@ -18,17 +18,14 @@ AGPCharacterPlayer::AGPCharacterPlayer()
     Helmet->SetVisibility(true);
 
     BodyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BodyMesh"));
-    BodyMesh->SetupAttachment(GetCapsuleComponent());
+    BodyMesh->SetupAttachment(GetMesh());
     BodyMesh->SetCollisionProfileName(TEXT("NoCollision"));
-    BodyMesh->SetRelativeLocationAndRotation(FVector(0.f, 0.f, 0.f), FRotator(0.f, -90.f, 0.f));
 
     HeadMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HeadMesh"));
     HeadMesh->SetupAttachment(BodyMesh);
 
     LegMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LegMesh"));
     LegMesh->SetupAttachment(BodyMesh);
-
-    // ExpBar = CreateWidgetComponent(TEXT("ExpWidget"), TEXT("/Game/UI/WBP_ExpBar_C"), FVector(0.f, 0.f, 308.f), FVector2D(150.f, 15.f));
 }
 
 void AGPCharacterPlayer::BeginPlay()
@@ -45,13 +42,6 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 void AGPCharacterPlayer::PostInitializeComponents()
 {
     Super::PostInitializeComponents();
-
-    //UGPCharacterControlData* LoadedCharacterData = LoadObject<UGPCharacterControlData>(nullptr, TEXT("/Game/CharacterType/GPC_Gunner.GPC_Gunner"));
-    //if (LoadedCharacterData)
-    //{
-    //    ApplyCharacterPartsFromData(LoadedCharacterData);
-    //}
-
     UGPCharacterControlData** FoundData = CharacterTypeManager.Find(CurrentCharacterType);
     if (FoundData && *FoundData)
     {
@@ -232,8 +222,7 @@ void AGPCharacterPlayer::EquipItemOnCharacter(FGPItemStruct& ItemData)
 
         BodyMesh = NewObject<USkeletalMeshComponent>(this);
         BodyMesh->SetSkeletalMesh(ItemData.ItemSkeletalMesh);
-        BodyMesh->SetupAttachment(GetCapsuleComponent());
-        BodyMesh->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
+        BodyMesh->SetupAttachment(GetMesh());
         BodyMesh->RegisterComponent();
 
         if (PreviousAnimBP)

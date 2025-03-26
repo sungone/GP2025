@@ -11,29 +11,41 @@ static void DrawDebugCollisionAndAttackRadius(UWorld* World, const FInfoData& In
 {
 	if (!World) return;
 
-	// 1. CollisionRadius 그리기 (파란색)
+	// 1. CollisionRadius
 	DrawDebugSphere(
 		World,
 		InfoData.Pos,
 		InfoData.CollisionRadius,
-		16,                     // 세그먼트 개수 (클수록 더 부드럽게 보임)
-		FColor::Blue,
-		false,
-		0.0f,                   // 지속 시간 (5초 동안 표시)
-		0,
-		1.0f                    // 선의 두께
+		16,
+		FColor::Silver
 	);
 
-	// 2. AttackRadius 그리기 (빨간색)
+	// 2. AttackRadius
 	DrawDebugSphere(
 		World,
 		InfoData.Pos,
 		InfoData.AttackRadius,
 		16,
-		FColor::Red,
+		FColor::Red
+	);
+
+	//3. ForwardVectorArrow
+	FRotator Rotation(0.0f, InfoData.Yaw, 0.0f);
+	FVector ForwardVector = Rotation.Vector();
+
+	float ArrowLength = 200.0f;
+
+	FVector Start = InfoData.Pos;
+	FVector End = Start + (ForwardVector * ArrowLength);
+	DrawDebugDirectionalArrow(
+		World,
+		Start,
+		End,
+		300.0f,
+		FColor::Orange,
 		false,
-		0.0f,
+		-1.0f,
 		0,
-		1.0f
+		5.0f
 	);
 }

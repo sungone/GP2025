@@ -1,10 +1,16 @@
 #include "pch.h"
 #include "Player.h"
 #include "SessionManager.h"
+#include "GameWorld.h"
+
 void Player::Init()
 {
 	Character::Init();
 	_characterType = CharacterType::Player;
+
+	FVector newPos{};
+	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
+	_info.SetLocation(newPos);
 }
 
 void Player::UpdateViewList(std::shared_ptr<Character> other)

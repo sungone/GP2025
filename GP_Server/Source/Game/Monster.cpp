@@ -7,6 +7,11 @@ void Monster::Init()
 {
 	Character::Init();
 	_characterType = CharacterType::Monster;
+
+	FVector newPos{};
+	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::DEFAULT); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
+	_info.SetLocation(newPos);
+
 	_info.CharacterType = RandomUtils::GetRandomUint8((uint8)Type::EMonster::ENERGY_DRINK, (uint8)Type::EMonster::TINO);
 	_info.Stats.Level = _info.CharacterType;
 }

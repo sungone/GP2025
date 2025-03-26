@@ -30,9 +30,7 @@ struct FInfoData
 	FVector Pos;
 	float Yaw;
 	float CollisionRadius;
-
 	float AttackRadius;
-	float AttackRange;
 
 	float Speed;
 	FStatData Stats;
@@ -41,22 +39,10 @@ struct FInfoData
 	FInfoData()
 		: ID(0), CharacterType(),
 		Pos(FVector(0.0f, 0.0f, 0.0f)), Yaw(0.0f),
-		CollisionRadius(200.0f), AttackRadius(200.0f),
-		AttackRange(200.0f), Speed(0.0f),
+		CollisionRadius(50.0f), AttackRadius(200.0f),
+		Speed(0.0f),
 		Stats(), State(STATE_IDLE)
 	{
-	}
-
-	void InitStats(float MaxHp, float Damage, float CrtRate, float CrtValue, float Dodge, float Speed_)
-	{
-		Stats.MaxHp = MaxHp;
-		Stats.Hp = MaxHp;
-		Stats.Damage = Damage;
-		Stats.CrtRate = CrtRate;
-		Stats.CrtValue = CrtValue;
-		Stats.Dodge = Dodge;
-		Speed = Speed_;
-		State = STATE_IDLE;
 	}
 	void SetYaw(float Yaw_) { Yaw = Yaw_; }
 	void SetLocation(float X_, float Y_, float Z_) { Pos = FVector(X_, Y_, Z_); }
@@ -74,21 +60,13 @@ struct FInfoData
 	float GetCrtRate() const { return Stats.CrtRate; }
 	float GetCrtValue() const { return Stats.CrtValue; }
 	float GetDodge() const { return Stats.Dodge; }
-	FVector GetAttackPos() const
-	{
-		return Pos + FVector(AttackRange * 0.5f, 0.0f, 0.0f);
-	}
+
 #ifdef SERVER_BUILD
 	void SetHp(float NewHp) { Stats.Hp = std::clamp(NewHp, 0.0f, Stats.MaxHp); }
 	void Heal(float Amount) { SetHp(Stats.Hp + Amount); }
 	void TakeDamage(float Amount) { SetHp(Stats.Hp - Amount); }
 	bool IsDead() const { return Stats.Hp < 1.0f; }
 	void SetDamage(float NewDamage) { Stats.Damage = std::max(0.0f, NewDamage); }
-	bool IsColision(const FVector& TargetPos) { return Pos.IsInRange(TargetPos, CollisionRadius); }
-	bool IsInAttackRange(const FInfoData& Target) const
-	{
-		return Pos.IsInRange(Target.Pos, AttackRange + Target.CollisionRadius);
-	}
 	float GetAttackDamage(float RandomValue) const
 	{
 		if (RandomValue < 0.1f)

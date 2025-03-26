@@ -24,6 +24,8 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 600.f;
 	CameraBoom->bUsePawnControlRotation = true;
+	CameraBoom->SetRelativeLocation(FVector(0.f, 0.f, 150.f));
+	CameraBoom->SetRelativeRotation(FRotator(-15.f, 0.f, 0.f));
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
@@ -106,7 +108,6 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 void AGPCharacterMyplayer::BeginPlay()
 {
 	Super::BeginPlay();
-	GetMesh()->SetWorldScale3D(FVector(1.0f));
 	SetCharacterType(CurrentCharacterType);
 
 	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();

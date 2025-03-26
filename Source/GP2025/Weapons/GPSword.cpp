@@ -23,7 +23,7 @@ void AGPSword::AttackHitCheck()
 	AGPCharacterMyplayer* PlayerCharacter = Cast<AGPCharacterMyplayer>(GetOwner());
 	if (!PlayerCharacter) return;
 
-	FHitResult OutHitResult;
+	/*FHitResult OutHitResult;
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
 
 	const float AttackRange = PlayerCharacter->CharacterInfo.AttackRange;
@@ -69,6 +69,6 @@ void AGPSword::AttackHitCheck()
 			FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(),
 			DrawColor, false, 5.f);
 	}
-#endif
+#endif*/
 
 }
