@@ -17,8 +17,7 @@ class GP2025_API AGPGun : public AGPWeaponBase
 public:
 	AGPGun();
 
-	virtual void StartAttack() override;
+	virtual void AttackHitCheck() override;
 
-	// 총알 발사 기능
-	void FireBullet();
+	float ValidRange = 5000.f;
 };

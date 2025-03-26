@@ -27,6 +27,7 @@ protected:
 	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
 	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
 
+public :
 	virtual USkeletalMeshComponent* GetCharacterMesh() const override;
 	
 	// Character Mesh Section

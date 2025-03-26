@@ -3,16 +3,28 @@
 
 #include "Animation/AnimNotify_AttackHitCheck.h"
 #include "Interface/GPAnimationAttackInterface.h"
+#include "Weapons/GPGun.h"
+#include "Weapons/GPSword.h"
+#include "Character/GPCharacterPlayer.h"
 
 void UAnimNotify_AttackHitCheck::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
-	if (MeshComp)
+	if (!MeshComp) return;
+
+	// 캐릭터 타입 확인
+	AGPCharacterPlayer* CharacterPlayer = Cast<AGPCharacterPlayer>(MeshComp->GetOwner());
+	if (!CharacterPlayer) return;
+
+	if (CharacterPlayer->WeaponActor)
 	{
-		IGPAnimationAttackInterface* AttackPawn = Cast<IGPAnimationAttackInterface>(MeshComp->GetOwner());
-		if (AttackPawn)
+		if (Cast<AGPSword>(CharacterPlayer->WeaponActor) || Cast<AGPGun>(CharacterPlayer->WeaponActor))
 		{
-			AttackPawn->AttackHitCheck();
+			IGPAnimationAttackInterface* AttackPawn = Cast<IGPAnimationAttackInterface>(CharacterPlayer);
+			if (AttackPawn)
+			{
+				AttackPawn->AttackHitCheck();
+			}
 		}
 	}
 }

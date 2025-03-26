@@ -28,13 +28,6 @@ void AGPWeaponBase::Tick(float DeltaTime)
 
 }
 
-void AGPWeaponBase::StartAttack()
-{
-}
-
-void AGPWeaponBase::EndAttack()
-{
-}
 
 void AGPWeaponBase::SetWeaponMesh(UStaticMesh* NewWeaponMesh)
 {
@@ -42,9 +35,5 @@ void AGPWeaponBase::SetWeaponMesh(UStaticMesh* NewWeaponMesh)
 		return;
 
 	WeaponMesh->SetStaticMesh(NewWeaponMesh);
-}
-
-void AGPWeaponBase::OnWeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
 }
 
