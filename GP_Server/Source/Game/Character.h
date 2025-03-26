@@ -16,7 +16,7 @@ public:
 	bool IsColision(const FVector& pos);
     bool IsInAttackRange(const FInfoData& target);
     bool IsInViewDistance(const FVector& targetPos, float viewDist);
-	bool IsInFieldOfView(const FInfoData& target, float fovAngle);
+	bool IsInFieldOfView(const FInfoData& target, float fovAngle = 90.f);
 	bool HasLineOfSight(const FVector& targetPos, const std::vector<FVector>& obstacles);
 
 	virtual void UpdateViewList(std::shared_ptr<Character> other){}

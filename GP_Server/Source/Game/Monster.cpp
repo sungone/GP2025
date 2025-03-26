@@ -14,6 +14,8 @@ void Monster::Init()
 
 	_info.CharacterType = RandomUtils::GetRandomUint8((uint8)Type::EMonster::ENERGY_DRINK, (uint8)Type::EMonster::TINO);
 	_info.Stats.Level = _info.CharacterType;
+	_info.CollisionRadius = 100.f;
+	_info.AttackRadius = 200;
 }
 
 void Monster::UpdateViewList(std::shared_ptr<Character> other)

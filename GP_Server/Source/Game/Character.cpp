@@ -33,12 +33,24 @@ bool Character::IsColision(const FVector& pos)
 
 bool Character::IsInAttackRange(const FInfoData& target)
 {
-	return IsInViewDistance(target.Pos, _info.AttackRadius + target.CollisionRadius);
+	return IsInViewDistance(target.Pos, _info.AttackRadius + target.CollisionRadius)
+		&& IsInFieldOfView(target);
 }
 
 bool Character::IsInViewDistance(const FVector& targetPos, float viewDist)
 {
 	return _info.Pos.IsInRange(targetPos, viewDist);
+}
+
+bool Character::IsInFieldOfView(const FInfoData& target, float fovAngle)
+{
+	float RadianYaw = _info.Yaw * (3.14159265f / 180.0f);
+	FVector ForwardVector(std::cos(RadianYaw), std::sin(RadianYaw), 0.0f);
+	FVector ToTarget = (target.Pos - _info.Pos).Normalize();
+	float Dot = ForwardVector.DotProduct(ToTarget);
+	float CosFOV = std::cos(fovAngle * 0.5f * (3.14159265f / 180.0f));
+
+	return Dot >= CosFOV;
 }
 
 bool Character::HasLineOfSight(const FVector& targetPos, const std::vector<FVector>& obstacles)
