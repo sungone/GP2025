@@ -21,16 +21,19 @@ void Monster::Init()
 void Monster::UpdateViewList(std::shared_ptr<Character> other)
 {
 	if (!other) { LOG(Warning, "Invaild!"); return; }
-
-	auto otherId = other->GetInfo().ID;
+	auto player = std::dynamic_pointer_cast<Player>(other);
+	if (!player) return;
+	auto playerId = other->GetInfo().ID;
 
 	if (IsInViewDistance(other->GetInfo().Pos, VIEW_DIST))
 	{
-		AddToViewList(otherId);
+		if (!AddToViewList(playerId)) return;
+		player->AddMonsterToViewList(std::shared_ptr<Character>(this));
 	}
 	else
 	{
-		RemoveFromViewList(other->GetInfo().ID);
+		if (!RemoveFromViewList(playerId)) return;
+		player->RemoveMonsterFromViewList(std::shared_ptr<Character>(this));
 	}
 }
 
@@ -84,7 +87,7 @@ void Monster::ChangeState(ECharacterStateType newState)
 
 bool Monster::DetectTarget()
 {
-
+	
 	return false;
 }
 

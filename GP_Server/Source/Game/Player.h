@@ -7,6 +7,10 @@ class Player : public Character
 public:
 	void Init() override;
 	void UpdateViewList(std::shared_ptr<Character> other) override;
+	void AddMonsterToViewList(std::shared_ptr<Character> monster);
+	void AddPlayerToViewList(std::shared_ptr<Character> player);
+	void RemoveMonsterFromViewList(std::shared_ptr<Character> monster);
+	void RemovePlayerFromViewList(std::shared_ptr<Character> player);
 
 	bool TakeWorldItem(const std::shared_ptr<WorldItem> item);
 	WorldItem DropItem(uint32 itemId);

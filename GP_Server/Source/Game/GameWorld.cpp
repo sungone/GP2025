@@ -127,7 +127,6 @@ void GameWorld::UpdateMonster()
 	{
 		if (!_characters[i]) return;
 
-		UpdateViewList(_characters[i]);
 		_characters[i]->Update();
 	}
 	BroadcastMonsterStates();
