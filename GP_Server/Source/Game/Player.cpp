@@ -27,11 +27,17 @@ void Player::UpdateViewList(std::shared_ptr<Character> other)
 		{
 			auto addPkt = InfoPacket(EPacketType::S_ADD_MONSTER, other->GetInfo());
 			SessionManager::GetInst().SendPacket(_id, &addPkt);
+			other->AddToViewList(_id);
 		}
 		else
 		{
 			auto addPkt = InfoPacket(EPacketType::S_ADD_PLAYER, other->GetInfo());
 			SessionManager::GetInst().SendPacket(_id, &addPkt);
+			if (other->AddToViewList(_id))
+			{
+				auto addPkt = InfoPacket(EPacketType::S_ADD_PLAYER, _info);
+				SessionManager::GetInst().SendPacket(other->GetInfo().ID, &addPkt);
+			}
 		}
 
 	}
@@ -48,6 +54,11 @@ void Player::UpdateViewList(std::shared_ptr<Character> other)
 		{
 			auto removePkt = IDPacket(EPacketType::S_REMOVE_PLAYER, otherId);
 			SessionManager::GetInst().SendPacket(_id, &removePkt);
+			if (other->RemoveFromViewList(_id))
+			{
+				auto removePkt = IDPacket(EPacketType::S_REMOVE_PLAYER, _id);
+				SessionManager::GetInst().SendPacket(other->GetInfo().ID, &removePkt);
+			}
 		}
 	}
 }

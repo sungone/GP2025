@@ -33,7 +33,7 @@ static void DrawDebugCollisionAndAttackRadius(UWorld* World, const FInfoData& In
 	FRotator Rotation(0.0f, InfoData.Yaw, 0.0f);
 	FVector ForwardVector = Rotation.Vector();
 
-	float ArrowLength = 200.0f;
+	float ArrowLength = 100.0f;
 
 	FVector Start = InfoData.Pos;
 	FVector End = Start + (ForwardVector * ArrowLength);
