@@ -5,7 +5,7 @@
 #include "Item.h"
 
 constexpr size_t MAX_PLAYER = MAX_CLIENT;
-constexpr size_t MAX_MONSTER = 500;
+constexpr size_t MAX_MONSTER = 100;
 constexpr size_t MAX_CHARACTER = MAX_PLAYER + MAX_MONSTER;
 
 class GameWorld
@@ -26,6 +26,7 @@ public:
 
 	void PlayerMove(int32 playerId, FInfoData& info);
 	void PlayerAttack(int32 playerId);
+	bool FindTarget(const int32 MonsterId);
 
 	void UpdateMonster();
 	void BroadcastMonsterStates();

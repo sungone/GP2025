@@ -21,11 +21,6 @@ void Character::OnDamaged(float damage)
 	}
 }
 
-float Character::GetAttackDamage()
-{
-	return _info.GetAttackDamage(RandomUtils::GetRandomFloat(0.0f, 1.0f));
-}
-
 bool Character::IsColision(const FVector& pos)
 {
 	return _info.Pos.IsInRange(pos, _info.CollisionRadius);
@@ -33,8 +28,8 @@ bool Character::IsColision(const FVector& pos)
 
 bool Character::IsInAttackRange(const FInfoData& target)
 {
-	return IsInViewDistance(target.Pos, _info.AttackRadius + target.CollisionRadius)
-		&& IsInFieldOfView(target);
+	return IsInViewDistance(target.Pos, _info.AttackRadius + target.CollisionRadius);
+		//&& IsInFieldOfView(target);
 }
 
 bool Character::IsInViewDistance(const FVector& targetPos, float viewDist)

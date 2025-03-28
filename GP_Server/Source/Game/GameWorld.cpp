@@ -85,7 +85,7 @@ void GameWorld::PlayerMove(int32 playerId, FInfoData& info)
 void GameWorld::PlayerAttack(int32 playerId)
 {
 	auto player = _characters[playerId];
-	player->GetInfo().AddState(ECharacterStateType::STATE_AUTOATTACK);
+	player->ChangeState(ECharacterStateType::STATE_AUTOATTACK);
 
 	for (auto& monsterId : player->GetViewList())
 	{
@@ -119,13 +119,42 @@ void GameWorld::PlayerAttack(int32 playerId)
 	SessionManager::GetInst().BroadcastToViewList(&infopkt, playerId);
 }
 
+bool GameWorld::FindTarget(const int32 ownerId)
+{
+	std::shared_ptr<Monster> monster = std::dynamic_pointer_cast<Monster>(_characters[ownerId]);
+	if (!monster)
+	{
+		LOG(Warning, "Invaild");
+		return false;
+	}
+
+	for (auto& playerId : monster->GetViewList())
+	{
+		if (playerId >= MAX_PLAYER)
+		{
+			LOG(Warning, "Invaild");
+			continue;
+		}
+
+		std::shared_ptr<Player> player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+		if (!player) continue;
+		if (monster->IsInAttackRange(player->GetInfo()))
+		{
+			//Todo: 현재는 공격범위가 짧지만... 쫓아가려면 다른 방식으로 해야할듯함
+			monster->SetTarget(player);
+			return true;
+		}
+	}
+	return false;
+}
+
 void GameWorld::UpdateMonster()
 {
 	LOG("Update Monster!");
 	std::unique_lock<std::mutex> lock(_carrMutex);
 	for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{
-		if (!_characters[i]) return;
+		if (!_characters[i]) continue;
 
 		_characters[i]->Update();
 	}

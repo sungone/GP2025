@@ -2,7 +2,7 @@
 #include "Common.h"
 
 constexpr float VIEW_DIST = 2000.f;
-enum class CharacterType {Player, Monster};
+enum class CharacterType { Player, Monster };
 class Character
 {
 public:
@@ -11,19 +11,20 @@ public:
 	virtual bool IsDead();
 
 	void OnDamaged(float damage);
-	float GetAttackDamage();
+	virtual float GetAttackDamage() = 0;
 
 	bool IsColision(const FVector& pos);
-    bool IsInAttackRange(const FInfoData& target);
-    bool IsInViewDistance(const FVector& targetPos, float viewDist);
+	bool IsInAttackRange(const FInfoData& target);
+	bool IsInViewDistance(const FVector& targetPos, float viewDist);
 	bool IsInFieldOfView(const FInfoData& target, float fovAngle = 90.f);
 	bool HasLineOfSight(const FVector& targetPos, const std::vector<FVector>& obstacles);
 
-	virtual void UpdateViewList(std::shared_ptr<Character> other){}
+	virtual void UpdateViewList(std::shared_ptr<Character> other) {}
 	bool AddToViewList(int32 CharacterId);
 	bool RemoveFromViewList(int32 CharacterId);
 	const std::unordered_set<int32>& GetViewList() const { return _viewList; }
 
+	virtual void ChangeState(ECharacterStateType newState) = 0;
 	FInfoData& GetInfo() { return _info; }
 	void SetInfo(FInfoData& info) { _info = info; }
 	bool IsMonster() { return _characterType == CharacterType::Monster; }

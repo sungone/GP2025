@@ -9,13 +9,14 @@ void Monster::Init()
 	_characterType = CharacterType::Monster;
 
 	FVector newPos{};
-	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::DEFAULT); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
+	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
 	_info.SetLocation(newPos);
 
 	_info.CharacterType = RandomUtils::GetRandomUint8((uint8)Type::EMonster::ENERGY_DRINK, (uint8)Type::EMonster::TINO);
 	_info.Stats.Level = _info.CharacterType;
 	_info.CollisionRadius = 100.f;
 	_info.AttackRadius = 200;
+	_info.State = ECharacterStateType::STATE_IDLE;
 }
 
 void Monster::UpdateViewList(std::shared_ptr<Character> other)
@@ -53,42 +54,69 @@ void Monster::BehaviorTree()
 	switch (_info.State)
 	{
 	case ECharacterStateType::STATE_IDLE:
-		if (DetectTarget())
+		if (IsTargetDetected())
 		{
 			ChangeState(ECharacterStateType::STATE_AUTOATTACK);
+			Attack();
 		}
-		else if (RandomUtils::GetRandomBool())
-		{
-			ChangeState(ECharacterStateType::STATE_WALK);
-		}
-		break;
-	case ECharacterStateType::STATE_WALK:
-		if (IsTargetInRange())
-		{
-			ChangeState(ECharacterStateType::STATE_AUTOATTACK);
-		}
+		//else if (RandomUtils::GetRandomBool())
+		//{
+		//	ChangeState(ECharacterStateType::STATE_WALK);
+		//}
 		break;
 	case ECharacterStateType::STATE_AUTOATTACK:
-		if (!IsTargetInRange())
+		if (!_target)
 		{
 			ChangeState(ECharacterStateType::STATE_IDLE);
+			break;
+		}
+
+		if (!IsTargetInRange())
+		{
+			_target.reset();
+			ChangeState(ECharacterStateType::STATE_IDLE);
+		}
+		else
+		{
+			Attack();
 		}
 		break;
+	default:
+		LOG(Warning, std::format("Invaild State :{}", _info.State));
 	}
 }
 
-void Monster::ChangeState(ECharacterStateType newState)
+void Monster::Attack()
 {
-	if (!_info.HasState(newState))
+	if (!_target) return;
+
+	auto player = _target;
+	auto playerID = player->GetInfo().ID;
+
+	float atkDamage = this->GetAttackDamage();
+	if (atkDamage > 0.0f)
 	{
-		_info.AddState(newState);
+		player->OnDamaged(atkDamage);
+	}
+
+	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
+	SessionManager::GetInst().SendPacket(playerID, &infopkt);
+	SessionManager::GetInst().BroadcastToViewList(&infopkt, playerID);
+
+	if (player->IsDead())
+	{
+		//Todo: 플레이어 죽음처리
 	}
 }
 
-bool Monster::DetectTarget()
+void Monster::Move()
 {
-	
-	return false;
+
+}
+
+bool Monster::IsTargetDetected()
+{
+	return GameWorld::GetInst().FindTarget(_id);
 }
 
 bool Monster::IsTargetInRange()
