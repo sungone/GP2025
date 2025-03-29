@@ -43,6 +43,7 @@ protected:
 	void CloseInventory();
 	void ResetInventoryToggle();
 	void OpenSettingWidget();
+	void ProcessInteraction();
 	bool bInventoryToggled = false;
 
 	// 카메라 
@@ -76,6 +77,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> SettingAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> InteractionAction;
 
 	// Sprint Speed 변수
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
@@ -123,6 +127,13 @@ public:
 	bool isJumpStart = false;
 	bool bWasJumping = false;
 
+public :
 	// CharacterInfo
 	virtual void SetCharacterInfo(FInfoData& CharacterInfo_) override;
+
+public :
+	// 아이템 충돌 판정 상태변수 함수들
+	bool bInteractItem = false;
+	FTimerHandle InteractItemTimerHandle;
+	void ResetInteractItem();
 };

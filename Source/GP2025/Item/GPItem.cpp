@@ -116,6 +116,8 @@ void AGPItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 	AGPCharacterMyplayer* Player = Cast<AGPCharacterMyplayer>(OtherActor);
 	if (!Player) return;
 
+	if (!Player->bInteractItem) return;
+
 	UE_LOG(LogTemp, Warning, TEXT("Item Overlap Detected! ItemID: %d | Player: %s"),
 		ItemID, *Player->GetName());
 

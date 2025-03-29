@@ -76,10 +76,17 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 	}
 
 
+
 	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSettingRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_ESC.IA_ESC'"));
 	if (InputActionSettingRef.Object)
 	{
 		SettingAction = InputActionSettingRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InteractionActionSettingRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Interaction.IA_Interaction'"));
+	if (InteractionActionSettingRef.Object)
+	{
+		InteractionAction = InteractionActionSettingRef.Object;
 	}
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBPClass(TEXT("/Game/Inventory/Widgets/WBP_Inventory"));
@@ -260,6 +267,8 @@ void AGPCharacterMyplayer::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::ToggleInventory);
 	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Completed, this, &AGPCharacterMyplayer::ResetInventoryToggle);
 	EnhancedInputComponent->BindAction(SettingAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::OpenSettingWidget);
+	EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::ProcessInteraction);
+
 }
 
 void AGPCharacterMyplayer::SetCharacterType(ECharacterType NewCharacterType)
@@ -439,6 +448,22 @@ void AGPCharacterMyplayer::OpenSettingWidget()
 	}
 }
 
+void AGPCharacterMyplayer::ProcessInteraction()
+{
+	bInteractItem = true;
+	GetWorldTimerManager().SetTimer(
+		InteractItemTimerHandle,             
+		this,                              
+		&AGPCharacterMyplayer::ResetInteractItem, 
+		2.0f,                              
+		false);
+}
+
+void AGPCharacterMyplayer::ResetInteractItem()
+{
+	bInteractItem = false;
+}
+
 UGPInventory* AGPCharacterMyplayer::GetInventoryWidget()
 {
 	UGPInventory* CastInventory = Cast<UGPInventory>(InventoryWidget);
@@ -464,6 +489,9 @@ void AGPCharacterMyplayer::SetCharacterInfo(FInfoData& CharacterInfo_)
 	Super::SetCharacterInfo(CharacterInfo_);
 
 	UGPInGameWidget* InGame = Cast<UGPInGameWidget>(InGameWidget);
+
+	if (!InGame) return;
+
 	InGame->UpdateHealthBar(CharacterInfo_.Stats.Hp / CharacterInfo_.Stats.MaxHp);
 	InGame->UpdateExpBar(CharacterInfo_.Stats.Exp / CharacterInfo_.Stats.MaxExp);
 	InGame->UpdatePlayerLevel(CharacterInfo_.Stats.Level);
