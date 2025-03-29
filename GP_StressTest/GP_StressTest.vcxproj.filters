@@ -17,14 +17,11 @@
     <Filter Include="소스 파일\Shared\Common">
       <UniqueIdentifier>{1c1598d2-38f3-4362-9d04-8597d59a3464}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Shared\IOCP">
+      <UniqueIdentifier>{217e5454-a697-4a74-b0ce-354000ed604e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\GP_Server\Source\IOCP\ExpOver.cpp">
-      <Filter>소스 파일\Shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\GP_Server\Source\IOCP\IOCP.cpp">
-      <Filter>소스 파일\Shared</Filter>
-    </ClCompile>
     <ClCompile Include="Source\pch.cpp">
       <Filter>소스 파일\Pch</Filter>
     </ClCompile>
@@ -36,6 +33,12 @@
     </ClCompile>
     <ClCompile Include="Source\TestMain.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GP_Server\Source\Core\IOCP\ExpOver.cpp">
+      <Filter>소스 파일\Shared\IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GP_Server\Source\Core\IOCP\IOCP.cpp">
+      <Filter>소스 파일\Shared\IOCP</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -51,12 +54,6 @@
     <ClInclude Include="..\GP_Server\Source\Common\Type.h">
       <Filter>소스 파일\Shared\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\GP_Server\Source\IOCP\ExpOver.h">
-      <Filter>소스 파일\Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\GP_Server\Source\IOCP\IOCP.h">
-      <Filter>소스 파일\Shared</Filter>
-    </ClInclude>
     <ClInclude Include="Source\pch.h">
       <Filter>소스 파일\Pch</Filter>
     </ClInclude>
@@ -65,6 +62,12 @@
     </ClInclude>
     <ClInclude Include="Source\DummyClinetManager.h">
       <Filter>소스 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\Core\IOCP\ExpOver.h">
+      <Filter>소스 파일\Shared\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\Core\IOCP\IOCP.h">
+      <Filter>소스 파일\Shared\IOCP</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

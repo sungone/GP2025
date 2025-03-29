@@ -35,20 +35,20 @@
     <Filter Include="Source Files\Game\GameObjects\Character">
       <UniqueIdentifier>{0966d558-393f-4cde-bc3a-30a33c8d61fe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Game\GameObjects\Item">
-      <UniqueIdentifier>{1abc2927-eb8d-4991-bc38-72092992a49a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Utils\Pch">
       <UniqueIdentifier>{3a7b361f-25be-42ce-99da-91564daa6b55}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\IOCP">
-      <UniqueIdentifier>{fae4c54b-3902-48a0-9f6b-e04620347384}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Utils\Timer">
       <UniqueIdentifier>{51b495f3-3a90-4b27-849d-85a68ddde618}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Game\GameObjects\Map">
       <UniqueIdentifier>{8c3f90d3-fa86-4a55-8ae0-ca4c78604b0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\GameObjects\Item">
+      <UniqueIdentifier>{1abc2927-eb8d-4991-bc38-72092992a49a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Network\IOCP">
+      <UniqueIdentifier>{fae4c54b-3902-48a0-9f6b-e04620347384}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -73,15 +73,6 @@
     <ClInclude Include="Source\DB\DBConnectionPool.h">
       <Filter>Source Files\DB</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Game\Character.h">
-      <Filter>Source Files\Game\GameObjects\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Game\Monster.h">
-      <Filter>Source Files\Game\GameObjects\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Game\Player.h">
-      <Filter>Source Files\Game\GameObjects\Character</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Utils\FVector.h">
       <Filter>Source Files\Utils</Filter>
     </ClInclude>
@@ -100,20 +91,8 @@
     <ClInclude Include="Source\Common\Type.h">
       <Filter>Source Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Game\Inventory.h">
-      <Filter>Source Files\Game\GameObjects\Item</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Game\Item.h">
-      <Filter>Source Files\Game\GameObjects\Item</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Core\SessionSocket.h">
       <Filter>Source Files\Network\Session</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\IOCP\ExpOver.h">
-      <Filter>Source Files\IOCP</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\IOCP\IOCP.h">
-      <Filter>Source Files\IOCP</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\GameWorld.h">
       <Filter>Source Files\Game</Filter>
@@ -121,17 +100,41 @@
     <ClInclude Include="Source\Utils\pch.h">
       <Filter>Source Files\Utils\Pch</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Game\TimerQueue.h">
+    <ClInclude Include="Source\Game\Character\Character.h">
+      <Filter>Source Files\Game\GameObjects\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\Character\Monster.h">
+      <Filter>Source Files\Game\GameObjects\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\Character\Player.h">
+      <Filter>Source Files\Game\GameObjects\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\Item\Inventory.h">
+      <Filter>Source Files\Game\GameObjects\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\Item\Item.h">
+      <Filter>Source Files\Game\GameObjects\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\Item\ItemTable.h">
+      <Filter>Source Files\Game\GameObjects\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\Map\BoundingBox.h">
+      <Filter>Source Files\Game\GameObjects\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\Map\MapZone.h">
+      <Filter>Source Files\Game\GameObjects\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\Map\NavMesh.h">
+      <Filter>Source Files\Game\GameObjects\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\IOCP\ExpOver.h">
+      <Filter>Source Files\Network\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\IOCP\IOCP.h">
+      <Filter>Source Files\Network\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Utils\TimerQueue.h">
       <Filter>Source Files\Utils\Timer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Game\BoundingBox.h">
-      <Filter>Source Files\Game\GameObjects\Map</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Game\MapZone.h">
-      <Filter>Source Files\Game\GameObjects\Map</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Game\NavMesh.h">
-      <Filter>Source Files\Game\GameObjects\Map</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -156,29 +159,8 @@
     <ClCompile Include="Source\ServerMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Game\Character.cpp">
-      <Filter>Source Files\Game\GameObjects\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Game\Monster.cpp">
-      <Filter>Source Files\Game\GameObjects\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Game\Player.cpp">
-      <Filter>Source Files\Game\GameObjects\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Game\Inventory.cpp">
-      <Filter>Source Files\Game\GameObjects\Item</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Game\Item.cpp">
-      <Filter>Source Files\Game\GameObjects\Item</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Core\SessionSocket.cpp">
       <Filter>Source Files\Network\Session</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\IOCP\ExpOver.cpp">
-      <Filter>Source Files\IOCP</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\IOCP\IOCP.cpp">
-      <Filter>Source Files\IOCP</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\GameWorld.cpp">
       <Filter>Source Files\Game</Filter>
@@ -186,17 +168,41 @@
     <ClCompile Include="Source\Utils\pch.cpp">
       <Filter>Source Files\Utils\Pch</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Game\TimerQueue.cpp">
+    <ClCompile Include="Source\Game\Character\Character.cpp">
+      <Filter>Source Files\Game\GameObjects\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Character\Monster.cpp">
+      <Filter>Source Files\Game\GameObjects\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Character\Player.cpp">
+      <Filter>Source Files\Game\GameObjects\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Item\Inventory.cpp">
+      <Filter>Source Files\Game\GameObjects\Item</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Item\Item.cpp">
+      <Filter>Source Files\Game\GameObjects\Item</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Item\ItemTable.cpp">
+      <Filter>Source Files\Game\GameObjects\Item</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Map\BoundingBox.cpp">
+      <Filter>Source Files\Game\GameObjects\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Map\MapZone.cpp">
+      <Filter>Source Files\Game\GameObjects\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Map\NavMesh.cpp">
+      <Filter>Source Files\Game\GameObjects\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\IOCP\ExpOver.cpp">
+      <Filter>Source Files\Network\IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\IOCP\IOCP.cpp">
+      <Filter>Source Files\Network\IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Utils\TimerQueue.cpp">
       <Filter>Source Files\Utils\Timer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Game\MapZone.cpp">
-      <Filter>Source Files\Game\GameObjects\Map</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Game\NavMesh.cpp">
-      <Filter>Source Files\Game\GameObjects\Map</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Game\BoundingBox.cpp">
-      <Filter>Source Files\Game\GameObjects\Map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -108,7 +108,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;SERVER_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source;$(SolutionDir)Source\Common;$(SolutionDir)Source\IOCP;$(SolutionDir)Source\Core;$(SolutionDir)Source\Game;$(SolutionDir)Source\DB;$(SolutionDir)Source\AI;$(SolutionDir)Source\Utils;$(SolutionDir)Source\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Source;$(SolutionDir)Source\Common;$(SolutionDir)Source\Core\IOCP;$(SolutionDir)Source\Core;$(SolutionDir)Source\Game;$(SolutionDir)Source\Game\Character;$(SolutionDir)Source\Game\Map;$(SolutionDir)Source\Game\Item;$(SolutionDir)Source\DB;$(SolutionDir)Source\AI;$(SolutionDir)Source\Utils;$(SolutionDir)Source\Include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -145,6 +145,8 @@
     <ClInclude Include="Source\Common\DataStruct.h" />
     <ClInclude Include="Source\Common\Packet.h" />
     <ClInclude Include="Source\Common\Type.h" />
+    <ClInclude Include="Source\Core\IOCP\ExpOver.h" />
+    <ClInclude Include="Source\Core\IOCP\IOCP.h" />
     <ClInclude Include="Source\Core\PacketManager.h" />
     <ClInclude Include="Source\Core\Server.h" />
     <ClInclude Include="Source\Core\Session.h" />
@@ -152,24 +154,25 @@
     <ClInclude Include="Source\Core\SessionSocket.h" />
     <ClInclude Include="Source\DB\DBConnection.h" />
     <ClInclude Include="Source\DB\DBConnectionPool.h" />
-    <ClInclude Include="Source\Game\BoundingBox.h" />
-    <ClInclude Include="Source\Game\Character.h" />
+    <ClInclude Include="Source\Game\Character\Character.h" />
+    <ClInclude Include="Source\Game\Character\Monster.h" />
+    <ClInclude Include="Source\Game\Character\Player.h" />
     <ClInclude Include="Source\Game\GameWorld.h" />
-    <ClInclude Include="Source\Game\Inventory.h" />
-    <ClInclude Include="Source\Game\Item.h" />
-    <ClInclude Include="Source\Game\MapZone.h" />
-    <ClInclude Include="Source\Game\Monster.h" />
-    <ClInclude Include="Source\Game\NavMesh.h" />
-    <ClInclude Include="Source\Game\Player.h" />
-    <ClInclude Include="Source\Game\TimerQueue.h" />
-    <ClInclude Include="Source\IOCP\ExpOver.h" />
-    <ClInclude Include="Source\IOCP\IOCP.h" />
+    <ClInclude Include="Source\Game\Item\Inventory.h" />
+    <ClInclude Include="Source\Game\Item\Item.h" />
+    <ClInclude Include="Source\Game\Item\ItemTable.h" />
+    <ClInclude Include="Source\Game\Map\BoundingBox.h" />
+    <ClInclude Include="Source\Game\Map\MapZone.h" />
+    <ClInclude Include="Source\Game\Map\NavMesh.h" />
     <ClInclude Include="Source\Utils\FVector.h" />
     <ClInclude Include="Source\Utils\Logger.h" />
     <ClInclude Include="Source\Utils\pch.h" />
     <ClInclude Include="Source\Utils\RandomUtils.h" />
+    <ClInclude Include="Source\Utils\TimerQueue.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Core\IOCP\ExpOver.cpp" />
+    <ClCompile Include="Source\Core\IOCP\IOCP.cpp" />
     <ClCompile Include="Source\Core\PacketManager.cpp" />
     <ClCompile Include="Source\Core\Server.cpp" />
     <ClCompile Include="Source\Core\Session.cpp" />
@@ -177,23 +180,22 @@
     <ClCompile Include="Source\Core\SessionSocket.cpp" />
     <ClCompile Include="Source\DB\DBConnection.cpp" />
     <ClCompile Include="Source\DB\DBConnectionPool.cpp" />
-    <ClCompile Include="Source\Game\BoundingBox.cpp" />
-    <ClCompile Include="Source\Game\Character.cpp" />
+    <ClCompile Include="Source\Game\Character\Character.cpp" />
+    <ClCompile Include="Source\Game\Character\Monster.cpp" />
+    <ClCompile Include="Source\Game\Character\Player.cpp" />
     <ClCompile Include="Source\Game\GameWorld.cpp" />
-    <ClCompile Include="Source\Game\Inventory.cpp" />
-    <ClCompile Include="Source\Game\Item.cpp" />
-    <ClCompile Include="Source\Game\MapZone.cpp" />
-    <ClCompile Include="Source\Game\Monster.cpp" />
-    <ClCompile Include="Source\Game\NavMesh.cpp" />
-    <ClCompile Include="Source\Game\Player.cpp" />
-    <ClCompile Include="Source\Game\TimerQueue.cpp" />
-    <ClCompile Include="Source\IOCP\ExpOver.cpp" />
-    <ClCompile Include="Source\IOCP\IOCP.cpp" />
+    <ClCompile Include="Source\Game\Item\Inventory.cpp" />
+    <ClCompile Include="Source\Game\Item\Item.cpp" />
+    <ClCompile Include="Source\Game\Item\ItemTable.cpp" />
+    <ClCompile Include="Source\Game\Map\BoundingBox.cpp" />
+    <ClCompile Include="Source\Game\Map\MapZone.cpp" />
+    <ClCompile Include="Source\Game\Map\NavMesh.cpp" />
     <ClCompile Include="Source\ServerMain.cpp" />
     <ClCompile Include="Source\Utils\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Source\Utils\TimerQueue.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="NavMeshData.json" />
