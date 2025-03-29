@@ -129,12 +129,13 @@ namespace Type
 	};
 }
 
-enum EItemCategory
+enum class EItemCategory
 {
 	Weapon,
 	Armor,
 	Useable,
-	Quest
+	Quest,
+	Unknown
 };
 
 enum ECharacterStateType : uint8

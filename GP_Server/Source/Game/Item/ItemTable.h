@@ -1,0 +1,43 @@
+#pragma once
+
+enum class EDetailType { Bow, Sword, Helmet, Chest, Consumable, Gold, Quest, Unknown };
+enum class EAbilityType { None, Recove, AtcBuff, Gold };
+struct FItemData
+{
+	uint32 ItemId;
+	std::string ItemName;
+	EItemCategory Category;
+	EDetailType DetailType;
+	float Damage = 0.f;
+	float Hp = 0.f;
+	float CrtRate = 0.f;
+	float DodgeRate = 0.f;
+	float MoveSpeed = 0.f;
+	EAbilityType AbilityType = EAbilityType::None;
+	float AbilityValue = 0.f;
+	int Grade = 0;
+	bool FromMonster = false;
+	int ResellPrice = 0;
+	int Price = 0;
+	bool bSellable = false;
+	bool bBuyable = false;
+};
+
+class ItemTable
+{
+public:
+	static ItemTable& GetInst()
+	{
+		static ItemTable inst;
+		return inst;
+	}
+	bool LoadFromCSV(const std::string& FilePath);
+	void PrintAllItems() const;
+	const FItemData* GetItemById(uint32 ItemId) const;
+private:
+	std::unordered_map<uint32, FItemData> _itemMap;
+
+	EItemCategory StringToCategory(const std::string& str);
+	EDetailType StringToDetailType(const std::string& str);
+	EAbilityType StringToAbilityType(const std::string& str);
+};

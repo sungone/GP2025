@@ -1,10 +1,11 @@
 #include "pch.h"
 #include "MapZone.h"
+const std::string MapDataPath = "Source/Game/Map/MapJsonData/";
 
 bool MapZone::Init()
 {
-	_default = NavMesh("NavMeshData.json");
-	_playground = NavMesh("PlaygroundNavData.json");
+	_default = NavMesh(MapDataPath + "NavMeshData.json");
+	_playground = NavMesh(MapDataPath + "PlaygroundNavData.json");
 	return true;
 }
 

@@ -21,11 +21,11 @@ uint8 WorldItem::GetRandomItemType()
 
 	switch (itemCategory)
 	{
-	case EItemCategory::Weapon:
+	case static_cast<uint8>(EItemCategory::Weapon):
 		return static_cast<uint8>(GetRandomWeapon());
-	case EItemCategory::Armor:
+	case static_cast<uint8>(EItemCategory::Armor):
 		return static_cast<uint8>(GetRandomArmor());
-	case EItemCategory::Useable:
+	case static_cast<uint8>(EItemCategory::Useable):
 		return static_cast<uint8>(GetRandomUseable());
 	}
 }

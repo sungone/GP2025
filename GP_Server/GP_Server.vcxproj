@@ -198,8 +198,8 @@
     <ClCompile Include="Source\Utils\TimerQueue.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="NavMeshData.json" />
-    <None Include="PlaygroundNavData.json" />
+    <None Include="Source\Game\Map\MapJsonData\NavMeshData.json" />
+    <None Include="Source\Game\Map\MapJsonData\PlaygroundNavData.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -4,7 +4,7 @@
 #include "SessionManager.h"
 #include "GameWorld.h"
 #include "DBConnectionPool.h"
-
+#include "ItemTable.h"
 bool Server::Init()
 {
 	std::wcout.imbue(std::locale("korean"));
@@ -14,6 +14,12 @@ bool Server::Init()
 	//	LOG(LogType::Warning, "DB");
 	//	return false;
 	//}
+
+	if (!ItemTable::GetInst().LoadFromCSV("../DataTable/UserItemTable_copy.csv"))
+	{
+		LOG(LogType::Warning, "LoadFromCSV");
+		return false;
+	}
 
 	WSADATA wsa_data;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
