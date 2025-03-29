@@ -6,7 +6,9 @@
 #include "Network/GPNetworkManager.h"
 #include "Character/GPCharacterMyplayer.h"
 #include "Engine/World.h"
+#include "Blueprint/UserWidget.h"
 #include "GPItemStruct.h"
+#include "Components/WidgetComponent.h"
 
 // Sets default values
 AGPItem::AGPItem()
@@ -33,6 +35,19 @@ AGPItem::AGPItem()
 	// 회전하는 움직임 추가
 	RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("RotatingMovement"));
 	RotatingMovement->RotationRate = FRotator(0.f, 180.f, 0.f); // 초당 180도 회전
+
+	ItemInteractionWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("ItemInteractionWidgetComp"));
+	ItemInteractionWidgetComp->SetupAttachment(RootComponent);
+	ItemInteractionWidgetComp->SetWidgetSpace(EWidgetSpace::Screen); 
+	ItemInteractionWidgetComp->SetDrawSize(FVector2D(150.f, 50.f));
+	ItemInteractionWidgetComp->SetVisibility(false);
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClassFinder(TEXT("/Game/Inventory/Widgets/WBP_ItemInteraction"));
+	if (WidgetClassFinder.Succeeded())
+	{
+		ItemInteractionWidgetClass = WidgetClassFinder.Class;
+		ItemInteractionWidgetComp->SetWidgetClass(ItemInteractionWidgetClass);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -111,10 +126,16 @@ void AGPItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 	bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (!ItemInteractionWidgetClass) return;
 	if (!OtherActor) return;
 
 	AGPCharacterMyplayer* Player = Cast<AGPCharacterMyplayer>(OtherActor);
 	if (!Player) return;
+
+	if (ItemInteractionWidgetComp && !ItemInteractionWidgetComp->IsVisible())
+	{
+		ItemInteractionWidgetComp->SetVisibility(true);
+	}
 
 	if (!Player->bInteractItem) return;
 
