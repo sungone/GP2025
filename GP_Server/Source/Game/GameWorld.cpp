@@ -84,7 +84,12 @@ void GameWorld::PlayerMove(int32 playerId, FInfoData& info)
 
 void GameWorld::PlayerAttack(int32 playerId)
 {
-	auto player = _characters[playerId];
+	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	if (!player)
+	{
+		LOG(Warning, "Invaild!");
+		return;
+	}
 	player->ChangeState(ECharacterStateType::STATE_AUTOATTACK);
 
 	for (auto& monsterId : player->GetViewList())

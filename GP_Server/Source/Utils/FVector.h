@@ -52,7 +52,7 @@ struct FVector
     }
 
     std::string ToString() const
-    {
+    { 
         std::ostringstream oss;
         oss << "("
             << std::format("{:.2f}", X) << ", "

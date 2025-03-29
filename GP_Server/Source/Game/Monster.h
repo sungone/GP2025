@@ -23,9 +23,9 @@ private:
 	bool SetTarget();
 	bool IsTargetInAttackRange();
 	bool IsTargetInChaseRange();
-	virtual float GetAttackDamage() override
+	float GetAttackDamage() override
 	{
-		return _info.GetAttackDamage(RandomUtils::GetRandomFloat(0.0f, 1.0f));
+		return _info.GetAttackDamage();
 	}
 	void ChangeState(ECharacterStateType newState) override
 	{
