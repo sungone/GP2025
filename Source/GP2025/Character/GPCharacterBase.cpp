@@ -177,7 +177,7 @@ void AGPCharacterBase::ProcessAutoAttackCommand()
 
 	FOnMontageEnded MontageEndedDelegate;
 	MontageEndedDelegate.BindUObject(this, &AGPCharacterBase::OnAutoAttackMontageEnded);
-	AnimInstance->Montage_Play(AttackActionMontage, 1.f);
+	AnimInstance->Montage_Play(AttackActionMontage, 2.f);
 	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, AttackActionMontage);
 }
 
