@@ -66,18 +66,27 @@ struct AttackPacket : public Packet
 		Header.PacketSize = sizeof(AttackPacket);
 	}
 };
-struct DamagePacket : public Packet
+struct MonsterDamagePacket : public Packet
 {
 	FInfoData Target;
 	float Damage;
 
-	DamagePacket(const FInfoData& Target_, float Damage_)
+	MonsterDamagePacket(const FInfoData& Target_, float Damage_)
 		: Packet(EPacketType::S_DAMAGED_MONSTER), Target(Target_), Damage(Damage_)
 	{
-		Header.PacketSize = sizeof(DamagePacket);
+		Header.PacketSize = sizeof(MonsterDamagePacket);
 	}
 };
+struct PlayerDamagePacket : public Packet
+{
+	FInfoData Target;
 
+	PlayerDamagePacket(const FInfoData& Target_)
+		: Packet(EPacketType::S_DAMAGED_MONSTER), Target(Target_)
+	{
+		Header.PacketSize = sizeof(PlayerDamagePacket);
+	}
+};
 namespace ItemPkt
 {
 	struct SpawnPacket : public Packet

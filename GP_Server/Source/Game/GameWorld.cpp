@@ -101,7 +101,7 @@ void GameWorld::PlayerAttack(int32 playerId)
 				monster->OnDamaged(atkDamage);
 			}
 
-			auto pkt = DamagePacket(monster->GetInfo(), atkDamage);
+			auto pkt = MonsterDamagePacket(monster->GetInfo(), atkDamage);
 			SessionManager::GetInst().SendPacket(playerId, &pkt);
 			SessionManager::GetInst().BroadcastToViewList(&pkt, playerId);
 

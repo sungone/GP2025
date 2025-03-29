@@ -78,7 +78,6 @@ void Monster::BehaviorTree()
 		if (SetTarget())
 		{
 			Look();
-			ChangeState(ECharacterStateType::STATE_WALK);
 		}
 		else
 		{
@@ -130,9 +129,8 @@ void Monster::Attack()
 		player->OnDamaged(atkDamage);
 	}
 
-	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
-	SessionManager::GetInst().SendPacket(playerID, &infopkt);
-	SessionManager::GetInst().BroadcastToViewList(&infopkt, playerID);
+	auto pkt = InfoPacket(EPacketType::S_DAMAGED_PLAYER, player->GetInfo());
+	SessionManager::GetInst().SendPacket(playerID, &pkt);
 
 	if (player->IsDead())
 	{
@@ -154,11 +152,16 @@ void Monster::Chase()
 	LOG("Chase!");
 	auto playerPos = _target->GetInfo().Pos;
 	FVector dir = (playerPos - _pos).Normalize();
-	FVector newPos = _pos + dir * _info.Speed;
-	_info.SetLocationAndYaw(newPos);
-
-	if (IsTargetInAttackRange())
+	FVector dist = dir * _info.Speed;
+	if (dist.Length() < _pos.DistanceTo(playerPos) - _info.AttackRadius)
+	{
+		_info.SetLocationAndYaw(_pos + dist);
+	}
+	else
+	{
+		_info.SetLocationAndYaw(playerPos - dir * _info.AttackRadius);
 		ChangeState(ECharacterStateType::STATE_AUTOATTACK);
+	}
 }
 
 void Monster::Patrol()
@@ -187,6 +190,7 @@ bool Monster::SetTarget()
 		{
 			LOG("SetTarget!");
 			//Todo: 제일 가까운 플레이어를 쫓아야함...
+			ChangeState(ECharacterStateType::STATE_WALK);
 			_target = std::dynamic_pointer_cast<Player>(player);
 			return true;
 		}
