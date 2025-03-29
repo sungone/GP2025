@@ -117,7 +117,7 @@ void Player::UseItem(uint32 itemId)
 {
 	auto targetItem = _inventory.FindInventoryItemById(itemId);
 	//Todo: 아이템아이디로 플레이어 인벤토리에서 찾아
-	// 타입(EUseable type)에 따른 값 스텟에 적용
+	// 타입(EUseable type)에 따른 값 스텟에 적용 -> ex)체력키트, 딸바...
 }
 
 uint8 Player::EquipItem(uint32 itemId)
