@@ -48,8 +48,8 @@ void UGPObjectManager::Login(FInfoData& PlayerInfo)
 
 	MyPlayer->SetCharacterInfo(PlayerInfo);
 	MyPlayer->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
-	Players.Add(PlayerInfo.ID, Cast<AGPCharacterPlayer*>(MyPlayer));
-
+	auto Player = Cast<AGPCharacterPlayer>(MyPlayer);
+	Players.Add(PlayerInfo.ID, Player);
 }
 
 void UGPObjectManager::AddPlayer(FInfoData& PlayerInfo)
