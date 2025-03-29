@@ -22,15 +22,14 @@ class GP2025_API AGPCharacterMyplayer : public AGPCharacterPlayer, public IGPAni
 public:
 	AGPCharacterMyplayer();
 
-protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
 	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
 
+protected:
 	// Input ÇÔ¼ö
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);

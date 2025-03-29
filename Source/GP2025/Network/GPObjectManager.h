@@ -25,6 +25,7 @@ public:
 	void AddPlayer(FInfoData& PlayerInfo);
 	void RemovePlayer(int32 PlayerID);
 	void UpdatePlayer(FInfoData& PlayerInfo);
+	void DamagedPlayer(FInfoData& PlayerInfo);
 
 	void AddMonster(FInfoData& MonsterInfo);
 	void RemoveMonster(int32 MonsterID);
@@ -46,14 +47,12 @@ private:
     UPROPERTY()
     TSubclassOf<AGPCharacterMonster> MonsterClass;
 
-	AGPCharacterPlayer* MyPlayer;
-	TMap<int32, AGPCharacterPlayer*> OtherPlayers;
+	class AGPCharacterMyplayer* MyPlayer;
+	TMap<int32, AGPCharacterPlayer*> Players;
     TMap<int32, AGPCharacterMonster*> Monsters;
     TMap<int32, AGPItem*> Items;
 
     UWorld* World;
-
-
 private :
 	UPROPERTY()
 	class UGPInventory* InventoryWidget;

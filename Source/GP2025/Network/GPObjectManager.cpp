@@ -23,7 +23,7 @@ void UGPObjectManager::Deinitialize()
 
 void UGPObjectManager::SetMyPlayer(AGPCharacterPlayer* InMyPlayer)
 {
-	MyPlayer = InMyPlayer;
+	MyPlayer = Cast<AGPCharacterMyplayer>(InMyPlayer);
 }
 
 void UGPObjectManager::Login(FInfoData& PlayerInfo)
@@ -48,6 +48,7 @@ void UGPObjectManager::Login(FInfoData& PlayerInfo)
 
 	MyPlayer->SetCharacterInfo(PlayerInfo);
 	MyPlayer->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
+	Players.Add(PlayerInfo.ID, Cast<AGPCharacterPlayer*>(MyPlayer));
 
 }
 
@@ -73,23 +74,33 @@ void UGPObjectManager::AddPlayer(FInfoData& PlayerInfo)
 
 	Player->SetCharacterInfo(PlayerInfo);
 	Player->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
-	OtherPlayers.Add(PlayerInfo.ID, Player);
+	Players.Add(PlayerInfo.ID, Player);
 }
 
 void UGPObjectManager::RemovePlayer(int32 PlayerID)
 {
-	if (OtherPlayers.Contains(PlayerID))
+	if (Players.Contains(PlayerID))
 	{
-		OtherPlayers[PlayerID]->Destroy();
-		OtherPlayers.Remove(PlayerID);
+		Players[PlayerID]->Destroy();
+		Players.Remove(PlayerID);
 	}
 }
 
 void UGPObjectManager::UpdatePlayer(FInfoData& PlayerInfo)
 {
-	if (OtherPlayers.Contains(PlayerInfo.ID))
+	auto PlayerID = PlayerInfo.ID;
+	if (Players.Contains(PlayerID))
 	{
-		OtherPlayers[PlayerInfo.ID]->SetCharacterInfo(PlayerInfo);
+		Players[PlayerID]->SetCharacterInfo(PlayerInfo);
+	}
+}
+
+void UGPObjectManager::DamagedPlayer(FInfoData& PlayerInfo)
+{
+	auto PlayerID = PlayerInfo.ID;
+	if (Players.Contains(PlayerID))
+	{
+		Players[PlayerID]->SetCharacterInfo(PlayerInfo);
 	}
 }
 
@@ -224,39 +235,9 @@ void UGPObjectManager::AddInventoryItem(uint32 ItemID, uint8 ItemType)
 	if (!MyPlayer)
 		return;
 
-	UGPInventory* Inventory = Cast<UGPInventory>(MyPlayer->InventoryWidget);
+	UGPInventory* Inventory = MyPlayer->GetInventoryWidget();
 	if (Inventory)
 		Inventory->AddItemToInventory(ItemID , ItemType, 1);
-
-	// ±¸¹öÀü
-	//UE_LOG(LogTemp, Warning, TEXT("AddInventoryItem - ItemID: %d | ItemType: %d"), ItemID, ItemType);
-
-	//AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	//if (!LocalMyPlayer)
-	//{
-	//	UE_LOG(LogTemp, Error, TEXT("No Player..."));
-	//	return;
-	//}
-
-	//if (!LocalMyPlayer->InventoryWidget)
-	//{
-	//	UE_LOG(LogTemp, Error, TEXT("InventoryWidget not found!"));
-	//	return;
-	//}
-
-	//UGPInventory* LocalInventoryWidget = Cast<UGPInventory>(LocalMyPlayer->InventoryWidget);
-
-	//if (!LocalInventoryWidget)
-	//{
-	//	UE_LOG(LogTemp, Error, TEXT("Failed to Cast InventoryWidget to UGPInventory"));
-	//	return;
-	//}
-
-	//UE_LOG(LogTemp, Warning, TEXT("Attempting to Add Item - ItemType: %d to Inventory"), ItemType);
-
-	//LocalInventoryWidget->AddItemToInventory(ItemType, 1);
-
-	//UE_LOG(LogTemp, Warning, TEXT("Item Successfully Added to Inventory!"));
 }
 
 void UGPObjectManager::RemoveInventoryItem(uint32 ItemID)
@@ -267,13 +248,13 @@ void UGPObjectManager::RemoveInventoryItem(uint32 ItemID)
 
 void UGPObjectManager::EquipItem(int32 PlayerID, uint8 ItemType)
 {
-	if (!OtherPlayers.Contains(PlayerID))
+	if (!Players.Contains(PlayerID))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("EquipItem Failed: PlayerID [%d] not found"), PlayerID);
 		return;
 	}
 
-	AGPCharacterPlayer* TargetPlayer = OtherPlayers[PlayerID];
+	AGPCharacterPlayer* TargetPlayer = Players[PlayerID];
 	if (!TargetPlayer)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UGPObjectManager::EquipItem , TargetPlayer Not Found"));

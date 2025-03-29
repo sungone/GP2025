@@ -182,6 +182,12 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->UpdatePlayer(Pkt->Data);
 				break;
 			}
+			case EPacketType::S_DAMAGED_PLAYER:
+			{
+				PlayerDamagePacket* Pkt = reinterpret_cast<PlayerDamagePacket*>(RemainingData.GetData());
+				ObjectMgr->DamagedPlayer(Pkt->Target);
+				break;
+			}
 #pragma endregion
 #pragma region Monster
 			case EPacketType::S_ADD_MONSTER:
@@ -204,7 +210,7 @@ void UGPNetworkManager::ProcessPacket()
 			}
 			case EPacketType::S_DAMAGED_MONSTER:
 			{
-				DamagePacket* Pkt = reinterpret_cast<DamagePacket*>(RemainingData.GetData());
+				MonsterDamagePacket* Pkt = reinterpret_cast<MonsterDamagePacket*>(RemainingData.GetData());
 				ObjectMgr->DamagedMonster(Pkt->Target, Pkt->Damage);
 				break;
 			}
