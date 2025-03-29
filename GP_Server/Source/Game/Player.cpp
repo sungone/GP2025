@@ -53,6 +53,15 @@ void Player::AddMonsterToViewList(std::shared_ptr<Character> monster)
     monster->AddToViewList(_id);
 }
 
+void Player::RemoveMonsterFromViewList(std::shared_ptr<Character> monster)
+{
+    auto monsterId = monster->GetInfo().ID;
+    if (!RemoveFromViewList(monsterId)) return;
+    auto removePkt = IDPacket(EPacketType::S_REMOVE_MONSTER, monsterId);
+    SessionManager::GetInst().SendPacket(_id, &removePkt);
+    monster->RemoveFromViewList(_id);
+}
+
 void Player::AddPlayerToViewList(std::shared_ptr<Character> otherPlayer)
 {
     auto otherPlayerId = otherPlayer->GetInfo().ID;
@@ -65,15 +74,6 @@ void Player::AddPlayerToViewList(std::shared_ptr<Character> otherPlayer)
         auto addPkt = InfoPacket(EPacketType::S_ADD_PLAYER, _info);
         SessionManager::GetInst().SendPacket(otherPlayer->GetInfo().ID, &addPkt);
     }
-}
-
-void Player::RemoveMonsterFromViewList(std::shared_ptr<Character> monster)
-{
-    auto monsterId = monster->GetInfo().ID;
-    if (!RemoveFromViewList(monsterId)) return;
-    auto removePkt = IDPacket(EPacketType::S_REMOVE_MONSTER, monsterId);
-    SessionManager::GetInst().SendPacket(_id, &removePkt);
-    monster->RemoveFromViewList(_id);
 }
 
 void Player::RemovePlayerFromViewList(std::shared_ptr<Character> player)

@@ -62,6 +62,7 @@ bool Character::HasLineOfSight(const FVector& targetPos, const std::vector<FVect
 
 bool Character::AddToViewList(int32 CharacterId)
 {
+	std::lock_guard<std::mutex> lock(_vlLock);
 	if (!_viewList.contains(CharacterId))
 	{
 		_viewList.insert(CharacterId);
@@ -72,6 +73,7 @@ bool Character::AddToViewList(int32 CharacterId)
 
 bool Character::RemoveFromViewList(int32 CharacterId)
 {
+	std::lock_guard<std::mutex> lock(_vlLock);
 	if (_viewList.contains(CharacterId))
 	{
 		_viewList.erase(CharacterId);

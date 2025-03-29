@@ -48,24 +48,6 @@ void SessionManager::HandleLogin(int32 id)
 		GameWorld::GetInst().UpdateViewList(newPlayer);
 	}
 	GameWorld::GetInst().SpawnMonster(*session);
-
-	//std::lock_guard<std::mutex> lock(_smgrMutex);
-	//for (int32 otherId = 0; otherId < MAX_CLIENT; ++otherId)
-	//{
-	//	if (otherId == id)continue;
-	//	const auto& otherPlayerSession = _sessions[otherId];
-	//	if (otherPlayerSession == nullptr || !otherPlayerSession->IsLogin()) continue;
-
-	//	int32 otherPlayerId = otherPlayerSession->GetId();
-	//	std::shared_ptr<Character> otherPlayer = GameWorld::GetInst().GetCharacterByID(otherPlayerId);
-
-	//	if (otherPlayer && newPlayer->GetViewList().find(otherPlayerId) != newPlayer->GetViewList().end())
-	//	{
-	//		const auto& otherInfo = otherPlayerSession->GetPlayerInfo();
-	//		const auto otherPlayerPkt = InfoPacket(EPacketType::S_ADD_PLAYER, otherInfo);
-	//		session->DoSend(&otherPlayerPkt);
-	//	}
-	//}
 	LOG(std::format("Player[{}] Login!", id));
 }
 
@@ -89,7 +71,8 @@ void SessionManager::BroadcastToViewList(Packet* packet, int32 senderId)
 {
 	std::shared_ptr<Character> senderCharacter = GameWorld::GetInst().GetCharacterByID(senderId);
 	if (!senderCharacter) return;
-	GameWorld::GetInst().UpdateViewList(senderCharacter);
+
+	std::lock_guard<std::mutex> vlock(senderCharacter->_vlLock);
 	const std::unordered_set<int32>& viewList = senderCharacter->GetViewList();
 
 	std::lock_guard<std::mutex> lock(_smgrMutex);

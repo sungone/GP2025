@@ -82,8 +82,7 @@ struct FInfoData
 	}
 	float CalculateYaw(FVector TargetPos) const
 	{
-		FVector Direction = (TargetPos - Pos).Normalize();
-		return std::atan2(Direction.Y, Direction.X) * (180.0f / 3.14159265f);
+		return Pos.GetYawToTarget(TargetPos);
 	}
 	void AddExp(float Amount)
 	{

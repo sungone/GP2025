@@ -3,6 +3,8 @@
 #include "Player.h"
 #include "NavMesh.h"
 
+const float detectDist = 1000.f;
+
 class Monster : public Character
 {
 public:
@@ -11,12 +13,16 @@ public:
 	void UpdateViewList(std::shared_ptr<Character> other) override;
 	void Update();
 	void BehaviorTree();
-	void SetTarget(std::shared_ptr<Player> player) { _target = player; }
+
 private:
+	void Look();
 	void Attack();
-	void Move();
-	bool IsTargetDetected();
-	bool IsTargetInRange();
+	void Chase();
+	void Patrol();
+
+	bool SetTarget();
+	bool IsTargetInAttackRange();
+	bool IsTargetInChaseRange();
 	virtual float GetAttackDamage() override
 	{
 		return _info.GetAttackDamage(RandomUtils::GetRandomFloat(0.0f, 1.0f));

@@ -22,17 +22,16 @@ public:
 	virtual void UpdateViewList(std::shared_ptr<Character> other) {}
 	bool AddToViewList(int32 CharacterId);
 	bool RemoveFromViewList(int32 CharacterId);
-	const std::unordered_set<int32>& GetViewList() const { return _viewList; }
+    std::unordered_set<int32> GetViewList() const {return _viewList; }
 
 	virtual void ChangeState(ECharacterStateType newState) = 0;
 	FInfoData& GetInfo() { return _info; }
 	void SetInfo(FInfoData& info) { _info = info; }
 	bool IsMonster() { return _characterType == CharacterType::Monster; }
-
-	void Lock() { _mutex.lock(); }
-	void Unlock() { _mutex.unlock(); }
+public:
+	std::mutex _cLock;
+	std::mutex _vlLock;
 protected:
-	std::mutex _mutex;
 	FInfoData _info;
 	int32& _id = _info.ID;
 	std::unordered_set<int32> _viewList;
