@@ -122,4 +122,7 @@ public:
 	float GroundZLocation = 147.7;
 	bool isJumpStart = false;
 	bool bWasJumping = false;
+
+	// CharacterInfo
+	virtual void SetCharacterInfo(FInfoData& CharacterInfo_) override;
 };

@@ -16,6 +16,7 @@
 #include "Inventory/GPInventory.h"
 #include "Player/GPPlayerController.h"
 #include "Weapons/GPWeaponBase.h"
+#include "UI/GPInGameWidget.h"
 
 AGPCharacterMyplayer::AGPCharacterMyplayer()
 {
@@ -457,4 +458,15 @@ void AGPCharacterMyplayer::AttackHitCheck()
 		WeaponActor->AttackHitCheck();
 	}
 }
+
+void AGPCharacterMyplayer::SetCharacterInfo(FInfoData& CharacterInfo_)
+{
+	Super::SetCharacterInfo(CharacterInfo_);
+
+	UGPInGameWidget* InGame = Cast<UGPInGameWidget>(InGameWidget);
+	InGame->UpdateHealthBar(CharacterInfo_.Stats.Hp / CharacterInfo_.Stats.MaxHp);
+	InGame->UpdateExpBar(CharacterInfo_.Stats.Exp / CharacterInfo_.Stats.MaxExp);
+	InGame->UpdatePlayerLevel(CharacterInfo_.Stats.Level);
+}
+
 

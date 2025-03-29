@@ -27,7 +27,7 @@ public:
 	virtual void PostInitializeComponents() override;
 
 	// 서버에서 받은 다른 클라이언트 정보를 업데이트
-	void SetCharacterInfo(FInfoData& CharacterInfo_);
+	virtual void SetCharacterInfo(FInfoData& CharacterInfo_);
 	FInfoData CharacterInfo;
 
 	// 플레이어 -> 마스터 포즈 컴포넌트 (BodyMesh) , 몬스터 -> GetMesh()
