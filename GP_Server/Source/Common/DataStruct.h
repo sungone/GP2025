@@ -17,7 +17,7 @@ struct FStatData
 	FStatData()
 		: Level(1), Exp(0.0f), MaxExp(100.0f),
 		Hp(100.0f), MaxHp(100.0f),
-		Damage(10.0f), CrtRate(0.1f), CrtValue(1.5f),
+		Damage(10.0f), CrtRate(0.5f), CrtValue(1.5f),
 		Dodge(0.1f)
 	{
 	}
@@ -39,7 +39,7 @@ struct FInfoData
 	FInfoData()
 		: ID(0), CharacterType(),
 		Pos(FVector(0.0f, 0.0f, 0.0f)), Yaw(0.0f),
-		CollisionRadius(50.0f), AttackRadius(100.0f),
+		CollisionRadius(0.0f), AttackRadius(0.f),
 		Speed(0.0f),
 		Stats(), State(STATE_IDLE)
 	{
@@ -67,6 +67,10 @@ struct FInfoData
 	void TakeDamage(float Amount) { SetHp(Stats.Hp - Amount); }
 	bool IsDead() const { return Stats.Hp < 1.0f; }
 	void SetDamage(float NewDamage) { Stats.Damage = std::max(0.0f, NewDamage); }
+	float GetAttackDamage() const
+	{
+		return Stats.Damage;
+	}
 	float GetAttackDamage(float RandomValue) const
 	{
 		if (RandomValue < 0.1f)
@@ -83,6 +87,13 @@ struct FInfoData
 	float CalculateYaw(FVector TargetPos) const
 	{
 		return Pos.GetYawToTarget(TargetPos);
+	}
+	FVector GetFrontVector() const
+	{
+		float RadianYaw = Yaw * (3.14159265359f / 180.0f);
+		float ForwardX = std::cos(RadianYaw);
+		float ForwardY = std::sin(RadianYaw);
+		return FVector(ForwardX, ForwardY, 0.0f).Normalize();
 	}
 	void AddExp(float Amount)
 	{

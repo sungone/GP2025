@@ -19,7 +19,7 @@ public:
 	uint8 EquipItem(uint32 itemId);
 	uint8 UnequipItem(uint32 itemId);
 
-	virtual float GetAttackDamage() override
+	float GetAttackDamage() override
 	{
 		return _info.GetAttackDamage(RandomUtils::GetRandomFloat(0.0f, 1.0f));
 	}
