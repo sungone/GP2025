@@ -21,6 +21,10 @@ public:
 
 	void AddItemStats(const ItemStats& stats);
 	void RemoveItemStats(const ItemStats& stats);
+
+	void AddExp(float amount);
+	void LevelUp();
+
 	void AddGold(int amount) { _gold += amount; }
 	bool SpendGold(int amount)
 	{
@@ -30,7 +34,6 @@ public:
 	}
 
 	int GetGold() const { return _gold; }
-
 	float GetAttackDamage() override
 	{
 		return _info.GetAttackDamage(RandomUtils::GetRandomFloat(0.0f, 1.0f));

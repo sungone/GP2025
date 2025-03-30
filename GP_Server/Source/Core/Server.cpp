@@ -5,6 +5,8 @@
 #include "GameWorld.h"
 #include "DBConnectionPool.h"
 #include "ItemTable.h"
+#include "LevelStatTable.h"
+
 bool Server::Init()
 {
 	std::wcout.imbue(std::locale("korean"));
@@ -16,6 +18,12 @@ bool Server::Init()
 	//}
 
 	if (!ItemTable::GetInst().LoadFromCSV("../DataTable/UserItemTable_copy.csv"))
+	{
+		LOG(LogType::Warning, "LoadFromCSV");
+		return false;
+	}
+
+	if (!LevelStatTable::GetInst().LoadFromCSV("../DataTable/PlayerStatTable.csv"))
 	{
 		LOG(LogType::Warning, "LoadFromCSV");
 		return false;

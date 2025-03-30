@@ -112,7 +112,7 @@ void GameWorld::PlayerAttack(int32 playerId)
 
 			if (monster->IsDead())
 			{
-				player->GetInfo().AddExp(10);
+				player->AddExp(10);
 				SpawnWorldItem({ monster->GetInfo().Pos.X, monster->GetInfo().Pos.Y, monster->GetInfo().Pos.Z + 20 });
 				RemoveCharacter(monsterId);
 			}

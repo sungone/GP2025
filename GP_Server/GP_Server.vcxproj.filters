@@ -50,6 +50,9 @@
     <Filter Include="Source Files\Network\IOCP">
       <UniqueIdentifier>{fae4c54b-3902-48a0-9f6b-e04620347384}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Game\GameObjects\DataTable">
+      <UniqueIdentifier>{5410e107-ebe2-467e-a7cd-01e4c2a5ac3c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Utils\Logger.h">
@@ -115,9 +118,6 @@
     <ClInclude Include="Source\Game\Item\Item.h">
       <Filter>Source Files\Game\GameObjects\Item</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Game\Item\ItemTable.h">
-      <Filter>Source Files\Game\GameObjects\Item</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Game\Map\BoundingBox.h">
       <Filter>Source Files\Game\GameObjects\Map</Filter>
     </ClInclude>
@@ -138,6 +138,12 @@
     </ClInclude>
     <ClInclude Include="Source\Game\Item\InventoryItem.h">
       <Filter>Source Files\Game\GameObjects\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\DataTable\ItemTable.h">
+      <Filter>Source Files\Game\GameObjects\DataTable</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\DataTable\LevelStatTable.h">
+      <Filter>Source Files\Game\GameObjects\DataTable</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -186,9 +192,6 @@
     <ClCompile Include="Source\Game\Item\Item.cpp">
       <Filter>Source Files\Game\GameObjects\Item</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Game\Item\ItemTable.cpp">
-      <Filter>Source Files\Game\GameObjects\Item</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Game\Map\BoundingBox.cpp">
       <Filter>Source Files\Game\GameObjects\Map</Filter>
     </ClCompile>
@@ -209,6 +212,12 @@
     </ClCompile>
     <ClCompile Include="Source\Game\Item\InventoryItem.cpp">
       <Filter>Source Files\Game\GameObjects\Item</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\DataTable\ItemTable.cpp">
+      <Filter>Source Files\Game\GameObjects\DataTable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\DataTable\LevelStatTable.cpp">
+      <Filter>Source Files\Game\GameObjects\DataTable</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

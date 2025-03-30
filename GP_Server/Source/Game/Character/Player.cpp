@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "SessionManager.h"
 #include "GameWorld.h"
+#include "LevelStatTable.h"
 
 void Player::Init()
 {
@@ -187,4 +188,35 @@ void Player::RemoveItemStats(const ItemStats& stats)
 	_stats.CrtRate = std::clamp(_stats.CrtRate - stats.critRate, 0.0f, 1.0f);
 	_stats.Dodge = std::clamp(_stats.Dodge - stats.dodgeRate, 0.0f, 1.0f);
 	_stats.Speed = std::max(0.0f, _stats.Speed - stats.moveSpeed);
+}
+
+void Player::AddExp(float amount)
+{
+	_stats.Exp += amount;
+
+	while (_stats.Exp >= _stats.MaxExp)
+	{
+		_stats.Exp -= _stats.MaxExp;
+		LevelUp();
+	}
+}
+
+void Player::LevelUp()
+{
+	_stats.Level++;
+
+	const FStatData* newStats = LevelStatTable::GetInst().GetStatByLevel(_stats.Level);
+	if (!newStats)
+	{
+		LOG(Warning, "Invaild");
+		return;
+	}
+
+	_stats.MaxHp = newStats->MaxHp;
+	_stats.Hp = _stats.MaxHp;
+	_stats.Damage = newStats->Damage;
+	_stats.CrtRate = newStats->CrtRate;
+	_stats.CrtValue = newStats->CrtValue;
+	_stats.Dodge = newStats->Dodge;
+	_stats.MaxExp = newStats->MaxExp;
 }
