@@ -169,7 +169,7 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 
 	CharacterInfo.SetLocation(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
 	CharacterInfo.Yaw = CurrentRotationYaw;
-	CharacterInfo.Speed = GetVelocity().Size();
+	CharacterInfo.Stats.Speed = GetVelocity().Size();
 
 	float DistanceMoved = FVector::DistSquared(CurrentLocation, LastLocation);
 	LastLocation = CurrentLocation;
@@ -211,7 +211,7 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 		&& (LastSendPlayerInfo.Pos.Z - GroundZLocation) > AirThreshold)
 	{
 		CharacterInfo.Pos.Z = GroundZLocation;
-		CharacterInfo.Speed = LastSendPlayerInfo.HasState(STATE_RUN) ? SprintSpeed : WalkSpeed;
+		CharacterInfo.Stats.Speed = LastSendPlayerInfo.HasState(STATE_RUN) ? SprintSpeed : WalkSpeed;
 
 		NetworkMgr->SendPlayerMovePacket();
 		LastSendPlayerInfo = CharacterInfo;
