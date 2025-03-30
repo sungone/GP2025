@@ -2,7 +2,6 @@
 #include "Player.h"
 #include "SessionManager.h"
 #include "GameWorld.h"
-#include "PlayerLevelTable.h"
 
 void Player::Init()
 {

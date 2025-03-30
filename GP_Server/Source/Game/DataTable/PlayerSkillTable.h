@@ -42,4 +42,5 @@ public:
 private:
     std::unordered_map<uint32, FSkillData> _skillMap;
     std::unordered_map<uint32, std::vector<FSkillData>> _groupMap;
+    ESkillType StringToSkillType(const std::string& str);
 };

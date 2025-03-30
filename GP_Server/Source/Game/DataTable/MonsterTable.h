@@ -4,7 +4,6 @@ struct FMonsterData
 {
     uint32 TypeId;
     uint32 Chapter;
-    std::string Name;
     int Hp;
     int Atk;
     float CrtRate;

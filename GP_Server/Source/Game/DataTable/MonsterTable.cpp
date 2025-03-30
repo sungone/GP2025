@@ -22,7 +22,6 @@ bool MonsterTable::LoadFromCSV(const std::string& filePath)
 
         std::getline(ss, cell, ','); monster.TypeId = std::stoi(cell);
         std::getline(ss, cell, ','); monster.Chapter = std::stoi(cell);
-        std::getline(ss, monster.Name, ',');
         std::getline(ss, cell, ','); monster.Hp = std::stoi(cell);
         std::getline(ss, cell, ','); monster.Atk = std::stoi(cell);
         std::getline(ss, cell, ','); monster.CrtRate = std::stof(cell);

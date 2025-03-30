@@ -30,6 +30,10 @@
 #include "TimerQueue.h"
 
 #include "MapZone.h"
+#include "ItemTable.h"
+#include "PlayerSkillTable.h"
+#include "PlayerLevelTable.h"
+#include "MonsterTable.h"
 
 enum CompType
 {

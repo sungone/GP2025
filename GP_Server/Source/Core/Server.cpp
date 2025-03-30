@@ -4,8 +4,6 @@
 #include "SessionManager.h"
 #include "GameWorld.h"
 #include "DBConnectionPool.h"
-#include "ItemTable.h"
-#include "PlayerLevelTable.h"
 
 bool Server::Init()
 {

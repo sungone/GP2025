@@ -58,7 +58,7 @@ const std::vector<FSkillData>& SkillTable::GetSkillGroup(uint32 groupId) const
 }
 
 
-ESkillType StringToSkillType(const std::string& str)
+ESkillType SkillTable::StringToSkillType(const std::string& str)
 {
     if (str == "atk") return ESkillType::Atk;
     if (str == "dash") return ESkillType::Dash;
