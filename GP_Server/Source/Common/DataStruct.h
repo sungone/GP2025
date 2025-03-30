@@ -35,6 +35,7 @@ struct FInfoData
 
 	FStatData Stats;
 	uint32 State;
+	uint32 Gold;
 
 	FInfoData()
 		: ID(0), CharacterType(),

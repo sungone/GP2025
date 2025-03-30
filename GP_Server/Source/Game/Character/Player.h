@@ -46,5 +46,5 @@ private:
 	Inventory _inventory;
 	std::unordered_set<int32> _viewList;
 	FStatData& _stats = _info.Stats;
-	uint32 _gold = 0;
+	uint32& _gold = _info.Gold;
 };
