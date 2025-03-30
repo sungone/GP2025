@@ -110,11 +110,11 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	/// Other Client 위치 및 회전 동기화 ///
 	FVector Location = GetActorLocation();
 	FVector DestLocation = CharacterInfo.Pos;
-	if (CharacterInfo.Speed < 400.f)
+	if (CharacterInfo.Stats.Speed < 400.f)
 	{
-		CharacterInfo.Speed = 500.f;
+		CharacterInfo.Stats.Speed = 500.f;
 	}
-	float Speed = CharacterInfo.Speed;
+	float Speed = CharacterInfo.Stats.Speed;
 
 	FVector MoveDir = (DestLocation - Location);
 	const float DistToDest = MoveDir.Length();
