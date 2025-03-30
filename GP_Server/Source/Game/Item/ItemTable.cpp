@@ -25,7 +25,7 @@ bool ItemTable::LoadFromCSV(const std::string& FilePath)
         std::getline(ss, dummy, ',');
 
         std::getline(ss, cell, ','); item.Category = StringToCategory(cell);
-        std::getline(ss, cell, ','); item.DetailType = StringToDetailType(cell);
+        std::getline(ss, dummy, ',');
 
         std::getline(ss, cell, ','); item.Damage = std::stof(cell);
         std::getline(ss, cell, ','); item.Hp = std::stof(cell);
@@ -55,7 +55,6 @@ void ItemTable::PrintAllItems() const
     std::cout << std::left
         << std::setw(5) << "ID"
         << std::setw(10) << "Category"
-        << std::setw(10) << "DetailType"
         << std::setw(8) << "Damage"
         << std::setw(8) << "Hp"
         << std::setw(10) << "CrtRate"
@@ -78,7 +77,6 @@ void ItemTable::PrintAllItems() const
         std::cout << std::left
             << std::setw(5) << item.TypeID
             << std::setw(10) << static_cast<int>(item.Category)
-            << std::setw(10) << static_cast<int>(item.DetailType)
             << std::setw(8) << item.Damage
             << std::setw(8) << item.Hp
             << std::setw(10) << item.CrtRate
@@ -114,18 +112,6 @@ EItemCategory ItemTable::StringToCategory(const std::string& str)
     if (str == "useable") return EItemCategory::Useable;
     if (str == "unuseable") return EItemCategory::Quest;
     return EItemCategory::Unknown;
-}
-
-EDetailType ItemTable::StringToDetailType(const std::string& str)
-{
-    if (str == "bow") return EDetailType::Bow;
-    if (str == "sword") return EDetailType::Sword;
-    if (str == "helmet") return EDetailType::Helmet;
-    if (str == "chest") return EDetailType::Chest;
-    if (str == "consumable") return EDetailType::Consumable;
-    if (str == "Gold") return EDetailType::Gold;
-    if (str == "Quest") return EDetailType::Quest;
-    return EDetailType::Unknown;
 }
 
 EAbilityType ItemTable::StringToAbilityType(const std::string& str)

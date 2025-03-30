@@ -21,6 +21,15 @@ public:
 
 	void AddItemStats(const ItemStats& stats);
 	void RemoveItemStats(const ItemStats& stats);
+	void AddGold(int amount) { _gold += amount; }
+	bool SpendGold(int amount)
+	{
+		if (_gold < amount) return false;
+		_gold -= amount;
+		return true;
+	}
+
+	int GetGold() const { return _gold; }
 
 	float GetAttackDamage() override
 	{
@@ -37,4 +46,5 @@ private:
 	Inventory _inventory;
 	std::unordered_set<int32> _viewList;
 	FStatData& _stats = _info.Stats;
+	uint32 _gold = 0;
 };

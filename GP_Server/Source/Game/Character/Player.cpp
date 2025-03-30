@@ -116,6 +116,32 @@ WorldItem Player::DropItem(uint32 itemId)
 void Player::UseItem(uint32 itemId)
 {
 	auto targetItem = _inventory.FindInventoryItemById(itemId);
+	if (!targetItem) return;
+
+	const ItemStats& stats = targetItem->GetStats();
+	const ItemMeta& meta = targetItem->GetMeta();
+	const EAbilityType ability = targetItem->GetAbilityType();
+	const float value = targetItem->GetAbilityValue();
+
+	switch (ability)
+	{
+	case EAbilityType::Recove:
+		_stats.Hp = std::min(_stats.Hp + value, _stats.MaxHp);
+		break;
+
+	case EAbilityType::AtcBuff:
+		_stats.Damage += value;
+		break;
+
+	case EAbilityType::Gold:
+		AddGold(value);
+		break;
+
+	default:
+		break;
+	}
+
+	_inventory.RemoveInventoryItemById(itemId);
 
 }
 

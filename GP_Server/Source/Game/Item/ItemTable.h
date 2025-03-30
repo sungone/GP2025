@@ -1,12 +1,10 @@
 #pragma once
 
-enum class EDetailType { Bow, Sword, Helmet, Chest, Consumable, Gold, Quest, Unknown };
 enum class EAbilityType { None, Recove, AtcBuff, Gold };
 struct FItemData
 {
 	uint32 TypeID;
 	EItemCategory Category;
-	EDetailType DetailType;
 	float Damage = 0.f;
 	float Hp = 0.f;
 	float CrtRate = 0.f;
@@ -37,6 +35,5 @@ private:
 	std::unordered_map<uint32, FItemData> _itemMap;
 
 	EItemCategory StringToCategory(const std::string& str);
-	EDetailType StringToDetailType(const std::string& str);
 	EAbilityType StringToAbilityType(const std::string& str);
 };
