@@ -14,7 +14,6 @@ InventoryItem::InventoryItem(uint32 itemId, uint8 itemType)
 	);
 
 	_meta = ItemMeta(
-		data->Grade,
 		data->FromMonster,
 		data->ResellPrice,
 		data->bSellable,

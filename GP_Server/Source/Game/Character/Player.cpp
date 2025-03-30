@@ -2,7 +2,7 @@
 #include "Player.h"
 #include "SessionManager.h"
 #include "GameWorld.h"
-#include "LevelStatTable.h"
+#include "PlayerLevelTable.h"
 
 void Player::Init()
 {
@@ -205,7 +205,7 @@ void Player::LevelUp()
 {
 	_stats.Level++;
 
-	const FStatData* newStats = LevelStatTable::GetInst().GetStatByLevel(_stats.Level);
+	const FStatData* newStats = PlayerLevelTable::GetInst().GetStatByLevel(_stats.Level);
 	if (!newStats)
 	{
 		LOG(Warning, "Invaild");

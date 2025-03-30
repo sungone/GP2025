@@ -141,6 +141,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="MonsterTable.h" />
+    <ClInclude Include="PlayerSkillTable.h" />
     <ClInclude Include="Source\Common\Common.h" />
     <ClInclude Include="Source\Common\DataStruct.h" />
     <ClInclude Include="Source\Common\Packet.h" />
@@ -158,7 +160,7 @@
     <ClInclude Include="Source\Game\Character\Monster.h" />
     <ClInclude Include="Source\Game\Character\Player.h" />
     <ClInclude Include="Source\Game\DataTable\ItemTable.h" />
-    <ClInclude Include="Source\Game\DataTable\LevelStatTable.h" />
+    <ClInclude Include="Source\Game\DataTable\PlayerLevelTable.h" />
     <ClInclude Include="Source\Game\GameWorld.h" />
     <ClInclude Include="Source\Game\Item\Inventory.h" />
     <ClInclude Include="Source\Game\Item\InventoryItem.h" />
@@ -173,6 +175,8 @@
     <ClInclude Include="Source\Utils\TimerQueue.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="MonsterTable.cpp" />
+    <ClCompile Include="PlayerSkillTable.cpp" />
     <ClCompile Include="Source\Core\IOCP\ExpOver.cpp" />
     <ClCompile Include="Source\Core\IOCP\IOCP.cpp" />
     <ClCompile Include="Source\Core\PacketManager.cpp" />
@@ -186,7 +190,7 @@
     <ClCompile Include="Source\Game\Character\Monster.cpp" />
     <ClCompile Include="Source\Game\Character\Player.cpp" />
     <ClCompile Include="Source\Game\DataTable\ItemTable.cpp" />
-    <ClCompile Include="Source\Game\DataTable\LevelStatTable.cpp" />
+    <ClCompile Include="Source\Game\DataTable\PlayerLevelTable.cpp" />
     <ClCompile Include="Source\Game\GameWorld.cpp" />
     <ClCompile Include="Source\Game\Item\Inventory.cpp" />
     <ClCompile Include="Source\Game\Item\InventoryItem.cpp" />

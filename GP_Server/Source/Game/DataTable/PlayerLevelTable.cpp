@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "LevelStatTable.h"
+#include "PlayerLevelTable.h"
 
-bool LevelStatTable::LoadFromCSV(const std::string& filePath)
+bool PlayerLevelTable::LoadFromCSV(const std::string& filePath)
 {
     std::ifstream file(filePath);
     if (!file.is_open())
@@ -37,7 +37,7 @@ bool LevelStatTable::LoadFromCSV(const std::string& filePath)
     return true;
 }
 
-const FStatData* LevelStatTable::GetStatByLevel(uint32 level) const
+const FStatData* PlayerLevelTable::GetStatByLevel(uint32 level) const
 {
     auto it = _levelStats.find(level);
     if (it != _levelStats.end())

@@ -1,11 +1,11 @@
 #pragma once
 
-class LevelStatTable
+class PlayerLevelTable
 {
 public:
-    static LevelStatTable& GetInst()
+    static PlayerLevelTable& GetInst()
     {
-        static LevelStatTable inst;
+        static PlayerLevelTable inst;
         return inst;
     }
 

@@ -5,20 +5,8 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Source Files\Network">
-      <UniqueIdentifier>{541cfa86-e0a4-45e9-97fe-349731f36986}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Game">
       <UniqueIdentifier>{053f68d3-c801-4234-820b-0898ac0fcda2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Network\Session">
-      <UniqueIdentifier>{f44568fd-afd9-483d-9703-f35088fe82bb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Network\Packet">
-      <UniqueIdentifier>{c6684bf7-4b36-4acc-a683-ff78741f3301}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Network\Server">
-      <UniqueIdentifier>{17f2af66-87ad-4819-b1e8-c8e64fbd720a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Utils">
       <UniqueIdentifier>{bd2831f8-ef1c-49f1-856e-b8adecab7014}</UniqueIdentifier>
@@ -47,11 +35,23 @@
     <Filter Include="Source Files\Game\GameObjects\Item">
       <UniqueIdentifier>{1abc2927-eb8d-4991-bc38-72092992a49a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Network\IOCP">
-      <UniqueIdentifier>{fae4c54b-3902-48a0-9f6b-e04620347384}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Game\GameObjects\DataTable">
       <UniqueIdentifier>{5410e107-ebe2-467e-a7cd-01e4c2a5ac3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Network">
+      <UniqueIdentifier>{541cfa86-e0a4-45e9-97fe-349731f36986}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Network\Session">
+      <UniqueIdentifier>{f44568fd-afd9-483d-9703-f35088fe82bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Network\Packet">
+      <UniqueIdentifier>{c6684bf7-4b36-4acc-a683-ff78741f3301}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Network\Server">
+      <UniqueIdentifier>{17f2af66-87ad-4819-b1e8-c8e64fbd720a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Network\IOCP">
+      <UniqueIdentifier>{fae4c54b-3902-48a0-9f6b-e04620347384}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -142,9 +142,11 @@
     <ClInclude Include="Source\Game\DataTable\ItemTable.h">
       <Filter>Source Files\Game\GameObjects\DataTable</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Game\DataTable\LevelStatTable.h">
+    <ClInclude Include="Source\Game\DataTable\PlayerLevelTable.h">
       <Filter>Source Files\Game\GameObjects\DataTable</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerSkillTable.h" />
+    <ClInclude Include="MonsterTable.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Core\Session.cpp">
@@ -216,8 +218,14 @@
     <ClCompile Include="Source\Game\DataTable\ItemTable.cpp">
       <Filter>Source Files\Game\GameObjects\DataTable</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Game\DataTable\LevelStatTable.cpp">
+    <ClCompile Include="Source\Game\DataTable\PlayerLevelTable.cpp">
       <Filter>Source Files\Game\GameObjects\DataTable</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerSkillTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MonsterTable.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

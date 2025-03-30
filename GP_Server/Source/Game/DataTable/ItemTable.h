@@ -12,7 +12,7 @@ struct FItemData
 	float MoveSpeed = 0.f;
 	EAbilityType AbilityType = EAbilityType::None;
 	float AbilityValue = 0.f;
-	int Grade = 0;
+	float DropRate = 0.f;
 	bool FromMonster = false;
 	int ResellPrice = 0;
 	int Price = 0;
@@ -29,7 +29,6 @@ public:
 		return inst;
 	}
 	bool LoadFromCSV(const std::string& FilePath);
-	void PrintAllItems() const;
 	const FItemData* GetItemByTypeId(uint32 TypeID) const;
 private:
 	std::unordered_map<uint32, FItemData> _itemMap;

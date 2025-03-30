@@ -16,14 +16,13 @@ struct ItemStats
 
 struct ItemMeta
 {
-	int grade;
 	bool fromMonster;
 	int resellPrice;
 	bool isSellable;
 	bool isBuyable;
 
-	ItemMeta(int grd = 0, bool fromMob = false, int resell = 0, bool sellable = false, bool buyable = false)
-		: grade(grd), fromMonster(fromMob), resellPrice(resell), isSellable(sellable), isBuyable(buyable) {
+	ItemMeta(bool fromMob = false, int resell = 0, bool sellable = false, bool buyable = false)
+		: fromMonster(fromMob), resellPrice(resell), isSellable(sellable), isBuyable(buyable) {
 	}
 };
 

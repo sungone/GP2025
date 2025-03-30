@@ -5,7 +5,7 @@
 #include "GameWorld.h"
 #include "DBConnectionPool.h"
 #include "ItemTable.h"
-#include "LevelStatTable.h"
+#include "PlayerLevelTable.h"
 
 bool Server::Init()
 {
@@ -23,7 +23,7 @@ bool Server::Init()
 		return false;
 	}
 
-	if (!LevelStatTable::GetInst().LoadFromCSV("../DataTable/PlayerStatTable.csv"))
+	if (!PlayerLevelTable::GetInst().LoadFromCSV("../DataTable/PlayerStatTable.csv"))
 	{
 		LOG(LogType::Warning, "LoadFromCSV");
 		return false;

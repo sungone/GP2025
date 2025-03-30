@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "ItemTable.h"
-#include <iomanip>
 
 bool ItemTable::LoadFromCSV(const std::string& FilePath)
 {
@@ -25,17 +24,14 @@ bool ItemTable::LoadFromCSV(const std::string& FilePath)
         std::getline(ss, dummy, ',');
 
         std::getline(ss, cell, ','); item.Category = StringToCategory(cell);
-        std::getline(ss, dummy, ',');
-
         std::getline(ss, cell, ','); item.Damage = std::stof(cell);
         std::getline(ss, cell, ','); item.Hp = std::stof(cell);
         std::getline(ss, cell, ','); item.CrtRate = std::stof(cell);
         std::getline(ss, cell, ','); item.DodgeRate = std::stof(cell);
         std::getline(ss, cell, ','); item.MoveSpeed = std::stof(cell);
-
         std::getline(ss, cell, ','); item.AbilityType = StringToAbilityType(cell);
         std::getline(ss, cell, ','); item.AbilityValue = std::stof(cell);
-        std::getline(ss, cell, ','); item.Grade = std::stoi(cell);
+        std::getline(ss, cell, ','); item.DropRate = std::stof(cell);
         std::getline(ss, cell, ','); item.FromMonster = std::stoi(cell) == 1;
         std::getline(ss, cell, ','); item.ResellPrice = std::stoi(cell);
         std::getline(ss, cell, ','); item.Price = std::stoi(cell);
@@ -48,52 +44,6 @@ bool ItemTable::LoadFromCSV(const std::string& FilePath)
     file.close();
     return true;
 }
-
-void ItemTable::PrintAllItems() const
-{
-    std::cout << "=== All Items in Item Table ===" << std::endl;
-    std::cout << std::left
-        << std::setw(5) << "ID"
-        << std::setw(10) << "Category"
-        << std::setw(8) << "Damage"
-        << std::setw(8) << "Hp"
-        << std::setw(10) << "CrtRate"
-        << std::setw(12) << "DodgeRate"
-        << std::setw(12) << "MoveSpeed"
-        << std::setw(12) << "AbilityType"
-        << std::setw(12) << "AbilityVal"
-        << std::setw(7) << "Grade"
-        << std::setw(8) << "Price"
-        << std::setw(8) << "Resell"
-        << std::setw(10) << "FromMon"
-        << std::setw(10) << "Sellable"
-        << std::setw(10) << "Buyable"
-        << std::endl;
-
-    std::cout << std::string(180, '-') << std::endl;
-
-    for (const auto& [itemId, item] : _itemMap)
-    {
-        std::cout << std::left
-            << std::setw(5) << item.TypeID
-            << std::setw(10) << static_cast<int>(item.Category)
-            << std::setw(8) << item.Damage
-            << std::setw(8) << item.Hp
-            << std::setw(10) << item.CrtRate
-            << std::setw(12) << item.DodgeRate
-            << std::setw(12) << item.MoveSpeed
-            << std::setw(12) << static_cast<int>(item.AbilityType)
-            << std::setw(12) << item.AbilityValue
-            << std::setw(7) << item.Grade
-            << std::setw(8) << item.Price
-            << std::setw(8) << item.ResellPrice
-            << std::setw(10) << (item.FromMonster ? "Yes" : "No")
-            << std::setw(10) << (item.bSellable ? "Yes" : "No")
-            << std::setw(10) << (item.bBuyable ? "Yes" : "No")
-            << std::endl;
-    }
-}
-
 
 const FItemData* ItemTable::GetItemByTypeId(uint32 TypeID) const
 {
