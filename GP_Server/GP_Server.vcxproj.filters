@@ -47,11 +47,11 @@
     <Filter Include="Source Files\Game\GameObjects\Item">
       <UniqueIdentifier>{1abc2927-eb8d-4991-bc38-72092992a49a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Game\GameObjects\DataTable">
-      <UniqueIdentifier>{5410e107-ebe2-467e-a7cd-01e4c2a5ac3c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Game\GameObjects\Character">
       <UniqueIdentifier>{0966d558-393f-4cde-bc3a-30a33c8d61fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\DataTable">
+      <UniqueIdentifier>{5410e107-ebe2-467e-a7cd-01e4c2a5ac3c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -140,16 +140,16 @@
       <Filter>Source Files\Game\GameObjects\Item</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\DataTable\ItemTable.h">
-      <Filter>Source Files\Game\GameObjects\DataTable</Filter>
+      <Filter>Source Files\Game\DataTable</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\DataTable\PlayerLevelTable.h">
-      <Filter>Source Files\Game\GameObjects\DataTable</Filter>
+      <Filter>Source Files\Game\DataTable</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\DataTable\MonsterTable.h">
-      <Filter>Source Files\Game\GameObjects\DataTable</Filter>
+      <Filter>Source Files\Game\DataTable</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\DataTable\PlayerSkillTable.h">
-      <Filter>Source Files\Game\GameObjects\DataTable</Filter>
+      <Filter>Source Files\Game\DataTable</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -220,16 +220,16 @@
       <Filter>Source Files\Game\GameObjects\Item</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\DataTable\ItemTable.cpp">
-      <Filter>Source Files\Game\GameObjects\DataTable</Filter>
+      <Filter>Source Files\Game\DataTable</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\DataTable\PlayerLevelTable.cpp">
-      <Filter>Source Files\Game\GameObjects\DataTable</Filter>
+      <Filter>Source Files\Game\DataTable</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\DataTable\MonsterTable.cpp">
-      <Filter>Source Files\Game\GameObjects\DataTable</Filter>
+      <Filter>Source Files\Game\DataTable</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\DataTable\PlayerSkillTable.cpp">
-      <Filter>Source Files\Game\GameObjects\DataTable</Filter>
+      <Filter>Source Files\Game\DataTable</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

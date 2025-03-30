@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "PlayerSkillTable.h"
 
-bool SkillTable::LoadFromCSV(const std::string& filePath)
+bool PlayerSkillTable::LoadFromCSV(const std::string& filePath)
 {
     std::ifstream file(filePath);
     if (!file.is_open())
@@ -39,7 +39,7 @@ bool SkillTable::LoadFromCSV(const std::string& filePath)
     return true;
 }
 
-const FSkillData* SkillTable::GetSkill(uint32 idx) const
+const FSkillData* PlayerSkillTable::GetSkill(uint32 idx) const
 {
     auto it = _skillMap.find(idx);
     if (it != _skillMap.end())
@@ -48,7 +48,7 @@ const FSkillData* SkillTable::GetSkill(uint32 idx) const
 }
 
 
-const std::vector<FSkillData>& SkillTable::GetSkillGroup(uint32 groupId) const
+const std::vector<FSkillData>& PlayerSkillTable::GetSkillGroup(uint32 groupId) const
 {
     static std::vector<FSkillData> empty;
     auto it = _groupMap.find(groupId);
@@ -58,7 +58,7 @@ const std::vector<FSkillData>& SkillTable::GetSkillGroup(uint32 groupId) const
 }
 
 
-ESkillType SkillTable::StringToSkillType(const std::string& str)
+ESkillType PlayerSkillTable::StringToSkillType(const std::string& str)
 {
     if (str == "atk") return ESkillType::Atk;
     if (str == "dash") return ESkillType::Dash;

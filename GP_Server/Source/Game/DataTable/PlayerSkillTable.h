@@ -26,12 +26,12 @@ struct FSkillData
     float Value1 = 0.f;
 };
 
-class SkillTable
+class PlayerSkillTable
 {
 public:
-    static SkillTable& GetInst()
+    static PlayerSkillTable& GetInst()
     {
-        static SkillTable inst;
+        static PlayerSkillTable inst;
         return inst;
     }
 

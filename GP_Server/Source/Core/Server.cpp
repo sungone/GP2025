@@ -15,13 +15,25 @@ bool Server::Init()
 	//	return false;
 	//}
 
-	if (!ItemTable::GetInst().LoadFromCSV("../DataTable/UserItemTable_copy.csv"))
+	if (!ItemTable::GetInst().LoadFromCSV("../DataTable/ItemTable.csv"))
 	{
 		LOG(LogType::Warning, "LoadFromCSV");
 		return false;
 	}
 
-	if (!PlayerLevelTable::GetInst().LoadFromCSV("../DataTable/PlayerStatTable.csv"))
+	if (!PlayerLevelTable::GetInst().LoadFromCSV("../DataTable/PlayerLevelTable.csv"))
+	{
+		LOG(LogType::Warning, "LoadFromCSV");
+		return false;
+	}
+
+	if (!PlayerSkillTable::GetInst().LoadFromCSV("../DataTable/PlayerSkillTable.csv"))
+	{
+		LOG(LogType::Warning, "LoadFromCSV");
+		return false;
+	}
+
+	if (!MonsterTable::GetInst().LoadFromCSV("../DataTable/MonsterTable.csv"))
 	{
 		LOG(LogType::Warning, "LoadFromCSV");
 		return false;
