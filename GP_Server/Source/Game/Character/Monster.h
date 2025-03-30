@@ -25,7 +25,7 @@ private:
 	bool IsTargetInChaseRange();
 	float GetAttackDamage() override
 	{
-		return _info.GetAttackDamage();
+		return _info.GetDamage();
 	}
 	void ChangeState(ECharacterStateType newState) override
 	{

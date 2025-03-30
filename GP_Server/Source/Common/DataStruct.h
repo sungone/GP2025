@@ -35,6 +35,7 @@ struct FInfoData
 
 	FStatData Stats;
 	uint32 State;
+	uint32 Gold;
 
 	FInfoData()
 		: ID(0), CharacterType(),
@@ -67,10 +68,6 @@ struct FInfoData
 	void TakeDamage(float Amount) { SetHp(Stats.Hp - Amount); }
 	bool IsDead() const { return Stats.Hp < 1.0f; }
 	void SetDamage(float NewDamage) { Stats.Damage = std::max(0.0f, NewDamage); }
-	float GetAttackDamage() const
-	{
-		return Stats.Damage;
-	}
 	float GetAttackDamage(float RandomValue) const
 	{
 		if (RandomValue < 0.1f)
@@ -94,20 +91,6 @@ struct FInfoData
 		float ForwardX = std::cos(RadianYaw);
 		float ForwardY = std::sin(RadianYaw);
 		return FVector(ForwardX, ForwardY, 0.0f).Normalize();
-	}
-	void AddExp(float Amount)
-	{
-		Stats.Exp += Amount;
-
-		while (Stats.Exp >= Stats.MaxExp)
-		{
-			Stats.Exp -= Stats.MaxExp;
-			Stats.Level++;
-			Stats.MaxExp *= 1.5f;
-			Stats.MaxHp += 20.0f;
-			Stats.Hp = Stats.MaxHp;
-			Stats.Damage += 5.0f;
-		}
 	}
 #endif
 };
