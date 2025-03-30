@@ -31,29 +31,16 @@ class InventoryItem : public Item
 {
 public:
 	InventoryItem() {};
-	InventoryItem(uint32 itemId, uint8 itemType) : Item(itemId, itemType)
-	{
-		auto data = ItemTable::GetInst().GetItemByTypeId(itemId);
-		_stats = ItemStats(
-			static_cast<int>(data->Damage),
-			static_cast<int>(data->Hp),
-			data->CrtRate,
-			data->DodgeRate,
-			data->MoveSpeed
-		);
-
-		_meta = ItemMeta(
-			data->Grade,
-			data->FromMonster,
-			data->ResellPrice,
-			data->bSellable,
-			data->bBuyable
-		);
-	}
+	InventoryItem(uint32 itemId, uint8 itemType);
 	WorldItem ToWorldItem() const;
 	const ItemStats& GetStats() const { return _stats; }
 	const ItemMeta& GetMeta() const { return _meta; }
+	EAbilityType GetAbilityType() const { return _abilityType; }
+	float GetAbilityValue() const { return _abilityValue; }
+
 private:
 	ItemStats _stats;
 	ItemMeta _meta;
+	EAbilityType _abilityType;
+	float _abilityValue;
 };
