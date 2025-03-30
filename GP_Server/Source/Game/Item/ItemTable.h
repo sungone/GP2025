@@ -4,8 +4,7 @@ enum class EDetailType { Bow, Sword, Helmet, Chest, Consumable, Gold, Quest, Unk
 enum class EAbilityType { None, Recove, AtcBuff, Gold };
 struct FItemData
 {
-	uint32 ItemId;
-	std::string ItemName;
+	uint32 TypeID;
 	EItemCategory Category;
 	EDetailType DetailType;
 	float Damage = 0.f;
@@ -33,7 +32,7 @@ public:
 	}
 	bool LoadFromCSV(const std::string& FilePath);
 	void PrintAllItems() const;
-	const FItemData* GetItemById(uint32 ItemId) const;
+	const FItemData* GetItemByTypeId(uint32 TypeID) const;
 private:
 	std::unordered_map<uint32, FItemData> _itemMap;
 

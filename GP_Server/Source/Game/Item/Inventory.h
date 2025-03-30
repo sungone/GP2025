@@ -1,5 +1,6 @@
 #pragma once
 #include "Item.h"
+#include "InventoryItem.h"
 
 struct ItemSlot
 {
@@ -9,6 +10,7 @@ struct ItemSlot
 class Inventory
 {
 public:
+
     bool AddInventoryItem(const InventoryItem& item);
     bool RemoveInventoryItemById(uint32 itemId);
     std::shared_ptr<InventoryItem> FindInventoryItemById(uint32_t itemId);

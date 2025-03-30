@@ -1,13 +1,6 @@
 #include "pch.h"
 #include "Item.h"
-
-WorldItem InventoryItem::ToWorldItem() const
-{
-	WorldItem worldItem(_itemId, _itemType);
-	return worldItem;
-}
-
-
+#include "InventoryItem.h"
 WorldItem::WorldItem(FVector pos) : _pos(pos)
 {
 	static int i = 300;

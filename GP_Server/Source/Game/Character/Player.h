@@ -19,6 +19,9 @@ public:
 	uint8 EquipItem(uint32 itemId);
 	uint8 UnequipItem(uint32 itemId);
 
+	void AddItemStats(const ItemStats& stats);
+	void RemoveItemStats(const ItemStats& stats);
+
 	float GetAttackDamage() override
 	{
 		return _info.GetAttackDamage(RandomUtils::GetRandomFloat(0.0f, 1.0f));
@@ -33,4 +36,5 @@ public:
 private:
 	Inventory _inventory;
 	std::unordered_set<int32> _viewList;
+	FStatData& _stats = _info.Stats;
 };

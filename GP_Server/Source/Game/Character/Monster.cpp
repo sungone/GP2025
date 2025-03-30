@@ -13,9 +13,9 @@ void Monster::Init()
 	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
 	_info.SetLocation(newPos);
 	_info.Stats.Level = _info.CharacterType;
+	_info.Stats.Speed = 200.f;
 	_info.CollisionRadius = 100.f;
 	_info.AttackRadius = 150;
-	_info.Speed = 200.f;
 	_info.State = ECharacterStateType::STATE_IDLE;
 }
 
@@ -151,7 +151,7 @@ void Monster::Chase()
 	LOG("Chase!");
 	auto playerPos = _target->GetInfo().Pos;
 	FVector dir = (playerPos - _pos).Normalize();
-	FVector dist = dir * _info.Speed;
+	FVector dist = dir * _info.GetSpeed();
 	if (dist.Length() < _pos.DistanceTo(playerPos) - _info.AttackRadius)
 	{
 		_info.SetLocationAndYaw(_pos + dist);

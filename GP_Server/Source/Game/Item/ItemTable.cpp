@@ -18,11 +18,11 @@ bool ItemTable::LoadFromCSV(const std::string& FilePath)
     {
         std::stringstream ss(line);
         std::string cell;
-
+        std::string dummy;
         FItemData item;
 
-        std::getline(ss, cell, ','); item.ItemId = std::stoi(cell);
-        std::getline(ss, item.ItemName, ',');
+        std::getline(ss, cell, ','); item.TypeID = std::stoi(cell);
+        std::getline(ss, dummy, ',');
 
         std::getline(ss, cell, ','); item.Category = StringToCategory(cell);
         std::getline(ss, cell, ','); item.DetailType = StringToDetailType(cell);
@@ -42,7 +42,7 @@ bool ItemTable::LoadFromCSV(const std::string& FilePath)
         std::getline(ss, cell, ','); item.bSellable = std::stoi(cell) == 1;
         std::getline(ss, cell, ','); item.bBuyable = std::stoi(cell) == 1;
 
-        _itemMap[item.ItemId] = item;
+        _itemMap[item.TypeID] = item;
     }
 
     file.close();
@@ -54,7 +54,6 @@ void ItemTable::PrintAllItems() const
     std::cout << "=== All Items in Item Table ===" << std::endl;
     std::cout << std::left
         << std::setw(5) << "ID"
-        << std::setw(15) << "Name"
         << std::setw(10) << "Category"
         << std::setw(10) << "DetailType"
         << std::setw(8) << "Damage"
@@ -77,8 +76,7 @@ void ItemTable::PrintAllItems() const
     for (const auto& [itemId, item] : _itemMap)
     {
         std::cout << std::left
-            << std::setw(5) << item.ItemId
-            << std::setw(15) << item.ItemName
+            << std::setw(5) << item.TypeID
             << std::setw(10) << static_cast<int>(item.Category)
             << std::setw(10) << static_cast<int>(item.DetailType)
             << std::setw(8) << item.Damage
@@ -99,9 +97,9 @@ void ItemTable::PrintAllItems() const
 }
 
 
-const FItemData* ItemTable::GetItemById(uint32 ItemId) const
+const FItemData* ItemTable::GetItemByTypeId(uint32 TypeID) const
 {
-    auto it = _itemMap.find(ItemId);
+    auto it = _itemMap.find(TypeID);
     if (it != _itemMap.end())
     {
         return &it->second;

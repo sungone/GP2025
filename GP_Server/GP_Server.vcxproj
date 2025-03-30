@@ -159,6 +159,7 @@
     <ClInclude Include="Source\Game\Character\Player.h" />
     <ClInclude Include="Source\Game\GameWorld.h" />
     <ClInclude Include="Source\Game\Item\Inventory.h" />
+    <ClInclude Include="Source\Game\Item\InventoryItem.h" />
     <ClInclude Include="Source\Game\Item\Item.h" />
     <ClInclude Include="Source\Game\Item\ItemTable.h" />
     <ClInclude Include="Source\Game\Map\BoundingBox.h" />
@@ -185,6 +186,7 @@
     <ClCompile Include="Source\Game\Character\Player.cpp" />
     <ClCompile Include="Source\Game\GameWorld.cpp" />
     <ClCompile Include="Source\Game\Item\Inventory.cpp" />
+    <ClCompile Include="Source\Game\Item\InventoryItem.cpp" />
     <ClCompile Include="Source\Game\Item\Item.cpp" />
     <ClCompile Include="Source\Game\Item\ItemTable.cpp" />
     <ClCompile Include="Source\Game\Map\BoundingBox.cpp" />

@@ -12,9 +12,9 @@ void Player::Init()
 	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
 	_info.SetLocation(newPos);
 	_info.Stats.Level = 1;
+	_info.Stats.Speed = 200.f;
 	_info.CollisionRadius = 50.f;
 	_info.AttackRadius = 100;
-	_info.Speed = 200.f;
 	_info.State = ECharacterStateType::STATE_IDLE;
 }
 
@@ -116,18 +116,49 @@ WorldItem Player::DropItem(uint32 itemId)
 void Player::UseItem(uint32 itemId)
 {
 	auto targetItem = _inventory.FindInventoryItemById(itemId);
-	//Todo: 아이템아이디로 플레이어 인벤토리에서 찾아
-	// 타입(EUseable type)에 따른 값 스텟에 적용 -> ex)체력키트, 딸바...
+
 }
 
 uint8 Player::EquipItem(uint32 itemId)
 {
 	auto targetItem = _inventory.FindInventoryItemById(itemId);
+	if (!targetItem) return 0;
+
+	const ItemStats& itemStats = targetItem->GetStats();
+	AddItemStats(itemStats);
+
 	return targetItem->GetItemType();
 }
 
 uint8 Player::UnequipItem(uint32 itemId)
 {
 	auto targetItem = _inventory.FindInventoryItemById(itemId);
+	if (!targetItem) return 0;
+
+	const ItemStats& itemStats = targetItem->GetStats();
+	RemoveItemStats(itemStats);
+
 	return targetItem->GetItemType();
+}
+
+void Player::AddItemStats(const ItemStats& stats)
+{
+	_stats.Damage += stats.damage;
+	_stats.Hp += stats.hp;
+	_stats.MaxHp += stats.hp;
+
+	_stats.CrtRate = std::clamp(_stats.CrtRate + stats.critRate, 0.0f, 1.0f);
+	_stats.Dodge = std::clamp(_stats.Dodge + stats.dodgeRate, 0.0f, 1.0f);
+	_stats.Speed = std::max(0.0f, _stats.Speed + stats.moveSpeed);
+}
+
+void Player::RemoveItemStats(const ItemStats& stats)
+{
+	_stats.Damage = std::max(0.0f, _stats.Damage - stats.damage);
+	_stats.Hp = std::max(0.0f, _stats.Hp - stats.hp);
+	_stats.MaxHp = std::max(1.0f, _stats.MaxHp - stats.hp);
+
+	_stats.CrtRate = std::clamp(_stats.CrtRate - stats.critRate, 0.0f, 1.0f);
+	_stats.Dodge = std::clamp(_stats.Dodge - stats.dodgeRate, 0.0f, 1.0f);
+	_stats.Speed = std::max(0.0f, _stats.Speed - stats.moveSpeed);
 }

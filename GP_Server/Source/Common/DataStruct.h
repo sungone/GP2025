@@ -13,12 +13,13 @@ struct FStatData
 	float CrtRate;
 	float CrtValue;
 	float Dodge;
+	float Speed;
 
 	FStatData()
 		: Level(1), Exp(0.0f), MaxExp(100.0f),
 		Hp(100.0f), MaxHp(100.0f),
 		Damage(10.0f), CrtRate(0.5f), CrtValue(1.5f),
-		Dodge(0.1f)
+		Dodge(0.1f), Speed(0.0f)
 	{
 	}
 };
@@ -32,7 +33,6 @@ struct FInfoData
 	float CollisionRadius;
 	float AttackRadius;
 
-	float Speed;
 	FStatData Stats;
 	uint32 State;
 
@@ -40,7 +40,6 @@ struct FInfoData
 		: ID(0), CharacterType(),
 		Pos(FVector(0.0f, 0.0f, 0.0f)), Yaw(0.0f),
 		CollisionRadius(0.0f), AttackRadius(0.f),
-		Speed(0.0f),
 		Stats(), State(STATE_IDLE)
 	{
 	}
@@ -60,6 +59,7 @@ struct FInfoData
 	float GetCrtRate() const { return Stats.CrtRate; }
 	float GetCrtValue() const { return Stats.CrtValue; }
 	float GetDodge() const { return Stats.Dodge; }
+	float GetSpeed() const { return Stats.Speed; }
 
 #ifdef SERVER_BUILD
 	void SetHp(float NewHp) { Stats.Hp = std::clamp(NewHp, 0.0f, Stats.MaxHp); }
