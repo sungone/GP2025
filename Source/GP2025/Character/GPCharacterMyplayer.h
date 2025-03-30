@@ -81,6 +81,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> InteractionAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ZoomAction;
+
 	// Sprint Speed 변수
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
 	float WalkSpeed;
@@ -136,4 +139,27 @@ public :
 	bool bInteractItem = false;
 	FTimerHandle InteractItemTimerHandle;
 	void ResetInteractItem();
+
+public :
+	// Gunner Character 에임 위젯 , 함수
+	UPROPERTY()
+	UUserWidget* GunCrosshairWidget;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> GunCrosshairWidgetClass;
+
+	void StartAiming();
+	void StopAiming();
+	
+	bool bIsGunnerCharacter() const;
+
+	float DefaultFOV = 90.f;
+	float ZoomedFOV = 60.f;
+	float ZoomInterpSpeed = 10.f;
+	bool bWantsToZoom = false;
+
+	FVector DefaultCameraOffset = FVector(0.f, 0.f, 100.f);
+	FVector ZoomedCameraOffset = FVector(50.f, 30.f, 100.f); 
+	float DefaultArmLength = 400.f;
+	float ZoomedArmLength = 150.f;
 };

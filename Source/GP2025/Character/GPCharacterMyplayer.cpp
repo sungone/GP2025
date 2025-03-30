@@ -89,6 +89,12 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 		InteractionAction = InteractionActionSettingRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> ZoomActionSettingRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Zoom.IA_Zoom'"));
+	if (ZoomActionSettingRef.Object)
+	{
+		ZoomAction = ZoomActionSettingRef.Object;
+	}
+
 	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBPClass(TEXT("/Game/Inventory/Widgets/WBP_Inventory"));
 
 	if (WidgetBPClass.Succeeded())
@@ -109,8 +115,14 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 		InGameWidgetClass = InGameWidgetBPClass.Class;
 	}
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> GunCrosshairWidgetBPClass(TEXT("/Game/UI/WBP_GunCrosshair"));
+	if (GunCrosshairWidgetBPClass.Succeeded())
+	{
+		GunCrosshairWidgetClass = GunCrosshairWidgetBPClass.Class;
+	}
+
 	// ±âº» Ä³¸¯ÅÍ Å¸ÀÔ
-	CurrentCharacterType = (uint8)Type::EPlayer::WARRIOR;
+	CurrentCharacterType = (uint8)Type::EPlayer::GUNNER;
 }
 
 void AGPCharacterMyplayer::BeginPlay()
@@ -155,11 +167,56 @@ void AGPCharacterMyplayer::BeginPlay()
 			UE_LOG(LogTemp, Error, TEXT("Failed to create InGameWidget."));
 		}
 	}
+
+	if (GunCrosshairWidgetClass)
+	{
+		GunCrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), GunCrosshairWidgetClass);
+		if (GunCrosshairWidget)
+		{
+			GunCrosshairWidget->AddToViewport();
+			GunCrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+
+	// Á¶ÁØ Ä«¸Þ¶ó ºä ¼³Á¤
+	if (FollowCamera)
+	{
+		DefaultFOV = FollowCamera->FieldOfView;
+	}
+
+	DefaultCameraOffset = CameraBoom->GetRelativeLocation();
+	DefaultArmLength = CameraBoom->TargetArmLength;
 }
 
 void AGPCharacterMyplayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// Ä«¸Þ¶ó ÁÜÀÎ ÁÜ¾Æ¿ô ºä ¼³Á¤
+	{
+		if (FollowCamera)
+		{
+			const float TargetFOV = bWantsToZoom ? ZoomedFOV : DefaultFOV;
+			const float NewFOV = FMath::FInterpTo(FollowCamera->FieldOfView, TargetFOV, DeltaTime, ZoomInterpSpeed);
+			FollowCamera->SetFieldOfView(NewFOV);
+		}
+
+		if (CameraBoom)
+		{
+			float TargetArmLength = bWantsToZoom ? ZoomedArmLength : DefaultArmLength;
+			FVector TargetOffset = bWantsToZoom ? ZoomedCameraOffset : DefaultCameraOffset;
+
+			float InterpSpeed = 10.f;
+			float Delta = DeltaTime;
+
+			float NewArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, TargetArmLength, Delta, InterpSpeed);
+			FVector NewOffset = FMath::VInterpTo(CameraBoom->GetRelativeLocation(), TargetOffset, Delta, InterpSpeed);
+
+			CameraBoom->TargetArmLength = NewArmLength;
+			CameraBoom->SetRelativeLocation(NewOffset);
+		}
+	}
+
 	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
 	if (!NetworkMgr) return;
 
@@ -249,6 +306,8 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 			}
 		}
 	}
+
+
 }
 
 void AGPCharacterMyplayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -268,6 +327,8 @@ void AGPCharacterMyplayer::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Completed, this, &AGPCharacterMyplayer::ResetInventoryToggle);
 	EnhancedInputComponent->BindAction(SettingAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::OpenSettingWidget);
 	EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::ProcessInteraction);
+	EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::StartAiming);
+	EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Completed, this, &AGPCharacterMyplayer::StopAiming);
 
 }
 
@@ -462,6 +523,37 @@ void AGPCharacterMyplayer::ProcessInteraction()
 void AGPCharacterMyplayer::ResetInteractItem()
 {
 	bInteractItem = false;
+}
+
+void AGPCharacterMyplayer::StartAiming()
+{
+	if (!bIsGunnerCharacter())
+		return;
+
+	bWantsToZoom = true;
+
+	if (GunCrosshairWidget)
+	{
+		GunCrosshairWidget->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void AGPCharacterMyplayer::StopAiming()
+{
+	if (!bIsGunnerCharacter())
+		return; 
+
+	bWantsToZoom = false;
+
+	if (GunCrosshairWidget)
+	{
+		GunCrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+bool AGPCharacterMyplayer::bIsGunnerCharacter() const
+{
+	return (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER);
 }
 
 UGPInventory* AGPCharacterMyplayer::GetInventoryWidget()
