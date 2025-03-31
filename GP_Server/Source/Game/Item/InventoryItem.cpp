@@ -4,7 +4,13 @@
 InventoryItem::InventoryItem(uint32 itemId, uint8 itemType)
 	: Item(itemId, itemType)
 {
-	auto data = ItemTable::GetInst().GetItemByTypeId(itemId);
+	auto data = ItemTable::GetInst().GetItemByTypeId(itemType);
+	if (!data)
+	{
+		LOG(Warning, "Invaild");
+		return;
+	}
+
 	_stats = ItemStats(
 		static_cast<int>(data->Damage),
 		static_cast<int>(data->Hp),

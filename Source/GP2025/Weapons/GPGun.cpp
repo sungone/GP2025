@@ -62,7 +62,7 @@ void AGPGun::AttackHitCheck()
             auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
             if (NetworkMgr)
             {
-                NetworkMgr->SendPlayerAttackPacket(TargetCharacter->CharacterInfo.ID);
+                //NetworkMgr->SendPlayerAttackPacket(TargetCharacter->CharacterInfo.ID);
             }
         }
     }

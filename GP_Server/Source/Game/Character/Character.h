@@ -2,7 +2,7 @@
 #include "Common.h"
 
 constexpr float VIEW_DIST = 2000.f;
-enum class CharacterType { Player, Monster };
+enum class ECharacterClass { Player, Monster };
 class Character
 {
 public:
@@ -27,7 +27,7 @@ public:
 	virtual void ChangeState(ECharacterStateType newState) = 0;
 	FInfoData& GetInfo() { return _info; }
 	void SetInfo(FInfoData& info) { _info = info; }
-	bool IsMonster() { return _characterType == CharacterType::Monster; }
+	bool IsMonster() { return _characterClass == ECharacterClass::Monster; }
 public:
 	std::mutex _cLock;
 	std::mutex _vlLock;
@@ -35,6 +35,6 @@ protected:
 	FInfoData _info;
 	int32& _id = _info.ID;
 	std::unordered_set<int32> _viewList;
-	CharacterType _characterType;
+	ECharacterClass _characterClass;
 };
 

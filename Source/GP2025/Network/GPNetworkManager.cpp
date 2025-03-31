@@ -78,9 +78,9 @@ void UGPNetworkManager::SendPlayerMovePacket()
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendPlayerAttackPacket(int32 TargetID)
+void UGPNetworkManager::SendPlayerAttackPacket(float PlayerYaw)
 {
-	AttackPacket Packet(TargetID);
+	AttackPacket Packet(PlayerYaw);
 	UE_LOG(LogTemp, Warning, TEXT("SendPlayerAttackPacket : Send [%d]"), MyPlayer->CharacterInfo.ID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }

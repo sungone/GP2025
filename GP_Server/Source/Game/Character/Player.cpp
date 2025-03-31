@@ -6,7 +6,7 @@
 void Player::Init()
 {
 	Character::Init();
-	_characterType = CharacterType::Player;
+	_characterClass = ECharacterClass::Player;
 
 	FVector newPos{};
 	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
@@ -14,8 +14,11 @@ void Player::Init()
 	_info.Stats.Level = 1;
 	_info.Stats.Speed = 200.f;
 	_info.CollisionRadius = 50.f;
-	_info.AttackRadius = 100;
+
+	_info.CharacterType = static_cast<uint8>(Type::EPlayer::GUNNER);
+	_info.AttackRadius = (_info.CharacterType == static_cast<uint8>(Type::EPlayer::WARRIOR))?100: 1200;
 	_info.State = ECharacterStateType::STATE_IDLE;
+	ApplyLevelStats(_info.Stats.Level);
 }
 
 void Player::UpdateViewList(std::shared_ptr<Character> other)
@@ -204,7 +207,12 @@ void Player::LevelUp()
 {
 	_stats.Level++;
 
-	const FStatData* newStats = PlayerLevelTable::GetInst().GetStatByLevel(_stats.Level);
+	ApplyLevelStats(_stats.Level);
+}
+
+void Player::ApplyLevelStats(uint32 level)
+{
+	const FStatData* newStats = PlayerLevelTable::GetInst().GetStatByLevel(level);
 	if (!newStats)
 	{
 		LOG(Warning, "Invaild");

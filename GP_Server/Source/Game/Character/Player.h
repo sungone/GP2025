@@ -24,6 +24,7 @@ public:
 
 	void AddExp(float amount);
 	void LevelUp();
+	void ApplyLevelStats(uint32 level);
 
 	void AddGold(int amount) { _gold += amount; }
 	bool SpendGold(int amount)
@@ -32,7 +33,6 @@ public:
 		_gold -= amount;
 		return true;
 	}
-
 	int GetGold() const { return _gold; }
 	float GetAttackDamage() override
 	{

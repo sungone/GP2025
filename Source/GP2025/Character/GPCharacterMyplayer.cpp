@@ -426,8 +426,10 @@ void AGPCharacterMyplayer::AutoAttack()
 	if (bIsAutoAttacking == false && !CharacterInfo.HasState(STATE_AUTOATTACK))
 	{
 		CharacterInfo.AddState(STATE_AUTOATTACK);
+		
+		float CurYaw = GetActorRotation().Yaw;
 		auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-		NetworkMgr->SendPlayerAttackPacket();
+		NetworkMgr->SendPlayerAttackPacket(CurYaw);
 	}
 
 	ProcessAutoAttackCommand();

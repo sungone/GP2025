@@ -58,10 +58,10 @@ struct LoginPacket : public Packet
 
 struct AttackPacket : public Packet
 {
-	int32 TargetID;
+	float PlayerYaw;
 
-	AttackPacket(int32 TargetID)
-		: Packet(EPacketType::C_ATTACK), TargetID(TargetID)
+	AttackPacket(float PlayerYaw_)
+		: Packet(EPacketType::C_ATTACK), PlayerYaw(PlayerYaw_)
 	{
 		Header.PacketSize = sizeof(AttackPacket);
 	}

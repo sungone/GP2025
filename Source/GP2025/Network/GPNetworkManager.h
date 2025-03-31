@@ -24,7 +24,7 @@ public:
 	void SendPlayerLoginPacket(const char* AccountID, const char* AccountPW, bool isCreate);
 	void SendPlayerLogoutPacket();
 	void SendPlayerMovePacket();
-	void SendPlayerAttackPacket(int32 TargetID = -1);
+	void SendPlayerAttackPacket(float PlayerYaw);
 
 	void SendPlayerTakeItem(int32 ItemID);
 	void SendPlayerDropItem(int32 ItemID);

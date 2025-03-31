@@ -110,7 +110,7 @@ void GameWorld::PlayerMove(int32 playerId, FInfoData& info)
 	SessionManager::GetInst().BroadcastToViewList(&pkt, playerId);
 }
 
-void GameWorld::PlayerAttack(int32 playerId)
+void GameWorld::PlayerAttack(int32 playerId, float playerYaw)
 {
 	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
 	if (!player)
@@ -119,6 +119,7 @@ void GameWorld::PlayerAttack(int32 playerId)
 		return;
 	}
 	player->ChangeState(ECharacterStateType::STATE_AUTOATTACK);
+	player->GetInfo().SetYaw(playerYaw);
 
 	for (auto& monsterId : player->GetViewList())
 	{

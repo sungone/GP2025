@@ -72,7 +72,7 @@ void PacketManager::HandleMovePacket(int32 sessionId, Packet* packet)
 void PacketManager::HandleAttackPacket(int32 sessionId, Packet* packet)
 {
 	AttackPacket* p = static_cast<AttackPacket*>(packet);
-	_gameWorld.PlayerAttack(sessionId);
+	_gameWorld.PlayerAttack(sessionId, p->PlayerYaw);
 }
 
 void PacketManager::HandlePickUpItemPacket(int32 sessionId, Packet* packet)

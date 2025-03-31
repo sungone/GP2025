@@ -6,7 +6,7 @@
 void Monster::Init()
 {
 	Character::Init();
-	_characterType = CharacterType::Monster;
+	_characterClass = ECharacterClass::Monster;
 
 	auto typeId = RandomUtils::GetRandomUint8((uint8)Type::EMonster::ENERGY_DRINK, (uint8)Type::EMonster::TINO);
 	auto data = MonsterTable::GetInst().GetMonsterByTypeId(typeId);
@@ -153,15 +153,15 @@ void Monster::Attack()
 void Monster::Chase()
 {
 	if (!_target) return;
-	Look();
 
 	if (!IsTargetInChaseRange())
 	{
 		LOG("Is Not In ChaseRange!");
-
 		_target.reset();
+		ChangeState(ECharacterStateType::STATE_IDLE);
 		return;
 	}
+
 	LOG("Chase!");
 	auto playerPos = _target->GetInfo().Pos;
 	FVector dir = (playerPos - _pos).Normalize();
@@ -195,6 +195,7 @@ bool Monster::SetTarget()
 		if (playerId >= MAX_PLAYER)
 		{
 			LOG(Warning, "Invaild");
+			ChangeState(ECharacterStateType::STATE_IDLE);
 			continue;
 		}
 		auto player = GameWorld::GetInst().GetCharacterByID(playerId);
