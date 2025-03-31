@@ -3,7 +3,7 @@
 enum class EAbilityType { None, Recove, AtcBuff, Gold };
 struct FItemData
 {
-	uint32 TypeID;
+	uint32 TypeId;
 	EItemCategory Category;
 	float Damage = 0.f;
 	float Hp = 0.f;

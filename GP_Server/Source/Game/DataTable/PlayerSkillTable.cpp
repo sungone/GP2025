@@ -11,7 +11,7 @@ bool PlayerSkillTable::LoadFromCSV(const std::string& filePath)
     }
 
     std::string line;
-    std::getline(file, line); // skip header
+    std::getline(file, line);
 
     while (std::getline(file, line))
     {
@@ -20,8 +20,9 @@ bool PlayerSkillTable::LoadFromCSV(const std::string& filePath)
 
         FSkillData skill;
 
-        std::getline(ss, cell, ','); skill.Idx = std::stoi(cell);
+        std::getline(ss, cell, ','); skill.TypeId = std::stoi(cell);
         std::getline(ss, skill.Name, ',');
+        std::getline(ss, cell, ','); skill.WeaponType = StringToWeaponType(cell);
         std::getline(ss, cell, ','); skill.SkillGroup = std::stoi(cell);
         std::getline(ss, cell, ','); skill.SkillLv = std::stoi(cell);
         std::getline(ss, cell, ','); skill.Cooltime = std::stoi(cell);
@@ -32,8 +33,9 @@ bool PlayerSkillTable::LoadFromCSV(const std::string& filePath)
         std::getline(ss, cell, ','); skill.Type1 = StringToSkillType(cell);
         std::getline(ss, cell, ','); skill.Value1 = std::stof(cell);
 
-        _skillMap[skill.Idx] = skill;
+        _skillMap[skill.TypeId] = skill;
         _groupMap[skill.SkillGroup].push_back(skill);
+        _weaponMap[skill.WeaponType].push_back(skill);
     }
 
     return true;
@@ -57,6 +59,15 @@ const std::vector<FSkillData>& PlayerSkillTable::GetSkillGroup(uint32 groupId) c
     return empty;
 }
 
+const std::vector<FSkillData>& PlayerSkillTable::GetSkillsByWeaponType(Type::EPlayer weapon) const
+{
+    static std::vector<FSkillData> empty;
+    auto it = _weaponMap.find(weapon);
+    if (it != _weaponMap.end())
+        return it->second;
+    return empty;
+}
+
 
 ESkillType PlayerSkillTable::StringToSkillType(const std::string& str)
 {
@@ -67,5 +78,13 @@ ESkillType PlayerSkillTable::StringToSkillType(const std::string& str)
     if (str == "buff_time") return ESkillType::BuffTime;
     if (str == "atk_spd") return ESkillType::AtkSpd;
     return ESkillType::None;
+}
+
+Type::EPlayer PlayerSkillTable::StringToWeaponType(const std::string& str)
+{
+    if (str == "Sword") return Type::EPlayer::WARRIOR;
+    if (str == "Gun") return Type::EPlayer::GUNNER;
+    
+    LOG(Warning, "error type");
 }
 

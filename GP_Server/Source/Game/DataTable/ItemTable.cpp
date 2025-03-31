@@ -17,11 +17,10 @@ bool ItemTable::LoadFromCSV(const std::string& FilePath)
     {
         std::stringstream ss(line);
         std::string cell;
-        std::string dummy;
         FItemData item;
 
-        std::getline(ss, cell, ','); item.TypeID = std::stoi(cell);
-        std::getline(ss, dummy, ',');
+        std::getline(ss, cell, ','); item.TypeId = std::stoi(cell);
+        std::getline(ss, cell, ',');
 
         std::getline(ss, cell, ','); item.Category = StringToCategory(cell);
         std::getline(ss, cell, ','); item.Damage = std::stof(cell);
@@ -38,7 +37,7 @@ bool ItemTable::LoadFromCSV(const std::string& FilePath)
         std::getline(ss, cell, ','); item.bSellable = std::stoi(cell) == 1;
         std::getline(ss, cell, ','); item.bBuyable = std::stoi(cell) == 1;
 
-        _itemMap[item.TypeID] = item;
+        _itemMap[item.TypeId] = item;
     }
 
     file.close();

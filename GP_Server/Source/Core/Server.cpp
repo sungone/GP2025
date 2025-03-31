@@ -7,37 +7,11 @@
 
 bool Server::Init()
 {
-	std::wcout.imbue(std::locale("korean"));
-	Logger::GetInst().OpenLogFile("gp_server_log.txt");
 	//if (!DBConnectionPool::GetInst().InitPool(L"GP2025", 10))
 	//{
 	//	LOG(LogType::Warning, "DB");
 	//	return false;
 	//}
-
-	if (!ItemTable::GetInst().LoadFromCSV("../DataTable/ItemTable.csv"))
-	{
-		LOG(LogType::Warning, "LoadFromCSV");
-		return false;
-	}
-
-	if (!PlayerLevelTable::GetInst().LoadFromCSV("../DataTable/PlayerLevelTable.csv"))
-	{
-		LOG(LogType::Warning, "LoadFromCSV");
-		return false;
-	}
-
-	if (!PlayerSkillTable::GetInst().LoadFromCSV("../DataTable/PlayerSkillTable.csv"))
-	{
-		LOG(LogType::Warning, "LoadFromCSV");
-		return false;
-	}
-
-	if (!MonsterTable::GetInst().LoadFromCSV("../DataTable/MonsterTable.csv"))
-	{
-		LOG(LogType::Warning, "LoadFromCSV");
-		return false;
-	}
 
 	WSADATA wsa_data;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
