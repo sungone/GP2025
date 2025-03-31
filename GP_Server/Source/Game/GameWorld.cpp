@@ -4,31 +4,35 @@
 
 bool GameWorld::Init()
 {
-	CreateMonster();
-
 	if (!ItemTable::GetInst().LoadFromCSV("../DataTable/ItemTable.csv"))
 	{
 		LOG(LogType::Warning, "LoadFromCSV");
 		return false;
 	}
+	LOG("ItemTable loaded successfully!");
 
 	if (!PlayerLevelTable::GetInst().LoadFromCSV("../DataTable/PlayerLevelTable.csv"))
 	{
 		LOG(LogType::Warning, "LoadFromCSV");
 		return false;
 	}
+	LOG("PlayerLevelTable loaded successfully!");
 
 	if (!PlayerSkillTable::GetInst().LoadFromCSV("../DataTable/PlayerSkillTable.csv"))
 	{
 		LOG(LogType::Warning, "LoadFromCSV");
 		return false;
 	}
+	LOG("PlayerSkillTable loaded successfully!");
 
 	if (!MonsterTable::GetInst().LoadFromCSV("../DataTable/MonsterTable.csv"))
 	{
 		LOG(LogType::Warning, "LoadFromCSV");
 		return false;
 	}
+	LOG("MonsterTable loaded successfully!");
+
+	CreateMonster();
 	return true;
 }
 

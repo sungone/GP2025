@@ -21,6 +21,7 @@ bool MonsterTable::LoadFromCSV(const std::string& filePath)
         FMonsterData monster;
 
         std::getline(ss, cell, ','); monster.TypeId = std::stoi(cell);
+        std::getline(ss, cell, ','); monster.Level = std::stoi(cell);
         std::getline(ss, cell, ','); monster.Chapter = std::stoi(cell);
         std::getline(ss, cell, ',');
         std::getline(ss, cell, ','); monster.Hp = std::stoi(cell);
@@ -28,6 +29,8 @@ bool MonsterTable::LoadFromCSV(const std::string& filePath)
         std::getline(ss, cell, ','); monster.CrtRate = std::stof(cell);
         std::getline(ss, cell, ','); monster.MoveSpd = std::stof(cell);
         std::getline(ss, cell, ','); monster.Dodge = std::stof(cell);
+        std::getline(ss, cell, ','); monster.CollisionRadius = std::stof(cell);
+        std::getline(ss, cell, ','); monster.AtkRadius = std::stof(cell);
 
         _monsterMap[monster.TypeId] = monster;
         _chapterMap[monster.Chapter].push_back(monster);
@@ -36,7 +39,7 @@ bool MonsterTable::LoadFromCSV(const std::string& filePath)
     return true;
 }
 
-const FMonsterData* MonsterTable::GetMonsterById(uint32 typeId) const
+const FMonsterData* MonsterTable::GetMonsterByTypeId(uint32 typeId) const
 {
     auto it = _monsterMap.find(typeId);
     if (it != _monsterMap.end())

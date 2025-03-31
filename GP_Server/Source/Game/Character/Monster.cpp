@@ -8,14 +8,26 @@ void Monster::Init()
 	Character::Init();
 	_characterType = CharacterType::Monster;
 
-	_info.CharacterType = RandomUtils::GetRandomUint8((uint8)Type::EMonster::ENERGY_DRINK, (uint8)Type::EMonster::TINO);
+	auto typeId = RandomUtils::GetRandomUint8((uint8)Type::EMonster::ENERGY_DRINK, (uint8)Type::EMonster::TINO);
+	auto data = MonsterTable::GetInst().GetMonsterByTypeId(typeId);
+	if (!data)
+	{
+		LOG(Warning, "Invaild");
+		return;
+	}
 	FVector newPos{};
 	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
 	_info.SetLocation(newPos);
-	_info.Stats.Level = _info.CharacterType;
-	_info.Stats.Speed = 200.f;
-	_info.CollisionRadius = 100.f;
-	_info.AttackRadius = 150;
+	_info.CharacterType = data->TypeId;
+	_info.Stats.Level = data->Level;
+	_info.Stats.Hp = data->Hp;
+	_info.Stats.MaxHp = data->Hp;
+	_info.Stats.Damage = data->Atk;
+	_info.Stats.CrtRate = data->CrtRate;
+	_info.Stats.Dodge = data->Dodge;
+	_info.Stats.Speed = data->MoveSpd;
+	_info.CollisionRadius = data->CollisionRadius;
+	_info.AttackRadius = data->AtkRadius;
 	_info.State = ECharacterStateType::STATE_IDLE;
 }
 
@@ -58,7 +70,8 @@ void Monster::BehaviorTree()
 	{
 		if (SetTarget())
 		{
-			Look();
+			Chase();
+			ChangeState(ECharacterStateType::STATE_WALK);
 		}
 		else if (RandomUtils::GetRandomBool())
 		{
@@ -76,7 +89,7 @@ void Monster::BehaviorTree()
 
 		if (SetTarget())
 		{
-			Look();
+			Chase();
 		}
 		else
 		{
@@ -140,6 +153,7 @@ void Monster::Attack()
 void Monster::Chase()
 {
 	if (!_target) return;
+	Look();
 
 	if (!IsTargetInChaseRange())
 	{
