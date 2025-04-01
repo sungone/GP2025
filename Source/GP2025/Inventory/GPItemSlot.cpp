@@ -75,6 +75,14 @@ void UGPItemSlot::ClickItem()
             UE_LOG(LogTemp, Error, TEXT("EquipItem: NetworkManager is NULL"));
         }
     }
+    else if (CurrentItem.Category == ECategory::consumable || CurrentItem.Category == ECategory::Gold) 
+    {
+        UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+        if (NetworkManager)
+        {
+            NetworkManager->SendPlayerUseItem(SlotData.ItemUniqueID);
+        }
+    }
     else
     {
         UE_LOG(LogTemp, Warning, TEXT("can't equip item"));
