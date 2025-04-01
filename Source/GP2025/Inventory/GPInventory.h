@@ -50,4 +50,10 @@ public :
 
 	UPROPERTY()
 	TArray<UGPItemSlot*> EatableSlots;
+
+	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "UI")
+	class UTextBlock* MoneyText;
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void SetGold(int32 Amount);
 };

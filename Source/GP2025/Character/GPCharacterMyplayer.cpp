@@ -467,6 +467,12 @@ void AGPCharacterMyplayer::OpenInventory()
 			PC->SetShowMouseCursor(true);
 			PC->SetInputMode(FInputModeGameAndUI()); 
 		}
+
+		UGPInventory* CastInventory = Cast<UGPInventory>(InventoryWidget);
+		if (CastInventory)
+		{
+			CastInventory->SetGold(CharacterInfo.Gold);
+		}
 	}
 
 	// InGameWidget À¯Áö

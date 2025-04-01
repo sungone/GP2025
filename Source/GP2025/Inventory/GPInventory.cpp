@@ -5,6 +5,7 @@
 #include "Components/WrapBox.h"
 #include "Components/WidgetSwitcher.h"
 #include "Inventory/SlotStruct.h"
+#include "Components/TextBlock.h"
 #include "Engine/DataTable.h"
 
 
@@ -163,4 +164,12 @@ void UGPInventory::RemoveItemFromInventory(uint8 ItemType)
     }
 
     UE_LOG(LogTemp, Warning, TEXT("Item Not Found in Inventory for ItemType: %d"), ItemType);
+}
+
+void UGPInventory::SetGold(int32 Amount)
+{
+    if (MoneyText)
+    {
+        MoneyText->SetText(FText::AsNumber(Amount));
+    }
 }
