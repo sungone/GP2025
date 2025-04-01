@@ -65,9 +65,11 @@ void UGPLoginWidget::OnEntered(const FText& Text, ETextCommit::Type CommitMethod
 		}
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("ID: %s | PW: %s"), *ID_Str, *PW_Str));
-
-		auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-		NetworkMgr->SendPlayerLoginPacket(TCHAR_TO_UTF8(*ID_Str), TCHAR_TO_UTF8(*PW_Str), isCreate);
+		if(!isCreate)
+		{
+			auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+			NetworkMgr->SendPlayerLoginPacket(TCHAR_TO_UTF8(*ID_Str), TCHAR_TO_UTF8(*PW_Str));
+		}
 	}
 }
 

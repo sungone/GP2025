@@ -27,6 +27,7 @@ struct FStatData
 struct FInfoData
 {
 	int32 ID;
+	char NickName[NICKNAME_LEN];
 	uint8 CharacterType;
 	FVector Pos;
 	float Yaw;
@@ -38,7 +39,7 @@ struct FInfoData
 	uint32 Gold;
 
 	FInfoData()
-		: ID(0), CharacterType(),
+		: ID(0), CharacterType(), NickName("None"),
 		Pos(FVector(0.0f, 0.0f, 0.0f)), Yaw(0.0f),
 		CollisionRadius(0.0f), AttackRadius(0.f),
 		Stats(), State(STATE_IDLE)

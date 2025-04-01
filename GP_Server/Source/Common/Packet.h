@@ -38,13 +38,13 @@ using InfoPacket = TPacket<FInfoData>;
 using IDPacket = TPacket<int32>;
 
 constexpr int LOGIN_STR_LEN = 20 + 1;
+constexpr int NICKNAME_LEN = 10 + 1;
 struct LoginPacket : public Packet
 {
 	char AccountID[LOGIN_STR_LEN];
 	char AccountPW[LOGIN_STR_LEN];
-	bool isCreate;
-	LoginPacket(const char* AccountID_, const char* AccountPW_ , bool isCreate_)
-		: Packet(EPacketType::C_LOGIN), isCreate(isCreate_)
+	LoginPacket(const char* AccountID_, const char* AccountPW_)
+		: Packet(EPacketType::C_LOGIN)
 	{
 		strncpy_s(AccountID, AccountID_, LOGIN_STR_LEN - 1);
 		AccountID[LOGIN_STR_LEN - 1] = '\0';
@@ -53,6 +53,41 @@ struct LoginPacket : public Packet
 		AccountPW[LOGIN_STR_LEN - 1] = '\0';
 
 		Header.PacketSize = sizeof(LoginPacket);
+	}
+};
+
+struct SignupPacket : public Packet
+{
+	char AccountID[LOGIN_STR_LEN];
+	char AccountPW[LOGIN_STR_LEN];
+	char NickName[NICKNAME_LEN];
+
+	SignupPacket(const char* InAccountID, const char* InAccountPW, const char* InNickName)
+		: Packet(EPacketType::C_SIGNUP)
+	{
+		strncpy_s(AccountID, InAccountID, LOGIN_STR_LEN - 1);
+		AccountID[LOGIN_STR_LEN - 1] = '\0';
+
+		strncpy_s(AccountPW, InAccountPW, LOGIN_STR_LEN - 1);
+		AccountPW[LOGIN_STR_LEN - 1] = '\0';
+
+		strncpy_s(NickName, InNickName, NICKNAME_LEN - 1);
+		NickName[NICKNAME_LEN - 1] = '\0';
+
+		Header.PacketSize = sizeof(SignupPacket);
+	}
+};
+
+struct LoginSuccessPacket : public Packet
+{
+	char NickName[NICKNAME_LEN];
+	LoginSuccessPacket(const char* NickNamePW_)
+		: Packet(EPacketType::S_LOGIN_SUCCESS)
+	{
+		strncpy_s(NickName, NickNamePW_, NICKNAME_LEN - 1);
+		NickName[NICKNAME_LEN - 1] = '\0';
+
+		Header.PacketSize = sizeof(LoginSuccessPacket);
 	}
 };
 

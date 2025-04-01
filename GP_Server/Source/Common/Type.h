@@ -3,6 +3,7 @@ enum EPacketType : uint8
 {
 	C_LOGIN,
 	C_LOGOUT,
+	C_SIGNUP,
 	C_MOVE,
 	C_ATTACK,
 

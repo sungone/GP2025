@@ -21,7 +21,8 @@ public:
 
 	void SetMyPlayer(AGPCharacterPlayer* InMyPlayer);
 public:
-	void SendPlayerLoginPacket(const char* AccountID, const char* AccountPW, bool isCreate);
+	void SendPlayerLoginPacket(const char* AccountID, const char* AccountPW);
+	void SendPlayerSignUpPacket(const char* AccountID, const char* AccountPW, const char* NickName);
 	void SendPlayerLogoutPacket();
 	void SendPlayerMovePacket();
 	void SendPlayerAttackPacket(float PlayerYaw);
