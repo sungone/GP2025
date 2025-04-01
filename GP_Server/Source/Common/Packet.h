@@ -37,8 +37,6 @@ using FPacketHeader = Packet::PacketHeader;
 using InfoPacket = TPacket<FInfoData>;
 using IDPacket = TPacket<int32>;
 
-constexpr int LOGIN_STR_LEN = 20 + 1;
-constexpr int NICKNAME_LEN = 10 + 1;
 struct LoginPacket : public Packet
 {
 	char AccountID[LOGIN_STR_LEN];
