@@ -38,7 +38,7 @@ FGPItemStruct& UGPItemSlot::GetItemData()
     return CurrentItem;
 }
 
-void UGPItemSlot::EquipItem()
+void UGPItemSlot::ClickItem()
 {
     UE_LOG(LogTemp, Warning, TEXT("Success"));
 
@@ -63,7 +63,7 @@ void UGPItemSlot::EquipItem()
         CurrentItem.Category == ECategory::bow)
     {
         Player->EquipItemOnCharacter(GetItemData());
-        
+
         UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
         if (NetworkManager)
         {
@@ -80,7 +80,6 @@ void UGPItemSlot::EquipItem()
         UE_LOG(LogTemp, Warning, TEXT("can't equip item"));
     }
 }
-
 
 void UGPItemSlot::InitializeInventoryWidget()
 {

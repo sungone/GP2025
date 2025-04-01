@@ -35,7 +35,7 @@ public:
 
 
     UFUNCTION(BlueprintCallable, Category = "Item")
-    void EquipItem();
+    void ClickItem();
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
     FGPItemStruct CurrentItem;
