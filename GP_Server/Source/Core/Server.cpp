@@ -3,16 +3,9 @@
 #include "IOCP.h"
 #include "SessionManager.h"
 #include "GameWorld.h"
-#include "DBConnectionPool.h"
 
 bool Server::Init()
 {
-	//if (!DBConnectionPool::GetInst().InitPool(L"GP2025", 10))
-	//{
-	//	LOG(LogType::Warning, "DB");
-	//	return false;
-	//}
-
 	WSADATA wsa_data;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
 	{
@@ -98,7 +91,7 @@ void Server::Close()
 
 void Server::InitSocket(SOCKET& socket, DWORD dwFlags)
 {
-	socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, dwFlags);
+	socket = WSASocketW(AF_INET, SOCK_STREAM, 0, NULL, 0, dwFlags);
 }
 
 void Server::WorkerThreadLoop()

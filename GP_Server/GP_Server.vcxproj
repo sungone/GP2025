@@ -43,7 +43,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -108,7 +108,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;SERVER_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source;$(SolutionDir)Source\Common;$(SolutionDir)Source\Core\IOCP;$(SolutionDir)Source\Core;$(SolutionDir)Source\Game;$(SolutionDir)Source\Game\Character;$(SolutionDir)Source\Game\Map;$(SolutionDir)Source\Game\Item;$(SolutionDir)Source\Game\DataTable;$(SolutionDir)Source\DB;$(SolutionDir)Source\AI;$(SolutionDir)Source\Utils;$(SolutionDir)Source\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include\include;$(SolutionDir)Source;$(SolutionDir)Source\Common;$(SolutionDir)Source\Core\IOCP;$(SolutionDir)Source\Core;$(SolutionDir)Source\Game;$(SolutionDir)Source\Game\Character;$(SolutionDir)Source\Game\Map;$(SolutionDir)Source\Game\Item;$(SolutionDir)Source\Game\DataTable;$(SolutionDir)Source\DB;$(SolutionDir)Source\AI;$(SolutionDir)Source\Utils;$(SolutionDir)Source\Include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -118,6 +118,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>mysqlcppconnx.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Include\lib64\vs14</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -152,8 +154,6 @@
     <ClInclude Include="Source\Core\Session.h" />
     <ClInclude Include="Source\Core\SessionManager.h" />
     <ClInclude Include="Source\Core\SessionSocket.h" />
-    <ClInclude Include="Source\DB\DBConnection.h" />
-    <ClInclude Include="Source\DB\DBConnectionPool.h" />
     <ClInclude Include="Source\Game\Character\Character.h" />
     <ClInclude Include="Source\Game\Character\Monster.h" />
     <ClInclude Include="Source\Game\Character\Player.h" />
@@ -182,8 +182,6 @@
     <ClCompile Include="Source\Core\Session.cpp" />
     <ClCompile Include="Source\Core\SessionManager.cpp" />
     <ClCompile Include="Source\Core\SessionSocket.cpp" />
-    <ClCompile Include="Source\DB\DBConnection.cpp" />
-    <ClCompile Include="Source\DB\DBConnectionPool.cpp" />
     <ClCompile Include="Source\Game\Character\Character.cpp" />
     <ClCompile Include="Source\Game\Character\Monster.cpp" />
     <ClCompile Include="Source\Game\Character\Player.cpp" />
