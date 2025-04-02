@@ -139,7 +139,7 @@ enum class EItemCategory
 	Unknown
 };
 
-enum ECharacterStateType : uint8
+enum ECharacterStateType : uint32
 {
 	STATE_NONE = 0, // 2^0
 	STATE_IDLE = 1 << 0,  // 2^1
@@ -148,4 +148,7 @@ enum ECharacterStateType : uint8
 	STATE_AUTOATTACK = 1 << 3, // 2^4
 	STATE_DIE = 1 << 4,
 	STATE_WALK = 1 << 5,
+	STATE_SKILL_Q = 1 << 6,
+	STATE_SKILL_E = 1 << 7,
+	STATE_SKILL_R = 1 << 8,
 };

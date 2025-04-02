@@ -95,6 +95,24 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 		ZoomAction = ZoomActionSettingRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> QSkillActionSettingRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_SkillQ.IA_SkillQ'"));
+	if (QSkillActionSettingRef.Object)
+	{
+		SkillQAction = QSkillActionSettingRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> ESkillActionSettingRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_SkillE.IA_SkillE'"));
+	if (ESkillActionSettingRef.Object)
+	{
+		SkillEAction = ESkillActionSettingRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> RSkillActionSettingRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_SkillR.IA_SkillR'"));
+	if (RSkillActionSettingRef.Object)
+	{
+		SkillRAction = RSkillActionSettingRef.Object;
+	}
+
 	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBPClass(TEXT("/Game/Inventory/Widgets/WBP_Inventory"));
 
 	if (WidgetBPClass.Succeeded())
@@ -122,7 +140,7 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 	}
 
 	// 기본 캐릭터 타입
-	CurrentCharacterType = (uint8)Type::EPlayer::GUNNER;
+	CurrentCharacterType = (uint8)Type::EPlayer::WARRIOR;
 }
 
 void AGPCharacterMyplayer::BeginPlay()
@@ -329,6 +347,9 @@ void AGPCharacterMyplayer::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::ProcessInteraction);
 	EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::StartAiming);
 	EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Completed, this, &AGPCharacterMyplayer::StopAiming);
+	EnhancedInputComponent->BindAction(SkillQAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::UseSkillQ);
+	EnhancedInputComponent->BindAction(SkillEAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::UseSkillE);
+	EnhancedInputComponent->BindAction(SkillRAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::UseSkillR);
 
 }
 
@@ -526,6 +547,34 @@ void AGPCharacterMyplayer::ProcessInteraction()
 		&AGPCharacterMyplayer::ResetInteractItem, 
 		2.0f,                              
 		false);
+}
+
+void AGPCharacterMyplayer::UseSkillQ()
+{
+	if (CurrentCharacterType == (uint8)Type::EPlayer::WARRIOR && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_Q))
+	{
+		CharacterInfo.AddState(STATE_SKILL_Q);
+		ProcessHitHardCommand();
+	}
+}
+
+void AGPCharacterMyplayer::UseSkillE()
+{
+	if (CurrentCharacterType == (uint8)Type::EPlayer::WARRIOR && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_E))
+	{
+		CharacterInfo.AddState(STATE_SKILL_E);
+		ProcessClashCommand();
+	}
+}
+
+void AGPCharacterMyplayer::UseSkillR()
+{
+
+	if (CurrentCharacterType == (uint8)Type::EPlayer::WARRIOR && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_R))
+	{
+		CharacterInfo.AddState(STATE_SKILL_R);
+		ProcessWhirlwindCommand();
+	}
 }
 
 void AGPCharacterMyplayer::ResetInteractItem()

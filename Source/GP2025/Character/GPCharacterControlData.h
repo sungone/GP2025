@@ -72,6 +72,15 @@ public:
 	UAnimMontage* AttackAnimMontage;
 
 	UPROPERTY(EditAnywhere, Category = "Animation")
+	UAnimMontage* QSkillAnimMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	UAnimMontage* ESkillAnimMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	UAnimMontage* RSkillAnimMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Animation")
 	UAnimMontage* DeadAnimMontage;
 
 	// 장비 아이템 설정
