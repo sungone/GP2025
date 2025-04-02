@@ -20,9 +20,6 @@
     <Filter Include="Source Files\Game\GameObjects">
       <UniqueIdentifier>{54a590bd-a49d-4bf5-8c7a-15c3aab5c80f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Utils\Pch">
-      <UniqueIdentifier>{3a7b361f-25be-42ce-99da-91564daa6b55}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Utils\Timer">
       <UniqueIdentifier>{51b495f3-3a90-4b27-849d-85a68ddde618}</UniqueIdentifier>
     </Filter>
@@ -53,6 +50,9 @@
     <Filter Include="Source Files\Game\DataTable">
       <UniqueIdentifier>{5410e107-ebe2-467e-a7cd-01e4c2a5ac3c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Utils\PCH">
+      <UniqueIdentifier>{3a7b361f-25be-42ce-99da-91564daa6b55}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Utils\Logger.h">
@@ -69,12 +69,6 @@
     </ClInclude>
     <ClInclude Include="Source\Core\PacketManager.h">
       <Filter>Source Files\Network\Packet</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\DB\DBConnection.h">
-      <Filter>Source Files\DB</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\DB\DBConnectionPool.h">
-      <Filter>Source Files\DB</Filter>
     </ClInclude>
     <ClInclude Include="Source\Utils\FVector.h">
       <Filter>Source Files\Utils</Filter>
@@ -101,7 +95,7 @@
       <Filter>Source Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="Source\Utils\pch.h">
-      <Filter>Source Files\Utils\Pch</Filter>
+      <Filter>Source Files\Utils\PCH</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\Character\Character.h">
       <Filter>Source Files\Game\GameObjects\Character</Filter>
@@ -165,12 +159,6 @@
     <ClCompile Include="Source\Core\PacketManager.cpp">
       <Filter>Source Files\Network\Packet</Filter>
     </ClCompile>
-    <ClCompile Include="Source\DB\DBConnection.cpp">
-      <Filter>Source Files\DB</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\DB\DBConnectionPool.cpp">
-      <Filter>Source Files\DB</Filter>
-    </ClCompile>
     <ClCompile Include="Source\ServerMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -181,7 +169,7 @@
       <Filter>Source Files\Game</Filter>
     </ClCompile>
     <ClCompile Include="Source\Utils\pch.cpp">
-      <Filter>Source Files\Utils\Pch</Filter>
+      <Filter>Source Files\Utils\PCH</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Character\Character.cpp">
       <Filter>Source Files\Game\GameObjects\Character</Filter>

@@ -15,7 +15,7 @@
 #include <queue>
 #include <unordered_set>
 #include <functional>
-#include <sqlext.h>
+#include <mysqlx/xdevapi.h>
 #include <chrono>
 #include <algorithm>
 #include <fstream>
