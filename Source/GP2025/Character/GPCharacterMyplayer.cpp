@@ -140,7 +140,7 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 	}
 
 	// 기본 캐릭터 타입
-	CurrentCharacterType = (uint8)Type::EPlayer::WARRIOR;
+	CurrentCharacterType = (uint8)Type::EPlayer::GUNNER;
 }
 
 void AGPCharacterMyplayer::BeginPlay()
@@ -380,6 +380,19 @@ void AGPCharacterMyplayer::SetCharacterData(const UGPCharacterControlData* Chara
 
 	WalkSpeed = CharacterControlData->WalkSpeed;
 	SprintSpeed = CharacterControlData->SprintSpeed;
+
+	if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER)
+	{
+		ThrowingMontage = CharacterControlData->QSkillAnimMontage;
+		FThrowingMontage = CharacterControlData->ESkillAnimMontage;
+		AngerMontage = CharacterControlData->ESkillAnimMontage;
+	}
+	else
+	{
+		HitHardMontage = CharacterControlData->QSkillAnimMontage;
+		ClashMontage = CharacterControlData->ESkillAnimMontage;
+		WhirlwindMontage = CharacterControlData->RSkillAnimMontage;
+	}
 }
 
 
@@ -556,6 +569,12 @@ void AGPCharacterMyplayer::UseSkillQ()
 		CharacterInfo.AddState(STATE_SKILL_Q);
 		ProcessHitHardCommand();
 	}
+
+	if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_Q))
+	{
+		CharacterInfo.AddState(STATE_SKILL_Q);
+		ProcessThrowingCommand();
+	}
 }
 
 void AGPCharacterMyplayer::UseSkillE()
@@ -564,6 +583,12 @@ void AGPCharacterMyplayer::UseSkillE()
 	{
 		CharacterInfo.AddState(STATE_SKILL_E);
 		ProcessClashCommand();
+	}
+
+	if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_E))
+	{
+		CharacterInfo.AddState(STATE_SKILL_E);
+		ProcessFThrowingCommand();
 	}
 }
 
@@ -574,6 +599,12 @@ void AGPCharacterMyplayer::UseSkillR()
 	{
 		CharacterInfo.AddState(STATE_SKILL_R);
 		ProcessWhirlwindCommand();
+	}
+
+	if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_R))
+	{
+		CharacterInfo.AddState(STATE_SKILL_R);
+		ProcessAngerCommand();
 	}
 }
 

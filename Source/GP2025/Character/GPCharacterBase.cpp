@@ -206,12 +206,6 @@ void AGPCharacterBase::SetCharacterData(const UGPCharacterControlData* Character
 
 	AttackActionMontage = CharacterData->AttackAnimMontage;
 	DeadMontage = CharacterData->DeadAnimMontage;
-
-
-	HitHardMontage = CharacterData->QSkillAnimMontage;
-	ClashMontage = CharacterData->ESkillAnimMontage;
-	WhirlwindMontage = CharacterData->RSkillAnimMontage;
-	
 }
 
 void AGPCharacterBase::SetCharacterType(ECharacterType NewCharacterType)
@@ -362,23 +356,111 @@ void AGPCharacterBase::ProcessWhirlwindCommand()
 	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, WhirlwindMontage);
 }
 
+void AGPCharacterBase::ProcessThrowingCommand()
+{
+	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
+	if (!AnimInstance || !ThrowingMontage)
+		return;
+
+	if (AnimInstance->Montage_IsPlaying(ThrowingMontage))
+		return;
+
+	if (ThrowingEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAttached(
+			ThrowingEffect,
+			GetCharacterMesh(),
+			FName(TEXT("WeaponSocket")),
+			FVector::ZeroVector,
+			FRotator::ZeroRotator,
+			EAttachLocation::SnapToTargetIncludingScale,
+			true);
+	}
+
+	bIsUsingSkill = true;
+
+	FOnMontageEnded MontageEndedDelegate;
+	MontageEndedDelegate.BindUObject(this, &AGPCharacterBase::OnSkillMontageEnded);
+	AnimInstance->Montage_Play(ThrowingMontage, 2.f);
+	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, ThrowingMontage);
+}
+
+void AGPCharacterBase::ProcessFThrowingCommand()
+{
+	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
+	if (!AnimInstance || !FThrowingMontage)
+		return;
+
+	if (AnimInstance->Montage_IsPlaying(FThrowingMontage))
+		return;
+
+	if (FThrowingEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAttached(
+			FThrowingEffect,
+			GetCharacterMesh(),
+			FName(TEXT("WeaponSocket")),
+			FVector::ZeroVector,
+			FRotator::ZeroRotator,
+			EAttachLocation::SnapToTargetIncludingScale,
+			true);
+	}
+
+	bIsUsingSkill = true;
+
+	FOnMontageEnded MontageEndedDelegate;
+	MontageEndedDelegate.BindUObject(this, &AGPCharacterBase::OnSkillMontageEnded);
+	AnimInstance->Montage_Play(FThrowingMontage, 2.f);
+	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, FThrowingMontage);
+}
+
+void AGPCharacterBase::ProcessAngerCommand()
+{
+	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
+	if (!AnimInstance || !AngerMontage)
+		return;
+
+	if (AnimInstance->Montage_IsPlaying(AngerMontage))
+		return;
+
+	if (AngerEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAttached(
+			AngerEffect,
+			GetCharacterMesh(),
+			FName(TEXT("WeaponSocket")),
+			FVector::ZeroVector,
+			FRotator::ZeroRotator,
+			EAttachLocation::SnapToTargetIncludingScale,
+			true);
+	}
+
+	bIsUsingSkill = true;
+
+	FOnMontageEnded MontageEndedDelegate;
+	MontageEndedDelegate.BindUObject(this, &AGPCharacterBase::OnSkillMontageEnded);
+	AnimInstance->Montage_Play(AngerMontage, 2.f);
+	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, AngerMontage);
+}
+
 void AGPCharacterBase::OnSkillMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-	if (Montage == HitHardMontage || Montage == ClashMontage || Montage == WhirlwindMontage)
+	if (Montage == HitHardMontage || Montage == ClashMontage || Montage == WhirlwindMontage ||
+		Montage == ThrowingMontage || Montage == FThrowingMontage || Montage == AngerMontage)
 	{
 		bIsUsingSkill = false;
 
-		if (CharacterInfo.HasState(STATE_SKILL_Q) && Montage == HitHardMontage)
+		if (CharacterInfo.HasState(STATE_SKILL_Q) && (Montage == HitHardMontage || Montage == ThrowingMontage))
 		{
 			CharacterInfo.RemoveState(STATE_SKILL_Q);
 		}
 
-		if (CharacterInfo.HasState(STATE_SKILL_E) && Montage == ClashMontage)
+		if (CharacterInfo.HasState(STATE_SKILL_E) && (Montage == ClashMontage || Montage == FThrowingMontage))
 		{
 			CharacterInfo.RemoveState(STATE_SKILL_E);
 		}
 
-		if (CharacterInfo.HasState(STATE_SKILL_R) && Montage == WhirlwindMontage)
+		if (CharacterInfo.HasState(STATE_SKILL_R) && (Montage == WhirlwindMontage || Montage == AngerMontage))
 		{
 			CharacterInfo.RemoveState(STATE_SKILL_R);
 		}
