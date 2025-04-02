@@ -11,6 +11,7 @@
 #include "Network/GPNetworkManager.h"
 #include "Physics/GPCollision.h"
 #include "UI/GPHpBarWidget.h"
+#include "Weapons/GPSword.h"
 #include "UI/GPLevelWidget.h"
 #include "UI/GPWidgetComponent.h"
 
@@ -204,6 +205,12 @@ void AGPCharacterBase::SetCharacterData(const UGPCharacterControlData* Character
 
 	AttackActionMontage = CharacterData->AttackAnimMontage;
 	DeadMontage = CharacterData->DeadAnimMontage;
+
+
+	HitHardMontage = CharacterData->QSkillAnimMontage;
+	ClashMontage = CharacterData->ESkillAnimMontage;
+	WhirlwindMontage = CharacterData->RSkillAnimMontage;
+	
 }
 
 void AGPCharacterBase::SetCharacterType(ECharacterType NewCharacterType)
@@ -264,4 +271,78 @@ void AGPCharacterBase::PlayDeadAnimation()
 	if (!AnimInstance) return;
 	AnimInstance->StopAllMontages(0.f);
 	AnimInstance->Montage_Play(DeadMontage, 1.f);
+}
+
+void AGPCharacterBase::ProcessHitHardCommand()
+{
+	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
+	if (!AnimInstance || !HitHardMontage)
+		return;
+
+	if (AnimInstance->Montage_IsPlaying(HitHardMontage))
+		return;
+
+	bIsUsingSkill = true;
+
+	FOnMontageEnded MontageEndedDelegate;
+	MontageEndedDelegate.BindUObject(this, &AGPCharacterBase::OnSkillMontageEnded);
+	AnimInstance->Montage_Play(HitHardMontage, 2.f);
+	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, HitHardMontage);
+}
+
+void AGPCharacterBase::ProcessClashCommand()
+{
+	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
+	if (!AnimInstance || !ClashMontage)
+		return;
+
+	if (AnimInstance->Montage_IsPlaying(ClashMontage))
+		return;
+
+	bIsUsingSkill = true;
+
+	FOnMontageEnded MontageEndedDelegate;
+	MontageEndedDelegate.BindUObject(this, &AGPCharacterBase::OnSkillMontageEnded);
+	AnimInstance->Montage_Play(ClashMontage, 2.f);
+	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, ClashMontage);
+}
+
+void AGPCharacterBase::ProcessWhirlwindCommand()
+{
+	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
+	if (!AnimInstance || !WhirlwindMontage)
+		return;
+
+	if (AnimInstance->Montage_IsPlaying(WhirlwindMontage))
+		return;
+
+	bIsUsingSkill = true;
+
+	FOnMontageEnded MontageEndedDelegate;
+	MontageEndedDelegate.BindUObject(this, &AGPCharacterBase::OnSkillMontageEnded);
+	AnimInstance->Montage_Play(WhirlwindMontage, 2.f);
+	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, WhirlwindMontage);
+}
+
+void AGPCharacterBase::OnSkillMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (Montage == HitHardMontage || Montage == ClashMontage || Montage == WhirlwindMontage)
+	{
+		bIsUsingSkill = false;
+
+		if (CharacterInfo.HasState(STATE_SKILL_Q) && Montage == HitHardMontage)
+		{
+			CharacterInfo.RemoveState(STATE_SKILL_Q);
+		}
+
+		if (CharacterInfo.HasState(STATE_SKILL_E) && Montage == ClashMontage)
+		{
+			CharacterInfo.RemoveState(STATE_SKILL_E);
+		}
+
+		if (CharacterInfo.HasState(STATE_SKILL_R) && Montage == WhirlwindMontage)
+		{
+			CharacterInfo.RemoveState(STATE_SKILL_R);
+		}
+	}
 }

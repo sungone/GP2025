@@ -75,4 +75,22 @@ public :
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> DeadMontage;
 	float DeadEventDelayTime = 0.5f;
+
+// ½ºÅ³   
+	void ProcessHitHardCommand();
+	void ProcessClashCommand();
+	void ProcessWhirlwindCommand();
+
+	void OnSkillMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
+	TObjectPtr<UAnimMontage> HitHardMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
+	TObjectPtr<UAnimMontage> ClashMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
+	TObjectPtr<UAnimMontage> WhirlwindMontage;
+
+	bool bIsUsingSkill = false;
 };
