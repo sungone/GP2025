@@ -93,4 +93,13 @@ public :
 	TObjectPtr<UAnimMontage> WhirlwindMontage;
 
 	bool bIsUsingSkill = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite , Category = "FX")
+	class UNiagaraSystem* HitHardEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite , Category = "FX")
+	class UNiagaraSystem* ClashEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite , Category = "FX")
+	class UNiagaraSystem* WhirlwindEffect;
 };

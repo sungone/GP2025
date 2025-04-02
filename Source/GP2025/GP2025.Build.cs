@@ -14,7 +14,7 @@ public class GP2025 : ModuleRules
         PublicDependencyModuleNames.AddRange(new string[] { 
             "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG", 
             "Sockets", "Networking", "Json", "JsonUtilities", "PhysicsCore" , "Slate" , "SlateCore" ,
-            "NavigationSystem"
+            "NavigationSystem" , "Niagara"
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] { });
