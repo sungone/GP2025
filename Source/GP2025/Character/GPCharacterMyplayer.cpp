@@ -233,6 +233,17 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 			CameraBoom->TargetArmLength = NewArmLength;
 			CameraBoom->SetRelativeLocation(NewOffset);
 		}
+
+		if (bWantsToZoom)
+		{
+			GetCharacterMovement()->bOrientRotationToMovement = false;
+			bUseControllerRotationYaw = true;
+		}
+		else
+		{
+			GetCharacterMovement()->bOrientRotationToMovement = true;
+			bUseControllerRotationYaw = false;
+		}
 	}
 
 	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
@@ -457,6 +468,9 @@ void AGPCharacterMyplayer::StopSprinting()
 
 void AGPCharacterMyplayer::AutoAttack()
 {
+	if (bIsGunnerCharacter() && !bWantsToZoom)
+		return;
+
 	if (bIsAutoAttacking == false && !CharacterInfo.HasState(STATE_AUTOATTACK))
 	{
 		CharacterInfo.AddState(STATE_AUTOATTACK);
@@ -572,6 +586,7 @@ void AGPCharacterMyplayer::UseSkillQ()
 
 	if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_Q))
 	{
+		if (!bWantsToZoom) return;
 		CharacterInfo.AddState(STATE_SKILL_Q);
 		ProcessThrowingCommand();
 	}
@@ -587,6 +602,7 @@ void AGPCharacterMyplayer::UseSkillE()
 
 	if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_E))
 	{
+		if (!bWantsToZoom) return;
 		CharacterInfo.AddState(STATE_SKILL_E);
 		ProcessFThrowingCommand();
 	}
@@ -603,6 +619,7 @@ void AGPCharacterMyplayer::UseSkillR()
 
 	if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_R))
 	{
+		if (!bWantsToZoom) return;
 		CharacterInfo.AddState(STATE_SKILL_R);
 		ProcessAngerCommand();
 	}

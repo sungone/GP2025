@@ -408,34 +408,36 @@ void AGPCharacterBase::ProcessFThrowingCommand()
 	if (ProjectileEffectClass)
 	{
 		FVector MuzzleLocation = GetMesh()->GetSocketLocation(FName("WeaponSocket"));
-		MuzzleLocation.Z += 70.f;
+		MuzzleLocation.Z += 80.f;
+		MuzzleLocation.Y -= 30.f;
 
-		// 1. 플레이어 컨트롤러에서 카메라 방향 가져오기
 		APlayerController* PC = Cast<APlayerController>(GetController());
 		if (!PC) return;
 
-		// 2. 플레이어 카메라의 위치와 방향 가져오기
 		FVector CameraLocation;
 		FRotator CameraRotation;
 		PC->GetPlayerViewPoint(CameraLocation, CameraRotation);
 
-		// 3. 카메라가 바라보는 방향을 기준으로 투사체 방향 계산
 		FVector FireDirection = CameraRotation.Vector();
-
-		// 4. 총구 위치에서 그 방향으로 회전값 계산
 		FRotator FireRotation = FireDirection.Rotation();
 
-		// 5. 투사체 스폰 파라미터 설정
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-		// 6. 투사체 액터 스폰
-		if (ProjectileEffectClass)
+		const int32 NumProjectiles = 5;
+		const float SpreadAngle = 10.f; 
+
+		for (int32 i = 0; i < NumProjectiles; ++i)
 		{
+			int32 OffsetFromCenter = i - (NumProjectiles / 2);
+
+			FRotator SpreadRotation = FireRotation;
+			SpreadRotation.Yaw += OffsetFromCenter * SpreadAngle;
+
 			GetWorld()->SpawnActor<AActor>(
 				ProjectileEffectClass,
 				MuzzleLocation,
-				FireRotation,
+				SpreadRotation,
 				SpawnParams
 			);
 		}
@@ -448,7 +450,6 @@ void AGPCharacterBase::ProcessFThrowingCommand()
 	AnimInstance->Montage_Play(FThrowingMontage, 2.f);
 	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, FThrowingMontage);
 }
-
 void AGPCharacterBase::ProcessAngerCommand()
 {
 	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
