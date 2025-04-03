@@ -22,27 +22,17 @@
 #include <filesystem>
 #include <sstream>
 
+#include "ServerDefine.h"
 #include "FVector.h"
 #include "Common.h"
 #include "Logger.h"
 #include "ExpOver.h"
 #include "RandomUtils.h"
 #include "TimerQueue.h"
+#include "DBManager.h"
 
 #include "MapZone.h"
 #include "ItemTable.h"
 #include "PlayerSkillTable.h"
 #include "PlayerLevelTable.h"
 #include "MonsterTable.h"
-
-enum CompType
-{
-	RECV,
-	SEND,
-	ACCEPT,
-};
-
-enum EventType
-{
-	MONSTER_UPDATE
-};

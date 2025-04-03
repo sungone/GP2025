@@ -145,6 +145,12 @@
     <ClInclude Include="Source\Game\DataTable\PlayerSkillTable.h">
       <Filter>Source Files\Game\DataTable</Filter>
     </ClInclude>
+    <ClInclude Include="Source\DB\DBManager.h">
+      <Filter>Source Files\DB</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ServerDefine.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Core\Session.cpp">
@@ -218,6 +224,9 @@
     </ClCompile>
     <ClCompile Include="Source\Game\DataTable\PlayerSkillTable.cpp">
       <Filter>Source Files\Game\DataTable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DB\DBManager.cpp">
+      <Filter>Source Files\DB</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

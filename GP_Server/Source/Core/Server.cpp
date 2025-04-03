@@ -6,17 +6,27 @@
 
 bool Server::Init()
 {
+	SetConsoleOutputCP(65001);
+	Logger::GetInst().OpenLogFile("gp_server_log.txt");
+#ifdef DB_LOCAL
+	if (DBManager::GetInst().Connect("localhost", 33060, "serverdev", "pass123!", "gp2025"))
+	{
+		DBManager::GetInst().PrintUsers();
+		LOG(LogType::Error, "DBManager");
+		return false;
+	}
+#endif
 	WSADATA wsa_data;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
 	{
-		LOG(LogType::Warning, "WSAStartup");
+		LOG(LogType::Error, "WSAStartup");
 		return false;
 	}
 
 	InitSocket(_listenSocket, WSA_FLAG_OVERLAPPED);
 	if (_listenSocket == INVALID_SOCKET)
 	{
-		LOG(LogType::Warning, "WSASocket");
+		LOG(LogType::Error, "WSASocket");
 		return false;
 	}
 
@@ -27,32 +37,32 @@ bool Server::Init()
 
 	if (bind(_listenSocket, reinterpret_cast<sockaddr*>(&addr_s), sizeof(addr_s)) == SOCKET_ERROR)
 	{
-		LOG(LogType::Warning, "bind");
+		LOG(LogType::Error, "bind");
 		return false;
 	}
 
 	if (listen(_listenSocket, SOMAXCONN) == SOCKET_ERROR)
 	{
-		LOG(LogType::Warning, "listen");
+		LOG(LogType::Error, "listen");
 		return false;
 	}
 
 	if (!IOCP::GetInst().Init())
 	{
-		LOG(LogType::Warning, "IOCP");
+		LOG(LogType::Error, "IOCP");
 		return false;
 	}
 	IOCP::GetInst().RegisterSocket(_listenSocket);
 
 	if (!MapZone::GetInst().Init())
 	{
-		LOG(LogType::Warning, "MapZone");
+		LOG(LogType::Error, "MapZone");
 		return false;
 	}
 
 	if (!GameWorld::GetInst().Init())
 	{
-		LOG(LogType::Warning, "GameMgr");
+		LOG(LogType::Error, "GameMgr");
 		return false;
 	}
 

@@ -12,6 +12,7 @@
 
 enum LogType
 {
+    Error,
     Warning,
     Log,
     RecvLog,
@@ -83,6 +84,7 @@ private:
     {
         switch (type)
         {
+        case LogType::Error: return "[Error] ";
         case LogType::Warning: return "[Warning] ";
         case LogType::Log: return "[Log] ";
         case LogType::SendLog: return "[SendLog] >>>> ";
