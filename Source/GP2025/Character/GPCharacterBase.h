@@ -77,7 +77,9 @@ public :
 	float DeadEventDelayTime = 0.5f;
 
 // 스킬 공통 기능
+
  	void OnSkillMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	bool bIsUsingSkill = false;
 
 // 남자 스킬   
 	void ProcessHitHardCommand();
@@ -93,18 +95,8 @@ public :
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
 	TObjectPtr<UAnimMontage> WhirlwindMontage;
 
-	bool bIsUsingSkill = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite , Category = "FX")
-	class UNiagaraSystem* HitHardEffect;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite , Category = "FX")
-	class UNiagaraSystem* ClashEffect;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite , Category = "FX")
-	class UNiagaraSystem* WhirlwindEffect;
-
 // 여자 스킬
+
 	void ProcessThrowingCommand();
 	void ProcessFThrowingCommand();
 	void ProcessAngerCommand();
@@ -117,10 +109,4 @@ public :
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
 	TObjectPtr<UAnimMontage> AngerMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX")
-	class UNiagaraSystem* AngerEffect;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill Effect")
-	TSubclassOf<AActor> ProjectileEffectClass;
 };

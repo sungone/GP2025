@@ -278,18 +278,6 @@ void AGPCharacterBase::ProcessHitHardCommand()
 	if (AnimInstance->Montage_IsPlaying(HitHardMontage))
 		return;
 
-	if (HitHardEffect)
-	{
-		UNiagaraFunctionLibrary::SpawnSystemAttached(
-			HitHardEffect,
-			GetCharacterMesh(),
-			FName(TEXT("WeaponSocket")),
-			FVector::ZeroVector,
-			FRotator::ZeroRotator,
-			EAttachLocation::SnapToTargetIncludingScale,
-			true);
-	}
-
 	bIsUsingSkill = true;
 
 	FOnMontageEnded MontageEndedDelegate;
@@ -307,19 +295,6 @@ void AGPCharacterBase::ProcessClashCommand()
 	if (AnimInstance->Montage_IsPlaying(ClashMontage))
 		return;
 
-
-	if (ClashEffect)
-	{
-		UNiagaraFunctionLibrary::SpawnSystemAttached(
-			ClashEffect,
-			GetCharacterMesh(),
-			FName(TEXT("WeaponSocket")),
-			FVector::ZeroVector,
-			FRotator::ZeroRotator,
-			EAttachLocation::SnapToTargetIncludingScale,
-			true);
-	}
-
 	bIsUsingSkill = true;
 
 	FOnMontageEnded MontageEndedDelegate;
@@ -336,18 +311,6 @@ void AGPCharacterBase::ProcessWhirlwindCommand()
 
 	if (AnimInstance->Montage_IsPlaying(WhirlwindMontage))
 		return;
-
-	if (WhirlwindEffect)
-	{
-		UNiagaraFunctionLibrary::SpawnSystemAttached(
-			WhirlwindEffect,
-			GetCharacterMesh(),
-			FName(TEXT("WeaponSocket")),
-			FVector::ZeroVector,
-			FRotator::ZeroRotator,
-			EAttachLocation::SnapToTargetIncludingScale,
-			true);
-	}
 
 	bIsUsingSkill = true;
 
@@ -399,23 +362,6 @@ void AGPCharacterBase::ProcessAngerCommand()
 
 	if (AnimInstance->Montage_IsPlaying(AngerMontage))
 		return;
-
-	if (AngerEffect)
-	{
-		UNiagaraComponent* EffectComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
-			AngerEffect,
-			GetCharacterMesh(),
-			FName(TEXT("WeaponSocket")),
-			FVector::ZeroVector,
-			FRotator::ZeroRotator,
-			EAttachLocation::SnapToTargetIncludingScale,
-			true);
-
-		if (EffectComp)
-		{
-			EffectComp->SetFloatParameter(TEXT("Duration"), 10.f);
-		}
-	}
 
 	bIsUsingSkill = true;
 
