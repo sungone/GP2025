@@ -119,12 +119,6 @@ public :
 	TObjectPtr<UAnimMontage> AngerMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX")
-	class UNiagaraSystem* ThrowingEffect;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX")
-	class UNiagaraSystem* FThrowingEffect;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX")
 	class UNiagaraSystem* AngerEffect;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill Effect")

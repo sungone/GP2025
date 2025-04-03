@@ -366,44 +366,6 @@ void AGPCharacterBase::ProcessThrowingCommand()
 	if (AnimInstance->Montage_IsPlaying(ThrowingMontage))
 		return;
 
-	if (ProjectileEffectClass)
-	{
-		FVector MuzzleLocation = GetMesh()->GetSocketLocation(FName("WeaponSocket"));
-		MuzzleLocation.Z += 80.f;
-		MuzzleLocation.Y -= 30.f;
-
-		APlayerController* PC = Cast<APlayerController>(GetController());
-		if (!PC) return;
-
-		FVector CameraLocation;
-		FRotator CameraRotation;
-		PC->GetPlayerViewPoint(CameraLocation, CameraRotation);
-
-		FVector TraceStart = CameraLocation;
-		FVector TraceEnd = TraceStart + (CameraRotation.Vector() * 10000.f);
-		FHitResult Hit;
-		FCollisionQueryParams TraceParams(SCENE_QUERY_STAT(ProjectileTrace), true, this);
-
-		FVector TargetPoint = TraceEnd;
-		if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility, TraceParams))
-		{
-			TargetPoint = Hit.ImpactPoint;
-		}
-
-		FVector AdjustedFireDirection = (TargetPoint - MuzzleLocation).GetSafeNormal();
-		FRotator AdjustedFireRotation = AdjustedFireDirection.Rotation();
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-		GetWorld()->SpawnActor<AActor>(
-			ProjectileEffectClass,
-			MuzzleLocation,
-			AdjustedFireRotation,
-			SpawnParams
-		);
-	}
-
 	bIsUsingSkill = true;
 
 	FOnMontageEnded MontageEndedDelegate;
@@ -420,55 +382,6 @@ void AGPCharacterBase::ProcessFThrowingCommand()
 
 	if (AnimInstance->Montage_IsPlaying(FThrowingMontage))
 		return;
-
-	if (ProjectileEffectClass)
-	{
-		FVector MuzzleLocation = GetMesh()->GetSocketLocation(FName("WeaponSocket"));
-		MuzzleLocation.Z += 80.f;
-		MuzzleLocation.Y -= 30.f;
-
-		APlayerController* PC = Cast<APlayerController>(GetController());
-		if (!PC) return;
-
-		FVector CameraLocation;
-		FRotator CameraRotation;
-		PC->GetPlayerViewPoint(CameraLocation, CameraRotation);
-
-		FVector TraceStart = CameraLocation;
-		FVector TraceEnd = TraceStart + (CameraRotation.Vector() * 10000.f);
-		FHitResult Hit;
-		FCollisionQueryParams TraceParams(SCENE_QUERY_STAT(ProjectileTrace), true, this);
-
-		FVector TargetPoint = TraceEnd;
-		if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility, TraceParams))
-		{
-			TargetPoint = Hit.ImpactPoint;
-		}
-
-		FVector CenterDirection = (TargetPoint - MuzzleLocation).GetSafeNormal();
-		FRotator CenterRotation = CenterDirection.Rotation();
-
-		const int32 NumProjectiles = 5;
-		const float SpreadAngle = 1.2f; 
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-		for (int32 i = 0; i < NumProjectiles; ++i)
-		{
-			int32 OffsetFromCenter = i - (NumProjectiles / 2);
-
-			FRotator SpreadRotation = CenterRotation;
-			SpreadRotation.Yaw += OffsetFromCenter * SpreadAngle;
-
-			GetWorld()->SpawnActor<AActor>(
-				ProjectileEffectClass,
-				MuzzleLocation,
-				SpreadRotation,
-				SpawnParams
-			);
-		}
-	}
 
 	bIsUsingSkill = true;
 
@@ -489,7 +402,7 @@ void AGPCharacterBase::ProcessAngerCommand()
 
 	if (AngerEffect)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAttached(
+		UNiagaraComponent* EffectComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
 			AngerEffect,
 			GetCharacterMesh(),
 			FName(TEXT("WeaponSocket")),
@@ -497,6 +410,11 @@ void AGPCharacterBase::ProcessAngerCommand()
 			FRotator::ZeroRotator,
 			EAttachLocation::SnapToTargetIncludingScale,
 			true);
+
+		if (EffectComp)
+		{
+			EffectComp->SetFloatParameter(TEXT("Duration"), 10.f);
+		}
 	}
 
 	bIsUsingSkill = true;

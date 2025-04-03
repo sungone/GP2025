@@ -1,0 +1,37 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Animation/AnimNotifies/AnimNotify.h"
+#include "AnimNotify_FThrowingEffect.generated.h"
+
+/**
+ * 
+ */
+UCLASS()
+class GP2025_API UAnimNotify_FThrowingEffect : public UAnimNotify
+{
+	GENERATED_BODY()
+
+public:
+	// 애니메이션 재생 시 호출되는 Notify
+	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+
+protected:
+	// 발사할 이펙트 액터 (예: 투사체)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	TSubclassOf<AActor> ProjectileEffectClass;
+
+	// 발사할 투사체 개수 (부채꼴 수)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	int32 NumProjectiles = 5;
+
+	// 부채꼴의 각도 간격 (도 단위)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	float SpreadAngle = 1.2f;
+
+	// 발사 위치 오프셋
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	FVector MuzzleOffset = FVector(0.f, -30.f, 80.f);
+};
