@@ -15,6 +15,7 @@
 #include "UI/GPLevelWidget.h"
 #include "UI/GPWidgetComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h" 
 
 #include <random>
 static std::random_device rd;
@@ -365,16 +366,26 @@ void AGPCharacterBase::ProcessThrowingCommand()
 	if (AnimInstance->Montage_IsPlaying(ThrowingMontage))
 		return;
 
-	if (ThrowingEffect)
+	if (ProjectileEffectClass)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAttached(
-			ThrowingEffect,
-			GetCharacterMesh(),
-			FName(TEXT("WeaponSocket")),
-			FVector::ZeroVector,
-			FRotator::ZeroRotator,
-			EAttachLocation::SnapToTargetIncludingScale,
-			true);
+		FVector MuzzleLocation = GetMesh()->GetSocketLocation(FName("WeaponSocket"));
+		FTransform MuzzleTransform = GetMesh()->GetSocketTransform(FName("WeaponSocket"));
+		FVector FireDirection = MuzzleTransform.GetUnitAxis(EAxis::Y); 
+
+		FRotator FireRotation = FireDirection.Rotation();
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+		if (ProjectileEffectClass)
+		{
+			GetWorld()->SpawnActor<AActor>(
+				ProjectileEffectClass,
+				MuzzleLocation,
+				FireRotation,
+				SpawnParams
+			);
+		}
 	}
 
 	bIsUsingSkill = true;
@@ -394,16 +405,40 @@ void AGPCharacterBase::ProcessFThrowingCommand()
 	if (AnimInstance->Montage_IsPlaying(FThrowingMontage))
 		return;
 
-	if (FThrowingEffect)
+	if (ProjectileEffectClass)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAttached(
-			FThrowingEffect,
-			GetCharacterMesh(),
-			FName(TEXT("WeaponSocket")),
-			FVector::ZeroVector,
-			FRotator::ZeroRotator,
-			EAttachLocation::SnapToTargetIncludingScale,
-			true);
+		FVector MuzzleLocation = GetMesh()->GetSocketLocation(FName("WeaponSocket"));
+		MuzzleLocation.Z += 70.f;
+
+		// 1. 플레이어 컨트롤러에서 카메라 방향 가져오기
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		if (!PC) return;
+
+		// 2. 플레이어 카메라의 위치와 방향 가져오기
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		PC->GetPlayerViewPoint(CameraLocation, CameraRotation);
+
+		// 3. 카메라가 바라보는 방향을 기준으로 투사체 방향 계산
+		FVector FireDirection = CameraRotation.Vector();
+
+		// 4. 총구 위치에서 그 방향으로 회전값 계산
+		FRotator FireRotation = FireDirection.Rotation();
+
+		// 5. 투사체 스폰 파라미터 설정
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+		// 6. 투사체 액터 스폰
+		if (ProjectileEffectClass)
+		{
+			GetWorld()->SpawnActor<AActor>(
+				ProjectileEffectClass,
+				MuzzleLocation,
+				FireRotation,
+				SpawnParams
+			);
+		}
 	}
 
 	bIsUsingSkill = true;

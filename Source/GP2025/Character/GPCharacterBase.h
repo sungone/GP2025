@@ -126,4 +126,7 @@ public :
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX")
 	class UNiagaraSystem* AngerEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill Effect")
+	TSubclassOf<AActor> ProjectileEffectClass;
 };
