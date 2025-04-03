@@ -11,4 +11,4 @@ enum CompType
 enum EventType
 {
 	MONSTER_UPDATE
-};S
+};
