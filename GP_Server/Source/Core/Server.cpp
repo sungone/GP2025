@@ -9,9 +9,8 @@ bool Server::Init()
 	SetConsoleOutputCP(65001);
 	Logger::GetInst().OpenLogFile("gp_server_log.txt");
 #ifdef DB_LOCAL
-	if (DBManager::GetInst().Connect("localhost", 33060, "serverdev", "pass123!", "gp2025"))
+	if (!DBManager::GetInst().Connect("localhost", 33060, "serverdev", "pass123!", "gp2025"))
 	{
-		DBManager::GetInst().PrintUsers();
 		LOG(LogType::Error, "DBManager");
 		return false;
 	}

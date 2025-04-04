@@ -154,7 +154,7 @@
     <ClInclude Include="Source\Core\IOCP\IOCP.h" />
     <ClInclude Include="Source\Core\PacketManager.h" />
     <ClInclude Include="Source\Core\Server.h" />
-    <ClInclude Include="Source\Core\Session.h" />
+    <ClInclude Include="Source\Core\PlayerSession.h" />
     <ClInclude Include="Source\Core\SessionManager.h" />
     <ClInclude Include="Source\Core\SessionSocket.h" />
     <ClInclude Include="Source\DB\DBManager.h" />
@@ -184,7 +184,7 @@
     <ClCompile Include="Source\Core\IOCP\IOCP.cpp" />
     <ClCompile Include="Source\Core\PacketManager.cpp" />
     <ClCompile Include="Source\Core\Server.cpp" />
-    <ClCompile Include="Source\Core\Session.cpp" />
+    <ClCompile Include="Source\Core\PlayerSession.cpp" />
     <ClCompile Include="Source\Core\SessionManager.cpp" />
     <ClCompile Include="Source\Core\SessionSocket.cpp" />
     <ClCompile Include="Source\DB\DBManager.cpp" />

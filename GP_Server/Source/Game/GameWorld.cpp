@@ -79,7 +79,7 @@ void GameWorld::CreateMonster()
 	TimerQueue::AddTimerEvent(TimerEvent(0, ::MONSTER_UPDATE, 2000));
 }
 
-void GameWorld::SpawnMonster(Session& session)
+void GameWorld::SpawnMonster(PlayerSession& session)
 {
 	int32 playerId = session.GetId();
 	std::shared_ptr<Character> playerCharacter = GetCharacterByID(playerId);

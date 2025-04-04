@@ -1,5 +1,5 @@
 #pragma once
-#include "Session.h"
+#include "PlayerSession.h"
 #include "IOCP.h"
 
 class SessionManager
@@ -19,11 +19,11 @@ public:
 	void SendPacket(int32 sessionId, const Packet* packet);
 	void BroadcastToAll(Packet* packet);
 	void BroadcastToViewList(Packet* packet, int32 senderId);
-	std::array<std::shared_ptr<Session>, MAX_CLIENT>& GetSessions() { return _sessions; }
+	std::array<std::shared_ptr<PlayerSession>, MAX_CLIENT>& GetSessions() { return _sessions; }
 private:
 	int32 GenerateId();
 private:
-	std::array<std::shared_ptr<Session>, MAX_CLIENT> _sessions;
+	std::array<std::shared_ptr<PlayerSession>, MAX_CLIENT> _sessions;
 	IOCP& _iocp = IOCP::GetInst();
 
 	std::mutex _smgrMutex;

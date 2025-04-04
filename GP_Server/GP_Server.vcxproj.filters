@@ -35,9 +35,6 @@
     <Filter Include="Source Files\Network\Server">
       <UniqueIdentifier>{17f2af66-87ad-4819-b1e8-c8e64fbd720a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Network\IOCP">
-      <UniqueIdentifier>{fae4c54b-3902-48a0-9f6b-e04620347384}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Game\GameObjects\Map">
       <UniqueIdentifier>{8c3f90d3-fa86-4a55-8ae0-ca4c78604b0d}</UniqueIdentifier>
     </Filter>
@@ -53,12 +50,15 @@
     <Filter Include="Source Files\Utils\PCH">
       <UniqueIdentifier>{3a7b361f-25be-42ce-99da-91564daa6b55}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Utils\IOCP">
+      <UniqueIdentifier>{fae4c54b-3902-48a0-9f6b-e04620347384}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Utils\Logger.h">
       <Filter>Source Files\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Core\Session.h">
+    <ClInclude Include="Source\Core\PlayerSession.h">
       <Filter>Source Files\Network\Session</Filter>
     </ClInclude>
     <ClInclude Include="Source\Core\SessionManager.h">
@@ -122,10 +122,10 @@
       <Filter>Source Files\Game\GameObjects\Map</Filter>
     </ClInclude>
     <ClInclude Include="Source\Core\IOCP\ExpOver.h">
-      <Filter>Source Files\Network\IOCP</Filter>
+      <Filter>Source Files\Utils\IOCP</Filter>
     </ClInclude>
     <ClInclude Include="Source\Core\IOCP\IOCP.h">
-      <Filter>Source Files\Network\IOCP</Filter>
+      <Filter>Source Files\Utils\IOCP</Filter>
     </ClInclude>
     <ClInclude Include="Source\Utils\TimerQueue.h">
       <Filter>Source Files\Utils\Timer</Filter>
@@ -153,7 +153,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Core\Session.cpp">
+    <ClCompile Include="Source\Core\PlayerSession.cpp">
       <Filter>Source Files\Network\Session</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\SessionManager.cpp">
@@ -202,10 +202,10 @@
       <Filter>Source Files\Game\GameObjects\Map</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\IOCP\ExpOver.cpp">
-      <Filter>Source Files\Network\IOCP</Filter>
+      <Filter>Source Files\Utils\IOCP</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\IOCP\IOCP.cpp">
-      <Filter>Source Files\Network\IOCP</Filter>
+      <Filter>Source Files\Utils\IOCP</Filter>
     </ClCompile>
     <ClCompile Include="Source\Utils\TimerQueue.cpp">
       <Filter>Source Files\Utils\Timer</Filter>
