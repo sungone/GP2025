@@ -7,6 +7,9 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 
 	switch (packetType)
 	{
+	case EPacketType::C_SIGNUP:
+		LOG(LogType::RecvLog, std::format("SignUpPacket from [{}]", sessionId));
+		HandleSignUpPacket(sessionId, packet);
 	case EPacketType::C_LOGIN:
 		LOG(LogType::RecvLog, std::format("LoginPacket from [{}]", sessionId));
 		HandleLoginPacket(sessionId, packet);
@@ -48,11 +51,49 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 	}
 }
 
+void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
+{
+	auto pkt = static_cast<SignUpPacket*>(packet);
+#ifdef DB_LOCAL
+	auto res = _dbMgr.SignUpUser(pkt->AccountID, pkt->AccountPW, ConvertToWString(pkt->NickName));
+	if (res.code == DBResultCode::SUCCESS)
+	{
+		LOG(LogType::Log, std::format("SignUp Success! userId: {}", res.dbId));
+		_sessionMgr.HandleLogin(sessionId);
+	}
+	else if (res.code == DBResultCode::DUPLICATE_ID)
+		LOG(LogType::Log, "SignUp Failed! Duplicate ID");
+	else
+		LOG(LogType::Log, "SignUp Failed!");
+	// Todo: Send sign up failed packet
+#endif
+}
+
 void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 {
 	auto pkt = static_cast<LoginPacket*>(packet);
+#ifdef DB_LOCAL
+	auto res = _dbMgr.CheckLogin(pkt->AccountID, pkt->AccountPW);
+
+	if (res.code == DBResultCode::SUCCESS)
+	{
+		LOG(LogType::Log, std::format("Login Success! userId: {}, nickname: {}",
+			res.dbId, res.nickname));
+		_sessionMgr.HandleLogin(sessionId);
+		return;
+	}
+	else if (res.code == DBResultCode::INVALID_USER)
+		LOG(LogType::Log, "Login Failed! Invalid User");
+	else if (res.code == DBResultCode::INVALID_PASSWORD)
+		LOG(LogType::Log, "Login Failed! Invalid Password");
+	else
+		LOG(LogType::Log, "Login Failed! DB Error");
+
+	// Todo: Send login failed packet
+#else
 	LOG(std::format("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW));
 	_sessionMgr.HandleLogin(sessionId);
+#endif
 }
 
 void PacketManager::HandleLogoutPacket(int32 sessionId)

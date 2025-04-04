@@ -1,6 +1,6 @@
 #pragma once
 #include "Monster.h"
-#include "Session.h"
+#include "PlayerSession.h"
 #include "SessionManager.h"
 #include "Item.h"
 
@@ -22,7 +22,7 @@ public:
 	void RemoveCharacter(int32 id);
 
 	void CreateMonster();
-	void SpawnMonster(Session& session);
+	void SpawnMonster(PlayerSession& session);
 
 	void PlayerMove(int32 playerId, FInfoData& info);
 	void PlayerAttack(int32 playerId, float playerYaw);

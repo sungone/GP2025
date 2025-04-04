@@ -54,13 +54,13 @@ struct LoginPacket : public Packet
 	}
 };
 
-struct SignupPacket : public Packet
+struct SignUpPacket : public Packet
 {
 	char AccountID[LOGIN_STR_LEN];
 	char AccountPW[LOGIN_STR_LEN];
 	char NickName[NICKNAME_LEN];
 
-	SignupPacket(const char* InAccountID, const char* InAccountPW, const char* InNickName)
+	SignUpPacket(const char* InAccountID, const char* InAccountPW, const char* InNickName)
 		: Packet(EPacketType::C_SIGNUP)
 	{
 		strncpy_s(AccountID, InAccountID, LOGIN_STR_LEN - 1);
@@ -72,7 +72,7 @@ struct SignupPacket : public Packet
 		strncpy_s(NickName, InNickName, NICKNAME_LEN - 1);
 		NickName[NICKNAME_LEN - 1] = '\0';
 
-		Header.PacketSize = sizeof(SignupPacket);
+		Header.PacketSize = sizeof(SignUpPacket);
 	}
 };
 

@@ -2,11 +2,11 @@
 #include "Player.h"
 #include "SessionSocket.h"
 
-class Session
+class PlayerSession
 {
 public:
-	Session() = default;
-	~Session() = default;
+	PlayerSession() = default;
+	~PlayerSession() = default;
 
 public:
 	void DoRecv();

@@ -7,7 +7,7 @@ void SessionManager::Connect(SOCKET& socket)
 	std::lock_guard<std::mutex> lock(_smgrMutex);
 	int32 _id = GenerateId();
 	if (_id != -1) {
-		_sessions[_id] = std::make_shared<Session>();
+		_sessions[_id] = std::make_shared<PlayerSession>();
 		_sessions[_id]->Connect(socket, _id);
 		_iocp.RegisterSocket(socket, _id);
 		LOG("Start Recv");

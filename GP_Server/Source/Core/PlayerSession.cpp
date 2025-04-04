@@ -1,14 +1,14 @@
 #include "pch.h"
-#include "Session.h"
+#include "PlayerSession.h"
 #include "SessionManager.h"
 #include "GameWorld.h"
 #include "PacketManager.h"
 
-void Session::DoRecv()
+void PlayerSession::DoRecv()
 {
 	_sSocket->DoRecv();
 }
-void Session::DoSend(const Packet* packet)
+void PlayerSession::DoSend(const Packet* packet)
 {
 #pragma region //Log
 	switch (packet->Header.PacketType)
@@ -72,25 +72,25 @@ void Session::DoSend(const Packet* packet)
 	_sSocket->DoSend(packet);
 }
 
-void Session::Connect(SOCKET socket, int32 id)
+void PlayerSession::Connect(SOCKET socket, int32 id)
 {
 	this->_id = id;
 	_sSocket = std::make_unique<SessionSocket>(socket);
 }
 
-void Session::Disconnect()
+void PlayerSession::Disconnect()
 {
 	_loginState = false;
 	_sSocket->Close();
 }
 
-void Session::Login()
+void PlayerSession::Login()
 {
 	_loginState = true;
 	CreatePlayer();
 }
 
-void Session::CreatePlayer()
+void PlayerSession::CreatePlayer()
 {
 	_player = std::make_shared<Player>();
 	_player->Init();
@@ -98,17 +98,17 @@ void Session::CreatePlayer()
 	GameWorld::GetInst().AddPlayer(_player);
 }
 
-int32 Session::GetId()
+int32 PlayerSession::GetId()
 {
 	return _id;
 }
 
-FInfoData& Session::GetPlayerInfo()
+FInfoData& PlayerSession::GetPlayerInfo()
 {
 	return _player->GetInfo();
 }
 
-void Session::HandleRecvBuffer(int32 recvByte, ExpOver* expOver)
+void PlayerSession::HandleRecvBuffer(int32 recvByte, ExpOver* expOver)
 {
 	_sSocket->HandleRecvBuffer(_id, recvByte, expOver);
 }
