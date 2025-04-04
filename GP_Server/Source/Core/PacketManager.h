@@ -14,6 +14,7 @@ public:
 
 	void ProcessPacket(int32 sessionId, Packet* packet);
 
+	void HandleSignUpPacket(int32 sessionId, Packet* packet);
 	void HandleLoginPacket(int32 sessionId, Packet* packet);
 	void HandleLogoutPacket(int32 sessionId);
 	void HandleMovePacket(int32 sessionId, Packet* packet);
@@ -27,6 +28,7 @@ public:
 
 private:
 	SessionManager& _sessionMgr = SessionManager::GetInst();
+	DBManager& _dbMgr = DBManager::GetInst();
 	GameWorld& _gameWorld = GameWorld::GetInst();
 };
 

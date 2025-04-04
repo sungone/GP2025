@@ -7,17 +7,6 @@ bool DBManager::Connect(const std::string& host, int port,
 	try {
 		_dbsess = std::make_shared<mysqlx::Session>(host, port, user, pass);
 		_db = std::make_shared<mysqlx::Schema>(_dbsess->getSchema(schemaName));
-
-		//test
-		auto res = SignUpUser("td2", "1234", L"´Ð³×ÀÓ");
-		if (res.code == DBResultCode::SUCCESS)
-			LOG(LogType::Log, std::format("SignUp Success! userId: {}", res.dbId));
-		else if (res.code == DBResultCode::DUPLICATE_ID)
-			LOG(LogType::Log, "SignUp Failed! Duplicate ID");
-		else
-			LOG(LogType::Log, "SignUp Failed!");
-
-		PrintUsersTable();
 		return true;
 	}
 	catch (const mysqlx::Error& e)
@@ -48,7 +37,7 @@ void DBManager::PrintUsersTable()
 			std::string loginId = row[1].get<std::string>();
 			std::string nickname = row[2].get<std::string>();
 
-			std::cout << std::format("UID[{:<4}] LoginID: {:<12} - {}\n", uid, loginId, nickname);
+			std::cout << std::format("UID: {:<4} LoginID: {:<12} - {}\n", uid, loginId, nickname);
 		}
 		std::cout << '\n';
 	}
@@ -65,7 +54,9 @@ DBSignUpResult DBManager::SignUpUser(const std::string& login_id, const std::str
 			.insert("login_id", "password", "nickname")
 			.values(login_id, password, nickname)
 			.execute();
+
 		uint32 userId = static_cast<uint32>(result.getAutoIncrementValue());
+		if (isPrint) PrintUsersTable();
 		return { DBResultCode::SUCCESS, userId };
 	}
 	catch (const mysqlx::Error& e)
@@ -102,6 +93,7 @@ DBLoginResult DBManager::CheckLogin(const std::string& login_id, const std::stri
 		uint32 userId = static_cast<uint32>(row[0].get<int>());
 		std::string nickname = row[2].get<std::string>();
 
+		if (isPrint) PrintUsersTable();
 		return { DBResultCode::SUCCESS, userId, nickname };
 	}
 	catch (const mysqlx::Error& e)

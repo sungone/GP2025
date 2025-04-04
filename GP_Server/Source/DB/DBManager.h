@@ -1,14 +1,5 @@
 #pragma once
 
-enum class DBResultCode : int32
-{
-	SUCCESS = 0,
-	INVALID_USER = -1,
-	INVALID_PASSWORD = -2,
-	DUPLICATE_ID = -3,
-	DB_ERROR = -99
-};
-
 struct DBSignUpResult
 {
 	DBResultCode code;
@@ -41,6 +32,6 @@ private:
 	std::shared_ptr<mysqlx::Schema> _db;
 
 	const std::string USERS_TABLE = "users";
-
+	bool isPrint = true;
 	mysqlx::Table GetUsersTable();
 };
