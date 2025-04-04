@@ -15,7 +15,7 @@ void UAnimNotify_WarriorAttackEffect::Notify(USkeletalMeshComponent* MeshComp, U
 	if (!OwnerActor)
 		return;
 
-	UNiagaraFunctionLibrary::SpawnSystemAttached(
+	UNiagaraComponent* Effect = UNiagaraFunctionLibrary::SpawnSystemAttached(
 		AutoAttackEffect,
 		MeshComp,
 		SocketName,
@@ -23,4 +23,10 @@ void UAnimNotify_WarriorAttackEffect::Notify(USkeletalMeshComponent* MeshComp, U
 		EffectRotationOffset,
 		EAttachLocation::SnapToTargetIncludingScale,
 		true);
+
+	if (Effect)
+	{
+		// 여기서 Duration 설정!
+		Effect->SetFloatParameter(TEXT("Lifetime"), 0.3f); // 원하는 재생 시간
+	}
 }

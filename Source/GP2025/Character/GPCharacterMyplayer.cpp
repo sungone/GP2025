@@ -140,7 +140,7 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 	}
 
 	// 기본 캐릭터 타입
-	CurrentCharacterType = (uint8)Type::EPlayer::GUNNER;
+	CurrentCharacterType = (uint8)Type::EPlayer::WARRIOR;
 }
 
 void AGPCharacterMyplayer::BeginPlay()
@@ -590,6 +590,8 @@ void AGPCharacterMyplayer::UseSkillQ()
 		CharacterInfo.AddState(STATE_SKILL_Q);
 		ProcessThrowingCommand();
 	}
+
+	SetupMasterPose();
 }
 
 void AGPCharacterMyplayer::UseSkillE()
@@ -606,6 +608,8 @@ void AGPCharacterMyplayer::UseSkillE()
 		CharacterInfo.AddState(STATE_SKILL_E);
 		ProcessFThrowingCommand();
 	}
+
+	SetupMasterPose();
 }
 
 void AGPCharacterMyplayer::UseSkillR()
@@ -623,6 +627,8 @@ void AGPCharacterMyplayer::UseSkillR()
 		CharacterInfo.AddState(STATE_SKILL_R);
 		ProcessAngerCommand();
 	}
+
+	SetupMasterPose();
 }
 
 void AGPCharacterMyplayer::ResetInteractItem()
