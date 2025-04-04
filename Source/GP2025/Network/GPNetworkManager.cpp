@@ -64,12 +64,12 @@ void UGPNetworkManager::SendPlayerLoginPacket(const char* AccountID, const char*
 	LoginPacket Packet(AccountID, AccountPW);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
-
-void UGPNetworkManager::SendPlayerSignUpPacket(const char* AccountID, const char* AccountPW, const char* NickName)
-{
-	SignupPacket Packet(AccountID, AccountPW, NickName);
-	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
-}
+//
+//void UGPNetworkManager::SendPlayerSignUpPacket(const char* AccountID, const char* AccountPW, const char* NickName)
+//{
+//	SignupPacket Packet(AccountID, AccountPW, NickName);
+//	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+//}
 
 void UGPNetworkManager::SendPlayerLogoutPacket()
 {

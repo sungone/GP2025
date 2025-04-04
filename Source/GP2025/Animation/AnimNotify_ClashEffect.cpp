@@ -15,7 +15,7 @@ void UAnimNotify_ClashEffect::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 	if (!OwnerActor)
 		return;
 
-	UNiagaraFunctionLibrary::SpawnSystemAttached(
+	UNiagaraComponent* Effect = UNiagaraFunctionLibrary::SpawnSystemAttached(
 		ClashEffect,
 		MeshComp,
 		SocketName,
@@ -23,4 +23,9 @@ void UAnimNotify_ClashEffect::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 		EffectRotationOffset,
 		EAttachLocation::SnapToTargetIncludingScale,
 		true);
+
+	if (Effect)
+	{
+		Effect->SetFloatParameter(TEXT("Lifetime"), 5.f); 
+	}
 }
