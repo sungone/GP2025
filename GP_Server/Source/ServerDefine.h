@@ -13,7 +13,7 @@ enum EventType
 	MONSTER_UPDATE
 };
 
-std::wstring ConvertToWString(const std::string& str)
+static std::wstring ConvertToWString(const std::string& str)
 {
 	int size = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, nullptr, 0);
 	if (size <= 0) return L"";

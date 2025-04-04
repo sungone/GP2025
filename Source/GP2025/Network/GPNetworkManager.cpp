@@ -59,17 +59,23 @@ void UGPNetworkManager::SendPacket(uint8* Buf, int32 Size)
 	Socket->Send(Buf, Size, BytesSent);
 }
 
-void UGPNetworkManager::SendPlayerLoginPacket(const char* AccountID, const char* AccountPW)
+void UGPNetworkManager::SendPlayerLoginPacket(const FString& AccountID, const FString& AccountPW)
 {
-	LoginPacket Packet(AccountID, AccountPW);
+	FTCHARToUTF8 IDUtf8(*AccountID);
+	FTCHARToUTF8 PWUtf8(*AccountPW);
+	LoginPacket Packet(IDUtf8.Get(), PWUtf8.Get());
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
-//
-//void UGPNetworkManager::SendPlayerSignUpPacket(const char* AccountID, const char* AccountPW, const char* NickName)
-//{
-//	SignupPacket Packet(AccountID, AccountPW, NickName);
-//	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
-//}
+
+void UGPNetworkManager::SendPlayerSignUpPacket(const FString& AccountID, const FString& AccountPW, const FString& NickName)
+{
+	FTCHARToUTF8 IDUtf8(*AccountID);
+	FTCHARToUTF8 PWUtf8(*AccountPW);
+	FTCHARToUTF8 NickUtf8(*NickName);
+	SignUpPacket Packet(IDUtf8.Get(), PWUtf8.Get(), NickUtf8.Get());
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
 
 void UGPNetworkManager::SendPlayerLogoutPacket()
 {
