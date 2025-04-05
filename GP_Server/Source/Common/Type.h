@@ -28,10 +28,10 @@ enum EPacketType : uint8
 	S_MONSTER_STATUS_UPDATE,
 	S_DAMAGED_MONSTER,
 
-	S_ITEM_SPAWN,//¸ó½ºÅÍ Á×À¸¸é µÕµÕ ¶ß°Ô ½ºÆù
+	S_ITEM_SPAWN,
 	S_ITEM_DESPAWN,
-	S_ITEM_PICKUP,// Todo : ÁÝ´Â ¾Ö´Ï¸ÞÀÌ¼Ç?
-	S_ITEM_DROP,//¶¥¹Ù´Ú¿¡ ½ºÆù
+	S_ITEM_PICKUP,
+	S_ITEM_DROP,
 
 	S_ADD_INVENTORY_ITEM,
 	S_USE_INVENTORY_ITEM,
