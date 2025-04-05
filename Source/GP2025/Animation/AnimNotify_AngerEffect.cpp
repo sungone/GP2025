@@ -26,6 +26,6 @@ void UAnimNotify_AngerEffect::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 
 	if (EffectComp)
 	{
-		EffectComp->SetFloatParameter(TEXT("Duration"), Duration);
+		EffectComp->SetFloatParameter(TEXT("Lifetime"), Duration);
 	}
 }

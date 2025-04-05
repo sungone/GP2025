@@ -19,10 +19,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	class UNiagaraSystem* AngerEffect;
 
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	float Duration = 10.f;
-
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	FName SocketName = FName("WeaponSocket");

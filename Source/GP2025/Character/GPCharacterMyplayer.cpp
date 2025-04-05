@@ -396,7 +396,7 @@ void AGPCharacterMyplayer::SetCharacterData(const UGPCharacterControlData* Chara
 	{
 		ThrowingMontage = CharacterControlData->QSkillAnimMontage;
 		FThrowingMontage = CharacterControlData->ESkillAnimMontage;
-		AngerMontage = CharacterControlData->ESkillAnimMontage;
+		AngerMontage = CharacterControlData->RSkillAnimMontage;
 	}
 	else
 	{
