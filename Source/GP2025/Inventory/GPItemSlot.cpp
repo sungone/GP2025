@@ -6,6 +6,7 @@
 #include "Inventory/GPInventory.h"
 #include "Network/GPNetworkManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/TextBlock.h"
 
 void UGPItemSlot::NativeConstruct()
 {
@@ -107,5 +108,13 @@ void UGPItemSlot::InitializeInventoryWidget()
     else
     {
         UE_LOG(LogTemp, Error, TEXT("Failed to Get GPCharacterMyPlayer in GPItemSlot"));
+    }
+}
+
+void UGPItemSlot::UpdateQuantityText()
+{
+    if (QuantityText)
+    {
+        QuantityText->SetText(FText::AsNumber(SlotData.Quantity));
     }
 }

@@ -44,4 +44,10 @@ public:
     UGPInventory* InventoryWidget;
 
     void InitializeInventoryWidget();
+
+
+    UPROPERTY(meta = (BindWidget), BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+    class UTextBlock* QuantityText;
+
+    void UpdateQuantityText();
 };

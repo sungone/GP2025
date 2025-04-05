@@ -146,7 +146,7 @@ void UGPInventory::UseItemFromInventory(uint32 ItemID)
                     if (Slot->SlotData.Quantity > 1)
                     {
                         Slot->SlotData.Quantity--;
-                        Slot->CurrentItem = Slot->GetItemData();  
+                        Slot->UpdateQuantityText();
                         UE_LOG(LogTemp, Warning, TEXT("Item [%d] Quantity decreased to %d"), ItemID, Slot->SlotData.Quantity);
                     }
                     else
