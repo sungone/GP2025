@@ -13,6 +13,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogGPCharacter, Log, All);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHpChanged, float, NewHpRatio);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnExpChanged, float, NewExpRatio);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelChanged, int32, NewLevel);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGoldChanged, int32, NewGold);
 
 
 UCLASS()
@@ -109,4 +110,9 @@ public :
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
 	TObjectPtr<UAnimMontage> AngerMontage;
+
+// Gold Setting
+public:
+	UPROPERTY(BlueprintAssignable, Category = "Event")
+	FOnGoldChanged OnGoldChanged;
 };

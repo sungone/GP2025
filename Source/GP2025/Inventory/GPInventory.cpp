@@ -6,6 +6,8 @@
 #include "Components/WidgetSwitcher.h"
 #include "Inventory/SlotStruct.h"
 #include "Components/TextBlock.h"
+#include "Kismet/GameplayStatics.h"
+#include "Character/GPCharacterMyplayer.h"
 #include "Engine/DataTable.h"
 
 
@@ -13,6 +15,13 @@
 void UGPInventory::NativeConstruct()
 {
     Super::NativeConstruct();
+
+    auto MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+    if (MyPlayer)
+    {
+        MyPlayer->OnGoldChanged.AddDynamic(this, &UGPInventory::SetGold);
+        SetGold(MyPlayer->CharacterInfo.Gold);
+    }
 }
 
 void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Quantity)

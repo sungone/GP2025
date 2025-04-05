@@ -56,8 +56,8 @@ public :
 	UFUNCTION(BlueprintCallable, Category = "Item")
 	void EquipItemOnCharacter(struct FGPItemStruct& ItemData);
 
-// Inventory Widget Reference
-public :
+	// Inventory Widget Reference
+public:
 	UPROPERTY()
 	UUserWidget* InventoryWidget;
 

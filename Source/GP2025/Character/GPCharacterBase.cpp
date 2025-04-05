@@ -160,6 +160,11 @@ void AGPCharacterBase::SetCharacterInfo(FInfoData& CharacterInfo_)
 	OnHpChanged.Broadcast(CharacterInfo.Stats.Hp / CharacterInfo.Stats.MaxHp);
 	OnExpChanged.Broadcast(CharacterInfo.Stats.Exp / CharacterInfo.Stats.MaxExp);
 	OnLevelChanged.Broadcast(CharacterInfo.Stats.Level);
+
+	if (CharacterInfo.Gold != CharacterInfo_.Gold)
+	{
+		OnGoldChanged.Broadcast(CharacterInfo.Gold);
+	}
 }
 
 USkeletalMeshComponent* AGPCharacterBase::GetCharacterMesh() const

@@ -52,10 +52,10 @@ void PlayerSession::DoSend(const Packet* packet)
 	case S_ITEM_DROP:
 		LOG(LogType::SendLog, std::format("ItemDrop PKT to [{}]", _id));
 		break;
-	case S_ADD_IVENTORY_ITEM:
+	case S_ADD_INVENTORY_ITEM:
 		LOG(LogType::SendLog, std::format("AddInventory PKT to [{}]", _id));
 		break;
-	case S_REMOVE_IVENTORY_ITEM:
+	case S_USE_INVENTORY_ITEM:
 		LOG(LogType::SendLog, std::format("RemoveInventory PKT to [{}]", _id));
 		break;
 	case S_EQUIP_ITEM:
