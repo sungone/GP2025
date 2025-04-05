@@ -262,7 +262,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_USE_INVENTORY_ITEM:
 			{
 				ItemPkt::ItemUsedPacket* Pkt = reinterpret_cast<ItemPkt::ItemUsedPacket*>(RemainingData.GetData());
-				ObjectMgr->RemoveInventoryItem(Pkt->ItemID);
+				ObjectMgr->UseInventoryItem(Pkt->ItemID);
 				ObjectMgr->UpdatePlayer(Pkt->PlayerInfo);
 				break;
 			}

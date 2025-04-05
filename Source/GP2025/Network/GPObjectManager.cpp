@@ -240,14 +240,14 @@ void UGPObjectManager::AddInventoryItem(uint32 ItemID, uint8 ItemType)
 		Inventory->AddItemToInventory(ItemID , ItemType, 1);
 }
 
-void UGPObjectManager::RemoveInventoryItem(uint32 ItemID)
+void UGPObjectManager::UseInventoryItem(uint32 ItemID)
 {
 	if (!MyPlayer)
 		return;
 
 	UGPInventory* Inventory = MyPlayer->GetInventoryWidget();
 	if (Inventory)
-		Inventory->RemoveItemFromInventory(ItemID);
+		Inventory->UseItemFromInventory(ItemID);
 }
 
 void UGPObjectManager::EquipItem(int32 PlayerID, uint8 ItemType)

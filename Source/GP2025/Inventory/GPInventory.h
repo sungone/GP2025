@@ -22,7 +22,7 @@ public :
 	virtual void NativeConstruct() override;
 
 	void AddItemToInventory(uint32 ItemID , uint8 ItemType , uint32 Quantity);
-	void RemoveItemFromInventory(uint32 ItemID);
+	void UseItemFromInventory(uint32 ItemID);
 
 	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "UI")
 	class UWidgetSwitcher* TabWidgetSwitcher;
