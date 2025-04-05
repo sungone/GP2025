@@ -71,6 +71,7 @@ struct FInfoData
 	float GetCrtValue() const { return Stats.CrtValue; }
 	float GetDodge() const { return Stats.Dodge; }
 	float GetSpeed() const { return Stats.Speed; }
+	const char* GetName() const { return NickName; }
 
 #ifdef SERVER_BUILD
 	void SetHp(float NewHp) { Stats.Hp = std::clamp(NewHp, 0.0f, Stats.MaxHp); }
@@ -101,6 +102,11 @@ struct FInfoData
 		float ForwardX = std::cos(RadianYaw);
 		float ForwardY = std::sin(RadianYaw);
 		return FVector(ForwardX, ForwardY, 0.0f).Normalize();
+	}
+	void SetName(const char* InNick)
+	{
+		strncpy_s(NickName, InNick, NICKNAME_LEN - 1);
+		NickName[NICKNAME_LEN - 1] = '\0';
 	}
 #endif
 };

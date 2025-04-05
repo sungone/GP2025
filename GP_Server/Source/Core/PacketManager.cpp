@@ -60,12 +60,19 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 	{
 		LOG(LogType::Log, std::format("SignUp Success! userId: {}", res.dbId));
 		_sessionMgr.HandleLogin(sessionId);
+		auto& playerInfo = _gameWorld.GetInfo(sessionId);
+		playerInfo.SetName(pkt->NickName);
+		SignUpSuccessPacket spkt(playerInfo);
+		_sessionMgr.SendPacket(sessionId, &spkt);
+		return;
 	}
 	else if (res.code == DBResultCode::DUPLICATE_ID)
 		LOG(LogType::Log, "SignUp Failed! Duplicate ID");
 	else
 		LOG(LogType::Log, "SignUp Failed!");
-	// Todo: Send sign up failed packet
+
+	SignUpFailPacket failpkt(res.code);
+	_sessionMgr.SendPacket(sessionId, &failpkt);
 #endif
 }
 
@@ -77,9 +84,12 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 
 	if (res.code == DBResultCode::SUCCESS)
 	{
-		LOG(LogType::Log, std::format("Login Success! userId: {}, nickname: {}",
-			res.dbId, res.nickname));
+		LOG(LogType::Log, std::format("Login Success! userId: {}, nickname: {}", res.dbId, res.nickname));
 		_sessionMgr.HandleLogin(sessionId);
+		auto& playerInfo = _gameWorld.GetInfo(sessionId);
+		playerInfo.SetName(res.nickname.c_str());
+		LoginSuccessPacket loginpkt(playerInfo);
+		_sessionMgr.SendPacket(sessionId, &loginpkt);
 		return;
 	}
 	else if (res.code == DBResultCode::INVALID_USER)
@@ -89,7 +99,8 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 	else
 		LOG(LogType::Log, "Login Failed! DB Error");
 
-	// Todo: Send login failed packet
+	LoginFailPacket failpkt(res.code);
+	_sessionMgr.SendPacket(sessionId, &failpkt);
 #else
 	LOG(std::format("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW));
 	_sessionMgr.HandleLogin(sessionId);

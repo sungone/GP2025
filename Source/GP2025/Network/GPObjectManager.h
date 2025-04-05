@@ -22,6 +22,7 @@ public:
 	void SetMyPlayer(AGPCharacterPlayer* InMyPlayer);
 
 	void Login(FInfoData& PlayerInfo);
+	void PrintFailMessege(DBResultCode ResultCode);
 	void AddPlayer(FInfoData& PlayerInfo);
 	void RemovePlayer(int32 PlayerID);
 	void UpdatePlayer(FInfoData& PlayerInfo);

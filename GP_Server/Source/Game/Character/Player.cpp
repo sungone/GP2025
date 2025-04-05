@@ -11,7 +11,7 @@ void Player::Init()
 	FVector newPos{};
 	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
 	_info.SetLocation(newPos);
-	_info.Stats.Level = 1;
+	_info.Stats.Level = 10;
 	_info.Stats.Speed = 200.f;
 	_info.CollisionRadius = 50.f;
 

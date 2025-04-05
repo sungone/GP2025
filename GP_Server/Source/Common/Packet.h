@@ -78,14 +78,10 @@ struct SignUpPacket : public Packet
 
 struct LoginSuccessPacket : public Packet
 {
-	char NickName[NICKNAME_LEN];
 	FInfoData PlayerInfo;
-	LoginSuccessPacket(const char* NickName_, const FInfoData& PlayerInfo_)
+	LoginSuccessPacket(const FInfoData& PlayerInfo_)
 		: Packet(EPacketType::S_LOGIN_SUCCESS), PlayerInfo(PlayerInfo_)
 	{
-		strncpy_s(NickName, NickName_, NICKNAME_LEN - 1);
-		NickName[NICKNAME_LEN - 1] = '\0';
-
 		Header.PacketSize = sizeof(LoginSuccessPacket);
 	}
 };
@@ -102,14 +98,10 @@ struct LoginFailPacket : public Packet
 
 struct SignUpSuccessPacket : public Packet
 {
-	char NickName[NICKNAME_LEN];
 	FInfoData PlayerInfo;
-	SignUpSuccessPacket(const char* NickName_, const FInfoData& PlayerInfo_)
+	SignUpSuccessPacket(const FInfoData& PlayerInfo_)
 		: Packet(EPacketType::S_SIGNUP_SUCCESS), PlayerInfo(PlayerInfo_)
 	{
-		strncpy_s(NickName, NickName_, NICKNAME_LEN - 1);
-		NickName[NICKNAME_LEN - 1] = '\0';
-
 		Header.PacketSize = sizeof(SignUpSuccessPacket);
 	}
 };

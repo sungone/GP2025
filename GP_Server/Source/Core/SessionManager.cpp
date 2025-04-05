@@ -39,8 +39,6 @@ void SessionManager::HandleLogin(int32 id)
 	auto session = _sessions[id];
 	session->Login();
 	auto& playerInfo = _sessions[id]->GetPlayerInfo();
-	auto loginPkt = InfoPacket(EPacketType::S_LOGIN_SUCCESS, playerInfo);
-	session->DoSend(&loginPkt);
 
 	std::shared_ptr<Character> newPlayer = GameWorld::GetInst().GetCharacterByID(id);
 	if (newPlayer)

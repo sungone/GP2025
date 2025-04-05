@@ -172,21 +172,19 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_LOGIN_FAIL:
 			{
 				LoginFailPacket* Pkt = reinterpret_cast<LoginFailPacket*>(RemainingData.GetData());
-				//Todo:
-				//ObjectMgr->PrintFailMessege(Pkt->ResultCode);
+				ObjectMgr->PrintFailMessege(Pkt->ResultCode);
 				break;
 			}
 			case EPacketType::S_SIGNUP_SUCCESS:
 			{
 				SignUpSuccessPacket* Pkt = reinterpret_cast<SignUpSuccessPacket*>(RemainingData.GetData());
-				ObjectMgr->Login(Pkt->Data);
+				ObjectMgr->Login(Pkt->PlayerInfo);
 				break;
 			}
 			case EPacketType::S_SIGNUP_FAIL:
 			{
 				SignUpFailPacket* Pkt = reinterpret_cast<SignUpFailPacket*>(RemainingData.GetData());
-				//Todo:
-				//ObjectMgr->PrintFailMessege(Pkt->ResultCode);
+				ObjectMgr->PrintFailMessege(Pkt->ResultCode);
 				break;
 			}
 			case EPacketType::S_ADD_PLAYER:

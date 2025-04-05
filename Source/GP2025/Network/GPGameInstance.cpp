@@ -8,8 +8,8 @@ void UGPGameInstance::Init()
 	Super::Init();
 	NetworkMgr = GetSubsystem<UGPNetworkManager>();
 	NetworkMgr->ConnectToServer();
-	NetworkMgr->SendPlayerLoginPacket("qwer", "1234");
-	//NetworkMgr->SendPlayerSignUpPacket(TEXT("qwer"), TEXT("1234"), TEXT("가나다"));
+	//NetworkMgr->SendPlayerLoginPacket("qwer", "1234");
+	NetworkMgr->SendPlayerSignUpPacket(TEXT("asdf"), TEXT("1234"), TEXT("가나다"));
 }
 
 void UGPGameInstance::Shutdown()

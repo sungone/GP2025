@@ -33,6 +33,8 @@ void UGPObjectManager::Login(FInfoData& PlayerInfo)
 		UE_LOG(LogTemp, Error, TEXT("Invaild World"));
 		FGenericPlatformMisc::RequestExit(false);
 	}
+	//Todo: UI로 머리 위에 출력하자. TCHAR로 변환하면 됨
+	FString NickName = FString(UTF8_TO_TCHAR(PlayerInfo.GetName()));
 
 	FVector SpawnLocation(PlayerInfo.Pos);
 	FRotator SpawnRotation(0, PlayerInfo.Yaw, 0);
@@ -52,6 +54,29 @@ void UGPObjectManager::Login(FInfoData& PlayerInfo)
 	Players.Add(PlayerInfo.ID, Player);
 }
 
+void UGPObjectManager::PrintFailMessege(DBResultCode ResultCode)
+{
+	//Todo: UI로 출력하고, 다시 로그인 or 회원가입
+
+	switch (ResultCode)
+	{
+	case DBResultCode::SUCCESS:
+		break;
+	case DBResultCode::INVALID_USER:
+		UE_LOG(LogTemp, Error, TEXT("Account Not Found"));
+		break;
+	case DBResultCode::INVALID_PASSWORD:
+		UE_LOG(LogTemp, Error, TEXT("Password Mismatch"));
+		break;
+	case DBResultCode::DUPLICATE_ID:
+		UE_LOG(LogTemp, Error, TEXT("Duplicate ID"));
+		break;
+	default:
+		UE_LOG(LogTemp, Error, TEXT("Unknown"));
+		break;
+	}
+}
+
 void UGPObjectManager::AddPlayer(FInfoData& PlayerInfo)
 {
 	if (World == nullptr)
@@ -61,7 +86,7 @@ void UGPObjectManager::AddPlayer(FInfoData& PlayerInfo)
 	FRotator SpawnRotation(0, PlayerInfo.Yaw, 0);
 
 	AGPCharacterPlayer* Player = World->SpawnActor<AGPCharacterPlayer>(OtherPlayerClass, SpawnLocation, SpawnRotation);
-	
+
 	if (Player == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed Add other player [%d] (%f,%f,%f)(%f)"),
@@ -176,7 +201,7 @@ void UGPObjectManager::DamagedMonster(FInfoData& MonsterInfo, float Damage)
 		UE_LOG(LogTemp, Warning, TEXT("Damaged monster [%d]"), MonsterInfo.ID);
 	}
 }
- 
+
 void UGPObjectManager::ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos)
 {
 	UE_LOG(LogTemp, Warning, TEXT("ItemSpawn [%d]"), ItemID);
@@ -237,7 +262,7 @@ void UGPObjectManager::AddInventoryItem(uint32 ItemID, uint8 ItemType)
 
 	UGPInventory* Inventory = MyPlayer->GetInventoryWidget();
 	if (Inventory)
-		Inventory->AddItemToInventory(ItemID , ItemType, 1);
+		Inventory->AddItemToInventory(ItemID, ItemType, 1);
 }
 
 void UGPObjectManager::UseInventoryItem(uint32 ItemID)
