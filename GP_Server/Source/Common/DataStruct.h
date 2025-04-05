@@ -1,6 +1,15 @@
 #pragma once
 #include "Common.h"
 
+enum class DBResultCode : int32
+{
+	SUCCESS = 0,
+	INVALID_USER = -1,
+	INVALID_PASSWORD = -2,
+	DUPLICATE_ID = -3,
+	DB_ERROR = -99
+};
+
 #pragma pack(push,1)
 struct FStatData
 {

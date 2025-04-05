@@ -253,16 +253,17 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->DropItem(Pkt->ItemID, Pkt->ItemType, Pkt->Pos);
 				break;
 			}
-			case EPacketType::S_ADD_IVENTORY_ITEM:
+			case EPacketType::S_ADD_INVENTORY_ITEM:
 			{
 				ItemPkt::AddInventoryPacket* Pkt = reinterpret_cast<ItemPkt::AddInventoryPacket*>(RemainingData.GetData());
 				ObjectMgr->AddInventoryItem(Pkt->ItemID, Pkt->ItemType);
 				break;
 			}
-			case EPacketType::S_REMOVE_IVENTORY_ITEM:
+			case EPacketType::S_USE_INVENTORY_ITEM:
 			{
-				ItemPkt::RemoveInventoryPacket* Pkt = reinterpret_cast<ItemPkt::RemoveInventoryPacket*>(RemainingData.GetData());
+				ItemPkt::ItemUsedPacket* Pkt = reinterpret_cast<ItemPkt::ItemUsedPacket*>(RemainingData.GetData());
 				ObjectMgr->RemoveInventoryItem(Pkt->ItemID);
+				ObjectMgr->UpdatePlayer(Pkt->PlayerInfo);
 				break;
 			}
 			case EPacketType::S_EQUIP_ITEM:

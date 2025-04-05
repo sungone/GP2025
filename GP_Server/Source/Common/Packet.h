@@ -79,10 +79,59 @@ struct SignUpPacket : public Packet
 struct LoginSuccessPacket : public Packet
 {
 	char NickName[NICKNAME_LEN];
-	LoginSuccessPacket(const char* NickNamePW_)
-		: Packet(EPacketType::S_LOGIN_SUCCESS)
+	FInfoData PlayerInfo;
+	LoginSuccessPacket(const char* NickName_, const FInfoData& PlayerInfo_)
+		: Packet(EPacketType::S_LOGIN_SUCCESS), PlayerInfo(PlayerInfo_)
 	{
-		strncpy_s(NickName, NickNamePW_, NICKNAME_LEN - 1);
+		strncpy_s(NickName, NickName_, NICKNAME_LEN - 1);
+		NickName[NICKNAME_LEN - 1] = '\0';
+
+		Header.PacketSize = sizeof(LoginSuccessPacket);
+	}
+};
+
+struct LoginFailPacket : public Packet
+{
+	DBResultCode ResultCode;
+	LoginFailPacket(const DBResultCode ResultCode_)
+		: Packet(EPacketType::S_LOGIN_FAIL), ResultCode(ResultCode_)
+	{
+		Header.PacketSize = sizeof(LoginFailPacket);
+	}
+};
+
+struct SignUpSuccessPacket : public Packet
+{
+	char NickName[NICKNAME_LEN];
+	FInfoData PlayerInfo;
+	SignUpSuccessPacket(const char* NickName_, const FInfoData& PlayerInfo_)
+		: Packet(EPacketType::S_SIGNUP_SUCCESS), PlayerInfo(PlayerInfo_)
+	{
+		strncpy_s(NickName, NickName_, NICKNAME_LEN - 1);
+		NickName[NICKNAME_LEN - 1] = '\0';
+
+		Header.PacketSize = sizeof(SignUpSuccessPacket);
+	}
+};
+
+struct SignUpFailPacket : public Packet
+{
+	DBResultCode ResultCode;
+	SignUpFailPacket(const DBResultCode ResultCode_)
+		: Packet(EPacketType::S_SIGNUP_FAIL), ResultCode(ResultCode_)
+	{
+		Header.PacketSize = sizeof(SignUpFailPacket);
+	}
+};
+
+struct AddPlayerPacket : public Packet
+{
+	char NickName[NICKNAME_LEN];
+	FInfoData PlayerInfo;
+	AddPlayerPacket(const char* NickName_, const FInfoData& PlayerInfo_)
+		: Packet(EPacketType::S_LOGIN_SUCCESS), PlayerInfo(PlayerInfo_)
+	{
+		strncpy_s(NickName, NickName_, NICKNAME_LEN - 1);
 		NickName[NICKNAME_LEN - 1] = '\0';
 
 		Header.PacketSize = sizeof(LoginSuccessPacket);
@@ -174,20 +223,21 @@ namespace ItemPkt
 		uint8 ItemType;
 
 		AddInventoryPacket(uint32 itemId, uint8 type)
-			: Packet(EPacketType::S_ADD_IVENTORY_ITEM), ItemID(itemId), ItemType(type)
+			: Packet(EPacketType::S_ADD_INVENTORY_ITEM), ItemID(itemId), ItemType(type)
 		{
 			Header.PacketSize = sizeof(AddInventoryPacket);
 		}
 	};
 
-	struct RemoveInventoryPacket : public Packet
+	struct ItemUsedPacket : public Packet
 	{
 		uint32 ItemID;
+		FInfoData PlayerInfo;
 
-		RemoveInventoryPacket(uint32 itemId)
-			: Packet(EPacketType::S_REMOVE_IVENTORY_ITEM), ItemID(itemId)
+		ItemUsedPacket(uint32 itemId, const FInfoData& PlayerInfo_)
+			: Packet(EPacketType::S_USE_INVENTORY_ITEM), ItemID(itemId), PlayerInfo(PlayerInfo_)
 		{
-			Header.PacketSize = sizeof(RemoveInventoryPacket);
+			Header.PacketSize = sizeof(ItemUsedPacket);
 		}
 	};
 

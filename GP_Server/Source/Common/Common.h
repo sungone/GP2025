@@ -16,15 +16,6 @@ constexpr uint32 BUFSIZE = 1024;
 constexpr int LOGIN_STR_LEN = 20 + 1;
 constexpr int NICKNAME_LEN = 10 + 1;
 
-enum class DBResultCode : int32
-{
-	SUCCESS = 0,
-	INVALID_USER = -1,
-	INVALID_PASSWORD = -2,
-	DUPLICATE_ID = -3,
-	DB_ERROR = -99
-};
-
 #include "Type.h"
 #include "DataStruct.h"
 #include "Packet.h"
