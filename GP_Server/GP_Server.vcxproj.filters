@@ -239,10 +239,10 @@
     <None Include="Source\Game\Map\MapJsonData\PlaygroundNavData.json">
       <Filter>Source Files\Game\GameObjects\Map</Filter>
     </None>
-    <None Include="Bat\backup_mysql.bat">
+    <None Include="Tools\backup_mysql.bat">
       <Filter>Source Files\DB\BatchFile</Filter>
     </None>
-    <None Include="Bat\restore_mysql.bat">
+    <None Include="Tools\restore_mysql.bat">
       <Filter>Source Files\DB\BatchFile</Filter>
     </None>
   </ItemGroup>
