@@ -242,8 +242,12 @@ void UGPObjectManager::AddInventoryItem(uint32 ItemID, uint8 ItemType)
 
 void UGPObjectManager::RemoveInventoryItem(uint32 ItemID)
 {
-	//Todo: myplayer인벤토리 업데이트
+	if (!MyPlayer)
+		return;
 
+	UGPInventory* Inventory = MyPlayer->GetInventoryWidget();
+	if (Inventory)
+		Inventory->RemoveItemFromInventory(ItemID);
 }
 
 void UGPObjectManager::EquipItem(int32 PlayerID, uint8 ItemType)

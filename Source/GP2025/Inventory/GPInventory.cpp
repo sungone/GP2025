@@ -124,46 +124,49 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
     UE_LOG(LogTemp, Warning, TEXT("Item Successfully Added to Inventory - %s"), *ItemData->ItemName.ToString());
 }
 
-void UGPInventory::RemoveItemFromInventory(uint8 ItemType)
+void UGPInventory::RemoveItemFromInventory(uint32 ItemID)
 {
-    TArray<UGPItemSlot*>* TargetArray = nullptr;
-
-    switch (static_cast<ECategory>(ItemType))
-    {
-    case ECategory::sword:
-    case ECategory::bow:
-        TargetArray = &WeaponSlots;
-        break;
-
-    case ECategory::helmet:
-    case ECategory::chest:
-        TargetArray = &ArmorSlots;
-        break;
-
-    case ECategory::consumable:
-    case ECategory::Gold:
-    case ECategory::Quest:
-        TargetArray = &EatableSlots;
-        break;
-
-    default:
-        UE_LOG(LogTemp, Error, TEXT("Unknown ItemType - Cannot Remove Item"));
-        return;
-    }
-
-    for (int32 i = 0; i < TargetArray->Num(); ++i)
-    {
-        if ((*TargetArray)[i]->SlotData.ItemID.RowName == FName(*FString::FromInt(ItemType)))
+    auto HandleRemoveLogic = [ItemID](TArray<UGPItemSlot*>& SlotArray, UWrapBox* WrapBox) -> bool
         {
-            (*TargetArray)[i]->RemoveFromParent();
-            TargetArray->RemoveAt(i);
+            for (int32 i = 0; i < SlotArray.Num(); ++i)
+            {
+                UGPItemSlot* Slot = SlotArray[i];
 
-            UE_LOG(LogTemp, Warning, TEXT("Item Successfully Removed from Inventory"));
-            return;
-        }
-    }
+                if (Slot->SlotData.ItemUniqueID == ItemID)
+                {
+                    if (Slot->SlotData.Quantity > 1)
+                    {
+                        // 수량만 줄이기
+                        Slot->SlotData.Quantity--;
+                        Slot->CurrentItem = Slot->GetItemData();  // 데이터 갱신 (필요 시)
+                        UE_LOG(LogTemp, Warning, TEXT("Item [%d] Quantity decreased to %d"), ItemID, Slot->SlotData.Quantity);
+                    }
+                    else
+                    {
+                        // 슬롯 제거
+                        if (WrapBox)
+                        {
+                            WrapBox->RemoveChild(Slot);
+                        }
 
-    UE_LOG(LogTemp, Warning, TEXT("Item Not Found in Inventory for ItemType: %d"), ItemType);
+                        Slot->RemoveFromParent();
+                        SlotArray.RemoveAt(i);
+
+                        UE_LOG(LogTemp, Warning, TEXT("Item [%d] completely removed from inventory"), ItemID);
+                    }
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+    // 카테고리별로 탐색
+    if (HandleRemoveLogic(WeaponSlots, WeaponsWrapBox)) return;
+    if (HandleRemoveLogic(ArmorSlots, ArmorsWrapBox)) return;
+    if (HandleRemoveLogic(EatableSlots, EatablesWrapBox)) return;
+
+    UE_LOG(LogTemp, Warning, TEXT("RemoveItemFromInventory: Item [%d] not found in inventory"), ItemID);
 }
 
 void UGPInventory::SetGold(int32 Amount)
