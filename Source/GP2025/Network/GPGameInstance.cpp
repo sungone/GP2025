@@ -8,8 +8,8 @@ void UGPGameInstance::Init()
 	Super::Init();
 	NetworkMgr = GetSubsystem<UGPNetworkManager>();
 	NetworkMgr->ConnectToServer();
-	//NetworkMgr->SendPlayerLoginPacket("qwer", "1234");
-	NetworkMgr->SendPlayerSignUpPacket("qwer", "1234", L"hf¤·j");
+	NetworkMgr->SendPlayerLoginPacket("qwer", "1234");
+	//NetworkMgr->SendPlayerSignUpPacket(TEXT("qwer"), TEXT("1234"), TEXT("ê°€ë‚˜ë‹¤"));
 }
 
 void UGPGameInstance::Shutdown()
@@ -23,13 +23,13 @@ void UGPGameInstance::ProcessPacket()
 	NetworkMgr->ProcessPacket();
 }
 
-//AABB¹Ú½º ÃßÃâ -> TUK level BP¿¡¼­ È£ÃâÇÏ°í ÀÖÀ½
+//AABBë°•ìŠ¤ ì¶”ì¶œ -> TUK level BPì—ì„œ í˜¸ì¶œí•˜ê³  ìˆìŒ
 void UGPGameInstance::SaveBoundingBoxData(ULevel* Level)
 {
 	ExportLevelBoundingBoxData(Level, TEXT("GP_Server/BoundingBoxData.json"));
 }
 
-//NavMesh ÃßÃâ
+//NavMesh ì¶”ì¶œ
 void UGPGameInstance::SaveNavData(bool IsSave)
 {
 	if (IsSave)

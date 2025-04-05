@@ -1,12 +1,13 @@
 #include "pch.h"
 #include "DBManager.h"
 
-bool DBManager::Connect(const std::string& host, int port,
-	const std::string& user, const std::string& pass, const std::string& schemaName)
+bool DBManager::Connect(const std::string& host, const std::string& user, const std::string& pwd, const  std::string& db)
 {
 	try {
-		_dbsess = std::make_shared<mysqlx::Session>(host, port, user, pass);
-		_db = std::make_shared<mysqlx::Schema>(_dbsess->getSchema(schemaName));
+		_dbsess = std::make_shared<mysqlx::Session>(mysqlx::SessionSettings(host, user, pwd, db));
+		_db = std::make_shared<mysqlx::Schema>(_dbsess->getSchema(db));
+		LOG("DB Connected!");
+		DBManager::PrintUsersTable();
 		return true;
 	}
 	catch (const mysqlx::Error& e)

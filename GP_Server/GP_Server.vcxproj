@@ -43,14 +43,14 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>NotSet</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>NotSet</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -106,7 +106,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;SERVER_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;SERVER_BUILD;DB_LOCAL%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Include;$(SolutionDir)Include\mysqlx\include;$(SolutionDir)Source;$(SolutionDir)Source\Common;$(SolutionDir)Source\Core\IOCP;$(SolutionDir)Source\Core;$(SolutionDir)Source\Game;$(SolutionDir)Source\Game\Character;$(SolutionDir)Source\Game\Map;$(SolutionDir)Source\Game\Item;$(SolutionDir)Source\Game\DataTable;$(SolutionDir)Source\DB;$(SolutionDir)Source\AI;$(SolutionDir)Source\Utils</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>

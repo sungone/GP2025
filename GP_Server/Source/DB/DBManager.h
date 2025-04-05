@@ -20,8 +20,7 @@ public:
 		static DBManager inst;
 		return inst;
 	}
-	bool Connect(const std::string& host, int port,
-		const std::string& user, const std::string& pass, const std::string& schema);
+	bool Connect(const std::string& host, const std::string& user, const std::string& pass, const std::string& schema);
 	void Close();
 	void PrintUsersTable();
 	DBSignUpResult SignUpUser(const std::string& login_id, const std::string& password, const std::wstring& nickname);
