@@ -14,7 +14,7 @@ bool DummyClientManager::Init()
 			_clients[i].DoRecv();
 			auto accountID = std::format("Test{}", i);
 			auto accountPW = std::format("1234");
-			auto pkt = LoginPacket(accountID.c_str(), accountPW.c_str(), false);
+			auto pkt = LoginPacket(accountID.c_str(), accountPW.c_str());
 			_clients[i].DoSend(&pkt);
 		}
 	}

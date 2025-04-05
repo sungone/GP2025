@@ -53,6 +53,9 @@
     <Filter Include="Source Files\Utils\IOCP">
       <UniqueIdentifier>{fae4c54b-3902-48a0-9f6b-e04620347384}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\DB\BatchFile">
+      <UniqueIdentifier>{ab37beed-ea21-490b-8126-5a07b3d984c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Utils\Logger.h">
@@ -235,6 +238,12 @@
     </None>
     <None Include="Source\Game\Map\MapJsonData\PlaygroundNavData.json">
       <Filter>Source Files\Game\GameObjects\Map</Filter>
+    </None>
+    <None Include="Bat\backup_mysql.bat">
+      <Filter>Source Files\DB\BatchFile</Filter>
+    </None>
+    <None Include="Bat\restore_mysql.bat">
+      <Filter>Source Files\DB\BatchFile</Filter>
     </None>
   </ItemGroup>
 </Project>
