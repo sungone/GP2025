@@ -33,5 +33,5 @@ protected:
 
 	// 발사 위치 오프셋
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
-	FVector MuzzleOffset = FVector(0.f, -30.f, 80.f);
+	FVector MuzzleOffset = FVector(0.f, 0.f, 0.f);
 };

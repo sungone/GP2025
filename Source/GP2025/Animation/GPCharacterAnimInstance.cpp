@@ -4,6 +4,7 @@
 #include "Animation/GPCharacterAnimInstance.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Character/GPCharacterMyplayer.h" 
 
 UGPCharacterAnimInstance::UGPCharacterAnimInstance()
 {
@@ -34,5 +35,14 @@ void UGPCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsIdle = GroundSpeed < MovingThreshould;
 		bIsFalling = Movement->IsFalling();
 		bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);
+	}
+
+	if (Owner)
+	{
+		AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(Owner);
+		if (MyPlayer)
+		{
+			bIsZooming = MyPlayer->IsZooming();
+		}
 	}
 }

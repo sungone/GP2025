@@ -175,4 +175,7 @@ public :
 	FVector ZoomedCameraOffset = FVector(50.f, 30.f, 100.f); 
 	float DefaultArmLength = 400.f;
 	float ZoomedArmLength = 150.f;
+
+	UFUNCTION(BlueprintCallable, Category = "Zoom")
+	bool IsZooming() const { return bWantsToZoom; }
 };

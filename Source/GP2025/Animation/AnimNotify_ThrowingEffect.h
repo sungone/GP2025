@@ -19,7 +19,7 @@ public:
 	TSubclassOf<AActor> ProjectileEffectClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
-	FVector MuzzleOffset = FVector(0.f, -30.f, 80.f);
+	FVector MuzzleOffset = FVector(0.f, 0.f, 0.f);
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 };
