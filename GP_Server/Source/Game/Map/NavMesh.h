@@ -60,8 +60,10 @@ public:
 	NavMesh() {}
 	NavMesh(const std::string& filePath)
 	{
-		if (LoadFromJson(filePath))
-			LOG("NavMesh loaded successfully!");
+		if (!LoadFromJson(filePath))
+		{
+			LOG(Error,"NavMesh");
+		}
 	}
 
 	void BuildPolygonGraph();

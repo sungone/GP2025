@@ -29,16 +29,14 @@ void DBManager::PrintUsersTable()
 	try {
 		auto users = GetUsersTable();
 		auto rows = users.select("id", "login_id", "nickname").execute();
-		std::cout << "\n============ User Table ============\n";
+		PRINT("============ User Table ============");
 		for (auto row : rows)
 		{
 			int uid = row[0].get<int>();
 			std::string loginId = row[1].get<std::string>();
 			std::string nickname = row[2].get<std::string>();
-
-			std::cout << std::format("UID: {:<4} LoginID: {:<12} - {}\n", uid, loginId, nickname);
+			PRINT(std::format("UID: {:<4} LoginID: {:<12} - {}\n", uid, loginId, nickname));
 		}
-		std::cout << '\n';
 	}
 	catch (const mysqlx::Error& e)
 	{

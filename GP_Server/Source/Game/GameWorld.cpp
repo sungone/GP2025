@@ -9,28 +9,24 @@ bool GameWorld::Init()
 		LOG(LogType::Warning, "LoadFromCSV");
 		return false;
 	}
-	LOG("ItemTable loaded successfully!");
 
 	if (!PlayerLevelTable::GetInst().LoadFromCSV("../DataTable/PlayerLevelTable.csv"))
 	{
 		LOG(LogType::Warning, "LoadFromCSV");
 		return false;
 	}
-	LOG("PlayerLevelTable loaded successfully!");
 
 	if (!PlayerSkillTable::GetInst().LoadFromCSV("../DataTable/PlayerSkillTable.csv"))
 	{
 		LOG(LogType::Warning, "LoadFromCSV");
 		return false;
 	}
-	LOG("PlayerSkillTable loaded successfully!");
 
 	if (!MonsterTable::GetInst().LoadFromCSV("../DataTable/MonsterTable.csv"))
 	{
 		LOG(LogType::Warning, "LoadFromCSV");
 		return false;
 	}
-	LOG("MonsterTable loaded successfully!");
 
 	CreateMonster();
 	return true;
@@ -69,7 +65,6 @@ void GameWorld::RemoveCharacter(int32 id)
 
 void GameWorld::CreateMonster()
 {
-	LOG("CreateMonster!");
 	for (int32 i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{
 		_characters[i] = std::make_shared<Monster>();
@@ -110,7 +105,6 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint64& time)
 		return;
 	}
 	player->GetInfo().SetLocationAndYaw(pos);
-	LOG(std::format("Player[{}] Move to {}", playerId, pos.ToString()));
 	auto pkt = MovePacket(playerId, time);
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
 	SessionManager::GetInst().BroadcastToViewList(&pkt, playerId);
@@ -161,7 +155,6 @@ void GameWorld::PlayerAttack(int32 playerId, float playerYaw)
 
 void GameWorld::UpdateMonster()
 {
-	LOG("");
 	std::unique_lock<std::mutex> lock(_carrMutex);
 	for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{

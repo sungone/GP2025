@@ -65,7 +65,7 @@ bool Server::Init()
 		return false;
 	}
 
-	LOG(LogType::Log, "Successfully initialized");
+	LOG(LogType::Log, "Successfully Init");
 	return true;
 }
 

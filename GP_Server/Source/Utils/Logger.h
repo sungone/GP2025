@@ -6,9 +6,22 @@
 #include <chrono>
 #include <iomanip>
 #include <sstream>
+#include <unordered_set>
 
 #define LOG(...) Logger::GetInst().LogMessage(__VA_ARGS__, __FUNCTION__)
 #define PRINT(message) Logger::GetInst().PrintNavMesh(message)
+
+#define ENABLE_CONSOLE_LOG       1
+#define ENABLE_CONSOLE_WARNING   1
+#define ENABLE_CONSOLE_ERROR     1
+#define ENABLE_CONSOLE_SEND_LOG  0
+#define ENABLE_CONSOLE_RECV_LOG  0
+
+#define ENABLE_FILE_LOG          1
+#define ENABLE_FILE_WARNING      1
+#define ENABLE_FILE_ERROR        1
+#define ENABLE_FILE_SEND_LOG     0
+#define ENABLE_FILE_RECV_LOG     0
 
 enum LogType
 {
@@ -28,11 +41,17 @@ public:
         return instance;
     }
 
-	void PrintNavMesh(const std::string& message)
-	{
-		std::lock_guard<std::mutex> lock(_logLock);
-		std::cout << message << '\n';
-	}
+    void EnableConsoleLog(LogType type) { _enabledConsoleLogs.insert(type); }
+    void DisableConsoleLog(LogType type) { _enabledConsoleLogs.erase(type); }
+
+    void EnableFileLog(LogType type) { _enabledFileLogs.insert(type); }
+    void DisableFileLog(LogType type) { _enabledFileLogs.erase(type); }
+
+    void PrintNavMesh(const std::string& message)
+    {
+        std::lock_guard<std::mutex> lock(_logLock);
+        PRINT(message);
+    }
 
     void LogMessage(const std::string& message, const char* functionName)
     {
@@ -45,14 +64,16 @@ public:
 
         std::string levelStr = LevelToString(type);
         std::string timeStr = GetCurrentTime();
+        std::string fullMessage = timeStr + " " + levelStr + "[" + functionName + "] " + message;
 
-        std::cout << timeStr << " " << levelStr
-            << "[" << functionName << "] "
-            << message << '\n';
-
-        if (_logFile.is_open())
+        if (_enabledConsoleLogs.count(type))
         {
-            _logFile << timeStr << " " << levelStr << message << '\n';
+            std::cout << fullMessage << '\n';
+        }
+
+        if (_enabledFileLogs.count(type) && _logFile.is_open())
+        {
+            _logFile << fullMessage << '\n';
         }
     }
 
@@ -72,7 +93,41 @@ public:
     }
 
 private:
-    Logger() = default;
+    Logger()
+    {
+#if ENABLE_CONSOLE_LOG
+        EnableConsoleLog(Log);
+#endif
+#if ENABLE_CONSOLE_WARNING
+        EnableConsoleLog(Warning);
+#endif
+#if ENABLE_CONSOLE_ERROR
+        EnableConsoleLog(Error);
+#endif
+#if ENABLE_CONSOLE_SEND_LOG
+        EnableConsoleLog(SendLog);
+#endif
+#if ENABLE_CONSOLE_RECV_LOG
+        EnableConsoleLog(RecvLog);
+#endif
+
+#if ENABLE_FILE_LOG
+        EnableFileLog(Log);
+#endif
+#if ENABLE_FILE_WARNING
+        EnableFileLog(Warning);
+#endif
+#if ENABLE_FILE_ERROR
+        EnableFileLog(Error);
+#endif
+#if ENABLE_FILE_SEND_LOG
+        EnableFileLog(SendLog);
+#endif
+#if ENABLE_FILE_RECV_LOG
+        EnableFileLog(RecvLog);
+#endif
+    }
+
     ~Logger()
     {
         CloseLogFile();
@@ -82,12 +137,12 @@ private:
     {
         switch (type)
         {
-        case LogType::Error: return "[Error] ";
-        case LogType::Warning: return "[Warning] ";
-        case LogType::Log: return "[Log] ";
-        case LogType::SendLog: return "[SendLog] >>>> ";
-        case LogType::RecvLog: return "[RecvLog] <<<< ";
-        default: return "[Unknown] ";
+        case LogType::Error:    return "[Error] ";
+        case LogType::Warning:  return "[Warning] ";
+        case LogType::Log:      return "[Log] ";
+        case LogType::SendLog:  return "[SendLog] >>>> ";
+        case LogType::RecvLog:  return "[RecvLog] <<<< ";
+        default:                return "[Unknown] ";
         }
     }
 
@@ -105,4 +160,7 @@ private:
 
     std::mutex _logLock;
     std::ofstream _logFile;
+
+    std::unordered_set<LogType> _enabledConsoleLogs;
+    std::unordered_set<LogType> _enabledFileLogs;
 };
