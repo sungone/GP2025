@@ -127,24 +127,13 @@ void GameWorld::PlayerAttack(int32 playerId, float playerYaw)
 
 		auto monster = _characters[monsterId];
 		if (!monster) continue;
-		if (player->IsInAttackRange(monster->GetInfo()))
+		if (!player->Attack(monster)) continue;
+		else
 		{
-			float atkDamage = player->GetAttackDamage();
-			if (atkDamage > 0.0f)
-			{
-				monster->OnDamaged(atkDamage);
-			}
-
-			auto pkt = MonsterDamagePacket(monster->GetInfo(), atkDamage);
-			SessionManager::GetInst().SendPacket(playerId, &pkt);
-			SessionManager::GetInst().BroadcastToViewList(&pkt, playerId);
-
-			if (monster->IsDead())
-			{
-				player->AddExp(10);
-				SpawnWorldItem({ monster->GetInfo().Pos.X, monster->GetInfo().Pos.Y, monster->GetInfo().Pos.Z + 20 });
-				RemoveCharacter(monsterId);
-			}
+			if (!monster->IsDead()) continue;
+			player->AddExp(10);
+			SpawnWorldItem({ monster->GetInfo().Pos.X, monster->GetInfo().Pos.Y, monster->GetInfo().Pos.Z + 20 });
+			RemoveCharacter(monsterId);
 		}
 	}
 

@@ -15,6 +15,8 @@ public:
 	bool TakeWorldItem(const std::shared_ptr<WorldItem> item);
 	WorldItem DropItem(uint32 itemId);
 
+	bool Attack(std::shared_ptr<Character> target);
+
 	void UseSkill(ESkillGroup groupId);
 	void ExecuteSkillEffect(const FSkillData& skill);
 	void LearnSkill(ESkillGroup groupId);

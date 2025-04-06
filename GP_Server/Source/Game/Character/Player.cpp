@@ -115,6 +115,23 @@ WorldItem Player::DropItem(uint32 itemId)
 	return dropedItem;
 }
 
+bool Player::Attack(std::shared_ptr<Character> monster)
+{
+	if (IsInAttackRange(monster->GetInfo()))
+		return false;
+
+	float atkDamage = GetAttackDamage();
+	if (atkDamage > 0.0f)
+	{
+		monster->OnDamaged(atkDamage);
+	}
+
+	auto pkt = MonsterDamagePacket(monster->GetInfo(), atkDamage);
+	SessionManager::GetInst().SendPacket(_id, &pkt);
+	SessionManager::GetInst().BroadcastToViewList(&pkt, _id);
+	return true;
+}
+
 void Player::UseSkill(ESkillGroup groupId)
 {
 	auto it = _skillLevels.find(groupId);
