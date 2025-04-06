@@ -1,4 +1,4 @@
-#include "Network/GPObjectManager.h"
+ï»¿#include "Network/GPObjectManager.h"
 #include "Character/GPCharacterPlayer.h"
 #include "Character/GPCharacterMonster.h"
 #include "Item/GPItemStruct.h"
@@ -33,7 +33,7 @@ void UGPObjectManager::OnLoginSuccess(FInfoData& PlayerInfo)
 		UE_LOG(LogTemp, Error, TEXT("Invaild World"));
 		FGenericPlatformMisc::RequestExit(false);
 	}
-	//Todo: UI·Î ¸Ó¸® À§¿¡ Ãâ·ÂÇÏÀÚ. TCHAR·Î º¯È¯ÇÏ¸é µÊ
+	//Todo: UIë¡œ ë¨¸ë¦¬ ìœ„ì— ì¶œë ¥í•˜ì. TCHARë¡œ ë³€í™˜í•˜ë©´ ë¨
 	FString NickName = FString(UTF8_TO_TCHAR(PlayerInfo.GetName()));
 
 	FVector SpawnLocation(PlayerInfo.Pos);
@@ -63,16 +63,16 @@ void UGPObjectManager::PrintFailMessege(DBResultCode ResultCode)
 	case DBResultCode::SUCCESS:
 		return;
 	case DBResultCode::INVALID_USER:
-		ErrorMessage = TEXT("Account Not Found");
+		ErrorMessage = TEXT("ê³„ì •ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤");
 		break;
 	case DBResultCode::INVALID_PASSWORD:
-		ErrorMessage = TEXT("Password Mismatch");
+		ErrorMessage = TEXT("ë¹„ë°€ë²ˆí˜¸ê°€ ì¼ì¹˜í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤");
 		break;
 	case DBResultCode::DUPLICATE_ID:
-		ErrorMessage = TEXT("Duplicate ID");
+		ErrorMessage = TEXT("ì´ë¯¸ ì¡´ì¬í•˜ëŠ” ì•„ì´ë””ì…ë‹ˆë‹¤");
 		break;
 	default:
-		ErrorMessage = TEXT("Unknown Error");
+		ErrorMessage = TEXT("ì•Œ ìˆ˜ ì—†ëŠ” ì˜¤ë¥˜ê°€ ë°œìƒí–ˆìŠµë‹ˆë‹¤");
 		break;
 	}
 
@@ -256,7 +256,7 @@ void UGPObjectManager::ItemDespawn(uint32 ItemID)
 
 void UGPObjectManager::DropItem(uint32 ItemID, uint8 ItemType, FVector Pos)
 {
-	//Todo : ItemSpawn()°ú ºñ½ÁÇÏÁö¸¸ µÕµÕ ¶ßÁö ¾Ê°í ¶¥¹Ù´Ú¿¡ ½ºÆùÇÏµµ·Ï 
+	//Todo : ItemSpawn()ê³¼ ë¹„ìŠ·í•˜ì§€ë§Œ ë‘¥ë‘¥ ëœ¨ì§€ ì•Šê³  ë•…ë°”ë‹¥ì— ìŠ¤í°í•˜ë„ë¡ 
 }
 
 void UGPObjectManager::AddInventoryItem(uint32 ItemID, uint8 ItemType)
@@ -317,5 +317,5 @@ void UGPObjectManager::EquipItem(int32 PlayerID, uint8 ItemType)
 
 void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType)
 {
-	//Todo: ´Ù¸¥ ÇÃ·¹ÀÌ¾î Âø¿ë ¾ÆÀÌÅÛ ¾÷µ¥ÀÌÆ®
+	//Todo: ë‹¤ë¥¸ í”Œë ˆì´ì–´ ì°©ìš© ì•„ì´í…œ ì—…ë°ì´íŠ¸
 }

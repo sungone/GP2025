@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "UI/GPLoginWidget.h"          
@@ -87,19 +87,25 @@ void UGPLoginWidget::TryLogin()
 	ID_Str = TBInputID->GetText().ToString();
 	PW_Str = TBInputPW->GetText().ToString();
 
-	if (ID_Str.IsEmpty() || PW_Str.IsEmpty())
+	if (ID_Str.IsEmpty())
 	{
-		ShowErrorMessage(TEXT("ID or Password is Empty!"), 3.0f);
+		FString Msg = TEXT("아이디를 입력해주세요");
+		ShowErrorMessage(Msg, 3.0f);
 		return;
 	}
-
+	else if (PW_Str.IsEmpty())
+	{
+		FString Msg = TEXT("비밀번호를 입력해주세요");
+		ShowErrorMessage(Msg, 3.0f);
+		return;
+	}
 	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
 	NetworkMgr->SendPlayerLoginPacket(TCHAR_TO_UTF8(*ID_Str), TCHAR_TO_UTF8(*PW_Str));
 }
 
 void UGPLoginWidget::TrySignUp()
 {
-	//Todo: ȸ������ UI 
+	//Todo: 회원가입 UI 
 }
 
 void UGPLoginWidget::ShowErrorMessage(const FString& Message, float Duration)
