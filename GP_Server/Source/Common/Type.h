@@ -142,6 +142,16 @@ enum class EItemCategory
 	Unknown
 };
 
+enum class ESkillGroup
+{
+	HitHard,
+	Clash,
+	Whirlwind,
+	Throwing,
+	FThrowing,
+	Anger,
+};
+
 enum ECharacterStateType : uint32
 {
 	STATE_NONE = 0, // 2^0

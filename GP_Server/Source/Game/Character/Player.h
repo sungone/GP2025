@@ -15,6 +15,11 @@ public:
 	bool TakeWorldItem(const std::shared_ptr<WorldItem> item);
 	WorldItem DropItem(uint32 itemId);
 
+	void UseSkill(ESkillGroup groupId);
+	void ExecuteSkillEffect(const FSkillData& skill);
+	void LearnSkill(ESkillGroup groupId);
+	void UpgradeSkill(ESkillGroup groupId);
+
 	void UseItem(uint32 itemId);
 	uint8 EquipItem(uint32 itemId);
 	uint8 UnequipItem(uint32 itemId);
@@ -50,4 +55,5 @@ private:
 	std::unordered_set<int32> _viewList;
 	FStatData& _stats = _info.Stats;
 	uint32& _gold = _info.Gold;
+	std::unordered_map<ESkillGroup, uint32> _skillLevels;
 };

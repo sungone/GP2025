@@ -35,7 +35,6 @@ bool PlayerSkillTable::LoadFromCSV(const std::string& filePath)
 
         _skillMap[skill.TypeId] = skill;
         _groupMap[skill.SkillGroup].push_back(skill);
-        _weaponMap[skill.WeaponType].push_back(skill);
     }
 
     return true;
@@ -49,25 +48,18 @@ const FSkillData* PlayerSkillTable::GetSkill(uint32 idx) const
     return nullptr;
 }
 
-
-const std::vector<FSkillData>& PlayerSkillTable::GetSkillGroup(uint32 groupId) const
+const FSkillData* PlayerSkillTable::GetSkill(uint32 groupId, uint32 skillLevel) const
 {
-    static std::vector<FSkillData> empty;
     auto it = _groupMap.find(groupId);
-    if (it != _groupMap.end())
-        return it->second;
-    return empty;
-}
+    if (it == _groupMap.end()) return nullptr;
 
-const std::vector<FSkillData>& PlayerSkillTable::GetSkillsByWeaponType(Type::EPlayer weapon) const
-{
-    static std::vector<FSkillData> empty;
-    auto it = _weaponMap.find(weapon);
-    if (it != _weaponMap.end())
-        return it->second;
-    return empty;
+    for (const auto& skill : it->second)
+    {
+        if (skill.SkillLv == skillLevel)
+            return &skill;
+    }
+    return nullptr;
 }
-
 
 ESkillType PlayerSkillTable::StringToSkillType(const std::string& str)
 {
@@ -87,4 +79,3 @@ Type::EPlayer PlayerSkillTable::StringToWeaponType(const std::string& str)
     
     LOG(Warning, "error type");
 }
-

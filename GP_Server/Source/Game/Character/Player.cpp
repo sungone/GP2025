@@ -99,7 +99,6 @@ void Player::RemovePlayerFromViewList(std::shared_ptr<Character> player)
 	}
 }
 
-
 bool Player::TakeWorldItem(const std::shared_ptr<WorldItem> item)
 {
 	auto invItem = item->ToInventoryItem();
@@ -114,6 +113,74 @@ WorldItem Player::DropItem(uint32 itemId)
 	auto dropPos = _info.Pos + _info.GetFrontVector() * 100;
 	dropedItem.SetPos(dropPos);
 	return dropedItem;
+}
+
+void Player::UseSkill(ESkillGroup groupId)
+{
+	auto it = _skillLevels.find(groupId);
+	if (it == _skillLevels.end())
+	{
+		LOG(Warning, "Invaild");
+		return;
+	}
+
+	uint32 level = it->second;
+	const FSkillData* skill = PlayerSkillTable::GetInst().GetSkill(static_cast<uint32>(groupId), level);
+	if (!skill)
+	{
+		LOG(Warning, "Invaild");
+		return;
+	}
+	ExecuteSkillEffect(*skill);
+}
+
+void Player::ExecuteSkillEffect(const FSkillData& skill)
+{
+	if (skill.Type0 == ESkillType::Atk)
+	{
+		//1.skill_value_0 만큼 공격력 증가
+
+		//2. skill_value_1(=n) 만큼
+		switch (skill.Type1)
+		{
+		case ESkillType::Dash:
+			// n미터 돌진
+			break;
+		case ESkillType::RangeAtk:
+			// 공격범위 n미터 증가
+			break;
+		case ESkillType::SectorAtk:
+			// 총알 n발 발사
+			break;
+		default:
+			break;
+		}
+	}
+	else if (skill.Type0 == ESkillType::BuffTime)
+	{
+		//1.skill_value_0초간
+
+		//2. skill_value_1(=n) 만큼
+		switch (skill.Type1)
+		{
+		case ESkillType::AtkSpd:
+			// 공격속도 n% 증가
+			break;
+		}
+	}
+}
+
+void Player::LearnSkill(ESkillGroup groupId)
+{
+	if (_skillLevels.contains(groupId)) return;
+	_skillLevels[groupId] = 1;
+}
+
+void Player::UpgradeSkill(ESkillGroup groupId)
+{
+	auto& lv = _skillLevels[groupId];
+	if (lv < 3)
+		lv++;
 }
 
 void Player::UseItem(uint32 itemId)
