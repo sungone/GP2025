@@ -41,40 +41,49 @@ void DummyClientManager::WorkerThread()
 	LPWSAOVERLAPPED over;
 	static auto lastCheck = std::chrono::steady_clock::now();
 
+	try {
+		while (true)
+		{
+			if (_connected == 0)
+			{
+				_clients[0].Connect(_hIocp);
+				_connected++;
+				_nextToConnect++;
+			}
 
-	while (true)
+			BOOL ret = _hIocp.GetCompletion(rbyte, id, over);
+			ExpOver* expOver = reinterpret_cast<ExpOver*>(over);
+
+			if (!ret)
+			{
+				_clients[id].Disconnect();
+				continue;
+			}
+
+			switch (expOver->_compType)
+			{
+			case RECV:
+				HandleRecv(static_cast<int32>(id), rbyte, over);
+				break;
+			case SEND:
+				delete over;
+				break;
+			}
+			auto now = steady_clock::now();
+			if (now - lastCheck > 100ms)
+			{
+				AdjustClientCount();
+				lastCheck = now;
+			}
+		}
+	}
+	catch (const std::exception& e)
 	{
-		if (_connected == 0)
-		{
-			_clients[0].Connect(_hIocp);
-			_connected++;
-			_nextToConnect++;
-		}
-
-		BOOL ret = _hIocp.GetCompletion(rbyte, id, over);
-		ExpOver* expOver = reinterpret_cast<ExpOver*>(over);
-
-		if (!ret)
-		{
-			_clients[id].Disconnect();
-			continue;
-		}
-
-		switch (expOver->_compType)
-		{
-		case RECV:
-			HandleRecv(static_cast<int32>(id), rbyte, over);
-			break;
-		case SEND:
-			delete over;
-			break;
-		}
-		auto now = steady_clock::now();
-		if (now - lastCheck > 100ms)
-		{
-			AdjustClientCount();
-			lastCheck = now;
-		}
+		LOG(Error, std::format("Exception in WorkerThread: {}", e.what()));
+	}
+	catch (...)
+	{
+		LOG(Error, "Unknown exception in WorkerThread!");
 	}
 }
 

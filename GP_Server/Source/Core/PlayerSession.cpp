@@ -3,6 +3,7 @@
 #include "SessionManager.h"
 #include "GameWorld.h"
 #include "PacketManager.h"
+#define SEND_LOG_PRINT 0
 
 void PlayerSession::DoRecv()
 {
@@ -11,6 +12,7 @@ void PlayerSession::DoRecv()
 void PlayerSession::DoSend(const Packet* packet)
 {
 #pragma region //Log
+#if SEND_LOG_PRINT 1
 	switch (packet->Header.PacketType)
 	{
 	case S_SIGNUP_SUCCESS:
@@ -30,6 +32,9 @@ void PlayerSession::DoSend(const Packet* packet)
 		break;
 	case S_REMOVE_PLAYER:
 		LOG(LogType::SendLog, std::format("RemovePlayer PKT to [{}]", _id));
+		break;
+	case S_PLAYER_MOVE:
+		LOG(LogType::SendLog, std::format("PlayerMove PKT to [{}]", _id));
 		break;
 	case S_PLAYER_STATUS_UPDATE:
 		LOG(LogType::SendLog, std::format("PlayerUpdate PKT to [{}]", _id));
@@ -77,6 +82,7 @@ void PlayerSession::DoSend(const Packet* packet)
 		LOG(LogType::SendLog, "Unknown Packet Type");
 		break;
 	}
+#endif // SEND_LOG_PRINT 1
 #pragma endregion
 	_sSocket->DoSend(packet);
 }

@@ -68,19 +68,25 @@ void DummyClient::DoSend(Packet* packet)
 void DummyClient::HandleRecvBuffer(int32 recvByte, ExpOver* expOver)
 {
 	int32 dataSize = recvByte + _remain;
-	Packet* packet = reinterpret_cast<Packet*>(expOver->_buf);
-	while (dataSize > 0) {
-		int32 packetSize = packet->Header.PacketSize;
-		if (packetSize <= dataSize) {
-			ProcessPacket(packet);
-			packet = packet + packetSize;
-			dataSize = dataSize - packetSize;
+	uint8* buf = expOver->_buf;
+	int32 offset = 0;
+	while (dataSize - offset >= sizeof(FPacketHeader)) {
+		FPacketHeader* header = reinterpret_cast<FPacketHeader*>(buf + offset);
+		int32 packetSize = header->PacketSize;
+		if (packetSize <= 0 || packetSize > BUFSIZE)
+		{
+			LOG(Error, "Invaild Pkt Size");
+			break;
 		}
-		else break;
+		if (dataSize - offset < packetSize) break;
+
+		Packet* packet = reinterpret_cast<Packet*>(buf + offset);
+		ProcessPacket(packet);
+		offset += packetSize;
 	}
-	_remain = dataSize;
-	if (dataSize > 0)
-		memcpy(expOver->_buf, packet, dataSize);
+	_remain = dataSize - offset;
+	if (_remain > 0)
+		memmove(buf, buf + offset, _remain);
 }
 
 void DummyClient::ProcessPacket(Packet* packet)
@@ -94,7 +100,6 @@ void DummyClient::ProcessPacket(Packet* packet)
 		_info = pkt->PlayerInfo;
 		SendMovePacket();
 		TimerQueue::Get().AddTimerEvent(TimerEvent(_dummyNum, EventType::Move, 1000));
-		LOG(RecvLog, std::format("LoginSuccess Pkt - {}", _name));
 		break;
 	}
 	case EPacketType::S_SIGNUP_SUCCESS:
@@ -103,20 +108,16 @@ void DummyClient::ProcessPacket(Packet* packet)
 		_info = pkt->PlayerInfo;
 		SendMovePacket();
 		TimerQueue::Get().AddTimerEvent(TimerEvent(_dummyNum, EventType::Move, 1000));
-		LOG(RecvLog, std::format("SignUpSuccess Pkt - {}", _name));
 		break;
 	}
 	case EPacketType::S_LOGIN_FAIL:
-		LOG(RecvLog, std::format("LoginFailed Pkt - {}", _name));
 		SendSignUpPacket();
 		break;
 	case EPacketType::S_SIGNUP_FAIL:
-		LOG(RecvLog, std::format("SignUpFailed Pkt - {}", _name));
 		SendLoginPacket();
 		break;
 	case EPacketType::S_PLAYER_MOVE:
 	{
-		LOG(RecvLog, std::format("Move Pkt - {}", _name));
 		auto pkt = reinterpret_cast<MovePacket*>(packet);
 		auto rtt_ms = NowMs() - pkt->MoveTime;
 		UpdateDelaySample(rtt_ms);

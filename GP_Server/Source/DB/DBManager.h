@@ -31,6 +31,6 @@ private:
 	std::shared_ptr<mysqlx::Schema> _db;
 
 	const std::string USERS_TABLE = "users";
-	bool isPrint = true;
+	bool isPrint = false;
 	mysqlx::Table GetUsersTable();
 };

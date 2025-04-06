@@ -6,8 +6,6 @@ bool DBManager::Connect(const std::string& host, const std::string& user, const 
 	try {
 		_dbsess = std::make_shared<mysqlx::Session>(mysqlx::SessionSettings(host, user, pwd, db));
 		_db = std::make_shared<mysqlx::Schema>(_dbsess->getSchema(db));
-		LOG("DB Connected!");
-		DBManager::PrintUsersTable();
 		return true;
 	}
 	catch (const mysqlx::Error& e)
