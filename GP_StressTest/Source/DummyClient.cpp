@@ -1,47 +1,151 @@
 #include "pch.h"
 #include "DummyClient.h"
-
-DummyClient::DummyClient()
+#include "Timer.h"
+bool DummyClient::Init(uint32 num)
 {
+	_dummyNum = num;
+	_name = std::format("D{:05}", _dummyNum);
+
+	WSADATA wsaData;
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+	{
+		LOG(Error, "WSAStartup");
+		return false;
+	}
+
+	_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
+	if (_socket == INVALID_SOCKET)
+	{
+		LOG(Error, "Socket");
+		return false;
+	}
+
+	return true;
 }
 
-DummyClient::~DummyClient()
+bool DummyClient::Connect(IOCP& hIocp)
 {
-}
+	sockaddr_in addr;
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(SERVER_PORT);
+	inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
+	if (connect(_socket, (struct sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR)
+	{
+		LOG(Error, "connect");
+		closesocket(_socket);
+		return false;
+	}
+	hIocp.RegisterSocket(_socket, _dummyNum);
+	DoRecv();
+	SendSignUpPacket();
 
-bool DummyClient::Connect()
-{
-    WSADATA wsaData;
-    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
-    {
-        std::cerr << "WSAStartup failed.\n";
-        return false;
-    }
-
-    _socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
-    if (_socket == INVALID_SOCKET)
-    {
-        std::cerr << "Socket creation failed.\n";
-        return false;
-    }
-
-    sockaddr_in addr;
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(SERVER_PORT);
-    inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
-    if (connect(_socket, (struct sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR)
-    {
-        std::cerr << "Failed to connect to server.\n";
-        closesocket(_socket);
-        return false;
-    }
-
-    return true;
+	LOG(std::format("Connect - {}", _name));
+	return true;
 }
 
 void DummyClient::Disconnect()
 {
-    auto pkt = IDPacket(EPacketType::C_LOGOUT, _info.ID);
-    DoSend(&pkt);
-    closesocket(_socket);
+	auto pkt = IDPacket(EPacketType::C_LOGOUT, _info.ID);
+	DoSend(&pkt);
+	closesocket(_socket);
+}
+
+void DummyClient::DoRecv()
+{
+	ZeroMemory(&_recvOver._wsaover, sizeof(_recvOver._wsaover));
+	DWORD recv_flag = 0;
+	_recvOver._wsabuf.len = BUFSIZE - _remain;
+	_recvOver._wsabuf.buf = reinterpret_cast<CHAR*>(_recvOver._buf) + _remain;
+	WSARecv(_socket, &_recvOver._wsabuf, 1, 0, &recv_flag, &_recvOver._wsaover, 0);
+}
+
+void DummyClient::DoSend(Packet* packet)
+{
+	auto send_data = new ExpOver{ packet };
+	WSASend(_socket, &send_data->_wsabuf, 1, nullptr, 0, &send_data->_wsaover, nullptr);
+}
+
+void DummyClient::HandleRecvBuffer(int32 recvByte, ExpOver* expOver)
+{
+	int32 dataSize = recvByte + _remain;
+	Packet* packet = reinterpret_cast<Packet*>(expOver->_buf);
+	while (dataSize > 0) {
+		int32 packetSize = packet->Header.PacketSize;
+		if (packetSize <= dataSize) {
+			ProcessPacket(packet);
+			packet = packet + packetSize;
+			dataSize = dataSize - packetSize;
+		}
+		else break;
+	}
+	_remain = dataSize;
+	if (dataSize > 0)
+		memcpy(expOver->_buf, packet, dataSize);
+}
+
+void DummyClient::ProcessPacket(Packet* packet)
+{
+	auto type = packet->Header.PacketType;
+	switch (type)
+	{
+	case EPacketType::S_LOGIN_SUCCESS:
+	{
+		auto pkt = reinterpret_cast<LoginSuccessPacket*>(packet);
+		_info = pkt->PlayerInfo;
+		SendMovePacket();
+		TimerQueue::Get().AddTimerEvent(TimerEvent(_dummyNum, EventType::Move, 1000));
+		LOG(RecvLog, std::format("LoginSuccess Pkt - {}", _name));
+		break;
+	}
+	case EPacketType::S_SIGNUP_SUCCESS:
+	{
+		auto pkt = reinterpret_cast<SignUpSuccessPacket*>(packet);
+		_info = pkt->PlayerInfo;
+		SendMovePacket();
+		TimerQueue::Get().AddTimerEvent(TimerEvent(_dummyNum, EventType::Move, 1000));
+		LOG(RecvLog, std::format("SignUpSuccess Pkt - {}", _name));
+		break;
+	}
+	case EPacketType::S_LOGIN_FAIL:
+		LOG(RecvLog, std::format("LoginFailed Pkt - {}", _name));
+		SendSignUpPacket();
+		break;
+	case EPacketType::S_SIGNUP_FAIL:
+		LOG(RecvLog, std::format("SignUpFailed Pkt - {}", _name));
+		SendLoginPacket();
+		break;
+	case EPacketType::S_PLAYER_MOVE:
+	{
+		LOG(RecvLog, std::format("Move Pkt - {}", _name));
+		auto pkt = reinterpret_cast<MovePacket*>(packet);
+		auto rtt_ms = NowMs() - pkt->MoveTime;
+		UpdateDelaySample(rtt_ms);
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+void DummyClient::SendLoginPacket()
+{
+	const auto accountID = std::format("{:05}", _dummyNum);
+	const auto accountPW = "123";
+	auto pkt = LoginPacket(accountID.c_str(), accountPW);
+	DoSend(&pkt);
+}
+
+void DummyClient::SendSignUpPacket()
+{
+	const auto accountID = std::format("{:05}", _dummyNum);
+	const auto accountPW = "123";
+	auto pkt = SignUpPacket(accountID.c_str(), accountPW, _name.c_str());
+	DoSend(&pkt);
+}
+
+void DummyClient::SendMovePacket()
+{
+	auto now = NowMs();
+	MovePacket pkt(_playerId, _info.Pos, now);
+	DoSend(&pkt);
 }

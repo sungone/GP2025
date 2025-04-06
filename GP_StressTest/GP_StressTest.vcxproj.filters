@@ -8,9 +8,6 @@
     <Filter Include="소스 파일\Network">
       <UniqueIdentifier>{ed68e76c-1850-4d7c-a5e9-875606c5c28b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\Pch">
-      <UniqueIdentifier>{0198502e-1345-4340-ab7e-bead8a2df816}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\Shared">
       <UniqueIdentifier>{0b276779-f9e9-45a7-9f86-30e48612d8f3}</UniqueIdentifier>
     </Filter>
@@ -20,10 +17,16 @@
     <Filter Include="소스 파일\Shared\IOCP">
       <UniqueIdentifier>{217e5454-a697-4a74-b0ce-354000ed604e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Utils">
+      <UniqueIdentifier>{38817187-92e5-4527-ac52-fee9bea7ae87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\PCH">
+      <UniqueIdentifier>{0198502e-1345-4340-ab7e-bead8a2df816}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\pch.cpp">
-      <Filter>소스 파일\Pch</Filter>
+      <Filter>소스 파일\PCH</Filter>
     </ClCompile>
     <ClCompile Include="Source\DummyClient.cpp">
       <Filter>소스 파일\Network</Filter>
@@ -40,6 +43,9 @@
     <ClCompile Include="..\GP_Server\Source\Core\IOCP\IOCP.cpp">
       <Filter>소스 파일\Shared\IOCP</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Timer.cpp">
+      <Filter>소스 파일\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\GP_Server\Source\Common\Common.h">
@@ -55,7 +61,7 @@
       <Filter>소스 파일\Shared\Common</Filter>
     </ClInclude>
     <ClInclude Include="Source\pch.h">
-      <Filter>소스 파일\Pch</Filter>
+      <Filter>소스 파일\PCH</Filter>
     </ClInclude>
     <ClInclude Include="Source\DummyClient.h">
       <Filter>소스 파일\Network</Filter>
@@ -68,6 +74,12 @@
     </ClInclude>
     <ClInclude Include="..\GP_Server\Source\Core\IOCP\IOCP.h">
       <Filter>소스 파일\Shared\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DelayTracker.h">
+      <Filter>소스 파일\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Timer.h">
+      <Filter>소스 파일\Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

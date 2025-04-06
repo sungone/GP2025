@@ -115,21 +115,24 @@ struct SignUpFailPacket : public Packet
 		Header.PacketSize = sizeof(SignUpFailPacket);
 	}
 };
-
-struct AddPlayerPacket : public Packet
+struct MovePacket : public Packet
 {
-	char NickName[NICKNAME_LEN];
-	FInfoData PlayerInfo;
-	AddPlayerPacket(const char* NickName_, const FInfoData& PlayerInfo_)
-		: Packet(EPacketType::S_LOGIN_SUCCESS), PlayerInfo(PlayerInfo_)
+	int32 PlayerID;
+	FVector PlayerPos;
+	uint64 MoveTime;
+	MovePacket(int32 PlayerID_, const FVector& PlayerPos_,
+		uint64 SendTime_, EPacketType Type_ = EPacketType::C_MOVE)
+		: Packet(Type_), PlayerID(PlayerID_), PlayerPos(PlayerPos_), MoveTime(SendTime_)
 	{
-		strncpy_s(NickName, NickName_, NICKNAME_LEN - 1);
-		NickName[NICKNAME_LEN - 1] = '\0';
-
-		Header.PacketSize = sizeof(LoginSuccessPacket);
+		Header.PacketSize = sizeof(MovePacket);
+	}
+	//for Stress Test
+	MovePacket(int32 PlayerID_, uint64 SendTime_, EPacketType Type_ = EPacketType::S_PLAYER_MOVE)
+		: Packet(Type_), PlayerID(PlayerID_), PlayerPos(), MoveTime(SendTime_)
+	{
+		Header.PacketSize = sizeof(MovePacket);
 	}
 };
-
 struct AttackPacket : public Packet
 {
 	float PlayerYaw;

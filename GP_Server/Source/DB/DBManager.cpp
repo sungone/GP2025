@@ -65,7 +65,6 @@ DBSignUpResult DBManager::SignUpUser(const std::string& login_id, const std::str
 		std::string msg = e.what();
 		if (msg.find("Duplicate entry") != std::string::npos)
 		{
-			LOG(LogType::Warning, "be duplicated");
 			return { DBResultCode::DUPLICATE_ID };
 		}
 

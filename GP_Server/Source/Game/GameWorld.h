@@ -24,7 +24,7 @@ public:
 	void CreateMonster();
 	void SpawnMonster(PlayerSession& session);
 
-	void PlayerMove(int32 playerId, FInfoData& info);
+	void PlayerMove(int32 playerId, FVector& pos, uint64& time);
 	void PlayerAttack(int32 playerId, float playerYaw);
 
 	void UpdateMonster();

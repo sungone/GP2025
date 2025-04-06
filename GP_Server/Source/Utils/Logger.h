@@ -47,9 +47,7 @@ public:
         std::string timeStr = GetCurrentTime();
 
         std::cout << timeStr << " " << levelStr
-#ifdef _DEBUG
             << "[" << functionName << "] "
-#endif
             << message << '\n';
 
         if (_logFile.is_open())

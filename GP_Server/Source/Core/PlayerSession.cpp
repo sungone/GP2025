@@ -13,8 +13,17 @@ void PlayerSession::DoSend(const Packet* packet)
 #pragma region //Log
 	switch (packet->Header.PacketType)
 	{
+	case S_SIGNUP_SUCCESS:
+		LOG(LogType::SendLog, std::format("SignUpSuccess PKT to [{}]", _id));
+		break;
+	case S_SIGNUP_FAIL:
+		LOG(LogType::SendLog, std::format("SignUpFail PKT to [{}]", _id));
+		break;
 	case S_LOGIN_SUCCESS:
-		LOG(LogType::SendLog, std::format("LoginInfo PKT to [{}]", _id));
+		LOG(LogType::SendLog, std::format("LoginSuccess PKT to [{}]", _id));
+		break;
+	case S_LOGIN_FAIL:
+		LOG(LogType::SendLog, std::format("LoginFail PKT to [{}]", _id));
 		break;
 	case S_ADD_PLAYER:
 		//LOG(LogType::SendLog, std::format("AddPlayer PKT to [{}]", _id));

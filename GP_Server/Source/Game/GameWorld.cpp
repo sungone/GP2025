@@ -101,12 +101,18 @@ void GameWorld::SpawnMonster(PlayerSession& session)
 }
 
 
-void GameWorld::PlayerMove(int32 playerId, FInfoData& info)
+void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint64& time)
 {
-	auto player = _characters[playerId];
-	player->SetInfo(info);
-	LOG(std::format("Player[{}] Move to {}", playerId, info.Pos.ToString()));
-	auto pkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, info);
+	auto player = GetCharacterByID(playerId);
+	if (!player)
+	{
+		LOG(Warning, "Invaild");
+		return;
+	}
+	player->GetInfo().SetLocationAndYaw(pos);
+	LOG(std::format("Player[{}] Move to {}", playerId, pos.ToString()));
+	auto pkt = MovePacket(playerId, time);
+	SessionManager::GetInst().SendPacket(playerId, &pkt);
 	SessionManager::GetInst().BroadcastToViewList(&pkt, playerId);
 }
 
@@ -155,7 +161,7 @@ void GameWorld::PlayerAttack(int32 playerId, float playerYaw)
 
 void GameWorld::UpdateMonster()
 {
-	LOG("Update Monster!");
+	LOG("");
 	std::unique_lock<std::mutex> lock(_carrMutex);
 	for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{

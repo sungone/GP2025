@@ -10,6 +10,7 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 	case EPacketType::C_SIGNUP:
 		LOG(LogType::RecvLog, std::format("SignUpPacket from [{}]", sessionId));
 		HandleSignUpPacket(sessionId, packet);
+		break;
 	case EPacketType::C_LOGIN:
 		LOG(LogType::RecvLog, std::format("LoginPacket from [{}]", sessionId));
 		HandleLoginPacket(sessionId, packet);
@@ -58,7 +59,7 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 	auto res = _dbMgr.SignUpUser(pkt->AccountID, pkt->AccountPW, ConvertToWString(pkt->NickName));
 	if (res.code == DBResultCode::SUCCESS)
 	{
-		LOG(LogType::Log, std::format("SignUp Success! userId: {}", res.dbId));
+		LOG(LogType::Log, std::format("SignUp Success [{}] userId: {}", sessionId, res.dbId));
 		_sessionMgr.HandleLogin(sessionId);
 		auto& playerInfo = _gameWorld.GetInfo(sessionId);
 		playerInfo.SetName(pkt->NickName);
@@ -84,7 +85,7 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 
 	if (res.code == DBResultCode::SUCCESS)
 	{
-		LOG(LogType::Log, std::format("Login Success! userId: {}, nickname: {}", res.dbId, res.nickname));
+		LOG(LogType::Log, std::format("Login Success [{}] userId: {}, nickname: {}", sessionId, res.dbId, res.nickname));
 		_sessionMgr.HandleLogin(sessionId);
 		auto& playerInfo = _gameWorld.GetInfo(sessionId);
 		playerInfo.SetName(res.nickname.c_str());
@@ -116,9 +117,8 @@ void PacketManager::HandleLogoutPacket(int32 sessionId)
 
 void PacketManager::HandleMovePacket(int32 sessionId, Packet* packet)
 {
-	InfoPacket* p = static_cast<InfoPacket*>(packet);
-	auto& playerInfo = p->Data;
-	_gameWorld.PlayerMove(sessionId, p->Data);
+	MovePacket* p = static_cast<MovePacket*>(packet);
+	_gameWorld.PlayerMove(p->PlayerID, p->PlayerPos, p->MoveTime);
 }
 
 void PacketManager::HandleAttackPacket(int32 sessionId, Packet* packet)
