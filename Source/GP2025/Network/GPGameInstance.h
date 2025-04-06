@@ -18,7 +18,7 @@ public:
 	virtual void Shutdown() override;
 
 	void ProcessPacket();
-
+	void OnLoginSuccess();
 public:
 	UFUNCTION(BlueprintCallable)
 	void SaveBoundingBoxData(ULevel* Level);

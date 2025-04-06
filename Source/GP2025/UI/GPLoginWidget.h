@@ -17,12 +17,9 @@ UCLASS()
 class GP2025_API UGPLoginWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
-private :
-	bool isCreate = false;
 
 protected :
-
+	FTimerHandle HideErrorTimerHandle;
 	FString ID_Str;
 	FString PW_Str;
 
@@ -33,21 +30,10 @@ public :
 	UTextBlock* TextError;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* TextCreateAccount;
-
-
-
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* TextLogin;
-
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* TextExit;
-
-	UPROPERTY(meta = (BindWidget))
 	UButton* ButtonLogin;
 
 	UPROPERTY(meta = (BindWidget))
-	UButton* ButtonCreateAccount;
+	UButton* ButtonSignUp;
 
 	UPROPERTY(meta = (BindWidget))
 	UButton* ButtonExit;
@@ -58,22 +44,19 @@ public :
 	UPROPERTY(meta = (BindWidget))
 	UEditableTextBox* TBInputPW;
 
-	UFUNCTION(BlueprintCallable)
-	void CreateAccount();
-
-	UFUNCTION(BlueprintCallable)
-	void CancleCreateAccount();
-
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 	void OnEntered(const FText& Text, ETextCommit::Type CommitMethod);
-
-	UFUNCTION(BlueprintCallable, Category = "UI")
-	void SetEnable(UWidget* widget, bool b);
-
-	// C++ 코드로 안되서 블프에서 일단 처리함
-	//UFUNCTION()
-	//void OnLoginClicked();
-
+	UFUNCTION()
+	void OnLoginClicked();
+	UFUNCTION()
+	void OnSignUpClicked();
 	UFUNCTION()
 	void OnExitClicked();
+	UFUNCTION()
+	void HandleLoginFail(FString Message);
+
+	void TryLogin();
+	void TrySignUp();
+	void ShowErrorMessage(const FString& Message, float Duration);
+	void HideErrorMessage();
 };

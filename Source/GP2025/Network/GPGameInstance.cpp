@@ -8,8 +8,9 @@ void UGPGameInstance::Init()
 	Super::Init();
 	NetworkMgr = GetSubsystem<UGPNetworkManager>();
 	NetworkMgr->ConnectToServer();
+	
 	//NetworkMgr->SendPlayerLoginPacket("qwer", "1234");
-	NetworkMgr->SendPlayerSignUpPacket(TEXT("asdf"), TEXT("1234"), TEXT("가나다"));
+	//NetworkMgr->SendPlayerSignUpPacket(TEXT("asdf"), TEXT("1234"), TEXT("가나다"));
 }
 
 void UGPGameInstance::Shutdown()
@@ -21,6 +22,11 @@ void UGPGameInstance::Shutdown()
 void UGPGameInstance::ProcessPacket()
 {
 	NetworkMgr->ProcessPacket();
+}
+
+void UGPGameInstance::OnLoginSuccess()
+{
+	UGameplayStatics::OpenLevel(this, FName("TestMap"));
 }
 
 //AABB박스 추출 -> TUK level BP에서 호출하고 있음

@@ -7,6 +7,7 @@
 #include "Serialization/ArrayWriter.h"
 #include "SocketSubsystem.h"
 #include "Network/GPObjectManager.h"
+#include "Network/GPGameInstance.h"
 #include "Character/GPCharacterPlayer.h"
 
 void UGPNetworkManager::ConnectToServer()
@@ -79,6 +80,8 @@ void UGPNetworkManager::SendPlayerSignUpPacket(const FString& AccountID, const F
 
 void UGPNetworkManager::SendPlayerLogoutPacket()
 {
+	if (!MyPlayer)
+		return;
 	IDPacket Packet(EPacketType::C_LOGOUT, MyPlayer->CharacterInfo.ID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
@@ -166,7 +169,8 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_LOGIN_SUCCESS:
 			{
 				LoginSuccessPacket* Pkt = reinterpret_cast<LoginSuccessPacket*>(RemainingData.GetData());
-				ObjectMgr->Login(Pkt->PlayerInfo);
+				Cast<UGPGameInstance>(GetGameInstance())->OnLoginSuccess();
+				ObjectMgr->OnLoginSuccess(Pkt->PlayerInfo);
 				break;
 			}
 			case EPacketType::S_LOGIN_FAIL:
@@ -178,7 +182,8 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_SIGNUP_SUCCESS:
 			{
 				SignUpSuccessPacket* Pkt = reinterpret_cast<SignUpSuccessPacket*>(RemainingData.GetData());
-				ObjectMgr->Login(Pkt->PlayerInfo);
+				Cast<UGPGameInstance>(GetGameInstance())->OnLoginSuccess();
+				ObjectMgr->OnLoginSuccess(Pkt->PlayerInfo);
 				break;
 			}
 			case EPacketType::S_SIGNUP_FAIL:

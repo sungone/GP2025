@@ -11,6 +11,7 @@
 #include "Logging/LogMacros.h"      
 #include "Player/GPPlayerController.h"
 #include "Network/GPNetworkManager.h"
+#include "Network/GPObjectManager.h"
 
 void UGPLoginWidget::NativeConstruct()
 {
@@ -22,74 +23,50 @@ void UGPLoginWidget::NativeConstruct()
 	if (TBInputPW)
 		TBInputPW->OnTextCommitted.AddDynamic(this, &UGPLoginWidget::OnEntered);
 
-	SetEnable(TextError, false);
-	SetEnable(TextCreateAccount, true);
-	SetEnable(TextLogin, true);
+	TextError->SetVisibility(ESlateVisibility::Hidden);
 
-	//if (ButtonLogin)
-	//{
-	//	ButtonLogin->OnClicked.AddDynamic(this, &UGPLoginWidget::OnLoginClicked);
-	//}
-
+	if (ButtonLogin)
+	{
+		ButtonLogin->OnClicked.AddDynamic(this, &UGPLoginWidget::OnLoginClicked);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("?!")));
+	}
+	if (ButtonSignUp)
+	{
+		ButtonSignUp->OnClicked.AddDynamic(this, &UGPLoginWidget::OnSignUpClicked);
+	}
 	if (ButtonExit)
 	{
 		ButtonExit->OnClicked.AddDynamic(this, &UGPLoginWidget::OnExitClicked);
 	}
-}
 
-void UGPLoginWidget::CreateAccount()
-{
-	SetEnable(TextCreateAccount, true);
-	SetEnable(TextLogin, false);
-	isCreate = true;
-}
-
-void UGPLoginWidget::CancleCreateAccount()
-{
-	SetEnable(TextCreateAccount, false);
-	SetEnable(TextLogin, true);
-	isCreate = false;
+	if (UGPObjectManager* ObjMgr = GetWorld()->GetSubsystem<UGPObjectManager>())
+	{
+		ObjMgr->OnLoginFailed.AddDynamic(this, &UGPLoginWidget::HandleLoginFail);
+	}
 }
 
 void UGPLoginWidget::OnEntered(const FText& Text, ETextCommit::Type CommitMethod)
 {
 	if (CommitMethod == ETextCommit::OnEnter)
 	{
-		ID_Str = TBInputID->GetText().ToString();
-		PW_Str = TBInputPW->GetText().ToString();
-
-		if (ID_Str.IsEmpty() || PW_Str.IsEmpty())
-		{
-			UE_LOG(LogTemp, Error, TEXT("ID or Password is Empty!"));
-			return;
-		}
-
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("ID: %s | PW: %s"), *ID_Str, *PW_Str));
-		if(!isCreate)
-		{
-			auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-			NetworkMgr->SendPlayerLoginPacket(TCHAR_TO_UTF8(*ID_Str), TCHAR_TO_UTF8(*PW_Str));
-		}
+		TryLogin();
 	}
 }
 
-void UGPLoginWidget::SetEnable(UWidget* widget, bool b)
+void UGPLoginWidget::OnLoginClicked()
 {
-	b ? widget->SetVisibility(ESlateVisibility::Visible) : widget->SetVisibility(ESlateVisibility::Hidden);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("OnLoginClicked")));
+	TryLogin();
 }
 
-//void UGPLoginWidget::OnLoginClicked()
-//{
-//	APlayerController* PC = GetOwningPlayer();
-//	if (PC)
-//	{
-//		AGPPlayerController* GPPC = Cast<AGPPlayerController>(PC);
-//		if (GPPC)
-//		{
-//			GPPC->ShowLobbyUI();  // 로비 UI 표시
-//		}
-//	}
-//}
+void UGPLoginWidget::OnSignUpClicked()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("OnSignUpClicked")));
+	TrySignUp();
+}
 
 void UGPLoginWidget::OnExitClicked()
 {
@@ -97,5 +74,54 @@ void UGPLoginWidget::OnExitClicked()
 	if (PC && GetWorld())
 	{
 		UKismetSystemLibrary::QuitGame(GetWorld(), PC, EQuitPreference::Quit, false);
+	}
+}
+
+void UGPLoginWidget::HandleLoginFail(FString Message)
+{
+	ShowErrorMessage(Message, 3.0f);
+}
+
+void UGPLoginWidget::TryLogin()
+{
+	ID_Str = TBInputID->GetText().ToString();
+	PW_Str = TBInputPW->GetText().ToString();
+
+	if (ID_Str.IsEmpty() || PW_Str.IsEmpty())
+	{
+		ShowErrorMessage(TEXT("ID or Password is Empty!"), 3.0f);
+		return;
+	}
+
+	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+	NetworkMgr->SendPlayerLoginPacket(TCHAR_TO_UTF8(*ID_Str), TCHAR_TO_UTF8(*PW_Str));
+}
+
+void UGPLoginWidget::TrySignUp()
+{
+	//Todo: 회원가입 UI 
+}
+
+void UGPLoginWidget::ShowErrorMessage(const FString& Message, float Duration)
+{
+	if (!TextError) return;
+
+	TextError->SetText(FText::FromString(Message));
+	TextError->SetVisibility(ESlateVisibility::Visible);
+
+	GetWorld()->GetTimerManager().SetTimer(
+		HideErrorTimerHandle,
+		this,
+		&UGPLoginWidget::HideErrorMessage,
+		Duration,
+		false
+	);
+}
+
+void UGPLoginWidget::HideErrorMessage()
+{
+	if (TextError)
+	{
+		TextError->SetVisibility(ESlateVisibility::Hidden);
 	}
 }

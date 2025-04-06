@@ -11,18 +11,22 @@ class AGPCharacterPlayer;
 class AGPCharacterMonster;
 class AGPItem;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLoginFailed, FString, Message);
+
 UCLASS()
 class GP2025_API UGPObjectManager : public UWorldSubsystem
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(BlueprintAssignable)
+	FOnLoginFailed OnLoginFailed;
+public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
 	void SetMyPlayer(AGPCharacterPlayer* InMyPlayer);
-
-	void Login(FInfoData& PlayerInfo);
 	void PrintFailMessege(DBResultCode ResultCode);
+	void OnLoginSuccess(FInfoData& PlayerInfo);
 	void AddPlayer(FInfoData& PlayerInfo);
 	void RemovePlayer(int32 PlayerID);
 	void UpdatePlayer(FInfoData& PlayerInfo);

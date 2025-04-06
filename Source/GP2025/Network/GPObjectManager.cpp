@@ -26,7 +26,7 @@ void UGPObjectManager::SetMyPlayer(AGPCharacterPlayer* InMyPlayer)
 	MyPlayer = Cast<AGPCharacterMyplayer>(InMyPlayer);
 }
 
-void UGPObjectManager::Login(FInfoData& PlayerInfo)
+void UGPObjectManager::OnLoginSuccess(FInfoData& PlayerInfo)
 {
 	if (World == nullptr)
 	{
@@ -56,25 +56,29 @@ void UGPObjectManager::Login(FInfoData& PlayerInfo)
 
 void UGPObjectManager::PrintFailMessege(DBResultCode ResultCode)
 {
-	//Todo: UI로 출력하고, 다시 로그인 or 회원가입
+	FString ErrorMessage;
 
 	switch (ResultCode)
 	{
 	case DBResultCode::SUCCESS:
-		break;
+		return;
 	case DBResultCode::INVALID_USER:
-		UE_LOG(LogTemp, Error, TEXT("Account Not Found"));
+		ErrorMessage = TEXT("Account Not Found");
 		break;
 	case DBResultCode::INVALID_PASSWORD:
-		UE_LOG(LogTemp, Error, TEXT("Password Mismatch"));
+		ErrorMessage = TEXT("Password Mismatch");
 		break;
 	case DBResultCode::DUPLICATE_ID:
-		UE_LOG(LogTemp, Error, TEXT("Duplicate ID"));
+		ErrorMessage = TEXT("Duplicate ID");
 		break;
 	default:
-		UE_LOG(LogTemp, Error, TEXT("Unknown"));
+		ErrorMessage = TEXT("Unknown Error");
 		break;
 	}
+
+	UE_LOG(LogTemp, Error, TEXT("%s"), *ErrorMessage);
+
+	OnLoginFailed.Broadcast(ErrorMessage);
 }
 
 void UGPObjectManager::AddPlayer(FInfoData& PlayerInfo)
