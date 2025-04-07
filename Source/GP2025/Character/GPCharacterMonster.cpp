@@ -2,6 +2,7 @@
 
 
 #include "Character/GPCharacterMonster.h"
+#include "Character/GPCharacterMyPlayer.h"
 #include "Character/GPCharacterControlData.h"
 #include "UI/GPHpBarWidget.h"
 #include "UI/GPLevelWidget.h"
@@ -48,16 +49,16 @@ void AGPCharacterMonster::UpdateWidgetVisibility()
         return;
     }
 
-    APawn* PlayerPawn = PlayerController->GetPawn();
-    if (!PlayerPawn)
+    AGPCharacterMyplayer* Player = Cast<AGPCharacterMyplayer>(PlayerController->GetPawn());
+    if (!Player)
     {
         return;
     }
 
-    float Distance = FVector::Dist(GetActorLocation(), PlayerPawn->GetActorLocation());
+    float Distance = FVector::Dist(GetActorLocation(), Player->GetActorLocation());
 
 
-    ESlateVisibility VisibilityState = (Distance > 400.f)
+    ESlateVisibility VisibilityState = (Distance > this->CharacterInfo.CollisionRadius + Player->CharacterInfo.AttackRadius)
         ? ESlateVisibility::Hidden
         : ESlateVisibility::Visible;
 

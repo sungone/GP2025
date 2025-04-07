@@ -26,7 +26,7 @@ static void DrawDebugCollisionAndAttackRadius(UWorld* World, const FInfoData& In
 		InfoData.Pos,
 		InfoData.AttackRadius,
 		16,
-		FColor::Red
+		FColor::Silver
 	);
 
 	//3. ForwardVectorArrow
@@ -48,4 +48,26 @@ static void DrawDebugCollisionAndAttackRadius(UWorld* World, const FInfoData& In
 		0,
 		5.0f
 	);
+
+	// 4. FOV
+	const float Radius = InfoData.AttackRadius;
+	const float HalfFOV = InfoData.fovAngle * 0.5f;
+	const int32 NumSegments = 64;
+
+	for (int32 i = 0; i < NumSegments; ++i)
+	{
+		float Angle1 = InfoData.Yaw - HalfFOV + (i * (InfoData.fovAngle / NumSegments));
+		float Angle2 = InfoData.Yaw - HalfFOV + ((i + 1) * (InfoData.fovAngle / NumSegments));
+
+		FVector Point1 = InfoData.Pos + FVector(FMath::Cos(FMath::DegreesToRadians(Angle1)), FMath::Sin(FMath::DegreesToRadians(Angle1)), 0.0f) * Radius;
+		FVector Point2 = InfoData.Pos + FVector(FMath::Cos(FMath::DegreesToRadians(Angle2)), FMath::Sin(FMath::DegreesToRadians(Angle2)), 0.0f) * Radius;
+
+		DrawDebugLine(World, Point1, Point2, FColor::Green, false, -1.0f, 0, 2.5f);
+	}
+
+	FVector LeftEdge = InfoData.Pos + FVector(FMath::Cos(FMath::DegreesToRadians(InfoData.Yaw - HalfFOV)), FMath::Sin(FMath::DegreesToRadians(InfoData.Yaw - HalfFOV)), 0.f) * Radius;
+	FVector RightEdge = InfoData.Pos + FVector(FMath::Cos(FMath::DegreesToRadians(InfoData.Yaw + HalfFOV)), FMath::Sin(FMath::DegreesToRadians(InfoData.Yaw + HalfFOV)), 0.f) * Radius;
+
+	DrawDebugLine(World, InfoData.Pos, LeftEdge, FColor::Red, false, -1.0f, 0, 3.0f);
+	DrawDebugLine(World, InfoData.Pos, RightEdge, FColor::Red, false, -1.0f, 0, 3.0f);
 }

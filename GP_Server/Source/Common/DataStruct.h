@@ -42,6 +42,7 @@ struct FInfoData
 	float Yaw;
 	float CollisionRadius;
 	float AttackRadius;
+	float fovAngle;
 
 	FStatData Stats;
 	uint32 State;
@@ -50,7 +51,7 @@ struct FInfoData
 	FInfoData()
 		: ID(0), CharacterType(), NickName("None"),
 		Pos(FVector(0.0f, 0.0f, 0.0f)), Yaw(0.0f),
-		CollisionRadius(0.0f), AttackRadius(0.f),
+		CollisionRadius(0.0f), AttackRadius(0.f), fovAngle(90.f),
 		Stats(), State(STATE_IDLE)
 	{
 	}

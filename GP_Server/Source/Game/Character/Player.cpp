@@ -16,6 +16,7 @@ void Player::Init()
 	_info.CollisionRadius = 50.f;
 
 	_info.CharacterType = static_cast<uint8>(Type::EPlayer::GUNNER);
+	_info.fovAngle = (_info.CharacterType == static_cast<uint8>(Type::EPlayer::GUNNER)) ? 45 : 100;
 	_info.AttackRadius = (_info.CharacterType == static_cast<uint8>(Type::EPlayer::WARRIOR)) ? 100 : 1200;
 	_info.State = ECharacterStateType::STATE_IDLE;
 	ApplyLevelStats(_info.Stats.Level);
