@@ -116,7 +116,7 @@ void UGPNetworkManager::SendPlayerLogoutPacket()
 void UGPNetworkManager::SendPlayerMovePacket()
 {
 	auto info = MyPlayer->CharacterInfo;
-	MovePacket Packet(info.ID,info.Pos,0);
+	MovePacket Packet(info.ID,info.Pos,info.State,0);
 	UE_LOG(LogTemp, Warning, TEXT("SendPlayerMovePacket : Send [%d]"), info.ID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }

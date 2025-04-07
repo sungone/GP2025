@@ -96,7 +96,7 @@ void GameWorld::SpawnMonster(PlayerSession& session)
 }
 
 
-void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint64& time)
+void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& time)
 {
 	auto player = GetCharacterByID(playerId);
 	if (!player)
@@ -106,10 +106,12 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint64& time)
 	}
 	LOG(std::format("Player [{}] Move {}", playerId, pos.ToString()));
 	player->GetInfo().SetLocationAndYaw(pos);
+	player->GetInfo().AddState(static_cast<ECharacterStateType>(state));
 	UpdateViewList(player);
 	auto pkt = MovePacket(playerId, time);
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
-	SessionManager::GetInst().BroadcastToViewList(&pkt, playerId);
+	auto upkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
+	SessionManager::GetInst().BroadcastToViewList(&upkt, playerId);
 }
 
 void GameWorld::PlayerAttack(int32 playerId, float playerYaw)

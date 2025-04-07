@@ -119,10 +119,12 @@ struct MovePacket : public Packet
 {
 	int32 PlayerID;
 	FVector PlayerPos;
+	uint32 State;
 	uint64 MoveTime;
-	MovePacket(int32 PlayerID_, const FVector& PlayerPos_,
-		uint64 SendTime_, EPacketType Type_ = EPacketType::C_MOVE)
-		: Packet(Type_), PlayerID(PlayerID_), PlayerPos(PlayerPos_), MoveTime(SendTime_)
+
+	MovePacket(int32 PlayerID_, const FVector& PlayerPos_, uint32 State_ = 0,
+		uint64 SendTime_ = 0, EPacketType Type_ = EPacketType::C_MOVE)
+		: Packet(Type_), PlayerID(PlayerID_), State(State_), PlayerPos(PlayerPos_), MoveTime(SendTime_)
 	{
 		Header.PacketSize = sizeof(MovePacket);
 	}

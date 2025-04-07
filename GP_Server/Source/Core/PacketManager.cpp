@@ -122,7 +122,7 @@ void PacketManager::HandleLogoutPacket(int32 sessionId)
 void PacketManager::HandleMovePacket(int32 sessionId, Packet* packet)
 {
 	MovePacket* p = static_cast<MovePacket*>(packet);
-	_gameWorld.PlayerMove(p->PlayerID, p->PlayerPos, p->MoveTime);
+	_gameWorld.PlayerMove(p->PlayerID, p->PlayerPos, p->State,p->MoveTime);
 }
 
 void PacketManager::HandleAttackPacket(int32 sessionId, Packet* packet)
