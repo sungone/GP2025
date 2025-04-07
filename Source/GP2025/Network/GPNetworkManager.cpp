@@ -9,7 +9,6 @@
 #include "Network/GPObjectManager.h"
 #include "Network/GPGameInstance.h"
 #include "Character/GPCharacterPlayer.h"
-#include "Kismet/GameplayStatics.h"
 
 void UGPNetworkManager::ConnectToServer()
 {
@@ -30,8 +29,6 @@ void UGPNetworkManager::ConnectToServer()
 	if (Socket->GetConnectionState() == SCS_Connected)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Connection Success")));
-		WorkerRunnable = MakeShareable(new FWorkerThread(this));
-		WorkerThread = FRunnableThread::Create(WorkerRunnable.Get(), TEXT("GPRecvWorkerThread"));
 	}
 	else
 	{
@@ -41,19 +38,6 @@ void UGPNetworkManager::ConnectToServer()
 
 void UGPNetworkManager::DisconnectFromServer()
 {
-	if (WorkerRunnable.IsValid())
-	{
-		WorkerRunnable->Stop();
-	}
-	if (WorkerThread)
-	{
-		WorkerThread->Kill(true);
-		delete WorkerThread;
-		WorkerThread = nullptr;
-	}
-
-	WorkerRunnable.Reset();
-
 	if (Socket)
 	{
 		this->SendPlayerLogoutPacket();
@@ -61,27 +45,13 @@ void UGPNetworkManager::DisconnectFromServer()
 		SocketSubsystem->DestroySocket(Socket);
 		Socket = nullptr;
 	}
-
-	UE_LOG(LogTemp, Log, TEXT("Disconnected from server and thread cleaned up."));
 }
 
-
-void UGPNetworkManager::SetMyPlayer()
+void UGPNetworkManager::SetMyPlayer(AGPCharacterPlayer* InMyPlayer)
 {
-	if (!GetWorld()) return;
-
-	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (!PC) return;
-
-	AGPCharacterPlayer* Player = Cast<AGPCharacterPlayer>(PC->GetPawn());
-	if (!Player) return;
-
-	MyPlayer = Player;
-
-	if (UGPObjectManager* ObjectMgr = GetWorld()->GetSubsystem<UGPObjectManager>())
-	{
-		ObjectMgr->SetMyPlayer(Player);
-	}
+	MyPlayer = InMyPlayer;
+	UGPObjectManager* ObjectMgr = GetWorld()->GetSubsystem<UGPObjectManager>();
+	ObjectMgr->SetMyPlayer(InMyPlayer);
 }
 
 void UGPNetworkManager::SendPacket(uint8* Buf, int32 Size)
@@ -163,7 +133,6 @@ void UGPNetworkManager::SendPlayerUnequipItem(int32 ItemID)
 void UGPNetworkManager::ReceiveData()
 {
 	uint32 DataSize;
-	if (!Socket) return;
 	if (Socket->HasPendingData(DataSize))
 	{
 		TArray<uint8> RecvData;
@@ -183,179 +152,156 @@ void UGPNetworkManager::ProcessPacket()
 {
 	ReceiveData();
 	TArray<uint8> PacketData;
+	UGPObjectManager* ObjectMgr = GetWorld()->GetSubsystem<UGPObjectManager>();
 	while (RecvQueue.Dequeue(PacketData))
 	{
 		RemainingData.Append(PacketData);
 
 		while (RemainingData.Num() > sizeof(FPacketHeader))
 		{
-			FPacketHeader* Header = reinterpret_cast<FPacketHeader*>(RemainingData.GetData());
+			FPacketHeader* PacketHeader = reinterpret_cast<FPacketHeader*>(RemainingData.GetData());
 
-			if (RemainingData.Num() < Header->PacketSize || Header->PacketSize <= 0)
-				break;
-			TArray<uint8> PacketCopy;
-			PacketCopy.Append(RemainingData.GetData(), Header->PacketSize);
+			if (RemainingData.Num() < PacketHeader->PacketSize) break;
 
-			AsyncTask(ENamedThreads::GameThread, [this, PacketCopy]()
-				{
-					HandlePacketOnGameThread(PacketCopy);
-				});
-
-			RemainingData.RemoveAt(0, Header->PacketSize, false);
-		}
-	}
-}
-
-void UGPNetworkManager::HandlePacketOnGameThread(const TArray<uint8>& PacketData)
-{
-	if (!GetWorld()) return;
-	UGPObjectManager* ObjectMgr = GetWorld()->GetSubsystem<UGPObjectManager>();
-	if (!ObjectMgr) return;
-	const FPacketHeader* Header = reinterpret_cast<const FPacketHeader*>(PacketData.GetData());
-
-	switch (Header->PacketType)
-	{
-#pragma region Player
-	case EPacketType::S_LOGIN_SUCCESS:
-	{
-		LoginSuccessPacket* Pkt = reinterpret_cast<LoginSuccessPacket*>(RemainingData.GetData());
-		CachedLoginInfo = Pkt->PlayerInfo;
-		Cast<UGPGameInstance>(GetGameInstance())->OnLoginSuccess();
-		FTimerHandle TempHandle;
-		GetWorld()->GetTimerManager().SetTimer(TempHandle, [this]()
+			switch (PacketHeader->PacketType)
 			{
-				if (UGPObjectManager* ObjMgr = GetWorld()->GetSubsystem<UGPObjectManager>())
-				{
-					ObjMgr->OnLoginSuccess(CachedLoginInfo);
-				}
-			}, 1.0f, false);
-		break;
-	}
-	case EPacketType::S_LOGIN_FAIL:
-	{
-		LoginFailPacket* Pkt = reinterpret_cast<LoginFailPacket*>(RemainingData.GetData());
-		ObjectMgr->PrintFailMessege(Pkt->ResultCode);
-		break;
-	}
-	case EPacketType::S_SIGNUP_SUCCESS:
-	{
-		SignUpSuccessPacket* Pkt = reinterpret_cast<SignUpSuccessPacket*>(RemainingData.GetData());
-		Cast<UGPGameInstance>(GetGameInstance())->OnLoginSuccess();
-		ObjectMgr->OnLoginSuccess(Pkt->PlayerInfo);
-		break;
-	}
-	case EPacketType::S_SIGNUP_FAIL:
-	{
-		SignUpFailPacket* Pkt = reinterpret_cast<SignUpFailPacket*>(RemainingData.GetData());
-		ObjectMgr->PrintFailMessege(Pkt->ResultCode);
-		break;
-	}
-	case EPacketType::S_ADD_PLAYER:
-	{
-		InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
-		ObjectMgr->AddPlayer(Pkt->Data);
-		break;
-	}
-	case EPacketType::S_REMOVE_PLAYER:
-	{
-		IDPacket* Pkt = reinterpret_cast<IDPacket*>(RemainingData.GetData());
-		ObjectMgr->RemovePlayer(Pkt->Data);
-		break;
-	}
-	case EPacketType::S_PLAYER_STATUS_UPDATE:
-	{
-		InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
-		ObjectMgr->UpdatePlayer(Pkt->Data);
-		break;
-	}
-	case EPacketType::S_DAMAGED_PLAYER:
-	{
-		PlayerDamagePacket* Pkt = reinterpret_cast<PlayerDamagePacket*>(RemainingData.GetData());
-		ObjectMgr->DamagedPlayer(Pkt->Target);
-		break;
-	}
+#pragma region Player
+			case EPacketType::S_LOGIN_SUCCESS:
+			{
+				LoginSuccessPacket* Pkt = reinterpret_cast<LoginSuccessPacket*>(RemainingData.GetData());
+				Cast<UGPGameInstance>(GetGameInstance())->OnLoginSuccess();
+				ObjectMgr->OnLoginSuccess(Pkt->PlayerInfo);
+				break;
+			}
+			case EPacketType::S_LOGIN_FAIL:
+			{
+				LoginFailPacket* Pkt = reinterpret_cast<LoginFailPacket*>(RemainingData.GetData());
+				ObjectMgr->PrintFailMessege(Pkt->ResultCode);
+				break;
+			}
+			case EPacketType::S_SIGNUP_SUCCESS:
+			{
+				SignUpSuccessPacket* Pkt = reinterpret_cast<SignUpSuccessPacket*>(RemainingData.GetData());
+				Cast<UGPGameInstance>(GetGameInstance())->OnLoginSuccess();
+				ObjectMgr->OnLoginSuccess(Pkt->PlayerInfo);
+				break;
+			}
+			case EPacketType::S_SIGNUP_FAIL:
+			{
+				SignUpFailPacket* Pkt = reinterpret_cast<SignUpFailPacket*>(RemainingData.GetData());
+				ObjectMgr->PrintFailMessege(Pkt->ResultCode);
+				break;
+			}
+			case EPacketType::S_ADD_PLAYER:
+			{
+				InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
+				ObjectMgr->AddPlayer(Pkt->Data);
+				break;
+			}
+			case EPacketType::S_REMOVE_PLAYER:
+			{
+				IDPacket* Pkt = reinterpret_cast<IDPacket*>(RemainingData.GetData());
+				ObjectMgr->RemovePlayer(Pkt->Data);
+				break;
+			}
+			case EPacketType::S_PLAYER_STATUS_UPDATE:
+			{
+				InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
+				ObjectMgr->UpdatePlayer(Pkt->Data);
+				break;
+			}
+			case EPacketType::S_DAMAGED_PLAYER:
+			{
+				PlayerDamagePacket* Pkt = reinterpret_cast<PlayerDamagePacket*>(RemainingData.GetData());
+				ObjectMgr->DamagedPlayer(Pkt->Target);
+				break;
+			}
 #pragma endregion
 #pragma region Monster
-	case EPacketType::S_ADD_MONSTER:
-	{
-		InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
-		ObjectMgr->AddMonster(Pkt->Data);
-		break;
-	}
-	case EPacketType::S_REMOVE_MONSTER:
-	{
-		IDPacket* Pkt = reinterpret_cast<IDPacket*>(RemainingData.GetData());
-		ObjectMgr->RemoveMonster(Pkt->Data);
-		break;
-	}
-	case EPacketType::S_MONSTER_STATUS_UPDATE:
-	{
-		InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
-		ObjectMgr->UpdateMonster(Pkt->Data);
-		break;
-	}
-	case EPacketType::S_DAMAGED_MONSTER:
-	{
-		MonsterDamagePacket* Pkt = reinterpret_cast<MonsterDamagePacket*>(RemainingData.GetData());
-		ObjectMgr->DamagedMonster(Pkt->Target, Pkt->Damage);
-		break;
-	}
+			case EPacketType::S_ADD_MONSTER:
+			{
+				InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
+				ObjectMgr->AddMonster(Pkt->Data);
+				break;
+			}
+			case EPacketType::S_REMOVE_MONSTER:
+			{
+				IDPacket* Pkt = reinterpret_cast<IDPacket*>(RemainingData.GetData());
+				ObjectMgr->RemoveMonster(Pkt->Data);
+				break;
+			}
+			case EPacketType::S_MONSTER_STATUS_UPDATE:
+			{
+				InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
+				ObjectMgr->UpdateMonster(Pkt->Data);
+				break;
+			}
+			case EPacketType::S_DAMAGED_MONSTER:
+			{
+				MonsterDamagePacket* Pkt = reinterpret_cast<MonsterDamagePacket*>(RemainingData.GetData());
+				ObjectMgr->DamagedMonster(Pkt->Target, Pkt->Damage);
+				break;
+			}
 #pragma endregion
 #pragma region Item
-	case EPacketType::S_ITEM_SPAWN:
-	{
-		ItemPkt::SpawnPacket* Pkt = reinterpret_cast<ItemPkt::SpawnPacket*>(RemainingData.GetData());
-		ObjectMgr->ItemSpawn(Pkt->ItemID, Pkt->ItemType, Pkt->Pos);
-		break;
-	}
-	case EPacketType::S_ITEM_DESPAWN:
-	{
-		ItemPkt::DespawnPacket* Pkt = reinterpret_cast<ItemPkt::DespawnPacket*>(RemainingData.GetData());
-		ObjectMgr->ItemDespawn(Pkt->ItemID);
-		break;
-	}
-	case EPacketType::S_ITEM_PICKUP:
-	{
-		ItemPkt::PickUpPacket* Pkt = reinterpret_cast<ItemPkt::PickUpPacket*>(RemainingData.GetData());
-		//Todo: 추후 pick up이랑 despawn 구분하기
-		ObjectMgr->ItemDespawn(Pkt->ItemID);
-		break;
-	}
-	case EPacketType::S_ITEM_DROP:
-	{
-		ItemPkt::DropPacket* Pkt = reinterpret_cast<ItemPkt::DropPacket*>(RemainingData.GetData());
-		ObjectMgr->DropItem(Pkt->ItemID, Pkt->ItemType, Pkt->Pos);
-		break;
-	}
-	case EPacketType::S_ADD_INVENTORY_ITEM:
-	{
-		ItemPkt::AddInventoryPacket* Pkt = reinterpret_cast<ItemPkt::AddInventoryPacket*>(RemainingData.GetData());
-		ObjectMgr->AddInventoryItem(Pkt->ItemID, Pkt->ItemType);
-		break;
-	}
-	case EPacketType::S_USE_INVENTORY_ITEM:
-	{
-		ItemPkt::ItemUsedPacket* Pkt = reinterpret_cast<ItemPkt::ItemUsedPacket*>(RemainingData.GetData());
-		ObjectMgr->UseInventoryItem(Pkt->ItemID);
-		ObjectMgr->UpdatePlayer(Pkt->PlayerInfo);
-		break;
-	}
-	case EPacketType::S_EQUIP_ITEM:
-	{
-		ItemPkt::EquipItemPacket* Pkt = reinterpret_cast<ItemPkt::EquipItemPacket*>(RemainingData.GetData());
-		ObjectMgr->EquipItem(Pkt->PlayerID, Pkt->ItemType);
-		break;
-	}
-	case EPacketType::S_UNEQUIP_ITEM:
-	{
-		ItemPkt::UnequipItemPacket* Pkt = reinterpret_cast<ItemPkt::UnequipItemPacket*>(RemainingData.GetData());
-		ObjectMgr->UnequipItem(Pkt->PlayerID, Pkt->ItemType);
-		break;
-	}
+			case EPacketType::S_ITEM_SPAWN:
+			{
+				ItemPkt::SpawnPacket* Pkt = reinterpret_cast<ItemPkt::SpawnPacket*>(RemainingData.GetData());
+				ObjectMgr->ItemSpawn(Pkt->ItemID, Pkt->ItemType, Pkt->Pos);
+				break;
+			}
+			case EPacketType::S_ITEM_DESPAWN:
+			{
+				ItemPkt::DespawnPacket* Pkt = reinterpret_cast<ItemPkt::DespawnPacket*>(RemainingData.GetData());
+				ObjectMgr->ItemDespawn(Pkt->ItemID);
+				break;
+			}
+			case EPacketType::S_ITEM_PICKUP:
+			{
+				ItemPkt::PickUpPacket* Pkt = reinterpret_cast<ItemPkt::PickUpPacket*>(RemainingData.GetData());
+				//Todo: 추후 pick up이랑 despawn 구분하기
+				ObjectMgr->ItemDespawn(Pkt->ItemID);
+				break;
+			}
+			case EPacketType::S_ITEM_DROP:
+			{
+				ItemPkt::DropPacket* Pkt = reinterpret_cast<ItemPkt::DropPacket*>(RemainingData.GetData());
+				ObjectMgr->DropItem(Pkt->ItemID, Pkt->ItemType, Pkt->Pos);
+				break;
+			}
+			case EPacketType::S_ADD_INVENTORY_ITEM:
+			{
+				ItemPkt::AddInventoryPacket* Pkt = reinterpret_cast<ItemPkt::AddInventoryPacket*>(RemainingData.GetData());
+				ObjectMgr->AddInventoryItem(Pkt->ItemID, Pkt->ItemType);
+				break;
+			}
+			case EPacketType::S_USE_INVENTORY_ITEM:
+			{
+				ItemPkt::ItemUsedPacket* Pkt = reinterpret_cast<ItemPkt::ItemUsedPacket*>(RemainingData.GetData());
+				ObjectMgr->UseInventoryItem(Pkt->ItemID);
+				ObjectMgr->UpdatePlayer(Pkt->PlayerInfo);
+				break;
+			}
+			case EPacketType::S_EQUIP_ITEM:
+			{
+				ItemPkt::EquipItemPacket* Pkt = reinterpret_cast<ItemPkt::EquipItemPacket*>(RemainingData.GetData());
+				ObjectMgr->EquipItem(Pkt->PlayerID, Pkt->ItemType);
+				break;
+			}
+			case EPacketType::S_UNEQUIP_ITEM:
+			{
+				ItemPkt::UnequipItemPacket* Pkt = reinterpret_cast<ItemPkt::UnequipItemPacket*>(RemainingData.GetData());
+				ObjectMgr->UnequipItem(Pkt->PlayerID, Pkt->ItemType);
+				break;
+			}
 #pragma endregion
-	default:
-		UE_LOG(LogTemp, Warning, TEXT("Unknown Packet Type received."));
-		break;
+			default:
+				UE_LOG(LogTemp, Warning, TEXT("Unknown Packet Type received."));
+				break;
+			}
+
+			RemainingData.RemoveAt(0, PacketHeader->PacketSize, false);
+		}
 	}
 }
 

@@ -16,4 +16,5 @@ class GP2025_API AGPGameMode : public AGameModeBase
 
 public :
 	AGPGameMode();
+	virtual void Tick(float DeltaTime) override;
 };

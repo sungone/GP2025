@@ -41,13 +41,13 @@ void UGPObjectManager::OnLoginSuccess(FInfoData& PlayerInfo)
 
 	if (MyPlayer == nullptr)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Invaild MyPlayer")); 
+		UE_LOG(LogTemp, Error, TEXT("Invaild MyPlayer"));
 		FGenericPlatformMisc::RequestExit(false);
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Login Success [%d] (%f,%f,%f)(%f)"),
 		PlayerInfo.ID, PlayerInfo.Pos.X, PlayerInfo.Pos.Y, PlayerInfo.Pos.Z, PlayerInfo.Yaw);
-	
+
 	MyPlayer->SetCharacterInfo(PlayerInfo);
 	MyPlayer->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
 	auto Player = Cast<AGPCharacterPlayer>(MyPlayer);

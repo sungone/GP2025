@@ -3,6 +3,7 @@
 #include "Game/GPGameMode.h"
 #include "Player/GPPlayerController.h"
 #include "Network/GPNetworkManager.h"
+#include "Engine/World.h"
 
 AGPGameMode::AGPGameMode()
 {
@@ -22,3 +23,12 @@ AGPGameMode::AGPGameMode()
 		PlayerControllerClass = PlayerControllerClassRef.Class;
 	}
 }
+
+void AGPGameMode::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+	if(NetworkMgr)
+		NetworkMgr->ProcessPacket();
+}
+

@@ -147,6 +147,11 @@ void AGPCharacterMyplayer::BeginPlay()
 {
 	Super::BeginPlay();
 	SetCharacterType(CurrentCharacterType);
+
+	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+	if (NetworkMgr)
+		NetworkMgr->SetMyPlayer(Cast<AGPCharacterPlayer>(this));
+
 	LastLocation = GetActorLocation();
 	LastRotationYaw = GetActorRotation().Yaw;
 	LastSendPlayerInfo = CharacterInfo;

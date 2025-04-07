@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "../../GP_Server/Source/Common/Common.h"
-#include "Network/WorkerThread.h" 
 #include "GPNetworkManager.generated.h"
 
 class AGPCharacterPlayer;
@@ -19,8 +18,8 @@ public:
 	void ConnectToServer();
 	void DisconnectFromServer();
 	void ProcessPacket();
-	void HandlePacketOnGameThread(const TArray<uint8>& PacketData);
-	void SetMyPlayer();
+
+	void SetMyPlayer(AGPCharacterPlayer* InMyPlayer);
 public:
 	void SendPlayerLoginPacket(const FString& AccountID, const FString& AccountPW);
 	void SendPlayerSignUpPacket(const FString& AccountID, const FString& AccountPW, const FString& NickName);
@@ -46,7 +45,4 @@ private:
 
 	TArray<uint8> RemainingData;
 	TQueue<TArray<uint8>, EQueueMode::Mpsc> RecvQueue;
-	TSharedPtr<class FWorkerThread> WorkerRunnable;
-	FRunnableThread* WorkerThread = nullptr;
-	FInfoData CachedLoginInfo;
 };
