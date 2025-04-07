@@ -104,7 +104,9 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint64& time)
 		LOG(Warning, "Invaild");
 		return;
 	}
+	LOG(std::format("Player [{}] Move {}", playerId, pos.ToString()));
 	player->GetInfo().SetLocationAndYaw(pos);
+	UpdateViewList(player);
 	auto pkt = MovePacket(playerId, time);
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
 	SessionManager::GetInst().BroadcastToViewList(&pkt, playerId);
