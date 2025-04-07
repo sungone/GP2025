@@ -1,5 +1,5 @@
 #pragma once
-#define DB_LOCAL
+//#define DB_LOCAL
 
 enum CompType
 {
