@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Network/GPNetworkManager.h"
@@ -58,6 +58,33 @@ void UGPNetworkManager::SendPacket(uint8* Buf, int32 Size)
 {
 	int32 BytesSent = 0;
 	Socket->Send(Buf, Size, BytesSent);
+}
+
+void UGPNetworkManager::PrintFailMessege(DBResultCode ResultCode)
+{
+		FString ErrorMessage;
+
+	switch (ResultCode)
+	{
+	case DBResultCode::SUCCESS:
+		return;
+	case DBResultCode::INVALID_USER:
+		ErrorMessage = TEXT("계정을 찾을 수 없습니다");
+		break;
+	case DBResultCode::INVALID_PASSWORD:
+		ErrorMessage = TEXT("비밀번호가 일치하지 않습니다");
+		break;
+	case DBResultCode::DUPLICATE_ID:
+		ErrorMessage = TEXT("이미 존재하는 아이디입니다");
+		break;
+	default:
+		ErrorMessage = TEXT("알 수 없는 오류가 발생했습니다");
+		break;
+	}
+
+	UE_LOG(LogTemp, Error, TEXT("%s"), *ErrorMessage);
+
+	OnLoginFailed.Broadcast(ErrorMessage);
 }
 
 void UGPNetworkManager::SendPlayerLoginPacket(const FString& AccountID, const FString& AccountPW)
@@ -169,27 +196,27 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_LOGIN_SUCCESS:
 			{
 				LoginSuccessPacket* Pkt = reinterpret_cast<LoginSuccessPacket*>(RemainingData.GetData());
-				Cast<UGPGameInstance>(GetGameInstance())->OnLoginSuccess();
+				OnLoginSuccess.Broadcast();
 				ObjectMgr->OnLoginSuccess(Pkt->PlayerInfo);
 				break;
 			}
 			case EPacketType::S_LOGIN_FAIL:
 			{
 				LoginFailPacket* Pkt = reinterpret_cast<LoginFailPacket*>(RemainingData.GetData());
-				ObjectMgr->PrintFailMessege(Pkt->ResultCode);
+				PrintFailMessege(Pkt->ResultCode);
 				break;
 			}
 			case EPacketType::S_SIGNUP_SUCCESS:
 			{
 				SignUpSuccessPacket* Pkt = reinterpret_cast<SignUpSuccessPacket*>(RemainingData.GetData());
-				Cast<UGPGameInstance>(GetGameInstance())->OnLoginSuccess();
 				ObjectMgr->OnLoginSuccess(Pkt->PlayerInfo);
 				break;
 			}
 			case EPacketType::S_SIGNUP_FAIL:
 			{
 				SignUpFailPacket* Pkt = reinterpret_cast<SignUpFailPacket*>(RemainingData.GetData());
-				ObjectMgr->PrintFailMessege(Pkt->ResultCode);
+				OnLoginSuccess.Broadcast();
+				PrintFailMessege(Pkt->ResultCode);
 				break;
 			}
 			case EPacketType::S_ADD_PLAYER:
@@ -259,7 +286,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_ITEM_PICKUP:
 			{
 				ItemPkt::PickUpPacket* Pkt = reinterpret_cast<ItemPkt::PickUpPacket*>(RemainingData.GetData());
-				//Todo: ���� pick up�̶� despawn �����ϱ�
+				//Todo: 추후 pick up이랑 despawn 구분하기
 				ObjectMgr->ItemDespawn(Pkt->ItemID);
 				break;
 			}

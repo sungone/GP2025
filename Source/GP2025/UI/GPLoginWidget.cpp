@@ -11,7 +11,6 @@
 #include "Logging/LogMacros.h"      
 #include "Player/GPPlayerController.h"
 #include "Network/GPNetworkManager.h"
-#include "Network/GPObjectManager.h"
 
 void UGPLoginWidget::NativeConstruct()
 {
@@ -42,9 +41,9 @@ void UGPLoginWidget::NativeConstruct()
 		ButtonExit->OnClicked.AddDynamic(this, &UGPLoginWidget::OnExitClicked);
 	}
 
-	if (UGPObjectManager* ObjMgr = GetWorld()->GetSubsystem<UGPObjectManager>())
+	if (UGPNetworkManager* Mgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>())
 	{
-		ObjMgr->OnLoginFailed.AddDynamic(this, &UGPLoginWidget::HandleLoginFail);
+		Mgr->OnLoginFailed.AddDynamic(this, &UGPLoginWidget::HandleLoginFail);
 	}
 }
 

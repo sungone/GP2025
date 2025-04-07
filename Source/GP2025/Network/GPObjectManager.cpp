@@ -54,32 +54,6 @@ void UGPObjectManager::OnLoginSuccess(FInfoData& PlayerInfo)
 	Players.Add(PlayerInfo.ID, Player);
 }
 
-void UGPObjectManager::PrintFailMessege(DBResultCode ResultCode)
-{
-	FString ErrorMessage;
-
-	switch (ResultCode)
-	{
-	case DBResultCode::SUCCESS:
-		return;
-	case DBResultCode::INVALID_USER:
-		ErrorMessage = TEXT("계정을 찾을 수 없습니다");
-		break;
-	case DBResultCode::INVALID_PASSWORD:
-		ErrorMessage = TEXT("비밀번호가 일치하지 않습니다");
-		break;
-	case DBResultCode::DUPLICATE_ID:
-		ErrorMessage = TEXT("이미 존재하는 아이디입니다");
-		break;
-	default:
-		ErrorMessage = TEXT("알 수 없는 오류가 발생했습니다");
-		break;
-	}
-
-	UE_LOG(LogTemp, Error, TEXT("%s"), *ErrorMessage);
-
-	OnLoginFailed.Broadcast(ErrorMessage);
-}
 
 void UGPObjectManager::AddPlayer(FInfoData& PlayerInfo)
 {

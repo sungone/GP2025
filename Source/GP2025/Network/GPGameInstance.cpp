@@ -19,16 +19,6 @@ void UGPGameInstance::Shutdown()
 	Super::Shutdown();
 }
 
-void UGPGameInstance::ProcessPacket()
-{
-	NetworkMgr->ProcessPacket();
-}
-
-void UGPGameInstance::OnLoginSuccess()
-{
-	UGameplayStatics::OpenLevel(this, FName("TestMap"));
-}
-
 //AABB박스 추출 -> TUK level BP에서 호출하고 있음
 void UGPGameInstance::SaveBoundingBoxData(ULevel* Level)
 {
