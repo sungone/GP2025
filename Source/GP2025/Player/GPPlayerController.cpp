@@ -8,7 +8,7 @@
 #include "UI/GPLoginWidget.h"
 #include "UI/GPLobbyWidget.h"
 #include "UObject/ConstructorHelpers.h"
-
+#include "Network/GPNetworkManager.h"
 
 void AGPPlayerController::BeginPlay()
 {
@@ -18,18 +18,22 @@ void AGPPlayerController::BeginPlay()
 	SetInputMode(GameOnlyInputMode);
 }
 
+void AGPPlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	if (UGPNetworkManager* NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>())
+	{
+		NetworkMgr->SetMyPlayer();
+	}
+}
+
 AGPPlayerController::AGPPlayerController()
 {
 	static ConstructorHelpers::FClassFinder<UGPInGameWidget> InGameWidgetBP(TEXT("/Game/Inventory/Widgets/WBP_InGame"));
 	if (InGameWidgetBP.Succeeded())
 	{
 		InGameWidgetClass = InGameWidgetBP.Class;
-	}
-
-	static ConstructorHelpers::FClassFinder<UGPInGameWidget> LoginWidgetBP(TEXT("/Game/Inventory/Widgets/WBP_Login"));
-	if (LoginWidgetBP.Succeeded())
-	{
-		LoginWidgetClass = LoginWidgetBP.Class;
 	}
 
 	static ConstructorHelpers::FClassFinder<UGPInGameWidget> LobbyWidgetBP(TEXT("/Game/Inventory/Widgets/WBP_Lobby"));
@@ -41,11 +45,6 @@ AGPPlayerController::AGPPlayerController()
 
 void AGPPlayerController::ShowInGameUI()
 {
-	if (LoginWidget)
-	{
-		LoginWidget->RemoveFromParent();  
-	}
-
 	if (LobbyWidget)
 	{
 		LobbyWidget->RemoveFromParent();  
@@ -63,32 +62,8 @@ void AGPPlayerController::ShowInGameUI()
 	}
 }
 
-void AGPPlayerController::ShowLoginUI()
-{
-	if (LobbyWidget)
-	{
-		LobbyWidget->RemoveFromParent();
-	}
-
-	if (LoginWidgetClass)
-	{
-		LoginWidget = CreateWidget<UGPLoginWidget>(this, LoginWidgetClass);
-		if (LoginWidget)
-		{
-			LoginWidget->AddToViewport();
-			bShowMouseCursor = true;  // 마우스 커서 보이기
-			SetInputMode(FInputModeUIOnly());  // UI 입력 모드 설정
-		}
-	}
-}
-
 void AGPPlayerController::ShowLobbyUI()
 {
-	if (LoginWidget)
-	{
-		LoginWidget->RemoveFromParent(); 
-	}
-
 	if (LobbyWidgetClass)
 	{
 		LobbyWidget = CreateWidget<UGPLobbyWidget>(this, LobbyWidgetClass);

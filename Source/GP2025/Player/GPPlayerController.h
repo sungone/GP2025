@@ -17,7 +17,7 @@ class GP2025_API AGPPlayerController : public APlayerController
 	
 protected :
 	virtual void BeginPlay() override;
-
+	virtual void OnPossess(APawn* InPawn) override;
 public:
 	AGPPlayerController();
 
@@ -30,15 +30,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void ShowInGameUI();
-public:
-	UPROPERTY()
-	class UGPLoginWidget* LoginWidget;
-
-	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<UGPLoginWidget> LoginWidgetClass;
-
-	UFUNCTION(BlueprintCallable, Category = "UI")
-	void ShowLoginUI();
 
 public :
 	UPROPERTY()
