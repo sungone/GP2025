@@ -54,16 +54,4 @@ void AGPGun::AttackHitCheck()
 
     DrawDebugLine(GetWorld(), MuzzleLocation, FinalTraceEnd, FColor::Red, false, 1.5f, 0, 2.f);
 
-    if (bHit)
-    {
-        AGPCharacterBase* TargetCharacter = Cast<AGPCharacterBase>(FinalHit.GetActor());
-        if (TargetCharacter)
-        {
-            auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-            if (NetworkMgr)
-            {
-                //NetworkMgr->SendPlayerAttackPacket(TargetCharacter->CharacterInfo.ID);
-            }
-        }
-    }
 }

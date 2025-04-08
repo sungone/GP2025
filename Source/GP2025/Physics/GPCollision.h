@@ -62,12 +62,12 @@ static void DrawDebugCollisionAndAttackRadius(UWorld* World, const FInfoData& In
 		FVector Point1 = InfoData.Pos + FVector(FMath::Cos(FMath::DegreesToRadians(Angle1)), FMath::Sin(FMath::DegreesToRadians(Angle1)), 0.0f) * Radius;
 		FVector Point2 = InfoData.Pos + FVector(FMath::Cos(FMath::DegreesToRadians(Angle2)), FMath::Sin(FMath::DegreesToRadians(Angle2)), 0.0f) * Radius;
 
-		DrawDebugLine(World, Point1, Point2, FColor::Green, false, -1.0f, 0, 2.5f);
+		DrawDebugLine(World, Point1, Point2, FColor::Green, false, -1.0f, 0, 4.0f);
 	}
 
 	FVector LeftEdge = InfoData.Pos + FVector(FMath::Cos(FMath::DegreesToRadians(InfoData.Yaw - HalfFOV)), FMath::Sin(FMath::DegreesToRadians(InfoData.Yaw - HalfFOV)), 0.f) * Radius;
 	FVector RightEdge = InfoData.Pos + FVector(FMath::Cos(FMath::DegreesToRadians(InfoData.Yaw + HalfFOV)), FMath::Sin(FMath::DegreesToRadians(InfoData.Yaw + HalfFOV)), 0.f) * Radius;
 
-	DrawDebugLine(World, InfoData.Pos, LeftEdge, FColor::Red, false, -1.0f, 0, 3.0f);
-	DrawDebugLine(World, InfoData.Pos, RightEdge, FColor::Red, false, -1.0f, 0, 3.0f);
+	DrawDebugLine(World, InfoData.Pos, LeftEdge, FColor::Red, false, -1.0f, 0, 2.0f);
+	DrawDebugLine(World, InfoData.Pos, RightEdge, FColor::Red, false, -1.0f, 0, 2.0f);
 }

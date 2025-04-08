@@ -1,5 +1,7 @@
 #pragma once
-//#define DB_LOCAL
+#if DEBUG
+#define DB_LOCAL
+#endif
 
 enum CompType
 {

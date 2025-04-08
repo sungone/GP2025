@@ -5,7 +5,7 @@
 #include "Item.h"
 
 constexpr size_t MAX_PLAYER = MAX_CLIENT;
-constexpr size_t MAX_MONSTER = 50;
+constexpr size_t MAX_MONSTER = 10;
 constexpr size_t MAX_CHARACTER = MAX_PLAYER + MAX_MONSTER;
 
 class GameWorld

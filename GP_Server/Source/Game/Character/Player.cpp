@@ -16,8 +16,8 @@ void Player::Init()
 	_info.CollisionRadius = 50.f;
 
 	_info.CharacterType = static_cast<uint8>(Type::EPlayer::GUNNER);
-	_info.fovAngle = (_info.CharacterType == static_cast<uint8>(Type::EPlayer::GUNNER)) ? 45 : 100;
-	_info.AttackRadius = (_info.CharacterType == static_cast<uint8>(Type::EPlayer::WARRIOR)) ? 100 : 1200;
+	_info.fovAngle = (_info.CharacterType == static_cast<uint8>(Type::EPlayer::GUNNER)) ? 10 : 100;
+	_info.AttackRadius = (_info.CharacterType == static_cast<uint8>(Type::EPlayer::WARRIOR)) ? 300 : 1500;
 	_info.State = ECharacterStateType::STATE_IDLE;
 	ApplyLevelStats(_info.Stats.Level);
 }
@@ -118,7 +118,7 @@ WorldItem Player::DropItem(uint32 itemId)
 
 bool Player::Attack(std::shared_ptr<Character> monster)
 {
-	if (IsInAttackRange(monster->GetInfo()))
+	if (!IsInAttackRange(monster->GetInfo()))
 		return false;
 
 	float atkDamage = GetAttackDamage();
