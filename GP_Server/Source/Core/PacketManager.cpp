@@ -19,6 +19,11 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 		LOG(LogType::RecvLog, std::format("LogoutPacket from [{}]", sessionId));
 		HandleLogoutPacket(sessionId);
 		break;
+	case EPacketType::C_SELECT_CHARACTER:
+		LOG(LogType::RecvLog, std::format("LogoutPacket from [{}]", sessionId));
+		HandleSelectCharacterPacket(sessionId, packet);
+		break;
+
 	case EPacketType::C_MOVE:
 		LOG(LogType::RecvLog, std::format("MovePacket from [{}]", sessionId));
 		HandleMovePacket(sessionId, packet);
@@ -27,10 +32,14 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 		LOG(LogType::RecvLog, std::format("AttackPacket from [{}]", sessionId));
 		HandleAttackPacket(sessionId, packet);
 		break;
+
+
 	case EPacketType::C_USE_SKILL:
 		LOG(LogType::RecvLog, std::format("UseSkillPacket from [{}]", sessionId));
 		HandleUseSkillPacket(sessionId, packet);
 		break;
+
+
 	case EPacketType::C_TAKE_ITEM:
 		LOG(LogType::RecvLog, std::format("PickUpItemPacket from [{}]", sessionId));
 		HandlePickUpItemPacket(sessionId, packet);
@@ -121,6 +130,12 @@ void PacketManager::HandleLogoutPacket(int32 sessionId)
 	//Todo: 로그인 전에 종료되면 여기서  "Invalid" 호출되는 것 같은데 해결하자
 	_sessionMgr.BroadcastToViewList(&pkt, sessionId);
 	_sessionMgr.Disconnect(sessionId);
+}
+
+void PacketManager::HandleSelectCharacterPacket(int32 sessionId, Packet* packet)
+{
+	SelectCharacterPacket* p = static_cast<SelectCharacterPacket*>(packet);
+	_gameWorld.PlayerSelectCharacter(sessionId, p->PlayerType);
 }
 
 void PacketManager::HandleMovePacket(int32 sessionId, Packet* packet)

@@ -157,6 +157,17 @@ void GameWorld::PlayerUseSkill(int32 playerId, ESkillGroup groupId)
 	player->UseSkill(groupId);
 }
 
+void GameWorld::PlayerSelectCharacter(int32 playerId, Type::EPlayer type)
+{
+	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	if (!player)
+	{
+		LOG(Warning, "Invaild!");
+		return;
+	}
+	player->SetCharacterType(type);
+}
+
 void GameWorld::UpdateMonster()
 {
 	std::unique_lock<std::mutex> lock(_carrMutex);

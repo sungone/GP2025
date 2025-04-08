@@ -13,17 +13,20 @@ void Player::Init()
 	_info.SetLocation(newPos);
 
 	//Todo: DB값으로 설정해줘야한다
+	SetCharacterType(Type::EPlayer::GUNNER);
 	_info.Stats.Level = 10;
 	_info.Stats.Speed = 200.f;
 	_info.CollisionRadius = 50.f;
+	_info.State = ECharacterStateType::STATE_IDLE;
+	ApplyLevelStats(_info.Stats.Level);
+}
 
-	//Todo: 테스트 편하게 캐릭터 선택 패킷 만들자
-	_playerType = Type::EPlayer::GUNNER;
+void Player::SetCharacterType(Type::EPlayer type)
+{
+	_playerType = type;
 	_info.CharacterType = static_cast<uint8>(_playerType);
 	_info.fovAngle = (_playerType == Type::EPlayer::WARRIOR) ? 45 : 10;
 	_info.AttackRadius = (_playerType == Type::EPlayer::WARRIOR) ? 300 : 1500;
-	_info.State = ECharacterStateType::STATE_IDLE;
-	ApplyLevelStats(_info.Stats.Level);
 }
 
 void Player::UpdateViewList(std::shared_ptr<Character> other)

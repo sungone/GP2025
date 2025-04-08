@@ -113,6 +113,12 @@ void UGPNetworkManager::SendPlayerLogoutPacket()
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
+void UGPNetworkManager::SendPlayerSelectCharacter(Type::EPlayer PlayerType)
+{
+	SelectCharacterPacket Packet(PlayerType);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
 void UGPNetworkManager::SendPlayerMovePacket()
 {
 	auto info = MyPlayer->CharacterInfo;

@@ -115,6 +115,16 @@ struct SignUpFailPacket : public Packet
 		Header.PacketSize = sizeof(SignUpFailPacket);
 	}
 };
+struct SelectCharacterPacket : public Packet
+{
+	Type::EPlayer PlayerType;
+	SelectCharacterPacket(Type::EPlayer PlayerType_)
+		: Packet(EPacketType::C_SELECT_CHARACTER), PlayerType(PlayerType_)
+	{
+		Header.PacketSize = sizeof(SelectCharacterPacket);
+	}
+};
+
 struct MovePacket : public Packet
 {
 	int32 PlayerID;

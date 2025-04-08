@@ -34,6 +34,10 @@ public:
 	void SendPlayerLoginPacket(const FString& AccountID, const FString& AccountPW);
 	void SendPlayerSignUpPacket(const FString& AccountID, const FString& AccountPW, const FString& NickName);
 	void SendPlayerLogoutPacket();
+
+	UFUNCTION()
+	void SendPlayerSelectCharacter(Type::EPlayer PlayerType);
+
 	void SendPlayerMovePacket();
 	void SendPlayerAttackPacket(float PlayerYaw);
 

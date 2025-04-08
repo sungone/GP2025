@@ -6,6 +6,8 @@ class Player : public Character
 {
 public:
 	void Init() override;
+	void SetCharacterType(Type::EPlayer type);
+
 	void UpdateViewList(std::shared_ptr<Character> other) override;
 	void AddMonsterToViewList(std::shared_ptr<Character> monster);
 	void AddPlayerToViewList(std::shared_ptr<Character> player);
@@ -14,7 +16,6 @@ public:
 
 	bool TakeWorldItem(const std::shared_ptr<WorldItem> item);
 	WorldItem DropItem(uint32 itemId);
-
 	bool Attack(std::shared_ptr<Character> target);
 
 	void UseSkill(ESkillGroup groupId);

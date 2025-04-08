@@ -27,6 +27,7 @@ public:
 	void PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& time);
 	void PlayerAttack(int32 playerId, float playerYaw);
 	void PlayerUseSkill(int32 playerId, ESkillGroup groupId);
+	void PlayerSelectCharacter(int32 playerId, Type::EPlayer type);
 
 	void UpdateMonster();
 	void BroadcastMonsterStates();

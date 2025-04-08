@@ -166,7 +166,7 @@ void AGPCharacterMyplayer::OnPlayerLoginSucess()
 			{
 				PC->SetShowMouseCursor(false);
 				PC->SetInputMode(FInputModeGameOnly());
-				InGameWidget->SetVisibility(ESlateVisibility::Hidden);
+				InGameWidget->SetVisibility(ESlateVisibility::Visible);
 			}
 		}
 	}
