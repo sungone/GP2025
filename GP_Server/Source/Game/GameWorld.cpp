@@ -166,6 +166,8 @@ void GameWorld::PlayerSelectCharacter(int32 playerId, Type::EPlayer type)
 		return;
 	}
 	player->SetCharacterType(type);
+	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
+	SessionManager::GetInst().SendPacket(playerId, &infopkt);
 }
 
 void GameWorld::UpdateMonster()

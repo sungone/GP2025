@@ -20,7 +20,7 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 		HandleLogoutPacket(sessionId);
 		break;
 	case EPacketType::C_SELECT_CHARACTER:
-		LOG(LogType::RecvLog, std::format("LogoutPacket from [{}]", sessionId));
+		LOG(LogType::RecvLog, std::format("SelectCharacter from [{}]", sessionId));
 		HandleSelectCharacterPacket(sessionId, packet);
 		break;
 

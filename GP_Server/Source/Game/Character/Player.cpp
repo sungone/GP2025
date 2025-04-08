@@ -13,7 +13,7 @@ void Player::Init()
 	_info.SetLocation(newPos);
 
 	//Todo: DB값으로 설정해줘야한다
-	SetCharacterType(Type::EPlayer::GUNNER);
+	SetCharacterType(Type::EPlayer::WARRIOR);
 	_info.Stats.Level = 10;
 	_info.Stats.Speed = 200.f;
 	_info.CollisionRadius = 50.f;
@@ -23,9 +23,10 @@ void Player::Init()
 
 void Player::SetCharacterType(Type::EPlayer type)
 {
+	LOG(std::format("Set type {}", (type == Type::EPlayer::WARRIOR) ? "warrior" : "gunner"));
 	_playerType = type;
 	_info.CharacterType = static_cast<uint8>(_playerType);
-	_info.fovAngle = (_playerType == Type::EPlayer::WARRIOR) ? 45 : 10;
+	_info.fovAngle = (_playerType == Type::EPlayer::WARRIOR) ? 90 : 10;
 	_info.AttackRadius = (_playerType == Type::EPlayer::WARRIOR) ? 300 : 1500;
 }
 

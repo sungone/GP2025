@@ -113,9 +113,9 @@ void UGPNetworkManager::SendPlayerLogoutPacket()
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendPlayerSelectCharacter(Type::EPlayer PlayerType)
+void UGPNetworkManager::SendPlayerSelectCharacter(uint8 PlayerType)
 {
-	SelectCharacterPacket Packet(PlayerType);
+	SelectCharacterPacket Packet((Type::EPlayer)PlayerType);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
