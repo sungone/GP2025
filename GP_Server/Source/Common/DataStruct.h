@@ -46,13 +46,14 @@ struct FInfoData
 
 	FStatData Stats;
 	uint32 State;
+	uint32 Skilllevel;
 	uint32 Gold;
 
 	FInfoData()
 		: ID(0), CharacterType(), NickName("None"),
 		Pos(FVector(0.0f, 0.0f, 0.0f)), Yaw(0.0f),
 		CollisionRadius(0.0f), AttackRadius(0.f), fovAngle(90.f),
-		Stats(), State(STATE_IDLE)
+		Stats(), State(STATE_IDLE), Skilllevel(0), Gold(0)
 	{
 	}
 	void SetYaw(float Yaw_) { Yaw = Yaw_; }
@@ -73,7 +74,6 @@ struct FInfoData
 	float GetDodge() const { return Stats.Dodge; }
 	float GetSpeed() const { return Stats.Speed; }
 	const char* GetName() const { return NickName; }
-
 #ifdef SERVER_BUILD
 	void SetHp(float NewHp) { Stats.Hp = std::clamp(NewHp, 0.0f, Stats.MaxHp); }
 	void Heal(float Amount) { SetHp(Stats.Hp + Amount); }
@@ -109,6 +109,7 @@ struct FInfoData
 		strncpy_s(NickName, InNick, NICKNAME_LEN - 1);
 		NickName[NICKNAME_LEN - 1] = '\0';
 	}
+
 #endif
 };
 

@@ -141,7 +141,6 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 
 	// 기본 캐릭터 타입
 	CurrentCharacterType = (uint8)Type::EPlayer::GUNNER;
-	NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
 }
 
 void AGPCharacterMyplayer::OnPlayerLoginSucess()
@@ -186,6 +185,7 @@ void AGPCharacterMyplayer::OnPlayerLoginSucess()
 void AGPCharacterMyplayer::BeginPlay()
 {
 	Super::BeginPlay();
+	NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
 	SetCharacterType(CurrentCharacterType);
 
 	if (NetMgr)
@@ -577,12 +577,11 @@ void AGPCharacterMyplayer::ProcessInteraction()
 
 void AGPCharacterMyplayer::UseSkillQ()
 {
-	NetMgr->SendPlayerUseSkill(ESkillKey::Q);
-	
 	if (CurrentCharacterType == (uint8)Type::EPlayer::WARRIOR && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_Q))
 	{
 		CharacterInfo.AddState(STATE_SKILL_Q);
 		ProcessHitHardCommand();
+		NetMgr->SendPlayerUseSkill(ESkillGroup::HitHard);
 	}
 
 	if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_Q))
@@ -590,6 +589,7 @@ void AGPCharacterMyplayer::UseSkillQ()
 		if (!bWantsToZoom) return;
 		CharacterInfo.AddState(STATE_SKILL_Q);
 		ProcessThrowingCommand();
+		NetMgr->SendPlayerUseSkill(ESkillGroup::Throwing);
 	}
 
 	SetupMasterPose();
@@ -597,12 +597,11 @@ void AGPCharacterMyplayer::UseSkillQ()
 
 void AGPCharacterMyplayer::UseSkillE()
 {
-	NetMgr->SendPlayerUseSkill(ESkillKey::E);
-
 	if (CurrentCharacterType == (uint8)Type::EPlayer::WARRIOR && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_E))
 	{
 		CharacterInfo.AddState(STATE_SKILL_E);
 		ProcessClashCommand();
+		NetMgr->SendPlayerUseSkill(ESkillGroup::Clash);
 	}
 
 	if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_E))
@@ -610,6 +609,7 @@ void AGPCharacterMyplayer::UseSkillE()
 		if (!bWantsToZoom) return;
 		CharacterInfo.AddState(STATE_SKILL_E);
 		ProcessFThrowingCommand();
+		NetMgr->SendPlayerUseSkill(ESkillGroup::FThrowing);
 	}
 
 	SetupMasterPose();
@@ -617,12 +617,11 @@ void AGPCharacterMyplayer::UseSkillE()
 
 void AGPCharacterMyplayer::UseSkillR()
 {
-	NetMgr->SendPlayerUseSkill(ESkillKey::R);
-
 	if (CurrentCharacterType == (uint8)Type::EPlayer::WARRIOR && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_R))
 	{
 		CharacterInfo.AddState(STATE_SKILL_R);
 		ProcessWhirlwindCommand();
+		NetMgr->SendPlayerUseSkill(ESkillGroup::Whirlwind);
 	}
 
 	if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_R))
@@ -630,6 +629,7 @@ void AGPCharacterMyplayer::UseSkillR()
 		if (!bWantsToZoom) return;
 		CharacterInfo.AddState(STATE_SKILL_R);
 		ProcessAngerCommand();
+		NetMgr->SendPlayerUseSkill(ESkillGroup::Anger);
 	}
 
 	SetupMasterPose();

@@ -27,6 +27,10 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 		LOG(LogType::RecvLog, std::format("AttackPacket from [{}]", sessionId));
 		HandleAttackPacket(sessionId, packet);
 		break;
+	case EPacketType::C_USE_SKILL:
+		LOG(LogType::RecvLog, std::format("UseSkillPacket from [{}]", sessionId));
+		HandleUseSkillPacket(sessionId, packet);
+		break;
 	case EPacketType::C_TAKE_ITEM:
 		LOG(LogType::RecvLog, std::format("PickUpItemPacket from [{}]", sessionId));
 		HandlePickUpItemPacket(sessionId, packet);
@@ -129,6 +133,12 @@ void PacketManager::HandleAttackPacket(int32 sessionId, Packet* packet)
 {
 	AttackPacket* p = static_cast<AttackPacket*>(packet);
 	_gameWorld.PlayerAttack(sessionId, p->PlayerYaw);
+}
+
+void PacketManager::HandleUseSkillPacket(int32 sessionId, Packet* packet)
+{
+	UseSkillPacket* p = static_cast<UseSkillPacket*>(packet);
+	_gameWorld.PlayerUseSkill(sessionId, p->SkillGID);
 }
 
 void PacketManager::HandlePickUpItemPacket(int32 sessionId, Packet* packet)

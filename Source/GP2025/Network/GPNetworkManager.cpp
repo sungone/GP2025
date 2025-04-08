@@ -117,14 +117,12 @@ void UGPNetworkManager::SendPlayerMovePacket()
 {
 	auto info = MyPlayer->CharacterInfo;
 	MovePacket Packet(info.ID,info.Pos,info.State,0);
-	UE_LOG(LogTemp, Warning, TEXT("SendPlayerMovePacket : Send [%d]"), info.ID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
 void UGPNetworkManager::SendPlayerAttackPacket(float PlayerYaw)
 {
 	AttackPacket Packet(PlayerYaw);
-	UE_LOG(LogTemp, Warning, TEXT("SendPlayerAttackPacket : Send [%d]"), MyPlayer->CharacterInfo.ID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
@@ -158,9 +156,9 @@ void UGPNetworkManager::SendPlayerUnequipItem(int32 ItemID)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendPlayerUseSkill(ESkillKey SkillKey)
+void UGPNetworkManager::SendPlayerUseSkill(ESkillGroup SkillGID)
 {
-	UseSkillPacket Packet(SkillKey);
+	UseSkillPacket Packet(SkillGID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 

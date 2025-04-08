@@ -144,11 +144,15 @@ enum class EItemCategory
 	Unknown
 };
 
-enum class ESkillKey
+enum class ESkillGroup
 {
-	Q,
-	E,
-	R,
+	HitHard,
+	Clash,
+	Whirlwind,
+	Throwing,
+	FThrowing,
+	Anger,
+	None
 };
 
 enum ECharacterStateType : uint32

@@ -146,6 +146,17 @@ void GameWorld::PlayerAttack(int32 playerId, float playerYaw)
 	SessionManager::GetInst().BroadcastToViewList(&infopkt, playerId);
 }
 
+void GameWorld::PlayerUseSkill(int32 playerId, ESkillGroup groupId)
+{
+	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	if (!player)
+	{
+		LOG(Warning, "Invaild!");
+		return;
+	}
+	player->UseSkill(groupId);
+}
+
 void GameWorld::UpdateMonster()
 {
 	std::unique_lock<std::mutex> lock(_carrMutex);

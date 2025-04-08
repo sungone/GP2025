@@ -11,13 +11,17 @@ void Player::Init()
 	FVector newPos{};
 	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
 	_info.SetLocation(newPos);
+
+	//Todo: DB값으로 설정해줘야한다
 	_info.Stats.Level = 10;
 	_info.Stats.Speed = 200.f;
 	_info.CollisionRadius = 50.f;
 
-	_info.CharacterType = static_cast<uint8>(Type::EPlayer::GUNNER);
-	_info.fovAngle = (_info.CharacterType == static_cast<uint8>(Type::EPlayer::GUNNER)) ? 10 : 100;
-	_info.AttackRadius = (_info.CharacterType == static_cast<uint8>(Type::EPlayer::WARRIOR)) ? 300 : 1500;
+	//Todo: 테스트 편하게 캐릭터 선택 패킷 만들자
+	_playerType = Type::EPlayer::GUNNER;
+	_info.CharacterType = static_cast<uint8>(_playerType);
+	_info.fovAngle = (_playerType == Type::EPlayer::WARRIOR) ? 45 : 10;
+	_info.AttackRadius = (_playerType == Type::EPlayer::WARRIOR) ? 300 : 1500;
 	_info.State = ECharacterStateType::STATE_IDLE;
 	ApplyLevelStats(_info.Stats.Level);
 }
@@ -135,6 +139,13 @@ bool Player::Attack(std::shared_ptr<Character> monster)
 
 void Player::UseSkill(ESkillGroup groupId)
 {
+	LOG(std::format("Use Skill - {}", static_cast<uint8>(groupId)));
+
+	if (groupId == ESkillGroup::None)
+	{
+		LOG("GetSkillGropID is None");
+		return;
+	}
 	auto it = _skillLevels.find(groupId);
 	if (it == _skillLevels.end())
 	{

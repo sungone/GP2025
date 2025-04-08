@@ -19,7 +19,8 @@ public:
 	void HandleLogoutPacket(int32 sessionId);
 	void HandleMovePacket(int32 sessionId, Packet* packet);
 	void HandleAttackPacket(int32 sessionId, Packet* packet);
-
+	void HandleUseSkillPacket(int32 sessionId, Packet* packet);
+	
 	void HandlePickUpItemPacket(int32 sessionId, Packet* packet);
 	void HandleDropItemPacket(int32 sessionId, Packet* packet);
 	void HandleUseItemPacket(int32 sessionId, Packet* packet);

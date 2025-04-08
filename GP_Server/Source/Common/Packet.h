@@ -169,9 +169,9 @@ struct PlayerDamagePacket : public Packet
 };
 struct UseSkillPacket : public Packet
 {
-	ESkillKey SkillKey;
-	UseSkillPacket(ESkillKey SkillKey_)
-		: Packet(EPacketType::C_USE_SKILL), SkillKey(SkillKey_)
+	ESkillGroup SkillGID;
+	UseSkillPacket(ESkillGroup SkillGID_)
+		: Packet(EPacketType::C_USE_SKILL), SkillGID(SkillGID_)
 	{
 		Header.PacketSize = sizeof(UseSkillPacket);
 	}
