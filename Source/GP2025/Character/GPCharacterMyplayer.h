@@ -18,7 +18,6 @@ UCLASS()
 class GP2025_API AGPCharacterMyplayer : public AGPCharacterPlayer, public IGPAnimationAttackInterface
 {
 	GENERATED_BODY()
-
 public:
 	AGPCharacterMyplayer();
 
@@ -28,6 +27,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
 	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
+public:
+	UFUNCTION()
+	void OnPlayerLoginSucess();
 
 protected:
 	// Input ÇÔ¼ö

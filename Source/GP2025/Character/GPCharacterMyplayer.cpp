@@ -143,19 +143,8 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 	CurrentCharacterType = (uint8)Type::EPlayer::GUNNER;
 }
 
-void AGPCharacterMyplayer::BeginPlay()
+void AGPCharacterMyplayer::OnPlayerLoginSucess()
 {
-	Super::BeginPlay();
-	SetCharacterType(CurrentCharacterType);
-
-	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-	if (NetworkMgr)
-		NetworkMgr->SetMyPlayer(Cast<AGPCharacterPlayer>(this));
-
-	LastLocation = GetActorLocation();
-	LastRotationYaw = GetActorRotation().Yaw;
-	LastSendPlayerInfo = CharacterInfo;
-
 	if (InventoryWidgetClass)
 	{
 		InventoryWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryWidgetClass);
@@ -177,12 +166,8 @@ void AGPCharacterMyplayer::BeginPlay()
 			{
 				PC->SetShowMouseCursor(false);
 				PC->SetInputMode(FInputModeGameOnly());
+				InGameWidget->SetVisibility(ESlateVisibility::Hidden);
 			}
-			UE_LOG(LogTemp, Warning, TEXT("InGameWidget successfully added to viewport."));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Failed to create InGameWidget."));
 		}
 	}
 
@@ -195,6 +180,26 @@ void AGPCharacterMyplayer::BeginPlay()
 			GunCrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+}
+
+void AGPCharacterMyplayer::BeginPlay()
+{
+	Super::BeginPlay();
+	SetCharacterType(CurrentCharacterType);
+
+	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+	if (NetworkMgr)
+		NetworkMgr->SetMyPlayer(Cast<AGPCharacterPlayer>(this));
+
+	if (UGPNetworkManager* Mgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>())
+	{
+		Mgr->OnLoginSuccess.AddDynamic(this, &AGPCharacterMyplayer::OnPlayerLoginSucess);
+	}
+	LastLocation = GetActorLocation();
+	LastRotationYaw = GetActorRotation().Yaw;
+	LastSendPlayerInfo = CharacterInfo;
+
+
 
 	// 조준 카메라 뷰 설정
 	if (FollowCamera)
