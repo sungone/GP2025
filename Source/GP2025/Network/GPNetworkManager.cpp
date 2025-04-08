@@ -158,6 +158,12 @@ void UGPNetworkManager::SendPlayerUnequipItem(int32 ItemID)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
+void UGPNetworkManager::SendPlayerUseSkill(ESkillKey SkillKey)
+{
+	UseSkillPacket Packet(SkillKey);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
 void UGPNetworkManager::ReceiveData()
 {
 	uint32 DataSize;

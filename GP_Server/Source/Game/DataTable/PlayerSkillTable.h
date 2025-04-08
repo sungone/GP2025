@@ -1,5 +1,15 @@
 #pragma once
 
+enum class ESkillGroup
+{
+    HitHard,
+    Clash,
+    Whirlwind,
+    Throwing,
+    FThrowing,
+    Anger,
+};
+
 enum class ESkillType
 {
     None,

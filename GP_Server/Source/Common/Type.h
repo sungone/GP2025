@@ -13,6 +13,8 @@ enum EPacketType : uint8
 	C_EQUIP_ITEM,
 	C_UNEQUIP_ITEM,
 
+	C_USE_SKILL,
+
 	S_LOGIN_SUCCESS,
 	S_LOGIN_FAIL,
 	S_SIGNUP_SUCCESS,
@@ -142,14 +144,11 @@ enum class EItemCategory
 	Unknown
 };
 
-enum class ESkillGroup
+enum class ESkillKey
 {
-	HitHard,
-	Clash,
-	Whirlwind,
-	Throwing,
-	FThrowing,
-	Anger,
+	Q,
+	E,
+	R,
 };
 
 enum ECharacterStateType : uint32

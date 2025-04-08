@@ -145,6 +145,7 @@ struct AttackPacket : public Packet
 		Header.PacketSize = sizeof(AttackPacket);
 	}
 };
+
 struct MonsterDamagePacket : public Packet
 {
 	FInfoData Target;
@@ -164,6 +165,15 @@ struct PlayerDamagePacket : public Packet
 		: Packet(EPacketType::S_DAMAGED_MONSTER), Target(Target_)
 	{
 		Header.PacketSize = sizeof(PlayerDamagePacket);
+	}
+};
+struct UseSkillPacket : public Packet
+{
+	ESkillKey SkillKey;
+	UseSkillPacket(ESkillKey SkillKey_)
+		: Packet(EPacketType::C_USE_SKILL), SkillKey(SkillKey_)
+	{
+		Header.PacketSize = sizeof(UseSkillPacket);
 	}
 };
 namespace ItemPkt
