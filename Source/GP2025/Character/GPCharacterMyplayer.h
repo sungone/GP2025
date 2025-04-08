@@ -30,7 +30,7 @@ public:
 public:
 	UFUNCTION()
 	void OnPlayerLoginSucess();
-
+	class UGPNetworkManager* NetMgr;
 protected:
 	// Input ÇÔ¼ö
 	void Move(const FInputActionValue& Value);

@@ -141,6 +141,7 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 
 	// 기본 캐릭터 타입
 	CurrentCharacterType = (uint8)Type::EPlayer::GUNNER;
+	NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
 }
 
 void AGPCharacterMyplayer::OnPlayerLoginSucess()
@@ -187,19 +188,14 @@ void AGPCharacterMyplayer::BeginPlay()
 	Super::BeginPlay();
 	SetCharacterType(CurrentCharacterType);
 
-	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-	if (NetworkMgr)
-		NetworkMgr->SetMyPlayer(Cast<AGPCharacterPlayer>(this));
-
-	if (UGPNetworkManager* Mgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>())
+	if (NetMgr)
 	{
-		Mgr->OnLoginSuccess.AddDynamic(this, &AGPCharacterMyplayer::OnPlayerLoginSucess);
+		NetMgr->SetMyPlayer(Cast<AGPCharacterPlayer>(this));
+		NetMgr->OnLoginSuccess.AddDynamic(this, &AGPCharacterMyplayer::OnPlayerLoginSucess);
 	}
 	LastLocation = GetActorLocation();
 	LastRotationYaw = GetActorRotation().Yaw;
 	LastSendPlayerInfo = CharacterInfo;
-
-
 
 	// 조준 카메라 뷰 설정
 	if (FollowCamera)
@@ -251,8 +247,7 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 		}
 	}
 
-	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-	if (!NetworkMgr) return;
+	if (!NetMgr) return;
 
 	MovePacketSendTimer -= DeltaTime;
 	FVector CurrentLocation = GetActorLocation();
@@ -286,7 +281,7 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 	{
 		isJumpStart = false;
 		bWasJumping = true;
-		NetworkMgr->SendPlayerMovePacket();
+		NetMgr->SendPlayerMovePacket();
 		LastSendPlayerInfo = CharacterInfo;
 		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Jump Issue"));
 		return;
@@ -304,7 +299,7 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 		CharacterInfo.Pos.Z = GroundZLocation;
 		CharacterInfo.Stats.Speed = LastSendPlayerInfo.HasState(STATE_RUN) ? SprintSpeed : WalkSpeed;
 
-		NetworkMgr->SendPlayerMovePacket();
+		NetMgr->SendPlayerMovePacket();
 		LastSendPlayerInfo = CharacterInfo;
 		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Air Fixed Issue"));
 		return;
@@ -313,7 +308,7 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 	// IDLE 상태에서 캐릭터의 회전이 변경되었을 때 패킷 전송
 	if (bYawChanged && CharacterInfo.HasState(STATE_IDLE))
 	{
-		NetworkMgr->SendPlayerMovePacket();
+		NetMgr->SendPlayerMovePacket();
 		LastSendPlayerInfo = CharacterInfo;
 		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Rotation Issue"));
 		return;
@@ -327,7 +322,7 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 		// IDLE 상태가 아니거나 일정 거리 이상 이동한 경우 패킷 전송
 		if (!CharacterInfo.HasState(STATE_IDLE) || DistanceMoved >= NotMovedThreshold)
 		{
-			NetworkMgr->SendPlayerMovePacket();
+			NetMgr->SendPlayerMovePacket();
 			LastSendPlayerInfo = CharacterInfo;
 
 			if (MovePacketSendTimer <= 0)
@@ -479,10 +474,9 @@ void AGPCharacterMyplayer::AutoAttack()
 	if (bIsAutoAttacking == false && !CharacterInfo.HasState(STATE_AUTOATTACK))
 	{
 		CharacterInfo.AddState(STATE_AUTOATTACK);
-		
+
 		float CurYaw = GetActorRotation().Yaw;
-		auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-		NetworkMgr->SendPlayerAttackPacket(CurYaw);
+		NetMgr->SendPlayerAttackPacket(CurYaw);
 	}
 
 	ProcessAutoAttackCommand();
@@ -491,7 +485,7 @@ void AGPCharacterMyplayer::AutoAttack()
 
 void AGPCharacterMyplayer::ToggleInventory()
 {
-	if (bInventoryToggled) return; 
+	if (bInventoryToggled) return;
 
 	bInventoryToggled = true;
 
@@ -518,7 +512,7 @@ void AGPCharacterMyplayer::OpenInventory()
 		if (PC)
 		{
 			PC->SetShowMouseCursor(true);
-			PC->SetInputMode(FInputModeGameAndUI()); 
+			PC->SetInputMode(FInputModeGameAndUI());
 		}
 
 		UGPInventory* CastInventory = Cast<UGPInventory>(InventoryWidget);
@@ -545,14 +539,14 @@ void AGPCharacterMyplayer::CloseInventory()
 		if (PC)
 		{
 			PC->SetShowMouseCursor(false);
-			PC->SetInputMode(FInputModeGameOnly()); 
+			PC->SetInputMode(FInputModeGameOnly());
 		}
 	}
 }
 
 void AGPCharacterMyplayer::ResetInventoryToggle()
 {
-	bInventoryToggled = false; 
+	bInventoryToggled = false;
 }
 
 void AGPCharacterMyplayer::OpenSettingWidget()
@@ -574,15 +568,17 @@ void AGPCharacterMyplayer::ProcessInteraction()
 {
 	bInteractItem = true;
 	GetWorldTimerManager().SetTimer(
-		InteractItemTimerHandle,             
-		this,                              
-		&AGPCharacterMyplayer::ResetInteractItem, 
-		2.0f,                              
+		InteractItemTimerHandle,
+		this,
+		&AGPCharacterMyplayer::ResetInteractItem,
+		2.0f,
 		false);
 }
 
 void AGPCharacterMyplayer::UseSkillQ()
 {
+	NetMgr->SendPlayerUseSkill(ESkillKey::Q);
+	
 	if (CurrentCharacterType == (uint8)Type::EPlayer::WARRIOR && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_Q))
 	{
 		CharacterInfo.AddState(STATE_SKILL_Q);
@@ -601,6 +597,8 @@ void AGPCharacterMyplayer::UseSkillQ()
 
 void AGPCharacterMyplayer::UseSkillE()
 {
+	NetMgr->SendPlayerUseSkill(ESkillKey::E);
+
 	if (CurrentCharacterType == (uint8)Type::EPlayer::WARRIOR && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_E))
 	{
 		CharacterInfo.AddState(STATE_SKILL_E);
@@ -619,6 +617,7 @@ void AGPCharacterMyplayer::UseSkillE()
 
 void AGPCharacterMyplayer::UseSkillR()
 {
+	NetMgr->SendPlayerUseSkill(ESkillKey::R);
 
 	if (CurrentCharacterType == (uint8)Type::EPlayer::WARRIOR && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_R))
 	{
@@ -657,7 +656,7 @@ void AGPCharacterMyplayer::StartAiming()
 void AGPCharacterMyplayer::StopAiming()
 {
 	if (!bIsGunnerCharacter())
-		return; 
+		return;
 
 	bWantsToZoom = false;
 

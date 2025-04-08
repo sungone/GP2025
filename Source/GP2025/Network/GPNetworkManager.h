@@ -43,6 +43,7 @@ public:
 	void SendPlayerEquipItem(int32 ItemID);
 	void SendPlayerUnequipItem(int32 ItemID);
 
+	void SendPlayerUseSkill(ESkillKey SkillKey);
 private:
 	void SendPacket(uint8* Buf, int32 Size);
 	void ReceiveData();
