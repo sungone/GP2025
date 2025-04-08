@@ -1,7 +1,7 @@
 #pragma once
 #include "Common.h"
 
-constexpr float VIEW_DIST = 2000.f;
+constexpr float VIEW_DIST = 5000.f;
 enum class ECharacterClass { Player, Monster };
 class Character
 {

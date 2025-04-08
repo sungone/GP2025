@@ -44,6 +44,10 @@ void SessionManager::HandleLogin(int32 id)
 	if (newPlayer)
 	{
 		GameWorld::GetInst().UpdateViewList(newPlayer);
+		for (int32 i : newPlayer->GetViewList())
+		{
+			
+		}
 	}
 	GameWorld::GetInst().SpawnMonster(*session);
 	LOG(std::format("Player[{}] Login!", id));
