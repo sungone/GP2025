@@ -18,6 +18,8 @@ void Monster::Init()
 	FVector newPos{};
 	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
 	_info.SetLocation(newPos);
+
+	_info.SetName("monster");
 	_info.CharacterType = data->TypeId;
 	_info.Stats.Level = data->Level;
 	_info.Stats.Hp = data->Hp;
@@ -146,7 +148,7 @@ void Monster::Attack()
 
 	if (player->IsDead())
 	{
-		//Todo: ÇÃ·¹ÀÌ¾î Á×À½Ã³¸®
+		//Todo: í”Œë ˆì´ì–´ ì£½ìŒì²˜ë¦¬
 	}
 }
 
@@ -203,7 +205,7 @@ bool Monster::SetTarget()
 		if (IsInViewDistance(player->GetInfo().Pos, detectDist))
 		{
 			LOG("SetTarget!");
-			//Todo: Á¦ÀÏ °¡±î¿î ÇÃ·¹ÀÌ¾î¸¦ ÂÑ¾Æ¾ßÇÔ...
+			//Todo: ì œì¼ ê°€ê¹Œìš´ í”Œë ˆì´ì–´ë¥¼ ì«“ì•„ì•¼í•¨...
 			ChangeState(ECharacterStateType::STATE_WALK);
 			_target = std::dynamic_pointer_cast<Player>(player);
 			return true;

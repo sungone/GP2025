@@ -11,8 +11,8 @@ void Player::Init()
 	FVector newPos{};
 	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
 	_info.SetLocation(newPos);
-
-	//Todo: DB°ªÀ¸·Î ¼³Á¤ÇØÁà¾ßÇÑ´Ù
+	//Todo: DBê°’ìœ¼ë¡œ ì„¤ì •í•´ì¤˜ì•¼í•œë‹¤
+	_info.SetName("player");
 	SetCharacterType(Type::EPlayer::WARRIOR);
 	_info.Stats.Level = 10;
 	_info.Stats.Speed = 200.f;
@@ -171,19 +171,19 @@ void Player::ExecuteSkillEffect(const FSkillData& skill)
 {
 	if (skill.Type0 == ESkillType::Atk)
 	{
-		//1.skill_value_0 ¸¸Å­ °ø°İ·Â Áõ°¡
+		//1.skill_value_0 ë§Œí¼ ê³µê²©ë ¥ ì¦ê°€
 
-		//2. skill_value_1(=n) ¸¸Å­
+		//2. skill_value_1(=n) ë§Œí¼
 		switch (skill.Type1)
 		{
 		case ESkillType::Dash:
-			// n¹ÌÅÍ µ¹Áø
+			// në¯¸í„° ëŒì§„
 			break;
 		case ESkillType::RangeAtk:
-			// °ø°İ¹üÀ§ n¹ÌÅÍ Áõ°¡
+			// ê³µê²©ë²”ìœ„ në¯¸í„° ì¦ê°€
 			break;
 		case ESkillType::SectorAtk:
-			// ÃÑ¾Ë n¹ß ¹ß»ç
+			// ì´ì•Œ në°œ ë°œì‚¬
 			break;
 		default:
 			break;
@@ -191,13 +191,13 @@ void Player::ExecuteSkillEffect(const FSkillData& skill)
 	}
 	else if (skill.Type0 == ESkillType::BuffTime)
 	{
-		//1.skill_value_0ÃÊ°£
+		//1.skill_value_0ì´ˆê°„
 
-		//2. skill_value_1(=n) ¸¸Å­
+		//2. skill_value_1(=n) ë§Œí¼
 		switch (skill.Type1)
 		{
 		case ESkillType::AtkSpd:
-			// °ø°İ¼Óµµ n% Áõ°¡
+			// ê³µê²©ì†ë„ n% ì¦ê°€
 			break;
 		}
 	}
