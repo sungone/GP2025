@@ -56,4 +56,5 @@ public :
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void SetGold(int32 Amount);
+
 };

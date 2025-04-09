@@ -13,5 +13,25 @@ UCLASS()
 class GP2025_API UGPStatInfo : public UUserWidget
 {
 	GENERATED_BODY()
-	
+protected:
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* DamageText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* CrtRateText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* CrtValueText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* MaxHpText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* DodgeText;
+
+public :
+	virtual void NativeConstruct() override;
+public:
+	UFUNCTION(BlueprintCallable, Category = "Stat")
+	void UpdateStatInfo();
 };
