@@ -3,21 +3,30 @@
 
 #include "UI/GPUserNameWidget.h"
 #include "Components/TextBlock.h"
+#include "Character/GPCharacterPlayer.h"
 
 void UGPUserNameWidget::NativeConstruct()
 {
-	Super::NativeConstruct();
+    Super::NativeConstruct();
 
-	if (NickNameText)
-	{
-		NickNameText->SetText(FText::FromString(TEXT("Player")));
-	}
+    NickNameText = Cast<UTextBlock>(GetWidgetFromName(TEXT("TxtLevel")));
 }
 
-void UGPUserNameWidget::SetNickNameText(const FString& NewName)
+void UGPUserNameWidget::BindToCharacter(AGPCharacterBase* Character)
 {
-	if (NickNameText)
-	{
-		NickNameText->SetText(FText::FromString(NewName));
-	}
+    if (Character)
+    {
+        Character->OnNickNameChanged.RemoveDynamic(this, &UGPUserNameWidget::UpdateNickNameText);
+        Character->OnNickNameChanged.AddDynamic(this, &UGPUserNameWidget::UpdateNickNameText);
+        UpdateNickNameText(Character->CharacterInfo.GetName());
+    }
 }
+
+void UGPUserNameWidget::UpdateNickNameText(FString NewName)
+{
+    if (NickNameText)
+    {
+        NickNameText->SetText(FText::FromString(NewName));
+    }
+}
+   

@@ -4,23 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Interface/GPCharacterWidgetInterface.h"
 #include "GPUserNameWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class GP2025_API UGPUserNameWidget : public UUserWidget
+class GP2025_API UGPUserNameWidget : public UUserWidget, public IGPCharacterWidgetInterface
 {
 	GENERATED_BODY()
 	
 
-public:
+protected:
 	virtual void NativeConstruct() override;
 public:
-	UPROPERTY(meta = (BindWidget), BlueprintReadOnly, Category = "Nickname")
+	virtual void BindToCharacter(AGPCharacterBase* Character) override;
+
+public:
+	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* NickNameText;
 
-	UFUNCTION(BlueprintCallable, Category = "Nickname")
-	void SetNickNameText(const FString& NewName);
+	UFUNCTION()
+	void UpdateNickNameText(FString NewName);
 };

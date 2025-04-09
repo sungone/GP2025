@@ -16,6 +16,7 @@
 #include "UI/GPWidgetComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h" 
+#include "UI/GPUserNameWidget.h"
 
 #include <random>
 static std::random_device rd;
@@ -90,11 +91,34 @@ AGPCharacterBase::AGPCharacterBase()
 	};
 
 	LoadCharacterData(CharacterTypeManager, CharacterTypes);
+
+	NickNameText = CreateWidgetComponent(
+		TEXT("NickNameWidget"),
+		TEXT("/Game/UI/WBP_UserName"),
+		FVector(0.f, 0.f, 360.f),  
+		FVector2D(200.f, 50.f),
+		NickNameWidget
+	);
 }
 
 void AGPCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (NickNameText)
+	{
+		UGPUserNameWidget* NameWidget = Cast<UGPUserNameWidget>(NickNameText->GetUserWidgetObject());
+		if (NameWidget)
+		{
+			FString NickName = FString(UTF8_TO_TCHAR(CharacterInfo.GetName()));
+			NameWidget->UpdateNickNameText(NickName);
+		}
+	}
+
+	if (NickNameWidget)
+	{
+		NickNameWidget->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 
 void AGPCharacterBase::Tick(float DeltaTime)

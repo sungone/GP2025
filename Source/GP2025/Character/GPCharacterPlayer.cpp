@@ -9,8 +9,6 @@
 #include "Weapons/GPWeaponBase.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
-#include "UI/GPUserNameWidget.h"
-#include "Components/WidgetComponent.h"
 
 AGPCharacterPlayer::AGPCharacterPlayer()
 {
@@ -28,31 +26,12 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 
     LegMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LegMesh"));
     LegMesh->SetupAttachment(BodyMesh);
-
-    NickNameWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("NickNameWidget"));
-    NickNameWidget->SetupAttachment(GetMesh());
-    NickNameWidget->SetRelativeLocation(FVector(0.f, 0.f, 220.f));
-    NickNameWidget->SetWidgetSpace(EWidgetSpace::Screen);
-    NickNameWidget->SetDrawSize(FVector2D(200.f, 50.f));
-    NickNameWidget->SetWidgetClass(NickNameWidgetClass); 
 }
 
 void AGPCharacterPlayer::BeginPlay()
 {
     Super::BeginPlay();
     SetCharacterType(CurrentCharacterType);
-
-    if (NickNameWidget && NickNameWidgetClass)
-    {
-        NickNameWidget->SetWidgetClass(NickNameWidgetClass);
-        NickNameWidget->InitWidget(); 
-        UGPUserNameWidget* NameWidget = Cast<UGPUserNameWidget>(NickNameWidget->GetUserWidgetObject());
-        if (NameWidget)
-        {
-            FString NickNameStr = FString(UTF8_TO_TCHAR(CharacterInfo.GetName()));
-            NameWidget->SetNickNameText(NickNameStr);
-        }
-    }
 }
 
 void AGPCharacterPlayer::Tick(float DeltaTime)

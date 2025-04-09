@@ -14,6 +14,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHpChanged, float, NewHpRatio);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnExpChanged, float, NewExpRatio);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelChanged, int32, NewLevel);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGoldChanged, int32, NewGold);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNickNameChanged, FString, NewNickName);
 
 
 UCLASS()
@@ -115,4 +116,13 @@ public :
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Event")
 	FOnGoldChanged OnGoldChanged;
+
+	// Nick Name Setting
+public:
+	UUserWidget* NickNameWidget;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UGPWidgetComponent> NickNameText;
+
+	FOnNickNameChanged OnNickNameChanged;
 };
