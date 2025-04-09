@@ -61,4 +61,12 @@ public:
 	UPROPERTY()
 	UUserWidget* InventoryWidget;
 
+	// Nick Name Setting
+public :
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> NickNameWidgetClass;
+
+	// 캐릭터 머리 위에 붙일 위젯 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	class UWidgetComponent* NickNameWidget;
 };
