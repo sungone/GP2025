@@ -15,3 +15,5 @@ class GP2025_API UGPButton : public UButton
 	GENERATED_BODY()
 	
 };
+
+// BP_PauseScreenButton 에서 필요한 클래스
