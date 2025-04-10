@@ -6,6 +6,7 @@
 #include "Inventory/GPInventory.h"
 #include "Network/GPNetworkManager.h"
 #include "Character/Modules/GPMyplayerUIManager.h"
+#include "Character/Modules/GPPlayerAppearanceHandler.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/TextBlock.h"
 
@@ -64,7 +65,7 @@ void UGPItemSlot::ClickItem()
         CurrentItem.Category == ECategory::sword ||
         CurrentItem.Category == ECategory::bow)
     {
-        Player->EquipItemOnCharacter(GetItemData());
+        Player->AppearanceHandler->EquipItemOnCharacter(GetItemData());
 
         UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
         if (NetworkManager)

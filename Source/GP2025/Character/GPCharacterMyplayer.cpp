@@ -33,7 +33,6 @@ void AGPCharacterMyplayer::BeginPlay()
 {
 	Super::BeginPlay();
 	NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-	SetCharacterType(CurrentCharacterType);
 
 	if (NetMgr)
 	{
@@ -50,6 +49,8 @@ void AGPCharacterMyplayer::BeginPlay()
 	NetworkSyncHandler = NewObject<UGPMyplayerNetworkSyncHandler>(this, UGPMyplayerNetworkSyncHandler::StaticClass());
 	if (NetworkSyncHandler)
 		NetworkSyncHandler->Initialize(this);
+
+	SetCharacterType(CurrentCharacterType);
 }
 
 void AGPCharacterMyplayer::Tick(float DeltaTime)
@@ -117,8 +118,11 @@ void AGPCharacterMyplayer::SetCharacterData(const UGPCharacterControlData* Chara
 {
 	Super::SetCharacterData(CharacterControlData);
 
-	NetworkSyncHandler->WalkSpeed = CharacterControlData->WalkSpeed;
-	NetworkSyncHandler->SprintSpeed = CharacterControlData->SprintSpeed;
+	if (NetworkSyncHandler)
+	{
+		NetworkSyncHandler->WalkSpeed = CharacterControlData->WalkSpeed;
+		NetworkSyncHandler->SprintSpeed = CharacterControlData->SprintSpeed;
+	}
 }
 
 bool AGPCharacterMyplayer::bIsGunnerCharacter() const

@@ -13,5 +13,18 @@ UCLASS()
 class GP2025_API UGPPlayerAppearanceHandler : public UObject
 {
 	GENERATED_BODY()
+
+public:
+	void Initialize(class AGPCharacterPlayer* InOwner);
+
+	void ApplyCharacterPartsFromData(const class UGPCharacterControlData* CharacterData);
+	void SetupMasterPose();
+	void EquipWeaponFromData(const class UGPCharacterControlData* CharacterData);
 	
+	UFUNCTION(BlueprintCallable)
+	void EquipItemOnCharacter(struct FGPItemStruct& ItemData);
+
+private:
+	UPROPERTY()
+	class AGPCharacterPlayer* Owner;
 };

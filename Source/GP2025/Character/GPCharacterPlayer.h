@@ -24,11 +24,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void PostInitializeComponents() override;
 
+	// <Appearance>
 public :
-	virtual USkeletalMeshComponent* GetCharacterMesh() const override;
-	
-	// Character Mesh Section
-public:
+	UPROPERTY()
+	class UGPPlayerAppearanceHandler* AppearanceHandler;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts")
 	TObjectPtr<USkeletalMeshComponent> HeadMesh;
 
@@ -38,23 +38,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts")
 	TObjectPtr<USkeletalMeshComponent> LegMesh;
 
-	void SetupMasterPose();
-	void ApplyCharacterPartsFromData(const class UGPCharacterControlData* CharacterData);
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USkeletalMeshComponent> Helmet;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class AGPWeaponBase> WeaponActor;
 
-	void EquipWeaponFromData(const class UGPCharacterControlData* CharacterData);
+	virtual USkeletalMeshComponent* GetCharacterMesh() const override;
 
-public :
-	// Inventory Equip Item Change
-	UFUNCTION(BlueprintCallable, Category = "Item")
-	void EquipItemOnCharacter(struct FGPItemStruct& ItemData);
-
-	// CharacterType Setting
+	// <CharacterType>
 public :
 	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
 	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;

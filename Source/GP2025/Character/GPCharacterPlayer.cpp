@@ -9,6 +9,8 @@
 #include "Weapons/GPWeaponBase.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
+#include "Character/Modules/GPPlayerAppearanceHandler.h"
+
 
 AGPCharacterPlayer::AGPCharacterPlayer()
 {
@@ -42,10 +44,20 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 void AGPCharacterPlayer::PostInitializeComponents()
 {
     Super::PostInitializeComponents();
-    UGPCharacterControlData** FoundData = CharacterTypeManager.Find(CurrentCharacterType);
-    if (FoundData && *FoundData)
+
+    if (!AppearanceHandler)
     {
-        ApplyCharacterPartsFromData(*FoundData);
+        AppearanceHandler = NewObject<UGPPlayerAppearanceHandler>(this, UGPPlayerAppearanceHandler::StaticClass());
+        if (AppearanceHandler)
+        {
+            AppearanceHandler->Initialize(this);
+        }
+    }
+
+    UGPCharacterControlData** FoundData = CharacterTypeManager.Find(CurrentCharacterType);
+    if (FoundData && *FoundData && AppearanceHandler)
+    {
+        AppearanceHandler->ApplyCharacterPartsFromData(*FoundData);
     }
 }
 
@@ -53,11 +65,13 @@ void AGPCharacterPlayer::SetCharacterData(const UGPCharacterControlData* Charact
 {
     Super::SetCharacterData(CharacterControlData);
 
-    BodyMesh->SetSkeletalMesh(CharacterControlData->BodyMesh);
-
-    if (CharacterControlData->AnimBlueprint)
+    if (CharacterControlData && BodyMesh)
     {
-        BodyMesh->SetAnimInstanceClass(CharacterControlData->AnimBlueprint);
+        BodyMesh->SetSkeletalMesh(CharacterControlData->BodyMesh);
+        if (CharacterControlData->AnimBlueprint)
+        {
+            BodyMesh->SetAnimInstanceClass(CharacterControlData->AnimBlueprint);
+        }
     }
 }
 
@@ -71,247 +85,14 @@ void AGPCharacterPlayer::SetCharacterType(ECharacterType NewCharacterControlType
     SetCharacterData(NewCharacterData);
 
     CurrentCharacterType = NewCharacterControlType;
+
+    if (AppearanceHandler)
+    {
+        AppearanceHandler->ApplyCharacterPartsFromData(NewCharacterData);
+    }
 }
 
 USkeletalMeshComponent* AGPCharacterPlayer::GetCharacterMesh() const
 {
     return BodyMesh;
-}
-
-
-void AGPCharacterPlayer::SetupMasterPose()
-{
-    if (BodyMesh)
-    {
-
-        if (HeadMesh)
-        {
-            HeadMesh->SetMasterPoseComponent(BodyMesh);
-        }
-        if (LegMesh)
-        {
-            LegMesh->SetMasterPoseComponent(BodyMesh);
-        }
-
-        if (Helmet)
-        {
-            Helmet->AttachToComponent(BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("HelmetSocket"));
-            Helmet->SetMasterPoseComponent(BodyMesh);
-            UE_LOG(LogTemp, Warning, TEXT("MasterPose Applied to Helmet"));
-        }
-
-        if (WeaponActor && WeaponActor->GetWeaponMesh())
-        {
-            UStaticMeshComponent* WeaponMesh = WeaponActor->GetWeaponMesh();
-            WeaponMesh->AttachToComponent(BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
-            UE_LOG(LogTemp, Warning, TEXT("Weapon Attached to BodyMesh -> WeaponSocket"));
-        }
-    }
-
-    UE_LOG(LogTemp, Log, TEXT("SetupMasterPose() Completed"));
-}
-
-void AGPCharacterPlayer::ApplyCharacterPartsFromData(const UGPCharacterControlData* CharacterData)
-{
-    if (!CharacterData) return;
-
-    if (CharacterData->BodyMesh)
-    {
-        TSubclassOf<UAnimInstance> PrevAnimBP = BodyMesh->GetAnimClass();
-        BodyMesh->SetSkeletalMesh(CharacterData->BodyMesh);
-        if (PrevAnimBP)
-        {
-            BodyMesh->SetAnimInstanceClass(PrevAnimBP);
-        }
-    }
-
-    if (CharacterData->HeadMesh)
-    {
-        HeadMesh->SetSkeletalMesh(CharacterData->HeadMesh);
-    }
-
-    if (CharacterData->LegMesh)
-    {
-        LegMesh->SetSkeletalMesh(CharacterData->LegMesh);
-    }
-
-    if (CharacterData->HelmetMesh)
-    {
-        Helmet->SetSkeletalMesh(CharacterData->HelmetMesh);
-        Helmet->AttachToComponent(HeadMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("HelmetSocket"));
-        Helmet->SetVisibility(true);
-    }
-    else
-    {
-        Helmet->SetSkeletalMesh(nullptr);
-        Helmet->SetVisibility(false);
-    }
-
-    EquipWeaponFromData(CharacterData);
-    SetupMasterPose();
-}
-
-void AGPCharacterPlayer::EquipWeaponFromData(const UGPCharacterControlData* CharacterData)
-{
-    if (!CharacterData) return;
-
-    if (WeaponActor)
-    {
-        WeaponActor->Destroy();
-        WeaponActor = nullptr;
-    }
-
-    if (CharacterData->WeaponClass)
-    {
-        FActorSpawnParameters SpawnParams;
-        SpawnParams.Owner = this;
-        SpawnParams.Instigator = GetInstigator();
-
-        if (BodyMesh == nullptr)
-            return;
-
-        WeaponActor = GetWorld()->SpawnActor<AGPWeaponBase>(CharacterData->WeaponClass, GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
-        if (WeaponActor)
-        {
-            USkeletalMeshComponent* MeshComp = BodyMesh;
-
-            if (MeshComp && MeshComp->DoesSocketExist(TEXT("WeaponSocket")))
-            {
-                WeaponActor->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
-                UE_LOG(LogTemp, Warning, TEXT("Attached WeaponActor -> WeaponSocket!"));
-            }
-        }
-
-        if (CharacterData->WeaponMesh)
-        {
-            WeaponActor->SetWeaponMesh(CharacterData->WeaponMesh);
-        }
-    }
-}
-
-void AGPCharacterPlayer::EquipItemOnCharacter(FGPItemStruct& ItemData)
-{
-    UE_LOG(LogTemp, Warning, TEXT("Equipped : %s"), *ItemData.ItemName.ToString());
-
-    if (ItemData.Category == ECategory::helmet)
-    {
-        if (!Helmet)
-        {
-            Helmet = NewObject<USkeletalMeshComponent>(this);
-            Helmet->SetupAttachment(HeadMesh);
-            Helmet->RegisterComponent();
-        }
-
-        Helmet->SetSkeletalMesh(ItemData.ItemSkeletalMesh);
-
-        if (BodyMesh)
-        {
-            Helmet->AttachToComponent(BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("HelmetSocket"));
-            Helmet->SetMasterPoseComponent(BodyMesh);
-            UE_LOG(LogTemp, Warning, TEXT("Helmet Re-Attached to BodyMesh"));
-        }
-    }
-
-
-    if (ItemData.Category == ECategory::chest)
-    {
-        if (!ItemData.ItemSkeletalMesh)
-        {
-            UE_LOG(LogTemp, Error, TEXT("ItemSkeletalMesh is NULL for chest armor!"));
-            return;
-        }
-
-        TSubclassOf<UAnimInstance> PreviousAnimBP = nullptr;
-        if (BodyMesh)
-        {
-            PreviousAnimBP = BodyMesh->GetAnimClass();
-            BodyMesh->DestroyComponent();
-            BodyMesh = nullptr;
-        }
-
-        BodyMesh = NewObject<USkeletalMeshComponent>(this);
-        BodyMesh->SetSkeletalMesh(ItemData.ItemSkeletalMesh);
-        BodyMesh->SetupAttachment(GetMesh());
-        BodyMesh->RegisterComponent();
-
-        if (PreviousAnimBP)
-        {
-            BodyMesh->SetAnimInstanceClass(PreviousAnimBP);
-        }
-
-        SetupMasterPose();
-
-
-        if (HeadMesh)
-        {
-            HeadMesh->SetMasterPoseComponent(BodyMesh);
-        }
-
-        if (LegMesh)
-        {
-            LegMesh->SetMasterPoseComponent(BodyMesh);
-        }
-
-        if (Helmet)
-        {
-            Helmet->SetMasterPoseComponent(BodyMesh);
-
-            if (BodyMesh->DoesSocketExist(TEXT("HelmetSocket")))
-            {
-                Helmet->AttachToComponent(BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("HelmetSocket"));
-                Helmet->SetVisibility(true);
-                UE_LOG(LogTemp, Warning, TEXT("Helmet Re-Attached to New BodyMesh"));
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("HelmetSocket does not exist on new BodyMesh!"));
-            }
-        }
-
-        if (WeaponActor)
-        {
-            WeaponActor->AttachToComponent(BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
-            UE_LOG(LogTemp, Warning, TEXT("Weapon successfully equipped on BodyMesh: %s"), *ItemData.ItemName.ToString());
-        }
-        else
-        {
-            UE_LOG(LogTemp, Error, TEXT("Failed to spawn WeaponActor! Check if WeaponClass is valid."));
-        }
-    }
-
-
-    if (ItemData.Category == ECategory::sword || ItemData.Category == ECategory::bow)
-    {
-        if (WeaponActor)
-        {
-            WeaponActor->Destroy();
-            WeaponActor = nullptr;
-        }
-
-        if (!BodyMesh)
-        {
-            UE_LOG(LogTemp, Error, TEXT("BodyMesh is NULL! Weapon cannot be equipped."));
-            return;
-        }
-
-        if (!BodyMesh->DoesSocketExist(TEXT("WeaponSocket")))
-        {
-            UE_LOG(LogTemp, Error, TEXT("WeaponSocket does not exist on BodyMesh!"));
-            return;
-        }
-
-        FActorSpawnParameters SpawnParams;
-        SpawnParams.Owner = this;
-        WeaponActor = GetWorld()->SpawnActor<AGPWeaponBase>(ItemData.WeaponClass, GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
-
-        if (WeaponActor)
-        {
-            WeaponActor->AttachToComponent(BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
-            UE_LOG(LogTemp, Warning, TEXT("Weapon successfully equipped on BodyMesh: %s"), *ItemData.ItemName.ToString());
-        }
-        else
-        {
-            UE_LOG(LogTemp, Error, TEXT("Failed to spawn WeaponActor! Check if WeaponClass is valid."));
-        }
-    }
 }

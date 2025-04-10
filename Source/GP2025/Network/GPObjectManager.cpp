@@ -5,6 +5,7 @@
 #include "Item/GPItem.h"
 #include "Character/GPCharacterMyplayer.h"
 #include "Character/Modules/GPMyplayerUIManager.h"
+#include "Character/Modules/GPPlayerAppearanceHandler.h"
 #include "UI/GPFloatingDamageText.h"
 #include "Inventory/GPInventory.h"
 #include "Kismet/GameplayStatics.h"
@@ -285,7 +286,7 @@ void UGPObjectManager::EquipItem(int32 PlayerID, uint8 ItemType)
 		return;
 	}
 
-	TargetPlayer->EquipItemOnCharacter(*ItemData);
+	TargetPlayer->AppearanceHandler->EquipItemOnCharacter(*ItemData);
 
 	UE_LOG(LogTemp, Warning, TEXT("Player [%d] equipped item: %s"), PlayerID, *ItemData->ItemName.ToString());
 }

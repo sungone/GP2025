@@ -6,6 +6,7 @@
 #include "Character/Modules/GPMyplayerUIManager.h"
 #include "Character/Modules/GPMyplayerCameraHandler.h"
 #include "Character/Modules/GPMyplayerNetworkSyncHandler.h"
+#include "Character/Modules/GPPlayerAppearanceHandler.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
@@ -120,7 +121,7 @@ void UGPMyplayerInputHandler::Jump()
 	Owner->NetworkSyncHandler->isJumpStart = true;
 	Owner->CharacterInfo.RemoveState(STATE_IDLE);
 	Owner->CharacterInfo.AddState(STATE_JUMP);
-	Owner->SetupMasterPose();
+	Owner->AppearanceHandler->SetupMasterPose();
 }
 
 void UGPMyplayerInputHandler::StopJumping()
@@ -129,7 +130,7 @@ void UGPMyplayerInputHandler::StopJumping()
 
 	Owner->StopJumping();
 	Owner->CharacterInfo.RemoveState(STATE_JUMP);
-	Owner->SetupMasterPose();
+	Owner->AppearanceHandler->SetupMasterPose();
 }
 
 void UGPMyplayerInputHandler::StartSprinting()
@@ -138,7 +139,7 @@ void UGPMyplayerInputHandler::StartSprinting()
 
 	Owner->GetCharacterMovement()->MaxWalkSpeed = Owner->NetworkSyncHandler->SprintSpeed;
 	Owner->CharacterInfo.AddState(STATE_RUN);
-	Owner->SetupMasterPose();
+	Owner->AppearanceHandler->SetupMasterPose();
 }
 
 void UGPMyplayerInputHandler::StopSprinting()
@@ -147,7 +148,7 @@ void UGPMyplayerInputHandler::StopSprinting()
 
 	Owner->GetCharacterMovement()->MaxWalkSpeed = Owner->NetworkSyncHandler->WalkSpeed;
 	Owner->CharacterInfo.RemoveState(STATE_RUN);
-	Owner->SetupMasterPose();
+	Owner->AppearanceHandler->SetupMasterPose();
 }
 
 void UGPMyplayerInputHandler::AutoAttack()
@@ -162,7 +163,7 @@ void UGPMyplayerInputHandler::AutoAttack()
 	}
 
 	Owner->ProcessAutoAttackCommand();
-	Owner->SetupMasterPose();
+	Owner->AppearanceHandler->SetupMasterPose();
 }
 
 void UGPMyplayerInputHandler::ToggleInventory()
@@ -266,7 +267,7 @@ void UGPMyplayerInputHandler::UseSkillQ()
 		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::HitHard);
 	}
 
-	Owner->SetupMasterPose();
+	Owner->AppearanceHandler->SetupMasterPose();
 }
 
 void UGPMyplayerInputHandler::UseSkillE()
@@ -288,7 +289,7 @@ void UGPMyplayerInputHandler::UseSkillE()
 		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::Clash);
 	}
 
-	Owner->SetupMasterPose();
+	Owner->AppearanceHandler->SetupMasterPose();
 }
 
 void UGPMyplayerInputHandler::UseSkillR()
@@ -310,5 +311,5 @@ void UGPMyplayerInputHandler::UseSkillR()
 		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::Whirlwind);
 	}
 
-	Owner->SetupMasterPose();
+	Owner->AppearanceHandler->SetupMasterPose();
 }
