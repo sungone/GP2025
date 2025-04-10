@@ -14,8 +14,4 @@ class GP2025_API AGPSword : public AGPWeaponBase
 {
 	GENERATED_BODY()
 	
-public:
-	AGPSword();
-
-	virtual void AttackHitCheck() override;
 };

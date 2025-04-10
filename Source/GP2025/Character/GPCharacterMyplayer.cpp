@@ -139,6 +139,8 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 		GunCrosshairWidgetClass = GunCrosshairWidgetBPClass.Class;
 	}
 
+
+
 	// 기본 캐릭터 타입
 	CurrentCharacterType = (uint8)Type::EPlayer::GUNNER;
 }
@@ -370,6 +372,7 @@ void AGPCharacterMyplayer::SetCharacterType(ECharacterType NewCharacterType)
 
 	UGPCharacterControlData* NewCharacterData = CharacterTypeManager[NewCharacterType];
 	check(NewCharacterData);
+	SetCharacterData(NewCharacterData);
 
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -391,19 +394,6 @@ void AGPCharacterMyplayer::SetCharacterData(const UGPCharacterControlData* Chara
 
 	WalkSpeed = CharacterControlData->WalkSpeed;
 	SprintSpeed = CharacterControlData->SprintSpeed;
-
-	if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER)
-	{
-		ThrowingMontage = CharacterControlData->QSkillAnimMontage;
-		FThrowingMontage = CharacterControlData->ESkillAnimMontage;
-		AngerMontage = CharacterControlData->RSkillAnimMontage;
-	}
-	else
-	{
-		HitHardMontage = CharacterControlData->QSkillAnimMontage;
-		ClashMontage = CharacterControlData->ESkillAnimMontage;
-		WhirlwindMontage = CharacterControlData->RSkillAnimMontage;
-	}
 }
 
 
@@ -671,6 +661,20 @@ bool AGPCharacterMyplayer::bIsGunnerCharacter() const
 	return (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER);
 }
 
+void AGPCharacterMyplayer::ChangePlayerType()
+{
+	if (bIsGunnerCharacter())
+	{
+		CurrentCharacterType = static_cast<uint8>(Type::EPlayer::WARRIOR);
+	}
+	else
+	{
+		CurrentCharacterType = static_cast<uint8>(Type::EPlayer::GUNNER);
+	}
+
+	SetCharacterType(static_cast<ECharacterType>(CurrentCharacterType));
+}
+
 UGPInventory* AGPCharacterMyplayer::GetInventoryWidget()
 {
 	UGPInventory* CastInventory = Cast<UGPInventory>(InventoryWidget);
@@ -681,14 +685,6 @@ UGPInventory* AGPCharacterMyplayer::GetInventoryWidget()
 	}
 
 	return CastInventory;
-}
-
-void AGPCharacterMyplayer::AttackHitCheck()
-{
-	if (WeaponActor)
-	{
-		WeaponActor->AttackHitCheck();
-	}
 }
 
 void AGPCharacterMyplayer::SetCharacterInfo(FInfoData& CharacterInfo_)

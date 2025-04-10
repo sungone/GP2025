@@ -14,20 +14,6 @@ AGPWeaponBase::AGPWeaponBase()
 	SetRootComponent(WeaponMesh);
 }
 
-// Called when the game starts or when spawned
-void AGPWeaponBase::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void AGPWeaponBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 
 void AGPWeaponBase::SetWeaponMesh(UStaticMesh* NewWeaponMesh)
 {

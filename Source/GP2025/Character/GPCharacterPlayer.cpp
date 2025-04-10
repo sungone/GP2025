@@ -53,6 +53,8 @@ void AGPCharacterPlayer::SetCharacterData(const UGPCharacterControlData* Charact
 {
     Super::SetCharacterData(CharacterControlData);
 
+    BodyMesh->SetSkeletalMesh(CharacterControlData->BodyMesh);
+
     if (CharacterControlData->AnimBlueprint)
     {
         BodyMesh->SetAnimInstanceClass(CharacterControlData->AnimBlueprint);
@@ -62,6 +64,13 @@ void AGPCharacterPlayer::SetCharacterData(const UGPCharacterControlData* Charact
 void AGPCharacterPlayer::SetCharacterType(ECharacterType NewCharacterControlType)
 {
     Super::SetCharacterType(NewCharacterControlType);
+
+    UGPCharacterControlData* NewCharacterData = CharacterTypeManager[NewCharacterControlType];
+    check(NewCharacterData);
+
+    SetCharacterData(NewCharacterData);
+
+    CurrentCharacterType = NewCharacterControlType;
 }
 
 USkeletalMeshComponent* AGPCharacterPlayer::GetCharacterMesh() const

@@ -13,11 +13,5 @@ UCLASS()
 class GP2025_API AGPGun : public AGPWeaponBase
 {
 	GENERATED_BODY()
-	
-public:
-	AGPGun();
 
-	virtual void AttackHitCheck() override;
-
-	float ValidRange = 5000.f;
 };

@@ -245,6 +245,19 @@ void AGPCharacterBase::SetCharacterType(ECharacterType NewCharacterType)
 
 	SetCharacterData(NewCharacterData);
 
+	if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER)
+	{
+		ThrowingMontage = NewCharacterData->QSkillAnimMontage;
+		FThrowingMontage = NewCharacterData->ESkillAnimMontage;
+		AngerMontage = NewCharacterData->RSkillAnimMontage;
+	}
+	else
+	{
+		HitHardMontage = NewCharacterData->QSkillAnimMontage;
+		ClashMontage = NewCharacterData->ESkillAnimMontage;
+		WhirlwindMontage = NewCharacterData->RSkillAnimMontage;
+	}
+
 	CurrentCharacterType = NewCharacterType;
 }
 
