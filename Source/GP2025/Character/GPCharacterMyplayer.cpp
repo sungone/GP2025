@@ -26,7 +26,7 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 
 	// Character Type
-	CurrentCharacterType = (uint8)Type::EPlayer::GUNNER;
+	CurrentCharacterType = (uint8)Type::EPlayer::WARRIOR;
 }
 
 void AGPCharacterMyplayer::BeginPlay()

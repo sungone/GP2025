@@ -24,6 +24,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void PostInitializeComponents() override;
 
+	// <CharacterType>
+public:
+	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
+	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
+
 	// <Appearance>
 public :
 	UPROPERTY()
@@ -45,9 +50,4 @@ public :
 	TObjectPtr<class AGPWeaponBase> WeaponActor;
 
 	virtual USkeletalMeshComponent* GetCharacterMesh() const override;
-
-	// <CharacterType>
-public :
-	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
-	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
 };

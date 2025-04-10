@@ -7,6 +7,7 @@
 #include "Character/Modules/GPMyplayerCameraHandler.h"
 #include "Character/Modules/GPMyplayerNetworkSyncHandler.h"
 #include "Character/Modules/GPPlayerAppearanceHandler.h"
+#include "Character/Modules/GPCharacterCombatHandler.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
@@ -154,15 +155,16 @@ void UGPMyplayerInputHandler::StopSprinting()
 void UGPMyplayerInputHandler::AutoAttack()
 {
 	if (!Owner) return;
+
 	if (Owner->bIsGunnerCharacter() && !Owner->CameraHandler->IsZooming()) return;
 
-	if (!Owner->bIsAutoAttacking && !Owner->CharacterInfo.HasState(STATE_AUTOATTACK))
+	if (!Owner->CombatHandler->IsAutoAttacking() && !Owner->CharacterInfo.HasState(STATE_AUTOATTACK))
 	{
 		Owner->CharacterInfo.AddState(STATE_AUTOATTACK);
 		Owner->NetMgr->SendPlayerAttackPacket(Owner->GetActorRotation().Yaw);
 	}
 
-	Owner->ProcessAutoAttackCommand();
+	Owner->CombatHandler->PlayAutoAttackMontage();
 	Owner->AppearanceHandler->SetupMasterPose();
 }
 
@@ -203,27 +205,6 @@ void UGPMyplayerInputHandler::OpenSettingWidget()
 	Owner->UIManager->OpenSettingWidget();
 }
 
-//void UGPMyplayerInputHandler::ProcessInteraction()
-//{
-//	if (!Owner) return;
-//
-//	Owner->bInteractItem = true;
-//
-//	FTimerDelegate Delegate;
-//	Delegate.BindUFunction(this, FName("ResetInteractItem"));
-//	Owner->GetWorldTimerManager().SetTimer(
-//		Owner->InteractItemTimerHandle,
-//		Delegate,
-//		2.0f,
-//		false
-//	);
-//}
-//
-//void UGPMyplayerInputHandler::ResetInteractItem()
-//{
-//
-//}
-
 void UGPMyplayerInputHandler::StartAiming()
 {
 	if (!Owner || !Owner->bIsGunnerCharacter()) return;
@@ -250,20 +231,20 @@ void UGPMyplayerInputHandler::StopAiming()
 
 void UGPMyplayerInputHandler::UseSkillQ()
 {
-	if (!Owner || Owner->bIsUsingSkill || Owner->CharacterInfo.HasState(STATE_SKILL_Q)) return;
+	if (!Owner || Owner->CombatHandler->IsUsingSkill()) return;
 
 	if (Owner->bIsGunnerCharacter())
 	{
 		if (!Owner->CameraHandler->IsZooming()) return;
 
 		Owner->CharacterInfo.AddState(STATE_SKILL_Q);
-		Owner->ProcessThrowingCommand();
+		Owner->CombatHandler->PlayQSkillMontage();
 		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::Throwing);
 	}
 	else
 	{
 		Owner->CharacterInfo.AddState(STATE_SKILL_Q);
-		Owner->ProcessHitHardCommand();
+		Owner->CombatHandler->PlayQSkillMontage();
 		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::HitHard);
 	}
 
@@ -272,20 +253,20 @@ void UGPMyplayerInputHandler::UseSkillQ()
 
 void UGPMyplayerInputHandler::UseSkillE()
 {
-	if (!Owner || Owner->bIsUsingSkill || Owner->CharacterInfo.HasState(STATE_SKILL_E)) return;
+	if (!Owner || Owner->CombatHandler->IsUsingSkill() || Owner->CharacterInfo.HasState(STATE_SKILL_E)) return;
 
 	if (Owner->bIsGunnerCharacter())
 	{
 		if (!Owner->CameraHandler->IsZooming()) return;
 
 		Owner->CharacterInfo.AddState(STATE_SKILL_E);
-		Owner->ProcessFThrowingCommand();
+		Owner->CombatHandler->PlayESkillMontage();
 		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::FThrowing);
 	}
 	else
 	{
 		Owner->CharacterInfo.AddState(STATE_SKILL_E);
-		Owner->ProcessClashCommand();
+		Owner->CombatHandler->PlayESkillMontage();
 		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::Clash);
 	}
 
@@ -294,20 +275,20 @@ void UGPMyplayerInputHandler::UseSkillE()
 
 void UGPMyplayerInputHandler::UseSkillR()
 {
-	if (!Owner || Owner->bIsUsingSkill || Owner->CharacterInfo.HasState(STATE_SKILL_R)) return;
+	if (!Owner || Owner->CombatHandler->IsUsingSkill() || Owner->CharacterInfo.HasState(STATE_SKILL_R)) return;
 
 	if (Owner->bIsGunnerCharacter())
 	{
 		if (!Owner->CameraHandler->IsZooming()) return;
 
 		Owner->CharacterInfo.AddState(STATE_SKILL_R);
-		Owner->ProcessAngerCommand();
+		Owner->CombatHandler->PlayRSkillMontage();
 		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::Anger);
 	}
 	else
 	{
 		Owner->CharacterInfo.AddState(STATE_SKILL_R);
-		Owner->ProcessWhirlwindCommand();
+		Owner->CombatHandler->PlayRSkillMontage();
 		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::Whirlwind);
 	}
 

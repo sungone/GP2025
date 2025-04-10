@@ -17,7 +17,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h" 
 #include "UI/GPUserNameWidget.h"
-
+#include "Character/Modules/GPCharacterCombatHandler.h"
 #include <random>
 static std::random_device rd;
 static std::mt19937 gen(rd());
@@ -119,6 +119,15 @@ void AGPCharacterBase::BeginPlay()
 	{
 		NickNameWidget->SetVisibility(ESlateVisibility::Visible);
 	}
+
+	if (!CombatHandler)
+	{
+		CombatHandler = NewObject<UGPCharacterCombatHandler>(this, UGPCharacterCombatHandler::StaticClass());
+		if (CombatHandler)
+		{
+			CombatHandler->Initialize(this);
+		}
+	}
 }
 
 void AGPCharacterBase::Tick(float DeltaTime)
@@ -128,9 +137,9 @@ void AGPCharacterBase::Tick(float DeltaTime)
 
 	if (Cast<AGPCharacterMyplayer>(this)) return;
 
-	if (CharacterInfo.HasState(STATE_AUTOATTACK) && bIsAutoAttacking == false)
+	if (CharacterInfo.HasState(STATE_AUTOATTACK) && !CombatHandler->IsAutoAttacking())
 	{
-		ProcessAutoAttackCommand();
+		CombatHandler->PlayAutoAttackMontage();
 		return;
 	}
 
@@ -196,36 +205,6 @@ USkeletalMeshComponent* AGPCharacterBase::GetCharacterMesh() const
 	return GetMesh();
 }
 
-void AGPCharacterBase::ProcessAutoAttackCommand()
-{
-	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
-	if (!AnimInstance || !AttackActionMontage)
-		return;
-
-	if (AnimInstance->Montage_IsPlaying(AttackActionMontage))
-		return;
-
-	bIsAutoAttacking = true;
-
-	FOnMontageEnded MontageEndedDelegate;
-	MontageEndedDelegate.BindUObject(this, &AGPCharacterBase::OnAutoAttackMontageEnded);
-	AnimInstance->Montage_Play(AttackActionMontage, 2.f);
-	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, AttackActionMontage);
-}
-
-void AGPCharacterBase::OnAutoAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
-{
-	if (Montage == AttackActionMontage)
-	{
-		bIsAutoAttacking = false;
-
-		if (CharacterInfo.HasState(STATE_AUTOATTACK))
-		{
-			CharacterInfo.RemoveState(STATE_AUTOATTACK);
-		}
-	}
-}
-
 void AGPCharacterBase::SetCharacterData(const UGPCharacterControlData* CharacterData)
 {
 	bUseControllerRotationYaw = CharacterData->bUseControllerRotationYaw;
@@ -234,7 +213,25 @@ void AGPCharacterBase::SetCharacterData(const UGPCharacterControlData* Character
 	GetCharacterMovement()->bUseControllerDesiredRotation = CharacterData->bUseControllerDesiredRotation;
 	GetCharacterMovement()->RotationRate = CharacterData->RotationRate;
 
-	AttackActionMontage = CharacterData->AttackAnimMontage;
+	// ¸ùÅ¸ÁÖ ¼¼ÆÃ
+	if (CombatHandler)
+	{
+		CombatHandler->SetAttackMontage(CharacterData->AttackAnimMontage);
+
+		if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER)
+		{
+			CombatHandler->SetQSkillMontage(CharacterData->QSkillAnimMontage);  
+			CombatHandler->SetESkillMontage(CharacterData->ESkillAnimMontage);  
+			CombatHandler->SetRSkillMontage(CharacterData->RSkillAnimMontage);  
+		}
+		else
+		{
+			CombatHandler->SetQSkillMontage(CharacterData->QSkillAnimMontage);  
+			CombatHandler->SetESkillMontage(CharacterData->ESkillAnimMontage);  
+			CombatHandler->SetRSkillMontage(CharacterData->RSkillAnimMontage);  
+		}
+	}
+
 	DeadMontage = CharacterData->DeadAnimMontage;
 }
 
@@ -243,23 +240,33 @@ void AGPCharacterBase::SetCharacterType(ECharacterType NewCharacterType)
 	UGPCharacterControlData* NewCharacterData = CharacterTypeManager[NewCharacterType];
 	check(NewCharacterData);
 
-	SetCharacterData(NewCharacterData);
-
-	if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER)
-	{
-		ThrowingMontage = NewCharacterData->QSkillAnimMontage;
-		FThrowingMontage = NewCharacterData->ESkillAnimMontage;
-		AngerMontage = NewCharacterData->RSkillAnimMontage;
-	}
-	else
-	{
-		HitHardMontage = NewCharacterData->QSkillAnimMontage;
-		ClashMontage = NewCharacterData->ESkillAnimMontage;
-		WhirlwindMontage = NewCharacterData->RSkillAnimMontage;
-	}
-
 	CurrentCharacterType = NewCharacterType;
+	SetCharacterData(NewCharacterData);
 }
+
+void AGPCharacterBase::SetDead()
+{
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	PlayDeadAnimation();
+	SetActorEnableCollision(false);
+
+	FTimerHandle DeadTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda(
+		[&]()
+		{
+			Destroy();
+		}
+	), DeadEventDelayTime, false);
+}
+
+void AGPCharacterBase::PlayDeadAnimation()
+{
+	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
+	if (!AnimInstance) return;
+	AnimInstance->StopAllMontages(0.f);
+	AnimInstance->Montage_Play(DeadMontage, 1.f);
+}
+
 
 UGPWidgetComponent* AGPCharacterBase::CreateWidgetComponent(const FString& Name, const FString& WidgetPath, FVector Location, FVector2D Size, UUserWidget*& OutUserWidget)
 {
@@ -286,153 +293,4 @@ UGPWidgetComponent* AGPCharacterBase::CreateWidgetComponent(const FString& Name,
 	}
 
 	return WidgetComp;
-}
-
-void AGPCharacterBase::SetDead()
-{
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-	PlayDeadAnimation();
-	SetActorEnableCollision(false);
-
-	FTimerHandle DeadTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda(
-		[&]()
-		{
-			Destroy();
-		}
-	), DeadEventDelayTime, false);
-}
-
-void AGPCharacterBase::PlayDeadAnimation()
-{
-	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
-	if (!AnimInstance) return;
-	AnimInstance->StopAllMontages(0.f);
-	AnimInstance->Montage_Play(DeadMontage, 1.f);
-}
-
-void AGPCharacterBase::ProcessHitHardCommand()
-{
-	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
-	if (!AnimInstance || !HitHardMontage)
-		return;
-
-	if (AnimInstance->Montage_IsPlaying(HitHardMontage))
-		return;
-
-	bIsUsingSkill = true;
-
-	FOnMontageEnded MontageEndedDelegate;
-	MontageEndedDelegate.BindUObject(this, &AGPCharacterBase::OnSkillMontageEnded);
-	AnimInstance->Montage_Play(HitHardMontage, 2.f);
-	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, HitHardMontage);
-}
-
-void AGPCharacterBase::ProcessClashCommand()
-{
-	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
-	if (!AnimInstance || !ClashMontage)
-		return;
-
-	if (AnimInstance->Montage_IsPlaying(ClashMontage))
-		return;
-
-	bIsUsingSkill = true;
-
-	FOnMontageEnded MontageEndedDelegate;
-	MontageEndedDelegate.BindUObject(this, &AGPCharacterBase::OnSkillMontageEnded);
-	AnimInstance->Montage_Play(ClashMontage, 2.f);
-	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, ClashMontage);
-}
-
-void AGPCharacterBase::ProcessWhirlwindCommand()
-{
-	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
-	if (!AnimInstance || !WhirlwindMontage)
-		return;
-
-	if (AnimInstance->Montage_IsPlaying(WhirlwindMontage))
-		return;
-
-	bIsUsingSkill = true;
-
-	FOnMontageEnded MontageEndedDelegate;
-	MontageEndedDelegate.BindUObject(this, &AGPCharacterBase::OnSkillMontageEnded);
-	AnimInstance->Montage_Play(WhirlwindMontage, 2.f);
-	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, WhirlwindMontage);
-}
-
-void AGPCharacterBase::ProcessThrowingCommand()
-{
-	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
-	if (!AnimInstance || !ThrowingMontage)
-		return;
-
-	if (AnimInstance->Montage_IsPlaying(ThrowingMontage))
-		return;
-
-	bIsUsingSkill = true;
-
-	FOnMontageEnded MontageEndedDelegate;
-	MontageEndedDelegate.BindUObject(this, &AGPCharacterBase::OnSkillMontageEnded);
-	AnimInstance->Montage_Play(ThrowingMontage, 2.f);
-	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, ThrowingMontage);
-}
-
-void AGPCharacterBase::ProcessFThrowingCommand()
-{
-	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
-	if (!AnimInstance || !FThrowingMontage)
-		return;
-
-	if (AnimInstance->Montage_IsPlaying(FThrowingMontage))
-		return;
-
-	bIsUsingSkill = true;
-
-	FOnMontageEnded MontageEndedDelegate;
-	MontageEndedDelegate.BindUObject(this, &AGPCharacterBase::OnSkillMontageEnded);
-	AnimInstance->Montage_Play(FThrowingMontage, 2.f);
-	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, FThrowingMontage);
-}
-
-void AGPCharacterBase::ProcessAngerCommand()
-{
-	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
-	if (!AnimInstance || !AngerMontage)
-		return;
-
-	if (AnimInstance->Montage_IsPlaying(AngerMontage))
-		return;
-
-	bIsUsingSkill = true;
-
-	FOnMontageEnded MontageEndedDelegate;
-	MontageEndedDelegate.BindUObject(this, &AGPCharacterBase::OnSkillMontageEnded);
-	AnimInstance->Montage_Play(AngerMontage, 2.f);
-	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, AngerMontage);
-}
-
-void AGPCharacterBase::OnSkillMontageEnded(UAnimMontage* Montage, bool bInterrupted)
-{
-	if (Montage == HitHardMontage || Montage == ClashMontage || Montage == WhirlwindMontage ||
-		Montage == ThrowingMontage || Montage == FThrowingMontage || Montage == AngerMontage)
-	{
-		bIsUsingSkill = false;
-
-		if (CharacterInfo.HasState(STATE_SKILL_Q) && (Montage == HitHardMontage || Montage == ThrowingMontage))
-		{
-			CharacterInfo.RemoveState(STATE_SKILL_Q);
-		}
-
-		if (CharacterInfo.HasState(STATE_SKILL_E) && (Montage == ClashMontage || Montage == FThrowingMontage))
-		{
-			CharacterInfo.RemoveState(STATE_SKILL_E);
-		}
-
-		if (CharacterInfo.HasState(STATE_SKILL_R) && (Montage == WhirlwindMontage || Montage == AngerMontage))
-		{
-			CharacterInfo.RemoveState(STATE_SKILL_R);
-		}
-	}
 }

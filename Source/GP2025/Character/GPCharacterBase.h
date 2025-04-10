@@ -27,31 +27,23 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void PostInitializeComponents() override;
 
-	// 서버에서 받은 다른 클라이언트 정보를 업데이트
-	virtual void SetCharacterInfo(FInfoData& CharacterInfo_);
-	FInfoData CharacterInfo;
-
-	// 플레이어 -> 마스터 포즈 컴포넌트 (BodyMesh) , 몬스터 -> GetMesh()
-	virtual USkeletalMeshComponent* GetCharacterMesh() const;
-
-// 기본 공격 애니메이션 및 공격 애니메이션 몽타주 코드
-public :
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TObjectPtr<class UAnimMontage> AttackActionMontage;
-
-	void ProcessAutoAttackCommand();
-	void OnAutoAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
-	bool bIsAutoAttacking = false;
-
-// Control Data 세팅
-public :
-	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterData);
-	virtual void SetCharacterType(ECharacterType NewCharacterType);
-
+	// <CharacterType>
+public:
 	TMap<ECharacterType, class UGPCharacterControlData*> CharacterTypeManager;
 	ECharacterType CurrentCharacterType;
 
-// UI Widget Section
+	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterData);
+	virtual void SetCharacterType(ECharacterType NewCharacterType);
+
+	// <CharacterInfo>
+	virtual void SetCharacterInfo(FInfoData& CharacterInfo_);
+	FInfoData CharacterInfo;
+
+	// <Appearance>
+	virtual USkeletalMeshComponent* GetCharacterMesh() const;
+
+
+	// <UI>
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UGPWidgetComponent> HpBar;
@@ -68,50 +60,7 @@ public:
 
 	UGPWidgetComponent* CreateWidgetComponent(const FString& Name, const FString& WidgetPath, FVector Location, FVector2D Size, UUserWidget*& OutUserWidget);
 
-// Dead Section
-public :
-	virtual void SetDead();
-	void PlayDeadAnimation();
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UAnimMontage> DeadMontage;
-	float DeadEventDelayTime = 0.5f;
-
-// 스킬 공통 기능
-
- 	void OnSkillMontageEnded(UAnimMontage* Montage, bool bInterrupted);
-	bool bIsUsingSkill = false;
-
-// 남자 스킬   
-	void ProcessHitHardCommand();
-	void ProcessClashCommand();
-	void ProcessWhirlwindCommand();
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
-	TObjectPtr<UAnimMontage> HitHardMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
-	TObjectPtr<UAnimMontage> ClashMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
-	TObjectPtr<UAnimMontage> WhirlwindMontage;
-
-// 여자 스킬
-
-	void ProcessThrowingCommand();
-	void ProcessFThrowingCommand();
-	void ProcessAngerCommand();
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
-	TObjectPtr<UAnimMontage> ThrowingMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
-	TObjectPtr<UAnimMontage> FThrowingMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
-	TObjectPtr<UAnimMontage> AngerMontage;
-
-// Gold Setting
+	// Gold Setting
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Event")
 	FOnGoldChanged OnGoldChanged;
@@ -124,4 +73,69 @@ public:
 	TObjectPtr<class UGPWidgetComponent> NickNameText;
 
 	FOnNickNameChanged OnNickNameChanged;
+
+	// Dead Section
+public:
+	virtual void SetDead();
+	void PlayDeadAnimation();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> DeadMontage;
+	float DeadEventDelayTime = 0.5f;
+
+	// <Combat Handler>
+public :
+	UPROPERTY()
+	class UGPCharacterCombatHandler* CombatHandler;
+
+//
+//// 기본 공격 애니메이션 및 공격 애니메이션 몽타주 코드
+//public :
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+//	TObjectPtr<class UAnimMontage> AttackActionMontage;
+//
+//	void ProcessAutoAttackCommand();
+//	void OnAutoAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+//	bool bIsAutoAttacking = false;
+//
+//
+
+//
+//// 스킬 공통 기능
+//
+// 	void OnSkillMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+//	bool bIsUsingSkill = false;
+//
+//// 남자 스킬   
+//	void ProcessHitHardCommand();
+//	void ProcessClashCommand();
+//	void ProcessWhirlwindCommand();
+//
+//	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
+//	TObjectPtr<UAnimMontage> HitHardMontage;
+//
+//	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
+//	TObjectPtr<UAnimMontage> ClashMontage;
+//
+//	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
+//	TObjectPtr<UAnimMontage> WhirlwindMontage;
+//
+//// 여자 스킬
+//
+//	void ProcessThrowingCommand();
+//	void ProcessFThrowingCommand();
+//	void ProcessAngerCommand();
+//
+//	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
+//	TObjectPtr<UAnimMontage> ThrowingMontage;
+//
+//	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
+//	TObjectPtr<UAnimMontage> FThrowingMontage;
+//
+//	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
+//	TObjectPtr<UAnimMontage> AngerMontage;
+//
+//
+
+
+
 };
