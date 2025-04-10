@@ -17,6 +17,7 @@
 #include "Player/GPPlayerController.h"
 #include "Weapons/GPWeaponBase.h"
 #include "UI/GPInGameWidget.h"
+#include "Character/Modules/GPMyplayerInputHandler.h" 
 
 AGPCharacterMyplayer::AGPCharacterMyplayer()
 {
@@ -32,86 +33,6 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
-	// Input 세팅
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/PlayerInput/IMC_PlayerIMC.IMC_PlayerIMC'"));
-	if (nullptr != InputMappingContextRef.Object)
-	{
-		DefaultMappingContext = InputMappingContextRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionJumpRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Jump.IA_Jump'"));
-	if (nullptr != InputActionJumpRef.Object)
-	{
-		JumpAction = InputActionJumpRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionMoveRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Move.IA_Move'"));
-	if (nullptr != InputActionMoveRef.Object)
-	{
-		MoveAction = InputActionMoveRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionLookRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Look.IA_Look'"));
-	if (nullptr != InputActionLookRef.Object)
-	{
-		LookAction = InputActionLookRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSprintRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Sprint.IA_Sprint'"));
-	if (InputActionSprintRef.Object)
-	{
-		SprintAction = InputActionSprintRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionAutoAttackRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_AutoAttack.IA_AutoAttack'"));
-	if (InputActionAutoAttackRef.Object)
-	{
-		AutoAttackAction = InputActionAutoAttackRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionInventoryRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Inventory.IA_Inventory'"));
-	if (InputActionInventoryRef.Object)
-	{
-		InventoryAction = InputActionInventoryRef.Object;
-	}
-
-
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSettingRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_ESC.IA_ESC'"));
-	if (InputActionSettingRef.Object)
-	{
-		SettingAction = InputActionSettingRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InteractionActionSettingRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Interaction.IA_Interaction'"));
-	if (InteractionActionSettingRef.Object)
-	{
-		InteractionAction = InteractionActionSettingRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> ZoomActionSettingRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Zoom.IA_Zoom'"));
-	if (ZoomActionSettingRef.Object)
-	{
-		ZoomAction = ZoomActionSettingRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> QSkillActionSettingRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_SkillQ.IA_SkillQ'"));
-	if (QSkillActionSettingRef.Object)
-	{
-		SkillQAction = QSkillActionSettingRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> ESkillActionSettingRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_SkillE.IA_SkillE'"));
-	if (ESkillActionSettingRef.Object)
-	{
-		SkillEAction = ESkillActionSettingRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> RSkillActionSettingRef(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_SkillR.IA_SkillR'"));
-	if (RSkillActionSettingRef.Object)
-	{
-		SkillRAction = RSkillActionSettingRef.Object;
-	}
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBPClass(TEXT("/Game/Inventory/Widgets/WBP_Inventory"));
 
@@ -341,29 +262,18 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 
 }
 
+
 void AGPCharacterMyplayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::Jump);
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AGPCharacterMyplayer::StopJumping);
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::Move);
-	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::Look);
-	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::StartSprinting);
-	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AGPCharacterMyplayer::StopSprinting);
-	EnhancedInputComponent->BindAction(AutoAttackAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::AutoAttack);
-	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::ToggleInventory);
-	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Completed, this, &AGPCharacterMyplayer::ResetInventoryToggle);
-	EnhancedInputComponent->BindAction(SettingAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::OpenSettingWidget);
-	EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::ProcessInteraction);
-	EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::StartAiming);
-	EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Completed, this, &AGPCharacterMyplayer::StopAiming);
-	EnhancedInputComponent->BindAction(SkillQAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::UseSkillQ);
-	EnhancedInputComponent->BindAction(SkillEAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::UseSkillE);
-	EnhancedInputComponent->BindAction(SkillRAction, ETriggerEvent::Triggered, this, &AGPCharacterMyplayer::UseSkillR);
-
+	if (!InputHandler)
+	{
+		InputHandler = NewObject<UGPMyplayerInputHandler>(this, UGPMyplayerInputHandler::StaticClass());
+		InputHandler->Initialize(this, EnhancedInputComponent);
+	}
 }
 
 void AGPCharacterMyplayer::SetCharacterType(ECharacterType NewCharacterType)
@@ -394,266 +304,6 @@ void AGPCharacterMyplayer::SetCharacterData(const UGPCharacterControlData* Chara
 
 	WalkSpeed = CharacterControlData->WalkSpeed;
 	SprintSpeed = CharacterControlData->SprintSpeed;
-}
-
-
-void AGPCharacterMyplayer::Move(const FInputActionValue& Value)
-{
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
-	{
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-		AddMovementInput(ForwardDirection, MovementVector.X);
-		AddMovementInput(RightDirection, MovementVector.Y);
-	}
-}
-
-void AGPCharacterMyplayer::Look(const FInputActionValue& Value)
-{
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
-	{
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
-	}
-}
-
-void AGPCharacterMyplayer::Jump()
-{
-	Super::Jump();
-	isJumpStart = true;
-	CharacterInfo.RemoveState(STATE_IDLE);
-	CharacterInfo.AddState(STATE_JUMP);
-	SetupMasterPose();
-
-}
-
-void AGPCharacterMyplayer::StopJumping()
-{
-	Super::StopJumping();
-	CharacterInfo.RemoveState(STATE_JUMP);
-	SetupMasterPose();
-}
-
-void AGPCharacterMyplayer::StartSprinting()
-{
-	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
-	CharacterInfo.AddState(STATE_RUN);
-	SetupMasterPose();
-}
-
-void AGPCharacterMyplayer::StopSprinting()
-{
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-	CharacterInfo.RemoveState(STATE_RUN);
-	SetupMasterPose();
-}
-
-void AGPCharacterMyplayer::AutoAttack()
-{
-	if (bIsGunnerCharacter() && !bWantsToZoom)
-		return;
-
-	if (bIsAutoAttacking == false && !CharacterInfo.HasState(STATE_AUTOATTACK))
-	{
-		CharacterInfo.AddState(STATE_AUTOATTACK);
-
-		float CurYaw = GetActorRotation().Yaw;
-		NetMgr->SendPlayerAttackPacket(CurYaw);
-	}
-
-	ProcessAutoAttackCommand();
-	SetupMasterPose();
-}
-
-void AGPCharacterMyplayer::ToggleInventory()
-{
-	if (bInventoryToggled) return;
-
-	bInventoryToggled = true;
-
-	if (InventoryWidget)
-	{
-		if (InventoryWidget->IsInViewport())
-		{
-			CloseInventory();
-		}
-		else
-		{
-			OpenInventory();
-		}
-	}
-}
-
-void AGPCharacterMyplayer::OpenInventory()
-{
-	if (InventoryWidget && !InventoryWidget->IsInViewport())
-	{
-		InventoryWidget->AddToViewport();
-
-		APlayerController* PC = Cast<AGPPlayerController>(GetController());
-		if (PC)
-		{
-			PC->SetShowMouseCursor(true);
-			PC->SetInputMode(FInputModeGameAndUI());
-		}
-
-		UGPInventory* CastInventory = Cast<UGPInventory>(InventoryWidget);
-		if (CastInventory)
-		{
-			CastInventory->SetGold(CharacterInfo.Gold);
-		}
-	}
-
-	// InGameWidget 유지
-	if (InGameWidget && !InGameWidget->IsInViewport())
-	{
-		InGameWidget->AddToViewport();
-	}
-}
-
-void AGPCharacterMyplayer::CloseInventory()
-{
-	if (InventoryWidget && InventoryWidget->IsInViewport())
-	{
-		InventoryWidget->RemoveFromParent();
-
-		APlayerController* PC = Cast<AGPPlayerController>(GetController());
-		if (PC)
-		{
-			PC->SetShowMouseCursor(false);
-			PC->SetInputMode(FInputModeGameOnly());
-		}
-	}
-}
-
-void AGPCharacterMyplayer::ResetInventoryToggle()
-{
-	bInventoryToggled = false;
-}
-
-void AGPCharacterMyplayer::OpenSettingWidget()
-{
-	if (SettingWidget && !SettingWidget->IsInViewport())
-	{
-		SettingWidget->AddToViewport();
-
-		APlayerController* PC = Cast<AGPPlayerController>(GetController());
-		if (PC)
-		{
-			PC->SetShowMouseCursor(true);
-			PC->SetInputMode(FInputModeGameAndUI());
-		}
-	}
-}
-
-void AGPCharacterMyplayer::ProcessInteraction()
-{
-	bInteractItem = true;
-	GetWorldTimerManager().SetTimer(
-		InteractItemTimerHandle,
-		this,
-		&AGPCharacterMyplayer::ResetInteractItem,
-		2.0f,
-		false);
-}
-
-void AGPCharacterMyplayer::UseSkillQ()
-{
-	if (CurrentCharacterType == (uint8)Type::EPlayer::WARRIOR && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_Q))
-	{
-		CharacterInfo.AddState(STATE_SKILL_Q);
-		ProcessHitHardCommand();
-		NetMgr->SendPlayerUseSkill(ESkillGroup::HitHard);
-	}
-
-	if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_Q))
-	{
-		if (!bWantsToZoom) return;
-		CharacterInfo.AddState(STATE_SKILL_Q);
-		ProcessThrowingCommand();
-		NetMgr->SendPlayerUseSkill(ESkillGroup::Throwing);
-	}
-
-	SetupMasterPose();
-}
-
-void AGPCharacterMyplayer::UseSkillE()
-{
-	if (CurrentCharacterType == (uint8)Type::EPlayer::WARRIOR && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_E))
-	{
-		CharacterInfo.AddState(STATE_SKILL_E);
-		ProcessClashCommand();
-		NetMgr->SendPlayerUseSkill(ESkillGroup::Clash);
-	}
-
-	if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_E))
-	{
-		if (!bWantsToZoom) return;
-		CharacterInfo.AddState(STATE_SKILL_E);
-		ProcessFThrowingCommand();
-		NetMgr->SendPlayerUseSkill(ESkillGroup::FThrowing);
-	}
-
-	SetupMasterPose();
-}
-
-void AGPCharacterMyplayer::UseSkillR()
-{
-	if (CurrentCharacterType == (uint8)Type::EPlayer::WARRIOR && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_R))
-	{
-		CharacterInfo.AddState(STATE_SKILL_R);
-		ProcessWhirlwindCommand();
-		NetMgr->SendPlayerUseSkill(ESkillGroup::Whirlwind);
-	}
-
-	if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER && !bIsUsingSkill && !CharacterInfo.HasState(STATE_SKILL_R))
-	{
-		if (!bWantsToZoom) return;
-		CharacterInfo.AddState(STATE_SKILL_R);
-		ProcessAngerCommand();
-		NetMgr->SendPlayerUseSkill(ESkillGroup::Anger);
-	}
-
-	SetupMasterPose();
-}
-
-void AGPCharacterMyplayer::ResetInteractItem()
-{
-	bInteractItem = false;
-}
-
-void AGPCharacterMyplayer::StartAiming()
-{
-	if (!bIsGunnerCharacter())
-		return;
-
-	bWantsToZoom = true;
-
-	if (GunCrosshairWidget)
-	{
-		GunCrosshairWidget->SetVisibility(ESlateVisibility::Visible);
-	}
-}
-
-void AGPCharacterMyplayer::StopAiming()
-{
-	if (!bIsGunnerCharacter())
-		return;
-
-	bWantsToZoom = false;
-
-	if (GunCrosshairWidget)
-	{
-		GunCrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
-	}
 }
 
 bool AGPCharacterMyplayer::bIsGunnerCharacter() const
