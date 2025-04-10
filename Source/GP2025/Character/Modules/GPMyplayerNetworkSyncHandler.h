@@ -19,7 +19,7 @@ public:
 	void Initialize(class AGPCharacterMyplayer* InOwner);
 	void Tick(float DeltaTime);
 
-private:
+public:
 	UPROPERTY()
 	AGPCharacterMyplayer* Owner;
 
@@ -28,6 +28,9 @@ private:
 	FInfoData LastSendPlayerInfo;
 	float MovePacketSendTimer = 0.5;
 	bool bWasJumping = false;
+
+	float WalkSpeed;
+	float SprintSpeed;
 
 	// 유틸리티
 	void HandleIdleState();

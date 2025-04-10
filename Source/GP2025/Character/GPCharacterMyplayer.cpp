@@ -2,20 +2,15 @@
 
 #include "Character/GPCharacterMyplayer.h"
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GPCharacterControlData.h"
-#include "GPCharacterMonster.h"
 #include "InputMappingContext.h"
 #include "Physics/GPCollision.h"
 #include "Network/GPNetworkManager.h"
 #include "Blueprint/UserWidget.h"
-#include "Inventory/GPInventory.h"
 #include "Player/GPPlayerController.h"
-#include "Weapons/GPWeaponBase.h"
 #include "UI/GPInGameWidget.h"
 #include "Character/Modules/GPMyplayerInputHandler.h" 
 #include "Character/Modules/GPMyplayerUIManager.h"
@@ -30,7 +25,7 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 	CameraBoom->SetupAttachment(RootComponent);
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 
-	// 기본 캐릭터 타입
+	// Character Type
 	CurrentCharacterType = (uint8)Type::EPlayer::GUNNER;
 }
 
@@ -83,6 +78,19 @@ void AGPCharacterMyplayer::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	}
 }
 
+void AGPCharacterMyplayer::OnPlayerLoginSucess()
+{
+	if (!UIManager)
+	{
+		UIManager = NewObject<UGPMyplayerUIManager>(this, UGPMyplayerUIManager::StaticClass());
+		if (UIManager)
+		{
+			UIManager->Initialize(this);
+			UIManager->OnLoginCreateWidget();
+		}
+	}
+}
+
 void AGPCharacterMyplayer::SetCharacterType(ECharacterType NewCharacterType)
 {
 	Super::SetCharacterType(NewCharacterType);
@@ -109,21 +117,8 @@ void AGPCharacterMyplayer::SetCharacterData(const UGPCharacterControlData* Chara
 {
 	Super::SetCharacterData(CharacterControlData);
 
-	WalkSpeed = CharacterControlData->WalkSpeed;
-	SprintSpeed = CharacterControlData->SprintSpeed;
-}
-
-void AGPCharacterMyplayer::OnPlayerLoginSucess()
-{
-	if (!UIManager)
-	{
-		UIManager = NewObject<UGPMyplayerUIManager>(this, UGPMyplayerUIManager::StaticClass());
-		if (UIManager)
-		{
-			UIManager->Initialize(this);
-			UIManager->OnLoginCreateWidget();
-		}
-	}
+	NetworkSyncHandler->WalkSpeed = CharacterControlData->WalkSpeed;
+	NetworkSyncHandler->SprintSpeed = CharacterControlData->SprintSpeed;
 }
 
 bool AGPCharacterMyplayer::bIsGunnerCharacter() const

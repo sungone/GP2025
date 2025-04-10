@@ -23,8 +23,6 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void PostInitializeComponents() override;
-	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
-	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
 
 public :
 	virtual USkeletalMeshComponent* GetCharacterMesh() const override;
@@ -55,4 +53,9 @@ public :
 	// Inventory Equip Item Change
 	UFUNCTION(BlueprintCallable, Category = "Item")
 	void EquipItemOnCharacter(struct FGPItemStruct& ItemData);
+
+	// CharacterType Setting
+public :
+	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
+	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
 };

@@ -5,6 +5,7 @@
 #include "Character/GPCharacterMyplayer.h"
 #include "Character/Modules/GPMyplayerUIManager.h"
 #include "Character/Modules/GPMyplayerCameraHandler.h"
+#include "Character/Modules/GPMyplayerNetworkSyncHandler.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
@@ -135,7 +136,7 @@ void UGPMyplayerInputHandler::StartSprinting()
 {
 	if (!Owner) return;
 
-	Owner->GetCharacterMovement()->MaxWalkSpeed = Owner->SprintSpeed;
+	Owner->GetCharacterMovement()->MaxWalkSpeed = Owner->NetworkSyncHandler->SprintSpeed;
 	Owner->CharacterInfo.AddState(STATE_RUN);
 	Owner->SetupMasterPose();
 }
@@ -144,7 +145,7 @@ void UGPMyplayerInputHandler::StopSprinting()
 {
 	if (!Owner) return;
 
-	Owner->GetCharacterMovement()->MaxWalkSpeed = Owner->WalkSpeed;
+	Owner->GetCharacterMovement()->MaxWalkSpeed = Owner->NetworkSyncHandler->WalkSpeed;
 	Owner->CharacterInfo.RemoveState(STATE_RUN);
 	Owner->SetupMasterPose();
 }

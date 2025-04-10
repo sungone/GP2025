@@ -79,7 +79,8 @@ void UGPMyplayerNetworkSyncHandler::HandleJumpState()
 		(LastSendPlayerInfo.Pos.Z - Owner->GroundZLocation) > AirThreshold)
 	{
 		Owner->CharacterInfo.Pos.Z = Owner->GroundZLocation;
-		Owner->CharacterInfo.Stats.Speed = LastSendPlayerInfo.HasState(STATE_RUN) ? Owner->SprintSpeed : Owner->WalkSpeed;
+		Owner->CharacterInfo.Stats.Speed = LastSendPlayerInfo.HasState(STATE_RUN) ? 
+			Owner->NetworkSyncHandler->SprintSpeed : Owner->NetworkSyncHandler->WalkSpeed;
 
 		Owner->NetMgr->SendPlayerMovePacket();
 		LastSendPlayerInfo = Owner->CharacterInfo;
