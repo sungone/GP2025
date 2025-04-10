@@ -32,6 +32,8 @@ void UGPCharacterCombatHandler::OnAutoAttackMontageEnded(UAnimMontage* Montage, 
 {
 	if (!Owner || Montage != AttackMontage) return;
 	bIsAutoAttacking = false;
+	Owner->CharacterInfo.RemoveState(STATE_AUTOATTACK);
+
 }
 
 void UGPCharacterCombatHandler::PlayQSkillMontage()
@@ -66,7 +68,19 @@ void UGPCharacterCombatHandler::PlaySkillMontage(UAnimMontage* SkillMontage)
 
 void UGPCharacterCombatHandler::OnSkillMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-	bIsUsingSkill = false;
+	if (Montage == QSkillMontage || Montage == ESkillMontage || Montage == RSkillMontage)
+	{
+		bIsUsingSkill = false;
+
+		if (Owner->CharacterInfo.HasState(STATE_SKILL_Q) && Montage == QSkillMontage)
+			Owner->CharacterInfo.RemoveState(STATE_SKILL_Q);
+
+		if (Owner->CharacterInfo.HasState(STATE_SKILL_E) && Montage == ESkillMontage)
+			Owner->CharacterInfo.RemoveState(STATE_SKILL_E);
+
+		if (Owner->CharacterInfo.HasState(STATE_SKILL_R) && Montage == RSkillMontage)
+			Owner->CharacterInfo.RemoveState(STATE_SKILL_R);
+	}
 }
 
 void UGPCharacterCombatHandler::SetAttackMontage(UAnimMontage* Montage)

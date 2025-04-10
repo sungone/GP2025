@@ -231,7 +231,7 @@ void UGPMyplayerInputHandler::StopAiming()
 
 void UGPMyplayerInputHandler::UseSkillQ()
 {
-	if (!Owner || Owner->CombatHandler->IsUsingSkill()) return;
+	if (!Owner || Owner->CombatHandler->IsUsingSkill() || Owner->CharacterInfo.HasState(STATE_SKILL_Q)) return;
 
 	if (Owner->bIsGunnerCharacter())
 	{
