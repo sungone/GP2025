@@ -4,6 +4,7 @@
 #include "Character/Modules/GPMyplayerInputHandler.h"
 #include "Character/GPCharacterMyplayer.h"
 #include "Character/Modules/GPMyplayerUIManager.h"
+#include "Character/Modules/GPMyplayerCameraHandler.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
@@ -151,7 +152,7 @@ void UGPMyplayerInputHandler::StopSprinting()
 void UGPMyplayerInputHandler::AutoAttack()
 {
 	if (!Owner) return;
-	if (Owner->bIsGunnerCharacter() && !Owner->IsZooming()) return;
+	if (Owner->bIsGunnerCharacter() && !Owner->CameraHandler->IsZooming()) return;
 
 	if (!Owner->bIsAutoAttacking && !Owner->CharacterInfo.HasState(STATE_AUTOATTACK))
 	{
@@ -225,7 +226,7 @@ void UGPMyplayerInputHandler::StartAiming()
 {
 	if (!Owner || !Owner->bIsGunnerCharacter()) return;
 
-	Owner->bWantsToZoom = true;
+	Owner->CameraHandler->bWantsToZoom = true;
 
 	if (Owner->UIManager->GunCrosshairWidget)
 	{
@@ -237,7 +238,7 @@ void UGPMyplayerInputHandler::StopAiming()
 {
 	if (!Owner || !Owner->bIsGunnerCharacter()) return;
 
-	Owner->bWantsToZoom = false;
+	Owner->CameraHandler->bWantsToZoom = false;
 
 	if (Owner->UIManager->GunCrosshairWidget)
 	{
@@ -251,7 +252,7 @@ void UGPMyplayerInputHandler::UseSkillQ()
 
 	if (Owner->bIsGunnerCharacter())
 	{
-		if (!Owner->IsZooming()) return;
+		if (!Owner->CameraHandler->IsZooming()) return;
 
 		Owner->CharacterInfo.AddState(STATE_SKILL_Q);
 		Owner->ProcessThrowingCommand();
@@ -273,7 +274,7 @@ void UGPMyplayerInputHandler::UseSkillE()
 
 	if (Owner->bIsGunnerCharacter())
 	{
-		if (!Owner->IsZooming()) return;
+		if (!Owner->CameraHandler->IsZooming()) return;
 
 		Owner->CharacterInfo.AddState(STATE_SKILL_E);
 		Owner->ProcessFThrowingCommand();
@@ -295,7 +296,7 @@ void UGPMyplayerInputHandler::UseSkillR()
 
 	if (Owner->bIsGunnerCharacter())
 	{
-		if (!Owner->IsZooming()) return;
+		if (!Owner->CameraHandler->IsZooming()) return;
 
 		Owner->CharacterInfo.AddState(STATE_SKILL_R);
 		Owner->ProcessAngerCommand();

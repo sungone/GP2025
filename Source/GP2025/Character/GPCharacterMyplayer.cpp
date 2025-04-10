@@ -19,63 +19,19 @@
 #include "UI/GPInGameWidget.h"
 #include "Character/Modules/GPMyplayerInputHandler.h" 
 #include "Character/Modules/GPMyplayerUIManager.h"
+#include "Character/Modules/GPMyplayerCameraHandler.h"
 
 AGPCharacterMyplayer::AGPCharacterMyplayer()
 {
-	// 카메라 세팅
+	// Camera 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.f;
-	CameraBoom->bUsePawnControlRotation = true;
-	CameraBoom->SetRelativeLocation(FVector(0.f, 0.f, 100.f));
-	CameraBoom->SetRelativeRotation(FRotator(-15.f, 0.f, 0.f));
-
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
+	CameraBoom->SetupAttachment(RootComponent);
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	FollowCamera->bUsePawnControlRotation = false;
 
 	// 기본 캐릭터 타입
 	CurrentCharacterType = (uint8)Type::EPlayer::GUNNER;
 }
-
-//void AGPCharacterMyplayer::OnPlayerLoginSucess()
-//{
-//	if (InventoryWidgetClass)
-//	{
-//		InventoryWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryWidgetClass);
-//	}
-//
-//	if (SettingWidgetClass)
-//	{
-//		SettingWidget = CreateWidget<UUserWidget>(GetWorld(), SettingWidgetClass);
-//	}
-//
-//	if (InGameWidgetClass)
-//	{
-//		InGameWidget = CreateWidget<UUserWidget>(GetWorld(), InGameWidgetClass);
-//		if (InGameWidget)
-//		{
-//			InGameWidget->AddToViewport();
-//			APlayerController* PC = Cast<AGPPlayerController>(GetController());
-//			if (PC)
-//			{
-//				PC->SetShowMouseCursor(false);
-//				PC->SetInputMode(FInputModeGameOnly());
-//				InGameWidget->SetVisibility(ESlateVisibility::Visible);
-//			}
-//		}
-//	}
-//
-//	if (GunCrosshairWidgetClass)
-//	{
-//		GunCrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), GunCrosshairWidgetClass);
-//		if (GunCrosshairWidget)
-//		{
-//			GunCrosshairWidget->AddToViewport();
-//			GunCrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
-//		}
-//	}
-//}
 
 void AGPCharacterMyplayer::BeginPlay()
 {
@@ -88,59 +44,23 @@ void AGPCharacterMyplayer::BeginPlay()
 		NetMgr->SetMyPlayer(Cast<AGPCharacterPlayer>(this));
 		NetMgr->OnLoginSuccess.AddDynamic(this, &AGPCharacterMyplayer::OnPlayerLoginSucess);
 	}
+
+	// Camera Handler 
+	CameraHandler = NewObject<UGPMyplayerCameraHandler>(this, UGPMyplayerCameraHandler::StaticClass());
+	if (CameraHandler)
+		CameraHandler->Initialize(this);
+
 	LastLocation = GetActorLocation();
 	LastRotationYaw = GetActorRotation().Yaw;
 	LastSendPlayerInfo = CharacterInfo;
-
-	// 조준 카메라 뷰 설정
-	if (FollowCamera)
-	{
-		DefaultFOV = FollowCamera->FieldOfView;
-	}
-
-	DefaultCameraOffset = CameraBoom->GetRelativeLocation();
-	DefaultArmLength = CameraBoom->TargetArmLength;
 }
 
 void AGPCharacterMyplayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// 카메라 줌인 줌아웃 뷰 설정
-	{
-		if (FollowCamera)
-		{
-			const float TargetFOV = bWantsToZoom ? ZoomedFOV : DefaultFOV;
-			const float NewFOV = FMath::FInterpTo(FollowCamera->FieldOfView, TargetFOV, DeltaTime, ZoomInterpSpeed);
-			FollowCamera->SetFieldOfView(NewFOV);
-		}
-
-		if (CameraBoom)
-		{
-			float TargetArmLength = bWantsToZoom ? ZoomedArmLength : DefaultArmLength;
-			FVector TargetOffset = bWantsToZoom ? ZoomedCameraOffset : DefaultCameraOffset;
-
-			float InterpSpeed = 10.f;
-			float Delta = DeltaTime;
-
-			float NewArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, TargetArmLength, Delta, InterpSpeed);
-			FVector NewOffset = FMath::VInterpTo(CameraBoom->GetRelativeLocation(), TargetOffset, Delta, InterpSpeed);
-
-			CameraBoom->TargetArmLength = NewArmLength;
-			CameraBoom->SetRelativeLocation(NewOffset);
-		}
-
-		if (bWantsToZoom)
-		{
-			GetCharacterMovement()->bOrientRotationToMovement = false;
-			bUseControllerRotationYaw = true;
-		}
-		else
-		{
-			GetCharacterMovement()->bOrientRotationToMovement = true;
-			bUseControllerRotationYaw = false;
-		}
-	}
+	if (CameraHandler)
+		CameraHandler->Tick(DeltaTime);
 
 	if (!NetMgr) return;
 

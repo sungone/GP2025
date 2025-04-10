@@ -4,6 +4,7 @@
 #include "Animation/GPCharacterAnimInstance.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Character/Modules/GPMyplayerCameraHandler.h"
 #include "Character/GPCharacterMyplayer.h" 
 
 UGPCharacterAnimInstance::UGPCharacterAnimInstance()
@@ -42,7 +43,7 @@ void UGPCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(Owner);
 		if (MyPlayer)
 		{
-			bIsZooming = MyPlayer->IsZooming();
+			bIsZooming = MyPlayer->CameraHandler->IsZooming();
 		}
 	}
 }

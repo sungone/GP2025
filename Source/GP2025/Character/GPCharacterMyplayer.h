@@ -41,13 +41,16 @@ public:
 	UPROPERTY()
 	class UGPMyplayerUIManager* UIManager;
 	
+	// <Camera>
+	UPROPERTY()
+	class UGPMyplayerCameraHandler* CameraHandler;
 
-	// 카메라 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USpringArmComponent> CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UCameraComponent> FollowCamera;
+
 
 	// Sprint Speed 변수
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
@@ -81,20 +84,6 @@ public :
 public :
 
 	bool bIsGunnerCharacter() const;
-
-	float DefaultFOV = 90.f;
-	float ZoomedFOV = 60.f;
-	float ZoomInterpSpeed = 10.f;
-	bool bWantsToZoom = false;
-
-	FVector DefaultCameraOffset = FVector(0.f, 0.f, 100.f);
-	FVector ZoomedCameraOffset = FVector(50.f, 30.f, 100.f); 
-	float DefaultArmLength = 400.f;
-	float ZoomedArmLength = 150.f;
-
-	UFUNCTION(BlueprintCallable, Category = "Zoom")
-	bool IsZooming() const { return bWantsToZoom; }
-
 
 public :
 	UFUNCTION(BlueprintCallable, Category = "CharacterType")
