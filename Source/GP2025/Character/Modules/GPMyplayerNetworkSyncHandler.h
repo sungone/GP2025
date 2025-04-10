@@ -28,6 +28,9 @@ public:
 	FInfoData LastSendPlayerInfo;
 	float MovePacketSendTimer = 0.5;
 	bool bWasJumping = false;
+	float GroundZLocation = 147.7f;
+
+	bool isJumpStart = false;
 
 	float WalkSpeed;
 	float SprintSpeed;

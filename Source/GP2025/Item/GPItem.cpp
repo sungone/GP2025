@@ -137,7 +137,7 @@ void AGPItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 		ItemInteractionWidgetComp->SetVisibility(true);
 	}
 
-	if (!Player->bInteractItem) return;
+	// if (!Player->bInteractItem) return;
 
 	UE_LOG(LogTemp, Warning, TEXT("Item Overlap Detected! ItemID: %d | Player: %s"),
 		ItemID, *Player->GetName());

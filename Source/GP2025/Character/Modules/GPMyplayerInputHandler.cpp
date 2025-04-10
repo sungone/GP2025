@@ -117,7 +117,7 @@ void UGPMyplayerInputHandler::Jump()
 	if (!Owner) return;
 
 	Owner->Jump();
-	Owner->isJumpStart = true;
+	Owner->NetworkSyncHandler->isJumpStart = true;
 	Owner->CharacterInfo.RemoveState(STATE_IDLE);
 	Owner->CharacterInfo.AddState(STATE_JUMP);
 	Owner->SetupMasterPose();

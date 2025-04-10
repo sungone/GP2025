@@ -56,9 +56,9 @@ void UGPMyplayerNetworkSyncHandler::HandleIdleState()
 // 2. 점프 시 처리
 void UGPMyplayerNetworkSyncHandler::HandleJumpState()
 {
-	if (Owner->isJumpStart && !bWasJumping)
+	if (Owner->NetworkSyncHandler->isJumpStart && !bWasJumping)
 	{
-		Owner->isJumpStart = false;
+		Owner->NetworkSyncHandler->isJumpStart = false;
 		bWasJumping = true;
 
 		Owner->NetMgr->SendPlayerMovePacket();
@@ -76,9 +76,9 @@ void UGPMyplayerNetworkSyncHandler::HandleJumpState()
 	const float AirThreshold = 10.f;
 	if (Owner->CharacterInfo.HasState(STATE_IDLE) &&
 		!Owner->CharacterInfo.HasState(STATE_JUMP) &&
-		(LastSendPlayerInfo.Pos.Z - Owner->GroundZLocation) > AirThreshold)
+		(LastSendPlayerInfo.Pos.Z - GroundZLocation) > AirThreshold)
 	{
-		Owner->CharacterInfo.Pos.Z = Owner->GroundZLocation;
+		Owner->CharacterInfo.Pos.Z = GroundZLocation;
 		Owner->CharacterInfo.Stats.Speed = LastSendPlayerInfo.HasState(STATE_RUN) ? 
 			Owner->NetworkSyncHandler->SprintSpeed : Owner->NetworkSyncHandler->WalkSpeed;
 
