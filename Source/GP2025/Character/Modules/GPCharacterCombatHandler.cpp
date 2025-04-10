@@ -36,6 +36,42 @@ void UGPCharacterCombatHandler::OnAutoAttackMontageEnded(UAnimMontage* Montage, 
 
 }
 
+void UGPCharacterCombatHandler::HandleDeath()
+{
+	if (!Owner) return;
+
+	Owner->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	Owner->SetActorEnableCollision(false);
+
+	PlayDeadAnimation();
+
+	FTimerHandle DeadTimerHandle;
+	AGPCharacterBase* LocalOwner = Owner;
+	Owner->GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda([LocalOwner]()
+		{
+			if (LocalOwner)
+			{
+				LocalOwner->Destroy();
+			}
+		}), DeadEventDelayTime, false);
+}
+
+void UGPCharacterCombatHandler::PlayDeadAnimation()
+{
+	if (!Owner || !DeadMontage) return;
+
+	UAnimInstance* AnimInstance = Owner->GetCharacterMesh()->GetAnimInstance();
+	if (!AnimInstance) return;
+
+	AnimInstance->StopAllMontages(0.f);
+	AnimInstance->Montage_Play(DeadMontage, 1.f);
+}
+
+void UGPCharacterCombatHandler::SetDeadEventDelay(float Delay)
+{
+	DeadEventDelayTime = Delay;
+}
+
 void UGPCharacterCombatHandler::PlayQSkillMontage()
 {
 	PlaySkillMontage(QSkillMontage);
@@ -101,4 +137,9 @@ void UGPCharacterCombatHandler::SetESkillMontage(UAnimMontage* Montage)
 void UGPCharacterCombatHandler::SetRSkillMontage(UAnimMontage* Montage)
 {
 	RSkillMontage = Montage;
+}
+
+void UGPCharacterCombatHandler::SetDeadMontage(UAnimMontage* Montage)
+{
+	DeadMontage = Montage;
 }

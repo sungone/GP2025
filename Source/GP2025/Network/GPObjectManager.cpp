@@ -6,6 +6,7 @@
 #include "Character/GPCharacterMyplayer.h"
 #include "Character/Modules/GPMyplayerUIManager.h"
 #include "Character/Modules/GPPlayerAppearanceHandler.h"
+#include "Character/Modules/GPCharacterCombatHandler.h"
 #include "UI/GPFloatingDamageText.h"
 #include "Inventory/GPInventory.h"
 #include "Kismet/GameplayStatics.h"
@@ -143,7 +144,7 @@ void UGPObjectManager::RemoveMonster(int32 MonsterID)
 	UE_LOG(LogTemp, Warning, TEXT("Remove monster [%d]"), MonsterID);
 	if (Monsters.Contains(MonsterID))
 	{
-		Monsters[MonsterID]->SetDead();
+		Monsters[MonsterID]->CombatHandler->HandleDeath();
 		Monsters.Remove(MonsterID);
 	}
 }

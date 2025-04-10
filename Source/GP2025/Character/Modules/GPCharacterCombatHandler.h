@@ -25,6 +25,11 @@ public:
 	void PlayAutoAttackMontage();
 	void OnAutoAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
+	// »ç¸Á
+	void HandleDeath();
+	void PlayDeadAnimation();
+	void SetDeadMontage(UAnimMontage* Montage);
+	void SetDeadEventDelay(float Delay);
 	// ½ºÅ³
 	void PlayQSkillMontage();
 	void PlayESkillMontage();
@@ -60,7 +65,11 @@ public:
 	UPROPERTY()
 	UAnimMontage* RSkillMontage;
 
+	UPROPERTY()
+	UAnimMontage* DeadMontage;
+
 private:
+	float DeadEventDelayTime = 0.5f;
 	bool bIsAutoAttacking = false;
 	bool bIsUsingSkill = false;
 };

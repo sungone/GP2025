@@ -217,6 +217,7 @@ void AGPCharacterBase::SetCharacterData(const UGPCharacterControlData* Character
 	if (CombatHandler)
 	{
 		CombatHandler->SetAttackMontage(CharacterData->AttackAnimMontage);
+		CombatHandler->SetDeadMontage(CharacterData->DeadAnimMontage);
 
 		if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER)
 		{
@@ -231,8 +232,6 @@ void AGPCharacterBase::SetCharacterData(const UGPCharacterControlData* Character
 			CombatHandler->SetRSkillMontage(CharacterData->RSkillAnimMontage);  
 		}
 	}
-
-	DeadMontage = CharacterData->DeadAnimMontage;
 }
 
 void AGPCharacterBase::SetCharacterType(ECharacterType NewCharacterType)
@@ -242,29 +241,6 @@ void AGPCharacterBase::SetCharacterType(ECharacterType NewCharacterType)
 
 	CurrentCharacterType = NewCharacterType;
 	SetCharacterData(NewCharacterData);
-}
-
-void AGPCharacterBase::SetDead()
-{
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-	PlayDeadAnimation();
-	SetActorEnableCollision(false);
-
-	FTimerHandle DeadTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda(
-		[&]()
-		{
-			Destroy();
-		}
-	), DeadEventDelayTime, false);
-}
-
-void AGPCharacterBase::PlayDeadAnimation()
-{
-	UAnimInstance* AnimInstance = GetCharacterMesh()->GetAnimInstance();
-	if (!AnimInstance) return;
-	AnimInstance->StopAllMontages(0.f);
-	AnimInstance->Montage_Play(DeadMontage, 1.f);
 }
 
 

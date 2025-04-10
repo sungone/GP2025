@@ -74,68 +74,8 @@ public:
 
 	FOnNickNameChanged OnNickNameChanged;
 
-	// Dead Section
-public:
-	virtual void SetDead();
-	void PlayDeadAnimation();
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UAnimMontage> DeadMontage;
-	float DeadEventDelayTime = 0.5f;
-
 	// <Combat Handler>
 public :
 	UPROPERTY()
 	class UGPCharacterCombatHandler* CombatHandler;
-
-//
-//// 기본 공격 애니메이션 및 공격 애니메이션 몽타주 코드
-//public :
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-//	TObjectPtr<class UAnimMontage> AttackActionMontage;
-//
-//	void ProcessAutoAttackCommand();
-//	void OnAutoAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
-//	bool bIsAutoAttacking = false;
-//
-//
-
-//
-//// 스킬 공통 기능
-//
-// 	void OnSkillMontageEnded(UAnimMontage* Montage, bool bInterrupted);
-//	bool bIsUsingSkill = false;
-//
-//// 남자 스킬   
-//	void ProcessHitHardCommand();
-//	void ProcessClashCommand();
-//	void ProcessWhirlwindCommand();
-//
-//	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
-//	TObjectPtr<UAnimMontage> HitHardMontage;
-//
-//	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
-//	TObjectPtr<UAnimMontage> ClashMontage;
-//
-//	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
-//	TObjectPtr<UAnimMontage> WhirlwindMontage;
-//
-//// 여자 스킬
-//
-//	void ProcessThrowingCommand();
-//	void ProcessFThrowingCommand();
-//	void ProcessAngerCommand();
-//
-//	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
-//	TObjectPtr<UAnimMontage> ThrowingMontage;
-//
-//	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
-//	TObjectPtr<UAnimMontage> FThrowingMontage;
-//
-//	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
-//	TObjectPtr<UAnimMontage> AngerMontage;
-//
-//
-
-
-
 };
