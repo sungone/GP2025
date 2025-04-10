@@ -4,6 +4,7 @@
 #include "Character/GPCharacterMonster.h"
 #include "Character/GPCharacterMyPlayer.h"
 #include "Character/GPCharacterControlData.h"
+#include "Character/Modules/GPCharacterUIHandler.h"
 #include "UI/GPHpBarWidget.h"
 #include "UI/GPLevelWidget.h"
 #include "Kismet/GameplayStatics.h"
@@ -13,8 +14,6 @@ AGPCharacterMonster::AGPCharacterMonster()
 {
     GetMesh()->SetCollisionProfileName(TEXT("PhysicsActor"));
     GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	HpBar = CreateWidgetComponent(TEXT("HpWidget"), TEXT("/Game/UI/WBP_CharacterHpBar.WBP_CharacterHpBar_C"), FVector(0.f, 0.f, 300.f), FVector2D(150.f, 15.f) , HpBarWidget);
-	LevelText = CreateWidgetComponent(TEXT("LevelWidget"), TEXT("/Game/UI/WBP_LevelText.WBP_LevelText_C"), FVector(0.f, 0.f, 330.f), FVector2D(40.f, 10.f) , LevelTextWidget);
 }
 
 void AGPCharacterMonster::BeginPlay()
@@ -26,7 +25,7 @@ void AGPCharacterMonster::BeginPlay()
 void AGPCharacterMonster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	UpdateWidgetVisibility();
+	UIHandler->UpdateAllWidgetVisibility();
 }
 
 void AGPCharacterMonster::SetCharacterData(const UGPCharacterControlData* CharacterControlData)
@@ -39,36 +38,4 @@ void AGPCharacterMonster::SetCharacterData(const UGPCharacterControlData* Charac
 void AGPCharacterMonster::SetCharacterType(ECharacterType NewCharacterControlType)
 {
 	Super::SetCharacterType(NewCharacterControlType);
-}
-
-void AGPCharacterMonster::UpdateWidgetVisibility()
-{
-    APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-    if (!PlayerController)
-    {
-        return;
-    }
-
-    AGPCharacterMyplayer* Player = Cast<AGPCharacterMyplayer>(PlayerController->GetPawn());
-    if (!Player)
-    {
-        return;
-    }
-
-    float Distance = FVector::Dist(GetActorLocation(), Player->GetActorLocation());
-
-
-    ESlateVisibility VisibilityState = (Distance > this->CharacterInfo.CollisionRadius + Player->CharacterInfo.AttackRadius)
-        ? ESlateVisibility::Hidden
-        : ESlateVisibility::Visible;
-
-    if (HpBarWidget)
-    {
-        HpBarWidget->SetVisibility(VisibilityState);
-    }
-
-    if (LevelTextWidget)
-    {
-        LevelTextWidget->SetVisibility(VisibilityState);
-    }
 }

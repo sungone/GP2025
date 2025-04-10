@@ -39,43 +39,25 @@ public:
 	virtual void SetCharacterInfo(FInfoData& CharacterInfo_);
 	FInfoData CharacterInfo;
 
+	// <Move Sync>
+	void HandleAutoAttackState();
+	void HandleRemoteMovementSync(float DeltaTime);
+	void HandleRemoteJumpSync();
+
 	// <Appearance>
 	virtual USkeletalMeshComponent* GetCharacterMesh() const;
 
+	// <Combat>
+	UPROPERTY()
+	class UGPCharacterCombatHandler* CombatHandler;
 
 	// <UI>
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UGPWidgetComponent> HpBar;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UGPWidgetComponent> LevelText;
-
-	UUserWidget* HpBarWidget;
-	UUserWidget* LevelTextWidget;
-
+	UPROPERTY()
+	class UGPCharacterUIHandler* UIHandler;
 	FOnHpChanged OnHpChanged;
 	FOnExpChanged OnExpChanged;
 	FOnLevelChanged OnLevelChanged;
-
-	UGPWidgetComponent* CreateWidgetComponent(const FString& Name, const FString& WidgetPath, FVector Location, FVector2D Size, UUserWidget*& OutUserWidget);
-
-	// Gold Setting
-public:
-	UPROPERTY(BlueprintAssignable, Category = "Event")
 	FOnGoldChanged OnGoldChanged;
-
-	// Nick Name Setting
-public:
-	UUserWidget* NickNameWidget;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UGPWidgetComponent> NickNameText;
-
 	FOnNickNameChanged OnNickNameChanged;
-
-	// <Combat Handler>
-public :
-	UPROPERTY()
-	class UGPCharacterCombatHandler* CombatHandler;
 };

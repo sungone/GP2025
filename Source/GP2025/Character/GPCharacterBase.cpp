@@ -18,6 +18,9 @@
 #include "NiagaraComponent.h" 
 #include "UI/GPUserNameWidget.h"
 #include "Character/Modules/GPCharacterCombatHandler.h"
+#include "Character/Modules/GPCharacterUIHandler.h"
+#include "Kismet/GameplayStatics.h"
+
 #include <random>
 static std::random_device rd;
 static std::mt19937 gen(rd());
@@ -91,34 +94,11 @@ AGPCharacterBase::AGPCharacterBase()
 	};
 
 	LoadCharacterData(CharacterTypeManager, CharacterTypes);
-
-	NickNameText = CreateWidgetComponent(
-		TEXT("NickNameWidget"),
-		TEXT("/Game/UI/WBP_UserName"),
-		FVector(0.f, 0.f, 360.f),  
-		FVector2D(200.f, 50.f),
-		NickNameWidget
-	);
 }
 
 void AGPCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (NickNameText)
-	{
-		UGPUserNameWidget* NameWidget = Cast<UGPUserNameWidget>(NickNameText->GetUserWidgetObject());
-		if (NameWidget)
-		{
-			FString NickName = FString(UTF8_TO_TCHAR(CharacterInfo.GetName()));
-			NameWidget->UpdateNickNameText(NickName);
-		}
-	}
-
-	if (NickNameWidget)
-	{
-		NickNameWidget->SetVisibility(ESlateVisibility::Visible);
-	}
 
 	if (!CombatHandler)
 	{
@@ -126,6 +106,17 @@ void AGPCharacterBase::BeginPlay()
 		if (CombatHandler)
 		{
 			CombatHandler->Initialize(this);
+		}
+	}
+	
+	if (!UIHandler)
+	{
+		UIHandler = NewObject<UGPCharacterUIHandler>(this);
+		if (UIHandler)
+		{
+			UIHandler->Initialize(this);               
+			UIHandler->CreateAllWidgets();   
+			UIHandler->OnBeginPlay();
 		}
 	}
 }
@@ -137,48 +128,12 @@ void AGPCharacterBase::Tick(float DeltaTime)
 
 	if (Cast<AGPCharacterMyplayer>(this)) return;
 
-	if (CharacterInfo.HasState(STATE_AUTOATTACK) && !CombatHandler->IsAutoAttacking())
-	{
-		CombatHandler->PlayAutoAttackMontage();
-		return;
-	}
+	// Move Sync
+	HandleAutoAttackState();
+	HandleRemoteMovementSync(DeltaTime);
+	HandleRemoteJumpSync();
 
-	/// Other Client 위치 및 회전 동기화 ///
-	FVector Location = GetActorLocation();
-	FVector DestLocation = CharacterInfo.Pos;
-	if (CharacterInfo.Stats.Speed < 400.f)
-	{
-		CharacterInfo.Stats.Speed = 500.f;
-	}
-	float Speed = CharacterInfo.Stats.Speed;
 
-	FVector MoveDir = (DestLocation - Location);
-	const float DistToDest = MoveDir.Length();
-	MoveDir.Normalize();
-
-	float MoveDist = (MoveDir * Speed * DeltaTime).Length();
-	MoveDist = FMath::Min(MoveDist, DistToDest);
-	FVector NextLocation = Location + MoveDir * MoveDist;
-
-	// 회전 보간 추가
-	FRotator CurrentRotation = GetActorRotation();
-	FRotator TargetRotation(0.f, CharacterInfo.Yaw, 0.f);
-	FRotator InterpolatedRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, 10.0f);
-
-	SetActorLocationAndRotation(NextLocation, InterpolatedRotation);
-
-	/// Ohter Client 속도 동기화 ///
-	GetCharacterMovement()->Velocity = MoveDir * Speed;
-
-	/// Other Client 점프 동기화 ///
-	if (CharacterInfo.HasState(STATE_JUMP))
-	{
-		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
-	}
-	else if (!CharacterInfo.HasState(STATE_JUMP) && GetActorLocation().Z < 150.f)
-	{
-		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-	}
 }
 
 void AGPCharacterBase::PostInitializeComponents()
@@ -200,6 +155,50 @@ void AGPCharacterBase::SetCharacterInfo(FInfoData& CharacterInfo_)
 	}
 }
 
+void AGPCharacterBase::HandleAutoAttackState()
+{
+	if (CharacterInfo.HasState(STATE_AUTOATTACK) && !CombatHandler->IsAutoAttacking())
+	{
+		CombatHandler->PlayAutoAttackMontage();
+	}
+}
+
+void AGPCharacterBase::HandleRemoteMovementSync(float DeltaTime)
+{
+	FVector Location = GetActorLocation();
+	FVector DestLocation = CharacterInfo.Pos;
+	float Speed = FMath::Max(CharacterInfo.Stats.Speed, 500.f);
+
+	FVector MoveDir = (DestLocation - Location);
+	float DistToDest = MoveDir.Length();
+	MoveDir.Normalize();
+
+	float MoveDist = FMath::Min((MoveDir * Speed * DeltaTime).Length(), DistToDest);
+	FVector NextLocation = Location + MoveDir * MoveDist;
+
+	FRotator InterpolatedRotation = FMath::RInterpTo(
+		GetActorRotation(),
+		FRotator(0.f, CharacterInfo.Yaw, 0.f),
+		DeltaTime,
+		10.0f
+	);
+
+	SetActorLocationAndRotation(NextLocation, InterpolatedRotation);
+	GetCharacterMovement()->Velocity = MoveDir * Speed;
+}
+
+void AGPCharacterBase::HandleRemoteJumpSync()
+{
+	if (CharacterInfo.HasState(STATE_JUMP))
+	{
+		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+	}
+	else if (GetActorLocation().Z < 147.7f)
+	{
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	}
+}
+
 USkeletalMeshComponent* AGPCharacterBase::GetCharacterMesh() const
 {
 	return GetMesh();
@@ -213,7 +212,6 @@ void AGPCharacterBase::SetCharacterData(const UGPCharacterControlData* Character
 	GetCharacterMovement()->bUseControllerDesiredRotation = CharacterData->bUseControllerDesiredRotation;
 	GetCharacterMovement()->RotationRate = CharacterData->RotationRate;
 
-	// 몽타주 세팅
 	if (CombatHandler)
 	{
 		CombatHandler->SetAttackMontage(CharacterData->AttackAnimMontage);
@@ -241,32 +239,4 @@ void AGPCharacterBase::SetCharacterType(ECharacterType NewCharacterType)
 
 	CurrentCharacterType = NewCharacterType;
 	SetCharacterData(NewCharacterData);
-}
-
-
-UGPWidgetComponent* AGPCharacterBase::CreateWidgetComponent(const FString& Name, const FString& WidgetPath, FVector Location, FVector2D Size, UUserWidget*& OutUserWidget)
-{
-	UGPWidgetComponent* WidgetComp = CreateDefaultSubobject<UGPWidgetComponent>(*Name);
-	WidgetComp->SetupAttachment(GetCharacterMesh());
-	WidgetComp->SetComponent(Location, Size);
-
-
-	TSubclassOf<UUserWidget> WidgetClass = LoadClass<UUserWidget>(nullptr, *WidgetPath);
-	if (!WidgetClass)
-	{
-		UE_LOG(LogTemp, Error, TEXT("[CreateWidgetComponent] Failed to load widget class at path: %s"), *WidgetPath);
-		return nullptr;
-	}
-
-	WidgetComp->SetWidgetClass(WidgetClass);
-	WidgetComp->InitWidget();
-
-	OutUserWidget = WidgetComp->GetUserWidgetObject();
-
-	if (!OutUserWidget)
-	{
-		UE_LOG(LogTemp, Error, TEXT("[CreateWidgetComponent] Failed to create UserWidget at path: %s"), *WidgetPath);
-	}
-
-	return WidgetComp;
 }

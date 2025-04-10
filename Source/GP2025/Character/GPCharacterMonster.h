@@ -22,8 +22,6 @@ public:
 	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
 	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
 	
-public :
-	void UpdateWidgetVisibility();
 
 	UPROPERTY(EditAnywhere, Category = "Visibility")
 	float VisibilityDistance = 1000.0f;  
