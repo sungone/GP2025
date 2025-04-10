@@ -51,6 +51,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UCameraComponent> FollowCamera;
 
+	// <Network Sync>
+	class UGPMyplayerNetworkSyncHandler* NetworkSyncHandler;
+
 
 	// Sprint Speed º¯¼ö
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))

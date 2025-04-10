@@ -20,6 +20,7 @@
 #include "Character/Modules/GPMyplayerInputHandler.h" 
 #include "Character/Modules/GPMyplayerUIManager.h"
 #include "Character/Modules/GPMyplayerCameraHandler.h"
+#include "Character/Modules/GPMyplayerNetworkSyncHandler.h"
 
 AGPCharacterMyplayer::AGPCharacterMyplayer()
 {
@@ -50,9 +51,10 @@ void AGPCharacterMyplayer::BeginPlay()
 	if (CameraHandler)
 		CameraHandler->Initialize(this);
 
-	LastLocation = GetActorLocation();
-	LastRotationYaw = GetActorRotation().Yaw;
-	LastSendPlayerInfo = CharacterInfo;
+	// Network Sync Handler
+	NetworkSyncHandler = NewObject<UGPMyplayerNetworkSyncHandler>(this, UGPMyplayerNetworkSyncHandler::StaticClass());
+	if (NetworkSyncHandler)
+		NetworkSyncHandler->Initialize(this);
 }
 
 void AGPCharacterMyplayer::Tick(float DeltaTime)
@@ -64,96 +66,9 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 
 	if (!NetMgr) return;
 
-	MovePacketSendTimer -= DeltaTime;
-	FVector CurrentLocation = GetActorLocation();
-	float CurrentRotationYaw = GetActorRotation().Yaw;
-
-	CharacterInfo.SetLocation(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z);
-	CharacterInfo.Yaw = CurrentRotationYaw;
-	CharacterInfo.Stats.Speed = GetVelocity().Size();
-
-	float DistanceMoved = FVector::DistSquared(CurrentLocation, LastLocation);
-	LastLocation = CurrentLocation;
-
-	const float YawThreshold = 10.f;
-	float YawDifference = FMath::Abs(FMath::FindDeltaAngleDegrees(CurrentRotationYaw, LastRotationYaw));
-	bool bYawChanged = (YawDifference > YawThreshold);
-	LastRotationYaw = CurrentRotationYaw;
-
-	// IDLE 상태인지 아닌지 판단 - IDLE 조건 1 : 이동 거리가 0.5cm 이하
-	const float NotMovedThreshold = 2.f;
-	if ((DistanceMoved >= NotMovedThreshold))
-	{
-		CharacterInfo.RemoveState(STATE_IDLE);
-	}
-	else if ((DistanceMoved < NotMovedThreshold))
-	{
-		CharacterInfo.AddState(STATE_IDLE);
-	}
-
-	// Jump() 시 패킷 전송
-	if (isJumpStart && !bWasJumping)
-	{
-		isJumpStart = false;
-		bWasJumping = true;
-		NetMgr->SendPlayerMovePacket();
-		LastSendPlayerInfo = CharacterInfo;
-		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Jump Issue"));
-		return;
-	}
-
-	// 착지 시 bWasJumping 초기화
-	if (GetCharacterMovement()->IsMovingOnGround())
-		bWasJumping = false;
-
-	const float AirThreshold = 10.f;
-	// 점프 후 착지를 안하고 플레이어가 계속 공중에 떠 있다면 떨어뜨리기 위해 패킷 전송
-	if (CharacterInfo.HasState(STATE_IDLE) && !CharacterInfo.HasState(STATE_JUMP)
-		&& (LastSendPlayerInfo.Pos.Z - GroundZLocation) > AirThreshold)
-	{
-		CharacterInfo.Pos.Z = GroundZLocation;
-		CharacterInfo.Stats.Speed = LastSendPlayerInfo.HasState(STATE_RUN) ? SprintSpeed : WalkSpeed;
-
-		NetMgr->SendPlayerMovePacket();
-		LastSendPlayerInfo = CharacterInfo;
-		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Air Fixed Issue"));
-		return;
-	}
-
-	// IDLE 상태에서 캐릭터의 회전이 변경되었을 때 패킷 전송
-	if (bYawChanged && CharacterInfo.HasState(STATE_IDLE))
-	{
-		NetMgr->SendPlayerMovePacket();
-		LastSendPlayerInfo = CharacterInfo;
-		UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : Rotation Issue"));
-		return;
-	}
-
-	// 일정 시간마다 서버에 패킷 전송
-	if (MovePacketSendTimer <= 0 || (CharacterInfo.HasState(STATE_IDLE) && DistanceMoved >= NotMovedThreshold))
-	{
-		MovePacketSendTimer = PACKETSENDTIME;
-
-		// IDLE 상태가 아니거나 일정 거리 이상 이동한 경우 패킷 전송
-		if (!CharacterInfo.HasState(STATE_IDLE) || DistanceMoved >= NotMovedThreshold)
-		{
-			NetMgr->SendPlayerMovePacket();
-			LastSendPlayerInfo = CharacterInfo;
-
-			if (MovePacketSendTimer <= 0)
-			{
-				UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : periodically"));
-			}
-			else
-			{
-				UE_LOG(LogTemp, Log, TEXT("Character Player Send Packet To Server : I am Idle but when I moved"));
-			}
-		}
-	}
-
-
+	if (NetworkSyncHandler)
+		NetworkSyncHandler->Tick(DeltaTime);
 }
-
 
 void AGPCharacterMyplayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
