@@ -13,7 +13,8 @@ public:
 	void OnDamaged(float damage);
 	virtual float GetAttackDamage() = 0;
 
-	bool IsColision(const FVector& pos);
+	bool IsColision(const FVector& pos, const float dist );
+	bool IsColision(const FInfoData& target);
 	bool IsInAttackRange(const FInfoData& target);
 	bool IsInViewDistance(const FVector& targetPos, float viewDist);
 	bool IsInFieldOfView(const FInfoData& target);
