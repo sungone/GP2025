@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Player.h"
 #include "SessionManager.h"
 #include "GameWorld.h"
@@ -12,7 +12,7 @@ void Player::Init()
 	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
 	_info.SetLocation(newPos);
 	//Todo: DB값으로 설정해줘야한다
-	_info.SetName("player");
+	_info.SetName("플레이어");
 	SetCharacterType(Type::EPlayer::WARRIOR);
 	_info.Stats.Level = 10;
 	_info.Stats.Speed = 200.f;

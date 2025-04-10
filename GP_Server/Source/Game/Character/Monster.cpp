@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Monster.h"
 #include "SessionManager.h"
 #include "GameWorld.h"
@@ -19,7 +19,7 @@ void Monster::Init()
 	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
 	_info.SetLocation(newPos);
 
-	_info.SetName("monster");
+	_info.SetName("몬스터");
 	_info.CharacterType = data->TypeId;
 	_info.Stats.Level = data->Level;
 	_info.Stats.Hp = data->Hp;
