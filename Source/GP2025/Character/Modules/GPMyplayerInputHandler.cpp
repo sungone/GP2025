@@ -3,6 +3,7 @@
 
 #include "Character/Modules/GPMyplayerInputHandler.h"
 #include "Character/GPCharacterMyplayer.h"
+#include "Character/Modules/GPMyplayerUIManager.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
@@ -164,83 +165,39 @@ void UGPMyplayerInputHandler::AutoAttack()
 
 void UGPMyplayerInputHandler::ToggleInventory()
 {
-	if (!Owner || bInventoryToggled) return;
-
-	bInventoryToggled = true;
-
-	if (Owner->InventoryWidget)
+	if (!Owner) return;
+	if (Owner->UIManager)
 	{
-		if (Owner->InventoryWidget->IsInViewport())
-			CloseInventory();
-		else
-			OpenInventory();
+		Owner->UIManager->ToggleInventory();
 	}
 }
 
 void UGPMyplayerInputHandler::ResetInventoryToggle()
 {
 	if (!Owner) return;
-	bInventoryToggled = false;
+	if (Owner->UIManager)
+	{
+		Owner->UIManager->ResetToggleInventory();
+	}
 }
 
 void UGPMyplayerInputHandler::OpenInventory()
 {
-	if (!Owner || !Owner->InventoryWidget) return;
-
-	if (!Owner->InventoryWidget->IsInViewport())
-	{
-		Owner->InventoryWidget->AddToViewport();
-
-		APlayerController* PC = Cast<AGPPlayerController>(Owner->GetController());
-		if (PC)
-		{
-			PC->SetShowMouseCursor(true);
-			PC->SetInputMode(FInputModeGameAndUI());
-		}
-
-		UGPInventory* CastInventory = Cast<UGPInventory>(Owner->InventoryWidget);
-		if (CastInventory)
-		{
-			CastInventory->SetGold(Owner->CharacterInfo.Gold);
-		}
-	}
-
-	if (Owner->InGameWidget && !Owner->InGameWidget->IsInViewport())
-	{
-		Owner->InGameWidget->AddToViewport();
-	}
+	if (!Owner || !Owner->UIManager) return;
+	Owner->UIManager->OpenInventory();
 }
 
 void UGPMyplayerInputHandler::CloseInventory()
 {
-	if (!Owner || !Owner->InventoryWidget) return;
-
-	if (Owner->InventoryWidget->IsInViewport())
-	{
-		Owner->InventoryWidget->RemoveFromParent();
-
-		APlayerController* PC = Cast<AGPPlayerController>(Owner->GetController());
-		if (PC)
-		{
-			PC->SetShowMouseCursor(false);
-			PC->SetInputMode(FInputModeGameOnly());
-		}
-	}
+	if (!Owner || !Owner->UIManager) return;
+	Owner->UIManager->CloseInventory();
 }
 
 
 void UGPMyplayerInputHandler::OpenSettingWidget()
 {
-	if (!Owner || !Owner->SettingWidget || Owner->SettingWidget->IsInViewport()) return;
-
-	Owner->SettingWidget->AddToViewport();
-
-	APlayerController* PC = Cast<APlayerController>(Owner->GetController());
-	if (PC)
-	{
-		PC->SetShowMouseCursor(true);
-		PC->SetInputMode(FInputModeGameAndUI());
-	}
+	if (!Owner || !Owner->UIManager) return;
+	Owner->UIManager->OpenSettingWidget();
 }
 
 //void UGPMyplayerInputHandler::ProcessInteraction()
@@ -270,9 +227,9 @@ void UGPMyplayerInputHandler::StartAiming()
 
 	Owner->bWantsToZoom = true;
 
-	if (Owner->GunCrosshairWidget)
+	if (Owner->UIManager->GunCrosshairWidget)
 	{
-		Owner->GunCrosshairWidget->SetVisibility(ESlateVisibility::Visible);
+		Owner->UIManager->GunCrosshairWidget->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 
@@ -282,9 +239,9 @@ void UGPMyplayerInputHandler::StopAiming()
 
 	Owner->bWantsToZoom = false;
 
-	if (Owner->GunCrosshairWidget)
+	if (Owner->UIManager->GunCrosshairWidget)
 	{
-		Owner->GunCrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
+		Owner->UIManager->GunCrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 

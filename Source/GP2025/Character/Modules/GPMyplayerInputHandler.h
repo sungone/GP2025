@@ -83,8 +83,6 @@ public :
 
     void ToggleInventory();
     void ResetInventoryToggle();
-	bool bInventoryToggled = false;
-
 	void OpenInventory();
 	void CloseInventory();
 

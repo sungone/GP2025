@@ -5,6 +5,7 @@
 #include "Character/GPCharacterMyPlayer.h"
 #include "Inventory/GPInventory.h"
 #include "Network/GPNetworkManager.h"
+#include "Character/Modules/GPMyplayerUIManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/TextBlock.h"
 
@@ -95,7 +96,7 @@ void UGPItemSlot::InitializeInventoryWidget()
     AGPCharacterMyplayer* Player = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
     if (Player)
     {
-        InventoryWidget = Player->GetInventoryWidget();
+        InventoryWidget = Player->UIManager->GetInventoryWidget();
         if (InventoryWidget)
         {
             UE_LOG(LogTemp, Warning, TEXT("Successfully Set InventoryWidget in GPItemSlot"));

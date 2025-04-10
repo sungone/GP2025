@@ -36,6 +36,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	UPROPERTY()
 	class UGPMyplayerInputHandler* InputHandler;
+
+	// <UI>
+	UPROPERTY()
+	class UGPMyplayerUIManager* UIManager;
 	
 
 	// 카메라 
@@ -51,28 +55,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Movement", Meta = (AllowPrivateAccess = "true"))
 	float SprintSpeed;
-
-public :
-	// Inventory Widget
-	UPROPERTY()
-	TSubclassOf<UUserWidget> InventoryWidgetClass;
-
-	UFUNCTION()
-	UGPInventory* GetInventoryWidget();
-
-	// Setting Widget
-	UPROPERTY()
-	TSubclassOf<UUserWidget> SettingWidgetClass;
-
-	UPROPERTY()
-	UUserWidget* SettingWidget;
-
-	// InGame Widget
-	UPROPERTY()
-	TSubclassOf<UUserWidget> InGameWidgetClass;
-
-	UPROPERTY()
-	UUserWidget* InGameWidget;
 
 
 	// 다른 뷰어 클라이언트들의 위치 동기화를 위해 위치를 계산하는 변수들
@@ -97,13 +79,7 @@ public :
 	FTimerHandle InteractItemTimerHandle;
 
 public :
-	// Gunner Character 에임 위젯 , 함수
-	UPROPERTY()
-	UUserWidget* GunCrosshairWidget;
 
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<UUserWidget> GunCrosshairWidgetClass;
-	
 	bool bIsGunnerCharacter() const;
 
 	float DefaultFOV = 90.f;

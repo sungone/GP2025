@@ -18,6 +18,7 @@
 #include "Weapons/GPWeaponBase.h"
 #include "UI/GPInGameWidget.h"
 #include "Character/Modules/GPMyplayerInputHandler.h" 
+#include "Character/Modules/GPMyplayerUIManager.h"
 
 AGPCharacterMyplayer::AGPCharacterMyplayer()
 {
@@ -33,77 +34,48 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
-
-	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBPClass(TEXT("/Game/Inventory/Widgets/WBP_Inventory"));
-
-	if (WidgetBPClass.Succeeded())
-	{
-		InventoryWidgetClass = WidgetBPClass.Class;
-	}
-
-	static ConstructorHelpers::FClassFinder<UUserWidget> SettingWidgetBPClass(TEXT("/Game/UI/WBP_PauseScreen"));
-
-	if (SettingWidgetBPClass.Succeeded())
-	{
-		SettingWidgetClass = SettingWidgetBPClass.Class;
-	}
-
-	static ConstructorHelpers::FClassFinder<UUserWidget> InGameWidgetBPClass(TEXT("/Game/UI/WBP_InGame"));
-	if (InGameWidgetBPClass.Succeeded())
-	{
-		InGameWidgetClass = InGameWidgetBPClass.Class;
-	}
-
-	static ConstructorHelpers::FClassFinder<UUserWidget> GunCrosshairWidgetBPClass(TEXT("/Game/UI/WBP_GunCrosshair"));
-	if (GunCrosshairWidgetBPClass.Succeeded())
-	{
-		GunCrosshairWidgetClass = GunCrosshairWidgetBPClass.Class;
-	}
-
-
-
 	// 기본 캐릭터 타입
 	CurrentCharacterType = (uint8)Type::EPlayer::GUNNER;
 }
 
-void AGPCharacterMyplayer::OnPlayerLoginSucess()
-{
-	if (InventoryWidgetClass)
-	{
-		InventoryWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryWidgetClass);
-	}
-
-	if (SettingWidgetClass)
-	{
-		SettingWidget = CreateWidget<UUserWidget>(GetWorld(), SettingWidgetClass);
-	}
-
-	if (InGameWidgetClass)
-	{
-		InGameWidget = CreateWidget<UUserWidget>(GetWorld(), InGameWidgetClass);
-		if (InGameWidget)
-		{
-			InGameWidget->AddToViewport();
-			APlayerController* PC = Cast<AGPPlayerController>(GetController());
-			if (PC)
-			{
-				PC->SetShowMouseCursor(false);
-				PC->SetInputMode(FInputModeGameOnly());
-				InGameWidget->SetVisibility(ESlateVisibility::Visible);
-			}
-		}
-	}
-
-	if (GunCrosshairWidgetClass)
-	{
-		GunCrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), GunCrosshairWidgetClass);
-		if (GunCrosshairWidget)
-		{
-			GunCrosshairWidget->AddToViewport();
-			GunCrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
-		}
-	}
-}
+//void AGPCharacterMyplayer::OnPlayerLoginSucess()
+//{
+//	if (InventoryWidgetClass)
+//	{
+//		InventoryWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryWidgetClass);
+//	}
+//
+//	if (SettingWidgetClass)
+//	{
+//		SettingWidget = CreateWidget<UUserWidget>(GetWorld(), SettingWidgetClass);
+//	}
+//
+//	if (InGameWidgetClass)
+//	{
+//		InGameWidget = CreateWidget<UUserWidget>(GetWorld(), InGameWidgetClass);
+//		if (InGameWidget)
+//		{
+//			InGameWidget->AddToViewport();
+//			APlayerController* PC = Cast<AGPPlayerController>(GetController());
+//			if (PC)
+//			{
+//				PC->SetShowMouseCursor(false);
+//				PC->SetInputMode(FInputModeGameOnly());
+//				InGameWidget->SetVisibility(ESlateVisibility::Visible);
+//			}
+//		}
+//	}
+//
+//	if (GunCrosshairWidgetClass)
+//	{
+//		GunCrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), GunCrosshairWidgetClass);
+//		if (GunCrosshairWidget)
+//		{
+//			GunCrosshairWidget->AddToViewport();
+//			GunCrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
+//		}
+//	}
+//}
 
 void AGPCharacterMyplayer::BeginPlay()
 {
@@ -306,6 +278,19 @@ void AGPCharacterMyplayer::SetCharacterData(const UGPCharacterControlData* Chara
 	SprintSpeed = CharacterControlData->SprintSpeed;
 }
 
+void AGPCharacterMyplayer::OnPlayerLoginSucess()
+{
+	if (!UIManager)
+	{
+		UIManager = NewObject<UGPMyplayerUIManager>(this, UGPMyplayerUIManager::StaticClass());
+		if (UIManager)
+		{
+			UIManager->Initialize(this);
+			UIManager->OnLoginCreateWidget();
+		}
+	}
+}
+
 bool AGPCharacterMyplayer::bIsGunnerCharacter() const
 {
 	return (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER);
@@ -325,23 +310,11 @@ void AGPCharacterMyplayer::ChangePlayerType()
 	SetCharacterType(static_cast<ECharacterType>(CurrentCharacterType));
 }
 
-UGPInventory* AGPCharacterMyplayer::GetInventoryWidget()
-{
-	UGPInventory* CastInventory = Cast<UGPInventory>(InventoryWidget);
-	if (!CastInventory)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to cast InventoryWidget to UGPInventory"));
-		return nullptr;
-	}
-
-	return CastInventory;
-}
-
 void AGPCharacterMyplayer::SetCharacterInfo(FInfoData& CharacterInfo_)
 {
 	Super::SetCharacterInfo(CharacterInfo_);
 
-	UGPInGameWidget* InGame = Cast<UGPInGameWidget>(InGameWidget);
+	UGPInGameWidget* InGame = Cast<UGPInGameWidget>(UIManager->GetInGameWidget());
 
 	if (!InGame) return;
 

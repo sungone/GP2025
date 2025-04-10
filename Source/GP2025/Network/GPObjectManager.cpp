@@ -4,6 +4,7 @@
 #include "Item/GPItemStruct.h"
 #include "Item/GPItem.h"
 #include "Character/GPCharacterMyplayer.h"
+#include "Character/Modules/GPMyplayerUIManager.h"
 #include "UI/GPFloatingDamageText.h"
 #include "Inventory/GPInventory.h"
 #include "Kismet/GameplayStatics.h"
@@ -238,7 +239,7 @@ void UGPObjectManager::AddInventoryItem(uint32 ItemID, uint8 ItemType)
 	if (!MyPlayer)
 		return;
 
-	UGPInventory* Inventory = MyPlayer->GetInventoryWidget();
+	UGPInventory* Inventory = MyPlayer->UIManager->GetInventoryWidget();
 	if (Inventory)
 		Inventory->AddItemToInventory(ItemID, ItemType, 1);
 }
@@ -248,7 +249,7 @@ void UGPObjectManager::UseInventoryItem(uint32 ItemID)
 	if (!MyPlayer)
 		return;
 
-	UGPInventory* Inventory = MyPlayer->GetInventoryWidget();
+	UGPInventory* Inventory = MyPlayer->UIManager->GetInventoryWidget();
 	if (Inventory)
 		Inventory->UseItemFromInventory(ItemID);
 }
