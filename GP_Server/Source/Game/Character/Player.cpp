@@ -9,7 +9,7 @@ void Player::Init()
 	_characterClass = ECharacterClass::Player;
 
 	//Todo: DB값으로 설정해줘야한다
-	_info.SetName("플레이어");
+	_info.SetName(L"플레이어");
 	SetCharacterType(Type::EPlayer::WARRIOR);
 	_info.Stats.Level = 10;
 	_info.Stats.Speed = 200.f;
@@ -182,13 +182,13 @@ void Player::ExecuteSkillEffect(const FSkillData& skill)
 		switch (skill.Type1)
 		{
 		case ESkillType::Dash:
-			// n미터 돌진 -> 위치를 클라에서 받으니까 
+			// n미터 돌진 -> 위치를 클라에서 받고 있음 어떻게 처리하지?
 			break;
 		case ESkillType::RangeAtk:
-			// 공격범위 n미터 증가
+			// 공격범위 n미터 증가 -> 잠시 증가해서 공격 후 다시 원래대로 돌려야함
 			break;
 		case ESkillType::SectorAtk:
-			// 총알 n발 발사
+			// 총알 n발 발사 공격 범위를 넓히자
 			break;
 		default:
 			break;
@@ -196,13 +196,15 @@ void Player::ExecuteSkillEffect(const FSkillData& skill)
 	}
 	else if (skill.Type0 == ESkillType::BuffTime)
 	{
-		//1.skill_value_0초간
+		//1.skill_value_0초간 -> 타이머 처리
 
 		//2. skill_value_1(=n) 만큼
 		switch (skill.Type1)
 		{
 		case ESkillType::AtkSpd:
-			// 공격속도 n% 증가
+			// 공격속도 n% 증가 
+			// -> 애니메이션 속도를 올려야 하네.. 
+			// 클라에서 처리하는 부분이니 패킷을 새로 추가해야하나?
 			break;
 		}
 	}
