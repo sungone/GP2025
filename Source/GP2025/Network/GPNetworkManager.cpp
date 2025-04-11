@@ -226,7 +226,6 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_SIGNUP_FAIL:
 			{
 				SignUpFailPacket* Pkt = reinterpret_cast<SignUpFailPacket*>(RemainingData.GetData());
-				OnLoginSuccess.Broadcast();
 				PrintFailMessege(Pkt->ResultCode);
 				break;
 			}

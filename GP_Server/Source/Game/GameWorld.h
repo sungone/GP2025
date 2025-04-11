@@ -45,6 +45,7 @@ public:
 
 	void UpdateViewList(std::shared_ptr<Character> character);
 	bool IsCollisionDetected(const FVector& pos);
+	bool IsCollisionDetected(const FInfoData& target);
 
 	std::shared_ptr<Character> GetCharacterByID(int32 id)
 	{

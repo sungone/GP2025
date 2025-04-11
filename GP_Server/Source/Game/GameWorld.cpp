@@ -347,11 +347,23 @@ void GameWorld::UpdateViewList(std::shared_ptr<Character> listOwner)
 
 bool GameWorld::IsCollisionDetected(const FVector& pos)
 {
+	const float margin = 10.f;
 	std::unique_lock<std::mutex> lock(_carrMutex);
 	for (auto other : _characters)
 	{
 		if (!other) continue;
-		if (other->IsColision(pos)) return true;
+		if (other->IsColision(pos,margin)) return true;
+	}
+	return false;
+}
+
+bool GameWorld::IsCollisionDetected(const FInfoData& target)
+{
+	std::unique_lock<std::mutex> lock(_carrMutex);
+	for (auto other : _characters)
+	{
+		if (!other) continue;
+		if (other->IsColision(target)) return true;
 	}
 	return false;
 }

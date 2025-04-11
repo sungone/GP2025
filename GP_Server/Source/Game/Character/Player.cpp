@@ -8,9 +8,6 @@ void Player::Init()
 	Character::Init();
 	_characterClass = ECharacterClass::Player;
 
-	FVector newPos{};
-	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
-	_info.SetLocation(newPos);
 	//Todo: DB값으로 설정해줘야한다
 	_info.SetName("플레이어");
 	SetCharacterType(Type::EPlayer::WARRIOR);
@@ -19,6 +16,11 @@ void Player::Init()
 	_info.CollisionRadius = 50.f;
 	_info.State = ECharacterStateType::STATE_IDLE;
 	ApplyLevelStats(_info.Stats.Level);
+
+	FVector newPos{};
+	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } 
+	while (GameWorld::GetInst().IsCollisionDetected(_info));
+	_info.SetLocation(newPos);
 }
 
 void Player::SetCharacterType(Type::EPlayer type)
@@ -180,7 +182,7 @@ void Player::ExecuteSkillEffect(const FSkillData& skill)
 		switch (skill.Type1)
 		{
 		case ESkillType::Dash:
-			// n미터 돌진
+			// n미터 돌진 -> 위치를 클라에서 받으니까 
 			break;
 		case ESkillType::RangeAtk:
 			// 공격범위 n미터 증가
