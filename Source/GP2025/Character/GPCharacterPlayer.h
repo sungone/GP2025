@@ -4,10 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Character/GPCharacterBase.h"
+#include "Item/GPItemStruct.h"
 #include "GPCharacterPlayer.generated.h"
 
-
-struct FGPItemStruct;
 
 /**
  *
@@ -50,4 +49,9 @@ public :
 	TObjectPtr<class AGPWeaponBase> WeaponActor;
 
 	virtual USkeletalMeshComponent* GetCharacterMesh() const override;
+
+
+	// <Equipment Tracking>
+	UPROPERTY()
+	TMap<ECategory, int32> EquippedItemIDs;
 };

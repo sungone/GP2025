@@ -25,6 +25,11 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 
     LegMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LegMesh"));
     LegMesh->SetupAttachment(BodyMesh);
+
+    EquippedItemIDs.Add(ECategory::bow, -1);
+    EquippedItemIDs.Add(ECategory::sword, -1);
+    EquippedItemIDs.Add(ECategory::helmet, -1);
+    EquippedItemIDs.Add(ECategory::chest, -1);
 }
 
 void AGPCharacterPlayer::BeginPlay()

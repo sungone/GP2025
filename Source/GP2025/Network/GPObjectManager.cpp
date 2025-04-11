@@ -292,5 +292,5 @@ void UGPObjectManager::EquipItem(int32 PlayerID, uint8 ItemType)
 
 void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType)
 {
-	//Todo: 다른 플레이어 착용 아이템 업데이트
+	
 }

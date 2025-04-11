@@ -65,13 +65,26 @@ void UGPItemSlot::ClickItem()
         CurrentItem.Category == ECategory::sword ||
         CurrentItem.Category == ECategory::bow)
     {
-        Player->AppearanceHandler->EquipItemOnCharacter(GetItemData());
-
         UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
         if (NetworkManager)
         {
-            NetworkManager->SendPlayerEquipItem(SlotData.ItemUniqueID);
-            UE_LOG(LogTemp, Warning, TEXT("EquipItem: Sent UniqueID [%d] to Server"), SlotData.ItemUniqueID);
+            Player->AppearanceHandler->EquipItemOnCharacter(GetItemData());
+            int32* FoundID = Player->EquippedItemIDs.Find(CurrentItem.Category);
+
+            if (FoundID == nullptr)
+                return;
+
+            if (*FoundID == -1)
+            {
+                NetworkManager->SendPlayerEquipItem(SlotData.ItemUniqueID);             
+            }
+            else
+            {
+                NetworkManager->SendPlayerUnequipItem(*FoundID);
+                NetworkManager->SendPlayerEquipItem(SlotData.ItemUniqueID);             
+            }
+
+            Player->EquippedItemIDs[CurrentItem.Category] = SlotData.ItemUniqueID;
         }
         else
         {
