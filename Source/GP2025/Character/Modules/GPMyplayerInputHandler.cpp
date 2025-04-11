@@ -17,6 +17,7 @@
 #include "Inventory/GPInventory.h"
 #include "Blueprint/UserWidget.h"
 #include "Network/GPNetworkManager.h"
+#include "Network/GPGameInstance.h"
 #include "TimerManager.h"
 
 
@@ -44,7 +45,7 @@ UGPMyplayerInputHandler::UGPMyplayerInputHandler()
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_AutoAttack.IA_AutoAttack'"), AutoAttackAction);
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Inventory.IA_Inventory'"), InventoryAction);
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_ESC.IA_ESC'"), SettingAction);
-	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Interaction.IA_Interaction'"), InteractionAction);
+	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_TakeItem.IA_TakeItem'"), TakeItemAction);
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Zoom.IA_Zoom'"), ZoomAction);
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_SkillQ.IA_SkillQ'"), SkillQAction);
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_SkillE.IA_SkillE'"), SkillEAction);
@@ -79,7 +80,7 @@ void UGPMyplayerInputHandler::SetupInputBindings(UEnhancedInputComponent* Enhanc
 	EnhancedInput->BindAction(InventoryAction, ETriggerEvent::Completed, this, &UGPMyplayerInputHandler::ResetInventoryToggle);
 
 	EnhancedInput->BindAction(SettingAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::OpenSettingWidget);
-	//EnhancedInput->BindAction(Owner->InteractionAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::ProcessInteraction);
+	EnhancedInput->BindAction(TakeItemAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::TakeItem);
 
 	EnhancedInput->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::StartAiming);
 	EnhancedInput->BindAction(ZoomAction, ETriggerEvent::Completed, this, &UGPMyplayerInputHandler::StopAiming);
@@ -203,6 +204,15 @@ void UGPMyplayerInputHandler::OpenSettingWidget()
 {
 	if (!Owner || !Owner->UIManager) return;
 	Owner->UIManager->OpenSettingWidget();
+}
+
+void UGPMyplayerInputHandler::TakeItem()
+{
+	//auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+	//if (NetworkMgr)
+	//{
+	//	NetworkMgr->SendPlayerTakeItem(ItemID);
+	//}
 }
 
 void UGPMyplayerInputHandler::StartAiming()

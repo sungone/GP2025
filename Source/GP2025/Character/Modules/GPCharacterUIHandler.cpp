@@ -39,6 +39,7 @@ void UGPCharacterUIHandler::CreateAllWidgets()
 	}
 }
 
+
 void UGPCharacterUIHandler::SetupNickNameUI()
 {
 	if (!Owner || !NickNameText)

@@ -55,7 +55,7 @@ public :
 	TObjectPtr<UInputAction> SettingAction;
 
 	UPROPERTY()
-	TObjectPtr<UInputAction> InteractionAction;
+	TObjectPtr<UInputAction> TakeItemAction;
 
 	UPROPERTY()
 	TObjectPtr<UInputAction> ZoomAction;
@@ -88,9 +88,7 @@ public :
 
     void OpenSettingWidget();
 
- //   void ProcessInteraction();
-	//UFUNCTION()
-	//void ResetInteractItem();
+	void TakeItem();
 
 
     void StartAiming();
