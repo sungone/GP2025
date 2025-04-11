@@ -96,4 +96,8 @@ public :
     void UseSkillQ();
     void UseSkillE();
     void UseSkillR();
+
+public :
+	bool bGetItem = false;
+	FTimerHandle GetItemResetTimerHandle;
 };

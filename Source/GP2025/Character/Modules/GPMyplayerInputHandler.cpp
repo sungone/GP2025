@@ -208,11 +208,20 @@ void UGPMyplayerInputHandler::OpenSettingWidget()
 
 void UGPMyplayerInputHandler::TakeItem()
 {
-	//auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-	//if (NetworkMgr)
-	//{
-	//	NetworkMgr->SendPlayerTakeItem(ItemID);
-	//}
+	bGetItem = true;
+
+	if (Owner)
+	{
+		Owner->GetWorldTimerManager().SetTimer(
+			GetItemResetTimerHandle,
+			[this]()
+			{
+				bGetItem = false;
+			},
+			3.0f,  // 딜레이: 3초
+			false  // 반복 X
+		);
+	}
 }
 
 void UGPMyplayerInputHandler::StartAiming()

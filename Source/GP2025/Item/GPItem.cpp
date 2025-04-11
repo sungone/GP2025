@@ -9,6 +9,7 @@
 #include "Blueprint/UserWidget.h"
 #include "GPItemStruct.h"
 #include "Components/WidgetComponent.h"
+#include "Character/Modules/GPMyplayerInputHandler.h"
 
 // Sets default values
 AGPItem::AGPItem()
@@ -131,13 +132,12 @@ void AGPItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 
 	AGPCharacterMyplayer* Player = Cast<AGPCharacterMyplayer>(OtherActor);
 	if (!Player) return;
+	if (!Player->InputHandler->bGetItem) return;
 
 	if (ItemInteractionWidgetComp && !ItemInteractionWidgetComp->IsVisible())
 	{
 		ItemInteractionWidgetComp->SetVisibility(true);
 	}
-
-	// if (!Player->bInteractItem) return;
 
 	UE_LOG(LogTemp, Warning, TEXT("Item Overlap Detected! ItemID: %d | Player: %s"),
 		ItemID, *Player->GetName());
