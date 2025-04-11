@@ -3,6 +3,7 @@
 
 #include "Character/Modules/GPCharacterUIHandler.h"
 #include "Character/GPCharacterBase.h"
+#include "Character/GPCharacterMonster.h"
 #include "UI/GPWidgetComponent.h"
 #include "UI/GPHpBarWidget.h"
 #include "UI/GPLevelWidget.h"
@@ -24,9 +25,13 @@ void UGPCharacterUIHandler::OnBeginPlay()
 
 void UGPCharacterUIHandler::CreateAllWidgets()
 {
-	NickNameText = CreateWidgetComponent(TEXT("NickNameWidget"), TEXT("/Game/UI/WBP_UserName"), FVector(0.f, 0.f, 360.f), FVector2D(200.f, 50.f), NickNameWidget);
-	HpBar = CreateWidgetComponent(TEXT("HpBarWidget"), TEXT("/Game/UI/WBP_CharacterHpBar"), FVector(0.f, 0.f, 320.f), FVector2D(250.f, 40.f), HpBarWidget);
-	LevelText = CreateWidgetComponent(TEXT("LevelTextWidget"), TEXT("/Game/UI/WBP_LevelText"), FVector(0.f, 0.f, 395.f), FVector2D(100.f, 40.f), LevelTextWidget);
+	NickNameText = CreateWidgetComponent(TEXT("NickNameWidget"), TEXT("/Game/UI/WBP_UserName"), FVector(0.f, 0.f, 330.f), FVector2D(200.f, 0.f), NickNameWidget);
+
+	if (Owner && Owner->IsA(AGPCharacterMonster::StaticClass()))
+	{
+		HpBar = CreateWidgetComponent(TEXT("HpBarWidget"), TEXT("/Game/UI/WBP_CharacterHpBar"), FVector(0.f, 0.f, 320.f), FVector2D(200.f, 30.f), HpBarWidget);
+		LevelText = CreateWidgetComponent(TEXT("LevelTextWidget"), TEXT("/Game/UI/WBP_LevelText"), FVector(0.f, 0.f, 395.f), FVector2D(100.f, 40.f), LevelTextWidget);
+	}
 
 	if (NickNameWidget)
 	{
@@ -36,16 +41,22 @@ void UGPCharacterUIHandler::CreateAllWidgets()
 
 void UGPCharacterUIHandler::SetupNickNameUI()
 {
-	if (!Owner || !NickNameText) return;
+	if (!Owner || !NickNameText)
+		return;
+	
 
-	if (UUserWidget* Widget = NickNameText->GetUserWidgetObject())
-	{
-		if (UGPUserNameWidget* NameWidget = Cast<UGPUserNameWidget>(Widget))
-		{
-			FString NickName = FString(UTF8_TO_TCHAR(Owner->CharacterInfo.GetName()));
-			NameWidget->UpdateNickNameText(NickName);
-		}
-	}
+	UUserWidget* Widget = NickNameText->GetUserWidgetObject();
+	if (!Widget)
+		return;
+	
+
+	UGPUserNameWidget* NameWidget = Cast<UGPUserNameWidget>(Widget);
+	if (!NameWidget)
+		return;
+	
+
+	FString NickName = FString(UTF8_TO_TCHAR(Owner->CharacterInfo.GetName()));
+	NameWidget->UpdateNickNameText(NickName);
 
 	if (NickNameWidget)
 	{

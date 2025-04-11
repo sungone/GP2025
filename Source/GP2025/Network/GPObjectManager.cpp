@@ -36,8 +36,6 @@ void UGPObjectManager::OnLoginSuccess(FInfoData& PlayerInfo)
 		UE_LOG(LogTemp, Error, TEXT("Invaild World"));
 		FGenericPlatformMisc::RequestExit(false);
 	}
-	//Todo: UI로 머리 위에 출력하자. TCHAR로 변환하면 됨
-	FString NickName = FString(UTF8_TO_TCHAR(PlayerInfo.GetName()));
 
 	FVector SpawnLocation(PlayerInfo.Pos);
 	FRotator SpawnRotation(0, PlayerInfo.Yaw, 0);

@@ -9,7 +9,7 @@ void UGPUserNameWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    NickNameText = Cast<UTextBlock>(GetWidgetFromName(TEXT("TxtLevel")));
+    NickNameText = Cast<UTextBlock>(GetWidgetFromName(TEXT("NickNameText")));
 }
 
 void UGPUserNameWidget::BindToCharacter(AGPCharacterBase* Character)

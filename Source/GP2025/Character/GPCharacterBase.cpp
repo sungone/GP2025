@@ -153,6 +153,11 @@ void AGPCharacterBase::SetCharacterInfo(FInfoData& CharacterInfo_)
 	{
 		OnGoldChanged.Broadcast(CharacterInfo.Gold);
 	}
+
+	if (UIHandler)
+	{
+		UIHandler->SetupNickNameUI();
+	}
 }
 
 void AGPCharacterBase::HandleAutoAttackState()
