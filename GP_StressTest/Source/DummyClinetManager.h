@@ -17,7 +17,7 @@ public:
 	void WorkerThread();
 	void HandleRecv(int32 id, DWORD rbyte, LPWSAOVERLAPPED over);
 	void AdjustClientCount();
-
+	void HandleCompletionError(ExpOver* ex_over, int32 id);
 private:
 	IOCP& _hIocp = IOCP::GetInst();
 	std::array<DummyClient, CLIENT_NUM> _clients;

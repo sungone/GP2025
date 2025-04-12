@@ -25,13 +25,23 @@ bool DummyClient::Init(uint32 num)
 
 bool DummyClient::Connect(IOCP& hIocp)
 {
+	if (_socket == INVALID_SOCKET)
+	{
+		_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
+		if (_socket == INVALID_SOCKET)
+		{
+			LOG(Error, std::format("WSASocket failed. WSAGetLastError: {}", WSAGetLastError()));
+			return false;
+		}
+	}
 	sockaddr_in addr;
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(SERVER_PORT);
 	inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
 	if (connect(_socket, (struct sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR)
 	{
-		LOG(Error, "connect");
+		int errCode = WSAGetLastError();
+		LOG(Error, std::format("connect failed. WSAGetLastError: {}", errCode));
 		closesocket(_socket);
 		return false;
 	}
@@ -48,6 +58,7 @@ void DummyClient::Disconnect()
 	auto pkt = IDPacket(EPacketType::C_LOGOUT, _info.ID);
 	DoSend(&pkt);
 	closesocket(_socket);
+	_socket = INVALID_SOCKET;
 }
 
 void DummyClient::DoRecv()
@@ -70,24 +81,30 @@ void DummyClient::HandleRecvBuffer(int32 recvByte, ExpOver* expOver)
 	int32 dataSize = recvByte + _remain;
 	uint8* buf = expOver->_buf;
 	int32 offset = 0;
-	while (dataSize - offset >= sizeof(FPacketHeader)) {
+
+	while (dataSize - offset >= sizeof(FPacketHeader))
+	{
 		FPacketHeader* header = reinterpret_cast<FPacketHeader*>(buf + offset);
 		int32 packetSize = header->PacketSize;
-		if (packetSize <= 0 || packetSize > BUFSIZE)
+
+		if (packetSize < sizeof(FPacketHeader) || packetSize > BUFSIZE)
 		{
-			LOG(Error, "Invaild Pkt Size");
 			break;
 		}
-		if (dataSize - offset < packetSize) break;
+
+		if (dataSize - offset < packetSize)
+			break;
 
 		Packet* packet = reinterpret_cast<Packet*>(buf + offset);
 		ProcessPacket(packet);
 		offset += packetSize;
 	}
+
 	_remain = dataSize - offset;
 	if (_remain > 0)
 		memmove(buf, buf + offset, _remain);
 }
+
 
 void DummyClient::ProcessPacket(Packet* packet)
 {

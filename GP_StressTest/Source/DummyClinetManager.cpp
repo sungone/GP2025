@@ -56,7 +56,7 @@ void DummyClientManager::WorkerThread()
 
 			if (!ret)
 			{
-				_clients[id].Disconnect();
+				HandleCompletionError(expOver, static_cast<int32>(id));
 				continue;
 			}
 
@@ -119,5 +119,26 @@ void DummyClientManager::AdjustClientCount()
 			_connected++;
 			_nextToConnect++;
 		}
+	}
+}
+
+void DummyClientManager::HandleCompletionError(ExpOver* ex_over, int32 id)
+{
+	switch (ex_over->_compType)
+	{
+	case ::ACCEPT:
+		LOG(Warning, std::format("CompType : ACCEPT[{}]", id));
+		break;
+	case ::RECV:
+		LOG(Warning, std::format("CompType : RECV[{}]", id));
+		_clients[id].Disconnect();
+		_connected--;
+		break;
+	case ::SEND:
+		LOG(Warning, std::format("CompType : SEND[{}]", id));
+		_clients[id].Disconnect();
+		_connected--;
+		delete ex_over;
+		break;
 	}
 }
