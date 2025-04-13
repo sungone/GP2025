@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "../../GP_Server/Source/Common/Common.h"
+#define PAKCETSENDTIME 0.5f
 #include "GPMyplayerNetworkSyncHandler.generated.h"
 
 /**
@@ -26,7 +27,7 @@ public:
 	FVector LastLocation;
 	float LastRotationYaw;
 	FInfoData LastSendPlayerInfo;
-	float MovePacketSendTimer = 0.5;
+	float MovePacketSendTimer = PAKCETSENDTIME;
 	bool bWasJumping = false;
 	float GroundZLocation = 147.7f;
 

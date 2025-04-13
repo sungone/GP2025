@@ -171,7 +171,8 @@ void AGPCharacterBase::HandleRemoteMovementSync(float DeltaTime)
 {
 	FVector Location = GetActorLocation();
 	FVector DestLocation = CharacterInfo.Pos;
-	float Speed = FMath::Max(CharacterInfo.Stats.Speed, 500.f);
+
+	float Speed = CharacterInfo.HasState(STATE_RUN) ? 1200.f : 600.f;
 
 	FVector MoveDir = (DestLocation - Location);
 	float DistToDest = MoveDir.Length();
@@ -188,7 +189,9 @@ void AGPCharacterBase::HandleRemoteMovementSync(float DeltaTime)
 	);
 
 	SetActorLocationAndRotation(NextLocation, InterpolatedRotation);
-	GetCharacterMovement()->Velocity = MoveDir * Speed;
+
+	FVector FinalVelocity = MoveDir * Speed;
+	GetCharacterMovement()->Velocity = FinalVelocity;
 }
 
 void AGPCharacterBase::HandleRemoteJumpSync()

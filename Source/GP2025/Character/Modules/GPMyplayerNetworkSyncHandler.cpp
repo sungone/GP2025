@@ -27,7 +27,9 @@ void UGPMyplayerNetworkSyncHandler::Tick(float DeltaTime)
 
 	Owner->CharacterInfo.SetLocation(Owner->GetActorLocation().X, Owner->GetActorLocation().Y, Owner->GetActorLocation().Z);
 	Owner->CharacterInfo.Yaw = Owner->GetActorRotation().Yaw;
-	Owner->CharacterInfo.Stats.Speed = Owner->GetVelocity().Size();
+
+	const float CurrentSpeed = Owner->GetVelocity().Size();
+	Owner->CharacterInfo.Stats.Speed = CurrentSpeed;
 
 	HandleIdleState();
 	HandleJumpState();
@@ -117,13 +119,12 @@ void UGPMyplayerNetworkSyncHandler::HandlePeriodicSend()
 
 	if (MovePacketSendTimer <= 0 || (Owner->CharacterInfo.HasState(STATE_IDLE) && DistanceMoved >= NotMovedThreshold))
 	{
-		MovePacketSendTimer = PACKETSENDTIME;
+		MovePacketSendTimer = PAKCETSENDTIME;
 
 		if (!Owner->CharacterInfo.HasState(STATE_IDLE) || DistanceMoved >= NotMovedThreshold)
 		{
 			Owner->NetMgr->SendPlayerMovePacket();
 			LastSendPlayerInfo = Owner->CharacterInfo;
-
 			UE_LOG(LogTemp, Log, TEXT("Send Packet: Periodic or Idle Move"));
 		}
 	}

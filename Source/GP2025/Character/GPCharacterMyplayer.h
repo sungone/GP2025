@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Character/GPCharacterBase.h"
 #include "InputActionValue.h"
-#define PACKETSENDTIME 0.5
 #include "GPCharacterPlayer.h"
 #include "GPCharacterMyplayer.generated.h"
 
