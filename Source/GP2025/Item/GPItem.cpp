@@ -49,22 +49,14 @@ AGPItem::AGPItem()
 		ItemInteractionWidgetClass = WidgetClassFinder.Class;
 		ItemInteractionWidgetComp->SetWidgetClass(ItemInteractionWidgetClass);
 	}
+
+	TriggerBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 
 // Called when the game starts or when spawned
 void AGPItem::BeginPlay()
 {
 	Super::BeginPlay();
-
-	TriggerBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	GetWorld()->GetTimerManager().SetTimer(
-		OverlapEnableTimerHandle,
-		this,
-		&AGPItem::EnableOverlap,
-		OverlapDelay, 
-		false 
-	);
 }
 
 // Called every frame
@@ -132,7 +124,7 @@ void AGPItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 
 	AGPCharacterMyplayer* Player = Cast<AGPCharacterMyplayer>(OtherActor);
 	if (!Player) return;
-	if (!Player->InputHandler->bGetItem) return;
+	// if (!Player->InputHandler->bGetItem) return;
 
 	if (ItemInteractionWidgetComp && !ItemInteractionWidgetComp->IsVisible())
 	{
@@ -152,10 +144,4 @@ void AGPItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 	{
 		UE_LOG(LogTemp, Error, TEXT("Network Manager is NULL - Failed to Send Item Pickup Packet."));
 	}
-}
-
-void AGPItem::EnableOverlap()
-{
-	TriggerBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	UE_LOG(LogTemp, Warning, TEXT("Overlap Enabled for Item ID: %d"), ItemID);
 }

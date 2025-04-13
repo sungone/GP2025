@@ -52,7 +52,7 @@ public:
 	// <Network Sync>
 	UPROPERTY()
 	class UGPMyplayerNetworkSyncHandler* NetworkSyncHandler;
-
+	
 	// <CharacterType> 
 public :
 	bool bIsGunnerCharacter() const;

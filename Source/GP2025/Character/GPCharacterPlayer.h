@@ -50,6 +50,9 @@ public :
 
 	virtual USkeletalMeshComponent* GetCharacterMesh() const override;
 
+	// <Scene Capture Component for Inventory>
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TObjectPtr<class USceneCaptureComponent2D> SceneCaptureComponent;
 
 	// <Equipment Tracking>
 	UPROPERTY()

@@ -53,13 +53,6 @@ public:
 		bool bFromSweep,
 		const FHitResult& SweepResult);
 
-	// 플레이어가 아이템 먹는걸 딜레이 하기위한 멤버들
-public :
-	void EnableOverlap();
-	FTimerHandle OverlapEnableTimerHandle;
-	UPROPERTY(EditAnywhere , Category = "Item")
-	float OverlapDelay = 1.5f;
-
 	// Pick Up Guid 
 public :
 	UPROPERTY(EditDefaultsOnly, Category = "UI")

@@ -64,7 +64,7 @@ AGPCharacterBase::AGPCharacterBase()
 	auto* Capsule = GetCapsuleComponent();
 	if (Capsule)
 	{
-		Capsule->InitCapsuleSize(42.f, 96.f);
+		Capsule->InitCapsuleSize(42.f, 99.f);
 		Capsule->SetHiddenInGame(false);
 		Capsule->SetVisibility(true);
 	}

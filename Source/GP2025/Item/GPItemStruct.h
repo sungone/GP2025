@@ -94,9 +94,14 @@ public :
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	UStaticMesh* ItemStaticMesh;
 
-	// 아이템 스켈레탈 메시
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	USkeletalMesh* ItemSkeletalMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	USkeletalMesh* ItemSkeletalMesh_Man;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	USkeletalMesh* ItemSkeletalMesh_Woman;
 
 	// 무기 클래스일 때 지정
 	UPROPERTY(EditAnywhere , BlueprintReadWrite , Category = "Item")
