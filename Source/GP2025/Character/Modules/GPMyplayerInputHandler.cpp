@@ -93,7 +93,10 @@ void UGPMyplayerInputHandler::SetupInputBindings(UEnhancedInputComponent* Enhanc
 
 void UGPMyplayerInputHandler::Move(const FInputActionValue& Value)
 {
-	if (!Owner) return;
+	if (!Owner || !Owner->Controller) return;
+
+	if (Owner->CameraHandler->bWantsToZoom)
+		return;
 
 	FVector2D Input = Value.Get<FVector2D>();
 	const FRotator ControlRotation = Owner->GetControlRotation();
