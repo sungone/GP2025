@@ -54,6 +54,7 @@ public:
 	
 	// <CharacterType> 
 public :
+	UFUNCTION(BlueprintCallable, Category = "CharacterType")
 	bool bIsGunnerCharacter() const;
 	UFUNCTION(BlueprintCallable, Category = "CharacterType")
 	void ChangePlayerType();
