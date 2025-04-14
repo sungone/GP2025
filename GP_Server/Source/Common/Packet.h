@@ -180,8 +180,10 @@ struct PlayerDamagePacket : public Packet
 struct UseSkillPacket : public Packet
 {
 	ESkillGroup SkillGID;
-	UseSkillPacket(ESkillGroup SkillGID_)
-		: Packet(EPacketType::C_USE_SKILL), SkillGID(SkillGID_)
+	float PlayerYaw;
+
+	UseSkillPacket(ESkillGroup SkillGID_, float PlayerYaw_)
+		: Packet(EPacketType::C_USE_SKILL), SkillGID(SkillGID_), PlayerYaw(PlayerYaw_)
 	{
 		Header.PacketSize = sizeof(UseSkillPacket);
 	}

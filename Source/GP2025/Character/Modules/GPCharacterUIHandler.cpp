@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Character/Modules/GPCharacterUIHandler.h"
@@ -29,6 +29,7 @@ void UGPCharacterUIHandler::CreateAllWidgets()
 
 	if (Owner && Owner->IsA(AGPCharacterMonster::StaticClass()))
 	{
+		NickNameText->SetRelativeLocation(FVector(0.f, 0.f, 360.f));
 		HpBar = CreateWidgetComponent(TEXT("HpBarWidget"), TEXT("/Game/UI/WBP_CharacterHpBar"), FVector(0.f, 0.f, 320.f), FVector2D(200.f, 30.f), HpBarWidget);
 		LevelText = CreateWidgetComponent(TEXT("LevelTextWidget"), TEXT("/Game/UI/WBP_LevelText"), FVector(0.f, 0.f, 395.f), FVector2D(100.f, 40.f), LevelTextWidget);
 	}

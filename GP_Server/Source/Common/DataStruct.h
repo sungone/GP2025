@@ -50,12 +50,21 @@ struct FInfoData
 	uint32 Gold;
 
 	FInfoData()
-		: ID(0), CharacterType(), NickName("None"),
-		Pos(FVector(0.0f, 0.0f, 0.0f)), Yaw(0.0f),
-		CollisionRadius(0.0f), AttackRadius(0.f), fovAngle(90.f),
-		Stats(), State(STATE_IDLE), Skilllevel(0), Gold(0)
+		: ID(0),
+		NickName("None"),
+		CharacterType(),
+		Pos(FVector(0.0f, 0.0f, 0.0f)),
+		Yaw(0.0f),
+		CollisionRadius(0.0f),
+		AttackRadius(0.f),
+		fovAngle(90.f),
+		Stats(),
+		State(STATE_IDLE),
+		Skilllevel(0),
+		Gold(0)
 	{
 	}
+
 	void SetYaw(float Yaw_) { Yaw = Yaw_; }
 	void SetLocation(float X_, float Y_, float Z_) { Pos = FVector(X_, Y_, Z_); }
 	void SetLocation(FVector Pos_) { Pos = Pos_; }
@@ -103,16 +112,6 @@ struct FInfoData
 		float ForwardX = std::cos(RadianYaw);
 		float ForwardY = std::sin(RadianYaw);
 		return FVector(ForwardX, ForwardY, 0.0f).Normalize();
-	}
-	void SetName(std::string InNick)
-	{
-		if (InNick.empty()) {
-			strncpy_s(NickName, "None", NICKNAME_LEN - 1);
-			NickName[NICKNAME_LEN - 1] = '\0';
-			return;
-		}
-		strncpy_s(NickName, InNick.c_str(), NICKNAME_LEN - 1);
-		NickName[NICKNAME_LEN - 1] = '\0';
 	}
 	void SetName(std::wstring InNick)
 	{

@@ -18,8 +18,7 @@ void Monster::Init()
 	FVector newPos{};
 	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
 	_info.SetLocation(newPos);
-
-	_info.SetName(data->Name);
+	_info.SetName(ConvertToWString(data->Name));
 	_info.CharacterType = data->TypeId;
 	_info.Stats.Level = data->Level;
 	_info.Stats.Hp = data->Hp;
