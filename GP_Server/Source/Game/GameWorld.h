@@ -24,8 +24,9 @@ public:
 	void CreateMonster();
 	void SpawnMonster(PlayerSession& session);
 
+	void PlayerSetYaw(int32 playerId, float yaw);
 	void PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& time);
-	void PlayerAttack(int32 playerId, float playerYaw);
+	void PlayerAttack(int32 playerId);
 	void PlayerUseSkill(int32 playerId, ESkillGroup groupId);
 	void PlayerSelectCharacter(int32 playerId, Type::EPlayer type);
 

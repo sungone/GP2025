@@ -147,12 +147,14 @@ void PacketManager::HandleMovePacket(int32 sessionId, Packet* packet)
 void PacketManager::HandleAttackPacket(int32 sessionId, Packet* packet)
 {
 	AttackPacket* p = static_cast<AttackPacket*>(packet);
-	_gameWorld.PlayerAttack(sessionId, p->PlayerYaw);
+	_gameWorld.PlayerSetYaw(sessionId, p->PlayerYaw);
+	_gameWorld.PlayerAttack(sessionId);
 }
 
 void PacketManager::HandleUseSkillPacket(int32 sessionId, Packet* packet)
 {
 	UseSkillPacket* p = static_cast<UseSkillPacket*>(packet);
+	_gameWorld.PlayerSetYaw(sessionId, p->PlayerYaw);
 	_gameWorld.PlayerUseSkill(sessionId, p->SkillGID);
 }
 

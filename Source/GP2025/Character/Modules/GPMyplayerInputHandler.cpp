@@ -261,13 +261,13 @@ void UGPMyplayerInputHandler::UseSkillQ()
 
 		Owner->CharacterInfo.AddState(STATE_SKILL_Q);
 		Owner->CombatHandler->PlayQSkillMontage();
-		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::Throwing);
+		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::Throwing, Owner->GetControlRotation().Yaw);
 	}
 	else
 	{
 		Owner->CharacterInfo.AddState(STATE_SKILL_Q);
 		Owner->CombatHandler->PlayQSkillMontage();
-		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::HitHard);
+		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::HitHard, Owner->GetControlRotation().Yaw);
 	}
 
 	Owner->AppearanceHandler->SetupMasterPose();
@@ -283,13 +283,13 @@ void UGPMyplayerInputHandler::UseSkillE()
 
 		Owner->CharacterInfo.AddState(STATE_SKILL_E);
 		Owner->CombatHandler->PlayESkillMontage();
-		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::FThrowing);
+		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::FThrowing, Owner->GetControlRotation().Yaw);
 	}
 	else
 	{
 		Owner->CharacterInfo.AddState(STATE_SKILL_E);
 		Owner->CombatHandler->PlayESkillMontage();
-		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::Clash);
+		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::Clash, Owner->GetControlRotation().Yaw);
 	}
 
 	Owner->AppearanceHandler->SetupMasterPose();
@@ -305,13 +305,13 @@ void UGPMyplayerInputHandler::UseSkillR()
 
 		Owner->CharacterInfo.AddState(STATE_SKILL_R);
 		Owner->CombatHandler->PlayRSkillMontage();
-		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::Anger);
+		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::Anger, Owner->GetControlRotation().Yaw);
 	}
 	else
 	{
 		Owner->CharacterInfo.AddState(STATE_SKILL_R);
 		Owner->CombatHandler->PlayRSkillMontage();
-		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::Whirlwind);
+		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::Whirlwind, Owner->GetControlRotation().Yaw);
 	}
 
 	Owner->AppearanceHandler->SetupMasterPose();

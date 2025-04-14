@@ -162,9 +162,9 @@ void UGPNetworkManager::SendPlayerUnequipItem(int32 ItemID)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendPlayerUseSkill(ESkillGroup SkillGID)
+void UGPNetworkManager::SendPlayerUseSkill(ESkillGroup SkillGID, float PlayerYaw)
 {
-	UseSkillPacket Packet(SkillGID);
+	UseSkillPacket Packet(SkillGID, PlayerYaw);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 

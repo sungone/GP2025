@@ -16,10 +16,8 @@ void Player::Init()
 	_info.CollisionRadius = 50.f;
 	_info.State = ECharacterStateType::STATE_IDLE;
 	ApplyLevelStats(_info.Stats.Level);
-
 	FVector newPos{};
-	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } 
-	while (GameWorld::GetInst().IsCollisionDetected(_info));
+	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(_info));
 	_info.SetLocation(newPos);
 }
 
@@ -28,8 +26,22 @@ void Player::SetCharacterType(Type::EPlayer type)
 	LOG(std::format("Set type {}", (type == Type::EPlayer::WARRIOR) ? "warrior" : "gunner"));
 	_playerType = type;
 	_info.CharacterType = static_cast<uint8>(_playerType);
-	_info.fovAngle = (_playerType == Type::EPlayer::WARRIOR) ? 90 : 10;
-	_info.AttackRadius = (_playerType == Type::EPlayer::WARRIOR) ? 300 : 1500;
+	if (_playerType == Type::EPlayer::WARRIOR)
+	{
+		_info.fovAngle = 90;
+		_info.AttackRadius = 300;
+		LearnSkill(ESkillGroup::HitHard);
+		LearnSkill(ESkillGroup::Clash);
+		LearnSkill(ESkillGroup::Whirlwind);
+	}
+	else
+	{
+		_info.fovAngle = 10;
+		_info.AttackRadius = 1500;
+		LearnSkill(ESkillGroup::Throwing);
+		LearnSkill(ESkillGroup::FThrowing);
+		LearnSkill(ESkillGroup::Anger);
+	}
 }
 
 void Player::UpdateViewList(std::shared_ptr<Character> other)
@@ -176,29 +188,33 @@ void Player::ExecuteSkillEffect(const FSkillData& skill)
 {
 	if (skill.Type0 == ESkillType::Atk)
 	{
-		//1.skill_value_0 만큼 공격력 증가
+		float prevDmg = _stats.Damage;
+		float prevAtkR = _info.AttackRadius;
+		float prevFov = _info.fovAngle;
 
-		//2. skill_value_1(=n) 만큼
+		_stats.Damage += skill.Value0;
+
 		switch (skill.Type1)
 		{
 		case ESkillType::Dash:
-			// n미터 돌진 -> 위치를 클라에서 받고 있음 어떻게 처리하지?
+			_info.SetLocation(_info.Pos + _info.GetFrontVector() * skill.Value1);
 			break;
 		case ESkillType::RangeAtk:
-			// 공격범위 n미터 증가 -> 잠시 증가해서 공격 후 다시 원래대로 돌려야함
+			_info.AttackRadius += 100.f * skill.Value1;
 			break;
 		case ESkillType::SectorAtk:
-			// 총알 n발 발사 공격 범위를 넓히자
+			_info.fovAngle += skill.Value1;
 			break;
 		default:
 			break;
 		}
+		GameWorld::GetInst().PlayerAttack(_id);
+		_stats.Damage = prevDmg;
+		_info.AttackRadius = prevAtkR;
+		_info.fovAngle = prevFov;
 	}
 	else if (skill.Type0 == ESkillType::BuffTime)
 	{
-		//1.skill_value_0초간 -> 타이머 처리
-
-		//2. skill_value_1(=n) 만큼
 		switch (skill.Type1)
 		{
 		case ESkillType::AtkSpd:
@@ -207,6 +223,8 @@ void Player::ExecuteSkillEffect(const FSkillData& skill)
 			// 클라에서 처리하는 부분이니 패킷을 새로 추가해야하나?
 			break;
 		}
+		TimerQueue::AddTimer([]() {/*원상복귀*/}, 1000 * skill.Value0, true);
+
 	}
 }
 

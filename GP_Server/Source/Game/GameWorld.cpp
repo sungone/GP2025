@@ -95,6 +95,16 @@ void GameWorld::SpawnMonster(PlayerSession& session)
 	}
 }
 
+void GameWorld::PlayerSetYaw(int32 playerId, float yaw)
+{
+	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	if (!player)
+	{
+		LOG(Warning, "Invaild!");
+		return;
+	}
+	player->GetInfo().SetYaw(yaw);
+}
 
 void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& time)
 {
@@ -114,7 +124,7 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 	SessionManager::GetInst().BroadcastToViewList(&upkt, playerId);
 }
 
-void GameWorld::PlayerAttack(int32 playerId, float playerYaw)
+void GameWorld::PlayerAttack(int32 playerId)
 {
 	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
 	if (!player)
@@ -123,7 +133,6 @@ void GameWorld::PlayerAttack(int32 playerId, float playerYaw)
 		return;
 	}
 	player->ChangeState(ECharacterStateType::STATE_AUTOATTACK);
-	player->GetInfo().SetYaw(playerYaw);
 
 	for (auto& monsterId : player->GetViewList())
 	{
@@ -353,7 +362,7 @@ bool GameWorld::IsCollisionDetected(const FVector& pos)
 	for (auto other : _characters)
 	{
 		if (!other) continue;
-		if (other->IsColision(pos,margin)) return true;
+		if (other->IsColision(pos, margin)) return true;
 	}
 	return false;
 }
