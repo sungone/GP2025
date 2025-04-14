@@ -3,6 +3,7 @@
 struct FMonsterData
 {
     uint32 TypeId;
+    std::string Name;
     uint32 Chapter;
     int Level;
     int Hp;

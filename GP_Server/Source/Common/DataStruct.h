@@ -104,6 +104,16 @@ struct FInfoData
 		float ForwardY = std::sin(RadianYaw);
 		return FVector(ForwardX, ForwardY, 0.0f).Normalize();
 	}
+	void SetName(std::string InNick)
+	{
+		if (InNick.empty()) {
+			strncpy_s(NickName, "None", NICKNAME_LEN - 1);
+			NickName[NICKNAME_LEN - 1] = '\0';
+			return;
+		}
+		strncpy_s(NickName, InNick.c_str(), NICKNAME_LEN - 1);
+		NickName[NICKNAME_LEN - 1] = '\0';
+	}
 	void SetName(std::wstring InNick)
 	{
 		if (InNick.empty()) {

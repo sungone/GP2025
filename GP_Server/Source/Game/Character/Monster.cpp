@@ -19,7 +19,7 @@ void Monster::Init()
 	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
 	_info.SetLocation(newPos);
 
-	_info.SetName(L"몬스터");
+	_info.SetName(data->Name);
 	_info.CharacterType = data->TypeId;
 	_info.Stats.Level = data->Level;
 	_info.Stats.Hp = data->Hp;
