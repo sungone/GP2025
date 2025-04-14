@@ -29,7 +29,7 @@ public:
 	// <CharacterType>
 public:
 	TMap<ECharacterType, class UGPCharacterControlData*> CharacterTypeManager;
-	ECharacterType CurrentCharacterType;
+	ECharacterType& CurrentCharacterType = CharacterInfo.CharacterType;
 
 	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterData);
 	virtual void SetCharacterType(ECharacterType NewCharacterType);
