@@ -71,7 +71,7 @@ void GameWorld::CreateMonster()
 		_characters[i]->Init();
 		_characters[i]->GetInfo().ID = i;
 	}
-	TimerQueue::AddTimerEvent(TimerEvent(0, ::MONSTER_UPDATE, 2000));
+	TimerQueue::AddTimer([]() {GameWorld::GetInst().UpdateMonster();}, 2000, true);
 }
 
 void GameWorld::SpawnMonster(PlayerSession& session)
@@ -172,6 +172,7 @@ void GameWorld::PlayerSelectCharacter(int32 playerId, Type::EPlayer type)
 
 void GameWorld::UpdateMonster()
 {
+	LOG("Update Monster");
 	std::unique_lock<std::mutex> lock(_carrMutex);
 	for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{

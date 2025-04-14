@@ -1,5 +1,5 @@
 #pragma once
-#if DEBUG
+#ifndef _DEBUG
 #define DB_LOCAL
 #endif
 
@@ -8,11 +8,6 @@ enum CompType
 	RECV,
 	SEND,
 	ACCEPT,
-};
-
-enum EventType
-{
-	MONSTER_UPDATE
 };
 
 static std::wstring ConvertToWString(const std::string& str)

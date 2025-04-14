@@ -1,19 +1,21 @@
 #pragma once
 
-enum EventType;
 struct TimerEvent
 {
-	int32 _id;
-	EventType _type;
-	uint32 _intervalMs;
-	std::chrono::system_clock::time_point _wakeUpTime;
-	TimerEvent(int32 id, EventType type, uint32 intervalMs)
-		: _id(id), _type(type), _intervalMs(intervalMs)
+	uint32_t intervalMs;
+	bool repeat;
+	std::function<void()> callback;
+	std::chrono::system_clock::time_point wakeUpTime;
+
+	TimerEvent(std::function<void()> cb, uint32_t interval, bool repeat_)
+		: intervalMs(interval), repeat(repeat_), callback(cb)
 	{
-		_wakeUpTime = std::chrono::system_clock::now() + std::chrono::milliseconds(intervalMs);
+		wakeUpTime = std::chrono::system_clock::now() + std::chrono::milliseconds(interval);
 	}
-	bool operator<(const TimerEvent& other) const {
-		return _wakeUpTime > other._wakeUpTime;
+
+	bool operator<(const TimerEvent& other) const
+	{
+		return wakeUpTime > other.wakeUpTime;
 	}
 };
 
@@ -21,9 +23,10 @@ class TimerQueue
 {
 public:
 	static void TimerThread();
-	static void AddTimerEvent(TimerEvent timerEvent);
-	static void AddTimerEvent(EventType type, uint32 intervalMs);
-	static std::priority_queue<TimerEvent> _TimerQueue;
-	static std::mutex _TimerMutex;
+	static void AddTimer(std::function<void()> callback, uint32_t intervalMs, bool repeat = false);
+	
+	static std::priority_queue<TimerEvent> _timerQueue;
+	static std::mutex _mutex;
+	static inline std::condition_variable _cv;
 };
 

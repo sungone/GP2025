@@ -1,48 +1,47 @@
 #include "pch.h"
 #include "TimerQueue.h"
 #include "GameWorld.h"
-std::priority_queue<TimerEvent> TimerQueue::_TimerQueue;
-std::mutex TimerQueue::_TimerMutex;
+std::priority_queue<TimerEvent> TimerQueue::_timerQueue;
+std::mutex TimerQueue::_mutex;
 
 void TimerQueue::TimerThread()
 {
+	std::unique_lock<std::mutex> lock(_mutex);
 	while (true)
 	{
-		auto now = std::chrono::system_clock::now();
-
-		std::unique_lock<std::mutex> lock(_TimerMutex);
-		while (!_TimerQueue.empty() && _TimerQueue.top()._wakeUpTime <= now)
+		if (_timerQueue.empty())
 		{
-			TimerEvent event = _TimerQueue.top();
-			_TimerQueue.pop();
+			_cv.wait(lock);
+			continue;
+		}
+
+		auto now = std::chrono::system_clock::now();
+		auto& top = _timerQueue.top();
+
+		if (now >= top.wakeUpTime)
+		{
+			auto event = top;
+			_timerQueue.pop();
 			lock.unlock();
 
-			auto over = std::make_shared<ExpOver>();
-			switch (event._type)
-			{
-			case ::MONSTER_UPDATE:
-				GameWorld::GetInst().UpdateMonster();
-				AddTimerEvent(TimerEvent(0, ::MONSTER_UPDATE, 2000));
-				break;
-			}
+			if (event.callback)
+				event.callback();
+
+			if (event.repeat)
+				AddTimer(event.callback, event.intervalMs, true);
 
 			lock.lock();
 		}
-		lock.unlock();
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		else
+		{
+			_cv.wait_until(lock, top.wakeUpTime);
+		}
 	}
 }
 
-
-void TimerQueue::AddTimerEvent(TimerEvent timerEvent)
+void TimerQueue::AddTimer(std::function<void()> callback, uint32_t intervalMs, bool repeat)
 {
-	std::lock_guard<std::mutex> lock(_TimerMutex);
-	_TimerQueue.push(timerEvent);
+	std::lock_guard<std::mutex> lock(_mutex);
+	_timerQueue.push(TimerEvent(callback, intervalMs, repeat));
+	_cv.notify_one();
 }
-
-void TimerQueue::AddTimerEvent(EventType type, uint32 intervalMs)
-{
-	std::lock_guard<std::mutex> lock(_TimerMutex);
-	_TimerQueue.push(TimerEvent(0, type, intervalMs));
-}
-
