@@ -4,16 +4,19 @@
 #include "Inventory/GPItemSlot.h"
 #include "Character/GPCharacterMyPlayer.h"
 #include "Inventory/GPInventory.h"
+#include "Shop/GPShop.h"
 #include "Network/GPNetworkManager.h"
 #include "Character/Modules/GPMyplayerUIManager.h"
 #include "Character/Modules/GPPlayerAppearanceHandler.h"
 #include "Kismet/GameplayStatics.h"
+#include "Character/GPCharacterNPC.h"
 #include "Components/TextBlock.h"
 
 void UGPItemSlot::NativeConstruct()
 {
     Super::NativeConstruct();
     InitializeInventoryWidget();
+    InitializeShopWidget();
     CurrentItem = GetItemData();
 }
 
@@ -43,65 +46,81 @@ FGPItemStruct& UGPItemSlot::GetItemData()
 
 void UGPItemSlot::ClickItem()
 {
-    UE_LOG(LogTemp, Warning, TEXT("Success"));
-
-    if (CurrentItem.Category == ECategory::None)
+    switch (SlotOwnerType)
     {
-        UE_LOG(LogTemp, Warning, TEXT("No Item"));
-        return;
-    }
 
-    // 현재 플레이어를 찾음
-    AGPCharacterPlayer* Player = Cast<AGPCharacterPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-    if (!Player)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("No Player"));
-        return;
-    }
+    case ESlotOwnerType::Inventory:
 
-    // 장착 가능한 아이템인지 확인
-    if (CurrentItem.Category == ECategory::helmet ||
-        CurrentItem.Category == ECategory::chest ||
-        CurrentItem.Category == ECategory::sword ||
-        CurrentItem.Category == ECategory::bow)
     {
-        UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-        if (NetworkManager)
+        UE_LOG(LogTemp, Warning, TEXT("Success"));
+
+        if (CurrentItem.Category == ECategory::None)
         {
-            Player->AppearanceHandler->EquipItemOnCharacter(GetItemData());
-            int32* FoundID = Player->EquippedItemIDs.Find(CurrentItem.Category);
+            UE_LOG(LogTemp, Warning, TEXT("No Item"));
+            return;
+        }
 
-            if (FoundID == nullptr)
-                return;
+        // 현재 플레이어를 찾음
+        AGPCharacterPlayer* Player = Cast<AGPCharacterPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+        if (!Player)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("No Player"));
+            return;
+        }
 
-            if (*FoundID == -1)
+        // 장착 가능한 아이템인지 확인
+        if (CurrentItem.Category == ECategory::helmet ||
+            CurrentItem.Category == ECategory::chest ||
+            CurrentItem.Category == ECategory::sword ||
+            CurrentItem.Category == ECategory::bow)
+        {
+            UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+            if (NetworkManager)
             {
-                NetworkManager->SendPlayerEquipItem(SlotData.ItemUniqueID);             
+                Player->AppearanceHandler->EquipItemOnCharacter(GetItemData());
+                int32* FoundID = Player->EquippedItemIDs.Find(CurrentItem.Category);
+
+                if (FoundID == nullptr)
+                    return;
+
+                if (*FoundID == -1)
+                {
+                    NetworkManager->SendPlayerEquipItem(SlotData.ItemUniqueID);
+                }
+                else
+                {
+                    NetworkManager->SendPlayerUnequipItem(*FoundID);
+                    NetworkManager->SendPlayerEquipItem(SlotData.ItemUniqueID);
+                }
+
+                Player->EquippedItemIDs[CurrentItem.Category] = SlotData.ItemUniqueID;
             }
             else
             {
-                NetworkManager->SendPlayerUnequipItem(*FoundID);
-                NetworkManager->SendPlayerEquipItem(SlotData.ItemUniqueID);             
+                UE_LOG(LogTemp, Error, TEXT("EquipItem: NetworkManager is NULL"));
             }
-
-            Player->EquippedItemIDs[CurrentItem.Category] = SlotData.ItemUniqueID;
+        }
+        else if (CurrentItem.Category == ECategory::consumable)
+        {
+            UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+            if (NetworkManager)
+            {
+                NetworkManager->SendPlayerUseItem(SlotData.ItemUniqueID);
+            }
         }
         else
         {
-            UE_LOG(LogTemp, Error, TEXT("EquipItem: NetworkManager is NULL"));
+            UE_LOG(LogTemp, Warning, TEXT("can't equip item"));
         }
+
+        break;
     }
-    else if (CurrentItem.Category == ECategory::consumable) 
+
+    case ESlotOwnerType::Shop:
     {
-        UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-        if (NetworkManager)
-        {
-            NetworkManager->SendPlayerUseItem(SlotData.ItemUniqueID);
-        }
+        break;
     }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("can't equip item"));
+
     }
 }
 
@@ -123,6 +142,26 @@ void UGPItemSlot::InitializeInventoryWidget()
     else
     {
         UE_LOG(LogTemp, Error, TEXT("Failed to Get GPCharacterMyPlayer in GPItemSlot"));
+    }
+}
+
+void UGPItemSlot::InitializeShopWidget()
+{
+    TArray<AActor*> FoundNPCs;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AGPCharacterNPC::StaticClass(), FoundNPCs);
+
+    for (AActor* Actor : FoundNPCs)
+    {
+        AGPCharacterNPC* NPC = Cast<AGPCharacterNPC>(Actor);
+        if (NPC && NPC->ShopWidget)
+        {
+            ShopWidget = Cast<UGPShop>(NPC->ShopWidget);
+            if (ShopWidget)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Successfully set ShopWidget in GPItemSlot from NPC: %s"), *NPC->GetName());
+                return;
+            }
+        }
     }
 }
 

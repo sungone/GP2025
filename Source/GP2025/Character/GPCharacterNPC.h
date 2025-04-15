@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Character/GPCharacterBase.h"
+#include "GameFramework/Character.h"
 #include "GPCharacterNPC.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class GP2025_API AGPCharacterNPC : public AGPCharacterBase
+class GP2025_API AGPCharacterNPC : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -18,8 +18,24 @@ class GP2025_API AGPCharacterNPC : public AGPCharacterBase
 public:
 	AGPCharacterNPC();
 	virtual void BeginPlay() override;
-protected:
-	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
-	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
 	
+public :
+	UPROPERTY()
+	UUserWidget* ShopWidget;
+
+	UPROPERTY()
+	TSubclassOf<UUserWidget> ShopWidgetClass;
+
+	void OpenShopUI(APlayerController* PlayerController);
+	void CloseShopUI();
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision", meta = (AllowPrivateAccess = "true"))
+	class USphereComponent* InteractionSphere;
+
+	UFUNCTION()
+	void OnPlayerEnter(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	void OnPlayerExit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };

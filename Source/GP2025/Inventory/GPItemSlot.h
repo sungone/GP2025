@@ -10,7 +10,15 @@
 
 
 class UGPInventory;
+class UGPShop;
 class AGPCharacterMyplayer;
+
+UENUM(BlueprintType)
+enum class ESlotOwnerType : uint8
+{
+    Inventory,
+    Shop
+};
 
 /**
  * 
@@ -24,6 +32,10 @@ class GP2025_API UGPItemSlot : public UUserWidget
 public:
     virtual void NativeConstruct() override;
 
+    // Inven 인지 상점 인지
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Slot")
+    ESlotOwnerType SlotOwnerType;
+
     // Expose on Spawn 매개변수 추가
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item", meta = (ExposeOnSpawn = "true"))
     FSlotStruct SlotData;
@@ -31,8 +43,6 @@ public:
     /** 현재 슬롯의 아이템 데이터를 가져오는 함수 */
     UFUNCTION(BlueprintCallable, Category = "Item")
     FGPItemStruct& GetItemData();
-
-
 
     UFUNCTION(BlueprintCallable, Category = "Item")
     void ClickItem();
@@ -43,8 +53,11 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
     UGPInventory* InventoryWidget;
 
-    void InitializeInventoryWidget();
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+    UGPShop* ShopWidget;
 
+    void InitializeInventoryWidget();
+    void InitializeShopWidget();
 
     UPROPERTY(meta = (BindWidget), BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
     class UTextBlock* QuantityText;

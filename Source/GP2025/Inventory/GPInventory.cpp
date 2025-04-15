@@ -53,6 +53,7 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
         return;
     }
 
+    NewSlot->SlotOwnerType = ESlotOwnerType::Inventory;
     NewSlot->SlotData.ItemID.DataTable = ItemDataTable;
     NewSlot->SlotData.ItemID.RowName = RowName;
     NewSlot->SlotData.Quantity = Quantity;
