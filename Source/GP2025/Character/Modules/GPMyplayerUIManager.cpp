@@ -99,6 +99,11 @@ void UGPMyplayerUIManager::OpenInventory()
 
 	if (!InventoryWidget->IsInViewport())
 	{
+		if (UGPInventory* Inventory = Cast<UGPInventory>(InventoryWidget))
+		{
+			Inventory->SetGold(Owner->CharacterInfo.Gold);
+		}
+
 		InventoryWidget->AddToViewport();
 
 		APlayerController* PC = Cast<APlayerController>(Owner->GetController());

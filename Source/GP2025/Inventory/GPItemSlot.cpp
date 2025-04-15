@@ -91,7 +91,7 @@ void UGPItemSlot::ClickItem()
             UE_LOG(LogTemp, Error, TEXT("EquipItem: NetworkManager is NULL"));
         }
     }
-    else if (CurrentItem.Category == ECategory::consumable || CurrentItem.Category == ECategory::Gold) 
+    else if (CurrentItem.Category == ECategory::consumable) 
     {
         UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
         if (NetworkManager)

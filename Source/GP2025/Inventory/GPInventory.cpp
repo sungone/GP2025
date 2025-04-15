@@ -8,6 +8,7 @@
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 #include "Character/GPCharacterMyplayer.h"
+#include "Network/GPNetworkManager.h"
 #include "Engine/DataTable.h"
 
 
@@ -45,13 +46,27 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
     UE_LOG(LogTemp, Warning, TEXT("Item Found - ItemName: %s | Category: %d"),
         *ItemData->ItemName.ToString(), static_cast<int32>(ItemData->Category));
 
+    UGPItemSlot* NewSlot = CreateWidget<UGPItemSlot>(GetWorld(), SlotClass);
+    if (!NewSlot)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to Create WBP_Slot Widget"));
+        return;
+    }
+
+    NewSlot->SlotData.ItemID.DataTable = ItemDataTable;
+    NewSlot->SlotData.ItemID.RowName = RowName;
+    NewSlot->SlotData.Quantity = Quantity;
+    NewSlot->CurrentItem = *ItemData;
+    NewSlot->SlotData.ItemUniqueID = ItemID;
+
+    // 만약 Gold 라면 바로 Use 해서 Money 업데이트
     if (ItemData->Category == ECategory::Gold)
     {
-        UE_LOG(LogTemp, Warning, TEXT("Picked up Gold! Amount: %d"), Quantity);
-
-        CurrentGoldAmount += Quantity;
-        SetGold(CurrentGoldAmount); 
-        // 혹시 아이템을 사용했으면 서버로 아이템 사용 확인 패킷도 줘야하나???
+        UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+        if (NetworkManager)
+        {
+            NetworkManager->SendPlayerUseItem(NewSlot->SlotData.ItemUniqueID);
+        }
         return;
     }
     
@@ -89,21 +104,6 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
             return;
         }
     }
-
-
-    // 새로운 슬롯 추가
-    UGPItemSlot* NewSlot = CreateWidget<UGPItemSlot>(GetWorld(), SlotClass);
-    if (!NewSlot)
-    {
-        UE_LOG(LogTemp, Error, TEXT("Failed to Create WBP_Slot Widget"));
-        return;
-    }
-
-    NewSlot->SlotData.ItemID.DataTable = ItemDataTable;
-    NewSlot->SlotData.ItemID.RowName = RowName;
-    NewSlot->SlotData.Quantity = Quantity;
-    NewSlot->CurrentItem = *ItemData;
-    NewSlot->SlotData.ItemUniqueID = ItemID;
 
     TargetArray->Add(NewSlot);
 
