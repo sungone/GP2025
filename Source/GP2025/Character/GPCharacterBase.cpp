@@ -130,10 +130,11 @@ void AGPCharacterBase::Tick(float DeltaTime)
 
 	// Move Sync
 	HandleAutoAttackState();
+	HandleQSkillState();
+	HandleESkillState();
+	HandleRSkillState();
 	HandleRemoteMovementSync(DeltaTime);
 	HandleRemoteJumpSync();
-
-
 }
 
 void AGPCharacterBase::PostInitializeComponents()
@@ -159,6 +160,30 @@ void AGPCharacterBase::HandleAutoAttackState()
 	if (CharacterInfo.HasState(STATE_AUTOATTACK) && !CombatHandler->IsAutoAttacking())
 	{
 		CombatHandler->PlayAutoAttackMontage();
+	}
+}
+
+void AGPCharacterBase::HandleQSkillState()
+{
+	if (CharacterInfo.HasState(STATE_SKILL_Q) && !CombatHandler->IsUsingSkill())
+	{
+		CombatHandler->PlayQSkillMontage();
+	}
+}
+
+void AGPCharacterBase::HandleESkillState()
+{
+	if (CharacterInfo.HasState(STATE_SKILL_E) && !CombatHandler->IsUsingSkill())
+	{
+		CombatHandler->PlayESkillMontage();
+	}
+}
+
+void AGPCharacterBase::HandleRSkillState()
+{
+	if (CharacterInfo.HasState(STATE_SKILL_R) && !CombatHandler->IsUsingSkill())
+	{
+		CombatHandler->PlayRSkillMontage();
 	}
 }
 

@@ -40,6 +40,9 @@ public:
 
 	// <Move Sync>
 	void HandleAutoAttackState();
+	void HandleQSkillState();
+	void HandleESkillState();
+	void HandleRSkillState();
 	void HandleRemoteMovementSync(float DeltaTime);
 	void HandleRemoteJumpSync();
 

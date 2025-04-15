@@ -104,6 +104,9 @@ void UGPCharacterCombatHandler::PlaySkillMontage(UAnimMontage* SkillMontage)
 
 void UGPCharacterCombatHandler::OnSkillMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
+	if (!Owner)
+		return;
+
 	if (Montage == QSkillMontage || Montage == ESkillMontage || Montage == RSkillMontage)
 	{
 		bIsUsingSkill = false;
