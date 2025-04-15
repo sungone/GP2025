@@ -107,12 +107,6 @@ void UGPMyplayerUIManager::OpenInventory()
 			PC->SetShowMouseCursor(true);
 			PC->SetInputMode(FInputModeGameAndUI());
 		}
-
-		UGPInventory* CastInventory = Cast<UGPInventory>(InventoryWidget);
-		if (CastInventory)
-		{
-			CastInventory->SetGold(Owner->CharacterInfo.Gold);
-		}
 	}
 
 	if (InGameWidget && !InGameWidget->IsInViewport())

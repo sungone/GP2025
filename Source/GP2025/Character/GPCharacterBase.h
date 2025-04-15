@@ -11,7 +11,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogGPCharacter, Log, All);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHpChanged, float, NewHpRatio);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelChanged, int32, NewLevel);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGoldChanged, int32, NewGold);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGoldChanged, int32, NewGold);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNickNameChanged, FString, NewNickName);
 
 
@@ -56,6 +56,5 @@ public:
 	class UGPCharacterUIHandler* UIHandler;
 	FOnHpChanged OnHpChanged;
 	FOnLevelChanged OnLevelChanged;
-	FOnGoldChanged OnGoldChanged;
 	FOnNickNameChanged OnNickNameChanged;
 };

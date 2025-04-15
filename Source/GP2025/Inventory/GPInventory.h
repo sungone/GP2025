@@ -53,8 +53,9 @@ public :
 
 	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "UI")
 	class UTextBlock* MoneyText;
+	
+	UPROPERTY()
+	int32 CurrentGoldAmount = 0;
 
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void SetGold(int32 Amount);
-
 };

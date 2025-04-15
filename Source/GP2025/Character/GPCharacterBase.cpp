@@ -148,11 +148,6 @@ void AGPCharacterBase::SetCharacterInfo(FInfoData& CharacterInfo_)
 	OnHpChanged.Broadcast(CharacterInfo.Stats.Hp / CharacterInfo.Stats.MaxHp);
 	OnLevelChanged.Broadcast(CharacterInfo.Stats.Level);
 
-	if (CharacterInfo.Gold != CharacterInfo_.Gold)
-	{
-		OnGoldChanged.Broadcast(CharacterInfo.Gold);
-	}
-
 	if (UIHandler)
 	{
 		UIHandler->SetupNickNameUI();

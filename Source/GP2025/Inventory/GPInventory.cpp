@@ -15,13 +15,6 @@
 void UGPInventory::NativeConstruct()
 {
     Super::NativeConstruct();
-
-    auto MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-    if (MyPlayer)
-    {
-        MyPlayer->OnGoldChanged.AddDynamic(this, &UGPInventory::SetGold);
-        SetGold(MyPlayer->CharacterInfo.Gold);
-    }
 }
 
 void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Quantity)
@@ -52,6 +45,15 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
     UE_LOG(LogTemp, Warning, TEXT("Item Found - ItemName: %s | Category: %d"),
         *ItemData->ItemName.ToString(), static_cast<int32>(ItemData->Category));
 
+    if (ItemData->Category == ECategory::Gold)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Picked up Gold! Amount: %d"), Quantity);
+
+        CurrentGoldAmount += Quantity;
+        SetGold(CurrentGoldAmount); 
+        // 혹시 아이템을 사용했으면 서버로 아이템 사용 확인 패킷도 줘야하나???
+        return;
+    }
     
     TArray<UGPItemSlot*>* TargetArray = nullptr;
 
@@ -68,7 +70,6 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
         break;
 
     case ECategory::consumable:
-    case ECategory::Gold:
     case ECategory::Quest:
         TargetArray = &EatableSlots;
         break;
@@ -120,7 +121,6 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
         break;
 
     case ECategory::consumable:
-    case ECategory::Gold:
     case ECategory::Quest:
         EatablesWrapBox->AddChildToWrapBox(NewSlot);
         break;
@@ -183,3 +183,4 @@ void UGPInventory::SetGold(int32 Amount)
         MoneyText->SetText(FText::AsNumber(Amount));
     }
 }
+
