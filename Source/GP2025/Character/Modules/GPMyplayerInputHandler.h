@@ -100,4 +100,8 @@ public :
 public :
 	bool bGetItem = false;
 	FTimerHandle GetItemResetTimerHandle;
+
+private:
+	bool bCanJump = true;
+	FTimerHandle JumpCooldownTimerHandle;
 };

@@ -65,7 +65,7 @@ void UGPMyplayerInputHandler::SetupInputBindings(UEnhancedInputComponent* Enhanc
 {
 	if (!Owner || !EnhancedInput) return;
 
-	EnhancedInput->BindAction(JumpAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::Jump);
+	EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::Jump);
 	EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &UGPMyplayerInputHandler::StopJumping);
 
 	EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::Move);
@@ -120,13 +120,25 @@ void UGPMyplayerInputHandler::Look(const FInputActionValue& Value)
 
 void UGPMyplayerInputHandler::Jump()
 {
-	if (!Owner) return;
+	if (!Owner || !bCanJump) return;
 
 	Owner->Jump();
+	bCanJump = false;
+
 	Owner->NetworkSyncHandler->isJumpStart = true;
 	Owner->CharacterInfo.RemoveState(STATE_IDLE);
 	Owner->CharacterInfo.AddState(STATE_JUMP);
 	Owner->AppearanceHandler->SetupMasterPose();
+
+	Owner->GetWorldTimerManager().SetTimer(
+		JumpCooldownTimerHandle,
+		[this]()
+		{
+			bCanJump = true;
+		},
+		1.2f,
+		false
+	);
 }
 
 void UGPMyplayerInputHandler::StopJumping()
