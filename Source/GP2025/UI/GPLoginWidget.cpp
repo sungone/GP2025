@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"  
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/Button.h"
+#include "Components/WidgetSwitcher.h"
 #include "Logging/LogMacros.h"      
 #include "Player/GPPlayerController.h"
 #include "Network/GPNetworkManager.h"
@@ -15,31 +16,31 @@
 void UGPLoginWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+	HideErrorMessage();
 
 	if (TBInputID)
 		TBInputID->OnTextCommitted.AddDynamic(this, &UGPLoginWidget::OnEntered);
-
 	if (TBInputPW)
 		TBInputPW->OnTextCommitted.AddDynamic(this, &UGPLoginWidget::OnEntered);
 
-	TextError->SetVisibility(ESlateVisibility::Hidden);
+	if (TBSignUpID)
+		TBSignUpID->OnTextCommitted.AddDynamic(this, &UGPLoginWidget::OnEntered);
+	if (TBSignUpPW)
+		TBSignUpPW->OnTextCommitted.AddDynamic(this, &UGPLoginWidget::OnEntered);
+	if (TBSignUpNname)
+		TBSignUpNname->OnTextCommitted.AddDynamic(this, &UGPLoginWidget::OnEntered);
 
 	if (ButtonLogin)
-	{
-		ButtonLogin->OnClicked.AddDynamic(this, &UGPLoginWidget::OnLoginClicked);
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("?!")));
-	}
+		ButtonLogin->OnClicked.AddDynamic(this, &UGPLoginWidget::TryLogin);
 	if (ButtonSignUp)
-	{
-		ButtonSignUp->OnClicked.AddDynamic(this, &UGPLoginWidget::OnSignUpClicked);
-	}
+		ButtonSignUp->OnClicked.AddDynamic(this, &UGPLoginWidget::SwitchWidget);
 	if (ButtonExit)
-	{
 		ButtonExit->OnClicked.AddDynamic(this, &UGPLoginWidget::OnExitClicked);
-	}
+
+	if (ButtonSignUpCencle)
+		ButtonSignUpCencle->OnClicked.AddDynamic(this, &UGPLoginWidget::SwitchWidget);
+	if (ButtonSignUpOK)
+		ButtonSignUpOK->OnClicked.AddDynamic(this, &UGPLoginWidget::TrySignUp);
 
 	if (UGPNetworkManager* Mgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>())
 	{
@@ -47,24 +48,33 @@ void UGPLoginWidget::NativeConstruct()
 	}
 }
 
+void UGPLoginWidget::SwitchWidget()
+{
+	if (LoginSwitcher)
+	{
+		int32 CurrentIndex = LoginSwitcher->GetActiveWidgetIndex();
+		int32 NextIndex = (CurrentIndex == 0) ? 1 : 0;
+		LoginSwitcher->SetActiveWidgetIndex(NextIndex);
+	}
+}
+
 void UGPLoginWidget::OnEntered(const FText& Text, ETextCommit::Type CommitMethod)
 {
 	if (CommitMethod == ETextCommit::OnEnter)
 	{
-		TryLogin();
+		if (!LoginSwitcher) return;
+
+		int32 CurrentIndex = LoginSwitcher->GetActiveWidgetIndex();
+
+		if (CurrentIndex == 0)
+		{
+			TryLogin();
+		}
+		else if (CurrentIndex == 1)
+		{
+			TrySignUp();
+		}
 	}
-}
-
-void UGPLoginWidget::OnLoginClicked()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("OnLoginClicked")));
-	TryLogin();
-}
-
-void UGPLoginWidget::OnSignUpClicked()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("OnSignUpClicked")));
-	TrySignUp();
 }
 
 void UGPLoginWidget::OnExitClicked()
@@ -78,24 +88,43 @@ void UGPLoginWidget::OnExitClicked()
 
 void UGPLoginWidget::HandleLoginFail(FString Message)
 {
-	ShowErrorMessage(Message, 3.0f);
+	if (!LoginSwitcher) return;
+
+	int32 CurrentIndex = LoginSwitcher->GetActiveWidgetIndex();
+
+	if (CurrentIndex == 0)
+	{
+		ShowLoginErrorMessage(Message, 3.0f);
+		if (ButtonLogin)
+			ButtonLogin->SetIsEnabled(true);
+	}
+	else if (CurrentIndex == 1)
+	{
+		ShowSignUpErrorMessage(Message, 3.0f);
+		if (ButtonSignUpOK)
+			ButtonSignUpOK->SetIsEnabled(true);
+	}
 }
 
 void UGPLoginWidget::TryLogin()
 {
-	ID_Str = TBInputID->GetText().ToString();
-	PW_Str = TBInputPW->GetText().ToString();
+	if (ButtonLogin)
+		ButtonLogin->SetIsEnabled(false);
+	FString ID_Str = TBInputID->GetText().ToString();
+	FString PW_Str = TBInputPW->GetText().ToString();
 
 	if (ID_Str.IsEmpty())
 	{
 		FString Msg = TEXT("아이디를 입력해주세요");
-		ShowErrorMessage(Msg, 3.0f);
+		ShowLoginErrorMessage(Msg, 3.0f);
+		ButtonLogin->SetIsEnabled(true);
 		return;
 	}
 	else if (PW_Str.IsEmpty())
 	{
 		FString Msg = TEXT("비밀번호를 입력해주세요");
-		ShowErrorMessage(Msg, 3.0f);
+		ShowLoginErrorMessage(Msg, 3.0f);
+		ButtonLogin->SetIsEnabled(true);
 		return;
 	}
 	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
@@ -104,10 +133,38 @@ void UGPLoginWidget::TryLogin()
 
 void UGPLoginWidget::TrySignUp()
 {
-	//Todo: 회원가입 UI 
+	if (ButtonSignUpOK)
+		ButtonSignUpOK->SetIsEnabled(false);
+	FString ID_Str = TBSignUpID->GetText().ToString();
+	FString PW_Str = TBSignUpPW->GetText().ToString();
+	FString Nname_Str = TBSignUpNname->GetText().ToString();
+
+	if (ID_Str.IsEmpty())
+	{
+		FString Msg = TEXT("아이디를 입력해주세요");
+		ShowSignUpErrorMessage(Msg, 3.0f);
+		ButtonSignUpOK->SetIsEnabled(true);
+		return;
+	}
+	else if (PW_Str.IsEmpty())
+	{
+		FString Msg = TEXT("비밀번호를 입력해주세요");
+		ShowSignUpErrorMessage(Msg, 3.0f);
+		ButtonSignUpOK->SetIsEnabled(true);
+		return;
+	}
+	else if (Nname_Str.IsEmpty())
+	{
+		FString Msg = TEXT("닉네임을 입력해주세요");
+		ShowSignUpErrorMessage(Msg, 3.0f);
+		ButtonSignUpOK->SetIsEnabled(true);
+		return;
+	}
+	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+	NetworkMgr->SendPlayerSignUpPacket(TCHAR_TO_UTF8(*ID_Str), TCHAR_TO_UTF8(*PW_Str), TCHAR_TO_UTF8(*Nname_Str));
 }
 
-void UGPLoginWidget::ShowErrorMessage(const FString& Message, float Duration)
+void UGPLoginWidget::ShowLoginErrorMessage(const FString& Message, float Duration)
 {
 	if (!TextError) return;
 
@@ -123,10 +180,30 @@ void UGPLoginWidget::ShowErrorMessage(const FString& Message, float Duration)
 	);
 }
 
+void UGPLoginWidget::ShowSignUpErrorMessage(const FString& Message, float Duration)
+{
+	if (!TextSignUpError) return;
+
+	TextSignUpError->SetText(FText::FromString(Message));
+	TextSignUpError->SetVisibility(ESlateVisibility::Visible);
+
+	GetWorld()->GetTimerManager().SetTimer(
+		HideErrorTimerHandle,
+		this,
+		&UGPLoginWidget::HideErrorMessage,
+		Duration,
+		false
+	);
+}
+
 void UGPLoginWidget::HideErrorMessage()
 {
 	if (TextError)
 	{
 		TextError->SetVisibility(ESlateVisibility::Hidden);
+	}
+	if (TextSignUpError)
+	{
+		TextSignUpError->SetVisibility(ESlateVisibility::Hidden);
 	}
 }

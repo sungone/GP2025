@@ -62,7 +62,7 @@ void UGPNetworkManager::SendPacket(uint8* Buf, int32 Size)
 
 void UGPNetworkManager::PrintFailMessege(DBResultCode ResultCode)
 {
-		FString ErrorMessage;
+	FString ErrorMessage;
 
 	switch (ResultCode)
 	{

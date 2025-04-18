@@ -9,7 +9,7 @@
 class UTextBlock;
 class UEditableTextBox;
 class UButton;
-
+class UWidgetSwitcher;
 /**
  * 
  */
@@ -20,11 +20,12 @@ class GP2025_API UGPLoginWidget : public UUserWidget
 
 protected :
 	FTimerHandle HideErrorTimerHandle;
-	FString ID_Str;
-	FString PW_Str;
 
 public :
 	virtual void NativeConstruct() override;
+	
+	UPROPERTY(meta = (BindWidget))
+	UWidgetSwitcher* LoginSwitcher;
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* TextError;
@@ -44,19 +45,39 @@ public :
 	UPROPERTY(meta = (BindWidget))
 	UEditableTextBox* TBInputPW;
 
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* TextSignUpError;
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* ButtonSignUpCencle;
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* ButtonSignUpOK;
+
+	UPROPERTY(meta = (BindWidget))
+	UEditableTextBox* TBSignUpID;
+
+	UPROPERTY(meta = (BindWidget))
+	UEditableTextBox* TBSignUpPW;
+
+	UPROPERTY(meta = (BindWidget))
+	UEditableTextBox* TBSignUpNname;
+
+	UFUNCTION()
+	void SwitchWidget();
 	UFUNCTION()
 	void OnEntered(const FText& Text, ETextCommit::Type CommitMethod);
-	UFUNCTION()
-	void OnLoginClicked();
-	UFUNCTION()
-	void OnSignUpClicked();
 	UFUNCTION()
 	void OnExitClicked();
 	UFUNCTION()
 	void HandleLoginFail(FString Message);
 
+	UFUNCTION()
 	void TryLogin();
+	UFUNCTION()
 	void TrySignUp();
-	void ShowErrorMessage(const FString& Message, float Duration);
+
+	void ShowLoginErrorMessage(const FString& Message, float Duration);
+	void ShowSignUpErrorMessage(const FString& Message, float Duration);
 	void HideErrorMessage();
 };
