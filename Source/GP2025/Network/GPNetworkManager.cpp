@@ -220,6 +220,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_SIGNUP_SUCCESS:
 			{
 				SignUpSuccessPacket* Pkt = reinterpret_cast<SignUpSuccessPacket*>(RemainingData.GetData());
+				OnLoginSuccess.Broadcast();
 				ObjectMgr->OnLoginSuccess(Pkt->PlayerInfo);
 				break;
 			}

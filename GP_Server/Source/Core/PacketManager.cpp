@@ -75,7 +75,7 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 		LOG(LogType::Log, std::format("SignUp Success [{}] userId: {}", sessionId, res.dbId));
 		_sessionMgr.HandleLogin(sessionId);
 		auto& playerInfo = _gameWorld.GetInfo(sessionId);
-		playerInfo.SetName(pkt->NickName);
+		playerInfo.SetName(ConvertToWString(pkt->NickName));
 		SignUpSuccessPacket spkt(playerInfo);
 		_sessionMgr.SendPacket(sessionId, &spkt);
 		return;
@@ -101,7 +101,7 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 		LOG(LogType::Log, std::format("Login Success [{}] userId: {}, nickname: {}", sessionId, res.dbId, res.nickname));
 		_sessionMgr.HandleLogin(sessionId);
 		auto& playerInfo = _gameWorld.GetInfo(sessionId);
-		playerInfo.SetName(res.nickname.c_str());
+		playerInfo.SetName(ConvertToWString(res.nickname.c_str()));
 		LoginSuccessPacket loginpkt(playerInfo);
 		_sessionMgr.SendPacket(sessionId, &loginpkt);
 		return;
