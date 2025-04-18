@@ -13,6 +13,12 @@ struct DBLoginResult
 	std::string nickname;
 };
 
+struct DBCharacterData
+{
+	DBResultCode code;
+	FInfoData info;
+};
+
 class DBManager
 {
 public:
@@ -25,6 +31,9 @@ public:
 	void PrintUsersTable();
 	DBSignUpResult SignUpUser(const std::string& login_id, const std::string& password, const std::wstring& nickname);
 	DBLoginResult CheckLogin(const std::string& login_id, const std::string& password);
+
+	bool CreatePlayerInfo(uint32 userId, const FInfoData& info);
+	DBCharacterData LoadPlayerInfo(uint32 userId);
 
 private:
 	std::shared_ptr<mysqlx::Session> _dbsess;

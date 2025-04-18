@@ -52,9 +52,9 @@ DBSignUpResult DBManager::SignUpUser(const std::string& login_id, const std::str
 			.values(login_id, password, nickname)
 			.execute();
 
-		uint32 userId = static_cast<uint32>(result.getAutoIncrementValue());
+		uint32 dbId = static_cast<uint32>(result.getAutoIncrementValue());
 		if (isPrint) PrintUsersTable();
-		return { DBResultCode::SUCCESS, userId };
+		return { DBResultCode::SUCCESS, dbId };
 	}
 	catch (const mysqlx::Error& e)
 	{
@@ -98,6 +98,82 @@ DBLoginResult DBManager::CheckLogin(const std::string& login_id, const std::stri
 		return { DBResultCode::DB_ERROR };
 	}
 }
+
+bool DBManager::CreatePlayerInfo(uint32 dbId, const FInfoData& info)
+{
+	try {
+		auto table = _db->getTable("player_info");
+		table.insert("id", "nickname", "character_type",
+			"pos_x", "pos_y", "pos_z", "yaw",
+			"level", "exp", "max_exp", "hp", "max_hp",
+			"damage", "crt_rate", "crt_value", "dodge", "speed",
+			"skill_level", "gold")
+			.values(dbId, info.GetName(), info.CharacterType,
+				info.Pos.X, info.Pos.Y, info.Pos.Z, info.Yaw,
+				info.Stats.Level, info.Stats.Exp, info.Stats.MaxExp,
+				info.Stats.Hp, info.Stats.MaxHp, info.Stats.Damage,
+				info.Stats.CrtRate, info.Stats.CrtValue,
+				info.Stats.Dodge, info.Stats.Speed,
+				info.Skilllevel, info.Gold)
+			.execute();
+
+		return true;
+	}
+	catch (const mysqlx::Error& e)
+	{
+		LOG(LogType::Error, std::format("MySQL Error (CreatePlayerInfo): {}", e.what()));
+		return false;
+	}
+}
+
+DBCharacterData DBManager::LoadPlayerInfo(uint32 dbId)
+{
+	FInfoData info;
+
+	try {
+		auto table = _db->getTable("player_info");
+		auto result = table.select("id", "nickname", "character_type",
+			"pos_x", "pos_y", "pos_z", "yaw",
+			"level", "exp", "max_exp", "hp", "max_hp",
+			"damage", "crt_rate", "crt_value", "dodge", "speed",
+			"skill_level", "gold")
+			.where("id = :id")
+			.bind("id", dbId)
+			.execute();
+
+		auto row = result.fetchOne();
+		if (!row)
+			return { DBResultCode::INVALID_USER };
+
+		info.ID = row[0].get<int>();
+		strncpy_s(info.NickName, row[1].get<std::string>().c_str(), NICKNAME_LEN - 1);
+		info.CharacterType = row[2].get<uint8>();
+		info.Pos = FVector(row[3].get<float>(), row[4].get<float>(), row[5].get<float>());
+		info.Yaw = row[6].get<float>();
+
+		info.Stats.Level = row[7].get<uint32>();
+		info.Stats.Exp = row[8].get<float>();
+		info.Stats.MaxExp = row[9].get<float>();
+		info.Stats.Hp = row[10].get<float>();
+		info.Stats.MaxHp = row[11].get<float>();
+		info.Stats.Damage = row[12].get<float>();
+		info.Stats.CrtRate = row[13].get<float>();
+		info.Stats.CrtValue = row[14].get<float>();
+		info.Stats.Dodge = row[15].get<float>();
+		info.Stats.Speed = row[16].get<float>();
+
+		info.Skilllevel = row[17].get<uint32>();
+		info.Gold = row[18].get<uint32>();
+
+		return { DBResultCode::SUCCESS, info };
+	}
+	catch (const mysqlx::Error& e)
+	{
+		LOG(LogType::Error, std::format("MySQL Error (LoadPlayerInfo): {}", e.what()));
+		return { DBResultCode::DB_ERROR };
+	}
+}
+
 
 
 mysqlx::Table DBManager::GetUsersTable()
