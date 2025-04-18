@@ -40,7 +40,7 @@ public:
 	UFUNCTION()
 	void OnLevelLoaded();
 
-	FVector GetSpawnLocationForLevel(FName LevelName);
+	FVector GetSpawnLocationForLevel(FName LoadLevelName , FName UnloadLevelName);
 
 
 public:

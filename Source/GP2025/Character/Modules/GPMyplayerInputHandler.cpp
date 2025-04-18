@@ -136,7 +136,7 @@ void UGPMyplayerInputHandler::Jump()
 		{
 			bCanJump = true;
 		},
-		1.2f,
+		1.f,
 		false
 	);
 }

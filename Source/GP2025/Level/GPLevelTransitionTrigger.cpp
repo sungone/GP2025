@@ -63,20 +63,25 @@ void AGPLevelTransitionTrigger::OnLevelLoaded()
 {
 	if (!CachedPlayer || LevelToLoad.IsNone()) return;
 
-	FVector SpawnLocation = GetSpawnLocationForLevel(LevelToLoad);
+	FVector SpawnLocation = GetSpawnLocationForLevel(LevelToLoad , LevelToUnload);
 	CachedPlayer->SetActorLocation(SpawnLocation);
 
 	UE_LOG(LogTemp, Log, TEXT("[Trigger] Player moved to spawn location after level load: %s"), *SpawnLocation.ToString());
 }
 
-FVector AGPLevelTransitionTrigger::GetSpawnLocationForLevel(FName LevelName)
+FVector AGPLevelTransitionTrigger::GetSpawnLocationForLevel(FName LoadLevelName, FName UnloadLevelName)
 {
-	if (LevelName == "tip")
-		return FVector(-100, 100, 150);
-	if (LevelName == "E")
-		return FVector(-150, 1500, 150);
-	if (LevelName == "gym")
-		return FVector(-2000, 0, 150);
-
+	if (LoadLevelName == "TUK" && UnloadLevelName == "tip")
+		return FVector(-5270.0, 15050.0, 147);
+	else if (LoadLevelName == "TUK" && UnloadLevelName == "E")
+		return FVector(-4420.0, -12730.0, 837);
+	else if (LoadLevelName == "TUK" && UnloadLevelName == "gym")
+		return FVector(-4180.0, 5220.0, 147);
+	else if (LoadLevelName == "tip")
+		return FVector(-100, 100, 147);
+	else if (LoadLevelName == "E")
+		return FVector(-150, 1500, 147);
+	else if (LoadLevelName == "gym")
+		return FVector(-2000, 0, 147);
 	return FVector::ZeroVector;
 }
