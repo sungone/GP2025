@@ -9,6 +9,14 @@ set BACKUP_DIR=%~dp0Backups\
 
 set FULL_PATH=%BACKUP_DIR%%FILE_NAME%
 
-mysql -u %DB_USER% -p%DB_PASSWORD% %DB_NAME% < "%FULL_PATH%"
+echo [INFO] Restoring database "%DB_NAME%" from "%FILE_NAME%"
 
-echo Completed: %FULL_PATH%
+mysql --user=%DB_USER% --password=%DB_PASSWORD% %DB_NAME% < "%BACKUP_DIR%%FILE_NAME%"
+
+if %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] Restore failed. Check table definitions or constraints.
+    exit /b 1
+)
+
+echo [OK] Restore completed successfully.
+pause

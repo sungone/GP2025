@@ -147,11 +147,12 @@ DBCharacterData DBManager::LoadPlayerInfo(uint32 dbId)
 
 		info.ID = row[0].get<int>();
 		strncpy_s(info.NickName, row[1].get<std::string>().c_str(), NICKNAME_LEN - 1);
-		info.CharacterType = row[2].get<uint8>();
+		info.CharacterType = static_cast<uint32>(row[2].get<int>());
+
 		info.Pos = FVector(row[3].get<float>(), row[4].get<float>(), row[5].get<float>());
 		info.Yaw = row[6].get<float>();
 
-		info.Stats.Level = row[7].get<uint32>();
+		info.Stats.Level = static_cast<uint32>(row[7].get<int>());
 		info.Stats.Exp = row[8].get<float>();
 		info.Stats.MaxExp = row[9].get<float>();
 		info.Stats.Hp = row[10].get<float>();
@@ -162,8 +163,8 @@ DBCharacterData DBManager::LoadPlayerInfo(uint32 dbId)
 		info.Stats.Dodge = row[15].get<float>();
 		info.Stats.Speed = row[16].get<float>();
 
-		info.Skilllevel = row[17].get<uint32>();
-		info.Gold = row[18].get<uint32>();
+		info.Skilllevel = static_cast<uint32>(row[17].get<int>());
+		info.Gold = static_cast<uint32>(row[18].get<int>());
 
 		return { DBResultCode::SUCCESS, info };
 	}

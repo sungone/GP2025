@@ -10,6 +10,8 @@ if not exist "%BACKUP_DIR%" (
     mkdir "%BACKUP_DIR%"
 )
 
+echo [INFO] Starting MySQL backup...
+
 mysqldump ^
  --user=%DB_USER% ^
  --password=%DB_PASSWORD% ^
@@ -19,4 +21,10 @@ mysqldump ^
  --no-tablespaces ^
  > "%BACKUP_DIR%%FILE_NAME%"
 
-echo Completed: %FILE_NAME%
+if %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] Backup failed. Please check MySQL credentials or access rights.
+    exit /b 1
+)
+
+echo [OK] Backup completed: %FILE_NAME%
+pause

@@ -69,7 +69,8 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 {
 	auto pkt = static_cast<SignUpPacket*>(packet);
 #ifdef DB_LOCAL
-	auto res = _dbMgr.SignUpUser(pkt->AccountID, pkt->AccountPW, ConvertToWString(pkt->NickName));
+	std::wstring name = ConvertToWString(pkt->NickName);
+	auto res = _dbMgr.SignUpUser(pkt->AccountID, pkt->AccountPW, name);
 	if (res.code != DBResultCode::SUCCESS)
 	{
 		LOG(std::format("SignUp Failed [{}]", sessionId));
@@ -85,7 +86,7 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 		_sessionMgr.SendPacket(sessionId, &failpkt);
 	}
 	auto& playerInfo = _gameWorld.GetInfo(sessionId);
-	playerInfo.SetName(ConvertToWString(pkt->NickName));
+	playerInfo.SetName(name);
 	SignUpSuccessPacket spkt(playerInfo);
 	_sessionMgr.SendPacket(sessionId, &spkt);
 	LOG(std::format("SignUp Success [{}] userId: {}", sessionId, res.dbId));
