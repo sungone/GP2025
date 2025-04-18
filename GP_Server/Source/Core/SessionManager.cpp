@@ -34,19 +34,63 @@ void SessionManager::HandleRecvBuffer(int32 id, int32 recvByte, ExpOver* expOver
 	_sessions[id]->HandleRecvBuffer(recvByte, expOver);
 }
 
-void SessionManager::HandleLogin(int32 id)
+void SessionManager::HandleLogin(int32 sessionId)
 {
-	auto session = _sessions[id];
+	//기존방식 - DB연결 없는 버전
+	auto session = _sessions[sessionId];
 	session->Login();
-	auto& playerInfo = _sessions[id]->GetPlayerInfo();
+	auto& playerInfo = _sessions[sessionId]->GetPlayerInfo();
 
-	std::shared_ptr<Character> newPlayer = GameWorld::GetInst().GetCharacterByID(id);
+	std::shared_ptr<Character> newPlayer = GameWorld::GetInst().GetCharacterByID(sessionId);
 	if (newPlayer)
 	{
 		GameWorld::GetInst().UpdateViewList(newPlayer);
 	}
 	GameWorld::GetInst().SpawnMonster(*session);
-	LOG(std::format("Player[{}] Login!", id));
+	LOG(std::format("Player[{}] Login!", sessionId));
+}
+
+bool SessionManager::HandleLogin(int32 sessionId, uint32 dbid)
+{
+	auto session = _sessions[sessionId];
+	session->Login();
+	auto res = DBManager::GetInst().LoadPlayerInfo(dbid);
+	if (res.code == DBResultCode::DB_ERROR || res.code == DBResultCode::INVALID_USER)
+	{
+		LOG(Warning, "Failed to Load DBinfo");
+		return false;
+	}
+	auto& playerInfo = _sessions[sessionId]->GetPlayerInfo();
+	playerInfo = res.info;
+
+	std::shared_ptr<Character> newPlayer = GameWorld::GetInst().GetCharacterByID(sessionId);
+	if (newPlayer)
+	{
+		GameWorld::GetInst().UpdateViewList(newPlayer);
+	}
+	GameWorld::GetInst().SpawnMonster(*session);
+	return true;
+}
+
+bool SessionManager::HandleSignUp(int32 sessionId, uint32 dbid)
+{
+	auto session = _sessions[sessionId];
+	session->Login();
+	auto& playerInfo = _sessions[sessionId]->GetPlayerInfo();
+	auto res = DBManager::GetInst().CreatePlayerInfo(dbid, playerInfo);
+	if (!res)
+	{
+		LOG(Warning, "Failed to Create DBinfo");
+		return false;
+	}
+
+	std::shared_ptr<Character> newPlayer = GameWorld::GetInst().GetCharacterByID(sessionId);
+	if (newPlayer)
+	{
+		GameWorld::GetInst().UpdateViewList(newPlayer);
+	}
+	GameWorld::GetInst().SpawnMonster(*session);
+	return true;
 }
 
 void SessionManager::SendPacket(int32 sessionId, const Packet* packet)

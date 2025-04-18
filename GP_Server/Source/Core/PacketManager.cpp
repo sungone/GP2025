@@ -70,23 +70,27 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 	auto pkt = static_cast<SignUpPacket*>(packet);
 #ifdef DB_LOCAL
 	auto res = _dbMgr.SignUpUser(pkt->AccountID, pkt->AccountPW, ConvertToWString(pkt->NickName));
-	if (res.code == DBResultCode::SUCCESS)
+	if (res.code != DBResultCode::SUCCESS)
 	{
-		LOG(LogType::Log, std::format("SignUp Success [{}] userId: {}", sessionId, res.dbId));
-		_sessionMgr.HandleLogin(sessionId);
-		auto& playerInfo = _gameWorld.GetInfo(sessionId);
-		playerInfo.SetName(ConvertToWString(pkt->NickName));
-		SignUpSuccessPacket spkt(playerInfo);
-		_sessionMgr.SendPacket(sessionId, &spkt);
+		LOG(std::format("SignUp Failed [{}]", sessionId));
+		SignUpFailPacket failpkt(res.code);
+		_sessionMgr.SendPacket(sessionId, &failpkt);
 		return;
 	}
-	else if (res.code == DBResultCode::DUPLICATE_ID)
-		LOG(LogType::Log, "SignUp Failed! Duplicate ID");
-	else
-		LOG(LogType::Log, "SignUp Failed!");
 
-	SignUpFailPacket failpkt(res.code);
-	_sessionMgr.SendPacket(sessionId, &failpkt);
+	if (!_sessionMgr.HandleSignUp(sessionId, res.dbId))
+	{
+		LOG(std::format("SignUp Failed [{}]", sessionId));
+		SignUpFailPacket failpkt(DBResultCode::DB_ERROR);
+		_sessionMgr.SendPacket(sessionId, &failpkt);
+	}
+	auto& playerInfo = _gameWorld.GetInfo(sessionId);
+	playerInfo.SetName(ConvertToWString(pkt->NickName));
+	SignUpSuccessPacket spkt(playerInfo);
+	_sessionMgr.SendPacket(sessionId, &spkt);
+	LOG(std::format("SignUp Success [{}] userId: {}", sessionId, res.dbId));
+	return;
+
 #endif
 }
 
@@ -96,25 +100,26 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 #ifdef DB_LOCAL
 	auto res = _dbMgr.CheckLogin(pkt->AccountID, pkt->AccountPW);
 
-	if (res.code == DBResultCode::SUCCESS)
+	if (res.code != DBResultCode::SUCCESS)
 	{
-		LOG(LogType::Log, std::format("Login Success [{}] userId: {}, nickname: {}", sessionId, res.dbId, res.nickname));
-		_sessionMgr.HandleLogin(sessionId);
-		auto& playerInfo = _gameWorld.GetInfo(sessionId);
-		playerInfo.SetName(ConvertToWString(res.nickname.c_str()));
-		LoginSuccessPacket loginpkt(playerInfo);
-		_sessionMgr.SendPacket(sessionId, &loginpkt);
+		LoginFailPacket failpkt(res.code);
+		_sessionMgr.SendPacket(sessionId, &failpkt);
 		return;
 	}
-	else if (res.code == DBResultCode::INVALID_USER)
-		LOG(LogType::Log, "Login Failed! Invalid User");
-	else if (res.code == DBResultCode::INVALID_PASSWORD)
-		LOG(LogType::Log, "Login Failed! Invalid Password");
-	else
-		LOG(LogType::Log, "Login Failed! DB Error");
+	if (!_sessionMgr.HandleLogin(sessionId, res.dbId))
+	{
+		LoginFailPacket failpkt(DBResultCode::DB_ERROR);
+		_sessionMgr.SendPacket(sessionId, &failpkt);
+		return;
+	}
 
-	LoginFailPacket failpkt(res.code);
-	_sessionMgr.SendPacket(sessionId, &failpkt);
+	LOG(LogType::Log, std::format("Login Success [{}] userId: {}, nickname: {}", sessionId, res.dbId, res.nickname));
+	auto& playerInfo = _gameWorld.GetInfo(sessionId);
+	playerInfo.SetName(ConvertToWString(res.nickname.c_str()));
+	LoginSuccessPacket loginpkt(playerInfo);
+	_sessionMgr.SendPacket(sessionId, &loginpkt);
+	return;
+
 #else
 	LOG(std::format("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW));
 	_sessionMgr.HandleLogin(sessionId);
@@ -141,7 +146,7 @@ void PacketManager::HandleSelectCharacterPacket(int32 sessionId, Packet* packet)
 void PacketManager::HandleMovePacket(int32 sessionId, Packet* packet)
 {
 	MovePacket* p = static_cast<MovePacket*>(packet);
-	_gameWorld.PlayerMove(p->PlayerID, p->PlayerPos, p->State,p->MoveTime);
+	_gameWorld.PlayerMove(p->PlayerID, p->PlayerPos, p->State, p->MoveTime);
 }
 
 void PacketManager::HandleAttackPacket(int32 sessionId, Packet* packet)
