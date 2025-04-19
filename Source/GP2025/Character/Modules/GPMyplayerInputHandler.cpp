@@ -128,7 +128,7 @@ void UGPMyplayerInputHandler::Jump()
 	Owner->NetworkSyncHandler->isJumpStart = true;
 	Owner->CharacterInfo.RemoveState(STATE_IDLE);
 	Owner->CharacterInfo.AddState(STATE_JUMP);
-	Owner->AppearanceHandler->SetupMasterPose();
+	Owner->AppearanceHandler->SetupLeaderPose();
 
 	Owner->GetWorldTimerManager().SetTimer(
 		JumpCooldownTimerHandle,
@@ -147,7 +147,7 @@ void UGPMyplayerInputHandler::StopJumping()
 
 	Owner->StopJumping();
 	Owner->CharacterInfo.RemoveState(STATE_JUMP);
-	Owner->AppearanceHandler->SetupMasterPose();
+	Owner->AppearanceHandler->SetupLeaderPose();
 }
 
 void UGPMyplayerInputHandler::StartSprinting()
@@ -156,7 +156,7 @@ void UGPMyplayerInputHandler::StartSprinting()
 
 	Owner->GetCharacterMovement()->MaxWalkSpeed = Owner->NetworkSyncHandler->SprintSpeed;
 	Owner->CharacterInfo.AddState(STATE_RUN);
-	Owner->AppearanceHandler->SetupMasterPose();
+	Owner->AppearanceHandler->SetupLeaderPose();
 }
 
 void UGPMyplayerInputHandler::StopSprinting()
@@ -165,7 +165,7 @@ void UGPMyplayerInputHandler::StopSprinting()
 
 	Owner->GetCharacterMovement()->MaxWalkSpeed = Owner->NetworkSyncHandler->WalkSpeed;
 	Owner->CharacterInfo.RemoveState(STATE_RUN);
-	Owner->AppearanceHandler->SetupMasterPose();
+	Owner->AppearanceHandler->SetupLeaderPose();
 }
 
 void UGPMyplayerInputHandler::AutoAttack()
@@ -181,7 +181,7 @@ void UGPMyplayerInputHandler::AutoAttack()
 	}
 
 	Owner->CombatHandler->PlayAutoAttackMontage();
-	Owner->AppearanceHandler->SetupMasterPose();
+	Owner->AppearanceHandler->SetupLeaderPose();
 }
 
 void UGPMyplayerInputHandler::ToggleInventory()
@@ -282,7 +282,7 @@ void UGPMyplayerInputHandler::UseSkillQ()
 		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::HitHard, Owner->GetControlRotation().Yaw);
 	}
 
-	Owner->AppearanceHandler->SetupMasterPose();
+	Owner->AppearanceHandler->SetupLeaderPose();
 }
 
 void UGPMyplayerInputHandler::UseSkillE()
@@ -304,7 +304,7 @@ void UGPMyplayerInputHandler::UseSkillE()
 		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::Clash, Owner->GetControlRotation().Yaw);
 	}
 
-	Owner->AppearanceHandler->SetupMasterPose();
+	Owner->AppearanceHandler->SetupLeaderPose();
 }
 
 void UGPMyplayerInputHandler::UseSkillR()
@@ -326,5 +326,5 @@ void UGPMyplayerInputHandler::UseSkillR()
 		Owner->NetMgr->SendPlayerUseSkill(ESkillGroup::Whirlwind, Owner->GetControlRotation().Yaw);
 	}
 
-	Owner->AppearanceHandler->SetupMasterPose();
+	Owner->AppearanceHandler->SetupLeaderPose();
 }

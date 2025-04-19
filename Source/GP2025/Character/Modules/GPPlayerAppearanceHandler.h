@@ -18,7 +18,7 @@ public:
 	void Initialize(class AGPCharacterPlayer* InOwner);
 
 	void ApplyCharacterPartsFromData(const class UGPCharacterControlData* CharacterData);
-	void SetupMasterPose();
+	void SetupLeaderPose();
 	void AttachWeaponToBodyMesh();
 	void EquipWeaponFromData(const class UGPCharacterControlData* CharacterData);
 	
