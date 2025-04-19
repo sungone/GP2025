@@ -67,10 +67,13 @@ void AGPLevelTransitionTrigger::OnLevelLoaded()
 	FVector SpawnLocation = GetSpawnLocationForLevel(LevelToLoad , LevelToUnload);
 	CachedPlayer->SetActorLocation(SpawnLocation);
 
-	if (CachedPlayer->AppearanceHandler)
-	{
-		CachedPlayer->AppearanceHandler->SetupLeaderPose();
-	}
+	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
+		{
+			if (CachedPlayer && CachedPlayer->AppearanceHandler)
+			{
+				CachedPlayer->AppearanceHandler->SetupLeaderPose();
+			}
+		});
 
 	UE_LOG(LogTemp, Log, TEXT("[Trigger] Player moved to spawn location after level load: %s"), *SpawnLocation.ToString());
 }
