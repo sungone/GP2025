@@ -7,7 +7,7 @@ void Player::Init()
 {
 	Character::Init();
 	_characterClass = ECharacterClass::Player;
-
+#ifndef DB_LOCAL
 	//Todo: DB값으로 설정해줘야한다
 	_info.SetName(L"플레이어");
 	SetCharacterType(Type::EPlayer::GUNNER);
@@ -19,11 +19,14 @@ void Player::Init()
 	FVector newPos{};
 	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(_info));
 	_info.SetLocation(newPos);
+#endif
 }
 
-void Player::SaveToDB()
+void Player::SaveToDB(uint32 dbId)
 {
-	DBManager::GetInst().UpdatePlayerInfo(_dbId, _info);
+#ifdef DB_LOCAL
+	DBManager::GetInst().UpdatePlayerInfo(dbId, _info);
+#endif
 }
 
 void Player::SetCharacterType(Type::EPlayer type)

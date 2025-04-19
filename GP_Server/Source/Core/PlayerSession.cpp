@@ -92,24 +92,31 @@ void PlayerSession::Connect(SOCKET socket, int32 id)
 
 void PlayerSession::Disconnect()
 {
-	_loginState = false;
+	Logout();
 	_sSocket->Close();
 }
 
-void PlayerSession::Login()
+void PlayerSession::Login(const DBLoginResult& dbRes)
 {
 	_loginState = true;
-	CreatePlayer();
+	_player = std::make_shared<Player>(_id);
+#ifdef DB_LOCAL
+	{
+		_dbId = dbRes.dbId;
+		_player->SetInfo(dbRes.info);
+	}
+#endif
+
+	GameWorld::GetInst().AddPlayer(_player);
 }
 
-void PlayerSession::CreatePlayer()
+void PlayerSession::Logout()
 {
-	_player = std::make_shared<Player>();
-	_player->Init();
-	_player->GetInfo().ID = _id;
-	GameWorld::GetInst().AddPlayer(_player);
-	GameWorld::GetInst().UpdateViewList(_player);
-	GameWorld::GetInst().SpawnMonster(*this);
+	if(_loginState)
+	{
+		_loginState = false;
+		_player->SaveToDB(_dbId);
+	}
 }
 
 int32 PlayerSession::GetId()

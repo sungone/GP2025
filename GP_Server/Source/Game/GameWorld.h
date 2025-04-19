@@ -22,7 +22,7 @@ public:
 	void RemoveCharacter(int32 id);
 
 	void CreateMonster();
-	void SpawnMonster(PlayerSession& session);
+	void SpawnMonster(int32 playerId);
 
 	void PlayerSetYaw(int32 playerId, float yaw);
 	void PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& time);

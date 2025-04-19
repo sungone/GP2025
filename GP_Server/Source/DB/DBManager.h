@@ -1,16 +1,9 @@
 #pragma once
 
-struct DBSignUpResult
-{
-	DBResultCode code;
-	uint32 dbId = 0;
-};
-
 struct DBLoginResult
 {
 	DBResultCode code;
 	uint32 dbId = 0;
-	std::string nickname;
 	FInfoData info;
 };
 
@@ -23,8 +16,8 @@ public:
 	}
 	bool Connect(const std::string& host, const std::string& user, const std::string& pass, const std::string& schema);
 	void Close();
-	DBSignUpResult SignUpUser(const std::string& login_id, const std::string& password, const std::wstring& nickname);
-	DBLoginResult CheckLogin(const std::string& login_id, const std::string& password);
+	DBLoginResult SignUpUser(const std::string& login_id, const std::string& password, const std::wstring& nickname);
+	DBLoginResult CheckLogin(int32 sessionId, const std::string& login_id, const std::string& password);
 	bool UpdatePlayerInfo(uint32 dbId, const FInfoData& info);
 
 private:

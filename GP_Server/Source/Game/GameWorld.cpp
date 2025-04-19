@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "GameWorld.h"
 
-
 bool GameWorld::Init()
 {
 	if (!ItemTable::GetInst().LoadFromCSV("../DataTable/ItemTable.csv"))
@@ -38,6 +37,9 @@ void GameWorld::AddPlayer(std::shared_ptr<Character> player)
 	std::unique_lock<std::mutex> lock(_carrMutex);
 	int32 id = player->GetInfo().ID;
 	_characters[id] = player;
+	LOG(std::format("ADD {}", id));
+	GameWorld::GetInst().UpdateViewList(player);
+	GameWorld::GetInst().SpawnMonster(id);
 }
 
 void GameWorld::RemoveCharacter(int32 id)
@@ -68,16 +70,13 @@ void GameWorld::CreateMonster()
 {
 	for (int32 i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{
-		_characters[i] = std::make_shared<Monster>();
-		_characters[i]->Init();
-		_characters[i]->GetInfo().ID = i;
+		_characters[i] = std::make_shared<Monster>(i);
 	}
 	TimerQueue::AddTimer([]() {GameWorld::GetInst().UpdateMonster();}, 2000, true);
 }
 
-void GameWorld::SpawnMonster(PlayerSession& session)
+void GameWorld::SpawnMonster(int32 playerId)
 {
-	int32 playerId = session.GetId();
 	std::shared_ptr<Character> playerCharacter = GetCharacterByID(playerId);
 
 	if (!playerCharacter) return;
@@ -91,7 +90,7 @@ void GameWorld::SpawnMonster(PlayerSession& session)
 		if (viewList.find(monsterId) != viewList.end())
 		{
 			auto Pkt = InfoPacket(EPacketType::S_ADD_MONSTER, monster->GetInfo());
-			session.DoSend(&Pkt);
+			SessionManager::GetInst().SendPacket(playerId, &Pkt);
 		}
 	}
 }
@@ -350,7 +349,7 @@ void GameWorld::UpdateViewList(std::shared_ptr<Character> listOwner)
 	for (int32 otherId = 1; otherId < MAX_CHARACTER; ++otherId)
 	{
 		auto other = _characters[otherId];
-		if (!other)continue;
+		if (!other) continue;
 		if (otherId == ownerId) continue;
 		listOwner->UpdateViewList(other);
 	}

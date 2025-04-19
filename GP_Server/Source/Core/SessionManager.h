@@ -15,7 +15,7 @@ public:
 
 	void DoRecv(int32 sessionId);
 	void HandleRecvBuffer(int32 sessionId, int32 recvByte, ExpOver* expOver);
-	void HandleLogin(int32 sessionId);
+	void HandleLogin(int32 sessionId, const DBLoginResult& dbRes = DBLoginResult());
 	void SendPacket(int32 sessionId, const Packet* packet);
 	void BroadcastToAll(Packet* packet);
 	void BroadcastToViewList(Packet* packet, int32 senderId);

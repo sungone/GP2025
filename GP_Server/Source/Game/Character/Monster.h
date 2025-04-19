@@ -8,7 +8,7 @@ const float detectDist = 1000.f;
 class Monster : public Character
 {
 public:
-	Monster() { Init(); }
+	Monster(int32 id): Character(id) { Init(); }
 	void Init() override;
 	void UpdateViewList(std::shared_ptr<Character> other) override;
 	void Update();

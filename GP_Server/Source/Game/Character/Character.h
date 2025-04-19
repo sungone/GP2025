@@ -6,6 +6,8 @@ enum class ECharacterClass { Player, Monster };
 class Character
 {
 public:
+	Character(int32 id) { _id = id; }
+
 	virtual void Init();
 	virtual void Update() {};
 	virtual bool IsDead();
@@ -27,7 +29,7 @@ public:
 
 	virtual void ChangeState(ECharacterStateType newState) = 0;
 	FInfoData& GetInfo() { return _info; }
-	void SetInfo(FInfoData& info) { _info = info; }
+	void SetInfo(const FInfoData& info) { _info = info; }
 	bool IsMonster() { return _characterClass == ECharacterClass::Monster; }
 public:
 	std::mutex _cLock;

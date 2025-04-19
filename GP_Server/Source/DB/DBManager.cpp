@@ -25,7 +25,7 @@ void DBManager::Close()
 	}
 }
 
-DBSignUpResult DBManager::SignUpUser(const std::string& login_id, const std::string& password, const std::wstring& nickname)
+DBLoginResult DBManager::SignUpUser(const std::string& login_id, const std::string& password, const std::wstring& nickname)
 {
 	FInfoData newinfo;
 	newinfo.SetName(nickname);
@@ -86,7 +86,7 @@ DBSignUpResult DBManager::SignUpUser(const std::string& login_id, const std::str
 					newinfo.Skilllevel, newinfo.Gold)
 			.execute();
 
-		return { DBResultCode::SUCCESS, dbId };
+		return { DBResultCode::SUCCESS, dbId, newinfo };
 	}
 	catch (const mysqlx::Error& e)
 	{
@@ -99,7 +99,7 @@ DBSignUpResult DBManager::SignUpUser(const std::string& login_id, const std::str
 	}
 }
 
-DBLoginResult DBManager::CheckLogin(const std::string& login_id, const std::string& password)
+DBLoginResult DBManager::CheckLogin(int32 sessionId, const std::string& login_id, const std::string& password)
 {
 	try {
 		auto result = _dbsess->sql(
@@ -122,11 +122,11 @@ DBLoginResult DBManager::CheckLogin(const std::string& login_id, const std::stri
 		if (dbPassword != password)
 			return { DBResultCode::INVALID_PASSWORD };
 
-		uint32 userId = static_cast<uint32>(row[0].get<int>());
+		uint32 dbId = static_cast<uint32>(row[0].get<int>());
 		std::string nickname = row[2].get<std::string>();
 
 		FInfoData info;
-		info.ID = userId;
+		info.ID = sessionId;
 		info.SetName(ConvertToWString(nickname));
 		info.CharacterType = static_cast<uint8>(row[3].get<int>());
 		info.Pos = FVector(row[4].get<float>(), row[5].get<float>(), row[6].get<float>());
@@ -147,7 +147,7 @@ DBLoginResult DBManager::CheckLogin(const std::string& login_id, const std::stri
 		info.Skilllevel = static_cast<uint32>(row[21].get<int>());
 		info.Gold = static_cast<uint32>(row[22].get<int>());
 
-		return { DBResultCode::SUCCESS, userId, nickname, info };
+		return { DBResultCode::SUCCESS, dbId, info };
 	}
 	catch (const mysqlx::Error& e) {
 		LOG(LogType::Error, std::format("MySQL Error (CheckLogin - login_id: {}): {}", login_id, e.what()));
@@ -183,6 +183,7 @@ bool DBManager::UpdatePlayerInfo(uint32 dbId, const FInfoData& info)
 			.where("id = :id")
 			.bind("id", dbId)
 			.execute();
+		LOG(std::format("Update DB - dbid: {}", dbId));
 		return true;
 	}
 	catch (const mysqlx::Error& e)

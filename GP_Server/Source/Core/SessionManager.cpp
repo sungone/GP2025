@@ -34,10 +34,10 @@ void SessionManager::HandleRecvBuffer(int32 id, int32 recvByte, ExpOver* expOver
 	_sessions[id]->HandleRecvBuffer(recvByte, expOver);
 }
 
-void SessionManager::HandleLogin(int32 sessionId)
+void SessionManager::HandleLogin(int32 sessionId, const DBLoginResult& dbRes)
 {
 	auto session = _sessions[sessionId];
-	session->Login();
+	session->Login(dbRes);
 
 	LOG(std::format("Player[{}] Login!", sessionId));
 }
