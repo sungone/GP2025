@@ -70,7 +70,7 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 #ifdef DB_LOCAL
 	auto pkt = static_cast<SignUpPacket*>(packet);
 	std::wstring name = ConvertToWString(pkt->NickName);
-	auto res = _dbMgr.SignUpUser(pkt->AccountID, pkt->AccountPW, name);
+	auto res = _dbMgr.SignUpUser(sessionId, pkt->AccountID, pkt->AccountPW, name);
 	if (res.code != DBResultCode::SUCCESS)
 	{
 		LOG(std::format("SignUp Failed [{}]", sessionId));

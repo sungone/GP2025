@@ -25,9 +25,10 @@ void DBManager::Close()
 	}
 }
 
-DBLoginResult DBManager::SignUpUser(const std::string& login_id, const std::string& password, const std::wstring& nickname)
+DBLoginResult DBManager::SignUpUser(int32 sessionId, const std::string& login_id, const std::string& password, const std::wstring& nickname)
 {
 	FInfoData newinfo;
+	newinfo.ID = sessionId;
 	newinfo.SetName(nickname);
 	newinfo.CharacterType = static_cast<uint8>(Type::EPlayer::WARRIOR);
 
