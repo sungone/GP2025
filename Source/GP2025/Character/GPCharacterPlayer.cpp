@@ -22,6 +22,7 @@ AGPCharacterPlayer::AGPCharacterPlayer()
 
     HeadMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HeadMesh"));
     HeadMesh->SetupAttachment(BodyMesh);
+    HeadMesh->SetRelativeLocation(FVector(0.f, 0.f, -4.0f));
 
     LegMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LegMesh"));
     LegMesh->SetupAttachment(BodyMesh);
