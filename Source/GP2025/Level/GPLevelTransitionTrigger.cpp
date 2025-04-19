@@ -5,6 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Actor.h"
+#include "Character/Modules/GPPlayerAppearanceHandler.h"
 #include "Character/GPCharacterMyplayer.h"
 #include "Physics/GPCollision.h"
 
@@ -65,6 +66,11 @@ void AGPLevelTransitionTrigger::OnLevelLoaded()
 
 	FVector SpawnLocation = GetSpawnLocationForLevel(LevelToLoad , LevelToUnload);
 	CachedPlayer->SetActorLocation(SpawnLocation);
+
+	if (CachedPlayer->AppearanceHandler)
+	{
+		CachedPlayer->AppearanceHandler->SetupLeaderPose();
+	}
 
 	UE_LOG(LogTemp, Log, TEXT("[Trigger] Player moved to spawn location after level load: %s"), *SpawnLocation.ToString());
 }

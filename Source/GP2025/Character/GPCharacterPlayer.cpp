@@ -11,14 +11,14 @@
 
 AGPCharacterPlayer::AGPCharacterPlayer()
 {
-    Helmet = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Helmet"));
-    Helmet->SetupAttachment(GetMesh(), TEXT("HelmetSocket"));
-    Helmet->SetCollisionProfileName(TEXT("NoCollision"));
-    Helmet->SetVisibility(true);
-
     BodyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BodyMesh"));
     BodyMesh->SetupAttachment(GetMesh());
     BodyMesh->SetCollisionProfileName(TEXT("NoCollision"));
+
+    Helmet = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Helmet"));
+    Helmet->SetupAttachment(BodyMesh, TEXT("HelmetSocket"));
+    Helmet->SetCollisionProfileName(TEXT("NoCollision"));
+    Helmet->SetVisibility(true);
 
     HeadMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HeadMesh"));
     HeadMesh->SetupAttachment(BodyMesh);

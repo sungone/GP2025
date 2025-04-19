@@ -49,6 +49,8 @@ public :
 	TObjectPtr<class AGPWeaponBase> WeaponActor;
 
 	virtual USkeletalMeshComponent* GetCharacterMesh() const override;
+	bool bDidLeaderPoseSetup = false;
+
 	// <Equipment Tracking>
 	UPROPERTY()
 	TMap<ECategory, int32> EquippedItemIDs;

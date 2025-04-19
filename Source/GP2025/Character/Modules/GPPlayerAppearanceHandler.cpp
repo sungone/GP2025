@@ -136,12 +136,6 @@ void UGPPlayerAppearanceHandler::EquipItemOnCharacter(FGPItemStruct& ItemData)
 					FAttachmentTransformRules::SnapToTargetIncludingScale,
 					TEXT("HelmetSocket"));
 			}
-
-			FTimerHandle TimerHandle;
-			Owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
-				{
-					Owner->Helmet->SetLeaderPoseComponent(Owner->BodyMesh, true);
-				}, 0.05f, false);
 		}
 	}
 
@@ -172,6 +166,9 @@ void UGPPlayerAppearanceHandler::EquipItemOnCharacter(FGPItemStruct& ItemData)
 
 		SetupLeaderPose();
 		AttachWeaponToBodyMesh();
+
+		if (Owner->HeadMesh) // Helmet ³»¸®±â
+			Owner->HeadMesh->SetRelativeLocation(FVector(0.f, 0.f, -4.0f));
 	}
 
 	if (ItemData.Category == ECategory::sword || ItemData.Category == ECategory::bow)
@@ -212,7 +209,11 @@ void UGPPlayerAppearanceHandler::EquipItemOnCharacter(FGPItemStruct& ItemData)
 
 void UGPPlayerAppearanceHandler::SetupLeaderPose()
 {
-	if (!Owner || !Owner->BodyMesh) return;
+	if (!Owner || !Owner->BodyMesh)
+	{
+		UE_LOG(LogTemp, Error, TEXT("SetupLeaderPose Update Failed"));
+		return;
+	}
 
 	FTimerHandle TimerHandle;
 	Owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
@@ -227,7 +228,6 @@ void UGPPlayerAppearanceHandler::SetupLeaderPose()
 			}
 			if (Owner->Helmet)
 			{
-				Owner->Helmet->SetLeaderPoseComponent(Owner->BodyMesh, true);
 				if (Owner->BodyMesh->DoesSocketExist(TEXT("HelmetSocket")))
 				{
 					Owner->Helmet->AttachToComponent(Owner->BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("HelmetSocket"));
@@ -235,7 +235,7 @@ void UGPPlayerAppearanceHandler::SetupLeaderPose()
 				}
 			}
 
-		}, 0.05f, false);
+		}, 0.02f, false);
 }
 
 void UGPPlayerAppearanceHandler::AttachWeaponToBodyMesh()
