@@ -32,7 +32,7 @@ DROP TABLE IF EXISTS `player_info`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `player_info` (
   `id` int unsigned NOT NULL,
-  `nickname` varchar(24) COLLATE utf8mb4_general_ci NOT NULL,
+  `nickname` varchar(24) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `character_type` tinyint unsigned NOT NULL,
   `pos_x` float NOT NULL DEFAULT '0',
   `pos_y` float NOT NULL DEFAULT '0',
@@ -62,6 +62,7 @@ CREATE TABLE `player_info` (
 
 LOCK TABLES `player_info` WRITE;
 /*!40000 ALTER TABLE `player_info` DISABLE KEYS */;
+INSERT INTO `player_info` VALUES (1,'플레이어',1,7356.34,19489.6,160,-52.4654,10,0,600,550,550,75,0.3,3,0.25,200,0,0);
 /*!40000 ALTER TABLE `player_info` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -74,13 +75,13 @@ DROP TABLE IF EXISTS `users`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `login_id` varchar(32) COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(64) COLLATE utf8mb4_general_ci NOT NULL,
-  `nickname` varchar(24) COLLATE utf8mb4_general_ci NOT NULL,
+  `login_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `nickname` varchar(24) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `login_id` (`login_id`),
   UNIQUE KEY `nickname` (`nickname`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -89,6 +90,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,'dev','2025','관리자');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -101,4 +103,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-18 17:10:03
+-- Dump completed on 2025-04-18 21:46:24

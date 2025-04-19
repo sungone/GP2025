@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "PacketManager.h"
 
 void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
@@ -133,7 +133,7 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 void PacketManager::HandleLogoutPacket(int32 sessionId)
 {
 	auto pkt = IDPacket(EPacketType::S_REMOVE_PLAYER, sessionId);
-	//Todo: ·Î±×ÀÎ Àü¿¡ Á¾·áµÇ¸é ¿©±â¼­  "Invalid" È£ÃâµÇ´Â °Í °°Àºµ¥ ÇØ°áÇÏÀÚ
+	//Todo: ë¡œê·¸ì¸ ì „ì— ì¢…ë£Œë˜ë©´ ì—¬ê¸°ì„œ  "Invalid" í˜¸ì¶œë˜ëŠ” ê²ƒ ê°™ì€ë° í•´ê²°í•˜ì
 	_sessionMgr.BroadcastToViewList(&pkt, sessionId);
 	_sessionMgr.Disconnect(sessionId);
 }
