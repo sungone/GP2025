@@ -29,6 +29,7 @@ bool GameWorld::Init()
 	}
 
 	CreateMonster();
+
 	return true;
 }
 

@@ -78,13 +78,8 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 		_sessionMgr.SendPacket(sessionId, &failpkt);
 		return;
 	}
+	_sessionMgr.HandleLogin(sessionId);
 
-	if (!_sessionMgr.HandleSignUp(sessionId, res.dbId))
-	{
-		LOG(std::format("SignUp Failed [{}]", sessionId));
-		SignUpFailPacket failpkt(DBResultCode::DB_ERROR);
-		_sessionMgr.SendPacket(sessionId, &failpkt);
-	}
 	auto& playerInfo = _gameWorld.GetInfo(sessionId);
 	playerInfo.SetName(name);
 	SignUpSuccessPacket spkt(playerInfo);
@@ -107,16 +102,12 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 		_sessionMgr.SendPacket(sessionId, &failpkt);
 		return;
 	}
-	if (!_sessionMgr.HandleLogin(sessionId, res.dbId))
-	{
-		LoginFailPacket failpkt(DBResultCode::DB_ERROR);
-		_sessionMgr.SendPacket(sessionId, &failpkt);
-		return;
-	}
+
+	_sessionMgr.HandleLogin(sessionId);
 
 	LOG(LogType::Log, std::format("Login Success [{}] userId: {}, nickname: {}", sessionId, res.dbId, res.nickname));
 	auto& playerInfo = _gameWorld.GetInfo(sessionId);
-	playerInfo.SetName(ConvertToWString(res.nickname.c_str()));
+	playerInfo = res.info;
 	LoginSuccessPacket loginpkt(playerInfo);
 	_sessionMgr.SendPacket(sessionId, &loginpkt);
 	return;

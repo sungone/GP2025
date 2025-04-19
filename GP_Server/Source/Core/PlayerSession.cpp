@@ -108,6 +108,8 @@ void PlayerSession::CreatePlayer()
 	_player->Init();
 	_player->GetInfo().ID = _id;
 	GameWorld::GetInst().AddPlayer(_player);
+	GameWorld::GetInst().UpdateViewList(_player);
+	GameWorld::GetInst().SpawnMonster(*this);
 }
 
 int32 PlayerSession::GetId()

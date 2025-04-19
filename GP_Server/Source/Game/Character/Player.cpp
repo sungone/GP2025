@@ -21,6 +21,11 @@ void Player::Init()
 	_info.SetLocation(newPos);
 }
 
+void Player::SaveToDB()
+{
+	DBManager::GetInst().UpdatePlayerInfo(_dbId, _info);
+}
+
 void Player::SetCharacterType(Type::EPlayer type)
 {
 	LOG(std::format("Set type {}", (type == Type::EPlayer::WARRIOR) ? "warrior" : "gunner"));

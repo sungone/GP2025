@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "DBManager.h"
+#include "GameWorld.h"
 
 bool DBManager::Connect(const std::string& host, const std::string& user, const std::string& pwd, const  std::string& db)
 {
@@ -24,28 +25,46 @@ void DBManager::Close()
 	}
 }
 
-void DBManager::PrintUsersTable()
-{
-	try {
-		auto users = GetUsersTable();
-		auto rows = users.select("id", "login_id", "nickname").execute();
-		PRINT("============ User Table ============");
-		for (auto row : rows)
-		{
-			int uid = row[0].get<int>();
-			std::string loginId = row[1].get<std::string>();
-			std::string nickname = row[2].get<std::string>();
-			PRINT(std::format("UID: {:<4} LoginID: {:<12} - {}\n", uid, loginId, nickname));
-		}
-	}
-	catch (const mysqlx::Error& e)
-	{
-		LOG(LogType::Error, std::format("MySQL Error: {}", e.what()));
-	}
-}
-
 DBSignUpResult DBManager::SignUpUser(const std::string& login_id, const std::string& password, const std::wstring& nickname)
 {
+	FInfoData newinfo;
+	newinfo.SetName(nickname);
+	newinfo.CharacterType = static_cast<uint8>(Type::EPlayer::WARRIOR);
+
+	if (newinfo.CharacterType == static_cast<uint8>(Type::EPlayer::WARRIOR)) {
+		newinfo.fovAngle = 90;
+		newinfo.AttackRadius = 300;
+	} else {
+		newinfo.fovAngle = 10;
+		newinfo.AttackRadius = 1500;
+	}
+
+	uint32 level = newinfo.Stats.Level = 10;
+	newinfo.Stats.Speed = 200.f;
+	newinfo.CollisionRadius = 50.f;
+
+	const FStatData* newStats = PlayerLevelTable::GetInst().GetStatByLevel(level);
+	if (!newStats) {
+		LOG(Warning, "Invalid level stat");
+		return { DBResultCode::DB_ERROR };
+	}
+
+	auto& stats = newinfo.Stats;
+	stats.MaxHp = newStats->MaxHp;
+	stats.Hp = stats.MaxHp;
+	stats.Damage = newStats->Damage;
+	stats.CrtRate = newStats->CrtRate;
+	stats.CrtValue = newStats->CrtValue;
+	stats.Dodge = newStats->Dodge;
+	stats.MaxExp = newStats->MaxExp;
+
+	FVector newPos{};
+	do {
+		newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND);
+	} while (GameWorld::GetInst().IsCollisionDetected(newinfo));
+
+	newinfo.SetLocation(newPos);
+
 	try {
 		auto result = GetUsersTable()
 			.insert("login_id", "password", "nickname")
@@ -53,17 +72,28 @@ DBSignUpResult DBManager::SignUpUser(const std::string& login_id, const std::str
 			.execute();
 
 		uint32 dbId = static_cast<uint32>(result.getAutoIncrementValue());
-		if (isPrint) PrintUsersTable();
+
+		_db->getTable("player_info")
+			.insert("id", "character_type", "pos_x", "pos_y", "pos_z", "yaw",
+					"collision_radius", "attack_radius", "fov_angle",
+					"level", "exp", "max_exp", "hp", "max_hp", "damage",
+					"crt_rate", "crt_value", "dodge", "speed",
+					"skill_level", "gold")
+			.values(dbId, newinfo.CharacterType, newPos.X, newPos.Y, newPos.Z, newinfo.Yaw,
+					newinfo.CollisionRadius, newinfo.AttackRadius, newinfo.fovAngle,
+					stats.Level, stats.Exp, stats.MaxExp, stats.Hp, stats.MaxHp, stats.Damage,
+					stats.CrtRate, stats.CrtValue, stats.Dodge, stats.Speed,
+					newinfo.Skilllevel, newinfo.Gold)
+			.execute();
+
 		return { DBResultCode::SUCCESS, dbId };
 	}
 	catch (const mysqlx::Error& e)
 	{
 		std::string msg = e.what();
-		if (msg.find("Duplicate entry") != std::string::npos)
-		{
+		if (msg.find("Duplicate entry") != std::string::npos) {
 			return { DBResultCode::DUPLICATE_ID };
 		}
-
 		LOG(LogType::Error, std::format("MySQL Error: {}", msg));
 		return { DBResultCode::DB_ERROR };
 	}
@@ -72,10 +102,16 @@ DBSignUpResult DBManager::SignUpUser(const std::string& login_id, const std::str
 DBLoginResult DBManager::CheckLogin(const std::string& login_id, const std::string& password)
 {
 	try {
-		auto result = GetUsersTable()
-			.select("id", "password", "nickname")
-			.where("login_id = :login_id")
-			.bind("login_id", login_id)
+		auto result = _dbsess->sql(
+			"SELECT "
+			"u.id, u.password, u.nickname, "
+			"p.character_type, p.pos_x, p.pos_y, p.pos_z, p.yaw, "
+			"p.collision_radius, p.attack_radius, p.fov_angle, "
+			"p.level, p.exp, p.max_exp, p.hp, p.max_hp, "
+			"p.damage, p.crt_rate, p.crt_value, p.dodge, p.speed, "
+			"p.skill_level, p.gold "
+			"FROM users u JOIN player_info p ON u.id = p.id WHERE u.login_id = ?")
+			.bind(login_id)
 			.execute();
 
 		auto row = result.fetchOne();
@@ -89,92 +125,72 @@ DBLoginResult DBManager::CheckLogin(const std::string& login_id, const std::stri
 		uint32 userId = static_cast<uint32>(row[0].get<int>());
 		std::string nickname = row[2].get<std::string>();
 
-		if (isPrint) PrintUsersTable();
-		return { DBResultCode::SUCCESS, userId, nickname };
+		FInfoData info;
+		info.ID = userId;
+		info.SetName(ConvertToWString(nickname));
+		info.CharacterType = static_cast<uint8>(row[3].get<int>());
+		info.Pos = FVector(row[4].get<float>(), row[5].get<float>(), row[6].get<float>());
+		info.Yaw = row[7].get<float>();
+		info.CollisionRadius = row[8].get<float>();
+		info.AttackRadius = row[9].get<float>();
+		info.fovAngle = row[10].get<float>();
+		info.Stats.Level = static_cast<uint32>(row[11].get<int>());
+		info.Stats.Exp = row[12].get<float>();
+		info.Stats.MaxExp = row[13].get<float>();
+		info.Stats.Hp = row[14].get<float>();
+		info.Stats.MaxHp = row[15].get<float>();
+		info.Stats.Damage = row[16].get<float>();
+		info.Stats.CrtRate = row[17].get<float>();
+		info.Stats.CrtValue = row[18].get<float>();
+		info.Stats.Dodge = row[19].get<float>();
+		info.Stats.Speed = row[20].get<float>();
+		info.Skilllevel = static_cast<uint32>(row[21].get<int>());
+		info.Gold = static_cast<uint32>(row[22].get<int>());
+
+		return { DBResultCode::SUCCESS, userId, nickname, info };
 	}
-	catch (const mysqlx::Error& e)
-	{
-		LOG(LogType::Error, std::format("MySQL Error (Login): {}", e.what()));
+	catch (const mysqlx::Error& e) {
+		LOG(LogType::Error, std::format("MySQL Error (CheckLogin - login_id: {}): {}", login_id, e.what()));
 		return { DBResultCode::DB_ERROR };
 	}
 }
 
-bool DBManager::CreatePlayerInfo(uint32 dbId, const FInfoData& info)
+bool DBManager::UpdatePlayerInfo(uint32 dbId, const FInfoData& info)
 {
 	try {
 		auto table = _db->getTable("player_info");
-		table.insert("id", "nickname", "character_type",
-			"pos_x", "pos_y", "pos_z", "yaw",
-			"level", "exp", "max_exp", "hp", "max_hp",
-			"damage", "crt_rate", "crt_value", "dodge", "speed",
-			"skill_level", "gold")
-			.values(dbId, info.GetName(), info.CharacterType,
-				info.Pos.X, info.Pos.Y, info.Pos.Z, info.Yaw,
-				info.Stats.Level, info.Stats.Exp, info.Stats.MaxExp,
-				info.Stats.Hp, info.Stats.MaxHp, info.Stats.Damage,
-				info.Stats.CrtRate, info.Stats.CrtValue,
-				info.Stats.Dodge, info.Stats.Speed,
-				info.Skilllevel, info.Gold)
+		table.update()
+			.set("character_type", info.CharacterType)
+			.set("pos_x", info.Pos.X)
+			.set("pos_y", info.Pos.Y)
+			.set("pos_z", info.Pos.Z)
+			.set("yaw", info.Yaw)
+			.set("collision_radius", info.CollisionRadius)
+			.set("attack_radius", info.AttackRadius)
+			.set("fov_angle", info.fovAngle)
+			.set("level", info.Stats.Level)
+			.set("exp", info.Stats.Exp)
+			.set("max_exp", info.Stats.MaxExp)
+			.set("hp", info.Stats.Hp)
+			.set("max_hp", info.Stats.MaxHp)
+			.set("damage", info.Stats.Damage)
+			.set("crt_rate", info.Stats.CrtRate)
+			.set("crt_value", info.Stats.CrtValue)
+			.set("dodge", info.Stats.Dodge)
+			.set("speed", info.Stats.Speed)
+			.set("skill_level", info.Skilllevel)
+			.set("gold", info.Gold)
+			.where("id = :id")
+			.bind("id", dbId)
 			.execute();
-
 		return true;
 	}
 	catch (const mysqlx::Error& e)
 	{
-		LOG(LogType::Error, std::format("MySQL Error (CreatePlayerInfo): {}", e.what()));
+		LOG(LogType::Error, std::format("MySQL Error (UpdatePlayerInfo): {}", e.what()));
 		return false;
 	}
 }
-
-DBCharacterData DBManager::LoadPlayerInfo(uint32 dbId)
-{
-	FInfoData info;
-
-	try {
-		auto table = _db->getTable("player_info");
-		auto result = table.select("id", "nickname", "character_type",
-			"pos_x", "pos_y", "pos_z", "yaw",
-			"level", "exp", "max_exp", "hp", "max_hp",
-			"damage", "crt_rate", "crt_value", "dodge", "speed",
-			"skill_level", "gold")
-			.where("id = :id")
-			.bind("id", dbId)
-			.execute();
-
-		auto row = result.fetchOne();
-		if (!row)
-			return { DBResultCode::INVALID_USER };
-
-		info.ID = row[0].get<int>();
-		strncpy_s(info.NickName, row[1].get<std::string>().c_str(), NICKNAME_LEN - 1);
-		info.CharacterType = static_cast<uint32>(row[2].get<int>());
-
-		info.Pos = FVector(row[3].get<float>(), row[4].get<float>(), row[5].get<float>());
-		info.Yaw = row[6].get<float>();
-
-		info.Stats.Level = static_cast<uint32>(row[7].get<int>());
-		info.Stats.Exp = row[8].get<float>();
-		info.Stats.MaxExp = row[9].get<float>();
-		info.Stats.Hp = row[10].get<float>();
-		info.Stats.MaxHp = row[11].get<float>();
-		info.Stats.Damage = row[12].get<float>();
-		info.Stats.CrtRate = row[13].get<float>();
-		info.Stats.CrtValue = row[14].get<float>();
-		info.Stats.Dodge = row[15].get<float>();
-		info.Stats.Speed = row[16].get<float>();
-
-		info.Skilllevel = static_cast<uint32>(row[17].get<int>());
-		info.Gold = static_cast<uint32>(row[18].get<int>());
-
-		return { DBResultCode::SUCCESS, info };
-	}
-	catch (const mysqlx::Error& e)
-	{
-		LOG(LogType::Error, std::format("MySQL Error (LoadPlayerInfo): {}", e.what()));
-		return { DBResultCode::DB_ERROR };
-	}
-}
-
 
 
 mysqlx::Table DBManager::GetUsersTable()

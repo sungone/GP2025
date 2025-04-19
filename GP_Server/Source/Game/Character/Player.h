@@ -6,6 +6,7 @@ class Player : public Character
 {
 public:
 	void Init() override;
+	void SaveToDB();
 	void SetCharacterType(Type::EPlayer type);
 
 	void UpdateViewList(std::shared_ptr<Character> other) override;
@@ -54,6 +55,7 @@ public:
 		}
 	}
 private:
+	uint32 _dbId;
 	Type::EPlayer _playerType;
 	Inventory _inventory;
 	std::unordered_set<int32> _viewList;

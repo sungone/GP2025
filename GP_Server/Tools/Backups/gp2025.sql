@@ -32,12 +32,14 @@ DROP TABLE IF EXISTS `player_info`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `player_info` (
   `id` int unsigned NOT NULL,
-  `nickname` varchar(24) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `character_type` tinyint unsigned NOT NULL,
   `pos_x` float NOT NULL DEFAULT '0',
   `pos_y` float NOT NULL DEFAULT '0',
   `pos_z` float NOT NULL DEFAULT '0',
   `yaw` float NOT NULL DEFAULT '0',
+  `collision_radius` float NOT NULL DEFAULT '50',
+  `attack_radius` float NOT NULL DEFAULT '150',
+  `fov_angle` float NOT NULL DEFAULT '90',
   `level` int unsigned NOT NULL DEFAULT '1',
   `exp` float NOT NULL DEFAULT '0',
   `max_exp` float NOT NULL DEFAULT '100',
@@ -51,7 +53,6 @@ CREATE TABLE `player_info` (
   `skill_level` int unsigned NOT NULL DEFAULT '0',
   `gold` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `nickname` (`nickname`),
   CONSTRAINT `player_info_ibfk_1` FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -62,7 +63,7 @@ CREATE TABLE `player_info` (
 
 LOCK TABLES `player_info` WRITE;
 /*!40000 ALTER TABLE `player_info` DISABLE KEYS */;
-INSERT INTO `player_info` VALUES (1,'플레이어',1,7356.34,19489.6,160,-52.4654,10,0,600,550,550,75,0.3,3,0.25,200,0,0);
+INSERT INTO `player_info` VALUES (1,1,7356.34,19489.6,160,-52.4654,50,150,90,10,0,600,550,550,75,0.3,3,0.25,200,0,0);
 /*!40000 ALTER TABLE `player_info` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -103,4 +104,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-18 21:46:24
+-- Dump completed on 2025-04-19 16:24:27
