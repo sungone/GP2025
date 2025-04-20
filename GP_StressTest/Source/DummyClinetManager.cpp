@@ -112,8 +112,8 @@ void DummyClientManager::AdjustClientCount()
 	static int delay_multiplier = 1;
 	static int max_limit = MAXINT;
 	static bool increasing = true;
-	/*if (_active_clients >= CLIENT_NUM) return;
-	if (_num_connections >= CLIENT_NUM) return;*/
+	if (_active_clients >= CLIENT_NUM) return;
+	if (_num_connections >= CLIENT_NUM) return;
 	auto duration = high_resolution_clock::now() - last_connect_time;
 	if (ACCEPT_DELY * delay_multiplier > duration_cast<milliseconds>(duration).count()) return;
 

@@ -10,7 +10,6 @@ void SessionManager::Connect(SOCKET& socket)
 		_sessions[_id] = std::make_shared<PlayerSession>();
 		_sessions[_id]->Connect(socket, _id);
 		_iocp.RegisterSocket(socket, _id);
-		LOG("Start Recv");
 		_sessions[_id]->DoRecv();
 	}
 }
@@ -38,8 +37,6 @@ void SessionManager::HandleLogin(int32 sessionId, const DBLoginResult& dbRes)
 {
 	auto session = _sessions[sessionId];
 	session->Login(dbRes);
-
-	LOG(std::format("Player[{}] Login!", sessionId));
 }
 
 void SessionManager::SendPacket(int32 sessionId, const Packet* packet)

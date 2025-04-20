@@ -185,7 +185,6 @@ void Server::DoAccept()
 
 void Server::HandleAccept()
 {
-	LOG("Accept!");
 	SessionManager::GetInst().Connect(_acceptSocket);
 	DoAccept();
 }

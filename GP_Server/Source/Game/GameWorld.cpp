@@ -37,7 +37,6 @@ void GameWorld::AddPlayer(std::shared_ptr<Character> player)
 	std::unique_lock<std::mutex> lock(_carrMutex);
 	int32 id = player->GetInfo().ID;
 	_characters[id] = player;
-	LOG(std::format("ADD {}", id));
 	GameWorld::GetInst().UpdateViewList(player);
 	GameWorld::GetInst().SpawnMonster(id);
 }
