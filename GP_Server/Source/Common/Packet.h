@@ -182,6 +182,17 @@ struct UseSkillPacket : public Packet
 		Header.PacketSize = sizeof(UseSkillPacket);
 	}
 };
+struct PlayerUseSkillPacket : public Packet
+{
+	int32 PlayerID;
+	ESkillGroup SkillGID;
+
+	PlayerUseSkillPacket(int32 PlayerID_, ESkillGroup SkillGID_)
+		: Packet(EPacketType::S_PLAYER_USE_SKILL), PlayerID(PlayerID_), SkillGID(SkillGID_)
+	{
+		Header.PacketSize = sizeof(UseSkillPacket);
+	}
+};
 namespace ItemPkt
 {
 	struct SpawnPacket : public Packet

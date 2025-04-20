@@ -248,6 +248,12 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->UpdatePlayer(Pkt->Data);
 				break;
 			}
+			case EPacketType::S_PLAYER_USE_SKILL:
+			{
+				PlayerUseSkillPacket* Pkt = reinterpret_cast<PlayerUseSkillPacket*>(RemainingData.GetData());
+				ObjectMgr->UpdatePlayer(Pkt->PlayerID, Pkt->SkillGID);
+				break;
+			}
 			case EPacketType::S_DAMAGED_PLAYER:
 			{
 				PlayerDamagePacket* Pkt = reinterpret_cast<PlayerDamagePacket*>(RemainingData.GetData());

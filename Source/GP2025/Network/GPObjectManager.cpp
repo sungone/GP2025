@@ -99,6 +99,15 @@ void UGPObjectManager::UpdatePlayer(FInfoData& PlayerInfo)
 	}
 }
 
+void UGPObjectManager::UpdatePlayer(int32 PlayerID, ESkillGroup SkillGID)
+{
+	if (Players.Contains(PlayerID))
+	{
+		//Todo:
+		//Players[PlayerID]->스킬애니메이션 재생
+	}
+}
+
 void UGPObjectManager::DamagedPlayer(FInfoData& PlayerInfo)
 {
 	auto PlayerID = PlayerInfo.ID;

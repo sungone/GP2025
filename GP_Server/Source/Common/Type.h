@@ -26,6 +26,7 @@ enum EPacketType : uint8
 	S_REMOVE_PLAYER,
 	S_PLAYER_MOVE,
 	S_PLAYER_STATUS_UPDATE,
+	S_PLAYER_USE_SKILL,
 	S_DAMAGED_PLAYER,
 
 	S_ADD_MONSTER,
@@ -42,6 +43,7 @@ enum EPacketType : uint8
 	S_USE_INVENTORY_ITEM,
 	S_EQUIP_ITEM,
 	S_UNEQUIP_ITEM,
+
 };
 
 using ECharacterType = uint8;

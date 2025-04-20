@@ -189,7 +189,10 @@ void Player::UseSkill(ESkillGroup groupId)
 		LOG(Warning, "Invaild");
 		return;
 	}
+	auto pkt = PlayerUseSkillPacket(_id, groupId);
 	ExecuteSkillEffect(*skill);
+	SessionManager::GetInst().SendPacket(_id, &pkt);
+	SessionManager::GetInst().BroadcastToViewList(&pkt, _id);
 }
 
 void Player::ExecuteSkillEffect(const FSkillData& skill)
@@ -226,12 +229,9 @@ void Player::ExecuteSkillEffect(const FSkillData& skill)
 		switch (skill.Type1)
 		{
 		case ESkillType::AtkSpd:
-			// 공격속도 n% 증가 
-			// -> 애니메이션 속도를 올려야 하네.. 
-			// 클라에서 처리하는 부분이니 패킷을 새로 추가해야하나?
+			// 공격속도 n% 증가 (클라에서 처리하자
 			break;
 		}
-		TimerQueue::AddTimer([]() {/*원상복귀*/}, 1000 * skill.Value0, true);
 
 	}
 }
