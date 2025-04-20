@@ -13,12 +13,16 @@
 #include <ranges>
 #include <queue>
 #include <unordered_set>
+#include <unordered_map>
+#include <algorithm>
 #include <atomic>
 
 #include "IOCP.h"
 #include "FVector.h"
 #include "Common.h"
 #include "Logger.h"
+#include "MapZone.h"
+#include "RandomUtils.h"
 
 using namespace std::chrono;
 
@@ -48,3 +52,4 @@ inline void UpdateDelay(int rtt_ms) {
 }
 
 inline std::atomic_int _active_clients;
+const std::string MapDataPath = "../GP_Server/Source/Game/Map/MapJsonData/";

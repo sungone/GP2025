@@ -21,6 +21,8 @@
   <ItemGroup>
     <ClCompile Include="..\GP_Server\Source\Core\IOCP\ExpOver.cpp" />
     <ClCompile Include="..\GP_Server\Source\Core\IOCP\IOCP.cpp" />
+    <ClCompile Include="..\GP_Server\Source\Game\Map\MapZone.cpp" />
+    <ClCompile Include="..\GP_Server\Source\Game\Map\NavMesh.cpp" />
     <ClCompile Include="Source\DummyClient.cpp" />
     <ClCompile Include="Source\DummyClinetManager.cpp" />
     <ClCompile Include="Source\pch.cpp">
@@ -36,6 +38,8 @@
     <ClInclude Include="..\GP_Server\Source\Common\Type.h" />
     <ClInclude Include="..\GP_Server\Source\Core\IOCP\ExpOver.h" />
     <ClInclude Include="..\GP_Server\Source\Core\IOCP\IOCP.h" />
+    <ClInclude Include="..\GP_Server\Source\Game\Map\MapZone.h" />
+    <ClInclude Include="..\GP_Server\Source\Game\Map\NavMesh.h" />
     <ClInclude Include="Source\DummyClient.h" />
     <ClInclude Include="Source\DummyClinetManager.h" />
     <ClInclude Include="Source\pch.h" />
@@ -97,7 +101,7 @@
     <ExternalIncludePath>$(SolutionDir)Source;$(SolutionDir)Source\Common;$(SolutionDir)Source\Core;$(SolutionDir)Source\Core\IOCP;$(SolutionDir)Source\Game;$(SolutionDir)Source\DB;$(SolutionDir)Source\AI;$(SolutionDir)Source\Utils</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ExternalIncludePath>$(SolutionDir)Source;$(SolutionDir)Source\Common;$(SolutionDir)Source\Core\IOCP;$(SolutionDir)Source\Core;$(SolutionDir)Source\Game;$(SolutionDir)Source\DB;$(SolutionDir)Source\AI;$(SolutionDir)Source\Utils</ExternalIncludePath>
+    <ExternalIncludePath>$(SolutionDir)Includes;$(SolutionDir)Includes\mysqlx\include;$(SolutionDir)Source;$(SolutionDir)Source\Common;$(SolutionDir)Source\Core\IOCP;$(SolutionDir)Source\Core;$(SolutionDir)Source\Game;$(SolutionDir)Source\Game\Character;$(SolutionDir)Source\Game\Map;$(SolutionDir)Source\Game\Item;$(SolutionDir)Source\Game\DataTable;$(SolutionDir)Source\DB;$(SolutionDir)Source\AI;$(SolutionDir)Source\Utils</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

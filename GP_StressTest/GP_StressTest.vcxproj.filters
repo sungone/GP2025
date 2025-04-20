@@ -20,6 +20,9 @@
     <Filter Include="소스 파일\ServerSource\IOCP">
       <UniqueIdentifier>{217e5454-a697-4a74-b0ce-354000ed604e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\ServerSource\Map">
+      <UniqueIdentifier>{3e0f9cf1-ec7e-48bc-a417-d69974eee2b1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\pch.cpp">
@@ -39,6 +42,12 @@
     </ClCompile>
     <ClCompile Include="..\GP_Server\Source\Core\IOCP\IOCP.cpp">
       <Filter>소스 파일\ServerSource\IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GP_Server\Source\Game\Map\NavMesh.cpp">
+      <Filter>소스 파일\ServerSource\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GP_Server\Source\Game\Map\MapZone.cpp">
+      <Filter>소스 파일\ServerSource\Map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -68,6 +77,12 @@
     </ClInclude>
     <ClInclude Include="..\GP_Server\Source\Core\IOCP\IOCP.h">
       <Filter>소스 파일\ServerSource\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\Game\Map\NavMesh.h">
+      <Filter>소스 파일\ServerSource\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\Game\Map\MapZone.h">
+      <Filter>소스 파일\ServerSource\Map</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

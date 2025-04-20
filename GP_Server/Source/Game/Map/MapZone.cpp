@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "MapZone.h"
-const std::string MapDataPath = "Source/Game/Map/MapJsonData/";
 
 bool MapZone::Init()
 {

@@ -15,6 +15,11 @@ bool DummyClientManager::Init()
 	}
 	for (uint32 i = 0;i < CLIENT_NUM;++i)
 		_clients[i].Init(i);
+	if (!MapZone::GetInst().Init())
+	{
+		LOG(LogType::Error, "MapZone");
+		return false;
+	}
 	return true;
 }
 
@@ -96,7 +101,8 @@ void DummyClientManager::TestThread()
 		for (int i = 0;i < CLIENT_NUM;i++)
 		{
 			if (!_clients[i].IsConnected()) continue;
-
+			if(_clients[i].IsLogin()&&_clients[i].Move())
+				_clients[i].SendMovePacket();
 		}
 	}
 }

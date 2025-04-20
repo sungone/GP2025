@@ -132,15 +132,9 @@ struct MovePacket : public Packet
 	uint32 State;
 	uint64 MoveTime;
 
-	MovePacket(int32 PlayerID_, const FVector& PlayerPos_, uint32 State_ = 0,
+	MovePacket(int32 PlayerID_, const FVector& PlayerPos_, uint32 State_,
 		uint64 SendTime_ = 0, EPacketType Type_ = EPacketType::C_MOVE)
 		: Packet(Type_), PlayerID(PlayerID_), State(State_), PlayerPos(PlayerPos_), MoveTime(SendTime_)
-	{
-		Header.PacketSize = sizeof(MovePacket);
-	}
-	//for Stress Test
-	MovePacket(int32 PlayerID_, uint64 SendTime_, EPacketType Type_ = EPacketType::S_PLAYER_MOVE)
-		: Packet(Type_), PlayerID(PlayerID_), PlayerPos(), MoveTime(SendTime_)
 	{
 		Header.PacketSize = sizeof(MovePacket);
 	}

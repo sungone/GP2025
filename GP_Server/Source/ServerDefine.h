@@ -7,6 +7,7 @@ inline constexpr size_t MAX_CLIENT = 10000;
 inline constexpr size_t MAX_PLAYER = MAX_CLIENT;
 inline constexpr size_t MAX_MONSTER = 500;
 inline constexpr size_t MAX_CHARACTER = MAX_PLAYER + MAX_MONSTER;
+const std::string MapDataPath = "Source/Game/Map/MapJsonData/";
 
 enum CompType
 {

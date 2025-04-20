@@ -19,20 +19,15 @@ public:
 	void SendLoginPacket();
 	void SendSignUpPacket();
 	bool SendMovePacket();
-	bool Move()
-	{
-		if (last_move_time + 1s > high_resolution_clock::now()) return false;
-		last_move_time = high_resolution_clock::now();
-		SendMovePacket();
-		return true;
-	}
+	bool Move();
 	bool IsConnected() const
 	{
 		return _connected && _socket != INVALID_SOCKET;
 	}
-
+	bool IsLogin() const { return _logined; }
 private:
 	std::atomic_bool _connected = false;
+	std::atomic_bool _logined = false;
 	SOCKET _socket = INVALID_SOCKET;
 	ExpOver _recvOver;
 	int32 _remain = 0;

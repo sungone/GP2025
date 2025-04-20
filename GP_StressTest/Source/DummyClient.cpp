@@ -125,6 +125,7 @@ void DummyClient::ProcessPacket(Packet* packet)
 	{
 		auto pkt = reinterpret_cast<LoginSuccessPacket*>(packet);
 		_info = pkt->PlayerInfo;
+		_logined = true;
 		_active_clients++;
 		break;
 	}
@@ -132,6 +133,7 @@ void DummyClient::ProcessPacket(Packet* packet)
 	{
 		auto pkt = reinterpret_cast<SignUpSuccessPacket*>(packet);
 		_info = pkt->PlayerInfo;
+		_logined = true;
 		_active_clients++;
 		break;
 	}
@@ -171,8 +173,32 @@ void DummyClient::SendSignUpPacket()
 
 bool DummyClient::SendMovePacket()
 {
+	if (last_move_time + 1s > high_resolution_clock::now()) return false;
+	last_move_time = high_resolution_clock::now();
+
 	auto now = NowMs();
-	MovePacket pkt(_playerId, _info.Pos, now);
+	_info.AddState(ECharacterStateType::STATE_WALK);
+	MovePacket pkt(_playerId, _info.Pos, _info.State, now);
 	DoSend(&pkt);
+	return true;
+}
+
+bool DummyClient::Move()
+{
+	static auto& nav = MapZone::GetInst().GetNavMesh(ZoneType::DEFAULT);
+	int currentTriIdx = nav.FindIdxFromPos(_info.Pos);
+	if (currentTriIdx == -1) return false;
+
+	const auto& neighbors = nav.GetNeighbors(currentTriIdx);
+	if (neighbors.empty()) return false;
+
+	int randIdx = RandomUtils::GetRandomInt(0, static_cast<int>(neighbors.size()) - 1);
+	auto it = neighbors.begin();
+	std::advance(it, randIdx);
+	int nextTriIdx = *it;
+	FVector nextPos = nav.GetTriangleCenter(nextTriIdx);
+	nextPos.Z = _info.Pos.Z;
+	_info.SetLocation(nextPos);
+
 	return true;
 }
