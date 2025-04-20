@@ -19,3 +19,14 @@ FVector MapZone::GetRandomPos(ZoneType type) const
 		return _playground.GetRandomPosition();
 	}
 }
+
+NavMesh& MapZone::GetNavMesh(ZoneType type)
+{
+	switch (type)
+	{
+	case ZoneType::DEFAULT:
+		return _default;
+	case ZoneType::PLAYGROUND:
+		return _playground;
+	}
+}

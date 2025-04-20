@@ -16,7 +16,7 @@ void Monster::Init()
 		return;
 	}
 	FVector newPos{};
-	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
+	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::DEFAULT); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
 	_info.SetLocation(newPos);
 	_info.SetName(ConvertToWString(data->Name));
 	_info.CharacterType = data->TypeId;
@@ -180,13 +180,24 @@ void Monster::Chase()
 
 void Monster::Patrol()
 {
-	static const float PatrolRadius = 500.0f;
-	float RandomX = RandomUtils::GetRandomFloat(-PatrolRadius, PatrolRadius);
-	float RandomY = RandomUtils::GetRandomFloat(-PatrolRadius, PatrolRadius);
+	static auto& nav = MapZone::GetInst().GetNavMesh(ZoneType::DEFAULT);
+	int currentTriIdx = nav.FindIdxFromPos(_pos);
+	if (currentTriIdx == -1) return;
 
-	auto newPos = FVector(_pos.X + RandomX, _pos.Y + RandomY, _pos.Z);
-	_info.SetLocationAndYaw(newPos);
+	const auto& neighbors = nav.GetNeighbors(currentTriIdx);
+	if (neighbors.empty()) return;
+
+	int randIdx = RandomUtils::GetRandomInt(0, static_cast<int>(neighbors.size()) - 1);
+	auto it = neighbors.begin();
+	std::advance(it, randIdx);
+	int nextTriIdx = *it;
+
+	FVector nextPos = nav.GetTriangleCenter(nextTriIdx);
+	nextPos.Z = _pos.Z;
+
+	_info.SetLocationAndYaw(nextPos);
 }
+
 
 bool Monster::SetTarget()
 {
@@ -200,7 +211,11 @@ bool Monster::SetTarget()
 			continue;
 		}
 		auto player = GameWorld::GetInst().GetCharacterByID(playerId);
-		if (!player) continue;
+		if (!player)
+		{
+			RemoveFromViewList(playerId);
+			continue;
+		}
 		if (IsInViewDistance(player->GetInfo().Pos, detectDist))
 		{
 			LOG("SetTarget!");

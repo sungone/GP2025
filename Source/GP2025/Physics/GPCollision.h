@@ -11,23 +11,23 @@ static void DrawDebugCollisionAndAttackRadius(UWorld* World, const FInfoData& In
 {
 	if (!World) return;
 
-	// 1. CollisionRadius
-	DrawDebugSphere(
-		World,
-		InfoData.Pos,
-		InfoData.CollisionRadius,
-		16,
-		FColor::Silver
-	);
+	//// 1. CollisionRadius
+	//DrawDebugSphere(
+	//	World,
+	//	InfoData.Pos,
+	//	InfoData.CollisionRadius,
+	//	16,
+	//	FColor::Silver
+	//);
 
-	// 2. AttackRadius
-	DrawDebugSphere(
-		World,
-		InfoData.Pos,
-		InfoData.AttackRadius,
-		16,
-		FColor::Silver
-	);
+	//// 2. AttackRadius
+	//DrawDebugSphere(
+	//	World,
+	//	InfoData.Pos,
+	//	InfoData.AttackRadius,
+	//	16,
+	//	FColor::Silver
+	//);
 
 	//3. ForwardVectorArrow
 	FRotator Rotation(0.0f, InfoData.Yaw, 0.0f);

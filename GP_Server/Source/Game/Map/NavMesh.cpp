@@ -85,9 +85,65 @@ void NavMesh::PrintPolygonGraph()
 
 std::vector<int> NavMesh::FindPath(int StartPolyIdx, int GoalPolyIdx)
 {
-	//Todo:
+	if (StartPolyIdx == GoalPolyIdx)
+		return { StartPolyIdx };
+
+	std::unordered_map<int, int> cameFrom;
+	std::unordered_map<int, float> gScore;
+	std::unordered_map<int, float> fScore;
+	std::unordered_set<int> closedSet;
+
+	auto heuristic = [&](int from, int to) -> float {
+		FVector fromCenter = GetTriangleCenter(from);
+		FVector toCenter = GetTriangleCenter(to);
+		return fromCenter.DistanceTo(toCenter); // 직선 거리
+		};
+
+	auto cmp = [&](int left, int right) {
+		return fScore[left] > fScore[right];
+		};
+
+	std::priority_queue<int, std::vector<int>, decltype(cmp)> openSet(cmp);
+	openSet.push(StartPolyIdx);
+	gScore[StartPolyIdx] = 0;
+	fScore[StartPolyIdx] = heuristic(StartPolyIdx, GoalPolyIdx);
+
+	while (!openSet.empty())
+	{
+		int current = openSet.top();
+		openSet.pop();
+
+		if (current == GoalPolyIdx)
+		{
+			std::vector<int> path;
+			for (int node = current; node != StartPolyIdx; node = cameFrom[node])
+				path.push_back(node);
+			path.push_back(StartPolyIdx);
+			std::reverse(path.begin(), path.end());
+			return path;
+		}
+
+		closedSet.insert(current);
+
+		for (int neighbor : PolygonGraph[current].Neighbors)
+		{
+			if (closedSet.contains(neighbor))
+				continue;
+
+			float tentative_g = gScore[current] + GetTriangleCenter(current).DistanceTo(GetTriangleCenter(neighbor));
+
+			if (!gScore.contains(neighbor) || tentative_g < gScore[neighbor])
+			{
+				cameFrom[neighbor] = current;
+				gScore[neighbor] = tentative_g;
+				fScore[neighbor] = tentative_g + heuristic(neighbor, GoalPolyIdx);
+				openSet.push(neighbor);
+			}
+		}
+	}
 	return {};
 }
+
 
 bool NavMesh::LoadFromJson(const std::string& filePath)
 {
@@ -153,4 +209,22 @@ FVector NavMesh::GetRandomPosition() const
 	FVector SpawnPosition = A + (B - A) * r1 + (C - A) * r2;
 	SpawnPosition.Z += 90.0f;
 	return SpawnPosition;
+}
+
+FVector NavMesh::GetTriangleCenter(int triIndex) const
+{
+	const Triangle& tri = Triangles[triIndex];
+	const FVector& A = Vertices[tri.IndexA];
+	const FVector& B = Vertices[tri.IndexB];
+	const FVector& C = Vertices[tri.IndexC];
+	return FVector((A.X + B.X + C.X) / 3.0f, (A.Y + B.Y + C.Y) / 3.0f, (A.Z + B.Z + C.Z) / 3.0f);
+}
+
+const std::unordered_set<int>& NavMesh::GetNeighbors(int triIdx) const
+{
+	auto it = PolygonGraph.find(triIdx);
+	if (it != PolygonGraph.end())
+		return it->second.Neighbors;
+	static const std::unordered_set<int> Empty;
+	return Empty;
 }

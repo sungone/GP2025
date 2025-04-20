@@ -18,6 +18,7 @@ public:
 
 	bool Init();
 	FVector GetRandomPos(ZoneType type) const;
+	NavMesh& GetNavMesh(ZoneType type);
 public:
 	NavMesh _default;
 	NavMesh _playground;

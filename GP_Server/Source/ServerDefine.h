@@ -5,7 +5,7 @@
 
 inline constexpr size_t MAX_CLIENT = 10000;
 inline constexpr size_t MAX_PLAYER = MAX_CLIENT;
-inline constexpr size_t MAX_MONSTER = 10;
+inline constexpr size_t MAX_MONSTER = 500;
 inline constexpr size_t MAX_CHARACTER = MAX_PLAYER + MAX_MONSTER;
 
 enum CompType
