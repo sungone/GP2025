@@ -1,10 +1,18 @@
 #include "pch.h"
 #include "DummyClinetManager.h"
-#include "Timer.h"
+
+using namespace std::chrono;
+
 
 bool DummyClientManager::Init()
 {
 	_hIocp.Init();
+	WSADATA wsaData;
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+	{
+		LOG(Error, "WSAStartup");
+		return false;
+	}
 	for (uint32 i = 0;i < CLIENT_NUM;++i)
 		_clients[i].Init(i);
 	return true;
@@ -15,7 +23,7 @@ void DummyClientManager::Run()
 	std::thread worker, timer;
 	try {
 		std::thread worker([this]() { WorkerThread(); });
-		std::thread timer([]() { TimerQueue::Get().TimerThread(); });
+		std::thread test([this]() { TestThread(); });
 
 		worker.join();
 		timer.join();
@@ -29,10 +37,15 @@ void DummyClientManager::Run()
 
 void DummyClientManager::SendMovePacket(int i)
 {
-	_clients[i].SendMovePacket();
-	TimerQueue::Get().AddTimerEvent(TimerEvent(i, EventType::Move, 1000));
+	if (_clients[i].IsConnected())
+	{
+		_clients[i].SendMovePacket();
+	}
+	else
+	{
+		LOG(Warning, std::format("client[{}] is not connected", i));
+	}
 }
-
 void DummyClientManager::WorkerThread()
 {
 	LOG("Run Stress Test");
@@ -44,18 +57,12 @@ void DummyClientManager::WorkerThread()
 	try {
 		while (true)
 		{
-			if (_connected == 0)
-			{
-				_clients[0].Connect(_hIocp);
-				_connected++;
-				_nextToConnect++;
-			}
-
 			BOOL ret = _hIocp.GetCompletion(rbyte, id, over);
 			ExpOver* expOver = reinterpret_cast<ExpOver*>(over);
 
-			if (!ret)
+			if (!ret || rbyte == 0)
 			{
+				expOver->errorCode = GetLastError();
 				HandleCompletionError(expOver, static_cast<int32>(id));
 				continue;
 			}
@@ -69,12 +76,6 @@ void DummyClientManager::WorkerThread()
 				delete over;
 				break;
 			}
-			auto now = steady_clock::now();
-			if (now - lastCheck > 100ms)
-			{
-				AdjustClientCount();
-				lastCheck = now;
-			}
 		}
 	}
 	catch (const std::exception& e)
@@ -87,6 +88,19 @@ void DummyClientManager::WorkerThread()
 	}
 }
 
+void DummyClientManager::TestThread()
+{
+	while (true)
+	{
+		AdjustClientCount();
+		for (int i = 0;i < CLIENT_NUM;i++)
+		{
+			if (!_clients[i].IsConnected()) continue;
+
+		}
+	}
+}
+
 void DummyClientManager::HandleRecv(int32 id, DWORD rbyte, LPWSAOVERLAPPED over)
 {
 	_clients[id].HandleRecvBuffer(rbyte, reinterpret_cast<ExpOver*>(over));
@@ -95,50 +109,74 @@ void DummyClientManager::HandleRecv(int32 id, DWORD rbyte, LPWSAOVERLAPPED over)
 
 void DummyClientManager::AdjustClientCount()
 {
-	using namespace std::chrono;
+	static int delay_multiplier = 1;
+	static int max_limit = MAXINT;
+	static bool increasing = true;
+	/*if (_active_clients >= CLIENT_NUM) return;
+	if (_num_connections >= CLIENT_NUM) return;*/
+	auto duration = high_resolution_clock::now() - last_connect_time;
+	if (ACCEPT_DELY * delay_multiplier > duration_cast<milliseconds>(duration).count()) return;
 
-	static auto lastAdjustTime = steady_clock::now();
-	auto now = steady_clock::now();
-	auto elapsed = now - lastAdjustTime;
-
-	if (elapsed < 100ms)
-		return;
-
-	lastAdjustTime = now;
-
-	int avgDelay = GetAverageDelay();
-
-	if (avgDelay > 150 && _connected > 0) {
-		_clients[_nextToClose++].Disconnect();
-		_connected--;
-		return;
-	}
-
-	if (avgDelay < 100 && _connected < CLIENT_NUM) {
-		if (_clients[_nextToConnect].Connect(_hIocp)) {
-			_connected++;
-			_nextToConnect++;
+	int t_delay = delayTime;
+	if (DELAY_LIMIT2 < t_delay) {
+		if (true == increasing) {
+			max_limit = _active_clients;
+			increasing = false;
 		}
+		if (100 > _active_clients) return;
+		if (ACCEPT_DELY * 10 > duration_cast<milliseconds>(duration).count()) return;
+		last_connect_time = high_resolution_clock::now();
+		Disconnect(_client_to_close);
+		_client_to_close++;
+		return;
 	}
+	else
+		if (DELAY_LIMIT < t_delay) {
+			delay_multiplier = 10;
+			return;
+		}
+	if (max_limit - (max_limit / 20) < _active_clients) return;
+	increasing = true;
+	last_connect_time = high_resolution_clock::now();
+	Connect(_num_connections);
 }
 
 void DummyClientManager::HandleCompletionError(ExpOver* ex_over, int32 id)
 {
+	LPVOID msgBuf = nullptr;
+	FormatMessageA(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		nullptr,
+		ex_over->errorCode,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPSTR)&msgBuf,
+		0,
+		nullptr
+	);
+
+	std::string errMsg = msgBuf ? (char*)msgBuf : "Unknown error";
+	if (msgBuf) LocalFree(msgBuf);
+
+	if (!_clients[id].IsConnected())
+	{
+		LOG(std::format("Skip error handling for already disconnected client [{}]", id));
+		if (ex_over->_compType == SEND)
+			delete ex_over;
+		return;
+	}
+	std::string cmptype;
 	switch (ex_over->_compType)
 	{
-	case ::ACCEPT:
-		LOG(Warning, std::format("CompType : ACCEPT[{}]", id));
-		break;
-	case ::RECV:
-		LOG(Warning, std::format("CompType : RECV[{}]", id));
-		_clients[id].Disconnect();
-		_connected--;
-		break;
-	case ::SEND:
-		LOG(Warning, std::format("CompType : SEND[{}]", id));
-		_clients[id].Disconnect();
-		_connected--;
-		delete ex_over;
-		break;
+	case ::ACCEPT: cmptype = "ACCEPT"; break;
+	case ::RECV: cmptype = "RECV"; break;
+	case ::SEND: cmptype = "SEND"; break;
 	}
+
+	LOG(Warning, std::format("CompType : {}[{}] Code={} Msg={}",
+		cmptype, id, ex_over->errorCode, errMsg));
+
+	Disconnect(id);
+
+	if (ex_over->_compType == SEND)
+		delete ex_over;
 }

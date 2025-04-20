@@ -12,4 +12,5 @@ public:
 	WSABUF _wsabuf{};
 	uint8	_buf[BUFSIZE]{};
 	CompType _compType{};
+	DWORD errorCode = 0;
 };

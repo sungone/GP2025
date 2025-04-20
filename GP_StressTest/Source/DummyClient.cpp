@@ -1,77 +1,87 @@
 #include "pch.h"
 #include "DummyClient.h"
-#include "Timer.h"
+
 bool DummyClient::Init(uint32 num)
 {
 	_dummyNum = num;
 	_name = std::format("D{:05}", _dummyNum);
+	return true;
+}
 
-	WSADATA wsaData;
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+bool DummyClient::Connect(IOCP& hIocp)
+{
+	if (_connected)
 	{
-		LOG(Error, "WSAStartup");
+		LOG(Warning, std::format("Already connected - ID{}", _playerId));
 		return false;
 	}
 
 	_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
 	if (_socket == INVALID_SOCKET)
 	{
-		LOG(Error, "Socket");
+		LOG(Error, std::format("WSASocket failed. WSAGetLastError: {}", WSAGetLastError()));
 		return false;
 	}
 
-	return true;
-}
-
-bool DummyClient::Connect(IOCP& hIocp)
-{
-	if (_socket == INVALID_SOCKET)
-	{
-		_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
-		if (_socket == INVALID_SOCKET)
-		{
-			LOG(Error, std::format("WSASocket failed. WSAGetLastError: {}", WSAGetLastError()));
-			return false;
-		}
-	}
 	sockaddr_in addr;
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(SERVER_PORT);
 	inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
+
 	if (connect(_socket, (struct sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR)
 	{
 		int errCode = WSAGetLastError();
 		LOG(Error, std::format("connect failed. WSAGetLastError: {}", errCode));
 		closesocket(_socket);
+		_socket = INVALID_SOCKET;
 		return false;
 	}
+
 	hIocp.RegisterSocket(_socket, _dummyNum);
 	DoRecv();
 	SendSignUpPacket();
+	LOG(std::format("Connect success: [{}] sock={}", _name, _socket));
+	_connected = true;
 
-	LOG(std::format("Connect - {}", _name));
 	return true;
 }
 
-void DummyClient::Disconnect()
+bool DummyClient::Disconnect()
 {
-	auto pkt = IDPacket(EPacketType::C_LOGOUT, _info.ID);
-	DoSend(&pkt);
-	closesocket(_socket);
-	_socket = INVALID_SOCKET;
+	bool status = true;
+	if (true == std::atomic_compare_exchange_strong(&_connected, &status, false)) {
+		closesocket(_socket);
+		return true;
+	}
+	return false;
 }
+
 
 void DummyClient::DoRecv()
 {
+	if (_socket == INVALID_SOCKET)
+	{
+		LOG(Warning, "DoRecv called with invalid socket");
+		return;
+	}
 	ZeroMemory(&_recvOver._wsaover, sizeof(_recvOver._wsaover));
 	DWORD recv_flag = 0;
 	_recvOver._wsabuf.len = BUFSIZE - _remain;
 	_recvOver._wsabuf.buf = reinterpret_cast<CHAR*>(_recvOver._buf) + _remain;
-	WSARecv(_socket, &_recvOver._wsabuf, 1, 0, &recv_flag, &_recvOver._wsaover, 0);
+	int res = WSARecv(_socket, &_recvOver._wsabuf, 1, 0, &recv_flag, &_recvOver._wsaover, 0);
+	if (res == SOCKET_ERROR && WSAGetLastError() != WSA_IO_PENDING)
+	{
+		LOG(Error, std::format("WSARecv failed. Error: {}", WSAGetLastError()));
+	}
 }
 
 void DummyClient::DoSend(Packet* packet)
 {
+	if (_socket == INVALID_SOCKET)
+	{
+		LOG(Warning, "DoSend called with invalid socket");
+		return;
+	}
 	auto send_data = new ExpOver{ packet };
 	WSASend(_socket, &send_data->_wsabuf, 1, nullptr, 0, &send_data->_wsaover, nullptr);
 }
@@ -115,16 +125,14 @@ void DummyClient::ProcessPacket(Packet* packet)
 	{
 		auto pkt = reinterpret_cast<LoginSuccessPacket*>(packet);
 		_info = pkt->PlayerInfo;
-		SendMovePacket();
-		TimerQueue::Get().AddTimerEvent(TimerEvent(_dummyNum, EventType::Move, 1000));
+		_active_clients++;
 		break;
 	}
 	case EPacketType::S_SIGNUP_SUCCESS:
 	{
 		auto pkt = reinterpret_cast<SignUpSuccessPacket*>(packet);
 		_info = pkt->PlayerInfo;
-		SendMovePacket();
-		TimerQueue::Get().AddTimerEvent(TimerEvent(_dummyNum, EventType::Move, 1000));
+		_active_clients++;
 		break;
 	}
 	case EPacketType::S_LOGIN_FAIL:
@@ -137,7 +145,7 @@ void DummyClient::ProcessPacket(Packet* packet)
 	{
 		auto pkt = reinterpret_cast<MovePacket*>(packet);
 		auto rtt_ms = NowMs() - pkt->MoveTime;
-		UpdateDelaySample(rtt_ms);
+		UpdateDelay(rtt_ms);
 		break;
 	}
 	default:
@@ -161,9 +169,10 @@ void DummyClient::SendSignUpPacket()
 	DoSend(&pkt);
 }
 
-void DummyClient::SendMovePacket()
+bool DummyClient::SendMovePacket()
 {
 	auto now = NowMs();
 	MovePacket pkt(_playerId, _info.Pos, now);
 	DoSend(&pkt);
+	return true;
 }

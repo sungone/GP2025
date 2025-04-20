@@ -80,7 +80,7 @@ public:
     void OpenLogFile(const std::string& filename)
     {
         std::lock_guard<std::mutex> lock(_logLock);
-        _logFile.open(filename, std::ios::out | std::ios::app);
+        _logFile.open(filename, std::ios::out | std::ios::trunc);
     }
 
     void CloseLogFile()

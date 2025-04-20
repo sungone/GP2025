@@ -28,7 +28,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Source\TestMain.cpp" />
-    <ClCompile Include="Source\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\GP_Server\Source\Common\Common.h" />
@@ -37,11 +36,9 @@
     <ClInclude Include="..\GP_Server\Source\Common\Type.h" />
     <ClInclude Include="..\GP_Server\Source\Core\IOCP\ExpOver.h" />
     <ClInclude Include="..\GP_Server\Source\Core\IOCP\IOCP.h" />
-    <ClInclude Include="Source\DelayTracker.h" />
     <ClInclude Include="Source\DummyClient.h" />
     <ClInclude Include="Source\DummyClinetManager.h" />
     <ClInclude Include="Source\pch.h" />
-    <ClInclude Include="Source\Timer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -9,7 +9,7 @@ public:
 
 	bool Init(uint32 num);
 	bool Connect(IOCP& hIocp);
-	void Disconnect();
+	bool Disconnect();
 	void DoRecv();
 	void DoSend(Packet* packet);
 
@@ -18,8 +18,21 @@ public:
 
 	void SendLoginPacket();
 	void SendSignUpPacket();
-	void SendMovePacket();
+	bool SendMovePacket();
+	bool Move()
+	{
+		if (last_move_time + 1s > high_resolution_clock::now()) return false;
+		last_move_time = high_resolution_clock::now();
+		SendMovePacket();
+		return true;
+	}
+	bool IsConnected() const
+	{
+		return _connected && _socket != INVALID_SOCKET;
+	}
+
 private:
+	std::atomic_bool _connected = false;
 	SOCKET _socket = INVALID_SOCKET;
 	ExpOver _recvOver;
 	int32 _remain = 0;
@@ -28,5 +41,6 @@ private:
 	std::string _name;
 	int32& _playerId = _info.ID;
 	std::thread _moveThread;
+	high_resolution_clock::time_point last_move_time;
 };
 

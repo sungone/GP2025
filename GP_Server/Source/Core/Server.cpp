@@ -113,8 +113,11 @@ void Server::WorkerThreadLoop()
 	{
 		BOOL ret = IOCP::GetInst().GetCompletion(recvByte, sessionId, over);
 		ExpOver* expOver = reinterpret_cast<ExpOver*>(over);
+		DWORD errorCode = (ret == FALSE) ? GetLastError() : NO_ERROR;
+
 		if (!ret)
 		{
+			expOver->errorCode = errorCode;
 			HandleCompletionError(expOver, static_cast<int32>(sessionId));
 			continue;
 		}
@@ -136,21 +139,39 @@ void Server::WorkerThreadLoop()
 
 void Server::HandleCompletionError(ExpOver* ex_over, int32 id)
 {
+	LPVOID msgBuf = nullptr;
+	FormatMessageA(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		nullptr,
+		ex_over->errorCode,
+		MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+		(LPSTR)&msgBuf,
+		0,
+		nullptr
+	);
+
+	std::string errMsg = msgBuf ? (char*)msgBuf : "Unknown error";
+	if (msgBuf) LocalFree(msgBuf);
+
 	switch (ex_over->_compType)
 	{
 	case ::ACCEPT:
-		LOG(Warning, std::format("CompType : ACCEPT[{}]", id));
+		LOG(Warning, std::format("CompType : ACCEPT[{}] Code={} Msg={}",
+			id, ex_over->errorCode, errMsg));
 		break;
 	case ::RECV:
-		LOG(Warning, std::format("CompType : RECV[{}]", id));
+		LOG(Warning, std::format("CompType : RECV[{}] Code={} Msg={}",
+			id, ex_over->errorCode, errMsg));
 		SessionManager::GetInst().Disconnect(id);
 		break;
 	case ::SEND:
-		LOG(Warning, std::format("CompType : SEND[{}]", id));
+		LOG(Warning, std::format("CompType : SEND[{}] Code={} Msg={}",
+			id, ex_over->errorCode, errMsg));
 		SessionManager::GetInst().Disconnect(id);
 		delete ex_over;
 		break;
 	}
+
 }
 
 void Server::DoAccept()

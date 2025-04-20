@@ -15,14 +15,26 @@ public:
 	void SendMovePacket(int i);
 
 	void WorkerThread();
+	void TestThread();
 	void HandleRecv(int32 id, DWORD rbyte, LPWSAOVERLAPPED over);
 	void AdjustClientCount();
 	void HandleCompletionError(ExpOver* ex_over, int32 id);
+	void Connect(int32 id)
+	{
+		if (_clients[id].Connect(_hIocp))
+			_num_connections++;
+	}
+	void Disconnect(int32 id)
+	{
+		if(_clients[id].Disconnect())
+			_active_clients--;
+	}
 private:
 	IOCP& _hIocp = IOCP::GetInst();
 	std::array<DummyClient, CLIENT_NUM> _clients;
-	int32 _connected = 0;
-	int32 _nextToConnect = 0;
-	int32 _nextToClose = 0;
+	high_resolution_clock::time_point last_connect_time{};
+
+	std::atomic_int _num_connections;
+	std::atomic_int _client_to_close;
 };
 
