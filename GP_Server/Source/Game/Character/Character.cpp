@@ -21,12 +21,12 @@ void Character::OnDamaged(float damage)
 	}
 }
 
-bool Character::IsColision(const FVector& pos, float dist)
+bool Character::IsCollision(const FVector& pos, float dist)
 {
 	return _info.Pos.IsInRange(pos, dist);
 }
 
-bool Character::IsColision(const FInfoData& target)
+bool Character::IsCollision(const FInfoData& target)
 {
 	return _info.Pos.IsInRange(target.Pos, _info.CollisionRadius + target.CollisionRadius);
 }

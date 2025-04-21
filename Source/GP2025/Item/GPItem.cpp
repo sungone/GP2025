@@ -133,12 +133,18 @@ void AGPItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 
 	UE_LOG(LogTemp, Warning, TEXT("Item Overlap Detected! ItemID: %d | Player: %s"),
 		ItemID, *Player->GetName());
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Item Overlap Detected!!")));
+	FVector ItemPosition = GetActorLocation();
+	FVector PlayerPosition = Player->GetActorLocation();
+	UE_LOG(LogTemp, Warning, TEXT("Item Position: X=%f Y=%f Z=%f"), ItemPosition.X, ItemPosition.Y, ItemPosition.Z);
+	UE_LOG(LogTemp, Warning, TEXT("Player Position: X=%f Y=%f Z=%f"), PlayerPosition.X, PlayerPosition.Y, PlayerPosition.Z);
 
 	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
 	if (NetworkMgr)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Sending PlayerTakeItem Packet for ItemID: %d"), ItemID);
 		NetworkMgr->SendPlayerTakeItem(ItemID);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("SendPlayerTakeItem!")));
 	}
 	else
 	{

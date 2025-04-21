@@ -132,8 +132,8 @@ void Player::RemovePlayerFromViewList(std::shared_ptr<Character> player)
 
 bool Player::TakeWorldItem(const std::shared_ptr<WorldItem> item)
 {
-	float detectDist = 100.f;
-	if (!IsColision(item->GetPos(), detectDist))
+	float detectDist = 300.f;
+	if (!IsCollision(item->GetPos(), detectDist))
 		return false;
 	auto invItem = item->ToInventoryItem();
 	return _inventory.AddInventoryItem(invItem);

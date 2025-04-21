@@ -361,7 +361,7 @@ bool GameWorld::IsCollisionDetected(const FVector& pos)
 	for (auto other : _characters)
 	{
 		if (!other) continue;
-		if (other->IsColision(pos, margin)) return true;
+		if (other->IsCollision(pos, margin)) return true;
 	}
 	return false;
 }
@@ -372,7 +372,7 @@ bool GameWorld::IsCollisionDetected(const FInfoData& target)
 	for (auto other : _characters)
 	{
 		if (!other) continue;
-		if (other->IsColision(target)) return true;
+		if (other->IsCollision(target)) return true;
 	}
 	return false;
 }

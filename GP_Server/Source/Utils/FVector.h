@@ -30,6 +30,12 @@ struct FVector
             (Z - Other.Z) * (Z - Other.Z);
     }
 
+    float DistanceSquared2D(const FVector& Other) const
+    {
+        return (X - Other.X) * (X - Other.X) +
+            (Y - Other.Y) * (Y - Other.Y);
+    }
+
     float DistanceTo(const FVector& Other) const
     {
         return sqrt(DistanceSquared(Other));
@@ -37,7 +43,7 @@ struct FVector
 
     bool IsInRange(const FVector& Other, float Range) const
     {
-        return DistanceSquared(Other) <= (Range * Range);
+        return DistanceSquared2D(Other) <= (Range * Range);
     }
 
     float DotProduct(const FVector& Other) const
