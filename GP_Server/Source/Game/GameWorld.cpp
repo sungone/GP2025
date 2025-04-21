@@ -38,7 +38,6 @@ void GameWorld::AddPlayer(std::shared_ptr<Character> player)
 	int32 id = player->GetInfo().ID;
 	_characters[id] = player;
 	GameWorld::GetInst().UpdateViewList(player);
-	GameWorld::GetInst().SpawnMonster(id);
 }
 
 void GameWorld::RemoveCharacter(int32 id)
@@ -72,26 +71,6 @@ void GameWorld::CreateMonster()
 		_characters[i] = std::make_shared<Monster>(i);
 	}
 	TimerQueue::AddTimer([]() {GameWorld::GetInst().UpdateMonster();}, 2000, true);
-}
-
-void GameWorld::SpawnMonster(int32 playerId)
-{
-	std::shared_ptr<Character> playerCharacter = GetCharacterByID(playerId);
-
-	if (!playerCharacter) return;
-	const auto& viewList = playerCharacter->GetViewList();
-
-	for (int32 i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
-	{
-		if (!_characters[i]) continue;
-		auto& monster = _characters[i];
-		int32 monsterId = monster->GetInfo().ID;
-		if (viewList.find(monsterId) != viewList.end())
-		{
-			auto Pkt = InfoPacket(EPacketType::S_ADD_MONSTER, monster->GetInfo());
-			SessionManager::GetInst().SendPacket(playerId, &Pkt);
-		}
-	}
 }
 
 void GameWorld::PlayerSetYaw(int32 playerId, float yaw)
