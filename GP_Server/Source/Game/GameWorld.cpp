@@ -83,7 +83,7 @@ void GameWorld::SpawnMonster(int32 playerId)
 
 	for (int32 i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{
-		if (_characters[i]) continue;
+		if (!_characters[i]) continue;
 		auto& monster = _characters[i];
 		int32 monsterId = monster->GetInfo().ID;
 		if (viewList.find(monsterId) != viewList.end())

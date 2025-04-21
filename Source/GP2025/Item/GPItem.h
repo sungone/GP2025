@@ -1,5 +1,3 @@
-
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -12,54 +10,38 @@ class GP2025_API AGPItem : public AActor
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	AGPItem();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 public:
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	void SetupItem(int32 NewItemID, uint8 NewItemtype, int32 NewAmount);
+
+private:
+	void UpdateFloatingEffect();
+	void ShowInteractionWidget();
+	void HideInteractionWidget();
+	void TryTakeItem();
+	class UDataTable* GetItemDataTable();
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+	class UStaticMeshComponent* ItemStaticMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+	class USkeletalMeshComponent* ItemSkeletalMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+	class UWidgetComponent* ItemInteractionWidgetComp;
+
+	UPROPERTY()
+	TSubclassOf<class UUserWidget> ItemInteractionWidgetClass;
+
+	UPROPERTY()
+	class AGPCharacterMyplayer* OverlappingPlayer;
+
+	UPROPERTY()
 	int32 ItemID;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
-	UStaticMeshComponent* ItemStaticMesh;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
-	USkeletalMeshComponent* ItemSkeletalMesh;
-
-	UPROPERTY(VisibleAnywhere, Category = "Item")
-	class UBoxComponent* TriggerBox;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	UPROPERTY()
 	int32 Amount;
-
-	UPROPERTY(VisibleAnywhere, Category = "Movement")
-	class URotatingMovementComponent* RotatingMovement;
-
-	void SetupItem(int32 NewItemID, uint8 NewItemtype, int32 NewMoneyAmount);
-	UDataTable* GetItemDataTable();
-
-	UFUNCTION()
-	void OnOverlapBegin(
-		UPrimitiveComponent* OverlappedComponent,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex,
-		bool bFromSweep,
-		const FHitResult& SweepResult);
-
-	// Pick Up Guid 
-public :
-	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<UUserWidget> ItemInteractionWidgetClass;
-
-	UUserWidget* ItemInteractionWidget;
-
-	UPROPERTY(VisibleAnywhere, Category = "UI")
-	class UWidgetComponent* ItemInteractionWidgetComp;
 };

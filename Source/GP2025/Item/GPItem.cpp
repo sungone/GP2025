@@ -2,7 +2,6 @@
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/RotatingMovementComponent.h"
 #include "Network/GPNetworkManager.h"
 #include "Character/GPCharacterMyplayer.h"
 #include "Engine/World.h"
@@ -10,20 +9,14 @@
 #include "GPItemStruct.h"
 #include "Components/WidgetComponent.h"
 #include "Character/Modules/GPMyplayerInputHandler.h"
+#include "GameFramework/PlayerController.h"
 
 // Sets default values
 AGPItem::AGPItem()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
-
-	TriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
-	TriggerBox->SetupAttachment(RootComponent);
-	TriggerBox->SetBoxExtent(FVector(50.f, 50.f, 50.f));
-	TriggerBox->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-	TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AGPItem::OnOverlapBegin);
 
 	ItemStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemStaticMesh"));
 	ItemStaticMesh->SetupAttachment(RootComponent);
@@ -33,13 +26,9 @@ AGPItem::AGPItem()
 	ItemSkeletalMesh->SetupAttachment(RootComponent);
 	ItemSkeletalMesh->SetCollisionProfileName(TEXT("NoCollision"));
 
-	// 회전하는 움직임 추가
-	RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("RotatingMovement"));
-	RotatingMovement->RotationRate = FRotator(0.f, 180.f, 0.f); // 초당 180도 회전
-
 	ItemInteractionWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("ItemInteractionWidgetComp"));
 	ItemInteractionWidgetComp->SetupAttachment(RootComponent);
-	ItemInteractionWidgetComp->SetWidgetSpace(EWidgetSpace::Screen); 
+	ItemInteractionWidgetComp->SetWidgetSpace(EWidgetSpace::Screen);
 	ItemInteractionWidgetComp->SetDrawSize(FVector2D(150.f, 50.f));
 	ItemInteractionWidgetComp->SetVisibility(false);
 
@@ -50,22 +39,88 @@ AGPItem::AGPItem()
 		ItemInteractionWidgetComp->SetWidgetClass(ItemInteractionWidgetClass);
 	}
 
-	TriggerBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	OverlappingPlayer = nullptr;
 }
 
-// Called when the game starts or when spawned
-void AGPItem::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-// Called every frame
 void AGPItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	UpdateFloatingEffect();
+
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (!PC) return;
+
+	APawn* PlayerPawn = PC->GetPawn();
+	if (!PlayerPawn) return;
+
+	AGPCharacterMyplayer* Player = Cast<AGPCharacterMyplayer>(PlayerPawn);
+	if (!Player) return;
+
+	const float Distance = FVector::Dist(GetActorLocation(), Player->GetActorLocation());
+	const float InteractRange = 300.f;
+
+	if (Distance < InteractRange)
+	{
+		OverlappingPlayer = Player;
+		ShowInteractionWidget();
+
+		if (OverlappingPlayer->InputHandler && OverlappingPlayer->InputHandler->bGetItem)
+		{
+			TryTakeItem();
+		}
+	}
+	else
+	{
+		OverlappingPlayer = nullptr;
+		HideInteractionWidget();
+	}
+}
+
+void AGPItem::UpdateFloatingEffect()
+{
 	FVector NewLocation = GetActorLocation();
-	NewLocation.Z += FMath::Sin(GetWorld()->TimeSeconds * 2) * 2;  // 위아래로 흔들리는 효과
+	NewLocation.Z += FMath::Sin(GetWorld()->TimeSeconds * 2.f) * 1.2f;
 	SetActorLocation(NewLocation);
+}
+
+void AGPItem::ShowInteractionWidget()
+{
+	if (!ItemInteractionWidgetComp->IsVisible())
+		ItemInteractionWidgetComp->SetVisibility(true);
+
+		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		if (!PC) return;
+
+		FVector CamLoc;
+		FRotator CamRot;
+		PC->GetPlayerViewPoint(CamLoc, CamRot);
+
+		const FVector Right = CamRot.Quaternion().GetRightVector();
+		const FVector WidgetOffset = Right * 80.f + FVector(0, 0, 50);
+
+		FVector NewWidgetLocation = GetActorLocation() + WidgetOffset;
+		ItemInteractionWidgetComp->SetWorldLocation(NewWidgetLocation);
+		ItemInteractionWidgetComp->SetWorldRotation(CamRot);
+}
+
+void AGPItem::HideInteractionWidget()
+{
+	if (ItemInteractionWidgetComp->IsVisible())
+		ItemInteractionWidgetComp->SetVisibility(false);
+}
+
+void AGPItem::TryTakeItem()
+{
+	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+	if (NetworkMgr)
+	{
+		NetworkMgr->SendPlayerTakeItem(ItemID);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("SendPlayerTakeItem!"));
+	}
+
+	OverlappingPlayer = nullptr;
+	HideInteractionWidget();
 }
 
 void AGPItem::SetupItem(int32 NewItemID, uint8 NewItemtype, int32 NewAmount)
@@ -79,25 +134,19 @@ void AGPItem::SetupItem(int32 NewItemID, uint8 NewItemtype, int32 NewAmount)
 	FGPItemStruct* ItemData = ItemTable->FindRow<FGPItemStruct>(*FString::FromInt(NewItemtype), TEXT(""));
 	if (!ItemData) return;
 
-	// 아이템 이름 설정 (디버깅용)
 	UE_LOG(LogTemp, Log, TEXT("Spawning Item: %s"), *ItemData->ItemName.ToString());
 
-	// Static Mesh가 있는 경우 적용
 	if (ItemData->ItemStaticMesh)
 	{
 		ItemStaticMesh->SetStaticMesh(ItemData->ItemStaticMesh);
 		ItemStaticMesh->SetVisibility(true);
 		ItemSkeletalMesh->SetVisibility(false);
-
-		UE_LOG(LogTemp, Log, TEXT("Set Static Mesh"));
 	}
 	else if (ItemData->ItemSkeletalMesh)
 	{
 		ItemSkeletalMesh->SetSkeletalMesh(ItemData->ItemSkeletalMesh);
 		ItemStaticMesh->SetVisibility(false);
 		ItemSkeletalMesh->SetVisibility(true);
-
-		UE_LOG(LogTemp, Log, TEXT("Set Skeletal Mesh"));
 	}
 }
 
@@ -113,41 +162,4 @@ UDataTable* AGPItem::GetItemDataTable()
 	}
 
 	return DataTable;
-}
-
-void AGPItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-	bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (!ItemInteractionWidgetClass) return;
-	if (!OtherActor) return;
-
-	AGPCharacterMyplayer* Player = Cast<AGPCharacterMyplayer>(OtherActor);
-	if (!Player) return;
-	// if (!Player->InputHandler->bGetItem) return;
-
-	if (ItemInteractionWidgetComp && !ItemInteractionWidgetComp->IsVisible())
-	{
-		ItemInteractionWidgetComp->SetVisibility(true);
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Item Overlap Detected! ItemID: %d | Player: %s"),
-		ItemID, *Player->GetName());
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Item Overlap Detected!!")));
-	FVector ItemPosition = GetActorLocation();
-	FVector PlayerPosition = Player->GetActorLocation();
-	UE_LOG(LogTemp, Warning, TEXT("Item Position: X=%f Y=%f Z=%f"), ItemPosition.X, ItemPosition.Y, ItemPosition.Z);
-	UE_LOG(LogTemp, Warning, TEXT("Player Position: X=%f Y=%f Z=%f"), PlayerPosition.X, PlayerPosition.Y, PlayerPosition.Z);
-
-	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-	if (NetworkMgr)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Sending PlayerTakeItem Packet for ItemID: %d"), ItemID);
-		NetworkMgr->SendPlayerTakeItem(ItemID);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("SendPlayerTakeItem!")));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Network Manager is NULL - Failed to Send Item Pickup Packet."));
-	}
 }
