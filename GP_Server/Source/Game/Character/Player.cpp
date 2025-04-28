@@ -8,10 +8,9 @@ void Player::Init()
 	Character::Init();
 	_characterClass = ECharacterClass::Player;
 #ifndef DB_LOCAL
-	//Todo: DB값으로 설정해줘야한다
 	_info.SetName(L"플레이어");
 	SetCharacterType(Type::EPlayer::GUNNER);
-	_info.Stats.Level = 10;
+	_info.Stats.Level = 5;
 	_info.Stats.Speed = 200.f;
 	_info.CollisionRadius = 50.f;
 	_info.State = ECharacterStateType::STATE_IDLE;

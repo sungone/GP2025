@@ -31,12 +31,13 @@ AGPCharacterPlayer::AGPCharacterPlayer()
     EquippedItemIDs.Add(ECategory::sword, -1);
     EquippedItemIDs.Add(ECategory::helmet, -1);
     EquippedItemIDs.Add(ECategory::chest, -1);
+
+    SetCharacterType(CurrentCharacterType);
 }
 
 void AGPCharacterPlayer::BeginPlay()
 {
     Super::BeginPlay();
-    SetCharacterType(CurrentCharacterType);
 }
 
 void AGPCharacterPlayer::Tick(float DeltaTime)
