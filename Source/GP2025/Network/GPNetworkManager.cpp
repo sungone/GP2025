@@ -248,16 +248,22 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->UpdatePlayer(Pkt->Data);
 				break;
 			}
-			case EPacketType::S_PLAYER_USE_SKILL:
-			{
-				PlayerUseSkillPacket* Pkt = reinterpret_cast<PlayerUseSkillPacket*>(RemainingData.GetData());
-				ObjectMgr->UpdatePlayer(Pkt->PlayerID, Pkt->SkillGID);
-				break;
-			}
 			case EPacketType::S_DAMAGED_PLAYER:
 			{
 				PlayerDamagePacket* Pkt = reinterpret_cast<PlayerDamagePacket*>(RemainingData.GetData());
 				ObjectMgr->DamagedPlayer(Pkt->Target);
+				break;
+			}
+			case EPacketType::S_SKILL_UNLOCK:
+			{
+				SkillUnlockPacket* Pkt = reinterpret_cast<SkillUnlockPacket*>(RemainingData.GetData());
+				ObjectMgr->SkillUnlock(Pkt->SkillGID);
+				break;
+			}
+			case EPacketType::S_PLAYER_USE_SKILL:
+			{
+				PlayerUseSkillPacket* Pkt = reinterpret_cast<PlayerUseSkillPacket*>(RemainingData.GetData());
+				ObjectMgr->UpdatePlayer(Pkt->PlayerID, Pkt->SkillGID);
 				break;
 			}
 #pragma endregion

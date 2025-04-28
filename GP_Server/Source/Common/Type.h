@@ -8,14 +8,13 @@ enum EPacketType : uint8
 
 	C_MOVE,
 	C_ATTACK,
+	C_USE_SKILL,
 
 	C_TAKE_ITEM,
 	C_DROP_ITEM,
 	C_USE_ITEM,
 	C_EQUIP_ITEM,
 	C_UNEQUIP_ITEM,
-
-	C_USE_SKILL,
 
 	S_LOGIN_SUCCESS,
 	S_LOGIN_FAIL,
@@ -26,8 +25,9 @@ enum EPacketType : uint8
 	S_REMOVE_PLAYER,
 	S_PLAYER_MOVE,
 	S_PLAYER_STATUS_UPDATE,
-	S_PLAYER_USE_SKILL,
 	S_DAMAGED_PLAYER,
+	S_PLAYER_USE_SKILL,
+	S_SKILL_UNLOCK,
 
 	S_ADD_MONSTER,
 	S_REMOVE_MONSTER,
@@ -150,7 +150,7 @@ enum class EItemCategory
 
 enum class ESkillGroup
 {
-	HitHard,
+	HitHard = 1,
 	Clash,
 	Whirlwind,
 	Throwing,

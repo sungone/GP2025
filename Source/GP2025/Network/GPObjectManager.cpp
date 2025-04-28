@@ -120,6 +120,12 @@ void UGPObjectManager::DamagedPlayer(FInfoData& PlayerInfo)
 	}
 }
 
+void UGPObjectManager::SkillUnlock(ESkillGroup SkillGID)
+{
+	//Todo:
+	//스킬 해금
+}
+
 void UGPObjectManager::AddMonster(FInfoData& MonsterInfo)
 {
 	if (World == nullptr)

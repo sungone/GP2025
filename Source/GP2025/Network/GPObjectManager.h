@@ -27,6 +27,7 @@ public:
 	void UpdatePlayer(FInfoData& PlayerInfo);
 	void UpdatePlayer(int32 PlayerID, ESkillGroup SkillGID);
 	void DamagedPlayer(FInfoData& PlayerInfo);
+	void SkillUnlock(ESkillGroup SkillGID);
 
 	void AddMonster(FInfoData& MonsterInfo);
 	void RemoveMonster(int32 MonsterID);

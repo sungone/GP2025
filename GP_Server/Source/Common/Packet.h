@@ -36,7 +36,7 @@ struct TPacket : public Packet
 using FPacketHeader = Packet::PacketHeader;
 using InfoPacket = TPacket<FInfoData>;
 using IDPacket = TPacket<int32>;
-
+#pragma region Account
 struct LoginPacket : public Packet
 {
 	char AccountID[LOGIN_STR_LEN];
@@ -115,6 +115,8 @@ struct SignUpFailPacket : public Packet
 		Header.PacketSize = sizeof(SignUpFailPacket);
 	}
 };
+#pragma endregion
+
 struct SelectCharacterPacket : public Packet
 {
 	Type::EPlayer PlayerType;
@@ -139,6 +141,8 @@ struct MovePacket : public Packet
 		Header.PacketSize = sizeof(MovePacket);
 	}
 };
+
+#pragma region Attack
 struct AttackPacket : public Packet
 {
 	float PlayerYaw;
@@ -171,6 +175,9 @@ struct PlayerDamagePacket : public Packet
 		Header.PacketSize = sizeof(PlayerDamagePacket);
 	}
 };
+#pragma endregion
+
+#pragma region Skill
 struct UseSkillPacket : public Packet
 {
 	ESkillGroup SkillGID;
@@ -180,6 +187,15 @@ struct UseSkillPacket : public Packet
 		: Packet(EPacketType::C_USE_SKILL), SkillGID(SkillGID_), PlayerYaw(PlayerYaw_)
 	{
 		Header.PacketSize = sizeof(UseSkillPacket);
+	}
+};
+struct SkillUnlockPacket : public Packet
+{
+	ESkillGroup SkillGID;
+	SkillUnlockPacket(ESkillGroup SkillGID_)
+		: Packet(EPacketType::S_SKILL_UNLOCK), SkillGID(SkillGID_)
+	{
+		Header.PacketSize = sizeof(SkillUnlockPacket);
 	}
 };
 struct PlayerUseSkillPacket : public Packet
@@ -193,6 +209,8 @@ struct PlayerUseSkillPacket : public Packet
 		Header.PacketSize = sizeof(UseSkillPacket);
 	}
 };
+#pragma endregion
+
 namespace ItemPkt
 {
 	struct SpawnPacket : public Packet

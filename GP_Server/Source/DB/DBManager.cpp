@@ -35,7 +35,8 @@ DBLoginResult DBManager::SignUpUser(int32 sessionId, const std::string& login_id
 	if (newinfo.CharacterType == static_cast<uint8>(Type::EPlayer::WARRIOR)) {
 		newinfo.fovAngle = 90;
 		newinfo.AttackRadius = 300;
-	} else {
+	}
+	else {
 		newinfo.fovAngle = 10;
 		newinfo.AttackRadius = 1500;
 	}
@@ -76,15 +77,13 @@ DBLoginResult DBManager::SignUpUser(int32 sessionId, const std::string& login_id
 
 		_db->getTable("player_info")
 			.insert("id", "character_type", "pos_x", "pos_y", "pos_z", "yaw",
-					"collision_radius", "attack_radius", "fov_angle",
-					"level", "exp", "max_exp", "hp", "max_hp", "damage",
-					"crt_rate", "crt_value", "dodge", "speed",
-					"skill_level", "gold")
+				"collision_radius", "attack_radius", "fov_angle",
+				"level", "exp", "max_exp", "hp", "max_hp", "damage",
+				"crt_rate", "crt_value", "dodge", "speed", "gold")
 			.values(dbId, newinfo.CharacterType, newPos.X, newPos.Y, newPos.Z, newinfo.Yaw,
-					newinfo.CollisionRadius, newinfo.AttackRadius, newinfo.fovAngle,
-					stats.Level, stats.Exp, stats.MaxExp, stats.Hp, stats.MaxHp, stats.Damage,
-					stats.CrtRate, stats.CrtValue, stats.Dodge, stats.Speed,
-					newinfo.Skilllevel, newinfo.Gold)
+				newinfo.CollisionRadius, newinfo.AttackRadius, newinfo.fovAngle,
+				stats.Level, stats.Exp, stats.MaxExp, stats.Hp, stats.MaxHp, stats.Damage,
+				stats.CrtRate, stats.CrtValue, stats.Dodge, stats.Speed, newinfo.Gold)
 			.execute();
 
 		return { DBResultCode::SUCCESS, dbId, newinfo };
@@ -145,7 +144,6 @@ DBLoginResult DBManager::CheckLogin(int32 sessionId, const std::string& login_id
 		info.Stats.CrtValue = row[18].get<float>();
 		info.Stats.Dodge = row[19].get<float>();
 		info.Stats.Speed = row[20].get<float>();
-		info.Skilllevel = static_cast<uint32>(row[21].get<int>());
 		info.Gold = static_cast<uint32>(row[22].get<int>());
 
 		return { DBResultCode::SUCCESS, dbId, info };
@@ -179,7 +177,6 @@ bool DBManager::UpdatePlayerInfo(uint32 dbId, const FInfoData& info)
 			.set("crt_value", info.Stats.CrtValue)
 			.set("dodge", info.Stats.Dodge)
 			.set("speed", info.Stats.Speed)
-			.set("skill_level", info.Skilllevel)
 			.set("gold", info.Gold)
 			.where("id = :id")
 			.bind("id", dbId)

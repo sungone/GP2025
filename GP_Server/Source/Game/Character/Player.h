@@ -24,7 +24,7 @@ public:
 	void ExecuteSkillEffect(const FSkillData& skill);
 	void LearnSkill(ESkillGroup groupId);
 	void UpgradeSkill(ESkillGroup groupId);
-
+	void UnlockSkillsOnLevelUp();
 	void UseItem(uint32 itemId);
 	uint8 EquipItem(uint32 itemId);
 	uint8 UnequipItem(uint32 itemId);

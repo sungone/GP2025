@@ -46,7 +46,6 @@ struct FInfoData
 
 	FStatData Stats;
 	uint32 State;
-	uint32 Skilllevel;
 	uint32 Gold;
 
 	FInfoData()
@@ -60,7 +59,6 @@ struct FInfoData
 		fovAngle(90.f),
 		Stats(),
 		State(STATE_IDLE),
-		Skilllevel(0),
 		Gold(0)
 	{
 	}

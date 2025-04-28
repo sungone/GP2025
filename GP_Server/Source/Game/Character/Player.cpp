@@ -9,8 +9,8 @@ void Player::Init()
 	_characterClass = ECharacterClass::Player;
 #ifndef DB_LOCAL
 	_info.SetName(L"플레이어");
-	SetCharacterType(Type::EPlayer::GUNNER);
-	_info.Stats.Level = 5;
+	SetCharacterType(Type::EPlayer::WARRIOR);
+	_info.Stats.Level = 1;
 	_info.Stats.Speed = 200.f;
 	_info.CollisionRadius = 50.f;
 	_info.State = ECharacterStateType::STATE_IDLE;
@@ -37,17 +37,17 @@ void Player::SetCharacterType(Type::EPlayer type)
 	{
 		_info.fovAngle = 90;
 		_info.AttackRadius = 300;
-		LearnSkill(ESkillGroup::HitHard);
+		/*LearnSkill(ESkillGroup::HitHard);
 		LearnSkill(ESkillGroup::Clash);
-		LearnSkill(ESkillGroup::Whirlwind);
+		LearnSkill(ESkillGroup::Whirlwind);*/
 	}
 	else
 	{
 		_info.fovAngle = 10;
 		_info.AttackRadius = 1500;
-		LearnSkill(ESkillGroup::Throwing);
+		/*LearnSkill(ESkillGroup::Throwing);
 		LearnSkill(ESkillGroup::FThrowing);
-		LearnSkill(ESkillGroup::Anger);
+		LearnSkill(ESkillGroup::Anger);*/
 	}
 }
 
@@ -153,7 +153,9 @@ bool Player::Attack(std::shared_ptr<Character> monster)
 	if (!IsInAttackRange(monster->GetInfo()))
 		return false;
 
-	float atkDamage = GetAttackDamage();
+	//float atkDamage = GetAttackDamage();
+	//for test
+	float atkDamage = 100;
 	if (atkDamage > 0.0f)
 	{
 		monster->OnDamaged(atkDamage);
@@ -167,8 +169,6 @@ bool Player::Attack(std::shared_ptr<Character> monster)
 
 void Player::UseSkill(ESkillGroup groupId)
 {
-	LOG(std::format("Use Skill - {}", static_cast<uint8>(groupId)));
-
 	if (groupId == ESkillGroup::None)
 	{
 		LOG("GetSkillGropID is None");
@@ -177,7 +177,7 @@ void Player::UseSkill(ESkillGroup groupId)
 	auto it = _skillLevels.find(groupId);
 	if (it == _skillLevels.end())
 	{
-		LOG(Warning, "Invaild");
+		LOG(Warning, std::format("Player [{}] has no skill group [{}]", _id, static_cast<uint32>(groupId)));
 		return;
 	}
 
@@ -185,9 +185,10 @@ void Player::UseSkill(ESkillGroup groupId)
 	const FSkillData* skill = PlayerSkillTable::GetInst().GetSkill(static_cast<uint32>(groupId), level);
 	if (!skill)
 	{
-		LOG(Warning, "Invaild");
+		LOG(Warning, std::format("Player [{}] has invalid skill data for group [{}] level [{}]", _id, static_cast<uint32>(groupId), level));
 		return;
 	}
+	LOG(std::format("Use Skill - {}", static_cast<uint8>(groupId)));
 	auto pkt = PlayerUseSkillPacket(_id, groupId);
 	ExecuteSkillEffect(*skill);
 	SessionManager::GetInst().SendPacket(_id, &pkt);
@@ -239,6 +240,8 @@ void Player::LearnSkill(ESkillGroup groupId)
 {
 	if (_skillLevels.contains(groupId)) return;
 	_skillLevels[groupId] = 1;
+	auto pkt = SkillUnlockPacket(groupId);
+	SessionManager::GetInst().SendPacket(_id, &pkt);
 }
 
 void Player::UpgradeSkill(ESkillGroup groupId)
@@ -247,6 +250,51 @@ void Player::UpgradeSkill(ESkillGroup groupId)
 	if (lv < 3)
 		lv++;
 }
+
+void Player::UnlockSkillsOnLevelUp()
+{
+	if (_stats.Level < 2)
+		return;
+
+	int32 order = _stats.Level - 2;
+
+	int32 baseGroup = 0;
+	switch (_playerType)
+	{
+	case Type::EPlayer::WARRIOR:
+		baseGroup = (int32)ESkillGroup::HitHard;
+		break;
+	case Type::EPlayer::GUNNER:
+		baseGroup = (int32)ESkillGroup::Throwing;
+		break;
+	default:
+		LOG(Warning, "Unknown Player Type");
+		return;
+	}
+
+	int32 skillGroup = baseGroup + (order % 3);
+	int32 skillLevel = (order / 3) + 1;
+
+	const FSkillData* skill = PlayerSkillTable::GetInst().GetSkill(skillGroup, skillLevel);
+	if (skill == nullptr)
+	{
+		LOG(Warning, "Invaild!");
+		return;
+	}
+	ESkillGroup groupId = static_cast<ESkillGroup>(skill->SkillGroup);
+
+	if (!_skillLevels.contains(groupId))
+	{
+		LearnSkill(groupId);
+		LOG(Log, std::format("Learned New Skill [{}] Level [{}]", static_cast<uint32>(groupId), skillLevel));
+	}
+	else
+	{
+		UpgradeSkill(groupId);
+		LOG(Log, std::format("Upgraded Skill [{}] to Level [{}]", static_cast<uint32>(groupId), _skillLevels[groupId]));
+	}
+}
+
 
 void Player::UseItem(uint32 itemId)
 {
@@ -340,6 +388,7 @@ void Player::LevelUp()
 	_stats.Level++;
 
 	ApplyLevelStats(_stats.Level);
+	UnlockSkillsOnLevelUp();
 }
 
 void Player::ApplyLevelStats(uint32 level)
