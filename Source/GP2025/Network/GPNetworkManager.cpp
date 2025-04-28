@@ -269,7 +269,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_LEVEL_UP:
 			{
 				PlayerLevelUpPacket* Pkt = reinterpret_cast<PlayerLevelUpPacket*>(RemainingData.GetData());
-				ObjectMgr->LevelUp(Pkt->SkillGID);
+				ObjectMgr->LevelUp(Pkt->PlayerInfo);
 				break;
 			}
 #pragma endregion
