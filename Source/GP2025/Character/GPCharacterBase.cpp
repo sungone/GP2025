@@ -189,29 +189,53 @@ void AGPCharacterBase::HandleRSkillState()
 
 void AGPCharacterBase::HandleRemoteMovementSync(float DeltaTime)
 {
-	FVector Location = GetActorLocation();
-	FVector DestLocation = CharacterInfo.Pos;
+	if (DeltaTime <= 0.f)
+		return;
 
-	float Speed = CharacterInfo.HasState(STATE_RUN) ? 1200.f : 600.f;
+	FVector CurrentLocation = GetActorLocation();
+	FVector TargetLocation = CharacterInfo.Pos;
 
-	FVector MoveDir = (DestLocation - Location);
-	float DistToDest = MoveDir.Length();
+	const float SprintSpeed = 1200.f;
+	const float WalkSpeed = 600.f;
+	float Speed = CharacterInfo.HasState(STATE_RUN) ? SprintSpeed : WalkSpeed;
+
+	FVector MoveDir = TargetLocation - CurrentLocation;
+	float DistanceToTarget = MoveDir.Size();
+
+	if (DistanceToTarget < KINDA_SMALL_NUMBER)
+	{
+		GetCharacterMovement()->Velocity = FVector::ZeroVector;
+		return;
+	}
+
 	MoveDir.Normalize();
 
-	float MoveDist = FMath::Min((MoveDir * Speed * DeltaTime).Length(), DistToDest);
-	FVector NextLocation = Location + MoveDir * MoveDist;
+	float MoveDistance = FMath::Min(Speed * DeltaTime, DistanceToTarget);
+	FVector NextLocation = CurrentLocation + MoveDir * MoveDistance;
 
+	FRotator TargetRotation(0.f, CharacterInfo.Yaw, 0.f);
 	FRotator InterpolatedRotation = FMath::RInterpTo(
 		GetActorRotation(),
-		FRotator(0.f, CharacterInfo.Yaw, 0.f),
+		TargetRotation,
 		DeltaTime,
-		10.0f
+		10.f
 	);
 
-	SetActorLocationAndRotation(NextLocation, InterpolatedRotation);
+	FHitResult HitResult;
+	SetActorLocationAndRotation(NextLocation, InterpolatedRotation, /*bSweep=*/ true, /*OutHit=*/ &HitResult);
 
-	FVector FinalVelocity = MoveDir * Speed;
-	GetCharacterMovement()->Velocity = FinalVelocity;
+	FVector NewLocation = GetActorLocation();
+	FVector DeltaMove = (NewLocation - CurrentLocation);
+
+	if (DeltaMove.SizeSquared() > KINDA_SMALL_NUMBER)
+	{
+		FVector NewVelocity = DeltaMove / DeltaTime;
+		GetCharacterMovement()->Velocity = NewVelocity;
+	}
+	else
+	{
+		GetCharacterMovement()->Velocity = FVector::ZeroVector;
+	}
 }
 
 void AGPCharacterBase::HandleRemoteJumpSync()
