@@ -94,7 +94,7 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 	}
 	LOG(std::format("Player [{}] Move {}", playerId, pos.ToString()));
 	player->GetInfo().SetLocationAndYaw(pos);
-	player->GetInfo().AddState(static_cast<ECharacterStateType>(state));
+	player->GetInfo().State = static_cast<ECharacterStateType>(state);
 	UpdateViewList(player);
 	auto pkt = MovePacket(playerId, pos, state, time);
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
@@ -122,7 +122,7 @@ void GameWorld::PlayerAttack(int32 playerId)
 		else
 		{
 			if (!monster->IsDead()) continue;
-			player->AddExp(10);
+			player->AddExp(10 * monster->GetInfo().GetLevel());
 			SpawnWorldItem({ monster->GetInfo().Pos.X, monster->GetInfo().Pos.Y, monster->GetInfo().Pos.Z + 20 });
 			RemoveCharacter(monsterId);
 		}
