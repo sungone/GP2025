@@ -244,7 +244,7 @@ void AGPCharacterBase::HandleRemoteJumpSync()
 	{
 		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 	}
-	else if (GetActorLocation().Z < 147.7f)
+	else if (GetActorLocation().Z < Ground_ZLocation + 10.f)
 	{
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	}

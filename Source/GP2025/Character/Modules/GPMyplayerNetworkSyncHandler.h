@@ -29,7 +29,6 @@ public:
 	FInfoData LastSendPlayerInfo;
 	float MovePacketSendTimer = PAKCETSENDTIME;
 	bool bWasJumping = false;
-	float GroundZLocation = 147.7f;
 
 	bool isJumpStart = false;
 

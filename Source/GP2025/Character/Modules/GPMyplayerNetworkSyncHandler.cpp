@@ -5,6 +5,7 @@
 #include "Character/GPCharacterMyplayer.h"
 #include "Network/GPNetworkManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GPMyplayerNetworkSyncHandler.h"
 
 
 void UGPMyplayerNetworkSyncHandler::Initialize(AGPCharacterMyplayer* InOwner)
@@ -58,6 +59,7 @@ void UGPMyplayerNetworkSyncHandler::HandleIdleState()
 // 2. 점프 시 처리
 void UGPMyplayerNetworkSyncHandler::HandleJumpState()
 {
+	// 점프 시작 처리
 	if (Owner->NetworkSyncHandler->isJumpStart && !bWasJumping)
 	{
 		Owner->NetworkSyncHandler->isJumpStart = false;
@@ -66,28 +68,38 @@ void UGPMyplayerNetworkSyncHandler::HandleJumpState()
 		Owner->NetMgr->SendPlayerMovePacket();
 		LastSendPlayerInfo = Owner->CharacterInfo;
 
-		UE_LOG(LogTemp, Log, TEXT("Send Packet: Jump"));
+		UE_LOG(LogTemp, Log, TEXT("[UGPMyplayerNetworkSyncHandler::HandleJumpState] Jump Start"));
 		return;
 	}
 
-	if (Owner->GetCharacterMovement()->IsMovingOnGround())
+	// 착지 처리
+	if (bWasJumping && Owner->GetCharacterMovement()->IsMovingOnGround())
 	{
 		bWasJumping = false;
+		UE_LOG(LogTemp, Log, TEXT("[UGPMyplayerNetworkSyncHandler::HandleJumpState] Jump End"));
 	}
 
+	// [UGPMyplayerNetworkSyncHandler::HandleJumpState] 공중 체류 강제 보정 처리
 	const float AirThreshold = 10.f;
 	if (Owner->CharacterInfo.HasState(STATE_IDLE) &&
 		!Owner->CharacterInfo.HasState(STATE_JUMP) &&
-		(LastSendPlayerInfo.Pos.Z - GroundZLocation) > AirThreshold)
+		(LastSendPlayerInfo.Pos.Z - Owner->Ground_ZLocation) > AirThreshold)
 	{
-		Owner->CharacterInfo.Pos.Z = GroundZLocation;
-		Owner->CharacterInfo.Stats.Speed = LastSendPlayerInfo.HasState(STATE_RUN) ? 
-			Owner->NetworkSyncHandler->SprintSpeed : Owner->NetworkSyncHandler->WalkSpeed;
+		Owner->CharacterInfo.Pos.Z = Owner->Ground_ZLocation;
 
 		Owner->NetMgr->SendPlayerMovePacket();
 		LastSendPlayerInfo = Owner->CharacterInfo;
 
-		UE_LOG(LogTemp, Log, TEXT("Send Packet: Air Fix"));
+		if (Owner->GetMesh())
+		{
+			UGPCharacterAnimInstance* AnimInstance = Cast<UGPCharacterAnimInstance>(Owner->GetMesh()->GetAnimInstance());
+			if (AnimInstance)
+			{
+				AnimInstance->bIsFalling = false;
+			}
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("[UGPMyplayerNetworkSyncHandler::HandleJumpState] Air Fix Issue"));
 	}
 }
 
