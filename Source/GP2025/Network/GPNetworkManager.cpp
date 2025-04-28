@@ -266,6 +266,12 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->UpdatePlayer(Pkt->PlayerID, Pkt->SkillGID);
 				break;
 			}
+			case EPacketType::S_LEVEL_UP:
+			{
+				PlayerLevelUpPacket* Pkt = reinterpret_cast<PlayerLevelUpPacket*>(RemainingData.GetData());
+				ObjectMgr->LevelUp(Pkt->SkillGID);
+				break;
+			}
 #pragma endregion
 #pragma region Monster
 			case EPacketType::S_ADD_MONSTER:

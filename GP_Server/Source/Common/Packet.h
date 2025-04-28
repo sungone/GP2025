@@ -141,7 +141,15 @@ struct MovePacket : public Packet
 		Header.PacketSize = sizeof(MovePacket);
 	}
 };
-
+struct PlayerLevelUpPacket : public Packet
+{
+	FInfoData PlayerInfo;
+	PlayerLevelUpPacket(const FInfoData& PlayerInfo_)
+		: Packet(EPacketType::S_LEVEL_UP), PlayerInfo(PlayerInfo_)
+	{
+		Header.PacketSize = sizeof(PlayerLevelUpPacket);
+	}
+};
 #pragma region Attack
 struct AttackPacket : public Packet
 {

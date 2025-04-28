@@ -126,6 +126,12 @@ void UGPObjectManager::SkillUnlock(ESkillGroup SkillGID)
 	//스킬 해금
 }
 
+void UGPObjectManager::LevelUp(FInfoData& PlayerInfo)
+{
+	//Todo:
+	//레벨업 UI 및 이펙트
+}
+
 void UGPObjectManager::AddMonster(FInfoData& MonsterInfo)
 {
 	if (World == nullptr)

@@ -386,8 +386,10 @@ void Player::AddExp(float amount)
 void Player::LevelUp()
 {
 	_stats.Level++;
-
 	ApplyLevelStats(_stats.Level);
+	auto pkt = PlayerLevelUpPacket(_info);
+	SessionManager::GetInst().SendPacket(_id, &pkt);
+
 	UnlockSkillsOnLevelUp();
 }
 
