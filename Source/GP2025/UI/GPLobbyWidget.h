@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "UI/GPCharacterSelectButtonWidget.h"
 #include "GPLobbyWidget.generated.h"
 
 class UButton;
@@ -17,18 +18,17 @@ class GP2025_API UGPLobbyWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public :
-	//UPROPERTY(meta = (BindWidget))
-	//UButton* ButtonNewGameMale;
+	virtual void NativeConstruct() override;
 
-	//UPROPERTY(meta = (BindWidget))
-	//UButton* ButtonNewGameFemale;
+	// 남자 캐릭터 선택 버튼
+	UPROPERTY(meta = (BindWidget))
+	class UGPCharacterSelectButtonWidget* SelectMan;
 
-	//UPROPERTY(meta = (BindWidget))
-	//UButton* ButtonContinue;
+	// 여자 캐릭터 선택 버튼
+	UPROPERTY(meta = (BindWidget))
+	class UGPCharacterSelectButtonWidget* SelectWoman;
 
-	//UPROPERTY(meta = (BindWidget))
-	//UButton* ButtonBack;
-
-	//UPROPERTY(meta = (BindWidget))
-	//UButton* ButtonExit;
+	// 캐릭터 선택 처리
+	UFUNCTION()
+	void OnCharacterSelected(ELobbyCharacterSelectType SelectedType);
 };
