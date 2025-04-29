@@ -90,15 +90,6 @@ void UGPMyplayerNetworkSyncHandler::HandleJumpState()
 		Owner->NetMgr->SendPlayerMovePacket();
 		LastSendPlayerInfo = Owner->CharacterInfo;
 
-		if (Owner->GetMesh())
-		{
-			UGPCharacterAnimInstance* AnimInstance = Cast<UGPCharacterAnimInstance>(Owner->GetMesh()->GetAnimInstance());
-			if (AnimInstance)
-			{
-				AnimInstance->bIsFalling = false;
-			}
-		}
-
 		UE_LOG(LogTemp, Log, TEXT("[UGPMyplayerNetworkSyncHandler::HandleJumpState] Air Fix Issue"));
 	}
 }

@@ -22,6 +22,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include <random>
+#include "GPCharacterBase.h"
 static std::random_device rd;
 static std::mt19937 gen(rd());
 
@@ -135,6 +136,12 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	HandleRSkillState();
 	HandleRemoteMovementSync(DeltaTime);
 	HandleRemoteJumpSync();
+
+	//if (!CharacterInfo.HasState(STATE_JUMP) && GetCharacterMovement() && !GetCharacterMovement()->IsFalling())
+	//{
+	//	SetGroundZLocation(GetActorLocation().Z);
+	//	UE_LOG(LogTemp, Log, TEXT("Set Z Location : %f") , Ground_ZLocation);
+	//}
 }
 
 void AGPCharacterBase::PostInitializeComponents()
@@ -240,14 +247,20 @@ void AGPCharacterBase::HandleRemoteMovementSync(float DeltaTime)
 
 void AGPCharacterBase::HandleRemoteJumpSync()
 {
+	const float ZAcceptableRangeValues = 10.f;
 	if (CharacterInfo.HasState(STATE_JUMP))
 	{
 		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 	}
-	else if (GetActorLocation().Z < Ground_ZLocation + 10.f)
+	else if (GetActorLocation().Z < Ground_ZLocation + ZAcceptableRangeValues)
 	{
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	}
+}
+
+void AGPCharacterBase::SetGroundZLocation(float Z)
+{
+	Ground_ZLocation = Z;
 }
 
 USkeletalMeshComponent* AGPCharacterBase::GetCharacterMesh() const

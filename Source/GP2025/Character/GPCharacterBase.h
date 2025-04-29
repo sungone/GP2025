@@ -45,7 +45,8 @@ public:
 	void HandleRSkillState();
 	void HandleRemoteMovementSync(float DeltaTime);
 	void HandleRemoteJumpSync();
-	const float Ground_ZLocation = 162.55f;
+	float Ground_ZLocation = 162.55f;
+	void SetGroundZLocation(float Z);
 
 	// <Appearance>
 	virtual USkeletalMeshComponent* GetCharacterMesh() const;
