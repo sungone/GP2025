@@ -41,5 +41,6 @@ public :
 
 public :
 
+	UFUNCTION()
 	void HandleClicked();
 };

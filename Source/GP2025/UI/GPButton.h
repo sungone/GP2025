@@ -16,4 +16,4 @@ class GP2025_API UGPButton : public UButton
 	
 };
 
-// BP_PauseScreenButton 에서 필요한 클래스
+// WBP_CharacterSelectButton 에서 필요한 클래스

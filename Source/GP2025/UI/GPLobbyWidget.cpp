@@ -26,10 +26,12 @@ void UGPLobbyWidget::OnCharacterSelected(ELobbyCharacterSelectType SelectedType)
 	switch (SelectedType)
 	{
 	case ELobbyCharacterSelectType::MAN:
+		UE_LOG(LogTemp, Log, TEXT("[Lobby] Man Character Selected. "));
 		// ToDo : 남자 캐릭터 3D 모델 활성화 또는 서버 전송 등
 		break;
 
 	case ELobbyCharacterSelectType::WOMAN:
+		UE_LOG(LogTemp, Log, TEXT("[Lobby] Woman Character Selected. "));
 		// ToDo : 여자 캐릭터 3D 모델 활성화 또는 서버 전송 등
 		break;
 	}
