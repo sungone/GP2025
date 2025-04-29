@@ -106,8 +106,12 @@ void UGPObjectManager::UpdatePlayer(int32 PlayerID, ESkillGroup SkillGID)
 {
 	if (Players.Contains(PlayerID))
 	{
-		//Todo:
-		//Players[PlayerID]->스킬애니메이션 재생
+		if (SkillGID == ESkillGroup::HitHard || SkillGID == ESkillGroup::Throwing)
+			Players[PlayerID]->CombatHandler->PlayQSkillMontage();
+		else if (SkillGID == ESkillGroup::Clash || SkillGID == ESkillGroup::FThrowing)
+			Players[PlayerID]->CombatHandler->PlayESkillMontage();
+		else if (SkillGID == ESkillGroup::Whirlwind || SkillGID == ESkillGroup::Anger)
+			Players[PlayerID]->CombatHandler->PlayRSkillMontage();
 	}
 }
 
@@ -316,5 +320,5 @@ void UGPObjectManager::EquipItem(int32 PlayerID, uint8 ItemType)
 
 void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType)
 {
-	
+
 }
