@@ -240,6 +240,8 @@ void UGPMyplayerInputHandler::StartAiming()
 	if (!Owner || !Owner->bIsGunnerCharacter()) return;
 
 	Owner->CameraHandler->bWantsToZoom = true;
+	Owner->CharacterInfo.AddState(STATE_AIMING);
+	Owner->NetMgr->SendPlayerStartAiming(Owner->GetActorRotation().Yaw);
 
 	if (Owner->UIManager->GunCrosshairWidget)
 	{
@@ -252,6 +254,8 @@ void UGPMyplayerInputHandler::StopAiming()
 	if (!Owner || !Owner->bIsGunnerCharacter()) return;
 
 	Owner->CameraHandler->bWantsToZoom = false;
+	Owner->CharacterInfo.RemoveState(STATE_AIMING);
+	Owner->NetMgr->SendPlayerStopAiming();
 
 	if (Owner->UIManager->GunCrosshairWidget)
 	{

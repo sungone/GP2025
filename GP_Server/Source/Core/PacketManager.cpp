@@ -147,13 +147,14 @@ void PacketManager::HandleMovePacket(int32 sessionId, Packet* packet)
 
 void PacketManager::HandleStartAimingPacket(int32 sessionId, Packet* packet)
 {
-	SelectCharacterPacket* p = static_cast<SelectCharacterPacket*>(packet);
+	StartAimingPacket* p = static_cast<StartAimingPacket*>(packet);
+	_gameWorld.PlayerSetYaw(sessionId, p->PlayerYaw);
 	_gameWorld.PlayerAddState(sessionId, ECharacterStateType::STATE_AIMING);
 }
 
 void PacketManager::HandleStopAimingPacket(int32 sessionId, Packet* packet)
 {
-	SelectCharacterPacket* p = static_cast<SelectCharacterPacket*>(packet);
+	StopAimingPacket* p = static_cast<StopAimingPacket*>(packet);
 	_gameWorld.PlayerRemoveState(sessionId, ECharacterStateType::STATE_AIMING);
 }
 
