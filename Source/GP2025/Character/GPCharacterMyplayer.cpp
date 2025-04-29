@@ -12,11 +12,14 @@
 #include "Blueprint/UserWidget.h"
 #include "Player/GPPlayerController.h"
 #include "UI/GPInGameWidget.h"
+#include "Components/ProgressBar.h"
 #include "Character/Modules/GPMyplayerInputHandler.h" 
 #include "Character/Modules/GPMyplayerUIManager.h"
 #include "Character/Modules/GPMyplayerCameraHandler.h"
 #include "Character/Modules/GPMyplayerNetworkSyncHandler.h"
 #include "Skill/GPSkillCoolDownHandler.h"
+#include "Components/TextBlock.h"
+#include "GPCharacterMyplayer.h"
 
 AGPCharacterMyplayer::AGPCharacterMyplayer()
 {
@@ -50,6 +53,7 @@ void AGPCharacterMyplayer::BeginPlay()
 	SkillCoolDownHandler = NewObject<UGPSkillCoolDownHandler>(this, UGPSkillCoolDownHandler::StaticClass());
 	if (SkillCoolDownHandler)
 		SkillCoolDownHandler->Init(this);
+	SkillCoolDownHandler->AddToRoot();
 
 	// Network Sync Handler
 	NetworkSyncHandler = NewObject<UGPMyplayerNetworkSyncHandler>(this, UGPMyplayerNetworkSyncHandler::StaticClass());
@@ -70,6 +74,27 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 
 	if (NetworkSyncHandler)
 		NetworkSyncHandler->Tick(DeltaTime);
+
+	if (!SkillCoolDownHandler || !IsValid(SkillCoolDownHandler))
+		return;
+	UpdateSkillCooldownBars();
+}
+
+void AGPCharacterMyplayer::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	// AddToRoot ¹ÝÈ¯
+	if (SkillCoolDownHandler)
+	{
+		if (SkillCoolDownHandler->IsRooted())
+		{
+			SkillCoolDownHandler->RemoveFromRoot();
+			UE_LOG(LogTemp, Warning, TEXT("SkillCoolDownHandler RemoveFromRoot() called in EndPlay."));
+		}
+
+		SkillCoolDownHandler = nullptr;
+	}
 }
 
 void AGPCharacterMyplayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -129,6 +154,75 @@ void AGPCharacterMyplayer::SetCharacterData(const UGPCharacterControlData* Chara
 		NetworkSyncHandler->WalkSpeed = CharacterControlData->WalkSpeed;
 		NetworkSyncHandler->SprintSpeed = CharacterControlData->SprintSpeed;
 	}
+}
+
+float AGPCharacterMyplayer::GetSkillCooldownRatio(ESkillGroup SkillGroup)
+{
+	if (!SkillCoolDownHandler)
+	{
+		return 0.f;
+	}
+
+	int32 UnlockLevel = SkillCoolDownHandler->GetUnlockLevelForSkill(SkillGroup);
+	int32 SkillLevel = SkillCoolDownHandler->GetSkillLevelByPlayerLevel(CharacterInfo.GetLevel(), UnlockLevel);
+
+	if (SkillLevel <= 0)
+	{
+		return 1.f;
+	}
+
+	float TotalCooldown = SkillCoolDownHandler->GetTotalCooldownTime(static_cast<int32>(SkillGroup), SkillLevel);
+	float RemainingCooldown = SkillCoolDownHandler->GetRemainingCooldownTime(static_cast<int32>(SkillGroup), SkillLevel);
+
+	if (TotalCooldown <= 0.f)
+	{
+		return 0.f;
+	}
+
+	return FMath::Clamp(RemainingCooldown / TotalCooldown, 0.f, 1.f);
+}
+
+void AGPCharacterMyplayer::UpdateSkillCooldownBars()
+{
+	if (!UIManager || !UIManager->GetInGameWidget()
+		|| !UIManager->GetInGameWidget()->QSkillBar || !UIManager->GetInGameWidget()->ESkillBar || !UIManager->GetInGameWidget()->RSkillBar)
+		return;
+
+	if (SkillCoolDownHandler->SkillCooldownTimes.Num() == 0)
+	{
+		return;
+	}
+
+	const bool bIsGunner = bIsGunnerCharacter();
+	const int32 CurrentLevel = CharacterInfo.GetLevel();
+
+	if (CurrentLevel < 2)
+		UIManager->GetInGameWidget()->QSkillBar->SetPercent(0.f);
+	else if (bIsGunner)
+		UIManager->GetInGameWidget()->QSkillBar->SetPercent(1 - GetSkillCooldownRatio(ESkillGroup::Throwing));
+	else
+		UIManager->GetInGameWidget()->QSkillBar->SetPercent(1 - GetSkillCooldownRatio(ESkillGroup::HitHard));
+
+	UIManager->GetInGameWidget()->QSkillText->SetColorAndOpacity(UIManager->GetInGameWidget()->GetQSkillTextColor());
+
+	if (CurrentLevel < 5)
+		UIManager->GetInGameWidget()->ESkillBar->SetPercent(0.f);
+	else if (bIsGunner)
+		UIManager->GetInGameWidget()->ESkillBar->SetPercent(1 - GetSkillCooldownRatio(ESkillGroup::FThrowing));
+	else
+		UIManager->GetInGameWidget()->ESkillBar->SetPercent(1 - GetSkillCooldownRatio(ESkillGroup::Clash));
+
+	UIManager->GetInGameWidget()->ESkillText->SetColorAndOpacity(UIManager->GetInGameWidget()->GetESkillTextColor());
+
+	if (CurrentLevel < 8)
+		UIManager->GetInGameWidget()->RSkillBar->SetPercent(0.f);
+	else if (bIsGunner)
+		UIManager->GetInGameWidget()->RSkillBar->SetPercent(1 - GetSkillCooldownRatio(ESkillGroup::Anger));
+	else
+		UIManager->GetInGameWidget()->RSkillBar->SetPercent(1 - GetSkillCooldownRatio(ESkillGroup::Whirlwind));
+
+	UIManager->GetInGameWidget()->RSkillText->SetColorAndOpacity(UIManager->GetInGameWidget()->GetRSkillTextColor());
+
 }
 
 void AGPCharacterMyplayer::ChangePlayerType()

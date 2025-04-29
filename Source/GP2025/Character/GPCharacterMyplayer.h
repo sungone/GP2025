@@ -22,6 +22,7 @@ public:
 	AGPCharacterMyplayer();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
 	// <Network>
@@ -54,6 +55,11 @@ public:
 
 	// <Skill Cool Down Handler>
 	class UGPSkillCoolDownHandler* SkillCoolDownHandler;
+
+	// <Skill Cool UI System>
+public :
+	float GetSkillCooldownRatio(enum class ESkillGroup SkillGroup);
+	void UpdateSkillCooldownBars();
 	
 	// <CharacterType> 
 public :

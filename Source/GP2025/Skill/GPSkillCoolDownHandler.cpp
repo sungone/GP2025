@@ -6,6 +6,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Skill/GPSkillStruct.h"
 #include "Character/GPCharacterMyplayer.h"
+#include "GPSkillCoolDownHandler.h"
 
 UGPSkillCoolDownHandler::UGPSkillCoolDownHandler()
 {
@@ -131,3 +132,68 @@ int32 UGPSkillCoolDownHandler::GetSkillLevelByPlayerLevel(int32 PlayerLevel, int
     return FMath::Clamp(SkillLevel, 1, 3); 
 }
 
+float UGPSkillCoolDownHandler::GetRemainingCooldownTime(int32 SkillGroup, int32 SkillLevel) const
+{
+    if (!IsValid(this) || !IsValid(Owner))
+    {
+        UE_LOG(LogTemp, Error, TEXT("[GetRemainingCooldownTime] Invalid this or Owner"));
+        return 0.f;
+    }
+
+    if (SkillCooldownTimes.Num() == 0)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[GetRemainingCooldownTime] SkillCooldownTimes EMPTY!"));
+        const_cast<UGPSkillCoolDownHandler*>(this)->Init(Owner);
+    }
+
+    FSkillKey Key(SkillGroup, SkillLevel);
+
+    const float* CooldownTime = SkillCooldownTimes.Find(Key);
+    const float* LastUseTime = LastSkillUseTimes.Find(Key);
+
+    if (!CooldownTime || !LastUseTime || !Owner || !Owner->GetWorld())
+    {
+        return 0.0f;
+    }
+
+    float CurrentTime = Owner->GetWorld()->GetTimeSeconds();
+    float ElapsedTime = CurrentTime - *LastUseTime;
+    float RemainingTime = *CooldownTime - ElapsedTime;
+
+    return FMath::Clamp(RemainingTime, 0.0f, *CooldownTime);
+}
+
+float UGPSkillCoolDownHandler::GetTotalCooldownTime(int32 SkillGroup, int32 SkillLevel) const
+{
+    if (!IsValid(this))
+    {
+        UE_LOG(LogTemp, Error, TEXT("[GetTotalCooldownTime] THIS is invalid!"));
+        return 0.f;
+    }
+
+    if (!IsValid(Owner))
+    {
+        UE_LOG(LogTemp, Error, TEXT("[GetTotalCooldownTime] Owner is invalid!"));
+        return 0.f;
+    }
+
+    if (SkillCooldownTimes.Num() == 0)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[GetTotalCooldownTime] SkillCooldownTimes is EMPTY!"));
+        const_cast<UGPSkillCoolDownHandler*>(this)->Init(Owner);
+    }
+
+    FSkillKey Key(SkillGroup, SkillLevel);
+
+    const float* CooldownTime = SkillCooldownTimes.Find(Key);
+
+    if (!CooldownTime)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[GetTotalCooldownTime] Cooldown data NOT FOUND! SkillGroup: %d, SkillLevel: %d"), SkillGroup, SkillLevel);
+        return 0.f;
+    }
+
+    UE_LOG(LogTemp, Log, TEXT("[GetTotalCooldownTime] Cooldown FOUND! SkillGroup: %d, SkillLevel: %d, CooldownTime: %.2f"), SkillGroup, SkillLevel, *CooldownTime);
+
+    return *CooldownTime;
+}

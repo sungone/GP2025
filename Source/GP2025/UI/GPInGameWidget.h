@@ -35,8 +35,21 @@ public :
     UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "UI")
     class UProgressBar* RSkillBar;
 
+    UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "UI")
+    class UTextBlock* QSkillText;
+
+    UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "UI")
+    class UTextBlock* ESkillText;
+
+    UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "UI")
+    class UTextBlock* RSkillText;
+
 public :
     void UpdateHealthBar(float Ratio);
     void UpdateExpBar(float Ratio);
     void UpdatePlayerLevel(__int32 NewLevel);
+
+    struct FSlateColor GetQSkillTextColor();
+    struct FSlateColor GetESkillTextColor();
+    struct FSlateColor GetRSkillTextColor();
 };

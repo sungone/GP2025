@@ -52,7 +52,10 @@ public:
     int32 GetUnlockLevelForSkill(enum class ESkillGroup SkillGroup);
     int32 GetSkillLevelByPlayerLevel(int32 PlayerLevel, int32 UnlockLevel);
 
-private:
+    float GetRemainingCooldownTime(int32 SkillGroup, int32 SkillLevel) const;
+    float GetTotalCooldownTime(int32 SkillGroup, int32 SkillLevel) const;
+
+public:
     UPROPERTY()
     AGPCharacterMyplayer* Owner;
 

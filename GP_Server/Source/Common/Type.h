@@ -151,7 +151,7 @@ enum class EItemCategory
 	Unknown
 };
 
-enum class ESkillGroup : uint32
+enum class ESkillGroup
 {
 	HitHard = 1,
 	Clash,
