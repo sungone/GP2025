@@ -125,11 +125,6 @@ void AGPCharacterMyplayer::SetCharacterData(const UGPCharacterControlData* Chara
 	}
 }
 
-bool AGPCharacterMyplayer::bIsGunnerCharacter() const
-{
-	return (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER);
-}
-
 void AGPCharacterMyplayer::ChangePlayerType()
 {
 	if (bIsGunnerCharacter())

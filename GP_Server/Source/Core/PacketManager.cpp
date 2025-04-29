@@ -32,7 +32,14 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 		LOG(LogType::RecvLog, std::format("AttackPacket from [{}]", sessionId));
 		HandleAttackPacket(sessionId, packet);
 		break;
-
+	case EPacketType::C_START_AIMING:
+		LOG(LogType::RecvLog, std::format("StartAimingPacket from [{}]", sessionId));
+		HandleStartAimingPacket(sessionId, packet);
+		break;
+	case EPacketType::C_STOP_AIMING:
+		LOG(LogType::RecvLog, std::format("StopAimingPacket from [{}]", sessionId));
+		HandleStopAimingPacket(sessionId, packet);
+		break;
 
 	case EPacketType::C_USE_SKILL:
 		LOG(LogType::RecvLog, std::format("UseSkillPacket from [{}]", sessionId));
@@ -138,11 +145,23 @@ void PacketManager::HandleMovePacket(int32 sessionId, Packet* packet)
 	_gameWorld.PlayerMove(p->PlayerID, p->PlayerPos, p->State, p->MoveTime);
 }
 
+void PacketManager::HandleStartAimingPacket(int32 sessionId, Packet* packet)
+{
+	SelectCharacterPacket* p = static_cast<SelectCharacterPacket*>(packet);
+	_gameWorld.PlayerAddState(sessionId, ECharacterStateType::STATE_AIMING);
+}
+
+void PacketManager::HandleStopAimingPacket(int32 sessionId, Packet* packet)
+{
+	SelectCharacterPacket* p = static_cast<SelectCharacterPacket*>(packet);
+	_gameWorld.PlayerRemoveState(sessionId, ECharacterStateType::STATE_AIMING);
+}
+
 void PacketManager::HandleAttackPacket(int32 sessionId, Packet* packet)
 {
 	AttackPacket* p = static_cast<AttackPacket*>(packet);
 	_gameWorld.PlayerSetYaw(sessionId, p->PlayerYaw);
-	_gameWorld.PlayerSetState(sessionId, ECharacterStateType::STATE_AUTOATTACK);
+	_gameWorld.PlayerAddState(sessionId, ECharacterStateType::STATE_AUTOATTACK);
 	_gameWorld.PlayerAttack(sessionId);
 }
 

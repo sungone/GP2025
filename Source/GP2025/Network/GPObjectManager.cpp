@@ -102,7 +102,7 @@ void UGPObjectManager::UpdatePlayer(FInfoData& PlayerInfo)
 	}
 }
 
-void UGPObjectManager::UpdatePlayer(int32 PlayerID, ESkillGroup SkillGID)
+void UGPObjectManager::PlayerUseSkill(int32 PlayerID, ESkillGroup SkillGID)
 {
 	if (Players.Contains(PlayerID))
 	{

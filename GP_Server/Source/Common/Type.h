@@ -8,6 +8,8 @@ enum EPacketType : uint8
 
 	C_MOVE,
 	C_ATTACK,
+	C_START_AIMING,
+	C_STOP_AIMING,
 	C_USE_SKILL,
 
 	C_TAKE_ITEM,
@@ -149,7 +151,7 @@ enum class EItemCategory
 	Unknown
 };
 
-enum class ESkillGroup
+enum class ESkillGroup : uint32
 {
 	HitHard = 1,
 	Clash,
@@ -172,4 +174,5 @@ enum ECharacterStateType : uint32
 	STATE_SKILL_Q = 1 << 6,
 	STATE_SKILL_E = 1 << 7,
 	STATE_SKILL_R = 1 << 8,
+	STATE_AIMING = 1 << 9,
 };

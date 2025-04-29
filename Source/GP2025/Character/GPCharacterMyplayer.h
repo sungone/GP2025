@@ -55,8 +55,6 @@ public:
 	// <CharacterType> 
 public :
 	UFUNCTION(BlueprintCallable, Category = "CharacterType")
-	bool bIsGunnerCharacter() const;
-	UFUNCTION(BlueprintCallable, Category = "CharacterType")
 	void ChangePlayerType();
 	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
 	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
