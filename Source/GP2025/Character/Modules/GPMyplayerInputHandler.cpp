@@ -266,15 +266,10 @@ void UGPMyplayerInputHandler::StopAiming()
 void UGPMyplayerInputHandler::UseSkillQ()
 {
 	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() || Owner->CharacterInfo.HasState(STATE_SKILL_Q)) return;
-	int32 PlayerLevel = Owner->CharacterInfo.GetLevel();
 	ESkillGroup SkillGroup = Owner->bIsGunnerCharacter() ? ESkillGroup::Throwing : ESkillGroup::HitHard;
-	int32 UnlockLevel = Owner->SkillCoolDownHandler->GetUnlockLevelForSkill(SkillGroup);
-	int32 SkillLevel = Owner->SkillCoolDownHandler->GetSkillLevelByPlayerLevel(PlayerLevel, UnlockLevel);
-
-	if (SkillLevel == 0)
-	{
+	int32 SkillLevel = Owner->CharacterInfo.GetSkillLevel(SkillGroup);
+	if (SkillLevel == -1)
 		return;
-	}
 
 	if (!Owner->SkillCoolDownHandler->CanUseSkill(static_cast<int32>(SkillGroup), SkillLevel))
 	{
@@ -302,15 +297,10 @@ void UGPMyplayerInputHandler::UseSkillQ()
 void UGPMyplayerInputHandler::UseSkillE()
 {
 	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() || Owner->CharacterInfo.HasState(STATE_SKILL_E)) return;
-	int32 PlayerLevel = Owner->CharacterInfo.GetLevel();
 	ESkillGroup SkillGroup = Owner->bIsGunnerCharacter() ? ESkillGroup::FThrowing : ESkillGroup::Clash;
-	int32 UnlockLevel = Owner->SkillCoolDownHandler->GetUnlockLevelForSkill(SkillGroup);
-	int32 SkillLevel = Owner->SkillCoolDownHandler->GetSkillLevelByPlayerLevel(PlayerLevel, UnlockLevel);
-
-	if (SkillLevel == 0)
-	{
+	int32 SkillLevel = Owner->CharacterInfo.GetSkillLevel(SkillGroup);
+	if (SkillLevel == -1)
 		return;
-	}
 
 	if (!Owner->SkillCoolDownHandler->CanUseSkill(static_cast<int32>(SkillGroup), SkillLevel))
 	{
@@ -338,15 +328,10 @@ void UGPMyplayerInputHandler::UseSkillE()
 void UGPMyplayerInputHandler::UseSkillR()
 {
 	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() || Owner->CharacterInfo.HasState(STATE_SKILL_R)) return;
-	int32 PlayerLevel = Owner->CharacterInfo.GetLevel();
 	ESkillGroup SkillGroup = Owner->bIsGunnerCharacter() ? ESkillGroup::Anger : ESkillGroup::Whirlwind;
-	int32 UnlockLevel = Owner->SkillCoolDownHandler->GetUnlockLevelForSkill(SkillGroup);
-	int32 SkillLevel = Owner->SkillCoolDownHandler->GetSkillLevelByPlayerLevel(PlayerLevel, UnlockLevel);
-
-	if (SkillLevel == 0)
-	{
+	int32 SkillLevel = Owner->CharacterInfo.GetSkillLevel(SkillGroup);
+	if (SkillLevel == -1)
 		return;
-	}
 
 	if (!Owner->SkillCoolDownHandler->CanUseSkill(static_cast<int32>(SkillGroup), SkillLevel))
 	{

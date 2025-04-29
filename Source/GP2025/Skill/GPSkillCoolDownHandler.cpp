@@ -103,35 +103,6 @@ void UGPSkillCoolDownHandler::StartCoolDown(int32 SkillGroup, int32 SkillLevel)
     LastSkillUseTimes.Add(Key, Owner->GetWorld()->GetTimeSeconds());
 }
 
-int32 UGPSkillCoolDownHandler::GetUnlockLevelForSkill(ESkillGroup SkillGroup)
-{
-    switch (SkillGroup)
-    {
-    case ESkillGroup::HitHard:
-    case ESkillGroup::Throwing:
-        return 2;
-    case ESkillGroup::Clash:
-    case ESkillGroup::FThrowing:
-        return 5;
-    case ESkillGroup::Whirlwind:
-    case ESkillGroup::Anger:
-        return 8;
-    default:
-        return 999;
-    }
-}
-
-int32 UGPSkillCoolDownHandler::GetSkillLevelByPlayerLevel(int32 PlayerLevel, int32 UnlockLevel)
-{
-    if (PlayerLevel < UnlockLevel)
-    {
-        return 0;
-    }
-
-    int32 SkillLevel = 1 + (PlayerLevel - UnlockLevel);
-    return FMath::Clamp(SkillLevel, 1, 3); 
-}
-
 float UGPSkillCoolDownHandler::GetRemainingCooldownTime(int32 SkillGroup, int32 SkillLevel) const
 {
     if (!IsValid(this) || !IsValid(Owner))

@@ -272,6 +272,12 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->SkillUnlock(Pkt->SkillGID);
 				break;
 			}
+			case S_SKILL_UPGRADE:
+			{
+				UpgradeSkillPacket* Pkt = reinterpret_cast<UpgradeSkillPacket*>(RemainingData.GetData());
+				ObjectMgr->SkillUpgrade(Pkt->SkillGID);
+				break;
+			}
 			case EPacketType::S_PLAYER_USE_SKILL:
 			{
 				PlayerUseSkillPacket* Pkt = reinterpret_cast<PlayerUseSkillPacket*>(RemainingData.GetData());

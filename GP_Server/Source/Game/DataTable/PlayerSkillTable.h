@@ -11,7 +11,7 @@ enum class ESkillType
     AtkSpd
 };
 
-struct FSkillData
+struct FSkillTableData
 {
     uint32 TypeId;
     std::string Name;
@@ -37,11 +37,11 @@ public:
     }
 
     bool LoadFromCSV(const std::string& filePath);
-    const FSkillData* GetSkill(uint32 idx) const;
-    const FSkillData* GetSkill(uint32 groupId, uint32 skillLevel) const;
+    const FSkillTableData* GetSkill(uint32 idx) const;
+    const FSkillTableData* GetSkill(uint32 groupId, uint32 skillLevel) const;
 private:
-    std::unordered_map<uint32, FSkillData> _skillMap;
-    std::unordered_map<uint32, std::vector<FSkillData>> _groupMap;
+    std::unordered_map<uint32, FSkillTableData> _skillMap;
+    std::unordered_map<uint32, std::vector<FSkillTableData>> _groupMap;
     ESkillType StringToSkillType(const std::string& str);
     Type::EPlayer StringToWeaponType(const std::string& str);
 };

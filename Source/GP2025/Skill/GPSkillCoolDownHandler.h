@@ -49,9 +49,6 @@ public:
     bool CanUseSkill(int32 SkillGroup, int32 SkillLevel) const;
     void StartCoolDown(int32 SkillGroup, int32 SkillLevel);
 
-    int32 GetUnlockLevelForSkill(enum class ESkillGroup SkillGroup);
-    int32 GetSkillLevelByPlayerLevel(int32 PlayerLevel, int32 UnlockLevel);
-
     float GetRemainingCooldownTime(int32 SkillGroup, int32 SkillLevel) const;
     float GetTotalCooldownTime(int32 SkillGroup, int32 SkillLevel) const;
 

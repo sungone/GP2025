@@ -46,6 +46,9 @@ void PlayerSession::DoSend(const Packet* packet)
 	case S_SKILL_UNLOCK:
 		LOG(LogType::SendLog, std::format("SkillUnlock PKT to [{}]", _id));
 		break;
+	case S_SKILL_UPGRADE:
+		LOG(LogType::SendLog, std::format("SkillUpgrade PKT to [{}]", _id));
+		break;
 	case S_LEVEL_UP:
 		LOG(LogType::SendLog, std::format("LevelUp PKT to [{}]", _id));
 		break;

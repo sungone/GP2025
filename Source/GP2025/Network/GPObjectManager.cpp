@@ -139,6 +139,10 @@ void UGPObjectManager::SkillUnlock(ESkillGroup SkillGID)
 {
 	if (MyPlayer->EffectHandler)
 		MyPlayer->EffectHandler->PlaySkillUnlockEffect();
+}
+
+void UGPObjectManager::SkillUpgrade(ESkillGroup SkillGID)
+{
 	// Todo : UI 처리
 }
 
@@ -146,7 +150,6 @@ void UGPObjectManager::LevelUp(FInfoData& PlayerInfo)
 {
 	if (MyPlayer->EffectHandler)
 		MyPlayer->EffectHandler->PlayLevelUpEffect();
-	// Todo : UI 처리
 }
 
 void UGPObjectManager::AddMonster(FInfoData& MonsterInfo)

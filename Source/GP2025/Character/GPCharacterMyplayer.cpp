@@ -163,8 +163,7 @@ float AGPCharacterMyplayer::GetSkillCooldownRatio(ESkillGroup SkillGroup)
 		return 0.f;
 	}
 
-	int32 UnlockLevel = SkillCoolDownHandler->GetUnlockLevelForSkill(SkillGroup);
-	int32 SkillLevel = SkillCoolDownHandler->GetSkillLevelByPlayerLevel(CharacterInfo.GetLevel(), UnlockLevel);
+	int32 SkillLevel = CharacterInfo.GetSkillLevel(SkillGroup);
 
 	if (SkillLevel <= 0)
 	{

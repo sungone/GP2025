@@ -37,17 +37,17 @@ void Player::SetCharacterType(Type::EPlayer type)
 	{
 		_info.fovAngle = 90;
 		_info.AttackRadius = 300;
-		LearnSkill(ESkillGroup::HitHard);
-		LearnSkill(ESkillGroup::Clash);
-		LearnSkill(ESkillGroup::Whirlwind);
+		//LearnSkill(ESkillGroup::HitHard);
+		//LearnSkill(ESkillGroup::Clash);
+		//LearnSkill(ESkillGroup::Whirlwind);
 	}
 	else
 	{
 		_info.fovAngle = 10;
 		_info.AttackRadius = 1500;
-		LearnSkill(ESkillGroup::Throwing);
-		LearnSkill(ESkillGroup::FThrowing);
-		LearnSkill(ESkillGroup::Anger);
+		//LearnSkill(ESkillGroup::Throwing);
+		//LearnSkill(ESkillGroup::FThrowing);
+		//LearnSkill(ESkillGroup::Anger);
 	}
 }
 
@@ -155,7 +155,7 @@ bool Player::Attack(std::shared_ptr<Character> monster)
 
 	//float atkDamage = GetAttackDamage();
 	//for test
-	float atkDamage = 100;
+	float atkDamage = 300;
 	if (atkDamage > 0.0f)
 	{
 		monster->OnDamaged(atkDamage);
@@ -169,33 +169,28 @@ bool Player::Attack(std::shared_ptr<Character> monster)
 
 void Player::UseSkill(ESkillGroup groupId)
 {
-	if (groupId == ESkillGroup::None)
+	auto curSkill = _info.GetSkillData(groupId);
+	if (curSkill == nullptr || !curSkill->IsValid())
 	{
-		LOG("GetSkillGropID is None");
-		return;
-	}
-	auto it = _skillLevels.find(groupId);
-	if (it == _skillLevels.end())
-	{
-		LOG(Warning, std::format("Player [{}] has no skill group [{}]", _id, static_cast<uint32>(groupId)));
+		LOG(Warning, "Invaild!");
 		return;
 	}
 
-	uint32 level = it->second;
-	const FSkillData* skill = PlayerSkillTable::GetInst().GetSkill(static_cast<uint32>(groupId), level);
-	if (!skill)
+	uint32 level = curSkill->SkillLevel;
+	const FSkillTableData* skilltable = PlayerSkillTable::GetInst().GetSkill(static_cast<uint32>(groupId), level);
+	if (!skilltable)
 	{
-		LOG(Warning, std::format("Player [{}] has invalid skill data for group [{}] level [{}]", _id, static_cast<uint32>(groupId), level));
+		LOG(Warning, "Invaild!");
 		return;
 	}
 	LOG(std::format("Use Skill - {}", static_cast<uint8>(groupId)));
 	auto pkt = PlayerUseSkillPacket(_id, groupId);
 	SessionManager::GetInst().SendPacket(_id, &pkt);
 	SessionManager::GetInst().BroadcastToViewList(&pkt, _id);
-	ExecuteSkillEffect(*skill);
+	ExecuteSkillEffect(*skilltable);
 }
 
-void Player::ExecuteSkillEffect(const FSkillData& skill)
+void Player::ExecuteSkillEffect(const FSkillTableData& skill)
 {
 	if (skill.Type0 == ESkillType::Atk)
 	{
@@ -238,17 +233,29 @@ void Player::ExecuteSkillEffect(const FSkillData& skill)
 
 void Player::LearnSkill(ESkillGroup groupId)
 {
-	if (_skillLevels.contains(groupId)) return;
-	_skillLevels[groupId] = 1;
-	auto pkt = SkillUnlockPacket(groupId);
-	SessionManager::GetInst().SendPacket(_id, &pkt);
+	if (_info.GetSkillData(groupId) != nullptr)
+		return;
+
+	for (int i = 0; i < 3; ++i)
+	{
+		if (!_info.SkillLevels[i].IsValid())
+		{
+			_info.SkillLevels[i].SetSkill(groupId, 1);
+			return;
+		}
+	}
 }
 
 void Player::UpgradeSkill(ESkillGroup groupId)
 {
-	auto& lv = _skillLevels[groupId];
-	if (lv < 3)
-		lv++;
+	auto* skill = _info.GetSkillData(groupId);
+	if (!skill)
+	{
+		LOG(Warning, "Trying to upgrade unlearned skill");
+		return;
+	}
+
+	skill->LevelUp();
 }
 
 void Player::UnlockSkillsOnLevelUp()
@@ -275,7 +282,7 @@ void Player::UnlockSkillsOnLevelUp()
 	int32 skillGroup = baseGroup + (order % 3);
 	int32 skillLevel = (order / 3) + 1;
 
-	const FSkillData* skill = PlayerSkillTable::GetInst().GetSkill(skillGroup, skillLevel);
+	const FSkillTableData* skill = PlayerSkillTable::GetInst().GetSkill(skillGroup, skillLevel);
 	if (skill == nullptr)
 	{
 		LOG(Warning, "Invaild!");
@@ -283,15 +290,20 @@ void Player::UnlockSkillsOnLevelUp()
 	}
 	ESkillGroup groupId = static_cast<ESkillGroup>(skill->SkillGroup);
 
-	if (!_skillLevels.contains(groupId))
+	auto* curSkill = _info.GetSkillData(groupId);
+	if (!curSkill)
 	{
 		LearnSkill(groupId);
+		auto pkt = SkillUnlockPacket(groupId);
+		SessionManager::GetInst().SendPacket(_id, &pkt);
 		LOG(Log, std::format("Learned New Skill [{}] Level [{}]", static_cast<uint32>(groupId), skillLevel));
 	}
 	else
 	{
 		UpgradeSkill(groupId);
-		LOG(Log, std::format("Upgraded Skill [{}] to Level [{}]", static_cast<uint32>(groupId), _skillLevels[groupId]));
+		auto pkt = UpgradeSkillPacket(groupId);
+		SessionManager::GetInst().SendPacket(_id, &pkt);
+		LOG(Log, std::format("Upgraded Skill [{}] to Level [{}]", static_cast<uint32>(groupId), curSkill->SkillLevel));
 	}
 }
 

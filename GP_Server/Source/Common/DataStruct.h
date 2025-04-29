@@ -11,6 +11,46 @@ enum class DBResultCode : int32
 };
 
 #pragma pack(push,1)
+
+struct FSkillData
+{
+	ESkillGroup SkillGID;
+	int32 SkillLevel;
+
+	FSkillData()
+		: SkillGID(ESkillGroup::None), SkillLevel(0)
+	{
+	}
+
+	FSkillData(ESkillGroup group, int32 level)
+		: SkillGID(group), SkillLevel(level)
+	{
+	}
+
+	bool IsValid() const
+	{
+		return SkillGID != ESkillGroup::None && SkillLevel > 0;
+	}
+
+	void SetSkill(ESkillGroup group, int32 level)
+	{
+		SkillGID = group;
+		SkillLevel = level;
+	}
+
+	void LevelUp()
+	{
+		if (SkillLevel < 3)
+			++SkillLevel;
+	}
+
+	bool operator==(const FSkillData& other) const
+	{
+		return SkillGID == other.SkillGID && SkillLevel == other.SkillLevel;
+	}
+};
+
+
 struct FStatData
 {
 	uint32 Level;
@@ -47,6 +87,7 @@ struct FInfoData
 	FStatData Stats;
 	uint32 State;
 	uint32 Gold;
+	FSkillData SkillLevels[3]{};
 
 	FInfoData()
 		: ID(0),
@@ -81,7 +122,25 @@ struct FInfoData
 	float GetDodge() const { return Stats.Dodge; }
 	float GetSpeed() const { return Stats.Speed; }
 	const char* GetName() const { return NickName; }
+	int32 GetSkillLevel(ESkillGroup groupId) const
+	{
+		for (int i = 0; i < 3; ++i)
+		{
+			if (SkillLevels[i].SkillGID == groupId)
+				return SkillLevels[i].SkillLevel;
+		}
+		return -1;
+	}
 #ifdef SERVER_BUILD
+	FSkillData* GetSkillData(ESkillGroup groupId)
+	{
+		for (int i = 0; i < 3; ++i)
+		{
+			if (SkillLevels[i].SkillGID == groupId)
+				return &SkillLevels[i];
+		}
+		return nullptr;
+	}
 	void SetHp(float NewHp) { Stats.Hp = std::clamp(NewHp, 0.0f, Stats.MaxHp); }
 	void Heal(float Amount) { SetHp(Stats.Hp + Amount); }
 	void TakeDamage(float Amount) { SetHp(Stats.Hp - Amount); }

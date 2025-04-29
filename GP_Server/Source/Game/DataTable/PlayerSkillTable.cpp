@@ -18,7 +18,7 @@ bool PlayerSkillTable::LoadFromCSV(const std::string& filePath)
         std::stringstream ss(line);
         std::string cell;
 
-        FSkillData skill;
+        FSkillTableData skill;
 
         std::getline(ss, cell, ','); skill.TypeId = std::stoi(cell);
         std::getline(ss, skill.Name, ',');
@@ -40,7 +40,7 @@ bool PlayerSkillTable::LoadFromCSV(const std::string& filePath)
     return true;
 }
 
-const FSkillData* PlayerSkillTable::GetSkill(uint32 idx) const
+const FSkillTableData* PlayerSkillTable::GetSkill(uint32 idx) const
 {
     auto it = _skillMap.find(idx);
     if (it != _skillMap.end())
@@ -48,7 +48,7 @@ const FSkillData* PlayerSkillTable::GetSkill(uint32 idx) const
     return nullptr;
 }
 
-const FSkillData* PlayerSkillTable::GetSkill(uint32 groupId, uint32 skillLevel) const
+const FSkillTableData* PlayerSkillTable::GetSkill(uint32 groupId, uint32 skillLevel) const
 {
     auto it = _groupMap.find(groupId);
     if (it == _groupMap.end()) return nullptr;

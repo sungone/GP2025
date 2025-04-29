@@ -21,7 +21,7 @@ public:
 	bool Attack(std::shared_ptr<Character> target);
 
 	void UseSkill(ESkillGroup groupId);
-	void ExecuteSkillEffect(const FSkillData& skill);
+	void ExecuteSkillEffect(const FSkillTableData& skill);
 	void LearnSkill(ESkillGroup groupId);
 	void UpgradeSkill(ESkillGroup groupId);
 	void UnlockSkillsOnLevelUp();
@@ -68,5 +68,4 @@ private:
 	std::unordered_set<int32> _viewList;
 	FStatData& _stats = _info.Stats;
 	uint32& _gold = _info.Gold;
-	std::unordered_map<ESkillGroup, uint32> _skillLevels;
 };

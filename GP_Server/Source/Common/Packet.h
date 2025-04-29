@@ -222,6 +222,15 @@ struct SkillUnlockPacket : public Packet
 		Header.PacketSize = sizeof(SkillUnlockPacket);
 	}
 };
+struct UpgradeSkillPacket : public Packet
+{
+	ESkillGroup SkillGID;
+	UpgradeSkillPacket(ESkillGroup SkillGID_)
+		: Packet(EPacketType::S_SKILL_UPGRADE), SkillGID(SkillGID_)
+	{
+		Header.PacketSize = sizeof(UpgradeSkillPacket);
+	}
+};
 struct PlayerUseSkillPacket : public Packet
 {
 	int32 PlayerID;
