@@ -161,7 +161,23 @@ struct AttackPacket : public Packet
 		Header.PacketSize = sizeof(AttackPacket);
 	}
 };
-
+struct StartAimingPacket : public Packet
+{
+	float PlayerYaw;
+	StartAimingPacket(float PlayerYaw_)
+		: Packet(EPacketType::C_START_AIMING), PlayerYaw(PlayerYaw_)
+	{
+		Header.PacketSize = sizeof(StartAimingPacket);
+	}
+};
+struct StopAimingPacket : public Packet
+{
+	StopAimingPacket()
+		: Packet(EPacketType::C_STOP_AIMING)
+	{
+		Header.PacketSize = sizeof(StopAimingPacket);
+	}
+};
 struct MonsterDamagePacket : public Packet
 {
 	FInfoData Target;

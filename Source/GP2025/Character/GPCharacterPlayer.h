@@ -27,6 +27,8 @@ public:
 public:
 	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
 	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
+	UFUNCTION(BlueprintCallable, Category = "CharacterType")
+	virtual bool bIsGunnerCharacter() const;
 
 	// <Appearance>
 public :

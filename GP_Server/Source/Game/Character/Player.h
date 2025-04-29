@@ -55,6 +55,13 @@ public:
 			_info.AddState(newState);
 		}
 	}
+	void RemoveState(ECharacterStateType oldState)
+	{
+		if (!_info.HasState(oldState))
+		{
+			_info.RemoveState(oldState);
+		}
+	}
 private:
 	Type::EPlayer _playerType;
 	Inventory _inventory;

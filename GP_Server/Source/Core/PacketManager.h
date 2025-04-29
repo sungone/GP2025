@@ -20,6 +20,8 @@ public:
 	void HandleSelectCharacterPacket(int32 sessionId, Packet* packet);
 	
 	void HandleMovePacket(int32 sessionId, Packet* packet);
+	void HandleStartAimingPacket(int32 sessionId, Packet* packet);
+	void HandleStopAimingPacket(int32 sessionId, Packet* packet);
 	void HandleAttackPacket(int32 sessionId, Packet* packet);
 	void HandleUseSkillPacket(int32 sessionId, Packet* packet);
 	

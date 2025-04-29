@@ -37,17 +37,17 @@ void Player::SetCharacterType(Type::EPlayer type)
 	{
 		_info.fovAngle = 90;
 		_info.AttackRadius = 300;
-		/*LearnSkill(ESkillGroup::HitHard);
+		LearnSkill(ESkillGroup::HitHard);
 		LearnSkill(ESkillGroup::Clash);
-		LearnSkill(ESkillGroup::Whirlwind);*/
+		LearnSkill(ESkillGroup::Whirlwind);
 	}
 	else
 	{
 		_info.fovAngle = 10;
 		_info.AttackRadius = 1500;
-		/*LearnSkill(ESkillGroup::Throwing);
+		LearnSkill(ESkillGroup::Throwing);
 		LearnSkill(ESkillGroup::FThrowing);
-		LearnSkill(ESkillGroup::Anger);*/
+		LearnSkill(ESkillGroup::Anger);
 	}
 }
 
@@ -190,9 +190,9 @@ void Player::UseSkill(ESkillGroup groupId)
 	}
 	LOG(std::format("Use Skill - {}", static_cast<uint8>(groupId)));
 	auto pkt = PlayerUseSkillPacket(_id, groupId);
-	ExecuteSkillEffect(*skill);
 	SessionManager::GetInst().SendPacket(_id, &pkt);
 	SessionManager::GetInst().BroadcastToViewList(&pkt, _id);
+	ExecuteSkillEffect(*skill);
 }
 
 void Player::ExecuteSkillEffect(const FSkillData& skill)

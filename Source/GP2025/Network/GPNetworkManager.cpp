@@ -132,6 +132,18 @@ void UGPNetworkManager::SendPlayerAttackPacket(float PlayerYaw)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
+void UGPNetworkManager::SendPlayerStartAiming(float PlayerYaw)
+{
+	StartAimingPacket Packet(PlayerYaw);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendPlayerStopAiming()
+{
+	StopAimingPacket Packet;
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
 void UGPNetworkManager::SendPlayerTakeItem(int32 ItemID)
 {
 	IDPacket Packet(EPacketType::C_TAKE_ITEM, ItemID);
@@ -263,7 +275,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_PLAYER_USE_SKILL:
 			{
 				PlayerUseSkillPacket* Pkt = reinterpret_cast<PlayerUseSkillPacket*>(RemainingData.GetData());
-				ObjectMgr->UpdatePlayer(Pkt->PlayerID, Pkt->SkillGID);
+				ObjectMgr->PlayerUseSkill(Pkt->PlayerID, Pkt->SkillGID);
 				break;
 			}
 			case EPacketType::S_LEVEL_UP:
