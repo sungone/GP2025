@@ -44,10 +44,16 @@ struct FSkillData
 			++SkillLevel;
 	}
 
-	bool operator==(const FSkillData& other) const
+	bool operator==(const FSkillData& Other) const
 	{
-		return SkillGID == other.SkillGID && SkillLevel == other.SkillLevel;
+		return SkillGID == Other.SkillGID && SkillLevel == Other.SkillLevel;
 	}
+#ifndef SERVER_BUILD
+	friend uint32 GetTypeHash(const FSkillData& Data)
+	{
+		return HashCombine(GetTypeHash(static_cast<uint32>(Data.SkillGID)), GetTypeHash(Data.SkillLevel));
+	}
+#endif
 };
 
 
@@ -131,7 +137,6 @@ struct FInfoData
 		}
 		return -1;
 	}
-#ifdef SERVER_BUILD
 	FSkillData* GetSkillData(ESkillGroup groupId)
 	{
 		for (int i = 0; i < 3; ++i)
@@ -141,6 +146,7 @@ struct FInfoData
 		}
 		return nullptr;
 	}
+#ifdef SERVER_BUILD
 	void SetHp(float NewHp) { Stats.Hp = std::clamp(NewHp, 0.0f, Stats.MaxHp); }
 	void Heal(float Amount) { SetHp(Stats.Hp + Amount); }
 	void TakeDamage(float Amount) { SetHp(Stats.Hp - Amount); }

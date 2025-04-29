@@ -271,12 +271,12 @@ void UGPMyplayerInputHandler::UseSkillQ()
 	if (SkillLevel == -1)
 		return;
 
-	if (!Owner->SkillCoolDownHandler->CanUseSkill(static_cast<int32>(SkillGroup), SkillLevel))
+	if (!Owner->SkillCoolDownHandler->CanUseSkill(SkillGroup, SkillLevel))
 	{
 		return;
 	}
 
-	Owner->SkillCoolDownHandler->StartCoolDown(static_cast<int32>(SkillGroup), SkillLevel);
+	Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 
 	if (Owner->bIsGunnerCharacter())
 	{
@@ -302,12 +302,12 @@ void UGPMyplayerInputHandler::UseSkillE()
 	if (SkillLevel == -1)
 		return;
 
-	if (!Owner->SkillCoolDownHandler->CanUseSkill(static_cast<int32>(SkillGroup), SkillLevel))
+	if (!Owner->SkillCoolDownHandler->CanUseSkill(SkillGroup, SkillLevel))
 	{
 		return;
 	}
 
-	Owner->SkillCoolDownHandler->StartCoolDown(static_cast<int32>(SkillGroup), SkillLevel);
+	Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 
 	if (Owner->bIsGunnerCharacter())
 	{
@@ -333,12 +333,12 @@ void UGPMyplayerInputHandler::UseSkillR()
 	if (SkillLevel == -1)
 		return;
 
-	if (!Owner->SkillCoolDownHandler->CanUseSkill(static_cast<int32>(SkillGroup), SkillLevel))
+	if (!Owner->SkillCoolDownHandler->CanUseSkill(SkillGroup, SkillLevel))
 	{
 		return;
 	}
 
-	Owner->SkillCoolDownHandler->StartCoolDown(static_cast<int32>(SkillGroup), SkillLevel);
+	Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 
 	if (Owner->bIsGunnerCharacter())
 	{
