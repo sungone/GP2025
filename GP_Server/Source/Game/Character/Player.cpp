@@ -190,9 +190,9 @@ void Player::UseSkill(ESkillGroup groupId)
 	}
 	LOG(std::format("Use Skill - {}", static_cast<uint8>(groupId)));
 	auto pkt = PlayerUseSkillPacket(_id, groupId);
-	ExecuteSkillEffect(*skill);
 	SessionManager::GetInst().SendPacket(_id, &pkt);
 	SessionManager::GetInst().BroadcastToViewList(&pkt, _id);
+	ExecuteSkillEffect(*skill);
 }
 
 void Player::ExecuteSkillEffect(const FSkillData& skill)

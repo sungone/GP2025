@@ -142,6 +142,7 @@ void PacketManager::HandleAttackPacket(int32 sessionId, Packet* packet)
 {
 	AttackPacket* p = static_cast<AttackPacket*>(packet);
 	_gameWorld.PlayerSetYaw(sessionId, p->PlayerYaw);
+	_gameWorld.PlayerSetState(sessionId, ECharacterStateType::STATE_AUTOATTACK);
 	_gameWorld.PlayerAttack(sessionId);
 }
 

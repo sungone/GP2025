@@ -107,11 +107,20 @@ void UGPObjectManager::UpdatePlayer(int32 PlayerID, ESkillGroup SkillGID)
 	if (Players.Contains(PlayerID))
 	{
 		if (SkillGID == ESkillGroup::HitHard || SkillGID == ESkillGroup::Throwing)
+		{
+			Players[PlayerID]->CharacterInfo.AddState(STATE_SKILL_Q);
 			Players[PlayerID]->CombatHandler->PlayQSkillMontage();
+		}
 		else if (SkillGID == ESkillGroup::Clash || SkillGID == ESkillGroup::FThrowing)
+		{
+			Players[PlayerID]->CharacterInfo.AddState(STATE_SKILL_E);
 			Players[PlayerID]->CombatHandler->PlayESkillMontage();
+		}
 		else if (SkillGID == ESkillGroup::Whirlwind || SkillGID == ESkillGroup::Anger)
+		{
+			Players[PlayerID]->CharacterInfo.AddState(STATE_SKILL_R);
 			Players[PlayerID]->CombatHandler->PlayRSkillMontage();
+		}
 	}
 }
 

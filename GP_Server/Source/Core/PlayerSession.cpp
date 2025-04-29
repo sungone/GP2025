@@ -40,6 +40,16 @@ void PlayerSession::DoSend(const Packet* packet)
 	case S_DAMAGED_PLAYER:
 		LOG(LogType::SendLog, std::format("DamagedPlayer PKT to [{}]", _id));
 		break;
+	case S_PLAYER_USE_SKILL:
+		LOG(LogType::SendLog, std::format("PlayerUseSkill PKT to [{}]", _id));
+		break;
+	case S_SKILL_UNLOCK:
+		LOG(LogType::SendLog, std::format("SkillUnlock PKT to [{}]", _id));
+		break;
+	case S_LEVEL_UP:
+		LOG(LogType::SendLog, std::format("LevelUp PKT to [{}]", _id));
+		break;
+
 	case S_ADD_MONSTER:
 		LOG(LogType::SendLog, std::format("AddMonster PKT to [{}]", _id));
 		break;

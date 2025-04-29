@@ -84,6 +84,17 @@ void GameWorld::PlayerSetYaw(int32 playerId, float yaw)
 	player->GetInfo().SetYaw(yaw);
 }
 
+void GameWorld::PlayerSetState(int32 playerId, ECharacterStateType newState)
+{
+	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	if (!player)
+	{
+		LOG(Warning, "Invaild!");
+		return;
+	}
+	player->ChangeState(newState);
+}
+
 void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& time)
 {
 	auto player = GetCharacterByID(playerId);
@@ -110,7 +121,6 @@ void GameWorld::PlayerAttack(int32 playerId)
 		LOG(Warning, "Invaild!");
 		return;
 	}
-	player->ChangeState(ECharacterStateType::STATE_AUTOATTACK);
 
 	for (auto& monsterId : player->GetViewList())
 	{

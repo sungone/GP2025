@@ -20,6 +20,7 @@ public:
 	void CreateMonster();
 
 	void PlayerSetYaw(int32 playerId, float yaw);
+	void PlayerSetState(int32 playerId, ECharacterStateType newState);
 	void PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& time);
 	void PlayerAttack(int32 playerId);
 	void PlayerUseSkill(int32 playerId, ESkillGroup groupId);
