@@ -7,6 +7,7 @@
 #include "Weapons/GPWeaponBase.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Character/Modules/GPPlayerAppearanceHandler.h"
+#include "Character/Modules/GPPlayerEffectHandler.h"
 
 
 AGPCharacterPlayer::AGPCharacterPlayer()
@@ -55,6 +56,15 @@ void AGPCharacterPlayer::PostInitializeComponents()
         if (AppearanceHandler)
         {
             AppearanceHandler->Initialize(this);
+        }
+    }
+
+    if (!EffectHandler)
+    {
+        EffectHandler = NewObject<UGPPlayerEffectHandler>(this);
+        if (EffectHandler)
+        {
+            EffectHandler->Init(this);
         }
     }
 

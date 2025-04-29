@@ -13,6 +13,7 @@
 #include "InputActionValue.h"
 #include "InputMappingContext.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Skill/GPSkillCoolDownHandler.h"
 #include "Player/GPPlayerController.h"
 #include "Inventory/GPInventory.h"
 #include "Blueprint/UserWidget.h"
@@ -50,7 +51,6 @@ UGPMyplayerInputHandler::UGPMyplayerInputHandler()
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_SkillQ.IA_SkillQ'"), SkillQAction);
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_SkillE.IA_SkillE'"), SkillEAction);
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_SkillR.IA_SkillR'"), SkillRAction);
-
 }
 
 void UGPMyplayerInputHandler::Initialize(AGPCharacterMyplayer* InOwner, UEnhancedInputComponent* InputComponent)
@@ -261,7 +261,23 @@ void UGPMyplayerInputHandler::StopAiming()
 
 void UGPMyplayerInputHandler::UseSkillQ()
 {
-	if (!Owner || Owner->CombatHandler->IsUsingSkill() || Owner->CharacterInfo.HasState(STATE_SKILL_Q)) return;
+	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() || Owner->CharacterInfo.HasState(STATE_SKILL_Q)) return;
+	int32 PlayerLevel = Owner->CharacterInfo.GetLevel();
+	ESkillGroup SkillGroup = Owner->bIsGunnerCharacter() ? ESkillGroup::Throwing : ESkillGroup::HitHard;
+	int32 UnlockLevel = Owner->SkillCoolDownHandler->GetUnlockLevelForSkill(SkillGroup);
+	int32 SkillLevel = Owner->SkillCoolDownHandler->GetSkillLevelByPlayerLevel(PlayerLevel, UnlockLevel);
+
+	if (SkillLevel == 0)
+	{
+		return;
+	}
+
+	if (!Owner->SkillCoolDownHandler->CanUseSkill(static_cast<int32>(SkillGroup), SkillLevel))
+	{
+		return;
+	}
+
+	Owner->SkillCoolDownHandler->StartCoolDown(static_cast<int32>(SkillGroup), SkillLevel);
 
 	if (Owner->bIsGunnerCharacter())
 	{
@@ -281,7 +297,23 @@ void UGPMyplayerInputHandler::UseSkillQ()
 
 void UGPMyplayerInputHandler::UseSkillE()
 {
-	if (!Owner || Owner->CombatHandler->IsUsingSkill() || Owner->CharacterInfo.HasState(STATE_SKILL_E)) return;
+	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() || Owner->CharacterInfo.HasState(STATE_SKILL_E)) return;
+	int32 PlayerLevel = Owner->CharacterInfo.GetLevel();
+	ESkillGroup SkillGroup = Owner->bIsGunnerCharacter() ? ESkillGroup::FThrowing : ESkillGroup::Clash;
+	int32 UnlockLevel = Owner->SkillCoolDownHandler->GetUnlockLevelForSkill(SkillGroup);
+	int32 SkillLevel = Owner->SkillCoolDownHandler->GetSkillLevelByPlayerLevel(PlayerLevel, UnlockLevel);
+
+	if (SkillLevel == 0)
+	{
+		return;
+	}
+
+	if (!Owner->SkillCoolDownHandler->CanUseSkill(static_cast<int32>(SkillGroup), SkillLevel))
+	{
+		return;
+	}
+
+	Owner->SkillCoolDownHandler->StartCoolDown(static_cast<int32>(SkillGroup), SkillLevel);
 
 	if (Owner->bIsGunnerCharacter())
 	{
@@ -301,7 +333,23 @@ void UGPMyplayerInputHandler::UseSkillE()
 
 void UGPMyplayerInputHandler::UseSkillR()
 {
-	if (!Owner || Owner->CombatHandler->IsUsingSkill() || Owner->CharacterInfo.HasState(STATE_SKILL_R)) return;
+	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() || Owner->CharacterInfo.HasState(STATE_SKILL_R)) return;
+	int32 PlayerLevel = Owner->CharacterInfo.GetLevel();
+	ESkillGroup SkillGroup = Owner->bIsGunnerCharacter() ? ESkillGroup::Anger : ESkillGroup::Whirlwind;
+	int32 UnlockLevel = Owner->SkillCoolDownHandler->GetUnlockLevelForSkill(SkillGroup);
+	int32 SkillLevel = Owner->SkillCoolDownHandler->GetSkillLevelByPlayerLevel(PlayerLevel, UnlockLevel);
+
+	if (SkillLevel == 0)
+	{
+		return;
+	}
+
+	if (!Owner->SkillCoolDownHandler->CanUseSkill(static_cast<int32>(SkillGroup), SkillLevel))
+	{
+		return;
+	}
+
+	Owner->SkillCoolDownHandler->StartCoolDown(static_cast<int32>(SkillGroup), SkillLevel);
 
 	if (Owner->bIsGunnerCharacter())
 	{

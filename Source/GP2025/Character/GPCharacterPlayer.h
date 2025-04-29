@@ -54,4 +54,8 @@ public :
 	// <Equipment Tracking>
 	UPROPERTY()
 	TMap<ECategory, int32> EquippedItemIDs;
+
+	// <Effect Viewing>
+	UPROPERTY()
+	class UGPPlayerEffectHandler* EffectHandler;
 };

@@ -7,6 +7,8 @@
 #include "Character/Modules/GPMyplayerUIManager.h"
 #include "Character/Modules/GPPlayerAppearanceHandler.h"
 #include "Character/Modules/GPCharacterCombatHandler.h"
+#include "Character/Modules/GPPlayerEffectHandler.h"
+#include "Skill/GPSkillCoolDownHandler.h"
 #include "UI/GPFloatingDamageText.h"
 #include "Inventory/GPInventory.h"
 #include "Kismet/GameplayStatics.h"
@@ -122,14 +124,16 @@ void UGPObjectManager::DamagedPlayer(FInfoData& PlayerInfo)
 
 void UGPObjectManager::SkillUnlock(ESkillGroup SkillGID)
 {
-	//Todo:
-	//스킬 해금
+	if (MyPlayer->EffectHandler)
+		MyPlayer->EffectHandler->PlaySkillUnlockEffect();
+	// Todo : UI 처리
 }
 
 void UGPObjectManager::LevelUp(FInfoData& PlayerInfo)
 {
-	//Todo:
-	//레벨업 UI 및 이펙트
+	if (MyPlayer->EffectHandler)
+		MyPlayer->EffectHandler->PlayLevelUpEffect();
+	// Todo : UI 처리
 }
 
 void UGPObjectManager::AddMonster(FInfoData& MonsterInfo)

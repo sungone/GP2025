@@ -93,6 +93,8 @@ public :
 
     void StartAiming();
     void StopAiming();
+
+	// <Skill>
     void UseSkillQ();
     void UseSkillE();
     void UseSkillR();
@@ -104,4 +106,5 @@ public :
 private:
 	bool bCanJump = true;
 	FTimerHandle JumpCooldownTimerHandle;
+
 };

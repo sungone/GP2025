@@ -136,12 +136,6 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	HandleRSkillState();
 	HandleRemoteMovementSync(DeltaTime);
 	HandleRemoteJumpSync();
-
-	//if (!CharacterInfo.HasState(STATE_JUMP) && GetCharacterMovement() && !GetCharacterMovement()->IsFalling())
-	//{
-	//	SetGroundZLocation(GetActorLocation().Z);
-	//	UE_LOG(LogTemp, Log, TEXT("Set Z Location : %f") , Ground_ZLocation);
-	//}
 }
 
 void AGPCharacterBase::PostInitializeComponents()

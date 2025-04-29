@@ -16,6 +16,7 @@
 #include "Character/Modules/GPMyplayerUIManager.h"
 #include "Character/Modules/GPMyplayerCameraHandler.h"
 #include "Character/Modules/GPMyplayerNetworkSyncHandler.h"
+#include "Skill/GPSkillCoolDownHandler.h"
 
 AGPCharacterMyplayer::AGPCharacterMyplayer()
 {
@@ -44,6 +45,11 @@ void AGPCharacterMyplayer::BeginPlay()
 	CameraHandler = NewObject<UGPMyplayerCameraHandler>(this, UGPMyplayerCameraHandler::StaticClass());
 	if (CameraHandler)
 		CameraHandler->Initialize(this);
+
+	// Skill Cool Down Handler
+	SkillCoolDownHandler = NewObject<UGPSkillCoolDownHandler>(this, UGPSkillCoolDownHandler::StaticClass());
+	if (SkillCoolDownHandler)
+		SkillCoolDownHandler->Init(this);
 
 	// Network Sync Handler
 	NetworkSyncHandler = NewObject<UGPMyplayerNetworkSyncHandler>(this, UGPMyplayerNetworkSyncHandler::StaticClass());

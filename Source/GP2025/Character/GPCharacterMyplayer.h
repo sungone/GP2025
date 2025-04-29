@@ -51,6 +51,9 @@ public:
 	// <Network Sync>
 	UPROPERTY()
 	class UGPMyplayerNetworkSyncHandler* NetworkSyncHandler;
+
+	// <Skill Cool Down Handler>
+	class UGPSkillCoolDownHandler* SkillCoolDownHandler;
 	
 	// <CharacterType> 
 public :
