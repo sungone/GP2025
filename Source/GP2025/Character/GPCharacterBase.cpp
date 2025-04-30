@@ -115,9 +115,8 @@ void AGPCharacterBase::BeginPlay()
 		UIHandler = NewObject<UGPCharacterUIHandler>(this);
 		if (UIHandler)
 		{
-			UIHandler->Initialize(this);               
-			UIHandler->CreateAllWidgets();   
-			UIHandler->OnBeginPlay();
+			UIHandler->Initialize(this);     
+			UIHandler->OnBeginPlay();       
 		}
 	}
 }
@@ -152,7 +151,7 @@ void AGPCharacterBase::SetCharacterInfo(FInfoData& CharacterInfo_)
 
 	if (UIHandler)
 	{
-		UIHandler->SetupNickNameUI();
+		UIHandler->UpdateNickNameOnly();
 	}
 }
 

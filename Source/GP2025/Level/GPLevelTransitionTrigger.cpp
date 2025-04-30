@@ -8,6 +8,8 @@
 #include "Character/Modules/GPPlayerAppearanceHandler.h"
 #include "Character/GPCharacterMyplayer.h"
 #include "Physics/GPCollision.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 AGPLevelTransitionTrigger::AGPLevelTransitionTrigger()
 {
@@ -18,6 +20,21 @@ AGPLevelTransitionTrigger::AGPLevelTransitionTrigger()
 
 	TriggerBox->SetCollisionProfileName(CPROFILE_GPTRIGGER);
 	TriggerBox->SetGenerateOverlapEvents(true);
+
+
+	// 이펙트 생성
+	PortalEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("PortalEffect"));
+	PortalEffect->SetupAttachment(RootComponent);
+	PortalEffect->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
+	PortalEffect->bAutoActivate = true;
+
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> PortalEffectAsset(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Loot_04_Epic.NS_ARPGEssentials_Loot_04_Epic"));
+	if (PortalEffectAsset.Succeeded())
+	{
+		PortalEffect->SetAsset(PortalEffectAsset.Object);
+	}
+
+	PortalEffect->SetWorldScale3D(FVector(4.0f, 4.0f, 1.0f));
 }
 
 void AGPLevelTransitionTrigger::BeginPlay()

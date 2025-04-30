@@ -1,68 +1,59 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "Character/Modules/GPCharacterUIHandler.h"
+﻿#include "Character/Modules/GPCharacterUIHandler.h"
 #include "Character/GPCharacterBase.h"
-#include "Character/GPCharacterMonster.h"
 #include "UI/GPWidgetComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/TextBlock.h"
 #include "UI/GPHpBarWidget.h"
 #include "UI/GPLevelWidget.h"
 #include "UI/GPUserNameWidget.h"
-#include "Kismet/GameplayStatics.h"
+#include "Components/ProgressBar.h"
+#include "Blueprint/UserWidget.h"
+#include "UI/GPCharacterStatusWidget.h"
 #include "GameFramework/PlayerController.h"
-
 
 void UGPCharacterUIHandler::Initialize(AGPCharacterBase* InOwner)
 {
 	Owner = InOwner;
-	CreateAllWidgets();
+	CreateCharacterStatusWidget();
 }
 
 void UGPCharacterUIHandler::OnBeginPlay()
 {
-	SetupNickNameUI();
+	UpdateCharacterStatus();
 }
 
-void UGPCharacterUIHandler::CreateAllWidgets()
+void UGPCharacterUIHandler::CreateCharacterStatusWidget()
 {
-	NickNameText = CreateWidgetComponent(TEXT("NickNameWidget"), TEXT("/Game/UI/WBP_UserName"), FVector(0.f, 0.f, 330.f), FVector2D(200.f, 0.f), NickNameWidget);
+	CharacterStatusWidget = CreateWidgetComponent(
+		TEXT("CharacterStatusWidget"),
+		TEXT("/Game/UI/WBP_CharacterStatus"),
+		FVector(0.f, 0.f, 350.f),
+		FVector2D(200.f, 60.f),
+		CharacterStatusWidgetInstance
+	);
 
-	if (Owner && Owner->IsA(AGPCharacterMonster::StaticClass()))
-	{
-		NickNameText->SetRelativeLocation(FVector(0.f, 0.f, 360.f));
-		HpBar = CreateWidgetComponent(TEXT("HpBarWidget"), TEXT("/Game/UI/WBP_CharacterHpBar"), FVector(0.f, 0.f, 320.f), FVector2D(200.f, 30.f), HpBarWidget);
-		LevelText = CreateWidgetComponent(TEXT("LevelTextWidget"), TEXT("/Game/UI/WBP_LevelText"), FVector(0.f, 0.f, 395.f), FVector2D(100.f, 40.f), LevelTextWidget);
-	}
-
-	if (NickNameWidget)
-	{
-		SetupNickNameUI();
-	}
+	UpdateCharacterStatus();
 }
 
-
-void UGPCharacterUIHandler::SetupNickNameUI()
+void UGPCharacterUIHandler::UpdateCharacterStatus()
 {
-	if (!Owner || !NickNameText)
-		return;
-	
+	UpdateNickNameOnly();
+}
 
-	UUserWidget* Widget = NickNameText->GetUserWidgetObject();
-	if (!Widget)
-		return;
-	
+void UGPCharacterUIHandler::UpdateWidgetVisibility()
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(Owner->GetWorld(), 0);
+	AGPCharacterBase* LocalPlayer = Cast<AGPCharacterBase>(PC ? PC->GetPawn() : nullptr);
+	if (!LocalPlayer) return;
 
-	UGPUserNameWidget* NameWidget = Cast<UGPUserNameWidget>(Widget);
-	if (!NameWidget)
-		return;
-	
+	float Distance = FVector::Dist(Owner->GetActorLocation(), LocalPlayer->GetActorLocation());
+	bool bVisible = Distance <= Owner->CharacterInfo.CollisionRadius + LocalPlayer->CharacterInfo.AttackRadius;
 
-	FString NickName = FString(UTF8_TO_TCHAR(Owner->CharacterInfo.GetName()));
-	NameWidget->UpdateNickNameText(NickName);
+	ESlateVisibility Visibility = bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden;
 
-	if (NickNameWidget)
+	if (CharacterStatusWidgetInstance)
 	{
-		NickNameWidget->SetVisibility(ESlateVisibility::Visible);
+		CharacterStatusWidgetInstance->SetVisibility(Visibility);
 	}
 }
 
@@ -95,19 +86,44 @@ UGPWidgetComponent* UGPCharacterUIHandler::CreateWidgetComponent(
 	return WidgetComp;
 }
 
-void UGPCharacterUIHandler::UpdateAllWidgetVisibility()
+void UGPCharacterUIHandler::UpdateNickNameOnly()
 {
-	APlayerController* PC = UGameplayStatics::GetPlayerController(Owner->GetWorld(), 0);
-	AGPCharacterBase* LocalPlayer = Cast<AGPCharacterBase>(PC ? PC->GetPawn() : nullptr);
-	if (!LocalPlayer) return;
+	if (!CharacterStatusWidgetInstance || !Owner) return;
 
-	float Distance = FVector::Dist(Owner->GetActorLocation(), LocalPlayer->GetActorLocation());
-	bool bVisible = Distance <= Owner->CharacterInfo.CollisionRadius + LocalPlayer->CharacterInfo.AttackRadius;
-
-	ESlateVisibility Visibility = bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden;
-
-	if (HpBarWidget) HpBarWidget->SetVisibility(Visibility);
-	if (LevelTextWidget) LevelTextWidget->SetVisibility(Visibility);
-	if (NickNameWidget) NickNameWidget->SetVisibility(Visibility);
+	UGPCharacterStatusWidget* StatusWidget = Cast<UGPCharacterStatusWidget>(CharacterStatusWidgetInstance);
+	if (StatusWidget && StatusWidget->WBPName)
+	{
+		FString Nick = FString(UTF8_TO_TCHAR(Owner->CharacterInfo.GetName()));
+		StatusWidget->WBPName->UpdateNickNameText(Nick);
+	}
 }
 
+//void UGPCharacterUIHandler::UpdateLevelOnly()
+//{
+//	if (!CharacterStatusWidgetInstance || !Owner) return;
+//
+//	UGPCharacterStatusWidget* StatusWidget = Cast<UGPCharacterStatusWidget>(CharacterStatusWidgetInstance);
+//	if (StatusWidget && StatusWidget->WBPLevelText)
+//	{
+//		StatusWidget->WBPLevelText->UpdateLevelText(Owner->CharacterInfo.GetLevel());
+//	}
+//}
+//
+//void UGPCharacterUIHandler::UpdateHpOnly()
+//{
+//	if (!CharacterStatusWidgetInstance || !Owner) return;
+//
+//	UGPCharacterStatusWidget* StatusWidget = Cast<UGPCharacterStatusWidget>(CharacterStatusWidgetInstance);
+//	if (StatusWidget && StatusWidget->WBPHpBar)
+//	{
+//		float MaxHp = Owner->CharacterInfo.GetMaxHp();
+//		if (MaxHp > 0.f)
+//		{
+//			StatusWidget->WBPHpBar->UpdateHpBar(Owner->CharacterInfo.GetHp() / MaxHp);
+//		}
+//		else
+//		{
+//			StatusWidget->WBPHpBar->UpdateHpBar(0.f);
+//		}
+//	}
+//}

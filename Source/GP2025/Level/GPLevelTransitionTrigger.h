@@ -46,4 +46,7 @@ public:
 public:
 	UPROPERTY()
 	class AGPCharacterMyplayer* CachedPlayer;
+
+	UPROPERTY(VisibleAnywhere, Category = "Effect")
+	class UNiagaraComponent* PortalEffect;
 };

@@ -13,32 +13,28 @@ UCLASS()
 class GP2025_API UGPCharacterUIHandler : public UObject
 {
 	GENERATED_BODY()
-	
+
 public:
 	void Initialize(class AGPCharacterBase* InOwner);
 	void OnBeginPlay();
+	void CreateCharacterStatusWidget();
+	void UpdateWidgetVisibility();
+	void UpdateCharacterStatus();
 
-	void CreateAllWidgets();
-	void UpdateAllWidgetVisibility();
-
-	void SetupNickNameUI();
+protected:
+	class UGPWidgetComponent* CreateWidgetComponent(const FString& Name, const FString& WidgetPath, FVector Location, FVector2D Size, UUserWidget*& OutUserWidget);
 
 public:
 	UPROPERTY()
-	AGPCharacterBase* Owner;
+	class AGPCharacterBase* Owner;
 
 	UPROPERTY()
-	class UGPWidgetComponent* HpBar;
+	class UGPWidgetComponent* CharacterStatusWidget;
 
 	UPROPERTY()
-	class UGPWidgetComponent* LevelText;
+	class UUserWidget* CharacterStatusWidgetInstance;
 
-	UPROPERTY()
-	class UGPWidgetComponent* NickNameText;
-
-	UUserWidget* HpBarWidget;
-	UUserWidget* LevelTextWidget;
-	UUserWidget* NickNameWidget;
-
-	UGPWidgetComponent* CreateWidgetComponent(const FString& Name, const FString& WidgetPath, FVector Location, FVector2D Size, UUserWidget*& OutUserWidget);
+	void UpdateNickNameOnly();
+	//void UpdateLevelOnly();
+	//void UpdateHpOnly();
 };
