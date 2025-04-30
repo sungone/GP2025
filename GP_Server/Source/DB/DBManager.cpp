@@ -79,12 +79,19 @@ DBLoginResult DBManager::SignUpUser(int32 sessionId, const std::string& login_id
 			.insert("id", "character_type", "pos_x", "pos_y", "pos_z", "yaw",
 				"collision_radius", "attack_radius", "fov_angle",
 				"level", "exp", "max_exp", "hp", "max_hp", "damage",
-				"crt_rate", "crt_value", "dodge", "speed", "gold")
+				"crt_rate", "crt_value", "dodge", "speed", "gold",
+				"skill1_gid", "skill1_level",
+				"skill2_gid", "skill2_level",
+				"skill3_gid", "skill3_level")
 			.values(dbId, newinfo.CharacterType, newPos.X, newPos.Y, newPos.Z, newinfo.Yaw,
 				newinfo.CollisionRadius, newinfo.AttackRadius, newinfo.fovAngle,
 				stats.Level, stats.Exp, stats.MaxExp, stats.Hp, stats.MaxHp, stats.Damage,
-				stats.CrtRate, stats.CrtValue, stats.Dodge, stats.Speed, newinfo.Gold)
+				stats.CrtRate, stats.CrtValue, stats.Dodge, stats.Speed, newinfo.Gold,
+				static_cast<int>(newinfo.SkillLevels[0].SkillGID), newinfo.SkillLevels[0].SkillLevel,
+				static_cast<int>(newinfo.SkillLevels[1].SkillGID), newinfo.SkillLevels[1].SkillLevel,
+				static_cast<int>(newinfo.SkillLevels[2].SkillGID), newinfo.SkillLevels[2].SkillLevel)
 			.execute();
+
 
 		return { DBResultCode::SUCCESS, dbId, newinfo };
 	}
@@ -109,10 +116,13 @@ DBLoginResult DBManager::CheckLogin(int32 sessionId, const std::string& login_id
 			"p.collision_radius, p.attack_radius, p.fov_angle, "
 			"p.level, p.exp, p.max_exp, p.hp, p.max_hp, "
 			"p.damage, p.crt_rate, p.crt_value, p.dodge, p.speed, "
-			"p.skill_level, p.gold "
-			"FROM users u JOIN player_info p ON u.id = p.id WHERE u.login_id = ?")
-			.bind(login_id)
-			.execute();
+			"p.gold, "
+			"p.skill1_gid, p.skill1_level, "
+			"p.skill2_gid, p.skill2_level, "
+			"p.skill3_gid, p.skill3_level "
+			"FROM users u JOIN player_info p ON u.id = p.id WHERE u.login_id = ?"
+		).bind(login_id).execute();
+
 
 		auto row = result.fetchOne();
 		if (!row)
@@ -144,7 +154,10 @@ DBLoginResult DBManager::CheckLogin(int32 sessionId, const std::string& login_id
 		info.Stats.CrtValue = row[18].get<float>();
 		info.Stats.Dodge = row[19].get<float>();
 		info.Stats.Speed = row[20].get<float>();
-		info.Gold = static_cast<uint32>(row[22].get<int>());
+		info.Gold = static_cast<uint32>(row[21].get<int>());
+		info.SkillLevels[0] = FSkillData((ESkillGroup)row[22].get<int>(), row[23].get<int>());
+		info.SkillLevels[1] = FSkillData((ESkillGroup)row[24].get<int>(), row[25].get<int>());
+		info.SkillLevels[2] = FSkillData((ESkillGroup)row[26].get<int>(), row[27].get<int>());
 
 		return { DBResultCode::SUCCESS, dbId, info };
 	}
@@ -178,9 +191,16 @@ bool DBManager::UpdatePlayerInfo(uint32 dbId, const FInfoData& info)
 			.set("dodge", info.Stats.Dodge)
 			.set("speed", info.Stats.Speed)
 			.set("gold", info.Gold)
+			.set("skill1_gid", static_cast<int>(info.SkillLevels[0].SkillGID))
+			.set("skill1_level", info.SkillLevels[0].SkillLevel)
+			.set("skill2_gid", static_cast<int>(info.SkillLevels[1].SkillGID))
+			.set("skill2_level", info.SkillLevels[1].SkillLevel)
+			.set("skill3_gid", static_cast<int>(info.SkillLevels[2].SkillGID))
+			.set("skill3_level", info.SkillLevels[2].SkillLevel)
 			.where("id = :id")
 			.bind("id", dbId)
 			.execute();
+
 		LOG(std::format("Update DB - dbid: {}", dbId));
 		return true;
 	}

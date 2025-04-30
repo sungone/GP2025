@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: gp2025
 -- ------------------------------------------------------
--- Server version 9.2.0
+-- Server version	9.2.0
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -13,7 +13,7 @@
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES=0 */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
 -- Current Database: `gp2025`
@@ -51,6 +51,12 @@ CREATE TABLE `player_info` (
   `dodge` float NOT NULL DEFAULT '0.1',
   `speed` float NOT NULL DEFAULT '0',
   `gold` int unsigned NOT NULL DEFAULT '0',
+  `skill1_gid` tinyint unsigned NOT NULL DEFAULT '0',
+  `skill1_level` int unsigned NOT NULL DEFAULT '0',
+  `skill2_gid` tinyint unsigned NOT NULL DEFAULT '0',
+  `skill2_level` int unsigned NOT NULL DEFAULT '0',
+  `skill3_gid` tinyint unsigned NOT NULL DEFAULT '0',
+  `skill3_level` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   CONSTRAINT `player_info_ibfk_1` FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -62,7 +68,7 @@ CREATE TABLE `player_info` (
 
 LOCK TABLES `player_info` WRITE;
 /*!40000 ALTER TABLE `player_info` DISABLE KEYS */;
-INSERT INTO `player_info` VALUES (1,1,7356.34,19489.6,160,-52.4654,50,150,90,10,0,600,550,550,75,0.3,3,0.25,200,0);
+INSERT INTO `player_info` VALUES (1,1,7356.34,19489.6,160,-52.4654,50,150,90,10,0,600,550,550,75,0.3,3,0.25,200,0,1,1,2,1,3,1);
 /*!40000 ALTER TABLE `player_info` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -93,8 +99,8 @@ LOCK TABLES `users` WRITE;
 INSERT INTO `users` VALUES (1,'dev','2025','관리자');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
-
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
@@ -103,4 +109,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-19
+-- Dump completed on 2025-04-30 15:10:54

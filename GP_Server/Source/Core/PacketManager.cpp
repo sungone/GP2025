@@ -23,6 +23,10 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 		LOG(LogType::RecvLog, std::format("SelectCharacter from [{}]", sessionId));
 		HandleSelectCharacterPacket(sessionId, packet);
 		break;
+	case EPacketType::C_ENTER_GAME:
+		LOG(LogType::RecvLog, std::format("EnterGamePacket from [{}]", sessionId));
+		HandleEnterGamePacket(sessionId, packet);
+		break;
 
 	case EPacketType::C_MOVE:
 		LOG(LogType::RecvLog, std::format("MovePacket from [{}]", sessionId));
@@ -86,9 +90,8 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 		return;
 	}
 	_sessionMgr.HandleLogin(sessionId, res);
-
 	auto& playerInfo = _gameWorld.GetInfo(sessionId);
-	SignUpSuccessPacket spkt(playerInfo);
+	SignUpSuccessPacket spkt;
 	_sessionMgr.SendPacket(sessionId, &spkt);
 	LOG(std::format("SignUp Success [{}] userId: {}", sessionId, res.dbId));
 	return;
@@ -107,12 +110,10 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 		_sessionMgr.SendPacket(sessionId, &failpkt);
 		return;
 	}
-
+	LoginSuccessPacket loginpkt;
+	_sessionMgr.SendPacket(sessionId, &loginpkt);
 	_sessionMgr.HandleLogin(sessionId, res);
 
-	auto& playerInfo = _gameWorld.GetInfo(sessionId);
-	LoginSuccessPacket loginpkt(playerInfo);
-	_sessionMgr.SendPacket(sessionId, &loginpkt);
 	LOG(LogType::Log, std::format("Login Success [{}] userId: {}", sessionId, res.dbId));
 	return;
 
@@ -120,8 +121,8 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 	LOG(std::format("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW));
 	_sessionMgr.HandleLogin(sessionId);
 	auto& playerInfo = _gameWorld.GetInfo(sessionId);
-	EnterGamePacket enterpkt(playerInfo);
-	_sessionMgr.SendPacket(sessionId, &enterpkt);
+	LoginSuccessPacket loginpkt(playerInfo);
+	_sessionMgr.SendPacket(sessionId, &loginpkt);
 #endif
 }
 
@@ -136,7 +137,35 @@ void PacketManager::HandleLogoutPacket(int32 sessionId)
 void PacketManager::HandleSelectCharacterPacket(int32 sessionId, Packet* packet)
 {
 	SelectCharacterPacket* p = static_cast<SelectCharacterPacket*>(packet);
-	_gameWorld.PlayerSelectCharacter(sessionId, p->PlayerType);
+	auto session = _sessionMgr.GetSession(sessionId);
+	if (!session || !session->IsLogin()) return;
+
+	auto player = session->GetPlayer();
+	if (!player) return;
+
+	player->SetCharacterType(p->PlayerType);
+
+	if (session->IsInGame())
+	{
+		InfoPacket infopkt(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
+		SessionManager::GetInst().SendPacket(sessionId, &infopkt);
+	}
+}
+
+
+void PacketManager::HandleEnterGamePacket(int32 sessionId, Packet* packet)
+{
+	auto session = _sessionMgr.GetSession(sessionId);
+	if (!session || !session->IsLogin()) return;
+
+	auto player = session->GetPlayer();
+	if (!player) return;
+
+	session->EnterGame();
+	_gameWorld.PlayerEnterGame(player);
+	auto& playerInfo = _gameWorld.GetInfo(sessionId);
+	EnterGamePacket enterpkt(playerInfo);
+	//실패처리를 따로 할까나말까나..
 }
 
 void PacketManager::HandleMovePacket(int32 sessionId, Packet* packet)

@@ -32,7 +32,7 @@ bool GameWorld::Init()
 	return true;
 }
 
-void GameWorld::AddPlayer(std::shared_ptr<Character> player)
+void GameWorld::PlayerEnterGame(std::shared_ptr<Character> player)
 {
 	std::unique_lock<std::mutex> lock(_carrMutex);
 	int32 id = player->GetInfo().ID;
@@ -62,15 +62,6 @@ void GameWorld::RemoveCharacter(int32 id)
 	}
 
 	_characters[id] = nullptr;
-}
-
-void GameWorld::CreateMonster()
-{
-	for (int32 i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
-	{
-		_characters[i] = std::make_shared<Monster>(i);
-	}
-	TimerQueue::AddTimer([]() {GameWorld::GetInst().UpdateMonster();}, 2000, true);
 }
 
 void GameWorld::PlayerSetYaw(int32 playerId, float yaw)
@@ -169,17 +160,13 @@ void GameWorld::PlayerUseSkill(int32 playerId, ESkillGroup groupId)
 	player->UseSkill(groupId);
 }
 
-void GameWorld::PlayerSelectCharacter(int32 playerId, Type::EPlayer type)
+void GameWorld::CreateMonster()
 {
-	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
-	if (!player)
+	for (int32 i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{
-		LOG(Warning, "Invaild!");
-		return;
+		_characters[i] = std::make_shared<Monster>(i);
 	}
-	player->SetCharacterType(type);
-	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
-	SessionManager::GetInst().SendPacket(playerId, &infopkt);
+	TimerQueue::AddTimer([]() {GameWorld::GetInst().UpdateMonster();}, 2000, true);
 }
 
 void GameWorld::UpdateMonster()

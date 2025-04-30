@@ -225,10 +225,11 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_LOGIN_SUCCESS:
 			{
 				LoginSuccessPacket* Pkt = reinterpret_cast<LoginSuccessPacket*>(RemainingData.GetData());
-				// Todo: 추후 로비로 이동
+
 				OnEnterLobby.Broadcast();
-				// OnEnterGame.Broadcast();
-				ObjectMgr->AddMyPlayer(Pkt->PlayerInfo);
+
+				// Todo: 입장버튼 클릭시 호출되도록
+				SendMyEnterGamePacket();
 				break;
 			}
 			case EPacketType::S_LOGIN_FAIL:
@@ -286,7 +287,7 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->SkillUnlock(Pkt->SkillGID);
 				break;
 			}
-			case S_SKILL_UPGRADE:
+			case EPacketType::S_SKILL_UPGRADE:
 			{
 				UpgradeSkillPacket* Pkt = reinterpret_cast<UpgradeSkillPacket*>(RemainingData.GetData());
 				ObjectMgr->SkillUpgrade(Pkt->SkillGID);
