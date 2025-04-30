@@ -73,6 +73,7 @@ void AGPCharacterMyplayer::BeginPlay()
 	}
 	
 	SetCharacterType(CurrentCharacterType);
+
 }
 
 void AGPCharacterMyplayer::Tick(float DeltaTime)
@@ -155,14 +156,6 @@ void AGPCharacterMyplayer::OnPlayerEnterGame()
 
 		UIManager->OnSetUpInGameWidgets();
 	}
-
-	UGameplayStatics::LoadStreamLevel(
-		this,
-		FName("TUK"),  
-		true,   
-		true,   
-		FLatentActionInfo()
-	);
 }
 
 void AGPCharacterMyplayer::OnPlayerEnterLobby()

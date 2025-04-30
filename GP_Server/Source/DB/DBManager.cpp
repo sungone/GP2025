@@ -41,7 +41,7 @@ DBLoginResult DBManager::SignUpUser(int32 sessionId, const std::string& login_id
 		newinfo.AttackRadius = 1500;
 	}
 
-	uint32 level = newinfo.Stats.Level = 10;
+	uint32 level = newinfo.Stats.Level = 1;
 	newinfo.Stats.Speed = 200.f;
 	newinfo.CollisionRadius = 50.f;
 

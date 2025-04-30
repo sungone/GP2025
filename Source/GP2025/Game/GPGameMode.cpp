@@ -4,6 +4,7 @@
 #include "Player/GPPlayerController.h"
 #include "Network/GPNetworkManager.h"
 #include "Engine/World.h"
+#include "kismet/GameplayStatics.h"
 
 AGPGameMode::AGPGameMode()
 {
@@ -20,6 +21,8 @@ AGPGameMode::AGPGameMode()
 	{
 		PlayerControllerClass = PlayerControllerClassRef.Class;
 	}
+
+	UGameplayStatics::LoadStreamLevel(this, FName("TUK"), true, true, FLatentActionInfo());
 }
 
 void AGPGameMode::Tick(float DeltaTime)
