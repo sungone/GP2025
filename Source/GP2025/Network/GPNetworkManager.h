@@ -37,23 +37,24 @@ public:
 	void PrintFailMessege(DBResultCode ResultCode);
 
 	UFUNCTION(BlueprintCallable)
-	void SendPlayerSelectCharacter(uint8 PlayerType);
+	void SendMySelectCharacter(uint8 PlayerType);
 	UFUNCTION(BlueprintCallable)
-	void SendPlayerLoginPacket(const FString& AccountID, const FString& AccountPW);
-	void SendPlayerSignUpPacket(const FString& AccountID, const FString& AccountPW, const FString& NickName);
-	void SendPlayerLogoutPacket();
+	void SendMyLoginPacket(const FString& AccountID, const FString& AccountPW);
+	void SendMySignUpPacket(const FString& AccountID, const FString& AccountPW, const FString& NickName);
+	void SendMyLogoutPacket();
+	void SendMyEnterGamePacket();
 
-	void SendPlayerMovePacket();
-	void SendPlayerAttackPacket(float PlayerYaw);
-	void SendPlayerStartAiming(float PlayerYaw);
-	void SendPlayerStopAiming();
-	void SendPlayerTakeItem(int32 ItemID);
-	void SendPlayerDropItem(int32 ItemID);
-	void SendPlayerUseItem(int32 ItemID);
-	void SendPlayerEquipItem(int32 ItemID);
-	void SendPlayerUnequipItem(int32 ItemID);
+	void SendMyMovePacket();
+	void SendMyAttackPacket(float PlayerYaw);
+	void SendMyStartAiming(float PlayerYaw);
+	void SendMyStopAiming();
+	void SendMyTakeItem(int32 ItemID);
+	void SendMyDropItem(int32 ItemID);
+	void SendMyUseItem(int32 ItemID);
+	void SendMyEquipItem(int32 ItemID);
+	void SendMyUnequipItem(int32 ItemID);
 
-	void SendPlayerUseSkill(ESkillGroup SkillGID, float PlayerYaw);
+	void SendMyUseSkill(ESkillGroup SkillGID, float PlayerYaw);
 private:
 	void SendPacket(uint8* Buf, int32 Size);
 	void ReceiveData();

@@ -85,12 +85,12 @@ void UGPItemSlot::ClickItem()
 
                 if (*FoundID == -1)
                 {
-                    NetworkManager->SendPlayerEquipItem(SlotData.ItemUniqueID);
+                    NetworkManager->SendMyEquipItem(SlotData.ItemUniqueID);
                 }
                 else
                 {
-                    NetworkManager->SendPlayerUnequipItem(*FoundID);
-                    NetworkManager->SendPlayerEquipItem(SlotData.ItemUniqueID);
+                    NetworkManager->SendMyUnequipItem(*FoundID);
+                    NetworkManager->SendMyEquipItem(SlotData.ItemUniqueID);
                 }
 
                 Player->EquippedItemIDs[CurrentItem.Category] = SlotData.ItemUniqueID;
@@ -105,7 +105,7 @@ void UGPItemSlot::ClickItem()
             UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
             if (NetworkManager)
             {
-                NetworkManager->SendPlayerUseItem(SlotData.ItemUniqueID);
+                NetworkManager->SendMyUseItem(SlotData.ItemUniqueID);
             }
         }
         else

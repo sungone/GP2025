@@ -1,31 +1,27 @@
 #include "pch.h"
 #include "MapZone.h"
 
-bool MapZone::Init()
+bool Map::Init()
 {
-	_default = NavMesh(MapDataPath + "NavMeshData.json");
-	_playground = NavMesh(MapDataPath + "PlaygroundNavData.json");
+	_zoneNavMeshes[ZoneType::DEFAULT] = NavMesh(MapDataPath + "NavMeshData.json");
+	_zoneNavMeshes[ZoneType::PLAYGROUND] = NavMesh(MapDataPath + "PlaygroundNavData.json");
 	return true;
 }
 
-FVector MapZone::GetRandomPos(ZoneType type) const
+FVector Map::GetRandomPos(ZoneType type) const
 {
-	switch (type)
-	{
-	case ZoneType::DEFAULT:
-		return _default.GetRandomPosition();
-	case ZoneType::PLAYGROUND:
-		return _playground.GetRandomPosition();
-	}
+	auto it = _zoneNavMeshes.find(type);
+	if (it != _zoneNavMeshes.end())
+		return it->second.GetRandomPosition();
+
+	return FVector(0, 0, 0);
 }
 
-NavMesh& MapZone::GetNavMesh(ZoneType type)
+NavMesh& Map::GetNavMesh(ZoneType type)
 {
-	switch (type)
-	{
-	case ZoneType::DEFAULT:
-		return _default;
-	case ZoneType::PLAYGROUND:
-		return _playground;
-	}
+	auto it = _zoneNavMeshes.find(type);
+	if (it == _zoneNavMeshes.end())
+		LOG(Warning, "type Invaild");
+
+	return it->second;
 }

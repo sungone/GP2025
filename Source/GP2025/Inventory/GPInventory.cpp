@@ -66,7 +66,7 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
         UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
         if (NetworkManager)
         {
-            NetworkManager->SendPlayerUseItem(NewSlot->SlotData.ItemUniqueID);
+            NetworkManager->SendMyUseItem(NewSlot->SlotData.ItemUniqueID);
         }
         return;
     }

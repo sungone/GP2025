@@ -115,7 +115,7 @@ void AGPItem::TryTakeItem()
 	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
 	if (NetworkMgr)
 	{
-		NetworkMgr->SendPlayerTakeItem(ItemID);
+		NetworkMgr->SendMyTakeItem(ItemID);
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("SendPlayerTakeItem!"));
 	}
 

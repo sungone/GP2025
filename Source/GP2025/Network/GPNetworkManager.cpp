@@ -40,7 +40,7 @@ void UGPNetworkManager::DisconnectFromServer()
 {
 	if (Socket)
 	{
-		this->SendPlayerLogoutPacket();
+		this->SendMyLogoutPacket();
 		ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get();
 		SocketSubsystem->DestroySocket(Socket);
 		Socket = nullptr;
@@ -87,7 +87,7 @@ void UGPNetworkManager::PrintFailMessege(DBResultCode ResultCode)
 	OnLoginFailed.Broadcast(ErrorMessage);
 }
 
-void UGPNetworkManager::SendPlayerLoginPacket(const FString& AccountID, const FString& AccountPW)
+void UGPNetworkManager::SendMyLoginPacket(const FString& AccountID, const FString& AccountPW)
 {
 	FTCHARToUTF8 IDUtf8(*AccountID);
 	FTCHARToUTF8 PWUtf8(*AccountPW);
@@ -95,7 +95,7 @@ void UGPNetworkManager::SendPlayerLoginPacket(const FString& AccountID, const FS
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendPlayerSignUpPacket(const FString& AccountID, const FString& AccountPW, const FString& NickName)
+void UGPNetworkManager::SendMySignUpPacket(const FString& AccountID, const FString& AccountPW, const FString& NickName)
 {
 	FTCHARToUTF8 IDUtf8(*AccountID);
 	FTCHARToUTF8 PWUtf8(*AccountPW);
@@ -105,7 +105,7 @@ void UGPNetworkManager::SendPlayerSignUpPacket(const FString& AccountID, const F
 }
 
 
-void UGPNetworkManager::SendPlayerLogoutPacket()
+void UGPNetworkManager::SendMyLogoutPacket()
 {
 	if (!MyPlayer)
 		return;
@@ -113,68 +113,74 @@ void UGPNetworkManager::SendPlayerLogoutPacket()
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendPlayerSelectCharacter(uint8 PlayerType)
+void UGPNetworkManager::SendMySelectCharacter(uint8 PlayerType)
 {
 	SelectCharacterPacket Packet((Type::EPlayer)PlayerType);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendPlayerMovePacket()
+void UGPNetworkManager::SendMyEnterGamePacket()
+{
+	RequestEnterGamePacket Packet;
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendMyMovePacket()
 {
 	auto info = MyPlayer->CharacterInfo;
 	MovePacket Packet(info.ID,info.Pos,info.State,0);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendPlayerAttackPacket(float PlayerYaw)
+void UGPNetworkManager::SendMyAttackPacket(float PlayerYaw)
 {
 	AttackPacket Packet(PlayerYaw);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendPlayerStartAiming(float PlayerYaw)
+void UGPNetworkManager::SendMyStartAiming(float PlayerYaw)
 {
 	StartAimingPacket Packet(PlayerYaw);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendPlayerStopAiming()
+void UGPNetworkManager::SendMyStopAiming()
 {
 	StopAimingPacket Packet;
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendPlayerTakeItem(int32 ItemID)
+void UGPNetworkManager::SendMyTakeItem(int32 ItemID)
 {
 	IDPacket Packet(EPacketType::C_TAKE_ITEM, ItemID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendPlayerDropItem(int32 ItemID)
+void UGPNetworkManager::SendMyDropItem(int32 ItemID)
 {
 	IDPacket Packet(EPacketType::C_DROP_ITEM, ItemID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendPlayerUseItem(int32 ItemID)
+void UGPNetworkManager::SendMyUseItem(int32 ItemID)
 {
 	IDPacket Packet(EPacketType::C_USE_ITEM, ItemID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendPlayerEquipItem(int32 ItemID)
+void UGPNetworkManager::SendMyEquipItem(int32 ItemID)
 {
 	IDPacket Packet(EPacketType::C_EQUIP_ITEM, ItemID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendPlayerUnequipItem(int32 ItemID)
+void UGPNetworkManager::SendMyUnequipItem(int32 ItemID)
 {
 	IDPacket Packet(EPacketType::C_UNEQUIP_ITEM, ItemID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendPlayerUseSkill(ESkillGroup SkillGID, float PlayerYaw)
+void UGPNetworkManager::SendMyUseSkill(ESkillGroup SkillGID, float PlayerYaw)
 {
 	UseSkillPacket Packet(SkillGID, PlayerYaw);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));

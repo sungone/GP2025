@@ -128,7 +128,7 @@ void UGPLoginWidget::TryLogin()
 		return;
 	}
 	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-	NetworkMgr->SendPlayerLoginPacket(ID_Str, PW_Str);
+	NetworkMgr->SendMyLoginPacket(ID_Str, PW_Str);
 }
 
 void UGPLoginWidget::TrySignUp()
@@ -161,7 +161,7 @@ void UGPLoginWidget::TrySignUp()
 		return;
 	}
 	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-	NetworkMgr->SendPlayerSignUpPacket(ID_Str, PW_Str, Nname_Str);
+	NetworkMgr->SendMySignUpPacket(ID_Str, PW_Str, Nname_Str);
 }
 
 void UGPLoginWidget::ShowLoginErrorMessage(const FString& Message, float Duration)
