@@ -63,6 +63,7 @@ void AGPCharacterMyplayer::BeginPlay()
 		NetworkSyncHandler->Initialize(this);
 	NetworkSyncHandler->AddToRoot();
 
+	// UIManager and Show Login UI
 	UIManager = NewObject<UGPMyplayerUIManager>(this, UGPMyplayerUIManager::StaticClass());
 	if (UIManager)
 	{
@@ -141,6 +142,7 @@ void AGPCharacterMyplayer::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 void AGPCharacterMyplayer::OnPlayerEnterGame()
 {
+	UE_LOG(LogTemp, Log, TEXT("OnPlayerEnterGame"));
 	if (UIManager)
 	{
 		if (UIManager->LobbyWidget)
@@ -159,13 +161,10 @@ void AGPCharacterMyplayer::OnPlayerEnterLobby()
 {
 	if (UIManager)
 	{
-		if (UIManager->LoginWidget)
+		if (UIManager->LoginWidget && UIManager->LoginWidget->IsInViewport())
 		{
-			if (UIManager->LoginWidget->IsInViewport())
-			{
-				UIManager->LoginWidget->RemoveFromParent();
-			}
-
+			UIManager->LoginWidget->SetVisibility(ESlateVisibility::Collapsed);
+			UIManager->LoginWidget->RemoveFromParent();
 		}
 
 		UIManager->ShowLobbyUI();

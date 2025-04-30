@@ -229,7 +229,6 @@ void UGPNetworkManager::ProcessPacket()
 				OnEnterLobby.Broadcast();
 
 				// Todo: 입장버튼 클릭시 호출되도록
-				SendMyEnterGamePacket();
 				break;
 			}
 			case EPacketType::S_LOGIN_FAIL:
