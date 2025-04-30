@@ -19,6 +19,7 @@
 #include "Character/Modules/GPMyplayerNetworkSyncHandler.h"
 #include "Skill/GPSkillCoolDownHandler.h"
 #include "Components/TextBlock.h"
+#include "kismet/GameplayStatics.h"
 #include "GPCharacterMyplayer.h"
 
 AGPCharacterMyplayer::AGPCharacterMyplayer()
@@ -154,6 +155,14 @@ void AGPCharacterMyplayer::OnPlayerEnterGame()
 
 		UIManager->OnSetUpInGameWidgets();
 	}
+
+	UGameplayStatics::LoadStreamLevel(
+		this,
+		FName("TUK"),  
+		true,   
+		true,   
+		FLatentActionInfo()
+	);
 }
 
 void AGPCharacterMyplayer::OnPlayerEnterLobby()
@@ -174,8 +183,17 @@ void AGPCharacterMyplayer::SetCharacterType(ECharacterType NewCharacterType)
 {
 	Super::SetCharacterType(NewCharacterType);
 
-	UGPCharacterControlData* NewCharacterData = CharacterTypeManager[NewCharacterType];
-	check(NewCharacterData);
+	UGPCharacterControlData** FoundData = CharacterTypeManager.Find(NewCharacterType);
+	if (!FoundData || !(*FoundData))
+	{
+		UE_LOG(LogTemp, Error, TEXT("[SetCharacterType] Not Found CharacterTypeManager : %d "), NewCharacterType);
+		return;
+	}
+
+	UGPCharacterControlData* NewCharacterData = *FoundData;
+
+	//UGPCharacterControlData* NewCharacterData = CharacterTypeManager[NewCharacterType];
+	//check(NewCharacterData);
 	SetCharacterData(NewCharacterData);
 
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
