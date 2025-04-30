@@ -65,7 +65,7 @@ void UGPMyplayerNetworkSyncHandler::HandleJumpState()
 		Owner->NetworkSyncHandler->isJumpStart = false;
 		bWasJumping = true;
 
-		Owner->NetMgr->SendPlayerMovePacket();
+		Owner->NetMgr->SendMyMovePacket();
 		LastSendPlayerInfo = Owner->CharacterInfo;
 
 		UE_LOG(LogTemp, Log, TEXT("[UGPMyplayerNetworkSyncHandler::HandleJumpState] Jump Start"));
@@ -87,7 +87,7 @@ void UGPMyplayerNetworkSyncHandler::HandleJumpState()
 	{
 		Owner->CharacterInfo.Pos.Z = Owner->Ground_ZLocation;
 
-		Owner->NetMgr->SendPlayerMovePacket();
+		Owner->NetMgr->SendMyMovePacket();
 		LastSendPlayerInfo = Owner->CharacterInfo;
 
 		UE_LOG(LogTemp, Log, TEXT("[UGPMyplayerNetworkSyncHandler::HandleJumpState] Air Fix Issue"));
@@ -107,7 +107,7 @@ void UGPMyplayerNetworkSyncHandler::HandleRotationChange()
 
 	if (bYawChanged && Owner->CharacterInfo.HasState(STATE_IDLE))
 	{
-		Owner->NetMgr->SendPlayerMovePacket();
+		Owner->NetMgr->SendMyMovePacket();
 		LastSendPlayerInfo = Owner->CharacterInfo;
 
 		UE_LOG(LogTemp, Log, TEXT("Send Packet: Yaw Changed in Idle"));
@@ -126,7 +126,7 @@ void UGPMyplayerNetworkSyncHandler::HandlePeriodicSend()
 
 		if (!Owner->CharacterInfo.HasState(STATE_IDLE) || DistanceMoved >= NotMovedThreshold)
 		{
-			Owner->NetMgr->SendPlayerMovePacket();
+			Owner->NetMgr->SendMyMovePacket();
 			LastSendPlayerInfo = Owner->CharacterInfo;
 			UE_LOG(LogTemp, Log, TEXT("Send Packet: Periodic or Idle Move"));
 		}
