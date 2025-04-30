@@ -44,12 +44,42 @@ void AGPSkillLevelUpText::Tick(float DeltaTime)
 	SetActorLocation(NewLocation);
 }
 
-void AGPSkillLevelUpText::SetSkillLevelUpText(const FString& Message)
+void AGPSkillLevelUpText::SetSkillLevelUpText(int32 SkillLevel)
 {
-	if (SkillTextBlock)
+	if (!SkillTextBlock) return;
+
+	FString Message;
+
+	if (SkillLevel == 2)
 	{
-		SkillTextBlock->SetText(FText::FromString(Message));
+		Message = FText::FromString(TEXT("Q skill unlocked")).ToString();
 	}
+	else if (SkillLevel == 3)
+	{
+		Message = FText::FromString(TEXT("E skill unlocked")).ToString();
+	}
+	else if (SkillLevel == 4)
+	{
+		Message = FText::FromString(TEXT("R skill unlocked")).ToString();
+	}
+	else if (SkillLevel == 5 || SkillLevel == 8)
+	{
+		Message = FText::FromString(TEXT("Q skill leveled up")).ToString();
+	}
+	else if (SkillLevel == 6 || SkillLevel == 9)
+	{
+		Message = FText::FromString(TEXT("E skill leveled up")).ToString();
+	}
+	else if (SkillLevel == 7 || SkillLevel == 10)
+	{
+		Message = FText::FromString(TEXT("R skill leveled up")).ToString();
+	}
+	else
+	{
+		Message = FText::FromString(TEXT("Skill leveled up!")).ToString();
+	}
+
+	SkillTextBlock->SetText(FText::FromString(Message));
 }
 
 void AGPSkillLevelUpText::DestroySelf()

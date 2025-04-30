@@ -319,6 +319,13 @@ void AGPCharacterMyplayer::SetCharacterInfo(FInfoData& CharacterInfo_)
 	InGame->UpdateHealthBar(CharacterInfo_.Stats.Hp / CharacterInfo_.Stats.MaxHp);
 	InGame->UpdateExpBar(CharacterInfo_.Stats.Exp / CharacterInfo_.Stats.MaxExp);
 	InGame->UpdatePlayerLevel(CharacterInfo_.Stats.Level);
+
+	if (CharacterInfo_.GetLevel() > PrevLevel)
+	{
+		UIManager->SpawnSkillLevelText(CharacterInfo_.Stats.Level);
+		PrevLevel = CharacterInfo_.Stats.Level;
+	}
+		
 }
 
 

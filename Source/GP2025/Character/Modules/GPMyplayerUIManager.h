@@ -90,5 +90,9 @@ public :
 public :
 	void ShowLobbyUI();
 	void ShowLoginUI();
+
+// Skill Level UP Text
+public :
+	void SpawnSkillLevelText(int32 NewLevel);
 };
 

@@ -32,7 +32,7 @@ void AGPFloatingDamageText::BeginPlay()
 	if (Widget)
 	{
 		DamageText = Cast<UTextBlock>(Widget->GetWidgetFromName(TEXT("DamageText")));
-		DamageText->SetColorAndOpacity(FSlateColor(FLinearColor::Red));
+		DamageText->SetColorAndOpacity(FSlateColor(FLinearColor::Blue));
 	}
 
 	GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &AGPFloatingDamageText::DestroySelf, 1.0f, false);

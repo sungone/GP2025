@@ -155,6 +155,7 @@ void UGPMyplayerInputHandler::StartSprinting()
 
 	Owner->GetCharacterMovement()->MaxWalkSpeed = Owner->NetworkSyncHandler->SprintSpeed;
 	Owner->CharacterInfo.AddState(STATE_RUN);
+	Owner->AppearanceHandler->SetupLeaderPose();
 }
 
 void UGPMyplayerInputHandler::StopSprinting()
@@ -178,6 +179,7 @@ void UGPMyplayerInputHandler::AutoAttack()
 	}
 
 	Owner->CombatHandler->PlayAutoAttackMontage();
+	Owner->AppearanceHandler->SetupLeaderPose();
 }
 
 void UGPMyplayerInputHandler::ToggleInventory()
@@ -247,6 +249,8 @@ void UGPMyplayerInputHandler::StartAiming()
 	{
 		Owner->UIManager->GunCrosshairWidget->SetVisibility(ESlateVisibility::Visible);
 	}
+
+	Owner->AppearanceHandler->SetupLeaderPose();
 }
 
 void UGPMyplayerInputHandler::StopAiming()
@@ -292,6 +296,8 @@ void UGPMyplayerInputHandler::UseSkillQ()
 		Owner->CombatHandler->PlayQSkillMontage();
 		Owner->NetMgr->SendMyUseSkill(ESkillGroup::HitHard, Owner->GetControlRotation().Yaw);
 	}
+
+	Owner->AppearanceHandler->SetupLeaderPose();
 }
 
 void UGPMyplayerInputHandler::UseSkillE()
@@ -323,6 +329,8 @@ void UGPMyplayerInputHandler::UseSkillE()
 		Owner->CombatHandler->PlayESkillMontage();
 		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Clash, Owner->GetControlRotation().Yaw);
 	}
+
+	Owner->AppearanceHandler->SetupLeaderPose();
 }
 
 void UGPMyplayerInputHandler::UseSkillR()
@@ -354,4 +362,6 @@ void UGPMyplayerInputHandler::UseSkillR()
 		Owner->CombatHandler->PlayRSkillMontage();
 		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Whirlwind, Owner->GetControlRotation().Yaw);
 	}
+
+	Owner->AppearanceHandler->SetupLeaderPose();
 }

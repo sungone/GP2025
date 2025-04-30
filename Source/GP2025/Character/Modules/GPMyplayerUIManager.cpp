@@ -9,6 +9,7 @@
 #include "UI/GPInGameWidget.h"
 #include "Character/GPCharacterMyplayer.h"
 #include "GPMyplayerUIManager.h"
+#include "UI/GPSkillLevelUpText.h"
 
 UGPMyplayerUIManager::UGPMyplayerUIManager()
 {
@@ -257,4 +258,43 @@ void UGPMyplayerUIManager::ShowLoginUI()
 			PC->SetInputMode(InputMode);
 		}
 	}
+}
+
+void UGPMyplayerUIManager::SpawnSkillLevelText(int32 NewLevel)
+{
+	if (!Owner)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[SkillText] Spawn failed: Owner is null"));
+		return;
+	}
+
+	UWorld* World = Owner->GetWorld();
+	if (!World)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[SkillText] Spawn failed: World is null"));
+		return;
+	}
+
+	FVector SpawnLocation = Owner->GetActorLocation() + FVector(0, 0, 0);
+	UE_LOG(LogTemp, Log, TEXT("[SkillText] Spawn location: %s"), *SpawnLocation.ToString());
+
+	// 텍스트 클래스 로딩
+	TSubclassOf<AGPSkillLevelUpText> TextClass = LoadClass<AGPSkillLevelUpText>(nullptr, TEXT("/Game/Blueprint/BP_SkillLevelUpText.BP_SkillLevelUpText_C"));
+	if (!TextClass)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[SkillText] Spawn failed: Could not load BP_SkillLevelUpText class"));
+		return;
+	}
+
+	// 액터 생성
+	AGPSkillLevelUpText* TextActor = World->SpawnActor<AGPSkillLevelUpText>(TextClass, SpawnLocation, FRotator::ZeroRotator);
+	if (!TextActor)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[SkillText] Spawn failed: Could not spawn text actor"));
+		return;
+	}
+
+	// 텍스트 설정
+	UE_LOG(LogTemp, Log, TEXT("[SkillText] Actor spawned successfully. Setting level text for level %d"), NewLevel);
+	TextActor->SetSkillLevelUpText(NewLevel);
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/TextBlock.h"
 #include "GPSkillLevelUpText.generated.h"
 
 UCLASS()
@@ -21,12 +22,12 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	void SetSkillLevelUpText(const FString& Message);
+	void SetSkillLevelUpText(int32 SkillLevel);
 
 	UPROPERTY(VisibleAnywhere)
 	class UWidgetComponent* SkillTextWidgetComponent;
 
-	UPROPERTY()
+	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* SkillTextBlock;
 
 private:
