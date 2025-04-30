@@ -16,7 +16,7 @@ void Player::Init()
 	_info.State = ECharacterStateType::STATE_IDLE;
 	ApplyLevelStats(_info.Stats.Level);
 	FVector newPos{};
-	do { newPos = MapZone::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(_info));
+	do { newPos = Map::GetInst().GetRandomPos(ZoneType::PLAYGROUND); } while (GameWorld::GetInst().IsCollisionDetected(_info));
 	_info.SetLocation(newPos);
 #endif
 }
