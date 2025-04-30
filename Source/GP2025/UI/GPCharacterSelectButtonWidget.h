@@ -4,18 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "../../GP_Server/Source/Common/Type.h"
 #include "GPCharacterSelectButtonWidget.generated.h"
 
-UENUM(BlueprintType)
-enum class ELobbyCharacterSelectType : uint8
-{
-	MAN,
-	WOMAN
-};
 
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterSelected, ELobbyCharacterSelectType, SelectedCharacter);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterSelected, uint8, SelectedCharacter);
 
 /**
  * 
@@ -34,7 +27,7 @@ public :
 	class UButton* SelectButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
-	ELobbyCharacterSelectType CharacterType;
+	uint8  CharacterType;
 
 	UPROPERTY(BlueprintAssignable, Category = "Character")
 	FOnCharacterSelected OnCharacterSelected;

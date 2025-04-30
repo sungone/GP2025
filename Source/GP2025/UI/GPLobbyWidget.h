@@ -30,5 +30,5 @@ public :
 
 	// 캐릭터 선택 처리
 	UFUNCTION()
-	void OnCharacterSelected(ELobbyCharacterSelectType SelectedType);
+	void OnCharacterSelected(uint8 SelectedType);
 };

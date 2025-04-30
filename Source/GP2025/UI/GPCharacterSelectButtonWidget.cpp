@@ -18,6 +18,5 @@ void UGPCharacterSelectButtonWidget::NativeConstruct()
 
 void UGPCharacterSelectButtonWidget::HandleClicked()
 {
-	UE_LOG(LogTemp, Log, TEXT("[CharacterSelectButton] Button Clicked! CharacterType: %d"), (int32)CharacterType);
 	OnCharacterSelected.Broadcast(CharacterType);
 }

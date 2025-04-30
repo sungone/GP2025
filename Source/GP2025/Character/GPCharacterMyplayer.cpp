@@ -153,8 +153,6 @@ void AGPCharacterMyplayer::OnPlayerEnterGame()
 
 		UIManager->OnSetUpInGameWidgets();
 	}
-
-	UE_LOG(LogTemp, Log, TEXT("[UI] faefefsafsf "));
 }
 
 void AGPCharacterMyplayer::OnPlayerEnterLobby()
@@ -172,8 +170,6 @@ void AGPCharacterMyplayer::OnPlayerEnterLobby()
 
 		UIManager->ShowLobbyUI();
 	}
-
-	UE_LOG(LogTemp, Log, TEXT("[UI] ddddddddd "));
 }
 
 void AGPCharacterMyplayer::SetCharacterType(ECharacterType NewCharacterType)

@@ -3,6 +3,8 @@
 
 #include "UI/GPLobbyWidget.h"
 #include "UI/GPCharacterSelectButtonWidget.h"
+#include "../../GP_Server/Source/Common/Common.h"
+#include "GPLobbyWidget.h"
 
 void UGPLobbyWidget::NativeConstruct()
 {
@@ -10,29 +12,32 @@ void UGPLobbyWidget::NativeConstruct()
 
 	if (SelectMan)
 	{
-		SelectMan->CharacterType = ELobbyCharacterSelectType::MAN;
+		SelectMan->CharacterType = static_cast<uint8>(Type::EPlayer::WARRIOR);
 		SelectMan->OnCharacterSelected.AddDynamic(this, &UGPLobbyWidget::OnCharacterSelected);
 	}
 
 	if (SelectWoman)
 	{
-		SelectWoman->CharacterType = ELobbyCharacterSelectType::WOMAN;
+		SelectWoman->CharacterType = static_cast<uint8>(Type::EPlayer::GUNNER);
 		SelectWoman->OnCharacterSelected.AddDynamic(this, &UGPLobbyWidget::OnCharacterSelected);
 	}
 }
 
-void UGPLobbyWidget::OnCharacterSelected(ELobbyCharacterSelectType SelectedType)
+void UGPLobbyWidget::OnCharacterSelected(uint8 SelectedType)
 {
-	switch (SelectedType)
-	{
-	case ELobbyCharacterSelectType::MAN:
-		UE_LOG(LogTemp, Log, TEXT("[Lobby] Man Character Selected. "));
-		// ToDo : 남자 캐릭터 3D 모델 활성화 또는 서버 전송 등
-		break;
+	using namespace Type;
 
-	case ELobbyCharacterSelectType::WOMAN:
-		UE_LOG(LogTemp, Log, TEXT("[Lobby] Woman Character Selected. "));
-		// ToDo : 여자 캐릭터 3D 모델 활성화 또는 서버 전송 등
-		break;
+	if (SelectedType == static_cast<uint8>(EPlayer::WARRIOR))
+	{
+		// 남자 캐릭터 선택 처리
+	}
+	else if (SelectedType == static_cast<uint8>(EPlayer::GUNNER))
+	{
+		// 여자 캐릭터 선택 처리
+	}
+	else
+	{
+		// 기존 캐릭터 처리
 	}
 }
+
