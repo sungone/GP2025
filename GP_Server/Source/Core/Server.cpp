@@ -53,7 +53,7 @@ bool Server::Init()
 	}
 	IOCP::GetInst().RegisterSocket(_listenSocket);
 
-	if (!MapZone::GetInst().Init())
+	if (!Map::GetInst().Init())
 	{
 		LOG(LogType::Error, "MapZone");
 		return false;
