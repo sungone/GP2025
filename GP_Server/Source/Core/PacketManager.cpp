@@ -120,8 +120,8 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 	LOG(std::format("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW));
 	_sessionMgr.HandleLogin(sessionId);
 	auto& playerInfo = _gameWorld.GetInfo(sessionId);
-	LoginSuccessPacket loginpkt(playerInfo);
-	_sessionMgr.SendPacket(sessionId, &loginpkt);
+	EnterGamePacket enterpkt(playerInfo);
+	_sessionMgr.SendPacket(sessionId, &enterpkt);
 #endif
 }
 

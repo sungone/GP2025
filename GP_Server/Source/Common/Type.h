@@ -5,6 +5,7 @@ enum EPacketType : uint8
 	C_LOGOUT,
 	C_SIGNUP,
 	C_SELECT_CHARACTER,
+	C_ENTER_GAME,
 
 	C_MOVE,
 	C_ATTACK,

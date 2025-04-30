@@ -126,7 +126,14 @@ struct SelectCharacterPacket : public Packet
 		Header.PacketSize = sizeof(SelectCharacterPacket);
 	}
 };
-
+struct RequestEnterGamePacket : public Packet
+{
+	RequestEnterGamePacket()
+		: Packet(EPacketType::C_ENTER_GAME)
+	{
+		Header.PacketSize = sizeof(RequestEnterGamePacket);
+	}
+};
 struct EnterGamePacket : public Packet
 {
 	FInfoData PlayerInfo;
