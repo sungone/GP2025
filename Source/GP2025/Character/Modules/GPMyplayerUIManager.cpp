@@ -39,7 +39,7 @@ void UGPMyplayerUIManager::Initialize(AGPCharacterMyplayer* InOwner)
 	Owner = InOwner;
 }
 
-void UGPMyplayerUIManager::OnLoginCreateWidget()
+void UGPMyplayerUIManager::OnSetUpInGameWidgets()
 {
 	if (!Owner) return;
 	UWorld* World = Owner->GetWorld();

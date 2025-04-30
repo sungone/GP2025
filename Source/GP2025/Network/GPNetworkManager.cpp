@@ -219,8 +219,10 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_LOGIN_SUCCESS:
 			{
 				LoginSuccessPacket* Pkt = reinterpret_cast<LoginSuccessPacket*>(RemainingData.GetData());
-				OnLoginSuccess.Broadcast();
-				ObjectMgr->OnLoginSuccess(Pkt->PlayerInfo);
+				// Todo: 추후 로비로 이동
+				// OnOnEnterLobby.Broadcast();
+				OnEnterGame.Broadcast();
+				ObjectMgr->AddMyPlayer(Pkt->PlayerInfo);
 				break;
 			}
 			case EPacketType::S_LOGIN_FAIL:
@@ -232,14 +234,20 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_SIGNUP_SUCCESS:
 			{
 				SignUpSuccessPacket* Pkt = reinterpret_cast<SignUpSuccessPacket*>(RemainingData.GetData());
-				OnLoginSuccess.Broadcast();
-				ObjectMgr->OnLoginSuccess(Pkt->PlayerInfo);
+				OnEnterLobby.Broadcast();
 				break;
 			}
 			case EPacketType::S_SIGNUP_FAIL:
 			{
 				SignUpFailPacket* Pkt = reinterpret_cast<SignUpFailPacket*>(RemainingData.GetData());
 				PrintFailMessege(Pkt->ResultCode);
+				break;
+			}
+			case EPacketType::S_ENTER_GAME:
+			{
+				EnterGamePacket* Pkt = reinterpret_cast<EnterGamePacket*>(RemainingData.GetData());
+				OnEnterGame.Broadcast();
+				ObjectMgr->AddMyPlayer(Pkt->PlayerInfo);
 				break;
 			}
 			case EPacketType::S_ADD_PLAYER:

@@ -127,6 +127,17 @@ struct SelectCharacterPacket : public Packet
 	}
 };
 
+struct EnterGamePacket : public Packet
+{
+	FInfoData PlayerInfo;
+
+	EnterGamePacket(const FInfoData& PlayerInfo_)
+		: Packet(EPacketType::S_ENTER_GAME), PlayerInfo(PlayerInfo_)
+	{
+		Header.PacketSize = sizeof(EnterGamePacket);
+	}
+};
+
 struct MovePacket : public Packet
 {
 	int32 PlayerID;

@@ -31,7 +31,7 @@ void UGPObjectManager::SetMyPlayer(AGPCharacterPlayer* InMyPlayer)
 	MyPlayer = Cast<AGPCharacterMyplayer>(InMyPlayer);
 }
 
-void UGPObjectManager::OnLoginSuccess(FInfoData& PlayerInfo)
+void UGPObjectManager::AddMyPlayer(FInfoData& PlayerInfo)
 {
 	if (World == nullptr)
 	{

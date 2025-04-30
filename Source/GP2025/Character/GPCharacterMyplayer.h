@@ -27,7 +27,8 @@ public:
 public:
 	// <Network>
 	UFUNCTION()
-	void OnPlayerLoginSucess();
+	void OnPlayerEnterGame();
+	void OnPlayerEnterLobby();
 	class UGPNetworkManager* NetMgr;
 
 	// <Input>

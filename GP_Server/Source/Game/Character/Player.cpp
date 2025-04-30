@@ -223,8 +223,7 @@ void Player::ExecuteSkillEffect(const FSkillTableData& skill)
 	{
 		switch (skill.Type1)
 		{
-		case ESkillType::AtkSpd:
-			// 공격속도 n% 증가 (클라에서 처리하자
+		case ESkillType::AtkSpd:// 공격속도 n% 증가 (클라에서 처리)
 			break;
 		}
 

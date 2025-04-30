@@ -20,7 +20,7 @@ public:
 	void Initialize(class AGPCharacterMyplayer* InOwner);
 
 	// Login
-	void OnLoginCreateWidget();
+	void OnSetUpInGameWidgets();
 
 	// Inventory
 	UFUNCTION()

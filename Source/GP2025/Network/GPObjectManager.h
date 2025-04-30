@@ -21,7 +21,7 @@ public:
 	virtual void Deinitialize() override;
 
 	void SetMyPlayer(AGPCharacterPlayer* InMyPlayer);
-	void OnLoginSuccess(FInfoData& PlayerInfo);
+	void AddMyPlayer(FInfoData& PlayerInfo);
 	void AddPlayer(FInfoData& PlayerInfo);
 	void RemovePlayer(int32 PlayerID);
 	void UpdatePlayer(FInfoData& PlayerInfo);

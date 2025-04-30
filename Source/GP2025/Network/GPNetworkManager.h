@@ -11,7 +11,8 @@ class AGPCharacterPlayer;
 class AGPCharacterMonster;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLoginFailed, FString, Message);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoginSuccess);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOnEnterGame);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOnEnterLobby);
 
 UCLASS()
 class GP2025_API UGPNetworkManager : public UGameInstanceSubsystem
@@ -22,7 +23,10 @@ public:
 	FOnLoginFailed OnLoginFailed;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnLoginSuccess OnLoginSuccess;
+	FOnOnEnterLobby OnEnterLobby;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnOnEnterGame OnEnterGame;
 public:
 	void ConnectToServer();
 	void DisconnectFromServer();

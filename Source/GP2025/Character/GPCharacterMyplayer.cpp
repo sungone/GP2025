@@ -41,7 +41,8 @@ void AGPCharacterMyplayer::BeginPlay()
 	if (NetMgr)
 	{
 		NetMgr->SetMyPlayer(Cast<AGPCharacterPlayer>(this));
-		NetMgr->OnLoginSuccess.AddDynamic(this, &AGPCharacterMyplayer::OnPlayerLoginSucess);
+		NetMgr->OnEnterGame.AddDynamic(this, &AGPCharacterMyplayer::OnPlayerEnterGame);
+		NetMgr->OnEnterLobby.AddDynamic(this, &AGPCharacterMyplayer::OnPlayerEnterLobby);
 	}
 
 	// Camera Handler 
@@ -110,7 +111,7 @@ void AGPCharacterMyplayer::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	}
 }
 
-void AGPCharacterMyplayer::OnPlayerLoginSucess()
+void AGPCharacterMyplayer::OnPlayerEnterGame()
 {
 	if (!UIManager)
 	{
@@ -118,9 +119,15 @@ void AGPCharacterMyplayer::OnPlayerLoginSucess()
 		if (UIManager)
 		{
 			UIManager->Initialize(this);
-			UIManager->OnLoginCreateWidget();
+			UIManager->OnSetUpInGameWidgets();
 		}
 	}
+}
+
+void AGPCharacterMyplayer::OnPlayerEnterLobby()
+{
+	//Todo:
+	//  ·Îºñ À§Á¬ 
 }
 
 void AGPCharacterMyplayer::SetCharacterType(ECharacterType NewCharacterType)
