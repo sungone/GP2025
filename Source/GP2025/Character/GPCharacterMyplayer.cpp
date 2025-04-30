@@ -49,6 +49,7 @@ void AGPCharacterMyplayer::BeginPlay()
 	CameraHandler = NewObject<UGPMyplayerCameraHandler>(this, UGPMyplayerCameraHandler::StaticClass());
 	if (CameraHandler)
 		CameraHandler->Initialize(this);
+	CameraHandler->AddToRoot();
 
 	// Skill Cool Down Handler
 	SkillCoolDownHandler = NewObject<UGPSkillCoolDownHandler>(this, UGPSkillCoolDownHandler::StaticClass());
@@ -60,7 +61,15 @@ void AGPCharacterMyplayer::BeginPlay()
 	NetworkSyncHandler = NewObject<UGPMyplayerNetworkSyncHandler>(this, UGPMyplayerNetworkSyncHandler::StaticClass());
 	if (NetworkSyncHandler)
 		NetworkSyncHandler->Initialize(this);
+	NetworkSyncHandler->AddToRoot();
 
+	UIManager = NewObject<UGPMyplayerUIManager>(this, UGPMyplayerUIManager::StaticClass());
+	if (UIManager)
+	{
+		UIManager->Initialize(this);
+		UIManager->ShowLoginUI();
+	}
+	
 	SetCharacterType(CurrentCharacterType);
 }
 
@@ -85,7 +94,6 @@ void AGPCharacterMyplayer::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	// AddToRoot 반환
 	if (SkillCoolDownHandler)
 	{
 		if (SkillCoolDownHandler->IsRooted())
@@ -95,6 +103,26 @@ void AGPCharacterMyplayer::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		}
 
 		SkillCoolDownHandler = nullptr;
+	}
+
+	if (CameraHandler)
+	{
+		if (CameraHandler->IsRooted())
+		{
+			CameraHandler->RemoveFromRoot();
+			UE_LOG(LogTemp, Warning, TEXT("CameraHandler RemoveFromRoot() called in EndPlay."));
+		}
+		CameraHandler = nullptr;
+	}
+
+	if (NetworkSyncHandler)
+	{
+		if (NetworkSyncHandler->IsRooted())
+		{
+			NetworkSyncHandler->RemoveFromRoot();
+			UE_LOG(LogTemp, Warning, TEXT("NetworkSyncHandler RemoveFromRoot() called in EndPlay."));
+		}
+		NetworkSyncHandler = nullptr;
 	}
 }
 
@@ -113,21 +141,39 @@ void AGPCharacterMyplayer::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 void AGPCharacterMyplayer::OnPlayerEnterGame()
 {
-	if (!UIManager)
+	if (UIManager)
 	{
-		UIManager = NewObject<UGPMyplayerUIManager>(this, UGPMyplayerUIManager::StaticClass());
-		if (UIManager)
+		if (UIManager->LobbyWidget)
 		{
-			UIManager->Initialize(this);
-			UIManager->OnSetUpInGameWidgets();
+			if (UIManager->LobbyWidget->IsInViewport())
+			{
+				UIManager->LobbyWidget->RemoveFromParent();
+			}
 		}
+
+		UIManager->OnSetUpInGameWidgets();
 	}
+
+	UE_LOG(LogTemp, Log, TEXT("[UI] faefefsafsf "));
 }
 
 void AGPCharacterMyplayer::OnPlayerEnterLobby()
 {
-	//Todo:
-	//  로비 위젯 
+	if (UIManager)
+	{
+		if (UIManager->LoginWidget)
+		{
+			if (UIManager->LoginWidget->IsInViewport())
+			{
+				UIManager->LoginWidget->RemoveFromParent();
+			}
+
+		}
+
+		UIManager->ShowLobbyUI();
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("[UI] ddddddddd "));
 }
 
 void AGPCharacterMyplayer::SetCharacterType(ECharacterType NewCharacterType)

@@ -28,7 +28,10 @@ public:
 	// <Network>
 	UFUNCTION()
 	void OnPlayerEnterGame();
+
+	UFUNCTION()
 	void OnPlayerEnterLobby();
+
 	class UGPNetworkManager* NetMgr;
 
 	// <Input>

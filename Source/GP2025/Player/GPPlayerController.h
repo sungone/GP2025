@@ -18,7 +18,7 @@ class GP2025_API AGPPlayerController : public APlayerController
 protected :
 	virtual void BeginPlay() override;
 
+
 public:
 	AGPPlayerController();
-
 };

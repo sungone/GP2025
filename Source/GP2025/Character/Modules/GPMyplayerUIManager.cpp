@@ -5,8 +5,10 @@
 #include "Blueprint/UserWidget.h"
 #include "Inventory/GPInventory.h"
 #include "Player/GPPlayerController.h"
+#include "UI/GPLobbyWidget.h"
 #include "UI/GPInGameWidget.h"
 #include "Character/GPCharacterMyplayer.h"
+#include "GPMyplayerUIManager.h"
 
 UGPMyplayerUIManager::UGPMyplayerUIManager()
 {
@@ -32,6 +34,18 @@ UGPMyplayerUIManager::UGPMyplayerUIManager()
 	if (GunCrosshairWidgetBPClass.Succeeded())
 	{
 		GunCrosshairWidgetClass = GunCrosshairWidgetBPClass.Class;
+	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> LobbyWidgetClassBPClass(TEXT("/Game/UI/WBP_Lobby"));
+	if (LobbyWidgetClassBPClass.Succeeded())
+	{
+		LobbyWidgetClass = LobbyWidgetClassBPClass.Class;
+	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> LoginWidgetClassBPClass(TEXT("/Game/UI/WBP_Login"));
+	if (LoginWidgetClassBPClass.Succeeded())
+	{
+		LoginWidgetClass = LoginWidgetClassBPClass.Class;
 	}
 }
 void UGPMyplayerUIManager::Initialize(AGPCharacterMyplayer* InOwner)
@@ -178,4 +192,69 @@ UGPInventory* UGPMyplayerUIManager::GetInventoryWidget()
 		return Inven;
 	else
 		return nullptr;
+}
+
+void UGPMyplayerUIManager::ShowLobbyUI()
+{
+	if (!Owner) return;
+	UWorld* World = Owner->GetWorld();
+	if (!World) return;
+
+	if (!LobbyWidget && LobbyWidgetClass)
+	{
+		LobbyWidget = CreateWidget<UUserWidget>(World, LobbyWidgetClass);
+	}
+
+	if (LobbyWidget && !LobbyWidget->IsInViewport())
+	{
+		LobbyWidget->AddToViewport();
+	}
+
+	if (Owner && Owner->IsPlayerControlled())
+	{
+		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
+		if (PC)
+		{
+			PC->bShowMouseCursor = true;
+
+			FInputModeUIOnly InputMode;
+			InputMode.SetWidgetToFocus(LobbyWidget->TakeWidget());
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			PC->SetInputMode(InputMode);
+		}
+	}
+}
+
+void UGPMyplayerUIManager::ShowLoginUI()
+{
+	if (!Owner) return;
+	UWorld* World = Owner->GetWorld();
+	if (!World) return;
+
+	// 위젯이 아직 생성되지 않았다면 생성
+	if (!LoginWidget && LoginWidgetClass)
+	{
+		LoginWidget = CreateWidget<UUserWidget>(World, LoginWidgetClass);
+	}
+
+	// 이미 Viewport에 없으면 추가
+	if (LoginWidget && !LoginWidget->IsInViewport())
+	{
+		LoginWidget->AddToViewport();
+	}
+
+	// 마우스 커서와 입력 모드 설정
+	if (Owner && Owner->IsPlayerControlled())
+	{
+		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
+		if (PC)
+		{
+			PC->bShowMouseCursor = true;
+
+			FInputModeUIOnly InputMode;
+			InputMode.SetWidgetToFocus(LoginWidget->TakeWidget());
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			PC->SetInputMode(InputMode);
+		}
+	}
 }

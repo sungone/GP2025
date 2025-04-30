@@ -58,6 +58,12 @@ public:
 	UUserWidget* GunCrosshairWidget;
 
 	UPROPERTY()
+	UUserWidget* LobbyWidget;
+
+	UPROPERTY()
+	UUserWidget* LoginWidget;
+
+	UPROPERTY()
 	TSubclassOf<UUserWidget> InventoryWidgetClass;
 
 	UPROPERTY()
@@ -67,6 +73,12 @@ public:
 	TSubclassOf<UUserWidget> InGameWidgetClass;
 
 	UPROPERTY()
+	TSubclassOf<UUserWidget> LobbyWidgetClass;
+
+	UPROPERTY()
+	TSubclassOf<UUserWidget> LoginWidgetClass;
+
+	UPROPERTY()
 	TSubclassOf<UUserWidget> GunCrosshairWidgetClass;
 
 	bool bInventoryToggled = false;
@@ -74,5 +86,9 @@ public:
 public :
 	class UGPInGameWidget* GetInGameWidget();
 	class UGPInventory* GetInventoryWidget();
+
+public :
+	void ShowLobbyUI();
+	void ShowLoginUI();
 };
 

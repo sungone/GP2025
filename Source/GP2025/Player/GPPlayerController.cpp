@@ -8,17 +8,15 @@
 #include "UI/GPLoginWidget.h"
 #include "UI/GPLobbyWidget.h"
 #include "UObject/ConstructorHelpers.h"
-
-
-void AGPPlayerController::BeginPlay()
-{
-	Super::BeginPlay();
-
-	FInputModeGameOnly GameOnlyInputMode;
-	SetInputMode(GameOnlyInputMode);
-}
+#include "Network/GPNetworkManager.h"
+#include "GPPlayerController.h"
 
 AGPPlayerController::AGPPlayerController()
 {
 
+}
+
+void AGPPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
 }

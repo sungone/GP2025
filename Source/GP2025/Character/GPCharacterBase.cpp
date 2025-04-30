@@ -142,6 +142,7 @@ void AGPCharacterBase::PostInitializeComponents()
 	Super::PostInitializeComponents();
 }
 
+
 void AGPCharacterBase::SetCharacterInfo(FInfoData& CharacterInfo_)
 {
 	CharacterInfo = CharacterInfo_;

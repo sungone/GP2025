@@ -8,6 +8,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "Character/Modules/GPPlayerAppearanceHandler.h"
 #include "Character/Modules/GPPlayerEffectHandler.h"
+#include "GPCharacterPlayer.h"
 
 
 AGPCharacterPlayer::AGPCharacterPlayer()
@@ -56,6 +57,7 @@ void AGPCharacterPlayer::PostInitializeComponents()
         if (AppearanceHandler)
         {
             AppearanceHandler->Initialize(this);
+            AppearanceHandler->AddToRoot();
         }
     }
 
@@ -65,6 +67,7 @@ void AGPCharacterPlayer::PostInitializeComponents()
         if (EffectHandler)
         {
             EffectHandler->Init(this);
+            EffectHandler->AddToRoot();
         }
     }
 
@@ -72,6 +75,28 @@ void AGPCharacterPlayer::PostInitializeComponents()
     if (FoundData && *FoundData && AppearanceHandler)
     {
         AppearanceHandler->ApplyCharacterPartsFromData(*FoundData);
+    }
+}
+
+void AGPCharacterPlayer::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    if (AppearanceHandler)
+    {
+        if (AppearanceHandler->IsRooted())
+        {
+            AppearanceHandler->RemoveFromRoot();
+            UE_LOG(LogTemp, Warning, TEXT("AppearanceHandler RemoveFromRoot() called in EndPlay."));
+        }
+        AppearanceHandler = nullptr;
+    }
+
+    if (EffectHandler)
+    {
+        if (EffectHandler->IsRooted())
+        {
+            EffectHandler->RemoveFromRoot();
+        }
+        EffectHandler = nullptr;
     }
 }
 

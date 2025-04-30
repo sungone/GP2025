@@ -220,8 +220,8 @@ void UGPNetworkManager::ProcessPacket()
 			{
 				LoginSuccessPacket* Pkt = reinterpret_cast<LoginSuccessPacket*>(RemainingData.GetData());
 				// Todo: 추후 로비로 이동
-				// OnOnEnterLobby.Broadcast();
-				OnEnterGame.Broadcast();
+				OnEnterLobby.Broadcast();
+				// OnEnterGame.Broadcast();
 				ObjectMgr->AddMyPlayer(Pkt->PlayerInfo);
 				break;
 			}

@@ -64,6 +64,7 @@ void UGPPlayerAppearanceHandler::ApplyCharacterPartsFromData(const UGPCharacterC
 void UGPPlayerAppearanceHandler::EquipWeaponFromData(const UGPCharacterControlData* CharacterData)
 {
 	if (!Owner || !CharacterData) return;
+	SetupLeaderPose();
 
 	if (Owner->WeaponActor)
 	{
@@ -104,6 +105,7 @@ USkeletalMesh* UGPPlayerAppearanceHandler::GetBodyMeshByCharacterType(const FGPI
 void UGPPlayerAppearanceHandler::EquipItemOnCharacter(FGPItemStruct& ItemData)
 {
 	if (!Owner) return;
+	SetupLeaderPose();
 
 	UE_LOG(LogTemp, Warning, TEXT("Equipped : %s"), *ItemData.ItemName.ToString());
 
@@ -141,6 +143,7 @@ void UGPPlayerAppearanceHandler::EquipItemOnCharacter(FGPItemStruct& ItemData)
 
 	if (ItemData.Category == ECategory::chest)
 	{
+		SetupLeaderPose();
 
 		USkeletalMesh* MeshToApply = GetBodyMeshByCharacterType(ItemData, Owner->CurrentCharacterType);
 		if (!MeshToApply)
@@ -215,31 +218,27 @@ void UGPPlayerAppearanceHandler::SetupLeaderPose()
 		return;
 	}
 
-	FTimerHandle TimerHandle;
-	Owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+	if (Owner->HeadMesh)
+	{
+		Owner->HeadMesh->SetLeaderPoseComponent(Owner->BodyMesh, true);
+	}
+	if (Owner->LegMesh)
+	{
+		Owner->LegMesh->SetLeaderPoseComponent(Owner->BodyMesh, true);
+	}
+	if (Owner->Helmet)
+	{
+		if (Owner->BodyMesh->DoesSocketExist(TEXT("HelmetSocket")))
 		{
-			if (Owner->HeadMesh)
-			{
-				Owner->HeadMesh->SetLeaderPoseComponent(Owner->BodyMesh, true);
-			}
-			if (Owner->LegMesh)
-			{
-				Owner->LegMesh->SetLeaderPoseComponent(Owner->BodyMesh, true);
-			}
-			if (Owner->Helmet)
-			{
-				if (Owner->BodyMesh->DoesSocketExist(TEXT("HelmetSocket")))
-				{
-					Owner->Helmet->AttachToComponent(Owner->BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("HelmetSocket"));
-					Owner->Helmet->SetVisibility(true);
-				}
-			}
-
-		}, 0.02f, false);
+			Owner->Helmet->AttachToComponent(Owner->BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("HelmetSocket"));
+			Owner->Helmet->SetVisibility(true);
+		}
+	}
 }
 
 void UGPPlayerAppearanceHandler::AttachWeaponToBodyMesh()
 {
+	SetupLeaderPose();
 	if (Owner->WeaponActor && Owner->WeaponActor->GetWeaponMesh() && Owner->BodyMesh)
 	{
 		Owner->WeaponActor->GetWeaponMesh()->AttachToComponent(
