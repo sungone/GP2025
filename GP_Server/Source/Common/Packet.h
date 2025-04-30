@@ -78,9 +78,9 @@ struct SignUpPacket : public Packet
 
 struct LoginSuccessPacket : public Packet
 {
-	FInfoData PlayerInfo;
-	LoginSuccessPacket(const FInfoData& PlayerInfo_)
-		: Packet(EPacketType::S_LOGIN_SUCCESS), PlayerInfo(PlayerInfo_)
+	bool dummy;
+	LoginSuccessPacket()
+		: Packet(EPacketType::S_LOGIN_SUCCESS)
 	{
 		Header.PacketSize = sizeof(LoginSuccessPacket);
 	}
@@ -98,9 +98,9 @@ struct LoginFailPacket : public Packet
 
 struct SignUpSuccessPacket : public Packet
 {
-	FInfoData PlayerInfo;
-	SignUpSuccessPacket(const FInfoData& PlayerInfo_)
-		: Packet(EPacketType::S_SIGNUP_SUCCESS), PlayerInfo(PlayerInfo_)
+	bool dummy;
+	SignUpSuccessPacket()
+		: Packet(EPacketType::S_SIGNUP_SUCCESS)
 	{
 		Header.PacketSize = sizeof(SignUpSuccessPacket);
 	}
@@ -128,6 +128,7 @@ struct SelectCharacterPacket : public Packet
 };
 struct RequestEnterGamePacket : public Packet
 {
+	bool dummy;
 	RequestEnterGamePacket()
 		: Packet(EPacketType::C_ENTER_GAME)
 	{
@@ -190,7 +191,8 @@ struct StartAimingPacket : public Packet
 };
 struct StopAimingPacket : public Packet
 {
-	StopAimingPacket()
+	bool dummy;
+	 StopAimingPacket()
 		: Packet(EPacketType::C_STOP_AIMING)
 	{
 		Header.PacketSize = sizeof(StopAimingPacket);

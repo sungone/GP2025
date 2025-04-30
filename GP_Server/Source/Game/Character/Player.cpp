@@ -203,6 +203,9 @@ void Player::ExecuteSkillEffect(const FSkillTableData& skill)
 		switch (skill.Type1)
 		{
 		case ESkillType::Dash:
+			//myplayer위치는 서버가 바꿔도 클라가 movepkt보내면
+			//값이 덮어씌워져서 서버가 처리하는건 소용없음..
+			//클라에서 처리해줘야함
 			_info.SetLocation(_info.Pos + _info.GetFrontVector() * skill.Value1);
 			break;
 		case ESkillType::RangeAtk:

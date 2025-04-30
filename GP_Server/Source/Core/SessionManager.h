@@ -20,6 +20,7 @@ public:
 	void BroadcastToAll(Packet* packet);
 	void BroadcastToViewList(Packet* packet, int32 senderId);
 	std::array<std::shared_ptr<PlayerSession>, MAX_CLIENT>& GetSessions() { return _sessions; }
+	std::shared_ptr<PlayerSession> GetSession(int32 sessionId);
 private:
 	int32 GenerateId();
 private:

@@ -25,6 +25,10 @@ void PlayerSession::DoSend(const Packet* packet)
 	case S_LOGIN_FAIL:
 		LOG(LogType::SendLog, std::format("LoginFail PKT to [{}]", _id));
 		break;
+	case S_ENTER_GAME:
+		LOG(LogType::SendLog, std::format("EnterGame PKT to [{}]", _id));
+		break;
+
 	case S_ADD_PLAYER:
 		LOG(LogType::SendLog, std::format("AddPlayer PKT to [{}]", _id));
 		break;
@@ -97,6 +101,11 @@ void PlayerSession::DoSend(const Packet* packet)
 	_sSocket->DoSend(packet);
 }
 
+void PlayerSession::HandleRecvBuffer(int32 recvByte, ExpOver* expOver)
+{
+	_sSocket->HandleRecvBuffer(_id, recvByte, expOver);
+}
+
 void PlayerSession::Connect(SOCKET socket, int32 id)
 {
 	this->_id = id;
@@ -111,7 +120,7 @@ void PlayerSession::Disconnect()
 
 void PlayerSession::Login(const DBLoginResult& dbRes)
 {
-	_loginState = true;
+	_state = SessionState::LoggedIn;
 	_player = std::make_shared<Player>(_id);
 #ifdef DB_LOCAL
 	{
@@ -119,15 +128,18 @@ void PlayerSession::Login(const DBLoginResult& dbRes)
 		_player->SetInfo(dbRes.info);
 	}
 #endif
+}
 
-	GameWorld::GetInst().AddPlayer(_player);
+void PlayerSession::EnterGame()
+{
+	_state = SessionState::InGame;
 }
 
 void PlayerSession::Logout()
 {
-	if(_loginState)
+	if(IsLogin())
 	{
-		_loginState = false;
+		_state = SessionState::None;
 		_player->SaveToDB(_dbId);
 	}
 }
@@ -142,7 +154,7 @@ FInfoData& PlayerSession::GetPlayerInfo()
 	return _player->GetInfo();
 }
 
-void PlayerSession::HandleRecvBuffer(int32 recvByte, ExpOver* expOver)
+std::shared_ptr<Player> PlayerSession::GetPlayer()
 {
-	_sSocket->HandleRecvBuffer(_id, recvByte, expOver);
+	return _player;
 }

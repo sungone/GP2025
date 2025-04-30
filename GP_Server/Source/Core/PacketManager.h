@@ -18,7 +18,8 @@ public:
 	void HandleLoginPacket(int32 sessionId, Packet* packet);
 	void HandleLogoutPacket(int32 sessionId);
 	void HandleSelectCharacterPacket(int32 sessionId, Packet* packet);
-	
+	void HandleEnterGamePacket(int32 sessionId, Packet* packet);
+
 	void HandleMovePacket(int32 sessionId, Packet* packet);
 	void HandleStartAimingPacket(int32 sessionId, Packet* packet);
 	void HandleStopAimingPacket(int32 sessionId, Packet* packet);

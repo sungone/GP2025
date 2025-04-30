@@ -35,8 +35,7 @@ void SessionManager::HandleRecvBuffer(int32 id, int32 recvByte, ExpOver* expOver
 
 void SessionManager::HandleLogin(int32 sessionId, const DBLoginResult& dbRes)
 {
-	auto session = _sessions[sessionId];
-	session->Login(dbRes);
+	_sessions[sessionId]->Login(dbRes);
 }
 
 void SessionManager::SendPacket(int32 sessionId, const Packet* packet)
@@ -79,6 +78,16 @@ void SessionManager::BroadcastToViewList(Packet* packet, int32 senderId)
 			session->DoSend(packet);
 		}
 	}
+}
+
+std::shared_ptr<PlayerSession> SessionManager::GetSession(int32 sessionId)
+{
+	std::lock_guard<std::mutex> lock(_smgrMutex);
+
+	if (sessionId < 0 || sessionId >= MAX_CLIENT)
+		return nullptr;
+
+	return _sessions[sessionId];
 }
 
 

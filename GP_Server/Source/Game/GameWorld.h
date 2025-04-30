@@ -14,11 +14,9 @@ public:
 	}
 
 	bool Init();
-	void AddPlayer(std::shared_ptr<Character> player);
+	void PlayerEnterGame(std::shared_ptr<Character> player);
 	void RemoveCharacter(int32 id);
-
-	void CreateMonster();
-
+	
 	void PlayerSetYaw(int32 playerId, float yaw);
 	void PlayerAddState(int32 playerId, ECharacterStateType newState);
 	void PlayerRemoveState(int32 playerId, ECharacterStateType oldState);
@@ -26,8 +24,8 @@ public:
 	void PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& time);
 	void PlayerAttack(int32 playerId);
 	void PlayerUseSkill(int32 playerId, ESkillGroup groupId);
-	void PlayerSelectCharacter(int32 playerId, Type::EPlayer type);
 
+	void CreateMonster();
 	void UpdateMonster();
 	void BroadcastMonsterStates();
 
