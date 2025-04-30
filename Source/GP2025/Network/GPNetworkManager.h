@@ -43,6 +43,7 @@ public:
 	void SendMySignUpPacket(const FString& AccountID, const FString& AccountPW, const FString& NickName);
 	void SendMyLogoutPacket();
 	void SendMyEnterGamePacket();
+	void SendMyEnterGamePacket(enum class Type::EPlayer PlayerType);
 
 	void SendMyMovePacket();
 	void SendMyAttackPacket(float PlayerYaw);

@@ -33,9 +33,11 @@ public :
 
 	// 캐릭터 선택 처리
 	UFUNCTION()
-	void OnCharacterSelected(uint8 SelectedType);
+	void OnCharacterSelected(uint8 NewType);
 
 	// 게임 시작
 	UFUNCTION()
 	void OnGameStartPressed();
+private:
+	enum class Type::EPlayer SelectedType = Type::EPlayer::NONE;
 };

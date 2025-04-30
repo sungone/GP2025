@@ -30,24 +30,9 @@ void UGPLobbyWidget::NativeConstruct()
 	}
 }
 
-void UGPLobbyWidget::OnCharacterSelected(uint8 SelectedType)
+void UGPLobbyWidget::OnCharacterSelected(uint8 NewType)
 {
-	using namespace Type;
-
-	// 네트워크 매니저 가져오기
-	UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-	if (!NetMgr) return;
-
-	if (SelectedType == static_cast<uint8>(EPlayer::WARRIOR))
-	{
-		// 남자 캐릭터 선택 처리
-		NetMgr->SendMySelectCharacter(SelectedType);
-	}
-	else if (SelectedType == static_cast<uint8>(EPlayer::GUNNER))
-	{
-		// 여자 캐릭터 선택 처리
-		NetMgr->SendMySelectCharacter(SelectedType);
-	}
+	SelectedType = static_cast<Type::EPlayer>(NewType);
 }
 
 void UGPLobbyWidget::OnGameStartPressed()
@@ -55,7 +40,10 @@ void UGPLobbyWidget::OnGameStartPressed()
 	UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
 	if (NetMgr)
 	{
-		NetMgr->SendMyEnterGamePacket();
+		if (SelectedType != Type::EPlayer::NONE)
+			NetMgr->SendMyEnterGamePacket(SelectedType);
+		else 
+			NetMgr->SendMyEnterGamePacket();
 	}
 }
 

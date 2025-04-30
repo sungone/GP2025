@@ -148,10 +148,9 @@ void PacketManager::HandleSelectCharacterPacket(int32 sessionId, Packet* packet)
 	if (session->IsInGame())
 	{
 		InfoPacket infopkt(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
-		SessionManager::GetInst().SendPacket(sessionId, &infopkt);
+		_sessionMgr.SendPacket(sessionId, &infopkt);
 	}
 }
-
 
 void PacketManager::HandleEnterGamePacket(int32 sessionId, Packet* packet)
 {
@@ -160,11 +159,17 @@ void PacketManager::HandleEnterGamePacket(int32 sessionId, Packet* packet)
 
 	auto player = session->GetPlayer();
 	if (!player) return;
+	RequestEnterGamePacket* p = static_cast<RequestEnterGamePacket*>(packet);
+	auto newType = p->PlayerType;
+	if(newType != Type::EPlayer::NONE)
+		player->SetCharacterType(p->PlayerType);
 
 	session->EnterGame();
 	_gameWorld.PlayerEnterGame(player);
 	auto& playerInfo = _gameWorld.GetInfo(sessionId);
 	EnterGamePacket enterpkt(playerInfo);
+	_sessionMgr.SendPacket(sessionId, &enterpkt);
+
 	//실패처리를 따로 할까나말까나..
 }
 
