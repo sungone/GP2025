@@ -128,9 +128,9 @@ struct SelectCharacterPacket : public Packet
 };
 struct RequestEnterGamePacket : public Packet
 {
-	bool dummy;
-	RequestEnterGamePacket()
-		: Packet(EPacketType::C_ENTER_GAME)
+	Type::EPlayer PlayerType;
+	RequestEnterGamePacket(Type::EPlayer InType = Type::EPlayer::NONE)
+		: Packet(EPacketType::C_ENTER_GAME), PlayerType(InType)
 	{
 		Header.PacketSize = sizeof(RequestEnterGamePacket);
 	}

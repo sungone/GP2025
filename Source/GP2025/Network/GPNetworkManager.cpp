@@ -125,6 +125,12 @@ void UGPNetworkManager::SendMyEnterGamePacket()
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
+void UGPNetworkManager::SendMyEnterGamePacket(Type::EPlayer PlayerType)
+{
+	RequestEnterGamePacket Packet(PlayerType);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
 void UGPNetworkManager::SendMyMovePacket()
 {
 	auto info = MyPlayer->CharacterInfo;

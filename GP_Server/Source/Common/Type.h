@@ -62,7 +62,8 @@ namespace Type
 		WARRIOR = START,
 		GUNNER,
 
-		END
+		END,
+		NONE,
 	};
 
 	enum class EMonster : uint8
