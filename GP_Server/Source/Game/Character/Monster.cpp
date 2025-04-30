@@ -16,7 +16,7 @@ void Monster::Init()
 		return;
 	}
 	FVector newPos{};
-	do { newPos = Map::GetInst().GetRandomPos(ZoneType::DEFAULT); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
+	do { newPos = Map::GetInst().GetRandomPos(ZoneType::TUK); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
 	_info.SetLocation(newPos);
 	_info.SetName(ConvertToWString(data->Name) + std::to_wstring(_id));
 	_info.CharacterType = data->TypeId;
@@ -180,7 +180,7 @@ void Monster::Chase()
 
 void Monster::Patrol()
 {
-	static auto& nav = Map::GetInst().GetNavMesh(ZoneType::DEFAULT);
+	static auto& nav = Map::GetInst().GetNavMesh(ZoneType::TUK);
 	int currentTriIdx = nav.FindIdxFromPos(_pos);
 	if (currentTriIdx == -1) return;
 

@@ -3,25 +3,12 @@
 
 enum class ZoneType
 {
-	DEFAULT,
-	PLAYGROUND,
-};
-
-class Zone
-{
-public:
-	Zone() = default;
-	Zone(ZoneType type, const std::string& navPath)
-		: _type(type), _navMesh(navPath)
-	{
-	}
-
-	FVector GetRandomPos() const { return _navMesh.GetRandomPosition(); }
-	NavMesh& GetNavMesh() {return _navMesh;}
-
-private:
-	ZoneType _type;
-	NavMesh _navMesh;
+	PLAYGROUND,//test¿ë
+	TUK,
+	TIP,
+	E,
+	INDUSTY,
+	GYM,
 };
 
 class Map

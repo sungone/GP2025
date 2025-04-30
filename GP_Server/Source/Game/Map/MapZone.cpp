@@ -3,7 +3,7 @@
 
 bool Map::Init()
 {
-	_zoneNavMeshes[ZoneType::DEFAULT] = NavMesh(MapDataPath + "NavMeshData.json");
+	_zoneNavMeshes[ZoneType::TUK] = NavMesh(MapDataPath + "NavMeshData.json");
 	_zoneNavMeshes[ZoneType::PLAYGROUND] = NavMesh(MapDataPath + "PlaygroundNavData.json");
 	return true;
 }
