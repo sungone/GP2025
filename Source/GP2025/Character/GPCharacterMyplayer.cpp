@@ -142,7 +142,6 @@ void AGPCharacterMyplayer::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 void AGPCharacterMyplayer::OnPlayerEnterGame()
 {
-	UE_LOG(LogTemp, Log, TEXT("OnPlayerEnterGame"));
 	if (UIManager)
 	{
 		if (UIManager->LobbyWidget)
