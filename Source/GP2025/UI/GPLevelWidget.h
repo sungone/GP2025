@@ -23,7 +23,7 @@ public:
 
     UFUNCTION()
     void UpdateLevelText(int32 Level);
-
+    
 private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> TextLevel;
