@@ -64,7 +64,6 @@ void UGPPlayerAppearanceHandler::ApplyCharacterPartsFromData(const UGPCharacterC
 void UGPPlayerAppearanceHandler::EquipWeaponFromData(const UGPCharacterControlData* CharacterData)
 {
 	if (!Owner || !CharacterData) return;
-	SetupLeaderPose();
 
 	if (Owner->WeaponActor)
 	{
@@ -104,8 +103,10 @@ USkeletalMesh* UGPPlayerAppearanceHandler::GetBodyMeshByCharacterType(const FGPI
 
 void UGPPlayerAppearanceHandler::EquipItemOnCharacter(FGPItemStruct& ItemData)
 {
-	if (!Owner) return;
-	SetupLeaderPose();
+	if (!Owner)
+	{
+		return;
+	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Equipped : %s"), *ItemData.ItemName.ToString());
 
@@ -143,11 +144,11 @@ void UGPPlayerAppearanceHandler::EquipItemOnCharacter(FGPItemStruct& ItemData)
 
 	if (ItemData.Category == ECategory::chest)
 	{
-		SetupLeaderPose();
-
 		USkeletalMesh* MeshToApply = GetBodyMeshByCharacterType(ItemData, Owner->CurrentCharacterType);
 		if (!MeshToApply)
+		{
 			return;
+		}
 
 		TSubclassOf<UAnimInstance> PreviousAnimBP = nullptr;
 		if (Owner->BodyMesh)
@@ -184,13 +185,11 @@ void UGPPlayerAppearanceHandler::EquipItemOnCharacter(FGPItemStruct& ItemData)
 
 		if (!Owner->BodyMesh)
 		{
-			UE_LOG(LogTemp, Error, TEXT("BodyMesh is NULL! Weapon cannot be equipped."));
 			return;
 		}
 
 		if (!Owner->BodyMesh->DoesSocketExist(TEXT("WeaponSocket")))
 		{
-			UE_LOG(LogTemp, Error, TEXT("WeaponSocket does not exist on BodyMesh!"));
 			return;
 		}
 
@@ -238,7 +237,6 @@ void UGPPlayerAppearanceHandler::SetupLeaderPose()
 
 void UGPPlayerAppearanceHandler::AttachWeaponToBodyMesh()
 {
-	SetupLeaderPose();
 	if (Owner->WeaponActor && Owner->WeaponActor->GetWeaponMesh() && Owner->BodyMesh)
 	{
 		Owner->WeaponActor->GetWeaponMesh()->AttachToComponent(

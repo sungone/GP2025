@@ -10,6 +10,7 @@
 #include "GPCharacterPlayer.h"
 #include "Network/GPNetworkManager.h"
 #include "Physics/GPCollision.h"
+#include "Animation/GPCharacterAnimInstance.h"
 #include "UI/GPHpBarWidget.h"
 #include "Weapons/GPSword.h"
 #include "UI/GPLevelWidget.h"

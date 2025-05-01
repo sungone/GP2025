@@ -70,6 +70,7 @@ void AGPCharacterMyplayer::BeginPlay()
 	{
 		UIManager->Initialize(this);
 		UIManager->ShowLoginUI();
+		UIManager->AddToRoot();
 	}
 	
 	SetCharacterType(CurrentCharacterType);
@@ -126,6 +127,16 @@ void AGPCharacterMyplayer::EndPlay(const EEndPlayReason::Type EndPlayReason)
 			UE_LOG(LogTemp, Warning, TEXT("NetworkSyncHandler RemoveFromRoot() called in EndPlay."));
 		}
 		NetworkSyncHandler = nullptr;
+	}
+
+	if (UIManager)
+	{
+		if (UIManager->IsRooted())
+		{
+			UIManager->RemoveFromRoot();
+			UE_LOG(LogTemp, Warning, TEXT("UIManager RemoveFromRoot() called in EndPlay."));
+		}
+		UIManager = nullptr;
 	}
 }
 
@@ -320,5 +331,4 @@ void AGPCharacterMyplayer::SetCharacterInfo(FInfoData& CharacterInfo_)
 	}
 		
 }
-
 

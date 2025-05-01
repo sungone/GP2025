@@ -45,5 +45,11 @@ void UGPCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		{
 			bIsZooming = MyPlayer->CameraHandler->IsZooming();
 		}
+		else
+		{
+			AGPCharacterPlayer* Player = Cast<AGPCharacterPlayer>(Owner);
+			if (Player)
+				bIsZooming = Player->CharacterInfo.HasState(STATE_AIMING);
+		}
 	}
 }

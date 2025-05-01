@@ -128,7 +128,6 @@ void UGPMyplayerInputHandler::Jump()
 	Owner->NetworkSyncHandler->isJumpStart = true;
 	Owner->CharacterInfo.RemoveState(STATE_IDLE);
 	Owner->CharacterInfo.AddState(STATE_JUMP);
-	Owner->AppearanceHandler->SetupLeaderPose();
 
 	Owner->GetWorldTimerManager().SetTimer(
 		JumpCooldownTimerHandle,
@@ -155,7 +154,6 @@ void UGPMyplayerInputHandler::StartSprinting()
 
 	Owner->GetCharacterMovement()->MaxWalkSpeed = Owner->NetworkSyncHandler->SprintSpeed;
 	Owner->CharacterInfo.AddState(STATE_RUN);
-	Owner->AppearanceHandler->SetupLeaderPose();
 }
 
 void UGPMyplayerInputHandler::StopSprinting()
@@ -179,7 +177,6 @@ void UGPMyplayerInputHandler::AutoAttack()
 	}
 
 	Owner->CombatHandler->PlayAutoAttackMontage();
-	Owner->AppearanceHandler->SetupLeaderPose();
 }
 
 void UGPMyplayerInputHandler::ToggleInventory()
@@ -250,7 +247,6 @@ void UGPMyplayerInputHandler::StartAiming()
 		Owner->UIManager->GunCrosshairWidget->SetVisibility(ESlateVisibility::Visible);
 	}
 
-	Owner->AppearanceHandler->SetupLeaderPose();
 }
 
 void UGPMyplayerInputHandler::StopAiming()
@@ -297,7 +293,6 @@ void UGPMyplayerInputHandler::UseSkillQ()
 		Owner->NetMgr->SendMyUseSkill(ESkillGroup::HitHard, Owner->GetControlRotation().Yaw);
 	}
 
-	Owner->AppearanceHandler->SetupLeaderPose();
 }
 
 void UGPMyplayerInputHandler::UseSkillE()
@@ -330,7 +325,6 @@ void UGPMyplayerInputHandler::UseSkillE()
 		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Clash, Owner->GetControlRotation().Yaw);
 	}
 
-	Owner->AppearanceHandler->SetupLeaderPose();
 }
 
 void UGPMyplayerInputHandler::UseSkillR()
