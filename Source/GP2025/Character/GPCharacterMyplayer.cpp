@@ -50,19 +50,19 @@ void AGPCharacterMyplayer::BeginPlay()
 	CameraHandler = NewObject<UGPMyplayerCameraHandler>(this, UGPMyplayerCameraHandler::StaticClass());
 	if (CameraHandler)
 		CameraHandler->Initialize(this);
-	CameraHandler->AddToRoot();
+	//CameraHandler->AddToRoot();
 
 	// Skill Cool Down Handler
 	SkillCoolDownHandler = NewObject<UGPSkillCoolDownHandler>(this, UGPSkillCoolDownHandler::StaticClass());
 	if (SkillCoolDownHandler)
 		SkillCoolDownHandler->Init(this);
-	SkillCoolDownHandler->AddToRoot();
+	//SkillCoolDownHandler->AddToRoot();
 
 	// Network Sync Handler
 	NetworkSyncHandler = NewObject<UGPMyplayerNetworkSyncHandler>(this, UGPMyplayerNetworkSyncHandler::StaticClass());
 	if (NetworkSyncHandler)
 		NetworkSyncHandler->Initialize(this);
-	NetworkSyncHandler->AddToRoot();
+	//NetworkSyncHandler->AddToRoot();
 
 	// UIManager and Show Login UI
 	UIManager = NewObject<UGPMyplayerUIManager>(this, UGPMyplayerUIManager::StaticClass());
@@ -70,7 +70,7 @@ void AGPCharacterMyplayer::BeginPlay()
 	{
 		UIManager->Initialize(this);
 		UIManager->ShowLoginUI();
-		UIManager->AddToRoot();
+		//UIManager->AddToRoot();
 	}
 	
 	SetCharacterType(CurrentCharacterType);
@@ -98,46 +98,46 @@ void AGPCharacterMyplayer::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	if (SkillCoolDownHandler)
-	{
-		if (SkillCoolDownHandler->IsRooted())
-		{
-			SkillCoolDownHandler->RemoveFromRoot();
-			UE_LOG(LogTemp, Warning, TEXT("SkillCoolDownHandler RemoveFromRoot() called in EndPlay."));
-		}
+	//if (SkillCoolDownHandler)
+	//{
+	//	if (SkillCoolDownHandler->IsRooted())
+	//	{
+	//		SkillCoolDownHandler->RemoveFromRoot();
+	//		UE_LOG(LogTemp, Warning, TEXT("SkillCoolDownHandler RemoveFromRoot() called in EndPlay."));
+	//	}
 
-		SkillCoolDownHandler = nullptr;
-	}
+	//	SkillCoolDownHandler = nullptr;
+	//}
 
-	if (CameraHandler)
-	{
-		if (CameraHandler->IsRooted())
-		{
-			CameraHandler->RemoveFromRoot();
-			UE_LOG(LogTemp, Warning, TEXT("CameraHandler RemoveFromRoot() called in EndPlay."));
-		}
-		CameraHandler = nullptr;
-	}
+	//if (CameraHandler)
+	//{
+	//	if (CameraHandler->IsRooted())
+	//	{
+	//		CameraHandler->RemoveFromRoot();
+	//		UE_LOG(LogTemp, Warning, TEXT("CameraHandler RemoveFromRoot() called in EndPlay."));
+	//	}
+	//	CameraHandler = nullptr;
+	//}
 
-	if (NetworkSyncHandler)
-	{
-		if (NetworkSyncHandler->IsRooted())
-		{
-			NetworkSyncHandler->RemoveFromRoot();
-			UE_LOG(LogTemp, Warning, TEXT("NetworkSyncHandler RemoveFromRoot() called in EndPlay."));
-		}
-		NetworkSyncHandler = nullptr;
-	}
+	//if (NetworkSyncHandler)
+	//{
+	//	if (NetworkSyncHandler->IsRooted())
+	//	{
+	//		NetworkSyncHandler->RemoveFromRoot();
+	//		UE_LOG(LogTemp, Warning, TEXT("NetworkSyncHandler RemoveFromRoot() called in EndPlay."));
+	//	}
+	//	NetworkSyncHandler = nullptr;
+	//}
 
-	if (UIManager)
-	{
-		if (UIManager->IsRooted())
-		{
-			UIManager->RemoveFromRoot();
-			UE_LOG(LogTemp, Warning, TEXT("UIManager RemoveFromRoot() called in EndPlay."));
-		}
-		UIManager = nullptr;
-	}
+	//if (UIManager)
+	//{
+	//	if (UIManager->IsRooted())
+	//	{
+	//		UIManager->RemoveFromRoot();
+	//		UE_LOG(LogTemp, Warning, TEXT("UIManager RemoveFromRoot() called in EndPlay."));
+	//	}
+	//	UIManager = nullptr;
+	//}
 }
 
 void AGPCharacterMyplayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

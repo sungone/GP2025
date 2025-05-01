@@ -60,6 +60,7 @@ public:
 public:
 	UPROPERTY()
 	class UGPCharacterUIHandler* UIHandler;
+
 	FOnHpChanged OnHpChanged;
 	FOnLevelChanged OnLevelChanged;
 	FOnNickNameChanged OnNickNameChanged;

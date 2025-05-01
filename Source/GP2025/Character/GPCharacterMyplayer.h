@@ -58,6 +58,7 @@ public:
 	class UGPMyplayerNetworkSyncHandler* NetworkSyncHandler;
 
 	// <Skill Cool Down Handler>
+	UPROPERTY()
 	class UGPSkillCoolDownHandler* SkillCoolDownHandler;
 
 	// <Skill Cool UI System>

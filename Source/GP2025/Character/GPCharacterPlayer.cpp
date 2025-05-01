@@ -57,7 +57,7 @@ void AGPCharacterPlayer::PostInitializeComponents()
         if (AppearanceHandler)
         {
             AppearanceHandler->Initialize(this);
-            AppearanceHandler->AddToRoot();
+            //AppearanceHandler->AddToRoot();
         }
     }
 
@@ -67,7 +67,7 @@ void AGPCharacterPlayer::PostInitializeComponents()
         if (EffectHandler)
         {
             EffectHandler->Init(this);
-            EffectHandler->AddToRoot();
+            //EffectHandler->AddToRoot();
         }
     }
 
@@ -80,24 +80,26 @@ void AGPCharacterPlayer::PostInitializeComponents()
 
 void AGPCharacterPlayer::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-    if (AppearanceHandler)
-    {
-        if (AppearanceHandler->IsRooted())
-        {
-            AppearanceHandler->RemoveFromRoot();
-            UE_LOG(LogTemp, Warning, TEXT("AppearanceHandler RemoveFromRoot() called in EndPlay."));
-        }
-        AppearanceHandler = nullptr;
-    }
+    Super::EndPlay(EndPlayReason);
 
-    if (EffectHandler)
-    {
-        if (EffectHandler->IsRooted())
-        {
-            EffectHandler->RemoveFromRoot();
-        }
-        EffectHandler = nullptr;
-    }
+    //if (AppearanceHandler)
+    //{
+    //    if (AppearanceHandler->IsRooted())
+    //    {
+    //        AppearanceHandler->RemoveFromRoot();
+    //        UE_LOG(LogTemp, Warning, TEXT("AppearanceHandler RemoveFromRoot() called in EndPlay."));
+    //    }
+    //    AppearanceHandler = nullptr;
+    //}
+
+    //if (EffectHandler)
+    //{
+    //    if (EffectHandler->IsRooted())
+    //    {
+    //        EffectHandler->RemoveFromRoot();
+    //    }
+    //    EffectHandler = nullptr;
+    //}
 }
 
 void AGPCharacterPlayer::SetCharacterData(const UGPCharacterControlData* CharacterControlData)
