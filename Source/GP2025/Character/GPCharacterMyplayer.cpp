@@ -326,7 +326,7 @@ void AGPCharacterMyplayer::SetCharacterInfo(FInfoData& CharacterInfo_)
 
 	if (CharacterInfo_.GetLevel() > PrevLevel)
 	{
-		UIManager->SpawnSkillLevelText(CharacterInfo_.Stats.Level);
+		// UIManager->SpawnSkillLevelText(CharacterInfo_.Stats.Level);
 		PrevLevel = CharacterInfo_.Stats.Level;
 	}
 		

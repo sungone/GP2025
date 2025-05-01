@@ -28,7 +28,7 @@ void UGPCharacterUIHandler::CreateCharacterStatusWidget()
 	CharacterStatusWidget = CreateWidgetComponent(
 		TEXT("CharacterStatusWidget"),
 		TEXT("/Game/UI/WBP_CharacterStatus"),
-		FVector(0.f, 0.f, 350.f),
+		FVector(0.f, 0.f, 340.f),
 		FVector2D(200.f, 60.f),
 		CharacterStatusWidgetInstance
 	);
