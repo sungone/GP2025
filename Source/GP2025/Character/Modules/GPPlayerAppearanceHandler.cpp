@@ -103,78 +103,44 @@ USkeletalMesh* UGPPlayerAppearanceHandler::GetBodyMeshByCharacterType(const FGPI
 
 void UGPPlayerAppearanceHandler::EquipItemOnCharacter(FGPItemStruct& ItemData)
 {
-	if (!Owner)
+	if (!Owner) return;
+
+	// Helmet 장착 처리
+	if (ItemData.Category == ECategory::helmet && Owner->Helmet)
 	{
-		return;
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Equipped : %s"), *ItemData.ItemName.ToString());
-
-	if (ItemData.Category == ECategory::helmet)
-	{
-		if (!Owner->Helmet)
-		{
-			Owner->Helmet = NewObject<USkeletalMeshComponent>(Owner);
-			Owner->Helmet->SetupAttachment(Owner->BodyMesh);
-			Owner->Helmet->RegisterComponent();
-		}
-
-		if (ItemData.ItemSkeletalMesh)
-		{
-			Owner->Helmet->SetSkeletalMesh(ItemData.ItemSkeletalMesh);
-			Owner->Helmet->SetVisibility(true);
-		}
-		else
-		{
-			Owner->Helmet->SetSkeletalMesh(nullptr);
-			Owner->Helmet->SetVisibility(false);
-		}
+		Owner->Helmet->SetSkeletalMesh(ItemData.ItemSkeletalMesh);
+		Owner->Helmet->SetVisibility(ItemData.ItemSkeletalMesh != nullptr);
 
 		if (Owner->BodyMesh && Owner->BodyMesh->DoesSocketExist(TEXT("HelmetSocket")))
 		{
-			if (Owner->Helmet->GetAttachParent() != Owner->BodyMesh)
-			{
-				Owner->Helmet->AttachToComponent(
-					Owner->BodyMesh,
-					FAttachmentTransformRules::SnapToTargetIncludingScale,
-					TEXT("HelmetSocket"));
-			}
+			Owner->Helmet->AttachToComponent(
+				Owner->BodyMesh,
+				FAttachmentTransformRules::SnapToTargetIncludingScale,
+				TEXT("HelmetSocket"));
 		}
 	}
 
+	// Chest 교체 시 메시만 바꿔끼움
 	if (ItemData.Category == ECategory::chest)
 	{
 		USkeletalMesh* MeshToApply = GetBodyMeshByCharacterType(ItemData, Owner->CurrentCharacterType);
-		if (!MeshToApply)
-		{
-			return;
-		}
+		if (!MeshToApply || !Owner->BodyMesh) return;
 
-		TSubclassOf<UAnimInstance> PreviousAnimBP = nullptr;
-		if (Owner->BodyMesh)
-		{
-			PreviousAnimBP = Owner->BodyMesh->GetAnimClass();
-			Owner->BodyMesh->DestroyComponent();
-			Owner->BodyMesh = nullptr;
-		}
-
-		Owner->BodyMesh = NewObject<USkeletalMeshComponent>(Owner);
 		Owner->BodyMesh->SetSkeletalMesh(MeshToApply);
-		Owner->BodyMesh->SetupAttachment(Owner->GetMesh());
-		Owner->BodyMesh->RegisterComponent();
 
-		if (PreviousAnimBP)
+		if (Owner->BodyMesh->GetAnimInstance() == nullptr && Owner->GetMesh()->GetAnimClass())
 		{
-			Owner->BodyMesh->SetAnimInstanceClass(PreviousAnimBP);
+			Owner->BodyMesh->SetAnimInstanceClass(Owner->GetMesh()->GetAnimClass());
 		}
 
 		SetupLeaderPose();
 		AttachWeaponToBodyMesh();
 
-		if (Owner->HeadMesh) // Helmet 내리기
-			Owner->HeadMesh->SetRelativeLocation(FVector(0.f, 0.f, -4.0f));
+		if (Owner->HeadMesh)
+			Owner->HeadMesh->SetRelativeLocation(FVector(0.f, 0.f, -4.f));
 	}
 
+	// 무기 교체
 	if (ItemData.Category == ECategory::sword || ItemData.Category == ECategory::bow)
 	{
 		if (Owner->WeaponActor)
@@ -183,28 +149,32 @@ void UGPPlayerAppearanceHandler::EquipItemOnCharacter(FGPItemStruct& ItemData)
 			Owner->WeaponActor = nullptr;
 		}
 
-		if (!Owner->BodyMesh)
-		{
-			return;
-		}
+		if (!ItemData.WeaponClass || !Owner->BodyMesh) return;
 
 		if (!Owner->BodyMesh->DoesSocketExist(TEXT("WeaponSocket")))
 		{
+			UE_LOG(LogTemp, Error, TEXT("WeaponSocket not found on BodyMesh."));
 			return;
 		}
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = Owner;
-		Owner->WeaponActor = Owner->GetWorld()->SpawnActor<AGPWeaponBase>(ItemData.WeaponClass, Owner->GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
+
+		Owner->WeaponActor = Owner->GetWorld()->SpawnActor<AGPWeaponBase>(
+			ItemData.WeaponClass,
+			Owner->GetActorLocation(),
+			FRotator::ZeroRotator,
+			SpawnParams
+		);
 
 		if (Owner->WeaponActor)
 		{
-			Owner->WeaponActor->AttachToComponent(Owner->BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
-			UE_LOG(LogTemp, Warning, TEXT("Weapon successfully equipped on BodyMesh: %s"), *ItemData.ItemName.ToString());
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Failed to spawn WeaponActor! Check if WeaponClass is valid."));
+			Owner->WeaponActor->AttachToComponent(
+				Owner->BodyMesh,
+				FAttachmentTransformRules::SnapToTargetIncludingScale,
+				TEXT("WeaponSocket")
+			);
+			Owner->WeaponActor->SetWeaponMesh(ItemData.ItemStaticMesh);
 		}
 	}
 }
@@ -216,7 +186,7 @@ void UGPPlayerAppearanceHandler::SetupLeaderPose()
 		UE_LOG(LogTemp, Error, TEXT("SetupLeaderPose Update Failed"));
 		return;
 	}
-
+	 
 	if (Owner->HeadMesh)
 	{
 		Owner->HeadMesh->SetLeaderPoseComponent(Owner->BodyMesh, true);
