@@ -54,6 +54,10 @@ void UGPObjectManager::AddMyPlayer(FInfoData& PlayerInfo)
 	MyPlayer->SetCharacterInfo(PlayerInfo);
 	MyPlayer->SetCharacterType(PlayerInfo.CharacterType);
 	MyPlayer->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
+	if (MyPlayer->UIHandler)
+	{
+		MyPlayer->SetNameByCharacterInfo();
+	}
 	auto Player = Cast<AGPCharacterPlayer>(MyPlayer);
 	Players.Add(PlayerInfo.ID, Player);
 }
@@ -81,7 +85,10 @@ void UGPObjectManager::AddPlayer(FInfoData& PlayerInfo)
 
 	Player->SetCharacterInfo(PlayerInfo);
 	Player->SetCharacterType(PlayerInfo.CharacterType);
-
+	if (Player->UIHandler)
+	{
+		Player->SetNameByCharacterInfo();
+	}
 	Player->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
 	Players.Add(PlayerInfo.ID, Player);
 }
@@ -178,6 +185,11 @@ void UGPObjectManager::AddMonster(FInfoData& MonsterInfo)
 	Monster->SetCharacterInfo(MonsterInfo);
 	Monster->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
 	Monster->SetCharacterType(MonsterInfo.CharacterType);
+
+	if (Monster->UIHandler)
+	{
+		Monster->SetNameByCharacterInfo();
+	}
 	Monsters.Add(MonsterInfo.ID, Monster);
 }
 

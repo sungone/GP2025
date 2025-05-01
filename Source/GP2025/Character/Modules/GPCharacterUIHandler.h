@@ -19,7 +19,6 @@ public:
 	void OnBeginPlay();
 	void CreateCharacterStatusWidget();
 	void UpdateWidgetVisibility();
-	void UpdateCharacterStatus();
 
 protected:
 	class UGPWidgetComponent* CreateWidgetComponent(const FString& Name, const FString& WidgetPath, FVector Location, FVector2D Size, UUserWidget*& OutUserWidget);
@@ -34,7 +33,7 @@ public:
 	UPROPERTY()
 	class UUserWidget* CharacterStatusWidgetInstance;
 
-	void UpdateNickNameOnly();
+	void SetNameByCharacterInfo();
 	//void UpdateLevelOnly();
 	//void UpdateHpOnly();
 };

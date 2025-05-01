@@ -16,31 +16,6 @@ void UGPCharacterUIHandler::Initialize(AGPCharacterBase* InOwner)
 {
 	Owner = InOwner;
 	CreateCharacterStatusWidget();
-}
-
-void UGPCharacterUIHandler::OnBeginPlay()
-{
-	UpdateCharacterStatus();
-}
-
-void UGPCharacterUIHandler::CreateCharacterStatusWidget()
-{
-	CharacterStatusWidget = CreateWidgetComponent(
-		TEXT("CharacterStatusWidget"),
-		TEXT("/Game/UI/WBP_CharacterStatus"),
-		FVector(0.f, 0.f, 340.f),
-		FVector2D(200.f, 60.f),
-		CharacterStatusWidgetInstance
-	);
-
-	UpdateCharacterStatus();
-}
-
-void UGPCharacterUIHandler::UpdateCharacterStatus()
-{
-	if (!CharacterStatusWidgetInstance || !Owner) return;
-
-	UpdateNickNameOnly();
 
 	if (Cast<AGPCharacterPlayer>(Owner))
 	{
@@ -50,6 +25,22 @@ void UGPCharacterUIHandler::UpdateCharacterStatus()
 			StatusWidget->WBPHpBar->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+}
+
+void UGPCharacterUIHandler::OnBeginPlay()
+{
+
+}
+
+void UGPCharacterUIHandler::CreateCharacterStatusWidget()
+{
+	CharacterStatusWidget = CreateWidgetComponent(
+		TEXT("CharacterStatusWidget"),
+		TEXT("/Game/UI/WBP_CharacterStatus"),
+		FVector(0.f, 0.f, 320.f),
+		FVector2D(280.f, 80.f),
+		CharacterStatusWidgetInstance
+	);
 }
 
 void UGPCharacterUIHandler::UpdateWidgetVisibility()
@@ -98,7 +89,7 @@ UGPWidgetComponent* UGPCharacterUIHandler::CreateWidgetComponent(
 	return WidgetComp;
 }
 
-void UGPCharacterUIHandler::UpdateNickNameOnly()
+void UGPCharacterUIHandler::SetNameByCharacterInfo()
 {
 	if (!CharacterStatusWidgetInstance || !Owner) return;
 

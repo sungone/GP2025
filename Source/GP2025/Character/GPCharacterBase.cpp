@@ -150,11 +150,11 @@ void AGPCharacterBase::SetCharacterInfo(FInfoData& CharacterInfo_)
 
 	OnHpChanged.Broadcast(CharacterInfo.Stats.Hp / CharacterInfo.Stats.MaxHp);
 	OnLevelChanged.Broadcast(CharacterInfo.Stats.Level);
+}
 
-	if (UIHandler)
-	{
-		UIHandler->UpdateNickNameOnly();
-	}
+void AGPCharacterBase::SetNameByCharacterInfo()
+{
+	UIHandler->SetNameByCharacterInfo();
 }
 
 void AGPCharacterBase::HandleAutoAttackState()

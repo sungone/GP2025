@@ -36,6 +36,7 @@ public:
 
 	// <CharacterInfo>
 	virtual void SetCharacterInfo(FInfoData& CharacterInfo_);
+	virtual void SetNameByCharacterInfo();
 	FInfoData CharacterInfo;
 
 	// <Move Sync>
