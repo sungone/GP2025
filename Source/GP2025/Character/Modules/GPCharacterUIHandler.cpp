@@ -1,5 +1,5 @@
 ﻿#include "Character/Modules/GPCharacterUIHandler.h"
-#include "Character/GPCharacterBase.h"
+#include "Character/GPCharacterPlayer.h"
 #include "UI/GPWidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/TextBlock.h"
@@ -8,6 +8,7 @@
 #include "UI/GPUserNameWidget.h"
 #include "Components/ProgressBar.h"
 #include "Blueprint/UserWidget.h"
+#include "Character/GPCharacterMonster.h"
 #include "UI/GPCharacterStatusWidget.h"
 #include "GameFramework/PlayerController.h"
 
@@ -37,7 +38,18 @@ void UGPCharacterUIHandler::CreateCharacterStatusWidget()
 
 void UGPCharacterUIHandler::UpdateCharacterStatus()
 {
+	if (!CharacterStatusWidgetInstance || !Owner) return;
+
 	UpdateNickNameOnly();
+
+	if (Cast<AGPCharacterPlayer>(Owner))
+	{
+		UGPCharacterStatusWidget* StatusWidget = Cast<UGPCharacterStatusWidget>(CharacterStatusWidgetInstance);
+		if (StatusWidget && StatusWidget->WBPHpBar)
+		{
+			StatusWidget->WBPHpBar->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
 }
 
 void UGPCharacterUIHandler::UpdateWidgetVisibility()

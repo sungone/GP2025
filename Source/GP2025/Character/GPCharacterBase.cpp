@@ -222,7 +222,6 @@ void AGPCharacterBase::HandleRemoteMovementSync(float DeltaTime)
 		10.f
 	);
 
-	FHitResult HitResult;
 	SetActorLocationAndRotation(NextLocation, InterpolatedRotation, /*bSweep=*/ false);
 
 	FVector NewLocation = GetActorLocation();
