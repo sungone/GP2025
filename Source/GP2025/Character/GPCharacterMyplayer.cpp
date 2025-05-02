@@ -23,6 +23,8 @@
 #include "GPCharacterMyplayer.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Engine/TextureRenderTarget2D.h"
+#include "EngineUtils.h"              
+#include "Engine/DirectionalLight.h"
 
 AGPCharacterMyplayer::AGPCharacterMyplayer()
 {
@@ -36,7 +38,9 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 	PortraitCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("PortraitCapture"));
 	PortraitCapture->SetupAttachment(GetRootComponent());
 	PortraitCapture->ProjectionType = ECameraProjectionMode::Perspective;
-	PortraitCapture->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
+	PortraitCapture->CaptureSource = ESceneCaptureSource::SCS_SceneColorHDR;
+	PortraitCapture->ShowOnlyActors.Empty();
+	PortraitCapture->ShowOnlyActors.Add(this);
 
 	// Character Type
 	CurrentCharacterType = (uint8)Type::EPlayer::GUNNER;
@@ -350,9 +354,14 @@ void AGPCharacterMyplayer::InitPortraitCapture()
 	PortraitRenderTarget->UpdateResourceImmediate(true);
 
 	PortraitCapture->TextureTarget = PortraitRenderTarget;
-	PortraitCapture->CaptureSource = ESceneCaptureSource::SCS_SceneColorHDR;
 
-	PortraitCapture->ShowOnlyActors.Empty();
-	PortraitCapture->ShowOnlyActors.Add(this);
+	for (TActorIterator<ADirectionalLight> It(GetWorld()); It; ++It)
+	{
+		ADirectionalLight* DirLight = *It;
+		if (DirLight)
+		{
+			PortraitCapture->HiddenActors.Add(DirLight);
+		}
+	}
 }
 
