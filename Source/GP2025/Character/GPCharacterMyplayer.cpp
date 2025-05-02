@@ -21,13 +21,6 @@
 #include "Components/TextBlock.h"
 #include "kismet/GameplayStatics.h"
 #include "GPCharacterMyplayer.h"
-<<<<<<< HEAD
-#include "Components/SceneCaptureComponent2D.h"
-#include "Engine/TextureRenderTarget2D.h"
-#include "EngineUtils.h"              
-#include "Engine/DirectionalLight.h"
-=======
->>>>>>> parent of bd3020d (씬 버그 수정 뒷 배경 수정 전)
 
 AGPCharacterMyplayer::AGPCharacterMyplayer()
 {
@@ -37,17 +30,6 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 	CameraBoom->SetupAttachment(RootComponent);
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 
-<<<<<<< HEAD
-	// Scene Capture 2D
-	PortraitCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("PortraitCapture"));
-	PortraitCapture->SetupAttachment(GetRootComponent());
-	PortraitCapture->ProjectionType = ECameraProjectionMode::Perspective;
-	PortraitCapture->CaptureSource = ESceneCaptureSource::SCS_SceneColorHDR;
-	PortraitCapture->ShowOnlyActors.Empty();
-	PortraitCapture->ShowOnlyActors.Add(this);
-
-=======
->>>>>>> parent of bd3020d (씬 버그 수정 뒷 배경 수정 전)
 	// Character Type
 	CurrentCharacterType = (uint8)Type::EPlayer::GUNNER;
 }
@@ -68,19 +50,19 @@ void AGPCharacterMyplayer::BeginPlay()
 	CameraHandler = NewObject<UGPMyplayerCameraHandler>(this, UGPMyplayerCameraHandler::StaticClass());
 	if (CameraHandler)
 		CameraHandler->Initialize(this);
-	//CameraHandler->AddToRoot();
+
 
 	// Skill Cool Down Handler
 	SkillCoolDownHandler = NewObject<UGPSkillCoolDownHandler>(this, UGPSkillCoolDownHandler::StaticClass());
 	if (SkillCoolDownHandler)
 		SkillCoolDownHandler->Init(this);
-	//SkillCoolDownHandler->AddToRoot();
+
 
 	// Network Sync Handler
 	NetworkSyncHandler = NewObject<UGPMyplayerNetworkSyncHandler>(this, UGPMyplayerNetworkSyncHandler::StaticClass());
 	if (NetworkSyncHandler)
 		NetworkSyncHandler->Initialize(this);
-	//NetworkSyncHandler->AddToRoot();
+
 
 	// UIManager and Show Login UI
 	UIManager = NewObject<UGPMyplayerUIManager>(this, UGPMyplayerUIManager::StaticClass());
@@ -88,7 +70,6 @@ void AGPCharacterMyplayer::BeginPlay()
 	{
 		UIManager->Initialize(this);
 		UIManager->ShowLoginUI();
-		//UIManager->AddToRoot();
 	}
 	
 	SetCharacterType(CurrentCharacterType);
@@ -112,51 +93,6 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 	UpdateSkillCooldownBars();
 }
 
-void AGPCharacterMyplayer::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
-
-	//if (SkillCoolDownHandler)
-	//{
-	//	if (SkillCoolDownHandler->IsRooted())
-	//	{
-	//		SkillCoolDownHandler->RemoveFromRoot();
-	//		UE_LOG(LogTemp, Warning, TEXT("SkillCoolDownHandler RemoveFromRoot() called in EndPlay."));
-	//	}
-
-	//	SkillCoolDownHandler = nullptr;
-	//}
-
-	//if (CameraHandler)
-	//{
-	//	if (CameraHandler->IsRooted())
-	//	{
-	//		CameraHandler->RemoveFromRoot();
-	//		UE_LOG(LogTemp, Warning, TEXT("CameraHandler RemoveFromRoot() called in EndPlay."));
-	//	}
-	//	CameraHandler = nullptr;
-	//}
-
-	//if (NetworkSyncHandler)
-	//{
-	//	if (NetworkSyncHandler->IsRooted())
-	//	{
-	//		NetworkSyncHandler->RemoveFromRoot();
-	//		UE_LOG(LogTemp, Warning, TEXT("NetworkSyncHandler RemoveFromRoot() called in EndPlay."));
-	//	}
-	//	NetworkSyncHandler = nullptr;
-	//}
-
-	//if (UIManager)
-	//{
-	//	if (UIManager->IsRooted())
-	//	{
-	//		UIManager->RemoveFromRoot();
-	//		UE_LOG(LogTemp, Warning, TEXT("UIManager RemoveFromRoot() called in EndPlay."));
-	//	}
-	//	UIManager = nullptr;
-	//}
-}
 
 void AGPCharacterMyplayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -349,28 +285,3 @@ void AGPCharacterMyplayer::SetCharacterInfo(FInfoData& CharacterInfo_)
 	}
 		
 }
-
-<<<<<<< HEAD
-void AGPCharacterMyplayer::InitPortraitCapture()
-{
-	if (!PortraitCapture || PortraitRenderTarget) return;
-
-	PortraitRenderTarget = NewObject<UTextureRenderTarget2D>(this);
-	PortraitRenderTarget->InitAutoFormat(1024, 1024);
-	PortraitRenderTarget->ClearColor = FLinearColor::Transparent;
-	PortraitRenderTarget->UpdateResourceImmediate(true);
-
-	PortraitCapture->TextureTarget = PortraitRenderTarget;
-
-	for (TActorIterator<ADirectionalLight> It(GetWorld()); It; ++It)
-	{
-		ADirectionalLight* DirLight = *It;
-		if (DirLight)
-		{
-			PortraitCapture->HiddenActors.Add(DirLight);
-		}
-	}
-}
-
-=======
->>>>>>> parent of bd3020d (씬 버그 수정 뒷 배경 수정 전)

@@ -23,7 +23,6 @@ public:
 
     float GetRemainingCooldownTime(ESkillGroup SkillGroup, int32 SkillLevel) const;
     float GetTotalCooldownTime(ESkillGroup SkillGroup, int32 SkillLevel) const;
-    bool HasCooldownData(ESkillGroup SkillGroup, int32 SkillLevel) const;
 
 public :
     UPROPERTY()
