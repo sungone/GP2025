@@ -36,9 +36,6 @@ public :
 	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "UI")
 	class UWrapBox* EatablesWrapBox;
 
-	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "UI")
-	class UImage* PortraitImage;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Data")
 	UDataTable* ItemDataTable;
 
@@ -58,6 +55,4 @@ public :
 	class UTextBlock* MoneyText;
 
 	void SetGold(int32 Amount);
-
-	void SetPortraitRenderTarget(class UTextureRenderTarget2D* RenderTarget);
 };

@@ -10,11 +10,6 @@
 #include "Character/GPCharacterMyplayer.h"
 #include "Network/GPNetworkManager.h"
 #include "Engine/DataTable.h"
-#include "GPInventory.h"
-#include "Components/Image.h"                    
-#include "Materials/MaterialInterface.h"          
-#include "Materials/MaterialInstanceDynamic.h"    
-#include "Engine/TextureRenderTarget2D.h"       
 
 
 
@@ -188,17 +183,5 @@ void UGPInventory::SetGold(int32 Amount)
     {
         MoneyText->SetText(FText::AsNumber(Amount));
     }
-}
-
-void UGPInventory::SetPortraitRenderTarget(UTextureRenderTarget2D* RenderTarget)
-{
-    if (!PortraitImage || !RenderTarget) return;
-
-    static UMaterialInterface* BaseMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Inventory/3DComponentForUI/M_UI_Protrait.M_UI_Protrait"));
-
-    UMaterialInstanceDynamic* DynMat = UMaterialInstanceDynamic::Create(BaseMaterial, this);
-    DynMat->SetTextureParameterValue("RenderTargetTexture", RenderTarget);
-
-    PortraitImage->SetBrushFromMaterial(DynMat);
 }
 

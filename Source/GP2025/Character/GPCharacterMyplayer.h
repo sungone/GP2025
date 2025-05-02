@@ -77,14 +77,4 @@ public :
 public :
 	virtual void SetCharacterInfo(FInfoData& CharacterInfo_) override;
 	int32 PrevLevel = 1;
-
-	// <Scene Capture>
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Capture", meta = (AllowPrivateAccess = "true"))
-	USceneCaptureComponent2D* PortraitCapture;
-
-	UPROPERTY()
-	UTextureRenderTarget2D* PortraitRenderTarget;
-
-	void InitPortraitCapture(); // 초기화 함수 선언
 };

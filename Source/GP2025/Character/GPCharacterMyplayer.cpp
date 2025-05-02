@@ -21,10 +21,13 @@
 #include "Components/TextBlock.h"
 #include "kismet/GameplayStatics.h"
 #include "GPCharacterMyplayer.h"
+<<<<<<< HEAD
 #include "Components/SceneCaptureComponent2D.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "EngineUtils.h"              
 #include "Engine/DirectionalLight.h"
+=======
+>>>>>>> parent of bd3020d (씬 버그 수정 뒷 배경 수정 전)
 
 AGPCharacterMyplayer::AGPCharacterMyplayer()
 {
@@ -34,6 +37,7 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 	CameraBoom->SetupAttachment(RootComponent);
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 
+<<<<<<< HEAD
 	// Scene Capture 2D
 	PortraitCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("PortraitCapture"));
 	PortraitCapture->SetupAttachment(GetRootComponent());
@@ -42,6 +46,8 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 	PortraitCapture->ShowOnlyActors.Empty();
 	PortraitCapture->ShowOnlyActors.Add(this);
 
+=======
+>>>>>>> parent of bd3020d (씬 버그 수정 뒷 배경 수정 전)
 	// Character Type
 	CurrentCharacterType = (uint8)Type::EPlayer::GUNNER;
 }
@@ -86,7 +92,7 @@ void AGPCharacterMyplayer::BeginPlay()
 	}
 	
 	SetCharacterType(CurrentCharacterType);
-	InitPortraitCapture();
+
 }
 
 void AGPCharacterMyplayer::Tick(float DeltaTime)
@@ -344,6 +350,7 @@ void AGPCharacterMyplayer::SetCharacterInfo(FInfoData& CharacterInfo_)
 		
 }
 
+<<<<<<< HEAD
 void AGPCharacterMyplayer::InitPortraitCapture()
 {
 	if (!PortraitCapture || PortraitRenderTarget) return;
@@ -365,3 +372,5 @@ void AGPCharacterMyplayer::InitPortraitCapture()
 	}
 }
 
+=======
+>>>>>>> parent of bd3020d (씬 버그 수정 뒷 배경 수정 전)
