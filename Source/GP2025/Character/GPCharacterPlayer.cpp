@@ -8,6 +8,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "Character/Modules/GPPlayerAppearanceHandler.h"
 #include "Character/Modules/GPPlayerEffectHandler.h"
+#include "Character/Modules/GPCharacterUIHandler.h"
 #include "GPCharacterPlayer.h"
 
 
@@ -45,6 +46,10 @@ void AGPCharacterPlayer::BeginPlay()
 void AGPCharacterPlayer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+    if (UIHandler)
+    {
+        UIHandler->UpdateWidgetVisibility();
+    }
 }
 
 void AGPCharacterPlayer::PostInitializeComponents()
