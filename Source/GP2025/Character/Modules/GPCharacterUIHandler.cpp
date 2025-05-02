@@ -100,33 +100,3 @@ void UGPCharacterUIHandler::SetNameByCharacterInfo()
 		StatusWidget->WBPName->UpdateNickNameText(Nick);
 	}
 }
-
-//void UGPCharacterUIHandler::UpdateLevelOnly()
-//{
-//	if (!CharacterStatusWidgetInstance || !Owner) return;
-//
-//	UGPCharacterStatusWidget* StatusWidget = Cast<UGPCharacterStatusWidget>(CharacterStatusWidgetInstance);
-//	if (StatusWidget && StatusWidget->WBPLevelText)
-//	{
-//		StatusWidget->WBPLevelText->UpdateLevelText(Owner->CharacterInfo.GetLevel());
-//	}
-//}
-//
-//void UGPCharacterUIHandler::UpdateHpOnly()
-//{
-//	if (!CharacterStatusWidgetInstance || !Owner) return;
-//
-//	UGPCharacterStatusWidget* StatusWidget = Cast<UGPCharacterStatusWidget>(CharacterStatusWidgetInstance);
-//	if (StatusWidget && StatusWidget->WBPHpBar)
-//	{
-//		float MaxHp = Owner->CharacterInfo.GetMaxHp();
-//		if (MaxHp > 0.f)
-//		{
-//			StatusWidget->WBPHpBar->UpdateHpBar(Owner->CharacterInfo.GetHp() / MaxHp);
-//		}
-//		else
-//		{
-//			StatusWidget->WBPHpBar->UpdateHpBar(0.f);
-//		}
-//	}
-//}

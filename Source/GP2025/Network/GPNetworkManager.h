@@ -64,6 +64,7 @@ private:
 	FString IpAddress = SERVER_IP;
 	int16 Port = SERVER_PORT;
 
+	UPROPERTY()
 	AGPCharacterPlayer* MyPlayer;
 
 	TArray<uint8> RemainingData;

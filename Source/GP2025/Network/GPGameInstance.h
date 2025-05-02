@@ -22,6 +22,8 @@ public:
 	void SaveBoundingBoxData(ULevel* Level);
 	UFUNCTION(BlueprintCallable)
 	void SaveNavData(bool IsSave);
+
 private:
+	UPROPERTY()
 	class UGPNetworkManager* NetworkMgr;
 };

@@ -54,5 +54,6 @@ public :
 	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "UI")
 	class UTextBlock* MoneyText;
 
+
 	void SetGold(int32 Amount);
 };

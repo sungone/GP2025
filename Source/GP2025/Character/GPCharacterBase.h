@@ -11,9 +11,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogGPCharacter, Log, All);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHpChanged, float, NewHpRatio);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelChanged, int32, NewLevel);
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGoldChanged, int32, NewGold);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNickNameChanged, FString, NewNickName);
-
 
 UCLASS()
 class GP2025_API AGPCharacterBase : public ACharacter
@@ -27,7 +25,6 @@ public:
 	virtual void PostInitializeComponents() override;
 
 	// <CharacterType>
-public:
 	TMap<ECharacterType, class UGPCharacterControlData*> CharacterTypeManager;
 	ECharacterType& CurrentCharacterType = CharacterInfo.CharacterType;
 
@@ -57,10 +54,10 @@ public:
 	class UGPCharacterCombatHandler* CombatHandler;
 
 	// <UI>
-public:
 	UPROPERTY()
 	class UGPCharacterUIHandler* UIHandler;
 
+	// <Stat Delegate>
 	FOnHpChanged OnHpChanged;
 	FOnLevelChanged OnLevelChanged;
 	FOnNickNameChanged OnNickNameChanged;

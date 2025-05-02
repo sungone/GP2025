@@ -23,16 +23,12 @@ public:
 	void OnSetUpInGameWidgets();
 
 	// Inventory
-	UFUNCTION()
 	void ToggleInventory();
 	
-	UFUNCTION()
 	void ResetToggleInventory();
 
-	UFUNCTION()
 	void OpenInventory();
 
-	UFUNCTION()
 	void CloseInventory();
 
 	// Setting

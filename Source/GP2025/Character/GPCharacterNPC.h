@@ -25,12 +25,12 @@ public :
 
 	UPROPERTY()
 	TSubclassOf<UUserWidget> ShopWidgetClass;
-
-	void OpenShopUI(APlayerController* PlayerController);
-	void CloseShopUI();
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision", meta = (AllowPrivateAccess = "true"))
 	class USphereComponent* InteractionSphere;
+
+	void OpenShopUI(APlayerController* PlayerController);
+	void CloseShopUI();
 
 	UFUNCTION()
 	void OnPlayerEnter(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,

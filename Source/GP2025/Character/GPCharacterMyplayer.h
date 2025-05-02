@@ -31,6 +31,7 @@ public:
 	UFUNCTION()
 	void OnPlayerEnterLobby();
 
+	UPROPERTY()
 	class UGPNetworkManager* NetMgr;
 
 	// <Input>

@@ -52,9 +52,13 @@ private:
     UPROPERTY()
     TSubclassOf<AGPCharacterMonster> MonsterClass;
 
+	UPROPERTY()
 	class AGPCharacterMyplayer* MyPlayer;
+
 	TMap<int32, AGPCharacterPlayer*> Players;
+
     TMap<int32, AGPCharacterMonster*> Monsters;
+
     TMap<int32, AGPItem*> Items;
 
     UWorld* World;

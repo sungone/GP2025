@@ -31,6 +31,7 @@ public:
 	UPROPERTY()
 	class UTextBlock* DamageText;
 
+
 	FTimerHandle DestroyTimerHandle;
 	
 	void DestroySelf();

@@ -56,11 +56,10 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
     UGPShop* ShopWidget;
 
-    void InitializeInventoryWidget();
-    void InitializeShopWidget();
-
     UPROPERTY(meta = (BindWidget), BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
     class UTextBlock* QuantityText;
 
+    void InitializeInventoryWidget();
+    void InitializeShopWidget();
     void UpdateQuantityText();
 };

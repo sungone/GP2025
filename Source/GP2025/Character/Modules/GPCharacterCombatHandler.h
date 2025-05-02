@@ -30,6 +30,7 @@ public:
 	void PlayDeadAnimation();
 	void SetDeadMontage(UAnimMontage* Montage);
 	void SetDeadEventDelay(float Delay);
+
 	// ½ºÅ³
 	void PlayQSkillMontage();
 	void PlayESkillMontage();

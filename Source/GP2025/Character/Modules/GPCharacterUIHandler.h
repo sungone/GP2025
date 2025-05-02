@@ -34,6 +34,4 @@ public:
 	class UUserWidget* CharacterStatusWidgetInstance;
 
 	void SetNameByCharacterInfo();
-	//void UpdateLevelOnly();
-	//void UpdateHpOnly();
 };

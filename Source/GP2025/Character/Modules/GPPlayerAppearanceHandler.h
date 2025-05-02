@@ -16,12 +16,10 @@ class GP2025_API UGPPlayerAppearanceHandler : public UObject
 
 public:
 	void Initialize(class AGPCharacterPlayer* InOwner);
-
 	void ApplyCharacterPartsFromData(const class UGPCharacterControlData* CharacterData);
 	void SetupLeaderPose();
 	void AttachWeaponToBodyMesh();
 	void EquipWeaponFromData(const class UGPCharacterControlData* CharacterData);
-	
 	USkeletalMesh* GetBodyMeshByCharacterType(const FGPItemStruct& ItemData, uint8 CurrentCharacterType);
 
 	UFUNCTION(BlueprintCallable)

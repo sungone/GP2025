@@ -18,7 +18,10 @@ public:
     UGPPlayerEffectHandler();
     void Init(class AGPCharacterPlayer* InOwner);
 
+    UFUNCTION()
     void PlaySkillUnlockEffect();
+
+    UFUNCTION()
     void PlayLevelUpEffect();
 
 public:
