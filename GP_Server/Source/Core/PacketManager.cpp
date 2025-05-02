@@ -175,6 +175,9 @@ void PacketManager::HandleEnterGamePacket(int32 sessionId, Packet* packet)
 
 void PacketManager::HandleMovePacket(int32 sessionId, Packet* packet)
 {
+	auto session = _sessionMgr.GetSession(sessionId);
+	if (!session || !session->IsInGame()) return;
+
 	MovePacket* p = static_cast<MovePacket*>(packet);
 	_gameWorld.PlayerMove(p->PlayerID, p->PlayerPos, p->State, p->MoveTime);
 }

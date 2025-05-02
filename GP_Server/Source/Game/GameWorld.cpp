@@ -113,7 +113,7 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 	player->GetInfo().SetLocationAndYaw(pos);
 	player->GetInfo().State = static_cast<ECharacterStateType>(state);
 	UpdateViewList(player);
-	auto pkt = MovePacket(playerId, pos, state, time);
+	auto pkt = MovePacket(playerId, pos, state, time, EPacketType::S_PLAYER_MOVE);
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
 	auto upkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
 	SessionManager::GetInst().BroadcastToViewList(&upkt, playerId);

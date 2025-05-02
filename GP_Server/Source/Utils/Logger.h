@@ -20,8 +20,8 @@
 #define ENABLE_FILE_LOG          1
 #define ENABLE_FILE_WARNING      1
 #define ENABLE_FILE_ERROR        1
-#define ENABLE_FILE_SEND_LOG     0
-#define ENABLE_FILE_RECV_LOG     0
+#define ENABLE_FILE_SEND_LOG     1
+#define ENABLE_FILE_RECV_LOG     1
 
 enum LogType
 {
