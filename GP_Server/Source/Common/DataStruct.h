@@ -48,6 +48,7 @@ struct FSkillData
 	{
 		return SkillGID == Other.SkillGID && SkillLevel == Other.SkillLevel;
 	}
+
 #ifndef SERVER_BUILD
 	friend uint32 GetTypeHash(const FSkillData& Data)
 	{

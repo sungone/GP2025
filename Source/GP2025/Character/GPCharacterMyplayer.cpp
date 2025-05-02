@@ -21,6 +21,8 @@
 #include "Components/TextBlock.h"
 #include "kismet/GameplayStatics.h"
 #include "GPCharacterMyplayer.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "Engine/TextureRenderTarget2D.h"
 
 AGPCharacterMyplayer::AGPCharacterMyplayer()
 {
@@ -29,6 +31,12 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	CameraBoom->SetupAttachment(RootComponent);
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+
+	// Scene Capture 2D
+	PortraitCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("PortraitCapture"));
+	PortraitCapture->SetupAttachment(GetRootComponent());
+	PortraitCapture->ProjectionType = ECameraProjectionMode::Perspective;
+	PortraitCapture->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
 
 	// Character Type
 	CurrentCharacterType = (uint8)Type::EPlayer::GUNNER;
@@ -74,7 +82,7 @@ void AGPCharacterMyplayer::BeginPlay()
 	}
 	
 	SetCharacterType(CurrentCharacterType);
-
+	InitPortraitCapture();
 }
 
 void AGPCharacterMyplayer::Tick(float DeltaTime)
@@ -330,5 +338,21 @@ void AGPCharacterMyplayer::SetCharacterInfo(FInfoData& CharacterInfo_)
 		PrevLevel = CharacterInfo_.Stats.Level;
 	}
 		
+}
+
+void AGPCharacterMyplayer::InitPortraitCapture()
+{
+	if (!PortraitCapture || PortraitRenderTarget) return;
+
+	PortraitRenderTarget = NewObject<UTextureRenderTarget2D>(this);
+	PortraitRenderTarget->InitAutoFormat(1024, 1024);
+	PortraitRenderTarget->ClearColor = FLinearColor::Transparent;
+	PortraitRenderTarget->UpdateResourceImmediate(true);
+
+	PortraitCapture->TextureTarget = PortraitRenderTarget;
+	PortraitCapture->CaptureSource = ESceneCaptureSource::SCS_SceneColorHDR;
+
+	PortraitCapture->ShowOnlyActors.Empty();
+	PortraitCapture->ShowOnlyActors.Add(this);
 }
 

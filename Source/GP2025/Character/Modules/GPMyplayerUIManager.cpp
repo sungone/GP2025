@@ -10,6 +10,8 @@
 #include "Character/GPCharacterMyplayer.h"
 #include "GPMyplayerUIManager.h"
 #include "UI/GPSkillLevelUpText.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "GameFramework/PlayerController.h"
 
 UGPMyplayerUIManager::UGPMyplayerUIManager()
 {
@@ -120,6 +122,14 @@ void UGPMyplayerUIManager::OpenInventory()
 		}
 
 		InventoryWidget->AddToViewport();
+
+		if (InventoryWidget && Owner->PortraitCapture)
+		{
+			if (UGPInventory* Inventory = Cast<UGPInventory>(InventoryWidget))
+			{
+				Inventory->SetPortraitRenderTarget(Owner->PortraitCapture->TextureTarget);
+			}
+		}
 
 		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
 		if (PC)

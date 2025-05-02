@@ -201,6 +201,7 @@ void UGPMyplayerInputHandler::OpenInventory()
 {
 	if (!Owner || !Owner->UIManager) return;
 	Owner->UIManager->OpenInventory();
+
 }
 
 void UGPMyplayerInputHandler::CloseInventory()
