@@ -25,6 +25,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void EquipItemOnCharacter(struct FGPItemStruct& ItemData);
 
+	UFUNCTION(BlueprintCallable)
+	void UnequipItemFromCharacter(ECategory Category);
+
 private:
 	UPROPERTY()
 	class AGPCharacterPlayer* Owner;

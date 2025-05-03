@@ -30,7 +30,7 @@ public :
 	FGPItemStruct& GetItemData();
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-	void ClickItem();
+	void ClickEquippedItemSlot();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	FGPItemStruct CurrentItem;

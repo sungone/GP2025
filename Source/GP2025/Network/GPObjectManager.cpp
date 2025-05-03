@@ -343,11 +343,48 @@ void UGPObjectManager::EquipItem(int32 PlayerID, uint8 ItemType, const FStatData
 		return;
 	}
 
-	TargetPlayer->AppearanceHandler->EquipItemOnCharacter(*ItemData);
+	if (TargetPlayer->AppearanceHandler)
+	{
+		TargetPlayer->AppearanceHandler->EquipItemOnCharacter(*ItemData);
+	}
 	UE_LOG(LogTemp, Warning, TEXT("Player [%d] equipped item: %s"), PlayerID, *ItemData->ItemName.ToString());
 }
 
 void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType, const FStatData& Stats)
 {
+	if (!Players.Contains(PlayerID))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UnequipItem Failed: PlayerID [%d] not found"), PlayerID);
+		return;
+	}
 
+	AGPCharacterPlayer* TargetPlayer = Players[PlayerID];
+	if (!TargetPlayer)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UGPObjectManager::UnequipItem , TargetPlayer Not Found"));
+		return;
+	}
+
+	static const FString DataTablePath = TEXT("/Game/Item/GPItemTable.GPItemTable");
+	UDataTable* DataTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath));
+	if (!DataTable)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UGPObjectManager::UnequipItem , DataTable Not Found"));
+		return;
+	}
+
+	FString ContextString;
+	FGPItemStruct* ItemData = DataTable->FindRow<FGPItemStruct>(*FString::FromInt(ItemType), ContextString);
+	if (!ItemData)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UnequipItem Failed: No matching item found for ItemType [%d]"), ItemType);
+		return;
+	}
+
+	if (TargetPlayer->AppearanceHandler)
+	{
+		TargetPlayer->AppearanceHandler->UnequipItemFromCharacter(ItemData->Category);
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Player [%d] unequipped item: %s"), PlayerID, *ItemData->ItemName.ToString());
 }

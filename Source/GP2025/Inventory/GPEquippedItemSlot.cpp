@@ -41,8 +41,26 @@ FGPItemStruct& UGPEquippedItemSlot::GetItemData()
     return CurrentItem;
 }
 
-void UGPEquippedItemSlot::ClickItem()
+void UGPEquippedItemSlot::ClickEquippedItemSlot()
 {
+    AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+    if (!MyPlayer)
+        return;
+
+    UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+    if (!NetworkManager)
+        return;
+
+    NetworkManager->SendMyUnequipItem(SlotData.ItemUniqueID);
+
+    if (MyPlayer->AppearanceHandler)
+    {
+        MyPlayer->AppearanceHandler->UnequipItemFromCharacter(CurrentItem.Category);
+    }
+
+    SlotData = FSlotStruct();  
+    CurrentItem = FGPItemStruct();  
+    SetImage(); 
 
 }
 

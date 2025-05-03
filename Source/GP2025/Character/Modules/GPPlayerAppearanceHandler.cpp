@@ -179,6 +179,52 @@ void UGPPlayerAppearanceHandler::EquipItemOnCharacter(FGPItemStruct& ItemData)
 	}
 }
 
+void UGPPlayerAppearanceHandler::UnequipItemFromCharacter(ECategory Category)
+{
+	if (!Owner) return;
+
+	switch (Category)
+	{
+	case ECategory::helmet:
+		if (Owner->Helmet)
+		{
+			Owner->Helmet->SetSkeletalMesh(nullptr);
+			Owner->Helmet->SetVisibility(false);
+		}
+		break;
+
+	case ECategory::chest:
+	{
+		// 안전성 체크 예시
+		auto* ControlData = Owner->CharacterTypeManager.Find(Owner->CurrentCharacterType);
+		if (ControlData && *ControlData && (*ControlData)->IsValidLowLevelFast())
+		{
+			Owner->BodyMesh->SetSkeletalMesh((*ControlData)->BodyMesh);
+		}
+		if (Owner->GetMesh()->GetAnimClass())
+		{
+			Owner->BodyMesh->SetAnimInstanceClass(Owner->GetMesh()->GetAnimClass());
+		}
+		SetupLeaderPose();
+		AttachWeaponToBodyMesh();
+
+		break;
+	}
+
+	case ECategory::sword:
+	case ECategory::bow:
+		if (Owner->WeaponActor)
+		{
+			Owner->WeaponActor->Destroy();
+			Owner->WeaponActor = nullptr;
+		}
+		break;
+
+	default:
+		break;
+	}
+}
+
 void UGPPlayerAppearanceHandler::SetupLeaderPose()
 {
 	if (!Owner || !Owner->BodyMesh)

@@ -207,7 +207,7 @@ void UGPItemSlot::UpdatePlayerEquippedItemSlot(AGPCharacterPlayer* Player)
             if (Inventory->HelmetViewerSlot)
             {
                 Inventory->HelmetViewerSlot->SetSlotDataFromRowName(RowName);
-            
+                Inventory->HelmetViewerSlot->SlotData.ItemUniqueID = SlotData.ItemUniqueID;
             }
             break;
 
@@ -215,7 +215,7 @@ void UGPItemSlot::UpdatePlayerEquippedItemSlot(AGPCharacterPlayer* Player)
             if (Inventory->ArmorViewerSlot)
             {
                 Inventory->ArmorViewerSlot->SetSlotDataFromRowName(RowName);
-              
+                Inventory->ArmorViewerSlot->SlotData.ItemUniqueID = SlotData.ItemUniqueID;
             }
             break;
 
@@ -224,7 +224,7 @@ void UGPItemSlot::UpdatePlayerEquippedItemSlot(AGPCharacterPlayer* Player)
             if (Inventory->WeaponViewerSlot)
             {
                 Inventory->WeaponViewerSlot->SetSlotDataFromRowName(RowName);
-             
+                Inventory->WeaponViewerSlot->SlotData.ItemUniqueID = SlotData.ItemUniqueID;
             }
             break;
 
