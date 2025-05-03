@@ -31,6 +31,6 @@ InventoryItem::InventoryItem(uint32 itemId, uint8 itemType)
 
 WorldItem InventoryItem::ToWorldItem() const
 {
-	WorldItem worldItem(_itemId, _itemType);
+	WorldItem worldItem(_itemID, _itemTypeID);
 	return worldItem;
 }

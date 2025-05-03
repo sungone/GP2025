@@ -238,13 +238,22 @@ void Player::LearnSkill(ESkillGroup groupId)
 	if (_info.GetSkillData(groupId) != nullptr)
 		return;
 
-	for (int i = 0; i < 3; ++i)
+	FSkillState& skills = _info.Skills;
+
+	if (!skills.Q.IsValid())
 	{
-		if (!_info.SkillLevels[i].IsValid())
-		{
-			_info.SkillLevels[i].SetSkill(groupId, 1);
-			return;
-		}
+		skills.Q.SetSkill(groupId, 1);
+		return;
+	}
+	if (!skills.E.IsValid())
+	{
+		skills.E.SetSkill(groupId, 1);
+		return;
+	}
+	if (!skills.R.IsValid())
+	{
+		skills.R.SetSkill(groupId, 1);
+		return;
 	}
 }
 
@@ -350,7 +359,10 @@ uint8 Player::EquipItem(uint32 itemId)
 	const ItemStats& itemStats = targetItem->GetStats();
 	AddItemStats(itemStats);
 
-	return targetItem->GetItemType();
+	uint8 itemType = targetItem->GetItemTypeID();
+	_info.EquipItemByType(itemType);
+
+	return itemType;
 }
 
 uint8 Player::UnequipItem(uint32 itemId)
@@ -361,7 +373,10 @@ uint8 Player::UnequipItem(uint32 itemId)
 	const ItemStats& itemStats = targetItem->GetStats();
 	RemoveItemStats(itemStats);
 
-	return targetItem->GetItemType();
+	uint8 itemType = targetItem->GetItemTypeID();
+	_info.UnequipItemByType(itemType);
+
+	return itemType;
 }
 
 void Player::AddItemStats(const ItemStats& stats)
