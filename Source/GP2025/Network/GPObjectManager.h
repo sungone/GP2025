@@ -45,6 +45,7 @@ public:
 	void EquipItem(int32 PlayerID, uint8 ItemType);
 	void UnequipItem(int32 PlayerID, uint8 ItemType);
 
+
 private:
     UPROPERTY()
     TSubclassOf<AGPCharacterPlayer> OtherPlayerClass;

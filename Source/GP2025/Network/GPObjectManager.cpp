@@ -12,6 +12,7 @@
 #include "UI/GPFloatingDamageText.h"
 #include "Inventory/GPInventory.h"
 #include "Kismet/GameplayStatics.h"
+#include "GPObjectManager.h"
 
 void UGPObjectManager::Initialize(FSubsystemCollectionBase& Collection)
 {

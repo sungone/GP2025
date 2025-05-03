@@ -12,6 +12,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Player/GPPlayerController.h"
 #include "UI/GPInGameWidget.h"
+#include "Inventory/GPInventory.h"
 #include "Components/ProgressBar.h"
 #include "Character/Modules/GPMyplayerInputHandler.h" 
 #include "Character/Modules/GPMyplayerUIManager.h"
@@ -282,6 +283,11 @@ void AGPCharacterMyplayer::SetCharacterInfo(FInfoData& CharacterInfo_)
 	{
 		// UIManager->SpawnSkillLevelText(CharacterInfo_.Stats.Level);
 		PrevLevel = CharacterInfo_.Stats.Level;
+	}
+
+	if (UIManager && UIManager->GetInventoryWidget())
+	{
+		UIManager->GetInventoryWidget()->HandlePlayerStatUpdate();
 	}
 		
 }

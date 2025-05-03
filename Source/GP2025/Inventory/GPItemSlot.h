@@ -62,4 +62,5 @@ public:
     void InitializeInventoryWidget();
     void InitializeShopWidget();
     void UpdateQuantityText();
+
 };

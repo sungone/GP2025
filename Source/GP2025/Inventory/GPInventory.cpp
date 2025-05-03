@@ -8,8 +8,10 @@
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 #include "Character/GPCharacterMyplayer.h"
+#include "Inventory/GPStatInfo.h"
 #include "Network/GPNetworkManager.h"
 #include "Engine/DataTable.h"
+#include "GPInventory.h"
 
 
 
@@ -182,6 +184,14 @@ void UGPInventory::SetGold(int32 Amount)
     if (MoneyText)
     {
         MoneyText->SetText(FText::AsNumber(Amount));
+    }
+}
+
+void UGPInventory::HandlePlayerStatUpdate()
+{
+    if (StatInfo && StatInfo->IsVisible())
+    {
+        StatInfo->UpdateStatInfo();
     }
 }
 

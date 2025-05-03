@@ -54,6 +54,21 @@ public :
 	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "UI")
 	class UTextBlock* MoneyText;
 
-
 	void SetGold(int32 Amount);
+
+	// Stat Info Ã³¸®
+	UPROPERTY(meta = (BindWidget))
+	class UGPStatInfo* StatInfo;
+
+	UPROPERTY(meta = (BindWidget))
+	class UGPEquippedItemSlot* WeaponViewerSlot;
+
+	UPROPERTY(meta = (BindWidget))
+	class UGPEquippedItemSlot* HelmetViewerSlot;
+
+	UPROPERTY(meta = (BindWidget))
+	class UGPEquippedItemSlot* ArmorViewerSlot;
+
+	UFUNCTION()
+	void HandlePlayerStatUpdate();
 };
