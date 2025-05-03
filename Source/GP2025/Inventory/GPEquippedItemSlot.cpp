@@ -67,34 +67,30 @@ void UGPEquippedItemSlot::InitializeInventoryWidget()
     }
 }
 
-void UGPEquippedItemSlot::SetSlotDataFromItemType(uint8 InItemType)
+void UGPEquippedItemSlot::SetSlotDataFromRowName(FName InRowName)
 {
-    if (!SlotData.ItemID.DataTable)
+    if (!InventoryWidget || !InventoryWidget->ItemDataTable)
     {
-        UE_LOG(LogTemp, Error, TEXT("SetSlotDataFromItemType: DataTable is NULL"));
+        UE_LOG(LogTemp, Error, TEXT("SetSlotDataFromRowName: InventoryWidget or ItemDataTable is NULL"));
         return;
     }
 
-    // ItemType을 RowName으로 사용 (예: "1", "2", "3", ...)
-    FName RowName = FName(*FString::FromInt(InItemType));
-    FGPItemStruct* FoundItem = SlotData.ItemID.DataTable->FindRow<FGPItemStruct>(RowName, TEXT("SetSlotDataFromItemType"));
+    SlotData.ItemID.DataTable = InventoryWidget->ItemDataTable;
+
+    FGPItemStruct* FoundItem = SlotData.ItemID.DataTable->FindRow<FGPItemStruct>(InRowName, TEXT("SetSlotDataFromRowName"));
 
     if (!FoundItem)
     {
-        UE_LOG(LogTemp, Error, TEXT("SetSlotDataFromItemType: No item found for ItemType [%d]"), InItemType);
+        UE_LOG(LogTemp, Error, TEXT("SetSlotDataFromRowName: No item found for RowName [%s]"), *InRowName.ToString());
         CurrentItem = FGPItemStruct();
         return;
     }
 
-    // SlotData 세팅
-    SlotData.ItemID = FDataTableRowHandle();
-    SlotData.ItemID.DataTable = InventoryWidget->ItemDataTable;
-    SlotData.ItemID.RowName = FName(*FString::FromInt(InItemType));
-
-    // 아이템 정보 캐싱
+    SlotData.ItemID.RowName = InRowName;
     CurrentItem = *FoundItem;
 
     SetImage();
 
-    UE_LOG(LogTemp, Log, TEXT("SetSlotDataFromItemType: SlotData set with ItemType [%d], Name: %s"), InItemType, *CurrentItem.ItemName.ToString());
+    UE_LOG(LogTemp, Log, TEXT("SetSlotDataFromRowName: SlotData set with RowName [%s], Name: %s"),
+        *InRowName.ToString(), *CurrentItem.ItemName.ToString());
 }

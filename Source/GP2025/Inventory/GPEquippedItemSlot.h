@@ -39,7 +39,7 @@ public :
 	UGPInventory* InventoryWidget;
 
 	void InitializeInventoryWidget();
-	void SetSlotDataFromItemType(uint8 InItemType);
+	void SetSlotDataFromRowName(FName InRowName);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Item")
 	void SetImage();

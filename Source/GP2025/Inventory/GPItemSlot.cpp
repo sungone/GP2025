@@ -9,6 +9,7 @@
 #include "Character/Modules/GPMyplayerUIManager.h"
 #include "Character/Modules/GPPlayerAppearanceHandler.h"
 #include "Kismet/GameplayStatics.h"
+#include "Inventory/GPEquippedItemSlot.h"
 #include "Character/GPCharacterNPC.h"
 #include "Components/TextBlock.h"
 
@@ -94,6 +95,7 @@ void UGPItemSlot::ClickItem()
                 }
 
                 Player->EquippedItemIDs[CurrentItem.Category] = SlotData.ItemUniqueID;
+                UpdatePlayerEquippedItemSlot(Player);
             }
             else
             {
@@ -170,5 +172,64 @@ void UGPItemSlot::UpdateQuantityText()
     if (QuantityText)
     {
         QuantityText->SetText(FText::AsNumber(SlotData.Quantity));
+    }
+}
+void UGPItemSlot::UpdatePlayerEquippedItemSlot(AGPCharacterPlayer* Player)
+{
+    if (Player)
+    {
+        AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(Player);
+        if (!MyPlayer)
+        {
+            UE_LOG(LogTemp, Error, TEXT("[UpdatePlayerStatInfo] Failed to cast Player to MyPlayer"));
+            return;
+        }
+
+        if (SlotData.ItemType == EItemTypes::Eatables)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("[UpdatePlayerStatInfo] ItemType is 'Eatables' - skipping stat update"));
+            return;
+        }
+
+        UGPInventory* Inventory = MyPlayer->UIManager->GetInventoryWidget();
+        if (!Inventory)
+        {
+            UE_LOG(LogTemp, Error, TEXT("[UpdatePlayerStatInfo] InventoryWidget is NULL"));
+            return;
+        }
+
+        FName RowName = SlotData.ItemID.RowName;
+        FString ItemCategoryNameStr = UEnum::GetValueAsString(GetItemData().Category);
+
+        switch (GetItemData().Category)
+        {
+        case ECategory::helmet:
+            if (Inventory->HelmetViewerSlot)
+            {
+                Inventory->HelmetViewerSlot->SetSlotDataFromRowName(RowName);
+            
+            }
+            break;
+
+        case ECategory::chest:
+            if (Inventory->ArmorViewerSlot)
+            {
+                Inventory->ArmorViewerSlot->SetSlotDataFromRowName(RowName);
+              
+            }
+            break;
+
+        case ECategory::sword:
+        case ECategory::bow:
+            if (Inventory->WeaponViewerSlot)
+            {
+                Inventory->WeaponViewerSlot->SetSlotDataFromRowName(RowName);
+             
+            }
+            break;
+
+        default:
+            break;
+        }
     }
 }

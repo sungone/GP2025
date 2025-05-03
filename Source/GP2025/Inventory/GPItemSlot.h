@@ -63,4 +63,6 @@ public:
     void InitializeShopWidget();
     void UpdateQuantityText();
 
+    void UpdatePlayerEquippedItemSlot(class AGPCharacterPlayer* Player);
+
 };

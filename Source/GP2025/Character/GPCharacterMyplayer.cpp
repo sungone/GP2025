@@ -289,5 +289,4 @@ void AGPCharacterMyplayer::SetCharacterInfo(const FInfoData& CharacterInfo_)
 	{
 		UIManager->GetInventoryWidget()->HandlePlayerStatUpdate();
 	}
-		
 }
