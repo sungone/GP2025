@@ -43,7 +43,9 @@ public:
 	void SendMySignUpPacket(const FString& AccountID, const FString& AccountPW, const FString& NickName);
 	void SendMyLogoutPacket();
 	void SendMyEnterGamePacket();
-	void SendMyEnterGamePacket(enum class Type::EPlayer PlayerType);
+	void SendMyEnterGamePacket(Type::EPlayer PlayerType);
+	void SendMyZoneChangePacket(ZoneType zone);
+	void SendMyRespawnPacket(ZoneType zone);
 
 	void SendMyMovePacket();
 	void SendMyAttackPacket(float PlayerYaw);

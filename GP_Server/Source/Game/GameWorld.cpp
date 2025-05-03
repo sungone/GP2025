@@ -332,6 +332,16 @@ void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
 	SessionManager::GetInst().BroadcastToViewList(&pkt1, playerId);
 }
 
+FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
+{
+	return FVector();
+}
+
+FVector GameWorld::RespawnPlayer(int32 playerId, ZoneType targetZone)
+{
+	return FVector();
+}
+
 void GameWorld::UpdateViewList(std::shared_ptr<Character> listOwner)
 {
 	int32 ownerId = listOwner->GetInfo().ID;

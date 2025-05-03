@@ -388,3 +388,15 @@ void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType, const FStatDa
 
 	UE_LOG(LogTemp, Warning, TEXT("Player [%d] unequipped item: %s"), PlayerID, *ItemData->ItemName.ToString());
 }
+
+void UGPObjectManager::ChangeZone(ZoneType zone, const FVector& pos)
+{
+}
+
+void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
+{
+}
+
+void UGPObjectManager::HandlePlayerDeath(int32 playerId)
+{
+}

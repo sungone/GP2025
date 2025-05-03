@@ -71,6 +71,16 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 		LOG(LogType::RecvLog, std::format("UnequipItemPacket from [{}]", sessionId));
 		HandleUnequipItemPacket(sessionId, packet);
 		break;
+
+	case EPacketType::C_CHANGE_ZONE:
+		LOG(LogType::RecvLog, std::format("RequestZoneChange from [{}]", sessionId));
+		HandleZoneChangeRequestPacket(sessionId, packet);
+		break;
+	case EPacketType::C_RESPAWN:
+		LOG(LogType::RecvLog, std::format("RespawnRequest from [{}]", sessionId));
+		HandleRespawnRequestPacket(sessionId, packet);
+		break;
+
 	default:
 		LOG(LogType::RecvLog, "Unknown Packet Type");
 	}
@@ -243,4 +253,39 @@ void PacketManager::HandleUnequipItemPacket(int32 sessionId, Packet* packet)
 	IDPacket* p = static_cast<IDPacket*>(packet);
 	auto itemid = p->Data;
 	_gameWorld.UnequipInventoryItem(sessionId, itemid);
+}
+
+void PacketManager::HandleZoneChangeRequestPacket(int32 sessionId, Packet* packet)
+{
+	auto session = _sessionMgr.GetSession(sessionId);
+	if (!session || !session->IsInGame()) return;
+
+	auto player = session->GetPlayer();
+	if (!player) return;
+
+	auto* p = static_cast<RequestZoneChangePacket*>(packet);
+	ZoneType targetZone = p->TargetZone;
+
+	FVector newPos = _gameWorld.TransferToZone(sessionId, targetZone); // 새 위치 반환한다고 가정
+
+	ChangeZonePacket response(targetZone, newPos);
+	_sessionMgr.SendPacket(sessionId, &response);
+}
+
+void PacketManager::HandleRespawnRequestPacket(int32 sessionId, Packet* packet)
+{
+	auto session = _sessionMgr.GetSession(sessionId);
+	if (!session || !session->IsInGame()) return;
+
+	auto player = session->GetPlayer();
+	if (!player) return;
+
+	auto* p = static_cast<RespawnRequestPacket*>(packet);
+	ZoneType targetZone = p->TargetZone;
+
+	FVector respawnPos = _gameWorld.RespawnPlayer(sessionId, targetZone);
+
+	auto& info = _gameWorld.GetInfo(sessionId);
+	RespawnPacket response(info);
+	_sessionMgr.SendPacket(sessionId, &response);
 }

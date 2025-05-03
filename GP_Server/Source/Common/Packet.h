@@ -262,6 +262,18 @@ struct PlayerUseSkillPacket : public Packet
 		Header.PacketSize = sizeof(UseSkillPacket);
 	}
 };
+
+struct PlayerDeadPacket : public Packet
+{
+	int32 PlayerID;
+
+	PlayerDeadPacket(int32 playerId)
+		: Packet(EPacketType::S_PLAYER_DEAD), PlayerID(playerId)
+	{
+		Header.PacketSize = sizeof(PlayerDeadPacket);
+	}
+};
+
 #pragma endregion
 
 namespace ItemPkt
@@ -362,4 +374,46 @@ namespace ItemPkt
 		}
 	};
 }// namespace Item
+
+struct RequestZoneChangePacket : public Packet
+{
+	ZoneType TargetZone;
+
+	RequestZoneChangePacket(ZoneType zone)
+		: Packet(EPacketType::C_CHANGE_ZONE), TargetZone(zone)
+	{
+		Header.PacketSize = sizeof(RequestZoneChangePacket);
+	}
+};
+struct ChangeZonePacket : public Packet
+{
+	ZoneType TargetZone;
+	FVector RandomPos;
+
+	ChangeZonePacket(ZoneType zone, const FVector& pos)
+		: Packet(EPacketType::S_CHANGE_ZONE), TargetZone(zone), RandomPos(pos)
+	{
+		Header.PacketSize = sizeof(ChangeZonePacket);
+	}
+};
+struct RespawnRequestPacket : public Packet
+{
+	ZoneType TargetZone;
+
+	RespawnRequestPacket(ZoneType zone)
+		: Packet(EPacketType::C_RESPAWN), TargetZone(zone)
+	{
+		Header.PacketSize = sizeof(RespawnRequestPacket);
+	}
+};
+struct RespawnPacket : public Packet
+{
+	FInfoData PlayerInfo;
+
+	RespawnPacket(const FInfoData& info)
+		: Packet(EPacketType::S_RESPAWN), PlayerInfo(info)
+	{
+		Header.PacketSize = sizeof(RespawnPacket);
+	}
+};
 #pragma pack(pop)

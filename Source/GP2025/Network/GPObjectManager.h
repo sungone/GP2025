@@ -45,7 +45,9 @@ public:
 	void EquipItem(int32 PlayerID, uint8 ItemType, const FStatData& Stats);
 	void UnequipItem(int32 PlayerID, uint8 ItemType, const FStatData& Stats);
 
-
+	void ChangeZone(ZoneType zone, const FVector& pos);
+	void RespawnMyPlayer(const FInfoData& info);
+	void HandlePlayerDeath(int32 playerId);
 private:
     UPROPERTY()
     TSubclassOf<AGPCharacterPlayer> OtherPlayerClass;
