@@ -50,8 +50,10 @@ void AGPCharacterMyplayer::BeginPlay()
 	// Camera Handler 
 	CameraHandler = NewObject<UGPMyplayerCameraHandler>(this, UGPMyplayerCameraHandler::StaticClass());
 	if (CameraHandler)
+	{
 		CameraHandler->Initialize(this);
-
+		CameraHandler->ConfigureCameraCollision();
+	}
 
 	// Skill Cool Down Handler
 	SkillCoolDownHandler = NewObject<UGPSkillCoolDownHandler>(this, UGPSkillCoolDownHandler::StaticClass());
@@ -75,6 +77,13 @@ void AGPCharacterMyplayer::BeginPlay()
 	
 	SetCharacterType(CurrentCharacterType);
 
+	// 몬스터와 충돌 설정
+	USkeletalMeshComponent* MyMesh = GetMesh();
+	MyMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	MyMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	MyMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+	MyMesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	MyMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 }
 
 void AGPCharacterMyplayer::Tick(float DeltaTime)
