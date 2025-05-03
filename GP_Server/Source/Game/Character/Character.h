@@ -15,7 +15,8 @@ public:
 	void OnDamaged(float damage);
 	virtual float GetAttackDamage() = 0;
 
-	bool IsCollision(const FVector& pos, const float dist );
+	bool IsCollision(const FVector& pos, const float dist);
+	bool IsCollision(const FVector& pos);
 	bool IsCollision(const FInfoData& target);
 	bool IsInAttackRange(const FInfoData& target);
 	bool IsInViewDistance(const FVector& targetPos, float viewDist);
@@ -25,7 +26,7 @@ public:
 	virtual void UpdateViewList(std::shared_ptr<Character> other) {}
 	bool AddToViewList(int32 CharacterId);
 	bool RemoveFromViewList(int32 CharacterId);
-    std::unordered_set<int32> GetViewList() const {return _viewList; }
+	std::unordered_set<int32> GetViewList() const { return _viewList; }
 
 	virtual void ChangeState(ECharacterStateType newState) = 0;
 	FInfoData& GetInfo() { return _info; }

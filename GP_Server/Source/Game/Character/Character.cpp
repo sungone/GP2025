@@ -26,6 +26,11 @@ bool Character::IsCollision(const FVector& pos, float dist)
 	return _info.Pos.IsInRange(pos, dist);
 }
 
+bool Character::IsCollision(const FVector& pos)
+{
+	return _info.Pos.IsInRange(pos, 0);
+}
+
 bool Character::IsCollision(const FInfoData& target)
 {
 	return _info.Pos.IsInRange(target.Pos, _info.CollisionRadius + target.CollisionRadius);

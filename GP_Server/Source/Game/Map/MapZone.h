@@ -21,7 +21,7 @@ public:
 	}
 
 	bool Init();
-	FVector GetRandomPos(ZoneType type) const;
+	FVector GetRandomPos(ZoneType type, float collisionRadius) const;
 	NavMesh& GetNavMesh(ZoneType type);
 
 private:

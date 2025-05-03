@@ -62,7 +62,7 @@ DBLoginResult DBManager::SignUpUser(int32 sessionId, const std::string& login_id
 
 	FVector newPos{};
 	do {
-		newPos = Map::GetInst().GetRandomPos(ZoneType::TUK);
+		newPos = Map::GetInst().GetRandomPos(ZoneType::TUK, newinfo.CollisionRadius);
 	} while (GameWorld::GetInst().IsCollisionDetected(newinfo));
 
 	newinfo.SetLocation(newPos);
