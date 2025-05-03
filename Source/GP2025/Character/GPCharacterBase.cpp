@@ -63,22 +63,37 @@ AGPCharacterBase::AGPCharacterBase()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
+	// 캡슐 초기화
 	auto* Capsule = GetCapsuleComponent();
 	if (Capsule)
 	{
-		Capsule->InitCapsuleSize(42.f, 99.f);
+		const float CapsuleRadius = 42.f;
+		const float CapsuleHalfHeight = 99.f;
+
+		Capsule->InitCapsuleSize(CapsuleRadius, CapsuleHalfHeight);
 		Capsule->SetHiddenInGame(false);
 		Capsule->SetVisibility(true);
 	}
 
+	// 이동 설정
 	auto* MovementComp = GetCharacterMovement();
-	MovementComp->bOrientRotationToMovement = true;
-	MovementComp->RotationRate = FRotator(0.f, 500.f, 0.f);
+	if (MovementComp)
+	{
+		MovementComp->bOrientRotationToMovement = true;
+		MovementComp->RotationRate = FRotator(0.f, 500.f, 0.f);
+	}
 
-	GetMesh()->SetWorldScale3D(FVector(0.65f));
-	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
+	// 메시 위치 정렬
+	auto* MeshComp = GetMesh();
+	if (MeshComp && Capsule)
+	{
+		const float MeshOffsetZ = -Capsule->GetUnscaledCapsuleHalfHeight();
+		MeshComp->SetWorldScale3D(FVector(0.65f));
+		MeshComp->SetRelativeLocationAndRotation(FVector(0.f, 0.f, MeshOffsetZ), FRotator(0.f, -90.f, 0.f));
+		MeshComp->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+		MeshComp->SetCollisionProfileName(TEXT("NoCollision"));
+	}
+
 
 	static const TArray<TTuple<ECharacterType, FString>> CharacterTypes = {
 		MakeTuple((uint8)Type::EPlayer::WARRIOR, TEXT("/Script/GP2025.GPCharacterControlData'/Game/CharacterType/GPC_Warrior.GPC_Warrior'")),

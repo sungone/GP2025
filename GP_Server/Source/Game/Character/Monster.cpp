@@ -16,7 +16,7 @@ void Monster::Init()
 		return;
 	}
 	FVector newPos{};
-	do { newPos = Map::GetInst().GetRandomPos(ZoneType::TUK); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
+	do { newPos = Map::GetInst().GetRandomPos(ZoneType::TUK, _info.CollisionRadius); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
 	_info.SetLocation(newPos);
 	_info.SetName(ConvertToWString(data->Name) + std::to_wstring(_id));
 	_info.CharacterType = data->TypeId;

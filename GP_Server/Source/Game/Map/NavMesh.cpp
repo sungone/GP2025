@@ -96,7 +96,7 @@ std::vector<int> NavMesh::FindPath(int StartPolyIdx, int GoalPolyIdx)
 	auto heuristic = [&](int from, int to) -> float {
 		FVector fromCenter = GetTriangleCenter(from);
 		FVector toCenter = GetTriangleCenter(to);
-		return fromCenter.DistanceTo(toCenter); // 직선 거리
+		return fromCenter.DistanceTo(toCenter);
 		};
 
 	auto cmp = [&](int left, int right) {
@@ -183,33 +183,60 @@ bool NavMesh::LoadFromJson(const std::string& filePath)
 	return true;
 }
 
-FVector NavMesh::GetRandomPosition() const
+FVector NavMesh::GetRandomPositionWithRadius(float radius) const
 {
 	if (Triangles.empty() || Vertices.empty())
-	{
 		return FVector(0, 0, 0);
-	}
 
-	int RandomTriangleIndex = RandomUtils::GetRandomInt(0, Triangles.size() - 1);
-	const Triangle& SelectedTriangle = Triangles[RandomTriangleIndex];
-
-	const FVector& A = Vertices[SelectedTriangle.IndexA];
-	const FVector& B = Vertices[SelectedTriangle.IndexB];
-	const FVector& C = Vertices[SelectedTriangle.IndexC];
-
-	float r1 = RandomUtils::GetRandomFloat(0.0f, 1.0f);
-	float r2 = RandomUtils::GetRandomFloat(0.0f, 1.0f);
-
-	if (r1 + r2 > 1.0f)
+	for (int attempt = 0; attempt < 10; ++attempt)
 	{
-		r1 = 1.0f - r1;
-		r2 = 1.0f - r2;
+		int RandomTriangleIndex = RandomUtils::GetRandomInt(0, Triangles.size() - 1);
+		const Triangle& tri = Triangles[RandomTriangleIndex];
+
+		const FVector& A = Vertices[tri.IndexA];
+		const FVector& B = Vertices[tri.IndexB];
+		const FVector& C = Vertices[tri.IndexC];
+
+		float r1 = RandomUtils::GetRandomFloat(0.0f, 1.0f);
+		float r2 = RandomUtils::GetRandomFloat(0.0f, 1.0f);
+		if (r1 + r2 > 1.0f)
+		{
+			r1 = 1.0f - r1;
+			r2 = 1.0f - r2;
+		}
+
+		FVector P = A + (B - A) * r1 + (C - A) * r2;
+		P.Z += 100.0f;//이건 사이즈 고려안함 현재 클라에서 설정된 캡슐의 반만큼 올려주는중 -> 추후 
+
+		auto DistanceToEdge2D = [](const FVector& p, const FVector& a, const FVector& b) -> float {
+			double dx = b.X - a.X;
+			double dy = b.Y - a.Y;
+			double lengthSq = dx * dx + dy * dy;
+
+			if (lengthSq == 0.0)
+				return std::sqrt((p.X - a.X) * (p.X - a.X) + (p.Y - a.Y) * (p.Y - a.Y));
+
+			double t = ((p.X - a.X) * dx + (p.Y - a.Y) * dy) / lengthSq;
+			t = std::clamp(t, 0.0, 1.0);
+			double projX = a.X + t * dx;
+			double projY = a.Y + t * dy;
+
+			double distX = p.X - projX;
+			double distY = p.Y - projY;
+			return std::sqrt(distX * distX + distY * distY);
+			};
+
+		if (DistanceToEdge2D(P, A, B) >= radius &&
+			DistanceToEdge2D(P, B, C) >= radius &&
+			DistanceToEdge2D(P, C, A) >= radius)
+		{
+			return P;
+		}
 	}
 
-	FVector SpawnPosition = A + (B - A) * r1 + (C - A) * r2;
-	SpawnPosition.Z += 90.0f;
-	return SpawnPosition;
+	return FVector(0, 0, 0);
 }
+
 
 FVector NavMesh::GetTriangleCenter(int triIndex) const
 {
@@ -217,7 +244,16 @@ FVector NavMesh::GetTriangleCenter(int triIndex) const
 	const FVector& A = Vertices[tri.IndexA];
 	const FVector& B = Vertices[tri.IndexB];
 	const FVector& C = Vertices[tri.IndexC];
-	return FVector((A.X + B.X + C.X) / 3.0f, (A.Y + B.Y + C.Y) / 3.0f, (A.Z + B.Z + C.Z) / 3.0f);
+
+	float a = (B - C).Length();
+	float b = (C - A).Length();
+	float c = (A - B).Length();
+
+	float sum = a + b + c;
+
+	if (sum == 0) return A;
+
+	return (A * a + B * b + C * c) / sum;
 }
 
 const std::unordered_set<int>& NavMesh::GetNeighbors(int triIdx) const

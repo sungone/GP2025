@@ -3,7 +3,7 @@
 
 bool Map::Init()
 {
-	_zoneNavMeshes[ZoneType::PLAYGROUND] = NavMesh(MapDataPath + "PlaygroundNavData.json");
+	_zoneNavMeshes[ZoneType::PLAYGROUND] = NavMesh(MapDataPath + "NavMeshData_Playground.json");
 	_zoneNavMeshes[ZoneType::TUK] = NavMesh(MapDataPath + "NavMeshData_TUK.json");
 	_zoneNavMeshes[ZoneType::E] = NavMesh(MapDataPath + "NavMeshData_E.json");
 	_zoneNavMeshes[ZoneType::INDUSTY] = NavMesh(MapDataPath + "NavMeshData_Industry.json");
@@ -11,11 +11,11 @@ bool Map::Init()
 	return true;
 }
 
-FVector Map::GetRandomPos(ZoneType type) const
+FVector Map::GetRandomPos(ZoneType type, float collisionRadius) const
 {
 	auto it = _zoneNavMeshes.find(type);
 	if (it != _zoneNavMeshes.end())
-		return it->second.GetRandomPosition();
+		return it->second.GetRandomPositionWithRadius(collisionRadius);
 
 	return FVector(0, 0, 0);
 }
