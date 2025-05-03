@@ -4,8 +4,8 @@
 WorldItem::WorldItem(FVector pos) : _pos(pos)
 {
 	static int i = 300;
-	_itemType = GetRandomItemType();
-	_itemId = i++;
+	_itemTypeID = GetRandomItemType();
+	_itemID = i++;
 }
 
 uint8 WorldItem::GetRandomItemType()
@@ -55,6 +55,6 @@ Type::EUseable WorldItem::GetRandomUseable()
 
 InventoryItem WorldItem::ToInventoryItem() const
 {
-	InventoryItem invItem(_itemId, _itemType);
+	InventoryItem invItem(_itemID, _itemTypeID);
 	return invItem;
 }

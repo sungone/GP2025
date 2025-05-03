@@ -79,6 +79,20 @@ struct FStatData
 	}
 };
 
+struct FSkillState
+{
+	FSkillData Q{};
+	FSkillData E{};
+	FSkillData R{};
+};
+
+struct FEquitState
+{
+	Type::EWeapon Sword = Type::EWeapon::NONE;
+	Type::EArmor Helmet = Type::EArmor::NONE;
+	Type::EArmor Chest = Type::EArmor::NONE;
+};
+
 struct FInfoData
 {
 	int32 ID;
@@ -93,7 +107,8 @@ struct FInfoData
 	FStatData Stats;
 	uint32 State;
 	uint32 Gold;
-	FSkillData SkillLevels[3]{};
+	FSkillState Skills;
+	FEquitState EquipState;
 
 	FInfoData()
 		: ID(0),
@@ -128,24 +143,100 @@ struct FInfoData
 	float GetDodge() const { return Stats.Dodge; }
 	float GetSpeed() const { return Stats.Speed; }
 	const char* GetName() const { return NickName; }
-	int32 GetSkillLevel(ESkillGroup groupId) const
-	{
-		for (int i = 0; i < 3; ++i)
-		{
-			if (SkillLevels[i].SkillGID == groupId)
-				return SkillLevels[i].SkillLevel;
-		}
-		return -1;
-	}
 	FSkillData* GetSkillData(ESkillGroup groupId)
 	{
-		for (int i = 0; i < 3; ++i)
+		switch (groupId)
 		{
-			if (SkillLevels[i].SkillGID == groupId)
-				return &SkillLevels[i];
+		case ESkillGroup::Throwing:
+		case ESkillGroup::HitHard:
+			return &Skills.Q;
+
+		case ESkillGroup::FThrowing:
+		case ESkillGroup::Clash:
+			return &Skills.E;
+
+		case ESkillGroup::Anger:
+		case ESkillGroup::Whirlwind:
+			return &Skills.R;
+
+		default:
+			return nullptr;
 		}
-		return nullptr;
 	}
+	int32 GetSkillLevel(ESkillGroup groupId)
+	{
+		FSkillData* skill = GetSkillData(groupId);
+		return skill ? skill->SkillLevel : -1;
+	}
+	void EquipWeapon(Type::EWeapon Weapon)
+	{
+		if (Weapon != Type::EWeapon::NONE)
+			EquipState.Sword = Weapon;
+	}
+
+	void EquipItemByType(uint8 itemTypeID)
+	{
+		if (itemTypeID >= static_cast<uint8>(Type::EWeapon::START) &&
+			itemTypeID < static_cast<uint8>(Type::EWeapon::END))
+		{
+			EquipState.Sword = static_cast<Type::EWeapon>(itemTypeID);
+		}
+		else if (itemTypeID >= static_cast<uint8>(Type::EArmor::START) &&
+			itemTypeID < static_cast<uint8>(Type::EArmor::END))
+		{
+			Type::EArmor armor = static_cast<Type::EArmor>(itemTypeID);
+			switch (armor)
+			{
+			case Type::EArmor::ALLOY_HELMET:
+			case Type::EArmor::ENHANCED_HELMET:
+				EquipState.Helmet = armor;
+				break;
+
+			case Type::EArmor::TITANIUM_ARMOR:
+			case Type::EArmor::POWERED_ARMOR:
+			case Type::EArmor::SUIT:
+			case Type::EArmor::TUCLOTHES:
+				EquipState.Chest = armor;
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
+
+	void UnequipItemByType(uint8 itemTypeID)
+	{
+		if (itemTypeID >= static_cast<uint8>(Type::EWeapon::START) &&
+			itemTypeID < static_cast<uint8>(Type::EWeapon::END))
+		{
+			EquipState.Sword = Type::EWeapon::NONE;
+		}
+		else if (itemTypeID >= static_cast<uint8>(Type::EArmor::START) &&
+			itemTypeID < static_cast<uint8>(Type::EArmor::END))
+		{
+			Type::EArmor armor = static_cast<Type::EArmor>(itemTypeID);
+			switch (armor)
+			{
+			case Type::EArmor::ALLOY_HELMET:
+			case Type::EArmor::ENHANCED_HELMET:
+				EquipState.Helmet = Type::EArmor::NONE;
+				break;
+
+			case Type::EArmor::TITANIUM_ARMOR:
+			case Type::EArmor::POWERED_ARMOR:
+			case Type::EArmor::SUIT:
+			case Type::EArmor::TUCLOTHES:
+				EquipState.Chest = Type::EArmor::NONE;
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
+
+
 #ifdef SERVER_BUILD
 	void SetHp(float NewHp) { Stats.Hp = std::clamp(NewHp, 0.0f, Stats.MaxHp); }
 	void Heal(float Amount) { SetHp(Stats.Hp + Amount); }

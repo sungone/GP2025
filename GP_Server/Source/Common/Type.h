@@ -96,6 +96,7 @@ namespace Type
 
 	enum class EWeapon : uint8
 	{
+		NONE,
 		START = 1,
 		BIRD_GUN = START,
 		PULSE_GUN,
@@ -109,6 +110,7 @@ namespace Type
 
 	enum class EArmor : uint8
 	{
+		NONE,
 		START = 10,
 		ALLOY_HELMET = START,
 		ENHANCED_HELMET,

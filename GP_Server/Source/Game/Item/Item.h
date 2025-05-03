@@ -4,20 +4,20 @@
 class Item
 {
 public:
-	Item(): _itemId(0),_itemType(0) {};
-	Item(uint32 itemId, uint8 itemType) : _itemId(itemId), _itemType(itemType) {}
-	uint8 GetItemType() const { return _itemType; }
-	uint32 GetItemID() const { return _itemId; }
+	Item(): _itemID(0),_itemTypeID(0) {};
+	Item(uint32 itemID, uint8 itemTypeID) : _itemID(itemID), _itemTypeID(itemTypeID) {}
+	uint8 GetItemTypeID() const { return _itemTypeID; }
+	uint32 GetItemID() const { return _itemID; }
 protected:
-	uint32 _itemId;
-	uint8 _itemType;
+	uint32 _itemID;
+	uint8 _itemTypeID;
 };
 
 class InventoryItem;
 class WorldItem : public Item
 {
 public:
-	WorldItem(uint32 itemId, uint8 itemType) : Item(itemId, itemType) {}
+	WorldItem(uint32 itemId, uint8 itemTypeID) : Item(itemId, itemTypeID) {}
 	WorldItem(FVector pos);
 
 	uint8 GetRandomItemType();

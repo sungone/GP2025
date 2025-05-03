@@ -87,9 +87,9 @@ DBLoginResult DBManager::SignUpUser(int32 sessionId, const std::string& login_id
 				newinfo.CollisionRadius, newinfo.AttackRadius, newinfo.fovAngle,
 				stats.Level, stats.Exp, stats.MaxExp, stats.Hp, stats.MaxHp, stats.Damage,
 				stats.CrtRate, stats.CrtValue, stats.Dodge, stats.Speed, newinfo.Gold,
-				static_cast<int>(newinfo.SkillLevels[0].SkillGID), newinfo.SkillLevels[0].SkillLevel,
-				static_cast<int>(newinfo.SkillLevels[1].SkillGID), newinfo.SkillLevels[1].SkillLevel,
-				static_cast<int>(newinfo.SkillLevels[2].SkillGID), newinfo.SkillLevels[2].SkillLevel)
+				static_cast<int>(newinfo.Skills.Q.SkillGID), newinfo.Skills.Q.SkillLevel,
+				static_cast<int>(newinfo.Skills.E.SkillGID), newinfo.Skills.E.SkillLevel,
+				static_cast<int>(newinfo.Skills.R.SkillGID), newinfo.Skills.R.SkillLevel)
 			.execute();
 
 
@@ -155,9 +155,9 @@ DBLoginResult DBManager::CheckLogin(int32 sessionId, const std::string& login_id
 		info.Stats.Dodge = row[19].get<float>();
 		info.Stats.Speed = row[20].get<float>();
 		info.Gold = static_cast<uint32>(row[21].get<int>());
-		info.SkillLevels[0] = FSkillData((ESkillGroup)row[22].get<int>(), row[23].get<int>());
-		info.SkillLevels[1] = FSkillData((ESkillGroup)row[24].get<int>(), row[25].get<int>());
-		info.SkillLevels[2] = FSkillData((ESkillGroup)row[26].get<int>(), row[27].get<int>());
+		info.Skills.Q = FSkillData((ESkillGroup)row[22].get<int>(), row[23].get<int>());
+		info.Skills.E = FSkillData((ESkillGroup)row[24].get<int>(), row[25].get<int>());
+		info.Skills.R = FSkillData((ESkillGroup)row[26].get<int>(), row[27].get<int>());
 
 		return { DBResultCode::SUCCESS, dbId, info };
 	}
@@ -191,12 +191,12 @@ bool DBManager::UpdatePlayerInfo(uint32 dbId, const FInfoData& info)
 			.set("dodge", info.Stats.Dodge)
 			.set("speed", info.Stats.Speed)
 			.set("gold", info.Gold)
-			.set("skill1_gid", static_cast<int>(info.SkillLevels[0].SkillGID))
-			.set("skill1_level", info.SkillLevels[0].SkillLevel)
-			.set("skill2_gid", static_cast<int>(info.SkillLevels[1].SkillGID))
-			.set("skill2_level", info.SkillLevels[1].SkillLevel)
-			.set("skill3_gid", static_cast<int>(info.SkillLevels[2].SkillGID))
-			.set("skill3_level", info.SkillLevels[2].SkillLevel)
+			.set("skill1_gid", static_cast<int>(info.Skills.Q.SkillGID))
+			.set("skill1_level", info.Skills.Q.SkillLevel)
+			.set("skill2_gid", static_cast<int>(info.Skills.E.SkillGID))
+			.set("skill2_level", info.Skills.E.SkillLevel)
+			.set("skill3_gid", static_cast<int>(info.Skills.R.SkillGID))
+			.set("skill3_level", info.Skills.R.SkillLevel)
 			.where("id = :id")
 			.bind("id", dbId)
 			.execute();

@@ -230,7 +230,7 @@ void GameWorld::SpawnWorldItem(FVector position)
 {
 	std::lock_guard<std::mutex> lock(_iMutex);
 	auto newItem = std::make_shared<WorldItem>(position);
-	ItemPkt::SpawnPacket packet(newItem->GetItemID(), newItem->GetItemType(), position);
+	ItemPkt::SpawnPacket packet(newItem->GetItemID(), newItem->GetItemTypeID(), position);
 	_worldItems.emplace_back(newItem);
 	SessionManager::GetInst().BroadcastToAll(&packet);
 }
@@ -240,7 +240,7 @@ void GameWorld::SpawnWorldItem(WorldItem dropedItem)
 	std::lock_guard<std::mutex> lock(_iMutex);
 	auto newItem = std::make_shared<WorldItem>(dropedItem);
 	_worldItems.emplace_back(newItem);
-	ItemPkt::DropPacket packet(newItem->GetItemID(), newItem->GetItemType(), newItem->GetPos());
+	ItemPkt::DropPacket packet(newItem->GetItemID(), newItem->GetItemTypeID(), newItem->GetPos());
 	SessionManager::GetInst().BroadcastToAll(&packet);
 }
 
@@ -271,7 +271,7 @@ void GameWorld::PickUpWorldItem(int32 playerId, uint32 itemId)
 	if (player->TakeWorldItem(targetItem))
 	{
 		RemoveWorldItem(targetItem);
-		auto pkt = ItemPkt::AddInventoryPacket(targetItem->GetItemID(), targetItem->GetItemType());
+		auto pkt = ItemPkt::AddInventoryPacket(targetItem->GetItemID(), targetItem->GetItemTypeID());
 		SessionManager::GetInst().SendPacket(playerId, &pkt);
 		auto pkt1 = ItemPkt::PickUpPacket(itemId);
 		SessionManager::GetInst().BroadcastToAll(&pkt1);
@@ -314,8 +314,8 @@ void GameWorld::EquipInventoryItem(int32 playerId, uint32 itemId)
 		LOG(Warning, "Invalid");
 		return;
 	}
-	uint8 itemType = player->EquipItem(itemId);
-	auto pkt1 = ItemPkt::EquipItemPacket(playerId, itemType, player->GetStats());
+	uint8 itemTypeID = player->EquipItem(itemId);
+	auto pkt1 = ItemPkt::EquipItemPacket(playerId, itemTypeID, player->GetStats());
 	SessionManager::GetInst().BroadcastToViewList(&pkt1, playerId);
 }
 
@@ -327,8 +327,8 @@ void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
 		LOG(Warning, "Invalid");
 		return;
 	}
-	uint8 itemType = player->UnequipItem(itemId);
-	auto pkt1 = ItemPkt::UnequipItemPacket(playerId, itemType, player->GetStats());
+	uint8 itemTypeID = player->UnequipItem(itemId);
+	auto pkt1 = ItemPkt::UnequipItemPacket(playerId, itemTypeID, player->GetStats());
 	SessionManager::GetInst().BroadcastToViewList(&pkt1, playerId);
 }
 

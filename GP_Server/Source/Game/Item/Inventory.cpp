@@ -3,7 +3,7 @@
 
 bool Inventory::AddInventoryItem(const InventoryItem& item)
 {
-    int itemType = item.GetItemType();
+    int itemType = item.GetItemTypeID();
     _slots[itemType].slotItems.emplace_back(std::make_shared<InventoryItem>(item));
     return true;
 }
