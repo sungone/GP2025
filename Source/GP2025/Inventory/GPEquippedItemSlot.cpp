@@ -43,6 +43,7 @@ FGPItemStruct& UGPEquippedItemSlot::GetItemData()
 
 void UGPEquippedItemSlot::ClickItem()
 {
+
 }
 
 void UGPEquippedItemSlot::InitializeInventoryWidget()
@@ -64,4 +65,36 @@ void UGPEquippedItemSlot::InitializeInventoryWidget()
     {
         UE_LOG(LogTemp, Error, TEXT("Failed to Get GPCharacterMyPlayer in GPItemSlot"));
     }
+}
+
+void UGPEquippedItemSlot::SetSlotDataFromItemType(uint8 InItemType)
+{
+    if (!SlotData.ItemID.DataTable)
+    {
+        UE_LOG(LogTemp, Error, TEXT("SetSlotDataFromItemType: DataTable is NULL"));
+        return;
+    }
+
+    // ItemType을 RowName으로 사용 (예: "1", "2", "3", ...)
+    FName RowName = FName(*FString::FromInt(InItemType));
+    FGPItemStruct* FoundItem = SlotData.ItemID.DataTable->FindRow<FGPItemStruct>(RowName, TEXT("SetSlotDataFromItemType"));
+
+    if (!FoundItem)
+    {
+        UE_LOG(LogTemp, Error, TEXT("SetSlotDataFromItemType: No item found for ItemType [%d]"), InItemType);
+        CurrentItem = FGPItemStruct();
+        return;
+    }
+
+    // SlotData 세팅
+    SlotData.ItemID = FDataTableRowHandle();
+    SlotData.ItemID.DataTable = InventoryWidget->ItemDataTable;
+    SlotData.ItemID.RowName = FName(*FString::FromInt(InItemType));
+
+    // 아이템 정보 캐싱
+    CurrentItem = *FoundItem;
+
+    SetImage();
+
+    UE_LOG(LogTemp, Log, TEXT("SetSlotDataFromItemType: SlotData set with ItemType [%d], Name: %s"), InItemType, *CurrentItem.ItemName.ToString());
 }

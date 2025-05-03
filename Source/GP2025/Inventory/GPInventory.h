@@ -61,13 +61,13 @@ public :
 	class UGPStatInfo* StatInfo;
 
 	UPROPERTY(meta = (BindWidget))
-	class UGPEquippedItemSlot* WeaponViewerSlot;
+	TObjectPtr<class UGPEquippedItemSlot> WeaponViewerSlot;
 
 	UPROPERTY(meta = (BindWidget))
-	class UGPEquippedItemSlot* HelmetViewerSlot;
+	TObjectPtr<class UGPEquippedItemSlot> HelmetViewerSlot;
 
 	UPROPERTY(meta = (BindWidget))
-	class UGPEquippedItemSlot* ArmorViewerSlot;
+	TObjectPtr<class UGPEquippedItemSlot> ArmorViewerSlot;
 
 	UFUNCTION()
 	void HandlePlayerStatUpdate();

@@ -11,6 +11,7 @@
 #include "Skill/GPSkillCoolDownHandler.h"
 #include "UI/GPFloatingDamageText.h"
 #include "Inventory/GPInventory.h"
+#include "Inventory/GPEquippedItemSlot.h"
 #include "Kismet/GameplayStatics.h"
 #include "GPObjectManager.h"
 
@@ -343,6 +344,36 @@ void UGPObjectManager::EquipItem(int32 PlayerID, uint8 ItemType)
 	}
 
 	TargetPlayer->AppearanceHandler->EquipItemOnCharacter(*ItemData);
+
+	// 장착된 슬롯 썸네일 바꾸기
+	if (MyPlayer && PlayerID == MyPlayer->CharacterInfo.ID)
+	{
+		UGPInventory* Inventory = MyPlayer->UIManager->GetInventoryWidget();
+		if (Inventory)
+		{
+			switch (ItemData->Category)
+			{
+			case ECategory::helmet:
+				if (Inventory->HelmetViewerSlot)
+					Inventory->HelmetViewerSlot->SetSlotDataFromItemType(ItemType);
+				break;
+
+			case ECategory::chest:
+				if (Inventory->ArmorViewerSlot)
+					Inventory->ArmorViewerSlot->SetSlotDataFromItemType(ItemType);
+				break;
+			
+			case ECategory::sword:
+			case ECategory::bow:
+				if (Inventory->WeaponViewerSlot)
+					Inventory->WeaponViewerSlot->SetSlotDataFromItemType(ItemType);
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Player [%d] equipped item: %s"), PlayerID, *ItemData->ItemName.ToString());
 }
