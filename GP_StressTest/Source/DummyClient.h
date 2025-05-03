@@ -18,6 +18,7 @@ public:
 
 	void SendLoginPacket();
 	void SendSignUpPacket();
+	void SendRequestEnterGamePacket();
 	bool SendMovePacket();
 	bool Move();
 	bool IsConnected() const

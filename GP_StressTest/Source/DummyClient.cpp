@@ -121,28 +121,26 @@ void DummyClient::ProcessPacket(Packet* packet)
 	auto type = packet->Header.PacketType;
 	switch (type)
 	{
-	case EPacketType::S_LOGIN_SUCCESS:
-	{
-		auto pkt = reinterpret_cast<LoginSuccessPacket*>(packet);
-		_info = pkt->PlayerInfo;
-		_logined = true;
-		_active_clients++;
-		break;
-	}
-	case EPacketType::S_SIGNUP_SUCCESS:
-	{
-		auto pkt = reinterpret_cast<SignUpSuccessPacket*>(packet);
-		_info = pkt->PlayerInfo;
-		_logined = true;
-		_active_clients++;
-		break;
-	}
 	case EPacketType::S_LOGIN_FAIL:
 		SendSignUpPacket();
 		break;
 	case EPacketType::S_SIGNUP_FAIL:
 		SendLoginPacket();
 		break;
+	case EPacketType::S_LOGIN_SUCCESS:
+	case EPacketType::S_SIGNUP_SUCCESS:
+	{
+		SendRequestEnterGamePacket();
+		break;
+	}
+	case EPacketType::S_ENTER_GAME:
+	{
+		auto pkt = reinterpret_cast<EnterGamePacket*>(packet);
+		_info = pkt->PlayerInfo;
+		_logined = true;
+		_active_clients++;
+		break;
+	}
 	case EPacketType::S_PLAYER_MOVE:
 	{
 		auto pkt = reinterpret_cast<MovePacket*>(packet);
@@ -171,6 +169,12 @@ void DummyClient::SendSignUpPacket()
 	DoSend(&pkt);
 }
 
+void DummyClient::SendRequestEnterGamePacket()
+{
+	auto pkt = RequestEnterGamePacket();
+	DoSend(&pkt);
+}
+
 bool DummyClient::SendMovePacket()
 {
 	if (last_move_time + 1s > high_resolution_clock::now()) return false;
@@ -185,7 +189,7 @@ bool DummyClient::SendMovePacket()
 
 bool DummyClient::Move()
 {
-	static auto& nav = MapZone::GetInst().GetNavMesh(ZoneType::DEFAULT);
+	static auto& nav = Map::GetInst().GetNavMesh(ZoneType::TUK);
 	int currentTriIdx = nav.FindIdxFromPos(_info.Pos);
 	if (currentTriIdx == -1) return false;
 

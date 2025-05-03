@@ -1,4 +1,5 @@
 #pragma once
+#define NOMINMAX
 #include <WS2tcpip.h>
 #include <MSWSock.h>
 #pragma comment(lib, "WS2_32.lib")
@@ -7,23 +8,25 @@
 #include <iostream>
 #include <vector>
 #include <mutex>
+#include <shared_mutex>
+#include <thread>
+#include <memory>
 #include <array>
-#include <sstream>
-#include <deque>
-#include <ranges>
 #include <queue>
 #include <unordered_set>
-#include <unordered_map>
+#include <functional>
+#include <chrono>
 #include <algorithm>
-#include <atomic>
+#include <fstream>
+#include <filesystem>
+#include <sstream>
 
 #include "IOCP.h"
 #include "FVector.h"
 #include "Common.h"
 #include "Logger.h"
-#include "MapZone.h"
 #include "RandomUtils.h"
-
+#include "MapZone.h"
 using namespace std::chrono;
 
 enum CompType
@@ -52,4 +55,4 @@ inline void UpdateDelay(int rtt_ms) {
 }
 
 inline std::atomic_int _active_clients;
-const std::string MapDataPath = "../GP_Server/Source/Game/Map/MapJsonData/";
+const std::string MapDataPath = "../GP_Server/MapJsonData/";

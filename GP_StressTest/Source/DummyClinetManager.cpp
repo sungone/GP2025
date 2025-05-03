@@ -15,7 +15,7 @@ bool DummyClientManager::Init()
 	}
 	for (uint32 i = 0;i < CLIENT_NUM;++i)
 		_clients[i].Init(i);
-	if (!MapZone::GetInst().Init())
+	if (!Map::GetInst().Init())
 	{
 		LOG(LogType::Error, "MapZone");
 		return false;
