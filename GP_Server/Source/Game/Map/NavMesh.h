@@ -60,25 +60,25 @@ public:
 	NavMesh() {}
 	NavMesh(const std::string& filePath)
 	{
-		if (!LoadFromJson(filePath))
+		isLoaded = LoadFromJson(filePath);
+		if (!isLoaded)
 		{
 			LOG(Error,"NavMesh");
 		}
 	}
 
 	void BuildPolygonGraph();
-	int FindIdxFromPos(const FVector& _pos);
+	int FindIdxFromPos(const FVector _pos);
 
-	void PrintNavMesh();
-	void PrintPolygonGraph();
 	std::vector<int> FindPath(int StartPolygon, int GoalPolygon);
 	bool LoadFromJson(const std::string& filePath);
 	FVector GetRandomPositionWithRadius(float radius) const;
 
 	FVector GetTriangleCenter(int triIndex) const;
 	const std::unordered_set<int>& GetNeighbors(int triIdx) const;
-
+	bool IsLoaded() { return isLoaded; }
 public:
+	bool isLoaded = false;
 	std::vector<FVector> Vertices;
 	std::vector<Triangle> Triangles;
 	std::unordered_map<int, PolygonNode> PolygonGraph;

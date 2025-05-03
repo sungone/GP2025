@@ -109,6 +109,7 @@ struct FInfoData
 	uint32 Gold;
 	FSkillState Skills;
 	FEquitState EquipState;
+	ZoneType CurrentZone;
 
 	FInfoData()
 		: ID(0),

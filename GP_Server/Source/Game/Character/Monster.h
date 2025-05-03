@@ -5,7 +5,7 @@
 
 const float detectDist = 1000.f;
 
-class Monster : public Character
+class Monster : public Character, public std::enable_shared_from_this<Monster>
 {
 public:
 	Monster(int32 id): Character(id) { Init(); }

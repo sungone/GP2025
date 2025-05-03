@@ -3,25 +3,12 @@
 
 bool GameWorld::Init()
 {
-	if (!ItemTable::GetInst().LoadFromCSV("../DataTable/ItemTable.csv"))
-	{
-		LOG(LogType::Warning, "LoadFromCSV");
-		return false;
-	}
-
-	if (!PlayerLevelTable::GetInst().LoadFromCSV("../DataTable/PlayerLevelTable.csv"))
-	{
-		LOG(LogType::Warning, "LoadFromCSV");
-		return false;
-	}
-
-	if (!PlayerSkillTable::GetInst().LoadFromCSV("../DataTable/PlayerSkillTable.csv"))
-	{
-		LOG(LogType::Warning, "LoadFromCSV");
-		return false;
-	}
-
-	if (!MonsterTable::GetInst().LoadFromCSV("../DataTable/MonsterTable.csv"))
+	bool res =
+		ItemTable::GetInst().LoadFromCSV("../DataTable/ItemTable.csv") &&
+		PlayerLevelTable::GetInst().LoadFromCSV("../DataTable/PlayerLevelTable.csv") &&
+		PlayerSkillTable::GetInst().LoadFromCSV("../DataTable/PlayerSkillTable.csv") &&
+		MonsterTable::GetInst().LoadFromCSV("../DataTable/MonsterTable.csv");
+	if (!res)
 	{
 		LOG(LogType::Warning, "LoadFromCSV");
 		return false;
@@ -32,41 +19,71 @@ bool GameWorld::Init()
 	return true;
 }
 
-void GameWorld::PlayerEnterGame(std::shared_ptr<Character> player)
+std::shared_ptr<Player> GameWorld::GetPlayerByID(int32 id)
 {
-	std::unique_lock<std::mutex> lock(_carrMutex);
-	int32 id = player->GetInfo().ID;
-	_characters[id] = player;
-	GameWorld::GetInst().UpdateViewList(player);
+	if (id < 0 || id >= MAX_PLAYER) return nullptr;
+	std::unique_lock lock(_playerMutex);
+	return _players[id];
+}
+
+std::shared_ptr<Monster> GameWorld::GetMonsterByID(int32 id)
+{
+	std::lock_guard lock(_monsterMutex);
+	auto it = _monsters.find(id);
+	if (it != _monsters.end()) return it->second;
+	return nullptr;
+}
+
+std::shared_ptr<Character> GameWorld::GetCharacterByID(int32 id)
+{
+	if (id < MAX_PLAYER) return GetPlayerByID(id);
+	return GetMonsterByID(id);
+}
+
+FInfoData& GameWorld::GetInfo(int32 id)
+{
+	return GetCharacterByID(id)->GetInfo();
+}
+
+bool GameWorld::IsMonster(int32 id)
+{
+	return id >= MAX_PLAYER;
+}
+
+void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
+{
+	{
+		std::lock_guard lock(_playerMutex);
+		int32 id = player->GetInfo().ID;
+		_players[id] = player;
+	}
+	UpdateViewList(player);
 }
 
 void GameWorld::RemoveCharacter(int32 id)
 {
-	if (id < 0 || id >= MAX_CHARACTER || !_characters[id])
-	{
-		LOG(Warning, "Invalid");
-		return;
-	}
-
 	if (id < MAX_PLAYER)
 	{
-		LOG(Log, std::format("Remove Player"));
-		auto Pkt = InfoPacket(EPacketType::S_REMOVE_PLAYER, _characters[id]->GetInfo());
-		SessionManager::GetInst().BroadcastToViewList(&Pkt, id);
+		std::unique_lock<std::mutex> lock(_playerMutex);
+		if (!_players[id]) return;
+		auto pkt = InfoPacket(EPacketType::S_REMOVE_PLAYER, _players[id]->GetInfo());
+		SessionManager::GetInst().BroadcastToViewList(&pkt, id);
+		_players[id] = nullptr;
 	}
 	else
 	{
-		LOG(Log, std::format("Remove Monster"));
-		auto Pkt = InfoPacket(EPacketType::S_REMOVE_MONSTER, _characters[id]->GetInfo());
-		SessionManager::GetInst().BroadcastToViewList(&Pkt, id);
+		std::unique_lock<std::mutex> lock(_monsterMutex);
+		auto it = _monsters.find(id);
+		if (it == _monsters.end()) return;
+		auto pkt = InfoPacket(EPacketType::S_REMOVE_MONSTER, it->second->GetInfo());
+		SessionManager::GetInst().BroadcastToViewList(&pkt, id);
+		_monsters.erase(it);
 	}
-
-	_characters[id] = nullptr;
 }
 
 void GameWorld::PlayerSetYaw(int32 playerId, float yaw)
 {
-	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
 		LOG(Warning, "Invaild!");
@@ -77,7 +94,7 @@ void GameWorld::PlayerSetYaw(int32 playerId, float yaw)
 
 void GameWorld::PlayerAddState(int32 playerId, ECharacterStateType newState)
 {
-	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
 		LOG(Warning, "Invaild!");
@@ -90,7 +107,7 @@ void GameWorld::PlayerAddState(int32 playerId, ECharacterStateType newState)
 
 void GameWorld::PlayerRemoveState(int32 playerId, ECharacterStateType oldState)
 {
-	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
 		LOG(Warning, "Invaild!");
@@ -103,7 +120,7 @@ void GameWorld::PlayerRemoveState(int32 playerId, ECharacterStateType oldState)
 
 void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& time)
 {
-	auto player = GetCharacterByID(playerId);
+	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
 		LOG(Warning, "Invaild");
@@ -121,26 +138,24 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 
 void GameWorld::PlayerAttack(int32 playerId)
 {
-	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
 		LOG(Warning, "Invaild!");
 		return;
 	}
 
-	for (auto& monsterId : player->GetViewList())
+	for (int32 targetId : player->GetViewList())
 	{
-		if (monsterId < MAX_PLAYER) continue;
-
-		auto monster = _characters[monsterId];
+		if (!IsMonster(targetId)) continue;
+		auto monster = GetMonsterByID(targetId);
 		if (!monster) continue;
 		if (!player->Attack(monster)) continue;
-		else
+		if (monster->IsDead())
 		{
-			if (!monster->IsDead()) continue;
 			player->AddExp(10 * monster->GetInfo().GetLevel());
 			SpawnWorldItem({ monster->GetInfo().Pos.X, monster->GetInfo().Pos.Y, monster->GetInfo().Pos.Z + 20 });
-			RemoveCharacter(monsterId);
+			RemoveCharacter(targetId);
 		}
 	}
 
@@ -151,7 +166,7 @@ void GameWorld::PlayerAttack(int32 playerId)
 
 void GameWorld::PlayerUseSkill(int32 playerId, ESkillGroup groupId)
 {
-	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
 		LOG(Warning, "Invaild!");
@@ -162,36 +177,53 @@ void GameWorld::PlayerUseSkill(int32 playerId, ESkillGroup groupId)
 
 void GameWorld::CreateMonster()
 {
-	for (int32 i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
+	for (int i = 0; i < MAX_MONSTER; ++i)
 	{
-		_characters[i] = std::make_shared<Monster>(i);
+		int32 id = MAX_PLAYER + i;
+		auto monster = std::make_shared<Monster>(id);
+		{
+			std::lock_guard lock(_monsterMutex);
+			_monsters[id] = monster;
+		}
 	}
-	TimerQueue::AddTimer([]() {GameWorld::GetInst().UpdateMonster();}, 2000, true);
+	TimerQueue::AddTimer([] { GameWorld::GetInst().UpdateMonster(); }, 2000, true);
 }
 
 void GameWorld::UpdateMonster()
 {
 	LOG("Update Monster");
-	std::unique_lock<std::mutex> lock(_carrMutex);
-	for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
 	{
-		if (!_characters[i]) continue;
-
-		_characters[i]->Update();
+		std::lock_guard lock(_monsterMutex);
+		for (auto& [id, monster] : _monsters)
+		{
+			if (monster) monster->Update();
+		}
 	}
 	BroadcastMonsterStates();
 }
 
 void GameWorld::BroadcastMonsterStates()
 {
-	for (int i = MAX_PLAYER; i < MAX_CHARACTER; ++i)
+	struct Snap { int id; FInfoData info; };
+	std::vector<Snap> snaps;
 	{
-		if (!_characters[i]) continue;
-		auto& monster = _characters[i];
-		FInfoData MonsterInfoData = monster->GetInfo();
-		InfoPacket packet(S_MONSTER_STATUS_UPDATE, MonsterInfoData);
-		const auto& viewList = monster->GetViewList();
-		SessionManager::GetInst().BroadcastToViewList(&packet, i);
+		std::lock_guard lock(_monsterMutex);
+		for (auto& [id, m] : _monsters)
+			if (m)
+				snaps.push_back({ id, m->GetInfo() });
+	}
+
+	for (auto& s : snaps)
+	{
+		auto owner = GameWorld::GetInst().GetMonsterByID(s.id);
+		std::unordered_set<int32> viewList;
+		{
+			std::lock_guard lock(owner->_vlLock);
+			viewList = owner->GetViewList();
+		}
+
+		InfoPacket pkt(S_MONSTER_STATUS_UPDATE, s.info);
+		SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
 	}
 }
 
@@ -247,17 +279,10 @@ void GameWorld::SpawnWorldItem(WorldItem dropedItem)
 void GameWorld::PickUpWorldItem(int32 playerId, uint32 itemId)
 {
 	std::lock_guard<std::mutex> lock(_iMutex);
-
-	if (playerId < 0 || playerId >= MAX_PLAYER || !_characters[playerId])
-	{
-		LOG(Warning, "Invalid");
-		return;
-	}
-
-	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
-		LOG(Warning, "Invalid");
+		LOG(Warning, "Invalid player in PickUpWorldItem");
 		return;
 	}
 
@@ -284,7 +309,7 @@ void GameWorld::PickUpWorldItem(int32 playerId, uint32 itemId)
 
 void GameWorld::DropInventoryItem(int32 playerId, uint32 itemId)
 {
-	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
 		LOG(Warning, "Invalid");
@@ -297,7 +322,7 @@ void GameWorld::DropInventoryItem(int32 playerId, uint32 itemId)
 
 void GameWorld::UseInventoryItem(int32 playerId, uint32 itemId)
 {
-	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
 		LOG(Warning, "Invalid");
@@ -308,7 +333,7 @@ void GameWorld::UseInventoryItem(int32 playerId, uint32 itemId)
 
 void GameWorld::EquipInventoryItem(int32 playerId, uint32 itemId)
 {
-	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
 		LOG(Warning, "Invalid");
@@ -321,7 +346,7 @@ void GameWorld::EquipInventoryItem(int32 playerId, uint32 itemId)
 
 void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
 {
-	auto player = std::dynamic_pointer_cast<Player>(_characters[playerId]);
+	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
 		LOG(Warning, "Invalid");
@@ -345,35 +370,77 @@ FVector GameWorld::RespawnPlayer(int32 playerId, ZoneType targetZone)
 void GameWorld::UpdateViewList(std::shared_ptr<Character> listOwner)
 {
 	int32 ownerId = listOwner->GetInfo().ID;
-
-	for (int32 otherId = 1; otherId < MAX_CHARACTER; ++otherId)
+	if (IsMonster(ownerId))
 	{
-		auto other = _characters[otherId];
-		if (!other) continue;
-		if (otherId == ownerId) continue;
-		listOwner->UpdateViewList(other);
+		std::lock_guard lock(_playerMutex);
+		for (const auto& player : _players)
+		{
+			if (player)
+				listOwner->UpdateViewList(player);
+		}
+	}
+	else
+	{
+		{
+			std::lock_guard lock1(_playerMutex);
+			for (const auto& player : _players)
+			{
+				if (player && player->GetInfo().ID != ownerId)
+					listOwner->UpdateViewList(player);
+			}
+		}
+		{
+			std::lock_guard lock2(_monsterMutex);
+			for (const auto& [id, monster] : _monsters)
+			{
+				if (monster)
+					listOwner->UpdateViewList(monster);
+			}
+		}
 	}
 }
 
 bool GameWorld::IsCollisionDetected(const FVector& pos)
 {
 	const float margin = 10.f;
-	std::unique_lock<std::mutex> lock(_carrMutex);
-	for (auto other : _characters)
+	std::lock_guard lock1(_playerMutex);
 	{
-		if (!other) continue;
-		if (other->IsCollision(pos, margin)) return true;
+		for (const auto& player : _players)
+		{
+			if (player && player->IsCollision(pos, margin))
+				return true;
+		}
+	}
+
+	std::lock_guard lock2(_monsterMutex);
+	{
+		for (const auto& [id, monster] : _monsters)
+		{
+			if (monster && monster->IsCollision(pos, margin))
+				return true;
+		}
 	}
 	return false;
 }
 
 bool GameWorld::IsCollisionDetected(const FInfoData& target)
 {
-	std::unique_lock<std::mutex> lock(_carrMutex);
-	for (auto other : _characters)
 	{
-		if (!other) continue;
-		if (other->IsCollision(target)) return true;
+		std::lock_guard lock1(_playerMutex);
+		for (const auto& player : _players)
+		{
+			if (player && player->IsCollision(target))
+				return true;
+		}
+	}
+
+	{
+		std::lock_guard lock2(_monsterMutex);
+		for (const auto& [id, monster] : _monsters)
+		{
+			if (monster && monster->IsCollision(target))
+				return true;
+		}
 	}
 	return false;
 }

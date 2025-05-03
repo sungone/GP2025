@@ -30,7 +30,7 @@ void NavMesh::BuildPolygonGraph()
 	}
 }
 
-int NavMesh::FindIdxFromPos(const FVector& _pos)
+int NavMesh::FindIdxFromPos(const FVector _pos)
 {
 	int BestTriangleIndex = -1;
 	float MinDistance = FLT_MAX;
@@ -56,31 +56,6 @@ int NavMesh::FindIdxFromPos(const FVector& _pos)
 	}
 
 	return BestTriangleIndex;
-}
-
-void NavMesh::PrintNavMesh()
-{
-	PRINT("=== NavMesh(Vertices) ===");
-	for (const auto& v : Vertices)
-	{
-		PRINT(v.ToString());
-	}
-
-	PRINT("=== NavMesh(Triangles) ===");
-	for (const auto& t : Triangles)
-	{
-		PRINT(t.ToString());
-	}
-}
-
-void NavMesh::PrintPolygonGraph()
-{
-	PRINT("=== PolygonGraph ===");
-	for (const auto& entry : PolygonGraph)
-	{
-		const PolygonNode& node = entry.second;
-		PRINT(node.ToString());
-	}
 }
 
 std::vector<int> NavMesh::FindPath(int StartPolyIdx, int GoalPolyIdx)
@@ -143,7 +118,6 @@ std::vector<int> NavMesh::FindPath(int StartPolyIdx, int GoalPolyIdx)
 	}
 	return {};
 }
-
 
 bool NavMesh::LoadFromJson(const std::string& filePath)
 {

@@ -6,7 +6,6 @@
 void Monster::Init()
 {
 	Character::Init();
-	_characterClass = ECharacterClass::Monster;
 
 	auto typeId = RandomUtils::GetRandomUint8((uint8)Type::EMonster::ENERGY_DRINK, (uint8)Type::EMonster::TINO);
 	auto data = MonsterTable::GetInst().GetMonsterByTypeId(typeId);
@@ -34,22 +33,27 @@ void Monster::Init()
 
 void Monster::UpdateViewList(std::shared_ptr<Character> other)
 {
-	std::lock_guard<std::mutex> lock(_vlLock);
 	if (!other) { LOG(Warning, "Invaild!"); return; }
 	auto player = std::dynamic_pointer_cast<Player>(other);
 	if (!player) return;
 	auto playerId = other->GetInfo().ID;
+	auto self = std::static_pointer_cast<Character>(shared_from_this());
+
+	bool added = false;
+	{
+		std::lock_guard lock(_vlLock);
+		if (IsInViewDistance(other->GetInfo().Pos, VIEW_DIST))
+			added = AddToViewList(playerId);
+		else
+			added = !RemoveFromViewList(playerId);
+	}
+
+	if (!added) return;
 
 	if (IsInViewDistance(other->GetInfo().Pos, VIEW_DIST))
-	{
-		if (!AddToViewList(playerId)) return;
-		player->AddMonsterToViewList(std::shared_ptr<Character>(this));
-	}
+		player->AddMonsterToViewList(self);
 	else
-	{
-		if (!RemoveFromViewList(playerId)) return;
-		player->RemoveMonsterFromViewList(std::shared_ptr<Character>(this));
-	}
+		player->RemoveMonsterFromViewList(self);
 }
 
 void Monster::Update()
@@ -201,8 +205,13 @@ void Monster::Patrol()
 
 bool Monster::SetTarget()
 {
-	std::lock_guard<std::mutex> lock(_vlLock);
-	for (auto& playerId : this->GetViewList())
+	std::vector<int32> viewListCopy;
+	{
+		std::lock_guard lock(_vlLock);
+		viewListCopy.assign(_viewList.begin(), _viewList.end());
+	}
+
+	for (auto& playerId : viewListCopy)
 	{
 		if (playerId >= MAX_PLAYER)
 		{
@@ -210,7 +219,7 @@ bool Monster::SetTarget()
 			ChangeState(ECharacterStateType::STATE_IDLE);
 			continue;
 		}
-		auto player = GameWorld::GetInst().GetCharacterByID(playerId);
+		auto player = GameWorld::GetInst().GetPlayerByID(playerId);
 		if (!player)
 		{
 			RemoveFromViewList(playerId);

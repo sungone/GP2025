@@ -19,6 +19,7 @@ public:
 	void SendPacket(int32 sessionId, const Packet* packet);
 	void BroadcastToAll(Packet* packet);
 	void BroadcastToViewList(Packet* packet, int32 senderId);
+	void BroadcastToViewList(Packet* packet, const std::unordered_set<int32>& viewList);
 	std::array<std::shared_ptr<PlayerSession>, MAX_CLIENT>& GetSessions() { return _sessions; }
 	std::shared_ptr<PlayerSession> GetSession(int32 sessionId);
 private:

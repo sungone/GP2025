@@ -9,7 +9,6 @@
 #include <unordered_set>
 
 #define LOG(...) Logger::GetInst().LogMessage(__VA_ARGS__, __FUNCTION__)
-#define PRINT(message) Logger::GetInst().PrintNavMesh(message)
 
 #define ENABLE_CONSOLE_LOG       1
 #define ENABLE_CONSOLE_WARNING   1
@@ -46,12 +45,6 @@ public:
 
     void EnableFileLog(LogType type) { _enabledFileLogs.insert(type); }
     void DisableFileLog(LogType type) { _enabledFileLogs.erase(type); }
-
-    void PrintNavMesh(const std::string& message)
-    {
-        std::lock_guard<std::mutex> lock(_logLock);
-        PRINT(message);
-    }
 
     void LogMessage(const std::string& message, const char* functionName)
     {

@@ -40,43 +40,51 @@ void SessionManager::HandleLogin(int32 sessionId, const DBLoginResult& dbRes)
 
 void SessionManager::SendPacket(int32 sessionId, const Packet* packet)
 {
-	if (!_sessions[sessionId]) { LOG(Warning, "Invalid!"); return; };
-	_sessions[sessionId]->DoSend(packet);
+	std::lock_guard<std::mutex> lock(_smgrMutex);
+	auto session = _sessions[sessionId];
+	if (!session) { LOG(Warning, "Invalid!"); return; }
+	session->DoSend(packet);
 }
 
 void SessionManager::BroadcastToAll(Packet* packet)
 {
+	std::lock_guard<std::mutex> lock(_smgrMutex);
 	for (auto& session : _sessions)
 	{
-		if (session == nullptr || !session->IsLogin())
-			continue;
+		if (!session || !session->IsLogin()) continue;
 		session->DoSend(packet);
 	}
 }
-
 void SessionManager::BroadcastToViewList(Packet* packet, int32 senderId)
 {
-	std::shared_ptr<Character> senderCharacter = GameWorld::GetInst().GetCharacterByID(senderId);
-	if (!senderCharacter) return;
+	auto sender = GameWorld::GetInst().GetCharacterByID(senderId);
+	if (!sender) return;
 
-	std::lock_guard<std::mutex> vlock(senderCharacter->_vlLock);
-	const std::unordered_set<int32>& viewList = senderCharacter->GetViewList();
+	std::unordered_set<int32> viewListCopy;
+	{
+		std::lock_guard<std::mutex> vlock(sender->_vlLock);
+		viewListCopy = sender->GetViewList();
+	}
 
 	std::lock_guard<std::mutex> lock(_smgrMutex);
 	for (auto& session : _sessions)
 	{
-		if (session == nullptr || !session->IsLogin())
-			continue;
-
-		int32 sessionId = session->GetId();
-
-		if (sessionId == senderId)
-			continue;
-
-		if (viewList.find(sessionId) != viewList.end())
-		{
+		if (!session || !session->IsLogin()) continue;
+		int sid = session->GetId();
+		if (sid != senderId && viewListCopy.count(sid))
 			session->DoSend(packet);
-		}
+	}
+}
+
+void SessionManager::BroadcastToViewList(Packet* packet, const std::unordered_set<int32>& viewList)
+{
+	std::lock_guard<std::mutex> lock(_smgrMutex);
+	for (auto& session : _sessions)
+	{
+		if (!session || !session->IsLogin()) continue;
+		int sid = session->GetId();
+		if (viewList.count(sid))
+			session->DoSend(packet);
 	}
 }
 

@@ -6,7 +6,6 @@
 void Player::Init()
 {
 	Character::Init();
-	_characterClass = ECharacterClass::Player;
 #ifndef DB_LOCAL
 	_info.SetName(L"플레이어");
 	SetCharacterType(Type::EPlayer::WARRIOR);
@@ -16,7 +15,8 @@ void Player::Init()
 	_info.State = ECharacterStateType::STATE_IDLE;
 	ApplyLevelStats(_info.Stats.Level);
 	FVector newPos{};
-	do { newPos = Map::GetInst().GetRandomPos(ZoneType::PLAYGROUND, _info.CollisionRadius); } while (GameWorld::GetInst().IsCollisionDetected(_info));
+	do { newPos = Map::GetInst().GetRandomPos(ZoneType::PLAYGROUND, _info.CollisionRadius); }
+	while (GameWorld::GetInst().IsCollisionDetected(newPos));
 	_info.SetLocation(newPos);
 #endif
 }

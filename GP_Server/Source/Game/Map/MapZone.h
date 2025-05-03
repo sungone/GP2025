@@ -15,6 +15,6 @@ public:
 	NavMesh& GetNavMesh(ZoneType type);
 
 private:
-	std::unordered_map<ZoneType, NavMesh> _zoneNavMeshes;
+	std::unordered_map<ZoneType, NavMesh> _navMeshs;
 };
 
