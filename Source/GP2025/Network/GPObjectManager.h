@@ -21,29 +21,29 @@ public:
 	virtual void Deinitialize() override;
 
 	void SetMyPlayer(AGPCharacterPlayer* InMyPlayer);
-	void AddMyPlayer(FInfoData& PlayerInfo);
-	void AddPlayer(FInfoData& PlayerInfo);
+	void AddMyPlayer(const FInfoData& PlayerInfo);
+	void AddPlayer(const FInfoData& PlayerInfo);
 	void RemovePlayer(int32 PlayerID);
-	void UpdatePlayer(FInfoData& PlayerInfo);
-	void DamagedPlayer(FInfoData& PlayerInfo);
+	void UpdatePlayer(const FInfoData& PlayerInfo);
+	void DamagedPlayer(const FInfoData& PlayerInfo);
 
 	void PlayerUseSkill(int32 PlayerID, ESkillGroup SkillGID);
 	void SkillUnlock(ESkillGroup SkillGID);
 	void SkillUpgrade(ESkillGroup SkillGID);
-	void LevelUp(FInfoData& PlayerInfo);
+	void LevelUp(const FInfoData& PlayerInfo);
 
-	void AddMonster(FInfoData& MonsterInfo);
+	void AddMonster(const FInfoData& MonsterInfo);
 	void RemoveMonster(int32 MonsterID);
-	void UpdateMonster(FInfoData& MonsterInfo);
-	void DamagedMonster(FInfoData& MonsterInfo, float Damage);
+	void UpdateMonster(const FInfoData& MonsterInfo);
+	void DamagedMonster(const FInfoData& MonsterInfo, float Damage);
 
 	void ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos);
 	void ItemDespawn(uint32 ItemID);
 	void DropItem(uint32 ItemID, uint8 ItemType, FVector Pos);
 	void AddInventoryItem(uint32 ItemID, uint8 ItemType);
 	void UseInventoryItem(uint32 ItemID);
-	void EquipItem(int32 PlayerID, uint8 ItemType);
-	void UnequipItem(int32 PlayerID, uint8 ItemType);
+	void EquipItem(int32 PlayerID, uint8 ItemType, const FStatData& Stats);
+	void UnequipItem(int32 PlayerID, uint8 ItemType, const FStatData& Stats);
 
 
 private:

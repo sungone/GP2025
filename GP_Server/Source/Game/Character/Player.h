@@ -62,6 +62,7 @@ public:
 			_info.RemoveState(oldState);
 		}
 	}
+	FStatData& GetStats() const { return _stats; }
 private:
 	Type::EPlayer _playerType;
 	Inventory _inventory;

@@ -192,7 +192,7 @@ struct StartAimingPacket : public Packet
 struct StopAimingPacket : public Packet
 {
 	bool dummy;
-	 StopAimingPacket()
+	StopAimingPacket()
 		: Packet(EPacketType::C_STOP_AIMING)
 	{
 		Header.PacketSize = sizeof(StopAimingPacket);
@@ -340,8 +340,10 @@ namespace ItemPkt
 	{
 		int32 PlayerID;
 		uint8 ItemType;
-		EquipItemPacket(int32 playerId, uint8 type)
-			: Packet(EPacketType::S_EQUIP_ITEM), PlayerID(playerId), ItemType(type)
+		FStatData Stats;
+
+		EquipItemPacket(int32 playerId, uint8 type, FStatData stats)
+			: Packet(EPacketType::S_EQUIP_ITEM), PlayerID(playerId), ItemType(type), Stats(stats)
 		{
 			Header.PacketSize = sizeof(EquipItemPacket);
 		}
@@ -351,8 +353,10 @@ namespace ItemPkt
 	{
 		int32 PlayerID;
 		uint8 ItemType;
-		UnequipItemPacket(int32 playerId, uint8 type)
-			: Packet(EPacketType::S_UNEQUIP_ITEM), PlayerID(playerId), ItemType(type)
+		FStatData Stats;
+
+		UnequipItemPacket(int32 playerId, uint8 type, FStatData stats)
+			: Packet(EPacketType::S_UNEQUIP_ITEM), PlayerID(playerId), ItemType(type), Stats(stats)
 		{
 			Header.PacketSize = sizeof(UnequipItemPacket);
 		}

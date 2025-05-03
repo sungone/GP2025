@@ -32,7 +32,7 @@ void UGPObjectManager::SetMyPlayer(AGPCharacterPlayer* InMyPlayer)
 	MyPlayer = Cast<AGPCharacterMyplayer>(InMyPlayer);
 }
 
-void UGPObjectManager::AddMyPlayer(FInfoData& PlayerInfo)
+void UGPObjectManager::AddMyPlayer(const FInfoData& PlayerInfo)
 {
 	if (World == nullptr)
 	{
@@ -64,7 +64,7 @@ void UGPObjectManager::AddMyPlayer(FInfoData& PlayerInfo)
 }
 
 
-void UGPObjectManager::AddPlayer(FInfoData& PlayerInfo)
+void UGPObjectManager::AddPlayer(const FInfoData& PlayerInfo)
 {
 	if (World == nullptr)
 		return;
@@ -103,7 +103,7 @@ void UGPObjectManager::RemovePlayer(int32 PlayerID)
 	}
 }
 
-void UGPObjectManager::UpdatePlayer(FInfoData& PlayerInfo)
+void UGPObjectManager::UpdatePlayer(const FInfoData& PlayerInfo)
 {
 	auto PlayerID = PlayerInfo.ID;
 	if (Players.Contains(PlayerID))
@@ -134,7 +134,7 @@ void UGPObjectManager::PlayerUseSkill(int32 PlayerID, ESkillGroup SkillGID)
 	}
 }
 
-void UGPObjectManager::DamagedPlayer(FInfoData& PlayerInfo)
+void UGPObjectManager::DamagedPlayer(const FInfoData& PlayerInfo)
 {
 	auto PlayerID = PlayerInfo.ID;
 	if (Players.Contains(PlayerID))
@@ -154,13 +154,13 @@ void UGPObjectManager::SkillUpgrade(ESkillGroup SkillGID)
 	// Todo : UI 처리
 }
 
-void UGPObjectManager::LevelUp(FInfoData& PlayerInfo)
+void UGPObjectManager::LevelUp(const FInfoData& PlayerInfo)
 {
 	if (MyPlayer->EffectHandler)
 		MyPlayer->EffectHandler->PlayLevelUpEffect();
 }
 
-void UGPObjectManager::AddMonster(FInfoData& MonsterInfo)
+void UGPObjectManager::AddMonster(const FInfoData& MonsterInfo)
 {
 	if (World == nullptr)
 		return;
@@ -204,7 +204,7 @@ void UGPObjectManager::RemoveMonster(int32 MonsterID)
 	}
 }
 
-void UGPObjectManager::UpdateMonster(FInfoData& MonsterInfo)
+void UGPObjectManager::UpdateMonster(const FInfoData& MonsterInfo)
 {
 	if (Monsters.Contains(MonsterInfo.ID))
 	{
@@ -218,7 +218,7 @@ void UGPObjectManager::UpdateMonster(FInfoData& MonsterInfo)
 	}
 }
 
-void UGPObjectManager::DamagedMonster(FInfoData& MonsterInfo, float Damage)
+void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage)
 {
 	if (Monsters.Contains(MonsterInfo.ID))
 	{
@@ -311,7 +311,7 @@ void UGPObjectManager::UseInventoryItem(uint32 ItemID)
 		Inventory->UseItemFromInventory(ItemID);
 }
 
-void UGPObjectManager::EquipItem(int32 PlayerID, uint8 ItemType)
+void UGPObjectManager::EquipItem(int32 PlayerID, uint8 ItemType, const FStatData& Stats)
 {
 	if (!Players.Contains(PlayerID))
 	{
@@ -347,7 +347,7 @@ void UGPObjectManager::EquipItem(int32 PlayerID, uint8 ItemType)
 	UE_LOG(LogTemp, Warning, TEXT("Player [%d] equipped item: %s"), PlayerID, *ItemData->ItemName.ToString());
 }
 
-void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType)
+void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType, const FStatData& Stats)
 {
 
 }

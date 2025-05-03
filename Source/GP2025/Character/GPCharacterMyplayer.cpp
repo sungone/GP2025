@@ -267,7 +267,7 @@ void AGPCharacterMyplayer::ChangePlayerType()
 	SetCharacterType(static_cast<ECharacterType>(CurrentCharacterType));
 }
 
-void AGPCharacterMyplayer::SetCharacterInfo(FInfoData& CharacterInfo_)
+void AGPCharacterMyplayer::SetCharacterInfo(const FInfoData& CharacterInfo_)
 {
 	Super::SetCharacterInfo(CharacterInfo_);
 
