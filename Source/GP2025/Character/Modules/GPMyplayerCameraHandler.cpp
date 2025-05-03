@@ -12,22 +12,17 @@ void UGPMyplayerCameraHandler::Initialize(AGPCharacterMyplayer* InOwner)
 {
 	Owner = InOwner;
 
-	if (Owner->FollowCamera)
-	{
-		DefaultFOV = Owner->FollowCamera->FieldOfView;
-	}
-	if (Owner->CameraBoom)
-	{
-		DefaultCameraOffset = Owner->CameraBoom->GetRelativeLocation();
-		DefaultArmLength = Owner->CameraBoom->TargetArmLength;
-	}
+	Owner->CameraBoom->TargetArmLength = DefaultArmLength;
+	Owner->CameraBoom->SetRelativeLocation(DefaultCameraOffset);
+	Owner->CameraBoom->SetRelativeRotation(DefaultCameraRotationOffset);
 
-	Owner->CameraBoom->TargetArmLength = 400.f;
 	Owner->CameraBoom->bUsePawnControlRotation = true;
-	Owner->FollowCamera->bUsePawnControlRotation = false;
-	Owner->CameraBoom->SetRelativeLocation(FVector(0.f, 0.f, 100.f));
-	Owner->CameraBoom->SetRelativeRotation(FRotator(-15.f, 0.f, 0.f));
+	Owner->CameraBoom->bUsePawnControlRotation = true;
+	Owner->CameraBoom->bDoCollisionTest = true;
+	Owner->CameraBoom->ProbeChannel = ECC_Camera;
 
+	Owner->FollowCamera->bUsePawnControlRotation = false;
+	Owner->FollowCamera->SetFieldOfView(DefaultFOV);
 }
 
 void UGPMyplayerCameraHandler::Tick(float DeltaTime)
@@ -63,4 +58,14 @@ void UGPMyplayerCameraHandler::StopZoom()
 bool UGPMyplayerCameraHandler::IsZooming() const
 {
 	return this && bWantsToZoom;
+}
+
+void UGPMyplayerCameraHandler::ConfigureCameraCollision()
+{
+	if (!Owner || !Owner->CameraBoom)
+		return;
+
+	Owner->CameraBoom->bDoCollisionTest = true;
+	Owner->CameraBoom->ProbeChannel = ECC_Camera;
+	Owner->CameraBoom->bUsePawnControlRotation = true;
 }

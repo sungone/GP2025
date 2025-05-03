@@ -28,6 +28,9 @@ public:
 	void StopZoom();
 	bool IsZooming() const;
 
+	UFUNCTION()
+	void ConfigureCameraCollision();
+
 public:
 	UPROPERTY()
 	AGPCharacterMyplayer* Owner;
@@ -38,8 +41,9 @@ public:
 	float ZoomedFOV = 60.f;
 	float ZoomInterpSpeed = 10.f;
 
-	FVector DefaultCameraOffset = FVector(0.f, 0.f, 100.f);
+	FVector DefaultCameraOffset = FVector(0.f, 0.f, 200.f);
+	FRotator DefaultCameraRotationOffset = FRotator(-35.f, 0.f, 0.f);
 	FVector ZoomedCameraOffset = FVector(50.f, 30.f, 100.f);
-	float DefaultArmLength = 400.f;
+	float DefaultArmLength = 800.f;
 	float ZoomedArmLength = 150.f;
 };

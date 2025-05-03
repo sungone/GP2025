@@ -20,6 +20,14 @@ void AGPCharacterMonster::BeginPlay()
 {
 	Super::BeginPlay();
 	SetCharacterType(CurrentCharacterType);
+
+	/// 플레이어와 충돌 설정 - 카메라 때문에 설정
+	USkeletalMeshComponent* MyMesh = GetMesh();
+	MyMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	MyMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	MyMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+	MyMesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	MyMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 }
 
 void AGPCharacterMonster::Tick(float DeltaTime)
