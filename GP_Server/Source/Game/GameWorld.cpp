@@ -60,24 +60,55 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 	UpdateViewList(player);
 }
 
+void GameWorld::PlayerLeaveGame(int32 id)
+{
+	RemoveCharacter(id);
+}
+
 void GameWorld::RemoveCharacter(int32 id)
 {
 	if (id < MAX_PLAYER)
 	{
-		std::unique_lock<std::mutex> lock(_playerMutex);
-		if (!_players[id]) return;
-		auto pkt = InfoPacket(EPacketType::S_REMOVE_PLAYER, _players[id]->GetInfo());
-		SessionManager::GetInst().BroadcastToViewList(&pkt, id);
+		std::lock_guard<std::mutex> lock(_playerMutex);
+		auto player = _players[id];
+		if (!player) return;
+		auto pkt = InfoPacket(EPacketType::S_REMOVE_PLAYER, player->GetInfo());
+		std::unordered_set<int32> viewList;
+		{
+			std::lock_guard lock(player->_vlLock);
+			viewList = player->GetViewList();
+		}
+		SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
+
 		_players[id] = nullptr;
+		for (auto& p : _players)
+			if (p) { p->RemoveFromViewList(id); }
+
+		{
+			std::lock_guard mlock(_monsterMutex);
+			for (auto& [mid, m] : _monsters)
+				if (m) { m->RemoveFromViewList(id); }
+		}
 	}
 	else
 	{
-		std::unique_lock<std::mutex> lock(_monsterMutex);
+		std::lock_guard<std::mutex> lock(_monsterMutex);
 		auto it = _monsters.find(id);
 		if (it == _monsters.end()) return;
-		auto pkt = InfoPacket(EPacketType::S_REMOVE_MONSTER, it->second->GetInfo());
-		SessionManager::GetInst().BroadcastToViewList(&pkt, id);
+		auto monster = it->second;
+		auto pkt = InfoPacket(EPacketType::S_REMOVE_MONSTER, monster->GetInfo());
+		std::unordered_set<int32> viewList;
+		{
+			std::lock_guard lock(monster->_vlLock);
+			viewList = monster->GetViewList();
+		}
+		SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
 		_monsters.erase(it);
+		{
+			std::lock_guard plock(_playerMutex);
+			for (auto& p : _players)
+				if (p) { p->RemoveFromViewList(id); }
+		}
 	}
 }
 
@@ -102,7 +133,12 @@ void GameWorld::PlayerAddState(int32 playerId, ECharacterStateType newState)
 	}
 	player->ChangeState(newState);
 	auto upkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
-	SessionManager::GetInst().BroadcastToViewList(&upkt, playerId);
+	std::unordered_set<int32> viewList;
+	{
+		std::lock_guard lock(player->_vlLock);
+		viewList = player->GetViewList();
+	}
+	SessionManager::GetInst().BroadcastToViewList(&upkt, viewList);
 }
 
 void GameWorld::PlayerRemoveState(int32 playerId, ECharacterStateType oldState)
@@ -115,7 +151,12 @@ void GameWorld::PlayerRemoveState(int32 playerId, ECharacterStateType oldState)
 	}
 	player->RemoveState(oldState);
 	auto upkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
-	SessionManager::GetInst().BroadcastToViewList(&upkt, playerId);
+	std::unordered_set<int32> viewList;
+	{
+		std::lock_guard lock(player->_vlLock);
+		viewList = player->GetViewList();
+	}
+	SessionManager::GetInst().BroadcastToViewList(&upkt, viewList);
 }
 
 void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& time)
@@ -133,7 +174,12 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 	auto pkt = MovePacket(playerId, pos, state, time, EPacketType::S_PLAYER_MOVE);
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
 	auto upkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
-	SessionManager::GetInst().BroadcastToViewList(&upkt, playerId);
+	std::unordered_set<int32> viewList;
+	{
+		std::lock_guard lock(player->_vlLock);
+		viewList = player->GetViewList();
+	}
+	SessionManager::GetInst().BroadcastToViewList(&upkt, viewList);
 }
 
 void GameWorld::PlayerAttack(int32 playerId)
@@ -161,7 +207,12 @@ void GameWorld::PlayerAttack(int32 playerId)
 
 	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
 	SessionManager::GetInst().SendPacket(playerId, &infopkt);
-	SessionManager::GetInst().BroadcastToViewList(&infopkt, playerId);
+	std::unordered_set<int32> viewList;
+	{
+		std::lock_guard lock(player->_vlLock);
+		viewList = player->GetViewList();
+	}
+	SessionManager::GetInst().BroadcastToViewList(&infopkt, viewList);
 }
 
 void GameWorld::PlayerUseSkill(int32 playerId, ESkillGroup groupId)
@@ -340,8 +391,14 @@ void GameWorld::EquipInventoryItem(int32 playerId, uint32 itemId)
 		return;
 	}
 	uint8 itemTypeID = player->EquipItem(itemId);
+	std::unordered_set<int32> viewList;
+	{
+		std::lock_guard lock(player->_vlLock);
+		viewList = player->GetViewList();
+	}
+
 	auto pkt1 = ItemPkt::EquipItemPacket(playerId, itemTypeID, player->GetStats());
-	SessionManager::GetInst().BroadcastToViewList(&pkt1, playerId);
+	SessionManager::GetInst().BroadcastToViewList(&pkt1, viewList);
 }
 
 void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
@@ -353,8 +410,13 @@ void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
 		return;
 	}
 	uint8 itemTypeID = player->UnequipItem(itemId);
+	std::unordered_set<int32> viewList;
+	{
+		std::lock_guard lock(player->_vlLock);
+		viewList = player->GetViewList();
+	}
 	auto pkt1 = ItemPkt::UnequipItemPacket(playerId, itemTypeID, player->GetStats());
-	SessionManager::GetInst().BroadcastToViewList(&pkt1, playerId);
+	SessionManager::GetInst().BroadcastToViewList(&pkt1, viewList);
 }
 
 FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)

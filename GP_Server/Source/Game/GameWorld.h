@@ -16,6 +16,7 @@ public:
 	bool Init();
 	// Player
 	void PlayerEnterGame(std::shared_ptr<Player> player);
+	void PlayerLeaveGame(int32 playerId);
 	void RemoveCharacter(int32 id);
 	void PlayerSetYaw(int32 playerId, float yaw);
 	void PlayerAddState(int32 playerId, ECharacterStateType newState);

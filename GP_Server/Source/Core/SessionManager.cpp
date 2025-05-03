@@ -42,7 +42,11 @@ void SessionManager::SendPacket(int32 sessionId, const Packet* packet)
 {
 	std::lock_guard<std::mutex> lock(_smgrMutex);
 	auto session = _sessions[sessionId];
-	if (!session) { LOG(Warning, "Invalid!"); return; }
+	if (!session) 
+	{
+		LOG(Warning, "Invalid!"); 
+		return; 
+	}
 	session->DoSend(packet);
 }
 
@@ -53,26 +57,6 @@ void SessionManager::BroadcastToAll(Packet* packet)
 	{
 		if (!session || !session->IsLogin()) continue;
 		session->DoSend(packet);
-	}
-}
-void SessionManager::BroadcastToViewList(Packet* packet, int32 senderId)
-{
-	auto sender = GameWorld::GetInst().GetCharacterByID(senderId);
-	if (!sender) return;
-
-	std::unordered_set<int32> viewListCopy;
-	{
-		std::lock_guard<std::mutex> vlock(sender->_vlLock);
-		viewListCopy = sender->GetViewList();
-	}
-
-	std::lock_guard<std::mutex> lock(_smgrMutex);
-	for (auto& session : _sessions)
-	{
-		if (!session || !session->IsLogin()) continue;
-		int sid = session->GetId();
-		if (sid != senderId && viewListCopy.count(sid))
-			session->DoSend(packet);
 	}
 }
 

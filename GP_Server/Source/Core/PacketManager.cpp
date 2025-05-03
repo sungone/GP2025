@@ -140,7 +140,7 @@ void PacketManager::HandleLogoutPacket(int32 sessionId)
 {
 	auto pkt = IDPacket(EPacketType::S_REMOVE_PLAYER, sessionId);
 	//Todo: 로그인 전에 종료되면 여기서  "Invalid" 호출되는 것 같은데 해결하자
-	_sessionMgr.BroadcastToViewList(&pkt, sessionId);
+	_gameWorld.PlayerLeaveGame(sessionId);
 	_sessionMgr.Disconnect(sessionId);
 }
 

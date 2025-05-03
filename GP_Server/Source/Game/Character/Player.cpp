@@ -163,7 +163,7 @@ bool Player::Attack(std::shared_ptr<Character> monster)
 
 	auto pkt = MonsterDamagePacket(monster->GetInfo(), atkDamage);
 	SessionManager::GetInst().SendPacket(_id, &pkt);
-	SessionManager::GetInst().BroadcastToViewList(&pkt, _id);
+	SessionManager::GetInst().BroadcastToViewList(&pkt, _viewList);
 	return true;
 }
 
@@ -186,7 +186,7 @@ void Player::UseSkill(ESkillGroup groupId)
 	LOG(std::format("Use Skill - {}", static_cast<uint8>(groupId)));
 	auto pkt = PlayerUseSkillPacket(_id, groupId);
 	SessionManager::GetInst().SendPacket(_id, &pkt);
-	SessionManager::GetInst().BroadcastToViewList(&pkt, _id);
+	SessionManager::GetInst().BroadcastToViewList(&pkt, _viewList);
 	ExecuteSkillEffect(*skilltable);
 }
 
