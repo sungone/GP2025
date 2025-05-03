@@ -19,6 +19,9 @@ enum EPacketType : uint8
 	C_EQUIP_ITEM,
 	C_UNEQUIP_ITEM,
 
+	C_CHANGE_ZONE,
+	C_RESPAWN,
+
 	S_LOGIN_SUCCESS,
 	S_LOGIN_FAIL,
 	S_SIGNUP_SUCCESS,
@@ -39,6 +42,7 @@ enum EPacketType : uint8
 	S_REMOVE_MONSTER,
 	S_MONSTER_STATUS_UPDATE,
 	S_DAMAGED_MONSTER,
+	S_PLAYER_DEAD,
 
 	S_ITEM_SPAWN,
 	S_ITEM_DESPAWN,
@@ -50,6 +54,8 @@ enum EPacketType : uint8
 	S_EQUIP_ITEM,
 	S_UNEQUIP_ITEM,
 
+	S_CHANGE_ZONE,
+	S_RESPAWN,
 };
 
 using ECharacterType = uint8;
@@ -181,4 +187,14 @@ enum ECharacterStateType : uint32
 	STATE_SKILL_E = 1 << 7,
 	STATE_SKILL_R = 1 << 8,
 	STATE_AIMING = 1 << 9,
+};
+
+enum class ZoneType: uint8
+{
+	PLAYGROUND,//test¿ë
+	TUK,
+	TIP,
+	E,
+	INDUSTY,
+	GYM,
 };

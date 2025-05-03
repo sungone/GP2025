@@ -1,16 +1,6 @@
 #pragma once
 #include "NavMesh.h"
 
-enum class ZoneType
-{
-	PLAYGROUND,//test¿ë
-	TUK,
-	TIP,
-	E,
-	INDUSTY,
-	GYM,
-};
-
 class Map
 {
 public:

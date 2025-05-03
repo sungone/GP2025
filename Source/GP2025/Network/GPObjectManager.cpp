@@ -351,3 +351,15 @@ void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType, const FStatDa
 {
 
 }
+
+void UGPObjectManager::ChangeZone(ZoneType zone, const FVector& pos)
+{
+}
+
+void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
+{
+}
+
+void UGPObjectManager::HandlePlayerDeath(int32 playerId)
+{
+}

@@ -32,6 +32,9 @@ public:
 	void HandleEquipItemPacket(int32 sessionId, Packet* packet);
 	void HandleUnequipItemPacket(int32 sessionId, Packet* packet);
 
+	void HandleZoneChangeRequestPacket(int32 sessionId, Packet* packet);
+	void HandleRespawnRequestPacket(int32 sessionId, Packet* packet);
+
 private:
 	SessionManager& _sessionMgr = SessionManager::GetInst();
 	DBManager& _dbMgr = DBManager::GetInst();

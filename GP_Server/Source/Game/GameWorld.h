@@ -40,6 +40,9 @@ public:
 	void EquipInventoryItem(int32 playerId, uint32 itemId);
 	void UnequipInventoryItem(int32 playerId, uint32 itemId);
 
+	FVector TransferToZone(int32 playerId, ZoneType targetZone);
+	FVector RespawnPlayer(int32 playerId, ZoneType targetZone);
+
 	void UpdateViewList(std::shared_ptr<Character> character);
 	bool IsCollisionDetected(const FVector& pos);
 	bool IsCollisionDetected(const FInfoData& target);

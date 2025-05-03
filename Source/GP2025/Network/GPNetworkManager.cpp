@@ -192,6 +192,18 @@ void UGPNetworkManager::SendMyUseSkill(ESkillGroup SkillGID, float PlayerYaw)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
+void UGPNetworkManager::SendMyZoneChangePacket(ZoneType zone)
+{
+	RequestZoneChangePacket Packet(zone);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendMyRespawnPacket(ZoneType zone)
+{
+	RespawnRequestPacket Packet(zone);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
 void UGPNetworkManager::ReceiveData()
 {
 	uint32 DataSize;
@@ -388,6 +400,25 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->UnequipItem(Pkt->PlayerID, Pkt->ItemType, Pkt->Stats);
 				break;
 			}
+			case EPacketType::S_CHANGE_ZONE:
+			{
+				ChangeZonePacket* Pkt = reinterpret_cast<ChangeZonePacket*>(RemainingData.GetData());
+				ObjectMgr->ChangeZone(Pkt->TargetZone, Pkt->RandomPos);
+				break;
+			}
+			case EPacketType::S_RESPAWN:
+			{
+				RespawnPacket* Pkt = reinterpret_cast<RespawnPacket*>(RemainingData.GetData());
+				ObjectMgr->RespawnMyPlayer(Pkt->PlayerInfo);
+				break;
+			}
+			case EPacketType::S_PLAYER_DEAD:
+			{
+				PlayerDeadPacket* Pkt = reinterpret_cast<PlayerDeadPacket*>(RemainingData.GetData());
+				ObjectMgr->HandlePlayerDeath(Pkt->PlayerID);
+				break;
+			}
+
 #pragma endregion
 			default:
 				UE_LOG(LogTemp, Warning, TEXT("Unknown Packet Type received."));
