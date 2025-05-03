@@ -379,13 +379,13 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_EQUIP_ITEM:
 			{
 				ItemPkt::EquipItemPacket* Pkt = reinterpret_cast<ItemPkt::EquipItemPacket*>(RemainingData.GetData());
-				ObjectMgr->EquipItem(Pkt->PlayerID, Pkt->ItemType);
+				ObjectMgr->EquipItem(Pkt->PlayerID, Pkt->ItemType, Pkt->Stats);
 				break;
 			}
 			case EPacketType::S_UNEQUIP_ITEM:
 			{
 				ItemPkt::UnequipItemPacket* Pkt = reinterpret_cast<ItemPkt::UnequipItemPacket*>(RemainingData.GetData());
-				ObjectMgr->UnequipItem(Pkt->PlayerID, Pkt->ItemType);
+				ObjectMgr->UnequipItem(Pkt->PlayerID, Pkt->ItemType, Pkt->Stats);
 				break;
 			}
 #pragma endregion

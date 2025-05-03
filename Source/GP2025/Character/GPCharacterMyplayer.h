@@ -75,6 +75,6 @@ public :
 
 	// <CharacterInfo>
 public :
-	virtual void SetCharacterInfo(FInfoData& CharacterInfo_) override;
+	virtual void SetCharacterInfo(const FInfoData& CharacterInfo_) override;
 	int32 PrevLevel = 1;
 };

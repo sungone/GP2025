@@ -144,7 +144,7 @@ void AGPCharacterBase::PostInitializeComponents()
 }
 
 
-void AGPCharacterBase::SetCharacterInfo(FInfoData& CharacterInfo_)
+void AGPCharacterBase::SetCharacterInfo(const FInfoData& CharacterInfo_)
 {
 	CharacterInfo = CharacterInfo_;
 

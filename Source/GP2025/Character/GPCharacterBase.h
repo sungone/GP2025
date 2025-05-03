@@ -32,7 +32,7 @@ public:
 	virtual void SetCharacterType(ECharacterType NewCharacterType);
 
 	// <CharacterInfo>
-	virtual void SetCharacterInfo(FInfoData& CharacterInfo_);
+	virtual void SetCharacterInfo(const FInfoData& CharacterInfo_);
 	virtual void SetNameByCharacterInfo();
 	FInfoData CharacterInfo;
 

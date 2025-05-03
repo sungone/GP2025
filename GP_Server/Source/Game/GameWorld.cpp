@@ -315,7 +315,7 @@ void GameWorld::EquipInventoryItem(int32 playerId, uint32 itemId)
 		return;
 	}
 	uint8 itemType = player->EquipItem(itemId);
-	auto pkt1 = ItemPkt::EquipItemPacket(playerId, itemType);
+	auto pkt1 = ItemPkt::EquipItemPacket(playerId, itemType, player->GetStats());
 	SessionManager::GetInst().BroadcastToViewList(&pkt1, playerId);
 }
 
@@ -328,7 +328,7 @@ void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
 		return;
 	}
 	uint8 itemType = player->UnequipItem(itemId);
-	auto pkt1 = ItemPkt::UnequipItemPacket(playerId, itemType);
+	auto pkt1 = ItemPkt::UnequipItemPacket(playerId, itemType, player->GetStats());
 	SessionManager::GetInst().BroadcastToViewList(&pkt1, playerId);
 }
 
