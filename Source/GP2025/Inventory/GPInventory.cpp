@@ -79,16 +79,19 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
     {
     case ECategory::sword:
     case ECategory::bow:
+        NewSlot->SlotData.ItemType = EItemTypes::Weapon;
         TargetArray = &WeaponSlots;
         break;
 
     case ECategory::helmet:
     case ECategory::chest:
+        NewSlot->SlotData.ItemType = EItemTypes::Armor;
         TargetArray = &ArmorSlots;
         break;
 
     case ECategory::consumable:
     case ECategory::Quest:
+        NewSlot->SlotData.ItemType = EItemTypes::Eatables;
         TargetArray = &EatableSlots;
         break;
 
