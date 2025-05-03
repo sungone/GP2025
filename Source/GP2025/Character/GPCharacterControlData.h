@@ -103,4 +103,14 @@ public:
 	// 무기 타입
 	UPROPERTY(EditAnywhere, Category = "WeaponType")
 	TSubclassOf<class AGPWeaponBase> WeaponClass;
+
+	// 몬스터의 캡슐 세팅
+	UPROPERTY(EditAnywhere, Category = "Capsule")
+	float CapsuleHalfHeight = 99.f;
+	  
+	UPROPERTY(EditAnywhere, Category = "Capsule")
+	float CapsuleRadius = 42.f;
+
+	UPROPERTY(EditAnywhere, Category = "Capsule")
+	uint8 bIsBoos : 1;
 };

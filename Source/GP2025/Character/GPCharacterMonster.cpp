@@ -33,9 +33,29 @@ void AGPCharacterMonster::SetCharacterData(const UGPCharacterControlData* Charac
 	Super::SetCharacterData(CharacterControlData);
 	GetMesh()->SetSkeletalMesh(CharacterControlData->SkeletalMesh);
 	GetMesh()->SetAnimInstanceClass(CharacterControlData->AnimBlueprint);
+
+	GetCapsuleComponent()->SetCapsuleHalfHeight(CharacterControlData->CapsuleHalfHeight);
+	GetCapsuleComponent()->SetCapsuleRadius(CharacterControlData->CapsuleRadius);
+
+	if (CharacterControlData->bIsBoos)
+		ApplyCapsuleAndMeshScaling(CharacterControlData->CapsuleRadius, CharacterControlData->CapsuleHalfHeight);
 }
 
 void AGPCharacterMonster::SetCharacterType(ECharacterType NewCharacterControlType)
 {
 	Super::SetCharacterType(NewCharacterControlType);
+}
+
+void AGPCharacterMonster::ApplyCapsuleAndMeshScaling(float CapsuleRadius, float CapsuleHalfHeight)
+{
+	const float BaseRadius = 42.f;
+	const float BaseHalfHeight = 99.f;
+		
+	const float RadiusScaleRatio = CapsuleRadius / BaseRadius;
+	const float HeightScaleRatio = CapsuleHalfHeight / BaseHalfHeight;
+
+	const float FinalScale = (RadiusScaleRatio + HeightScaleRatio) * 0.5f;
+
+	GetMesh()->SetWorldScale3D(FVector(FinalScale));
+	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -CapsuleHalfHeight));
 }

@@ -21,4 +21,7 @@ public:
 public:
 	virtual void SetCharacterData(const class UGPCharacterControlData* CharacterControlData) override;
 	virtual void SetCharacterType(ECharacterType NewCharacterControlType) override;
+
+	// Ä¸½¶¿¡ ¸ÂÃç¼­ ¸Þ½Ã Å©±â Á¶Á¤
+	void ApplyCapsuleAndMeshScaling(float CapsuleRadius, float CapsuleHalfHeight);
 };
