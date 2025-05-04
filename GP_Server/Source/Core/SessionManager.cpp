@@ -36,6 +36,9 @@ void SessionManager::HandleRecvBuffer(int32 id, int32 recvByte, ExpOver* expOver
 void SessionManager::HandleLogin(int32 sessionId, const DBLoginResult& dbRes)
 {
 	_sessions[sessionId]->Login(dbRes);
+	auto& playerInfo = _sessions[sessionId]->GetPlayerInfo();
+	SignUpSuccessPacket spkt;
+	SendPacket(sessionId, &spkt);
 }
 
 void SessionManager::SendPacket(int32 sessionId, const Packet* packet)

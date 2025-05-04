@@ -2,6 +2,8 @@
 #include "Common.h"
 
 constexpr float VIEW_DIST = 5000.f;
+constexpr float playerCollision = 50.f;
+
 class Character
 {
 public:
@@ -30,6 +32,7 @@ public:
 	virtual void ChangeState(ECharacterStateType newState) = 0;
 	FInfoData& GetInfo() { return _info; }
 	void SetInfo(const FInfoData& info) { _info = info; }
+	void SetPos(const FVector& pos) { _info.Pos = pos; }
 	bool IsMonster() const {
 		return _info.ID >= MAX_PLAYER;
 	}

@@ -11,13 +11,9 @@ void Player::Init()
 	SetCharacterType(Type::EPlayer::WARRIOR);
 	_info.Stats.Level = 1;
 	_info.Stats.Speed = 200.f;
-	_info.CollisionRadius = 50.f;
+	_info.CollisionRadius = playerCollision;
 	_info.State = ECharacterStateType::STATE_IDLE;
 	ApplyLevelStats(_info.Stats.Level);
-	FVector newPos{};
-	do { newPos = Map::GetInst().GetRandomPos(ZoneType::PLAYGROUND, _info.CollisionRadius); }
-	while (GameWorld::GetInst().IsCollisionDetected(newPos));
-	_info.SetLocation(newPos);
 #endif
 }
 
@@ -37,17 +33,11 @@ void Player::SetCharacterType(Type::EPlayer type)
 	{
 		_info.fovAngle = 90;
 		_info.AttackRadius = 300;
-		//LearnSkill(ESkillGroup::HitHard);
-		//LearnSkill(ESkillGroup::Clash);
-		//LearnSkill(ESkillGroup::Whirlwind);
 	}
 	else
 	{
 		_info.fovAngle = 10;
 		_info.AttackRadius = 1500;
-		//LearnSkill(ESkillGroup::Throwing);
-		//LearnSkill(ESkillGroup::FThrowing);
-		//LearnSkill(ESkillGroup::Anger);
 	}
 }
 
@@ -153,9 +143,7 @@ bool Player::Attack(std::shared_ptr<Character> monster)
 	if (!IsInAttackRange(monster->GetInfo()))
 		return false;
 
-	//float atkDamage = GetAttackDamage();
-	//for test
-	float atkDamage = 300;
+	float atkDamage = GetAttackDamage();
 	if (atkDamage > 0.0f)
 	{
 		monster->OnDamaged(atkDamage);

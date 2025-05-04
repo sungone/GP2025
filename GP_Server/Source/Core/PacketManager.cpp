@@ -100,9 +100,6 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 		return;
 	}
 	_sessionMgr.HandleLogin(sessionId, res);
-	auto& playerInfo = _gameWorld.GetInfo(sessionId);
-	SignUpSuccessPacket spkt;
-	_sessionMgr.SendPacket(sessionId, &spkt);
 	LOG(std::format("SignUp Success [{}] userId: {}", sessionId, res.dbId));
 	return;
 #endif
@@ -176,10 +173,9 @@ void PacketManager::HandleEnterGamePacket(int32 sessionId, Packet* packet)
 
 	session->EnterGame();
 	_gameWorld.PlayerEnterGame(player);
-	auto& playerInfo = _gameWorld.GetInfo(sessionId);
+	auto& playerInfo = player->GetInfo();
 	EnterGamePacket enterpkt(playerInfo);
 	_sessionMgr.SendPacket(sessionId, &enterpkt);
-
 	//실패처리를 따로 할까나말까나..
 }
 

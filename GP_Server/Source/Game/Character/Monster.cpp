@@ -7,15 +7,15 @@ void Monster::Init()
 {
 	Character::Init();
 
-	auto typeId = RandomUtils::GetRandomUint8((uint8)Type::EMonster::ENERGY_DRINK, (uint8)Type::EMonster::TINO);
-	auto data = MonsterTable::GetInst().GetMonsterByTypeId(typeId);
+	auto data = MonsterTable::GetInst().GetMonsterByTypeId(static_cast<uint8>(_monType));
 	if (!data)
 	{
 		LOG(Warning, "Invaild");
 		return;
 	}
 	FVector newPos{};
-	do { newPos = Map::GetInst().GetRandomPos(ZoneType::TUK, _info.CollisionRadius); } while (GameWorld::GetInst().IsCollisionDetected(newPos));
+	do { newPos = Map::GetInst().GetRandomPos(_zone, _info.CollisionRadius); }
+	while (GameWorld::GetInst().IsCollisionDetected(newPos, _info.CollisionRadius));
 	_info.SetLocation(newPos);
 	_info.SetName(ConvertToWString(data->Name) + std::to_wstring(_id));
 	_info.CharacterType = data->TypeId;

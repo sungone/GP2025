@@ -27,8 +27,7 @@ public:
 
 	// Monster
 	void CreateMonster();
-	void UpdateMonster();
-	void BroadcastMonsterStates();
+	void UpdateAllMonsters();
 
 	// Inventory
 	void PickUpWorldItem(int32 playerId, uint32 itemId);
@@ -47,8 +46,7 @@ public:
 	FVector TransferToZone(int32 playerId, ZoneType targetZone);
 	FVector RespawnPlayer(int32 playerId, ZoneType targetZone);
 	void UpdateViewList(std::shared_ptr<Character> character);
-	bool IsCollisionDetected(const FVector& pos);
-	bool IsCollisionDetected(const FInfoData& target);
+	bool IsCollisionDetected(const FVector& pos, float dist);
 
 	std::shared_ptr<Player> GetPlayerByID(int32 id);
 	std::shared_ptr<Monster> GetMonsterByID(int32 id);
@@ -56,15 +54,28 @@ public:
 
 	FInfoData& GetInfo(int32 id);
 	bool IsMonster(int32 id);
+	int32 GenerateMonsterId() { return _nextMonsterId++; }
+
+	static inline const std::vector<std::tuple<ZoneType, Type::EMonster, int>> _spawnTable = {
+		{ ZoneType::GYM, Type::EMonster::TINO, 1},
+		{ ZoneType::TUK, Type::EMonster::ENERGY_DRINK, 100},
+		{ ZoneType::TUK, Type::EMonster::BUBBLE_TEA, 100},
+		{ ZoneType::TUK, Type::EMonster::COFFEE, 50},
+		{ ZoneType::E, Type::EMonster::MOUSE, 5},
+		{ ZoneType::E, Type::EMonster::KEYBOARD, 5},
+		{ ZoneType::E, Type::EMonster::DESKTOP, 1},
+		{ ZoneType::INDUSTY, Type::EMonster::COGWHEEL, 5},
+		{ ZoneType::INDUSTY, Type::EMonster::BOLT_NUT, 5},
+		{ ZoneType::INDUSTY, Type::EMonster::DRILL, 1},
+	};
 private:
 	std::array<std::shared_ptr<Player>, MAX_PLAYER> _players;
-	std::unordered_map<int32, std::shared_ptr<Monster>> _monsters;
+	std::unordered_map<ZoneType, std::unordered_map<int32, std::shared_ptr<Monster>>> _monstersByZone;
 	std::vector<std::shared_ptr<WorldItem>> _worldItems;
 
 	std::mutex _playerMutex;
 	std::mutex _monsterMutex;
 	std::mutex _iMutex;
-
-	std::atomic<bool> _updating{ false };
+	int32 _nextMonsterId = MAX_PLAYER;
 };
 

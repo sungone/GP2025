@@ -8,7 +8,12 @@ const float detectDist = 1000.f;
 class Monster : public Character, public std::enable_shared_from_this<Monster>
 {
 public:
-	Monster(int32 id): Character(id) { Init(); }
+	Monster(int32 id) : Character(id) { Init(); }
+	Monster(int32 id, ZoneType zone, Type::EMonster monType)
+		: Character(id), _zone(zone), _monType(monType)
+	{
+		Init();
+	}
 	void Init() override;
 	void UpdateViewList(std::shared_ptr<Character> other) override;
 	void Update();
@@ -32,6 +37,8 @@ private:
 		_info.State = newState;
 	}
 private:
+	ZoneType _zone;
+	Type::EMonster _monType;
 	FVector& _pos = _info.Pos;
 	std::shared_ptr<Player> _target = nullptr;
 };
