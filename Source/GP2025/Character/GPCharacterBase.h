@@ -45,6 +45,9 @@ public:
 	void HandleRemoteJumpSync();
 	float Ground_ZLocation = 162.55f;
 	void SetGroundZLocation(float Z);
+	void UpdateGroundZLocation();
+	float GroundTraceElapsedTime = 0.f;
+	const float GroundTraceInterval = 1.f;
 
 	// <Appearance>
 	virtual USkeletalMeshComponent* GetCharacterMesh() const;

@@ -256,12 +256,22 @@ void AGPCharacterBase::HandleRemoteMovementSync(float DeltaTime)
 
 void AGPCharacterBase::HandleRemoteJumpSync()
 {
-	const float ZAcceptableRangeValues = 10.f;
+	// Z값 동기화
+	GroundTraceElapsedTime += GetWorld()->GetDeltaSeconds();
+	if (GroundTraceElapsedTime >= GroundTraceInterval)
+	{
+		UpdateGroundZLocation();
+		GroundTraceElapsedTime = 0.f;
+	}
+
+	const float ZAcceptableRangeValues = 15.f;
+	float DeltaZ = FMath::Abs(GetActorLocation().Z - Ground_ZLocation);
+
 	if (CharacterInfo.HasState(STATE_JUMP))
 	{
 		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 	}
-	else if (GetActorLocation().Z < Ground_ZLocation + ZAcceptableRangeValues)
+	else if (DeltaZ < ZAcceptableRangeValues)
 	{
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	}
@@ -270,6 +280,20 @@ void AGPCharacterBase::HandleRemoteJumpSync()
 void AGPCharacterBase::SetGroundZLocation(float Z)
 {
 	Ground_ZLocation = Z;
+}
+
+void AGPCharacterBase::UpdateGroundZLocation()
+{
+	FHitResult Hit;
+	FVector Start = GetActorLocation();
+	FVector End = Start - FVector(0, 0, 1000.0f);
+
+	FCollisionQueryParams Params(NAME_None, false, this);
+	if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	{
+		const float CapsuleHalfHeight = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
+		Ground_ZLocation = Hit.ImpactPoint.Z + CapsuleHalfHeight;
+	}
 }
 
 USkeletalMeshComponent* AGPCharacterBase::GetCharacterMesh() const

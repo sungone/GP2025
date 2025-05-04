@@ -5,6 +5,7 @@
 #include "Character/GPCharacterMyplayer.h"
 #include "Network/GPNetworkManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GPMyplayerNetworkSyncHandler.h"
 
 
@@ -33,6 +34,7 @@ void UGPMyplayerNetworkSyncHandler::Tick(float DeltaTime)
 	Owner->CharacterInfo.Stats.Speed = CurrentSpeed;
 
 	HandleIdleState();
+	Owner->UpdateGroundZLocation();
 	HandleJumpState();
 	HandleRotationChange();
 	HandlePeriodicSend();
