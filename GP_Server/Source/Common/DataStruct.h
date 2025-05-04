@@ -132,7 +132,8 @@ struct FInfoData
 	void AddState(ECharacterStateType NewState) { State |= NewState; }
 	void RemoveState(ECharacterStateType RemoveState) { State &= ~RemoveState; }
 	bool HasState(ECharacterStateType CheckState) const { return (State & CheckState) != 0; }
-
+	void SetZone(ZoneType zone) { CurrentZone = zone; }
+	ZoneType GetZone() const { return CurrentZone; }
 	int32 GetLevel() const { return Stats.Level; }
 	float GetHp() const { return Stats.Hp; }
 	float GetMaxHp() const { return Stats.MaxHp; }

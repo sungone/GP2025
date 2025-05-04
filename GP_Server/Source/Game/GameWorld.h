@@ -17,7 +17,6 @@ public:
 	// Player
 	void PlayerEnterGame(std::shared_ptr<Player> player);
 	void PlayerLeaveGame(int32 playerId);
-	void RemoveCharacter(int32 id);
 	void PlayerSetYaw(int32 playerId, float yaw);
 	void PlayerAddState(int32 playerId, ECharacterStateType newState);
 	void PlayerRemoveState(int32 playerId, ECharacterStateType oldState);
@@ -27,6 +26,7 @@ public:
 
 	// Monster
 	void CreateMonster();
+	void RemoveMonster(int32 id);
 	void UpdateAllMonsters();
 
 	// Inventory
@@ -46,7 +46,7 @@ public:
 	FVector TransferToZone(int32 playerId, ZoneType targetZone);
 	FVector RespawnPlayer(int32 playerId, ZoneType targetZone);
 	void UpdateViewList(std::shared_ptr<Character> character);
-	bool IsCollisionDetected(const FVector& pos, float dist);
+	bool IsCollisionDetected(ZoneType zone, const FVector& pos, float dist);
 
 	std::shared_ptr<Player> GetPlayerByID(int32 id);
 	std::shared_ptr<Monster> GetMonsterByID(int32 id);
@@ -70,12 +70,14 @@ public:
 	};
 private:
 	std::array<std::shared_ptr<Player>, MAX_PLAYER> _players;
+	std::unordered_map<ZoneType, std::unordered_map<int32, std::shared_ptr<Player>>> _playersByZone;
 	std::unordered_map<ZoneType, std::unordered_map<int32, std::shared_ptr<Monster>>> _monstersByZone;
 	std::vector<std::shared_ptr<WorldItem>> _worldItems;
 
-	std::mutex _playerMutex;
-	std::mutex _monsterMutex;
-	std::mutex _iMutex;
+	std::mutex _mtPlayers;
+	std::mutex _mtPlayerZMap;
+	std::mutex _mtMonZMap;
+	std::mutex _mtItem;
 	int32 _nextMonsterId = MAX_PLAYER;
 };
 

@@ -23,13 +23,13 @@ bool GameWorld::Init()
 std::shared_ptr<Player> GameWorld::GetPlayerByID(int32 id)
 {
 	if (id < 0 || id >= MAX_PLAYER) return nullptr;
-	std::unique_lock lock(_playerMutex);
+	std::unique_lock lock(_mtPlayers);
 	return _players[id];
 }
 
 std::shared_ptr<Monster> GameWorld::GetMonsterByID(int32 id)
 {
-	std::lock_guard lock(_monsterMutex);
+	std::lock_guard lock(_mtMonZMap);
 	for (auto& [zone, zoneMap] : _monstersByZone)
 	{
 		auto it = zoneMap.find(id);
@@ -58,72 +58,68 @@ bool GameWorld::IsMonster(int32 id)
 void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 {
 	FVector newPos;
+	ZoneType startZone = ZoneType::TUK;
 	float radius = playerCollision;
 	do {
-		newPos = Map::GetInst().GetRandomPos(ZoneType::TUK, radius);
-	} while (GameWorld::GetInst().IsCollisionDetected(newPos, radius));
+		newPos = Map::GetInst().GetRandomPos(startZone, radius);
+	} while (GameWorld::GetInst().IsCollisionDetected(startZone, newPos, radius));
 	player->SetPos(newPos);
+
+	int32 id = player->GetInfo().ID;
+	player->GetInfo().SetZone(startZone);
+
 	{
-		std::lock_guard lock(_playerMutex);
-		int32 id = player->GetInfo().ID;
+		std::lock_guard lock(_mtPlayers);
 		_players[id] = player;
 	}
+
+	{
+		std::lock_guard lock(_mtPlayerZMap);
+		_playersByZone[startZone][id] = player;
+	}
+
 	UpdateViewList(player);
 }
 
 void GameWorld::PlayerLeaveGame(int32 id)
 {
-	RemoveCharacter(id);
-}
+	std::shared_ptr<Player> player;
+	std::unordered_set<int32> viewList;
+	ZoneType zone;
+	InfoPacket pkt(InfoPacket(EPacketType::S_REMOVE_PLAYER, {}));
 
-void GameWorld::RemoveCharacter(int32 id)
-{
-	if (id < MAX_PLAYER)
+	std::lock_guard<std::mutex> lock(_mtPlayers);
 	{
-		std::lock_guard<std::mutex> lock(_playerMutex);
-		auto player = _players[id];
+		player = _players[id];
 		if (!player) return;
-		auto pkt = InfoPacket(EPacketType::S_REMOVE_PLAYER, player->GetInfo());
-		std::unordered_set<int32> viewList;
+		zone = player->GetZone();
+		pkt = InfoPacket(EPacketType::S_REMOVE_PLAYER, player->GetInfo());
 		{
+			std::lock_guard lock(player->_vlLock);
 			viewList = player->GetViewList();
 		}
-		SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
 
 		_players[id] = nullptr;
-		for (auto& p : _players)
-			if (p) { p->RemoveFromViewList(id); }
-
-		{
-			std::lock_guard<std::mutex> mlock(_monsterMutex);
-			for (auto& [zone, zoneMap] : _monstersByZone)
-				for (auto& [mid, m] : zoneMap)
-					if (m) m->RemoveFromViewList(id);
-		}
 	}
-	else
+	SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
+
 	{
-		std::lock_guard<std::mutex> lock(_monsterMutex);
-		for (auto& [zone, zoneMap] : _monstersByZone)
+		std::lock_guard lock(_mtPlayerZMap);
+		auto& players = _playersByZone[zone];
+		for (auto& [pid, p] : players)
+			if (p) p->RemoveFromViewList(id);
+		players.erase(id);
+		if (players.empty())
+			_playersByZone.erase(zone);
+	}
+	{
+		std::lock_guard<std::mutex> lock(_mtMonZMap);
+		auto& monsters = _monstersByZone[zone];
 		{
-			auto it = zoneMap.find(id);
-			if (it == zoneMap.end()) continue;
-
-			auto monster = it->second;
-			InfoPacket pkt(EPacketType::S_REMOVE_MONSTER, monster->GetInfo());
-			std::unordered_set<int32> viewList;
+			for (auto& [mid, m] : monsters)
 			{
-				viewList = monster->GetViewList();
+				m->RemoveFromViewList(id);
 			}
-			SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
-
-			zoneMap.erase(it);
-			break;
-		}
-		{
-			std::lock_guard plock(_playerMutex);
-			for (auto& p : _players)
-				if (p) { p->RemoveFromViewList(id); }
 		}
 	}
 }
@@ -151,6 +147,7 @@ void GameWorld::PlayerAddState(int32 playerId, ECharacterStateType newState)
 	auto upkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
 	std::unordered_set<int32> viewList;
 	{
+		std::lock_guard lock(player->_vlLock);
 		viewList = player->GetViewList();
 	}
 	SessionManager::GetInst().BroadcastToViewList(&upkt, viewList);
@@ -168,6 +165,7 @@ void GameWorld::PlayerRemoveState(int32 playerId, ECharacterStateType oldState)
 	auto upkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
 	std::unordered_set<int32> viewList;
 	{
+		std::lock_guard lock(player->_vlLock);
 		viewList = player->GetViewList();
 	}
 	SessionManager::GetInst().BroadcastToViewList(&upkt, viewList);
@@ -190,6 +188,7 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 	auto upkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
 	std::unordered_set<int32> viewList;
 	{
+		std::lock_guard lock(player->_vlLock);
 		viewList = player->GetViewList();
 	}
 	SessionManager::GetInst().BroadcastToViewList(&upkt, viewList);
@@ -203,8 +202,12 @@ void GameWorld::PlayerAttack(int32 playerId)
 		LOG(Warning, "Invaild!");
 		return;
 	}
-
-	for (int32 targetId : player->GetViewList())
+	std::unordered_set<int32> viewList;
+	{
+		std::lock_guard lock(player->_vlLock);
+		viewList = player->GetViewList();
+	}
+	for (int32 targetId : viewList)
 	{
 		if (!IsMonster(targetId)) continue;
 		auto monster = GetMonsterByID(targetId);
@@ -214,17 +217,12 @@ void GameWorld::PlayerAttack(int32 playerId)
 		{
 			player->AddExp(10 * monster->GetInfo().GetLevel());
 			SpawnWorldItem({ monster->GetInfo().Pos.X, monster->GetInfo().Pos.Y, monster->GetInfo().Pos.Z + 20 });
-			RemoveCharacter(targetId);
+			RemoveMonster(targetId);
 		}
 	}
 
 	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
 	SessionManager::GetInst().SendPacket(playerId, &infopkt);
-	std::unordered_set<int32> viewList;
-	{
-		std::lock_guard lock(player->_vlLock);
-		viewList = player->GetViewList();
-	}
 	SessionManager::GetInst().BroadcastToViewList(&infopkt, viewList);
 }
 
@@ -252,10 +250,38 @@ void GameWorld::CreateMonster()
 			auto monster = std::make_shared<Monster>(id, zone, typeId);
 			monster->Init();
 			{
-				std::lock_guard lock(_monsterMutex);
+				std::lock_guard lock(_mtMonZMap);
 				zoneMap[id] = monster;
 			}
+			LOG(std::format("id- {}", id));
 		}
+	}
+}
+
+void GameWorld::RemoveMonster(int32 id)
+{
+	std::lock_guard<std::mutex> lock(_mtMonZMap);
+	for (auto& [zone, zoneMap] : _monstersByZone)
+	{
+		auto it = zoneMap.find(id);
+		if (it == zoneMap.end()) continue;
+
+		auto monster = it->second;
+		InfoPacket pkt(EPacketType::S_REMOVE_MONSTER, monster->GetInfo());
+		std::unordered_set<int32> viewList;
+		{
+			std::lock_guard lock(monster->_vlLock);
+			viewList = monster->GetViewList();
+		}
+		SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
+
+		zoneMap.erase(it);
+		break;
+	}
+	{
+		std::lock_guard plock(_mtPlayers);
+		for (auto& p : _players)
+			if (p) { p->RemoveFromViewList(id); }
 	}
 }
 
@@ -263,7 +289,7 @@ void GameWorld::UpdateAllMonsters()
 {
 	std::vector<std::pair<int32, FInfoData>> snaps;
 	{
-		std::lock_guard lock(_monsterMutex);
+		std::lock_guard lock(_mtMonZMap);
 		for (auto& [zone, zoneMap] : _monstersByZone)
 		{
 			for (auto& [id, monster] : zoneMap)
@@ -282,6 +308,7 @@ void GameWorld::UpdateAllMonsters()
 		auto monster = GetMonsterByID(id);
 		std::unordered_set<int32> viewList;
 		{
+			std::lock_guard lock(monster->_vlLock);
 			viewList = monster->GetViewList();
 		}
 
@@ -323,7 +350,7 @@ std::shared_ptr<WorldItem> GameWorld::FindWorldItemById(uint32 itemId)
 
 void GameWorld::SpawnWorldItem(FVector position)
 {
-	std::lock_guard<std::mutex> lock(_iMutex);
+	std::lock_guard<std::mutex> lock(_mtItem);
 	auto newItem = std::make_shared<WorldItem>(position);
 	ItemPkt::SpawnPacket packet(newItem->GetItemID(), newItem->GetItemTypeID(), position);
 	_worldItems.emplace_back(newItem);
@@ -332,7 +359,7 @@ void GameWorld::SpawnWorldItem(FVector position)
 
 void GameWorld::SpawnWorldItem(WorldItem dropedItem)
 {
-	std::lock_guard<std::mutex> lock(_iMutex);
+	std::lock_guard<std::mutex> lock(_mtItem);
 	auto newItem = std::make_shared<WorldItem>(dropedItem);
 	_worldItems.emplace_back(newItem);
 	ItemPkt::DropPacket packet(newItem->GetItemID(), newItem->GetItemTypeID(), newItem->GetPos());
@@ -341,7 +368,7 @@ void GameWorld::SpawnWorldItem(WorldItem dropedItem)
 
 void GameWorld::PickUpWorldItem(int32 playerId, uint32 itemId)
 {
-	std::lock_guard<std::mutex> lock(_iMutex);
+	std::lock_guard<std::mutex> lock(_mtItem);
 	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
@@ -405,6 +432,7 @@ void GameWorld::EquipInventoryItem(int32 playerId, uint32 itemId)
 	uint8 itemTypeID = player->EquipItem(itemId);
 	std::unordered_set<int32> viewList;
 	{
+		std::lock_guard lock(player->_vlLock);
 		viewList = player->GetViewList();
 	}
 
@@ -423,6 +451,7 @@ void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
 	uint8 itemTypeID = player->UnequipItem(itemId);
 	std::unordered_set<int32> viewList;
 	{
+		std::lock_guard lock(player->_vlLock);
 		viewList = player->GetViewList();
 	}
 	auto pkt1 = ItemPkt::UnequipItemPacket(playerId, itemTypeID, player->GetStats());
@@ -442,10 +471,11 @@ FVector GameWorld::RespawnPlayer(int32 playerId, ZoneType targetZone)
 void GameWorld::UpdateViewList(std::shared_ptr<Character> listOwner)
 {
 	int32 ownerId = listOwner->GetInfo().ID;
+	ZoneType ownerZone = listOwner->GetZone();
 	if (IsMonster(ownerId))
 	{
-		std::lock_guard lock(_playerMutex);
-		for (const auto& player : _players)
+		std::lock_guard lock(_mtPlayerZMap);
+		for (auto& [pid, player] : _playersByZone[ownerZone])
 		{
 			if (player)
 				listOwner->UpdateViewList(player);
@@ -454,46 +484,40 @@ void GameWorld::UpdateViewList(std::shared_ptr<Character> listOwner)
 	else
 	{
 		{
-			std::lock_guard lock1(_playerMutex);
-			for (auto const& player : _players)
+			std::lock_guard lock(_mtPlayerZMap);
+			for (auto& [pid, player] : _playersByZone[ownerZone])
 			{
-				if (player && player->GetInfo().ID != ownerId)
+				if (player && pid != ownerId)
 					listOwner->UpdateViewList(player);
 			}
 		}
 		{
-			std::lock_guard lock2(_monsterMutex);
-			for (auto& [zone, zoneMap] : _monstersByZone)
+			std::lock_guard lock(_mtMonZMap);
+			for (auto& [mid, monster] : _monstersByZone[ownerZone])
 			{
-				for (auto& [mid, monster] : zoneMap)
-				{
-					if (monster)
-						listOwner->UpdateViewList(monster);
-				}
+				if (monster)
+					listOwner->UpdateViewList(monster);
 			}
 		}
 	}
 }
 
-bool GameWorld::IsCollisionDetected(const FVector& pos, float dist)
+bool GameWorld::IsCollisionDetected(ZoneType zone, const FVector& pos, float dist)
 {
 	{
-		std::lock_guard lock1(_playerMutex);
-		for (const auto& player : _players)
+		std::lock_guard lock(_mtPlayerZMap);
+		for (auto& [pid, player] : _playersByZone[zone])
 		{
 			if (player && player->IsCollision(pos, dist))
 				return true;
 		}
 	}
 	{
-		std::lock_guard lock2(_monsterMutex);
-		for (auto& [zone, zoneMap] : _monstersByZone)
+		std::lock_guard lock(_mtMonZMap);
+		for (auto& [mid, monster] : _monstersByZone[zone])
 		{
-			for (auto& [mid, monster] : zoneMap)
-			{
-				if (monster && monster->IsCollision(pos, dist))
-					return true;
-			}
+			if (monster && monster->IsCollision(pos, dist))
+				return true;
 		}
 	}
 	return false;

@@ -208,7 +208,15 @@ FVector NavMesh::GetRandomPositionWithRadius(float radius) const
 		}
 	}
 
-	return FVector(0, 0, 0);
+	{
+		const Triangle& tri = Triangles[RandomUtils::GetRandomInt(0, Triangles.size() - 1)];
+		const FVector& A = Vertices[tri.IndexA];
+		const FVector& B = Vertices[tri.IndexB];
+		const FVector& C = Vertices[tri.IndexC];
+		FVector centroid = (A + B + C) / 3.0f;
+		centroid.Z += 100.0f;
+		return centroid;
+	}
 }
 
 

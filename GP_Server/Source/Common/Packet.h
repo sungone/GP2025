@@ -25,7 +25,6 @@ template<typename T>
 struct TPacket : public Packet
 {
 	T Data;
-
 	TPacket(EPacketType type, const T& payload)
 		: Packet(type), Data(payload)
 	{
