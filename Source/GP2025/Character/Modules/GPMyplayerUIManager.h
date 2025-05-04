@@ -36,6 +36,9 @@ public:
 
 	// InGame
 	void ShowInGameUI();
+	
+	// Quest
+	void AcceptQuest(const FString& QuestID);
 
 public:
 	UPROPERTY()

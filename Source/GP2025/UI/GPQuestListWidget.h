@@ -14,4 +14,13 @@ class GP2025_API UGPQuestListWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+	void NativeConstruct();
+
+	UPROPERTY(meta = (BindWidget), BlueprintReadWrite)
+	class UGPQuestListEntryWidget* TinoQuest;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void ShowQuestEntry(const FString& QuestID);
 };

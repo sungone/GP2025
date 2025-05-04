@@ -5,6 +5,11 @@
 #include "Components/TextBlock.h"  
 #include "Components/Button.h"
 #include "Character/GPCharacterNPC.h"
+#include "kismet/GameplayStatics.h"
+#include "UI/GPInGameWidget.h"
+#include "UI/GPQuestListWidget.h"
+#include "Character/GPCharacterMyplayer.h"
+#include "Character/Modules/GPMyplayerUIManager.h"
 
 void UGPQuestWidget::NativeConstruct()
 {
@@ -19,7 +24,15 @@ void UGPQuestWidget::NativeConstruct()
 
 void UGPQuestWidget::OnQuestAccepted()
 {
-	UE_LOG(LogTemp, Log, TEXT("Quest Accepted Log!"));
+	if (!OwningNPC) return;
+
+	AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (MyPlayer && MyPlayer->UIManager)
+	{
+		MyPlayer->UIManager->GetInGameWidget()->QuestListWidget->ShowQuestEntry(TEXT("TinoQuest"));
+	}
+
+	OwningNPC->ExitInteraction(); 
 }
 
 void UGPQuestWidget::OnQuestExit()

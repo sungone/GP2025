@@ -9,6 +9,7 @@
 #include "UI/GPInGameWidget.h"
 #include "Character/GPCharacterMyplayer.h"
 #include "GPMyplayerUIManager.h"
+#include "UI/GPQuestListWidget.h"
 #include "UI/GPSkillLevelUpText.h"
 
 UGPMyplayerUIManager::UGPMyplayerUIManager()
@@ -174,6 +175,15 @@ void UGPMyplayerUIManager::ShowInGameUI()
 	if (InGameWidget && !InGameWidget->IsInViewport())
 	{
 		InGameWidget->AddToViewport();
+	}
+}
+
+void UGPMyplayerUIManager::AcceptQuest(const FString& QuestID)
+{
+
+	if (GetInGameWidget() && GetInGameWidget()->QuestListWidget)
+	{
+		GetInGameWidget()->QuestListWidget->ShowQuestEntry(QuestID);
 	}
 }
 
