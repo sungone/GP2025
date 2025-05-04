@@ -18,10 +18,10 @@ class WorldItem : public Item
 {
 public:
 	WorldItem(uint32 itemId, uint8 itemTypeID) : Item(itemId, itemTypeID) {}
-	WorldItem(FVector pos);
+	WorldItem(FVector pos, uint32 monlv, Type::EPlayer playertype);
 
-	uint8 GetRandomItemType();
-	Type::EWeapon GetRandomWeapon();
+	uint8 GetRandomItemType(uint32 monlv, Type::EPlayer playertype);
+	Type::EWeapon GetRandomWeapon(Type::EPlayer playertype);
 	Type::EArmor GetRandomArmor();
 	Type::EUseable GetRandomUseable();
 	InventoryItem ToInventoryItem() const;

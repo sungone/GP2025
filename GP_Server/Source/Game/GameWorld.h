@@ -39,7 +39,7 @@ public:
 	// World Item
 	bool RemoveWorldItem(std::shared_ptr<WorldItem> item);
 	std::shared_ptr<WorldItem> FindWorldItemById(uint32 itemId);
-	void SpawnWorldItem(FVector position);
+	void SpawnWorldItem(FVector position, uint32 monlv, Type::EPlayer playertype);
 	void SpawnWorldItem(WorldItem newItem);
 
 	// Etc
@@ -52,7 +52,6 @@ public:
 	std::shared_ptr<Monster> GetMonsterByID(int32 id);
 	std::shared_ptr<Character> GetCharacterByID(int32 id);
 
-	FInfoData& GetInfo(int32 id);
 	bool IsMonster(int32 id);
 	int32 GenerateMonsterId() { return _nextMonsterId++; }
 

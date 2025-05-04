@@ -45,11 +45,6 @@ std::shared_ptr<Character> GameWorld::GetCharacterByID(int32 id)
 	return GetMonsterByID(id);
 }
 
-FInfoData& GameWorld::GetInfo(int32 id)
-{
-	return GetCharacterByID(id)->GetInfo();
-}
-
 bool GameWorld::IsMonster(int32 id)
 {
 	return id >= MAX_PLAYER;
@@ -215,8 +210,11 @@ void GameWorld::PlayerAttack(int32 playerId)
 		if (!player->Attack(monster)) continue;
 		if (monster->IsDead())
 		{
+			uint32 monlv = monster->GetInfo().GetLevel();
+			Type::EPlayer playertype = (Type::EPlayer)player->GetInfo().CharacterType;
 			player->AddExp(10 * monster->GetInfo().GetLevel());
-			SpawnWorldItem({ monster->GetInfo().Pos.X, monster->GetInfo().Pos.Y, monster->GetInfo().Pos.Z + 20 });
+			FVector itemPos = { monster->GetInfo().Pos.X, monster->GetInfo().Pos.Y, monster->GetInfo().Pos.Z + 20 };
+			SpawnWorldItem(itemPos, monlv, playertype);
 			RemoveMonster(targetId);
 		}
 	}
@@ -253,7 +251,6 @@ void GameWorld::CreateMonster()
 				std::lock_guard lock(_mtMonZMap);
 				zoneMap[id] = monster;
 			}
-			LOG(std::format("id- {}", id));
 		}
 	}
 }
@@ -306,6 +303,7 @@ void GameWorld::UpdateAllMonsters()
 		InfoPacket pkt(EPacketType::S_MONSTER_STATUS_UPDATE, info);
 
 		auto monster = GetMonsterByID(id);
+		if (!monster) continue;
 		std::unordered_set<int32> viewList;
 		{
 			std::lock_guard lock(monster->_vlLock);
@@ -348,10 +346,11 @@ std::shared_ptr<WorldItem> GameWorld::FindWorldItemById(uint32 itemId)
 	return nullptr;
 }
 
-void GameWorld::SpawnWorldItem(FVector position)
+void GameWorld::SpawnWorldItem(FVector position, uint32 monlv, Type::EPlayer playertype)
 {
 	std::lock_guard<std::mutex> lock(_mtItem);
-	auto newItem = std::make_shared<WorldItem>(position);
+	auto newItem = std::make_shared<WorldItem>(position, monlv, playertype);
+
 	ItemPkt::SpawnPacket packet(newItem->GetItemID(), newItem->GetItemTypeID(), position);
 	_worldItems.emplace_back(newItem);
 	SessionManager::GetInst().BroadcastToAll(&packet);

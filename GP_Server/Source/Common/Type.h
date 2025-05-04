@@ -104,14 +104,20 @@ namespace Type
 	{
 		NONE,
 		START = 1,
-		BIRD_GUN = START,
+
+		GUN_FIRST = START,
+		BIRD_GUN = GUN_FIRST,
 		PULSE_GUN,
 		POSITRON,
-		PRACS_WORD,
+		GUN_LAST,
+
+		SWORD_FIRST = GUN_LAST,
+		PRAC_SWORD = SWORD_FIRST,
 		PULSE_SWORD,
 		ENERGY_SWORD,
+		SWORD_LAST,
 
-		END
+		END = SWORD_LAST,
 	};
 
 	enum class EArmor : uint8
