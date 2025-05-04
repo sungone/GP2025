@@ -44,7 +44,7 @@ public:
 
 	// Etc
 	FVector TransferToZone(int32 playerId, ZoneType targetZone);
-	FVector RespawnPlayer(int32 playerId, ZoneType targetZone);
+	void RespawnPlayer(int32 playerId, ZoneType targetZone);
 	void UpdateViewList(std::shared_ptr<Character> character);
 	bool IsCollisionDetected(ZoneType zone, const FVector& pos, float dist);
 

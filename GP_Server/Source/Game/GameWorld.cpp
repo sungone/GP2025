@@ -460,12 +460,44 @@ void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
 
 FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
 {
-	return FVector();
+	auto player = GetPlayerByID(playerId);
+	if (!player) return FVector();
+
+	ZoneType oldZone = player->GetZone();
+	float radius = playerCollision;
+	FVector newPos;
+	do {
+		newPos = Map::GetInst().GetRandomPos(targetZone, radius);
+	} while (IsCollisionDetected(targetZone, newPos, radius));
+
+	player->GetInfo().SetLocation(newPos);
+	player->GetInfo().SetZone(targetZone);
+
+	{
+		std::lock_guard lock(_mtPlayerZMap);
+		auto& oldMap = _playersByZone[oldZone];
+		oldMap.erase(playerId);
+		if (oldMap.empty()) _playersByZone.erase(oldZone);
+		_playersByZone[targetZone][playerId] = player;
+	}
+
+	UpdateViewList(player);
+	return newPos;
 }
 
-FVector GameWorld::RespawnPlayer(int32 playerId, ZoneType targetZone)
+void GameWorld::RespawnPlayer(int32 playerId, ZoneType targetZone)
 {
-	return FVector();
+	FVector respawnPos = TransferToZone(playerId, targetZone);
+
+	auto player = GetPlayerByID(playerId);
+	if (player) {
+		auto& info = player->GetInfo();
+		info.Stats.Hp = info.Stats.MaxHp;
+		info.State = ECharacterStateType::STATE_IDLE;
+
+		RespawnPacket pkt(info);
+		SessionManager::GetInst().SendPacket(playerId, &pkt);
+	}
 }
 
 void GameWorld::UpdateViewList(std::shared_ptr<Character> listOwner)

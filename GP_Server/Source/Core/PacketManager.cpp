@@ -259,35 +259,17 @@ void PacketManager::HandleUnequipItemPacket(int32 sessionId, Packet* packet)
 
 void PacketManager::HandleZoneChangeRequestPacket(int32 sessionId, Packet* packet)
 {
-	auto session = _sessionMgr.GetSession(sessionId);
-	if (!session || !session->IsInGame()) return;
-
-	auto player = session->GetPlayer();
-	if (!player) return;
-
 	auto* p = static_cast<RequestZoneChangePacket*>(packet);
 	ZoneType targetZone = p->TargetZone;
 
-	FVector newPos = _gameWorld.TransferToZone(sessionId, targetZone); // 새 위치 반환한다고 가정
-
+	FVector newPos = _gameWorld.TransferToZone(sessionId, targetZone);
 	ChangeZonePacket response(targetZone, newPos);
 	_sessionMgr.SendPacket(sessionId, &response);
 }
 
 void PacketManager::HandleRespawnRequestPacket(int32 sessionId, Packet* packet)
 {
-	auto session = _sessionMgr.GetSession(sessionId);
-	if (!session || !session->IsInGame()) return;
-
-	auto player = session->GetPlayer();
-	if (!player) return;
-
 	auto* p = static_cast<RespawnRequestPacket*>(packet);
 	ZoneType targetZone = p->TargetZone;
-
-	FVector respawnPos = _gameWorld.RespawnPlayer(sessionId, targetZone);
-
-	auto& info = _gameWorld.GetInfo(sessionId);
-	RespawnPacket response(info);
-	_sessionMgr.SendPacket(sessionId, &response);
+	_gameWorld.RespawnPlayer(sessionId, targetZone);
 }
