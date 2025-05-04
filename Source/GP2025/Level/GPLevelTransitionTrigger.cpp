@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "Character/Modules/GPPlayerAppearanceHandler.h"
 #include "Character/GPCharacterMyplayer.h"
+#include "Network/GPNetworkManager.h"
 #include "Physics/GPCollision.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
@@ -74,6 +75,22 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 		LatentInfo.UUID = __LINE__;
 
 		UGameplayStatics::LoadStreamLevel(this, LevelToLoad, true, true, LatentInfo);
+	}
+
+	if (CachedPlayer)
+	{
+		UGPNetworkManager* NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+		if (NetworkMgr)
+		{
+			ZoneType NewZone = ZoneType::TUK;
+
+			if (LevelToLoad == "tip")       NewZone = ZoneType::TIP;
+			else if (LevelToLoad == "E")    NewZone = ZoneType::E;
+			else if (LevelToLoad == "gym")  NewZone = ZoneType::GYM;
+			else if (LevelToLoad == "TUK")  NewZone = ZoneType::TUK;
+
+			NetworkMgr->SendMyZoneChangePacket(NewZone);
+		}
 	}
 }
 
