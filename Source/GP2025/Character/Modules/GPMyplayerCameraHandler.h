@@ -46,4 +46,25 @@ public:
 	FVector ZoomedCameraOffset = FVector(50.f, 30.f, 100.f);
 	float DefaultArmLength = 600.f;
 	float ZoomedArmLength = 150.f;
+
+
+	// Quest NPC 와 상호작용 시 카메라 처리
+public:
+	void StartDialogueCamera(const FVector& TargetLocation);
+	void StopDialogueCamera();
+
+	UPROPERTY()
+	APlayerController* PlayerController;
+
+	UPROPERTY()
+	APawn* PlayerPawn;
+
+	UPROPERTY()
+	class USpringArmComponent* PlayerSpringArm = nullptr;
+
+	FVector LookAtTarget;
+	bool bIsLookingAtTarget = false;
+	bool bIsZoomingForDialogue = false;
+	float DialogueZoomTargetLength = 200.f; 
+	float DefaultZoomLength = 600.f;
 };

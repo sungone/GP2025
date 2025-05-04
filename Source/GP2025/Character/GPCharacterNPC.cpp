@@ -9,6 +9,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Components/SphereComponent.h"
 #include "Character/Modules/GPMyplayerInputHandler.h"
+#include "Character/Modules/GPMyplayerCameraHandler.h"
 #include "Character/GPCharacterMyplayer.h"
 
 AGPCharacterNPC::AGPCharacterNPC()
@@ -120,6 +121,7 @@ void AGPCharacterNPC::OnInteractionExit(UPrimitiveComponent* OverlappedComp, AAc
 			CloseShopUI();
 			break;
 		case ENPCType::QUEST:
+			MyPlayer->CameraHandler->StopDialogueCamera();
 			CloseQuestUI();
 			break;
 		default:
@@ -148,6 +150,7 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 			CloseShopUI();
 			break;
 		case ENPCType::QUEST:
+			MyPlayer->CameraHandler->StopDialogueCamera();
 			CloseQuestUI();
 			break;
 		default:
@@ -163,6 +166,7 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 			OpenShopUI(PC);
 			break;
 		case ENPCType::QUEST:
+			MyPlayer->CameraHandler->StartDialogueCamera(GetActorLocation());
 			OpenQuestUI(PC);
 			break;
 		default:
