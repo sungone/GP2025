@@ -20,6 +20,12 @@ AGPCharacterNPC::AGPCharacterNPC()
 		ShopWidgetClass = ShopBP.Class;
 	}
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> QuestBP(TEXT("/Game/UI/WBP_Quest"));
+	if (QuestBP.Succeeded())
+	{
+		QuestWidgetClass = QuestBP.Class;
+	}
+
 	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBP(TEXT("/Game/UI/WBP_ShopNPCInteraction.WBP_ShopNPCInteraction_C"));
 	if (WidgetBP.Succeeded())
 	{
@@ -91,12 +97,36 @@ void AGPCharacterNPC::CloseShopUI()
 
 void AGPCharacterNPC::OpenQuestUI(APlayerController* PlayerController)
 {
+	if (!QuestWidget && QuestWidgetClass)
+	{
+		QuestWidget = CreateWidget<UUserWidget>(PlayerController, QuestWidgetClass);
+		if (QuestWidget)
+		{
+			QuestWidget->AddToViewport();
+		}
+	}
 
+	if (QuestWidget)
+	{
+		QuestWidget->SetVisibility(ESlateVisibility::Visible);
+		PlayerController->SetInputMode(FInputModeUIOnly());
+		PlayerController->bShowMouseCursor = true;
+	}
 }
 
 void AGPCharacterNPC::CloseQuestUI()
 {
+	if (QuestWidget)
+	{
+		QuestWidget->SetVisibility(ESlateVisibility::Hidden);
 
+		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		if (PC)
+		{
+			PC->SetInputMode(FInputModeGameOnly());
+			PC->bShowMouseCursor = false;
+		}
+	}
 }
 
 void AGPCharacterNPC::OnInteractionToggle(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -167,7 +197,13 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 			break;
 		case ENPCType::QUEST:
 			MyPlayer->CameraHandler->StartDialogueCamera(GetActorLocation());
-			OpenQuestUI(PC);
+			GetWorld()->GetTimerManager().SetTimer(
+				QuestOpenUITimerHandle,
+				this,
+				&AGPCharacterNPC::OpenQuestUIDelayed,
+				1.f,
+				false
+			);
 			break;
 		default:
 			break;
@@ -177,4 +213,13 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 
 	InteractionWidgetComponent->SetVisibility(false);
 	MyPlayer->InputHandler->bGetInteraction = false;
+}
+
+void AGPCharacterNPC::OpenQuestUIDelayed()
+{
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (PC)
+	{
+		OpenQuestUI(PC);
+	}
 }

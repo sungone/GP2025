@@ -69,4 +69,17 @@ public :
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUserWidget> WBPClass_NPCInteraction;
+
+
+	// <Quest>
+	UPROPERTY()
+	UUserWidget* QuestWidget;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> QuestWidgetClass;
+
+	FTimerHandle QuestOpenUITimerHandle;
+
+	UFUNCTION()
+	void OpenQuestUIDelayed();
 };
