@@ -1,21 +1,22 @@
 #include "pch.h"
 #include "Item.h"
 #include "InventoryItem.h"
-WorldItem::WorldItem(FVector pos) : _pos(pos)
+WorldItem::WorldItem(FVector pos, uint32 monlv, Type::EPlayer playertype)
+	: _pos(pos)
 {
 	static int i = 300;
-	_itemTypeID = GetRandomItemType();
+	_itemTypeID = GetRandomItemType(monlv, playertype);
 	_itemID = i++;
 }
 
-uint8 WorldItem::GetRandomItemType()
+uint8 WorldItem::GetRandomItemType(uint32 monlv, Type::EPlayer playertype)
 {
 	uint8 itemCategory = RandomUtils::GetRandomUint8(0, 2);
 
 	switch (itemCategory)
 	{
 	case static_cast<uint8>(EItemCategory::Weapon):
-		return static_cast<uint8>(GetRandomWeapon());
+		return static_cast<uint8>(GetRandomWeapon(playertype));
 	case static_cast<uint8>(EItemCategory::Armor):
 		return static_cast<uint8>(GetRandomArmor());
 	case static_cast<uint8>(EItemCategory::Useable):
@@ -23,14 +24,26 @@ uint8 WorldItem::GetRandomItemType()
 	}
 }
 
-Type::EWeapon WorldItem::GetRandomWeapon()
+Type::EWeapon WorldItem::GetRandomWeapon(Type::EPlayer playertype)
 {
-	return static_cast<Type::EWeapon>(
-		RandomUtils::GetRandomUint8(
-			static_cast<uint8>(Type::EWeapon::START),
-			static_cast<uint8>(Type::EWeapon::END) - 1
-		)
-		);
+	if (playertype == Type::EPlayer::WARRIOR)
+	{
+		return static_cast<Type::EWeapon>(
+			RandomUtils::GetRandomUint8(
+				static_cast<uint8>(Type::EWeapon::SWORD_FIRST),
+				static_cast<uint8>(Type::EWeapon::SWORD_LAST) - 1
+			)
+			);
+	}
+	else
+	{
+		return static_cast<Type::EWeapon>(
+			RandomUtils::GetRandomUint8(
+				static_cast<uint8>(Type::EWeapon::GUN_FIRST),
+				static_cast<uint8>(Type::EWeapon::GUN_LAST) - 1
+			)
+			);
+	}
 }
 
 Type::EArmor WorldItem::GetRandomArmor()
