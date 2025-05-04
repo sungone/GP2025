@@ -44,6 +44,9 @@ public :
     UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "UI")
     class UTextBlock* RSkillText;
 
+    UPROPERTY(meta = (BindWidget))
+    class UGPQuestListWidget* QuestListWidget;
+
 public :
     void UpdateHealthBar(float Ratio);
     void UpdateExpBar(float Ratio);
