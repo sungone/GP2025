@@ -143,7 +143,7 @@ bool Player::Attack(std::shared_ptr<Character> monster)
 	if (!IsInAttackRange(monster->GetInfo()))
 		return false;
 
-	float atkDamage = GetAttackDamage();
+	float atkDamage = GetAttackDamage()*100;
 	if (atkDamage > 0.0f)
 	{
 		monster->OnDamaged(atkDamage);
