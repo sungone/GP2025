@@ -6,6 +6,14 @@
 #include "GameFramework/Character.h"
 #include "GPCharacterNPC.generated.h"
 
+UENUM(BlueprintType)
+enum class ENPCType : uint8
+{
+	NONE       UMETA(DisplayName = "None"),
+	SHOP       UMETA(DisplayName = "ShopNPC"),
+	QUEST      UMETA(DisplayName = "QuestNPC"),
+};
+
 /**
  * 
  */
@@ -20,23 +28,45 @@ public:
 	virtual void BeginPlay() override;
 	
 public :
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC")
+	ENPCType NPCType = ENPCType::NONE;
+
+
+	// <Shop>
 	UPROPERTY()
 	UUserWidget* ShopWidget;
 
 	UPROPERTY()
 	TSubclassOf<UUserWidget> ShopWidgetClass;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision", meta = (AllowPrivateAccess = "true"))
-	class USphereComponent* InteractionSphere;
-
 	void OpenShopUI(APlayerController* PlayerController);
 	void CloseShopUI();
 
+	void OpenQuestUI(APlayerController* PlayerController);
+	void CloseQuestUI();
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision", meta = (AllowPrivateAccess = "true"))
+	class USphereComponent* InteractionSphere;
+
 	UFUNCTION()
-	void OnPlayerEnter(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	void OnInteractionToggle(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	
+
 	UFUNCTION()
-	void OnPlayerExit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	void OnInteractionExit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION()
+	void CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer);
+
+	UPROPERTY()
+	bool bIsInteracting = false;
+
+	// <Desc UI>
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	class UWidgetComponent* InteractionWidgetComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> WBPClass_NPCInteraction;
 };

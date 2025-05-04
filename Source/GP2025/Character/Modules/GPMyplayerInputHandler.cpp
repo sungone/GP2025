@@ -8,6 +8,7 @@
 #include "Character/Modules/GPMyplayerNetworkSyncHandler.h"
 #include "Character/Modules/GPPlayerAppearanceHandler.h"
 #include "Character/Modules/GPCharacterCombatHandler.h"
+#include "Character/GPCharacterNPC.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
@@ -46,7 +47,7 @@ UGPMyplayerInputHandler::UGPMyplayerInputHandler()
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_AutoAttack.IA_AutoAttack'"), AutoAttackAction);
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Inventory.IA_Inventory'"), InventoryAction);
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_ESC.IA_ESC'"), SettingAction);
-	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_TakeItem.IA_TakeItem'"), TakeItemAction);
+	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_TakeItem.IA_TakeItem'"), TakeInteractionAction);
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Zoom.IA_Zoom'"), ZoomAction);
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_SkillQ.IA_SkillQ'"), SkillQAction);
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_SkillE.IA_SkillE'"), SkillEAction);
@@ -80,7 +81,7 @@ void UGPMyplayerInputHandler::SetupInputBindings(UEnhancedInputComponent* Enhanc
 	EnhancedInput->BindAction(InventoryAction, ETriggerEvent::Completed, this, &UGPMyplayerInputHandler::ResetInventoryToggle);
 
 	EnhancedInput->BindAction(SettingAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::OpenSettingWidget);
-	EnhancedInput->BindAction(TakeItemAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::TakeItem);
+	EnhancedInput->BindAction(TakeInteractionAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::TakeInteraction);
 
 	EnhancedInput->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::StartAiming);
 	EnhancedInput->BindAction(ZoomAction, ETriggerEvent::Completed, this, &UGPMyplayerInputHandler::StopAiming);
@@ -216,20 +217,25 @@ void UGPMyplayerInputHandler::OpenSettingWidget()
 	Owner->UIManager->OpenSettingWidget();
 }
 
-void UGPMyplayerInputHandler::TakeItem()
+void UGPMyplayerInputHandler::TakeInteraction()
 {
-	bGetItem = true;
+	bGetInteraction = true;
 
-	if (Owner)
+	if (!Owner) return;
+
+	// NPC
+	if (AGPCharacterNPC* NPC = Cast<AGPCharacterNPC>(CurrentInteractionTarget))
+	{
+		NPC->CheckAndHandleInteraction(Cast<AGPCharacterMyplayer>(Owner));
+		bGetInteraction = false;
+	}
+	else // Item Drop
 	{
 		Owner->GetWorldTimerManager().SetTimer(
-			GetItemResetTimerHandle,
-			[this]()
-			{
-				bGetItem = false;
-			},
-			3.0f,  // 딜레이: 3초
-			false  // 반복 X
+			GetInteractionResetTimerHandle,
+			[this]() { bGetInteraction = false; },
+			3.0f,
+			false
 		);
 	}
 }

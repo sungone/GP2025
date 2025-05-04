@@ -3,10 +3,12 @@
 
 #include "Character/GPCharacterNPC.h"
 #include "Character/GPCharacterControlData.h"
+#include "Components/WidgetComponent.h"
 #include "Shop/GPShop.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/SphereComponent.h"
+#include "Character/Modules/GPMyplayerInputHandler.h"
 #include "Character/GPCharacterMyplayer.h"
 
 AGPCharacterNPC::AGPCharacterNPC()
@@ -17,11 +19,24 @@ AGPCharacterNPC::AGPCharacterNPC()
 		ShopWidgetClass = ShopBP.Class;
 	}
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBP(TEXT("/Game/UI/WBP_ShopNPCInteraction.WBP_ShopNPCInteraction_C"));
+	if (WidgetBP.Succeeded())
+	{
+		WBPClass_NPCInteraction = WidgetBP.Class;
+	}
+
 	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionSphere"));
 	InteractionSphere->SetupAttachment(RootComponent);
-	InteractionSphere->SetSphereRadius(200.f);
+	InteractionSphere->SetSphereRadius(400.f);
 	InteractionSphere->SetCollisionProfileName(TEXT("Trigger"));
 	InteractionSphere->SetGenerateOverlapEvents(true);
+
+	// Ό³Έν UI
+	InteractionWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractionWidget"));
+	InteractionWidgetComponent->SetupAttachment(RootComponent);
+	InteractionWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+	InteractionWidgetComponent->SetDrawSize(FVector2D(150.f, 50.f));
+	InteractionWidgetComponent->SetVisibility(false);
 }
 
 void AGPCharacterNPC::BeginPlay()
@@ -29,8 +44,13 @@ void AGPCharacterNPC::BeginPlay()
 	Super::BeginPlay();
 	if (InteractionSphere)
 	{
-		InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AGPCharacterNPC::OnPlayerEnter);
-		InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &AGPCharacterNPC::OnPlayerExit);
+		InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AGPCharacterNPC::OnInteractionToggle);
+		InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &AGPCharacterNPC::OnInteractionExit);
+	}
+
+	if (WBPClass_NPCInteraction && InteractionWidgetComponent)
+	{
+		InteractionWidgetComponent->SetWidgetClass(WBPClass_NPCInteraction);
 	}
 }
 
@@ -68,22 +88,89 @@ void AGPCharacterNPC::CloseShopUI()
 	}
 }
 
-void AGPCharacterNPC::OnPlayerEnter(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AGPCharacterNPC::OpenQuestUI(APlayerController* PlayerController)
 {
-	if (!OtherActor) return;
 
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-
-	if (Cast<AGPCharacterMyplayer>(OtherActor))
-	{
-		OpenShopUI(PC);
-	}
 }
 
-void AGPCharacterNPC::OnPlayerExit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void AGPCharacterNPC::CloseQuestUI()
 {
-	if (Cast<AGPCharacterMyplayer>(OtherActor))
+
+}
+
+void AGPCharacterNPC::OnInteractionToggle(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(OtherActor);
+	if (!MyPlayer || !MyPlayer->InputHandler) return;
+
+	InteractionWidgetComponent->SetVisibility(true);
+	MyPlayer->InputHandler->CurrentInteractionTarget = this;
+}
+
+void AGPCharacterNPC::OnInteractionExit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(OtherActor);
+	if (!MyPlayer) return;
+
+	if (bIsInteracting)
 	{
-		CloseShopUI();
+		switch (NPCType)
+		{
+		case ENPCType::SHOP:
+			CloseShopUI();
+			break;
+		case ENPCType::QUEST:
+			CloseQuestUI();
+			break;
+		default:
+			break;
+		}
+
+		bIsInteracting = false;
 	}
+
+	MyPlayer->InputHandler->CurrentInteractionTarget = nullptr;
+}
+
+void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
+{
+	if (!MyPlayer || !MyPlayer->InputHandler) return;
+	// if (!MyPlayer->InputHandler->bGetInteraction) return;
+
+	APlayerController* PC = Cast<APlayerController>(MyPlayer->GetController());
+	if (!PC) return;
+
+	if (bIsInteracting)
+	{
+		switch (NPCType)
+		{
+		case ENPCType::SHOP:
+			CloseShopUI();
+			break;
+		case ENPCType::QUEST:
+			CloseQuestUI();
+			break;
+		default:
+			break;
+		}
+		bIsInteracting = false;
+	}
+	else
+	{
+		switch (NPCType)
+		{
+		case ENPCType::SHOP:
+			OpenShopUI(PC);
+			break;
+		case ENPCType::QUEST:
+			OpenQuestUI(PC);
+			break;
+		default:
+			break;
+		}
+		bIsInteracting = true;
+	}
+
+	InteractionWidgetComponent->SetVisibility(false);
+	MyPlayer->InputHandler->bGetInteraction = false;
 }

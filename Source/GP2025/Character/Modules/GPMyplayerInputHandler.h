@@ -55,7 +55,7 @@ public :
 	TObjectPtr<UInputAction> SettingAction;
 
 	UPROPERTY()
-	TObjectPtr<UInputAction> TakeItemAction;
+	TObjectPtr<UInputAction> TakeInteractionAction;
 
 	UPROPERTY()
 	TObjectPtr<UInputAction> ZoomAction;
@@ -87,8 +87,11 @@ public :
 	void CloseInventory();
 
     void OpenSettingWidget();
+	
 
-	void TakeItem();
+	void TakeInteraction();
+	UPROPERTY()
+	AActor* CurrentInteractionTarget = nullptr;
 
 
     void StartAiming();
@@ -100,8 +103,8 @@ public :
     void UseSkillR();
 
 public :
-	bool bGetItem = false;
-	FTimerHandle GetItemResetTimerHandle;
+	bool bGetInteraction = false;
+	FTimerHandle GetInteractionResetTimerHandle;
 
 private:
 	bool bCanJump = true;
