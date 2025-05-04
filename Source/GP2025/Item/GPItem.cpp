@@ -65,7 +65,7 @@ void AGPItem::Tick(float DeltaTime)
 		OverlappingPlayer = Player;
 		ShowInteractionWidget();
 
-		if (OverlappingPlayer->InputHandler && OverlappingPlayer->InputHandler->bGetInteraction)
+		if (OverlappingPlayer->InputHandler && OverlappingPlayer->InputHandler->bGetTakeItem)
 		{
 			TryTakeItem();
 		}

@@ -22,11 +22,21 @@ public:
 	class UButton* QuestAcceptButton;
 
 	UPROPERTY(meta = (BindWidget))
+	class UButton* QuestExitButton;
+
+	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* QuestDescriptionText;
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* QuestTypeText;
 
+	UPROPERTY()
+	class AGPCharacterNPC* OwningNPC;
+
 	UFUNCTION()
 	void OnQuestAccepted();
+
+	UFUNCTION()
+	void OnQuestExit();
+
 };

@@ -103,7 +103,7 @@ public :
     void UseSkillR();
 
 public :
-	bool bGetInteraction = false;
+	bool bGetTakeItem = false;
 	FTimerHandle GetInteractionResetTimerHandle;
 
 private:

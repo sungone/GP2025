@@ -14,4 +14,26 @@ class GP2025_API UGPShop : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+	virtual void NativeConstruct() override;
+
+public :
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* BuyButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* SellButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* QuitButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* MoneyText;
+
+	UPROPERTY()
+	class AGPCharacterNPC* OwningNPC;
+
+	UFUNCTION()
+	void OnShopExit();
 };

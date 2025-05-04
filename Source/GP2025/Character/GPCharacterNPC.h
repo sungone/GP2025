@@ -50,7 +50,7 @@ public :
 	class USphereComponent* InteractionSphere;
 
 	UFUNCTION()
-	void OnInteractionToggle(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	void OnInteractionStart(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
@@ -59,6 +59,9 @@ public :
 
 	UFUNCTION()
 	void CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer);
+
+	UFUNCTION()
+	void ExitInteraction();
 
 	UPROPERTY()
 	bool bIsInteracting = false;

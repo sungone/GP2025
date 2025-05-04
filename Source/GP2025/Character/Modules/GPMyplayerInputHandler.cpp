@@ -219,22 +219,20 @@ void UGPMyplayerInputHandler::OpenSettingWidget()
 
 void UGPMyplayerInputHandler::TakeInteraction()
 {
-	bGetInteraction = true;
-
 	if (!Owner) return;
 
 	// NPC
 	if (AGPCharacterNPC* NPC = Cast<AGPCharacterNPC>(CurrentInteractionTarget))
 	{
 		NPC->CheckAndHandleInteraction(Cast<AGPCharacterMyplayer>(Owner));
-		bGetInteraction = false;
 	}
 	else // Item Drop
 	{
+		bGetTakeItem = true;
 		Owner->GetWorldTimerManager().SetTimer(
 			GetInteractionResetTimerHandle,
-			[this]() { bGetInteraction = false; },
-			3.0f,
+			[this]() { bGetTakeItem = false; },
+			1.f,
 			false
 		);
 	}

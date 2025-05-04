@@ -10,6 +10,8 @@
 #include "Components/SphereComponent.h"
 #include "Character/Modules/GPMyplayerInputHandler.h"
 #include "Character/Modules/GPMyplayerCameraHandler.h"
+#include "UI/GPQuestWidget.h"
+#include "Kismet/GameplayStatics.h"
 #include "Character/GPCharacterMyplayer.h"
 
 AGPCharacterNPC::AGPCharacterNPC()
@@ -51,7 +53,7 @@ void AGPCharacterNPC::BeginPlay()
 	Super::BeginPlay();
 	if (InteractionSphere)
 	{
-		InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AGPCharacterNPC::OnInteractionToggle);
+		InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AGPCharacterNPC::OnInteractionStart);
 		InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &AGPCharacterNPC::OnInteractionExit);
 	}
 
@@ -69,6 +71,10 @@ void AGPCharacterNPC::OpenShopUI(APlayerController* PlayerController)
 		if (ShopWidget)
 		{
 			ShopWidget->AddToViewport();
+			if (UGPShop* LocalShopWidget = Cast<UGPShop>(ShopWidget))
+			{
+				LocalShopWidget->OwningNPC = this;
+			}
 		}
 	}
 
@@ -103,6 +109,10 @@ void AGPCharacterNPC::OpenQuestUI(APlayerController* PlayerController)
 		if (QuestWidget)
 		{
 			QuestWidget->AddToViewport();
+			if (UGPQuestWidget* LocalQuestWidget = Cast<UGPQuestWidget>(QuestWidget))
+			{
+				LocalQuestWidget->OwningNPC = this;
+			}
 		}
 	}
 
@@ -129,7 +139,7 @@ void AGPCharacterNPC::CloseQuestUI()
 	}
 }
 
-void AGPCharacterNPC::OnInteractionToggle(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AGPCharacterNPC::OnInteractionStart(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(OtherActor);
 	if (!MyPlayer || !MyPlayer->InputHandler) return;
@@ -160,59 +170,68 @@ void AGPCharacterNPC::OnInteractionExit(UPrimitiveComponent* OverlappedComp, AAc
 
 		bIsInteracting = false;
 	}
-
-	MyPlayer->InputHandler->CurrentInteractionTarget = nullptr;
 }
 
 void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 {
 	if (!MyPlayer || !MyPlayer->InputHandler) return;
-	// if (!MyPlayer->InputHandler->bGetInteraction) return;
+	InteractionWidgetComponent->SetVisibility(false);
 
 	APlayerController* PC = Cast<APlayerController>(MyPlayer->GetController());
 	if (!PC) return;
-
 	if (bIsInteracting)
 	{
-		switch (NPCType)
-		{
-		case ENPCType::SHOP:
-			CloseShopUI();
-			break;
-		case ENPCType::QUEST:
-			MyPlayer->CameraHandler->StopDialogueCamera();
-			CloseQuestUI();
-			break;
-		default:
-			break;
-		}
-		bIsInteracting = false;
-	}
-	else
-	{
-		switch (NPCType)
-		{
-		case ENPCType::SHOP:
-			OpenShopUI(PC);
-			break;
-		case ENPCType::QUEST:
-			MyPlayer->CameraHandler->StartDialogueCamera(GetActorLocation());
-			GetWorld()->GetTimerManager().SetTimer(
-				QuestOpenUITimerHandle,
-				this,
-				&AGPCharacterNPC::OpenQuestUIDelayed,
-				1.f,
-				false
-			);
-			break;
-		default:
-			break;
-		}
-		bIsInteracting = true;
+		MyPlayer->InputHandler->CurrentInteractionTarget = nullptr;
+		return;
 	}
 
-	InteractionWidgetComponent->SetVisibility(false);
-	MyPlayer->InputHandler->bGetInteraction = false;
+	switch (NPCType)
+	{
+	case ENPCType::SHOP:
+		OpenShopUI(PC);
+		bIsInteracting = true;
+		break;
+	case ENPCType::QUEST:
+		MyPlayer->CameraHandler->StartDialogueCamera(GetActorLocation());
+		GetWorld()->GetTimerManager().SetTimer(
+			QuestOpenUITimerHandle,
+			this,
+			&AGPCharacterNPC::OpenQuestUIDelayed,
+			1.f,
+			false
+		);
+		break;
+	default:
+		break;
+	}
+
+	MyPlayer->InputHandler->CurrentInteractionTarget = nullptr;
+}
+
+void AGPCharacterNPC::ExitInteraction()
+{
+	if (!bIsInteracting) return;
+
+	switch (NPCType)
+	{
+	case ENPCType::SHOP:
+		CloseShopUI();
+		break;
+	case ENPCType::QUEST:
+		if (AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0)))
+		{
+			if (MyPlayer->CameraHandler)
+			{
+				MyPlayer->CameraHandler->StopDialogueCamera();
+			}
+		}
+		CloseQuestUI();
+		break;
+	default:
+		break;
+	}
+
+	bIsInteracting = false;
 }
 
 void AGPCharacterNPC::OpenQuestUIDelayed()
@@ -221,5 +240,6 @@ void AGPCharacterNPC::OpenQuestUIDelayed()
 	if (PC)
 	{
 		OpenQuestUI(PC);
+		bIsInteracting = true;
 	}
 }

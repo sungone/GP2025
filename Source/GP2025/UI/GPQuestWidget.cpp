@@ -4,6 +4,7 @@
 #include "UI/GPQuestWidget.h"
 #include "Components/TextBlock.h"  
 #include "Components/Button.h"
+#include "Character/GPCharacterNPC.h"
 
 void UGPQuestWidget::NativeConstruct()
 {
@@ -12,20 +13,20 @@ void UGPQuestWidget::NativeConstruct()
 	if (QuestAcceptButton)
 	{
 		QuestAcceptButton->OnClicked.AddDynamic(this, &UGPQuestWidget::OnQuestAccepted);
-	}
-
-	if (QuestTypeText)
-	{
-		// QuestTypeText->SetText(FText::FromString(TEXT("메인 퀘스트"))); 
-	}
-
-	if (QuestDescriptionText)
-	{
-		// QuestDescriptionText->SetText(FText::FromString(TEXT("사냥터로 가서 몬스터 10마리를 처치하세요.")));
+		QuestExitButton->OnClicked.AddDynamic(this, &UGPQuestWidget::OnQuestExit);
 	}
 }
 
 void UGPQuestWidget::OnQuestAccepted()
 {
 	UE_LOG(LogTemp, Log, TEXT("Quest Accepted Log!"));
+}
+
+void UGPQuestWidget::OnQuestExit()
+{
+	if (OwningNPC)
+	{
+		OwningNPC->ExitInteraction();
+		RemoveFromParent();
+	}
 }
