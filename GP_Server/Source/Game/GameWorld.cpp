@@ -113,7 +113,7 @@ void GameWorld::PlayerLeaveGame(int32 id)
 		{
 			for (auto& [mid, m] : monsters)
 			{
-				m->RemoveFromViewList(id);
+				if (m) m->RemoveFromViewList(id);
 			}
 		}
 	}
@@ -464,6 +464,7 @@ FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
 
 	ZoneType oldZone = player->GetZone();
 	float radius = playerCollision;
+	//Todo: 랜덤스폰이 아니라 입구 쪽 스폰으로 설정해줘야한다
 	FVector newPos;
 	do {
 		newPos = Map::GetInst().GetRandomPos(targetZone, radius);
@@ -471,7 +472,24 @@ FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
 
 	player->GetInfo().SetLocation(newPos);
 	player->GetInfo().SetZone(targetZone);
-
+	std::unordered_set<int32> oldvlist;
+	{
+		std::lock_guard lock(player->_vlLock);
+		oldvlist = player->GetViewList();
+	}
+	for (int32 mid : oldvlist)
+	{
+		auto other = GetCharacterByID(mid);
+		if (!other) continue;
+		if (other->IsMonster())
+		{
+			player->RemoveMonsterFromViewList(other);
+		}
+		else
+		{
+			player->RemovePlayerFromViewList(other);
+		}
+	}
 	{
 		std::lock_guard lock(_mtPlayerZMap);
 		auto& oldMap = _playersByZone[oldZone];

@@ -140,7 +140,6 @@ namespace Type
 		HPKIT_LOW = START,
 		HPKIT_MID,
 		HPKIT_HIGH,
-
 		COFFEE,
 		DDALBA,
 		MANGBA,

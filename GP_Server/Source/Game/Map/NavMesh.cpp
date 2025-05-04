@@ -180,7 +180,7 @@ FVector NavMesh::GetRandomPositionWithRadius(float radius) const
 		}
 
 		FVector P = A + (B - A) * r1 + (C - A) * r2;
-		P.Z += 100.0f;//이건 사이즈 고려안함 현재 클라에서 설정된 캡슐의 반만큼 올려주는중 -> 추후 
+		P.Z += 90.0f;
 
 		auto DistanceToEdge2D = [](const FVector& p, const FVector& a, const FVector& b) -> float {
 			double dx = b.X - a.X;
