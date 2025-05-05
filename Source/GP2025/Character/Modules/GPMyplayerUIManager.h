@@ -36,6 +36,9 @@ public:
 
 	// InGame
 	void ShowInGameUI();
+
+	// Dead
+	void ShowDeadScreen();
 	
 	// Quest
 	void AcceptQuest(const FString& QuestID);
@@ -63,6 +66,9 @@ public:
 	UUserWidget* LoginWidget;
 
 	UPROPERTY()
+	UUserWidget* DeadScreenWidget;
+
+	UPROPERTY()
 	TSubclassOf<UUserWidget> InventoryWidgetClass;
 
 	UPROPERTY()
@@ -79,6 +85,10 @@ public:
 
 	UPROPERTY()
 	TSubclassOf<UUserWidget> GunCrosshairWidgetClass;
+
+
+	UPROPERTY()
+	TSubclassOf<UUserWidget> DeadScreenWidgetClass;
 
 	bool bInventoryToggled = false;
 

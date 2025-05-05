@@ -49,6 +49,12 @@ UGPMyplayerUIManager::UGPMyplayerUIManager()
 	{
 		LoginWidgetClass = LoginWidgetClassBPClass.Class;
 	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> DeadWidgetClassBPClass(TEXT("/Game/UI/WBP_DeadScreen"));
+	if (DeadWidgetClassBPClass.Succeeded())
+	{
+		DeadScreenWidgetClass = DeadWidgetClassBPClass.Class;
+	}
 }
 void UGPMyplayerUIManager::Initialize(AGPCharacterMyplayer* InOwner)
 {
@@ -69,6 +75,11 @@ void UGPMyplayerUIManager::OnSetUpInGameWidgets()
 	if (SettingWidgetClass)
 	{
 		SettingWidget = CreateWidget<UUserWidget>(World, SettingWidgetClass);
+	}
+
+	if (DeadScreenWidgetClass)
+	{
+		DeadScreenWidget = CreateWidget<UUserWidget>(World, DeadScreenWidgetClass);
 	}
 
 	if (InGameWidgetClass)
@@ -175,6 +186,14 @@ void UGPMyplayerUIManager::ShowInGameUI()
 	if (InGameWidget && !InGameWidget->IsInViewport())
 	{
 		InGameWidget->AddToViewport();
+	}
+}
+
+void UGPMyplayerUIManager::ShowDeadScreen()
+{
+	if (DeadScreenWidget && !DeadScreenWidget->IsInViewport())
+	{
+		DeadScreenWidget->AddToViewport();
 	}
 }
 

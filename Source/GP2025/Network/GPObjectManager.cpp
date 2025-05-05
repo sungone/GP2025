@@ -391,12 +391,51 @@ void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType)
 
 void UGPObjectManager::ChangeZone(ZoneType zone, const FVector& RandomPos)
 {
+	if (!MyPlayer) return;
+	MyPlayer->SetActorLocation(RandomPos);
+	MyPlayer->CharacterInfo.CurrentZone = zone;
+
+	// ChangeZone 안에서 Level Streaming 처리를 해야하나?
 }
 
 void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
 {
+	auto PlayerID = info.ID;
+	AGPCharacterPlayer** FoundPlayerPtr = Players.Find(PlayerID);
+	if (!FoundPlayerPtr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Respawn] No player found with ID: %d"), PlayerID);
+		return;
+	}
+
+	AGPCharacterPlayer* FoundPlayer = *FoundPlayerPtr;
+	if (FoundPlayer == MyPlayer)
+	{
+		UE_LOG(LogTemp, Log, TEXT("[Respawn] This is MyPlayer."));
+
+		MyPlayer->SetActorHiddenInGame(false);
+		MyPlayer->SetActorEnableCollision(true);
+	}
 }
 
 void UGPObjectManager::HandlePlayerDeath(int32 playerId)
 {
+	AGPCharacterPlayer* TargetPlayer = Players.FindRef(playerId);
+	if (!TargetPlayer) return;
+
+	TargetPlayer->CombatHandler->PlayDeadAnimation();
+	FTimerHandle HideTimerHandle;
+	TargetPlayer->GetWorldTimerManager().SetTimer(HideTimerHandle, [TargetPlayer]()
+		{
+			TargetPlayer->SetActorHiddenInGame(true);
+			TargetPlayer->SetActorEnableCollision(false);
+		}, 1.f, false);
+
+	if (TargetPlayer == MyPlayer)
+	{
+		if (MyPlayer->UIManager)
+		{
+			MyPlayer->UIManager->ShowDeadScreen();
+		}
+	}
 }

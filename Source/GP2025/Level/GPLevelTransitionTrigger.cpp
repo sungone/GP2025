@@ -61,6 +61,22 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 	CachedPlayer = Cast<AGPCharacterMyplayer>(OtherActor);
 	if (!CachedPlayer) return;
 
+	if (CachedPlayer && !LevelToLoad.IsNone())
+	{
+		UGPNetworkManager* NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+		if (NetworkMgr)
+		{
+			ZoneType NewZone = ZoneType::TUK;
+
+			if (LevelToLoad == "tip")       NewZone = ZoneType::TIP;
+			else if (LevelToLoad == "E")    NewZone = ZoneType::E;
+			else if (LevelToLoad == "gym")  NewZone = ZoneType::GYM;
+			else if (LevelToLoad == "TUK")  NewZone = ZoneType::TUK;
+
+			NetworkMgr->SendMyZoneChangePacket(NewZone);
+		}
+	}
+
 	if (!LevelToUnload.IsNone())
 	{
 		UGameplayStatics::UnloadStreamLevel(this, LevelToUnload, FLatentActionInfo(), false);
@@ -75,22 +91,6 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 		LatentInfo.UUID = __LINE__;
 
 		UGameplayStatics::LoadStreamLevel(this, LevelToLoad, true, true, LatentInfo);
-	}
-
-	if (CachedPlayer)
-	{
-		UGPNetworkManager* NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-		if (NetworkMgr)
-		{
-			ZoneType NewZone = ZoneType::TUK;
-
-			if (LevelToLoad == "tip")       NewZone = ZoneType::TIP;
-			else if (LevelToLoad == "E")    NewZone = ZoneType::E;
-			else if (LevelToLoad == "gym")  NewZone = ZoneType::GYM;
-			else if (LevelToLoad == "TUK")  NewZone = ZoneType::TUK;
-
-			NetworkMgr->SendMyZoneChangePacket(NewZone);
-		}
 	}
 }
 
