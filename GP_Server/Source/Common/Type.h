@@ -1,35 +1,26 @@
 #pragma once
 enum EPacketType : uint8
 {
+	// --- Account ---
 	C_LOGIN,
 	C_LOGOUT,
 	C_SIGNUP,
 	C_SELECT_CHARACTER,
 	C_ENTER_GAME,
-
-	C_MOVE,
-	C_ATTACK,
-	C_START_AIMING,
-	C_STOP_AIMING,
-	C_USE_SKILL,
-
-	C_TAKE_ITEM,
-	C_DROP_ITEM,
-	C_USE_ITEM,
-	C_EQUIP_ITEM,
-	C_UNEQUIP_ITEM,
-
-	C_CHANGE_ZONE,
-	C_RESPAWN,
-
+	
 	S_LOGIN_SUCCESS,
 	S_LOGIN_FAIL,
 	S_SIGNUP_SUCCESS,
 	S_SIGNUP_FAIL,
 	S_ENTER_GAME,
 
-	S_ADD_PLAYER,
-	S_REMOVE_PLAYER,
+	// --- Player Actions ---
+	C_MOVE,
+	C_ATTACK,
+	C_START_AIMING,
+	C_STOP_AIMING,
+	C_USE_SKILL,
+
 	S_PLAYER_MOVE,
 	S_PLAYER_STATUS_UPDATE,
 	S_DAMAGED_PLAYER,
@@ -38,25 +29,51 @@ enum EPacketType : uint8
 	S_SKILL_UPGRADE,
 	S_LEVEL_UP,
 
+	// --- Player Join/Leave ---
+	S_ADD_PLAYER,
+	S_REMOVE_PLAYER,
+
+	// --- Monster Events ---
 	S_ADD_MONSTER,
 	S_REMOVE_MONSTER,
 	S_MONSTER_STATUS_UPDATE,
 	S_DAMAGED_MONSTER,
 	S_PLAYER_DEAD,
 
+	// --- Item ---
+	C_TAKE_ITEM,
+	C_DROP_ITEM,
+	C_USE_ITEM,
+	C_EQUIP_ITEM,
+	C_UNEQUIP_ITEM,
+
 	S_ITEM_SPAWN,
 	S_ITEM_DESPAWN,
 	S_ITEM_PICKUP,
 	S_ITEM_DROP,
-
 	S_ADD_INVENTORY_ITEM,
 	S_USE_INVENTORY_ITEM,
 	S_EQUIP_ITEM,
 	S_UNEQUIP_ITEM,
 
+	// --- Zone ---
+	C_CHANGE_ZONE,
+	C_RESPAWN,
+
 	S_CHANGE_ZONE,
 	S_RESPAWN,
+
+	// --- Shop ---
+	C_SHOP_BUY_ITEM,
+	C_SHOP_SELL_ITEM,
+
+	S_SHOP_ITEM_LIST,
+	S_SHOP_BUY_RESULT,
+	S_SHOP_SELL_RESULT,
+	S_SHOP_CURRENCY_UPDATE,
 };
+
+
 
 using ECharacterType = uint8;
 
@@ -105,17 +122,19 @@ namespace Type
 		NONE,
 		START = 1,
 
-		GUN_FIRST = START,
-		BIRD_GUN = GUN_FIRST,
+		BIRD_GUN = START,
 		PULSE_GUN,
 		POSITRON,
-		GUN_LAST,
 
-		SWORD_FIRST = GUN_LAST,
-		PRAC_SWORD = SWORD_FIRST,
+		GUN_FIRST = BIRD_GUN,
+		GUN_LAST = POSITRON,
+
+		PRAC_SWORD,
 		PULSE_SWORD,
 		ENERGY_SWORD,
-		SWORD_LAST,
+
+		SWORD_FIRST = PRAC_SWORD,
+		SWORD_LAST = ENERGY_SWORD,
 
 		END = SWORD_LAST,
 	};
@@ -131,7 +150,7 @@ namespace Type
 
 		SUIT,
 		TUCLOTHES,
-		END
+		END = TUCLOTHES
 	};
 
 	enum class EUseable : uint8
@@ -147,7 +166,13 @@ namespace Type
 		GOLD_SMALL,
 		GOLD_MEDIUM,
 		GOLD_LARGE,
-		END
+
+		BUFFTEM_FIRST = HPKIT_LOW,
+		BUFFTEM_LAST = MANGBA,
+		GOLD_FIRST = GOLD_SMALL,
+		GOLD_LAST = GOLD_LARGE,
+
+		END = GOLD_LAST,
 	};
 
 	enum EQuestItem : uint8
@@ -194,7 +219,7 @@ enum ECharacterStateType : uint32
 	STATE_AIMING = 1 << 9,
 };
 
-enum class ZoneType: uint8
+enum class ZoneType : uint8
 {
 	PLAYGROUND,//test¿ë
 	TUK,

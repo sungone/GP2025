@@ -20,7 +20,7 @@ uint8 WorldItem::GetRandomItemType(uint32 monlv, Type::EPlayer playertype)
 	case static_cast<uint8>(EItemCategory::Armor):
 		return static_cast<uint8>(GetRandomArmor());
 	case static_cast<uint8>(EItemCategory::Useable):
-		return static_cast<uint8>(GetRandomUseable());
+		return static_cast<uint8>(GetRandomBuffTem());
 	}
 }
 
@@ -31,7 +31,7 @@ Type::EWeapon WorldItem::GetRandomWeapon(Type::EPlayer playertype)
 		return static_cast<Type::EWeapon>(
 			RandomUtils::GetRandomUint8(
 				static_cast<uint8>(Type::EWeapon::SWORD_FIRST),
-				static_cast<uint8>(Type::EWeapon::SWORD_LAST) - 1
+				static_cast<uint8>(Type::EWeapon::SWORD_LAST)
 			)
 			);
 	}
@@ -40,7 +40,7 @@ Type::EWeapon WorldItem::GetRandomWeapon(Type::EPlayer playertype)
 		return static_cast<Type::EWeapon>(
 			RandomUtils::GetRandomUint8(
 				static_cast<uint8>(Type::EWeapon::GUN_FIRST),
-				static_cast<uint8>(Type::EWeapon::GUN_LAST) - 1
+				static_cast<uint8>(Type::EWeapon::GUN_LAST)
 			)
 			);
 	}
@@ -56,12 +56,22 @@ Type::EArmor WorldItem::GetRandomArmor()
 		);
 }
 
-Type::EUseable WorldItem::GetRandomUseable()
+Type::EUseable WorldItem::GetRandomBuffTem()
 {
 	return static_cast<Type::EUseable>(
 		RandomUtils::GetRandomUint8(
-			static_cast<uint8>(Type::EUseable::START),
-			static_cast<uint8>(Type::EUseable::END) - 1
+			static_cast<uint8>(Type::EUseable::BUFFTEM_FIRST),
+			static_cast<uint8>(Type::EUseable::BUFFTEM_LAST)
+		)
+		);
+}
+
+Type::EUseable WorldItem::GetRandomGold()
+{
+	return static_cast<Type::EUseable>(
+		RandomUtils::GetRandomUint8(
+			static_cast<uint8>(Type::EUseable::GOLD_FIRST),
+			static_cast<uint8>(Type::EUseable::GOLD_LAST)
 		)
 		);
 }

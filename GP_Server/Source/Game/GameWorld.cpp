@@ -435,8 +435,9 @@ void GameWorld::EquipInventoryItem(int32 playerId, uint32 itemId)
 		viewList = player->GetViewList();
 	}
 
-	auto pkt1 = ItemPkt::EquipItemPacket(playerId, itemTypeID, player->GetInfo());
-	SessionManager::GetInst().BroadcastToViewList(&pkt1, viewList);
+	auto pkt = ItemPkt::EquipItemPacket(playerId, itemTypeID, player->GetInfo());
+	SessionManager::GetInst().SendPacket(playerId, &pkt);
+	SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
 }
 
 void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
@@ -453,8 +454,9 @@ void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
 		std::lock_guard lock(player->_vlLock);
 		viewList = player->GetViewList();
 	}
-	auto pkt1 = ItemPkt::UnequipItemPacket(playerId, itemTypeID, player->GetInfo());
-	SessionManager::GetInst().BroadcastToViewList(&pkt1, viewList);
+	auto pkt = ItemPkt::UnequipItemPacket(playerId, itemTypeID, player->GetInfo());
+	SessionManager::GetInst().SendPacket(playerId, &pkt);
+	SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
 }
 
 FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
