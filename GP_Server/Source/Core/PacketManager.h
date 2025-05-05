@@ -35,6 +35,12 @@ public:
 	void HandleZoneChangeRequestPacket(int32 sessionId, Packet* packet);
 	void HandleRespawnRequestPacket(int32 sessionId, Packet* packet);
 
+	void HandleShopBuyItemPacket(int32 sessionId, Packet* packet);
+	void HandleShopSellItemPacket(int32 sessionId, Packet* packet);
+
+	void HandleRequestQuestPacket(int32 sessionId, Packet* packet);
+	void HandleCompleteQuestPacket(int32 sessionId, Packet* packet);
+
 private:
 	SessionManager& _sessionMgr = SessionManager::GetInst();
 	DBManager& _dbMgr = DBManager::GetInst();

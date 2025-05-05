@@ -56,8 +56,13 @@ public:
 	void SendMyUseItem(int32 ItemID);
 	void SendMyEquipItem(int32 ItemID);
 	void SendMyUnequipItem(int32 ItemID);
-
 	void SendMyUseSkill(ESkillGroup SkillGID, float PlayerYaw);
+
+	void SendMyShopBuyItem(int32 ItemID, int32 Quantity);
+	void SendMyShopSellItem(int32 ItemID, int32 Quantity);
+	void SendMyRequestQuest(enum class QuestType quest);
+	void SendMyCompleteQuest(enum class QuestType quest);
+
 private:
 	void SendPacket(uint8* Buf, int32 Size);
 	void ReceiveData();

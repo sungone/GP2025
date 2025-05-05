@@ -70,9 +70,13 @@ enum EPacketType : uint8
 	S_SHOP_ITEM_LIST,
 	S_SHOP_BUY_RESULT,
 	S_SHOP_SELL_RESULT,
-	S_SHOP_CURRENCY_UPDATE,
-};
 
+	// --- Quest ---
+	C_REQUEST_QUEST,
+	C_COMPLETE_QUEST,
+
+	S_QUEST_REWARD,
+};
 
 
 using ECharacterType = uint8;
@@ -227,4 +231,18 @@ enum class ZoneType : uint8
 	E,
 	INDUSTY,
 	GYM,
+};
+
+enum class QuestType
+{
+	None, 
+	TalkToNPC,           // 특정 NPC와 대화
+	DefeatTinoboss,       // 티노보스를 해치우는 미션
+};
+
+enum class QuestStatus
+{
+	NotStarted,
+	InProgress,
+	Completed,
 };

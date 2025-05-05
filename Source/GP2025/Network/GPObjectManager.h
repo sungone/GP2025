@@ -26,6 +26,7 @@ public:
 	void RemovePlayer(int32 PlayerID);
 	void UpdatePlayer(const FInfoData& PlayerInfo);
 	void DamagedPlayer(const FInfoData& PlayerInfo);
+	void HandlePlayerDeath(int32 playerId);
 
 	void PlayerUseSkill(int32 PlayerID, ESkillGroup SkillGID);
 	void SkillUnlock(ESkillGroup SkillGID);
@@ -47,25 +48,30 @@ public:
 
 	void ChangeZone(ZoneType zone, const FVector& pos);
 	void RespawnMyPlayer(const FInfoData& info);
-	void HandlePlayerDeath(int32 playerId);
-private:
-    UPROPERTY()
-    TSubclassOf<AGPCharacterPlayer> OtherPlayerClass;
 
-    UPROPERTY()
-    TSubclassOf<AGPCharacterMonster> MonsterClass;
+	void ShowShopItems(uint8 Count, const struct ShopItemInfo* shopitems);
+	void HandleBuyResult(bool bSuccess, DBResultCode Code, uint32 NewGold);
+	void HandleSellResult(bool bSuccess, DBResultCode Code, uint32 NewGold);
+
+	void OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpReward, uint32 GoldReward);
+private:
+	UPROPERTY()
+	TSubclassOf<AGPCharacterPlayer> OtherPlayerClass;
+
+	UPROPERTY()
+	TSubclassOf<AGPCharacterMonster> MonsterClass;
 
 	UPROPERTY()
 	class AGPCharacterMyplayer* MyPlayer;
 
 	TMap<int32, AGPCharacterPlayer*> Players;
 
-    TMap<int32, AGPCharacterMonster*> Monsters;
+	TMap<int32, AGPCharacterMonster*> Monsters;
 
-    TMap<int32, AGPItem*> Items;
+	TMap<int32, AGPItem*> Items;
 
-    UWorld* World;
-private :
+	UWorld* World;
+private:
 	UPROPERTY()
 	class UGPInventory* InventoryWidget;
 };

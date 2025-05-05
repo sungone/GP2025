@@ -134,7 +134,7 @@ void UGPNetworkManager::SendMyEnterGamePacket(Type::EPlayer PlayerType)
 void UGPNetworkManager::SendMyMovePacket()
 {
 	auto info = MyPlayer->CharacterInfo;
-	MovePacket Packet(info.ID,info.Pos,info.State,0);
+	MovePacket Packet(info.ID, info.Pos, info.State, 0);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
@@ -201,6 +201,30 @@ void UGPNetworkManager::SendMyZoneChangePacket(ZoneType zone)
 void UGPNetworkManager::SendMyRespawnPacket(ZoneType zone)
 {
 	RespawnRequestPacket Packet(zone);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendMyShopBuyItem(int32 ItemID, int32 Quantity)
+{
+	BuyItemPacket Packet(ItemID, Quantity);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendMyShopSellItem(int32 ItemID, int32 Quantity)
+{
+	SellItemPacket Packet(ItemID, Quantity);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendMyRequestQuest(QuestType quest)
+{
+	RequestQuestPacket Packet(quest);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendMyCompleteQuest(QuestType quest)
+{
+	CompleteQuestPacket Packet(quest);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
@@ -298,6 +322,14 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->DamagedPlayer(Pkt->Target);
 				break;
 			}
+			case EPacketType::S_PLAYER_DEAD:
+			{
+				PlayerDeadPacket* Pkt = reinterpret_cast<PlayerDeadPacket*>(RemainingData.GetData());
+				ObjectMgr->HandlePlayerDeath(Pkt->PlayerID);
+				break;
+			}
+#pragma endregion
+#pragma region Skill
 			case EPacketType::S_SKILL_UNLOCK:
 			{
 				SkillUnlockPacket* Pkt = reinterpret_cast<SkillUnlockPacket*>(RemainingData.GetData());
@@ -402,6 +434,8 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->UpdatePlayer(Pkt->PlayerInfo);
 				break;
 			}
+#pragma endregion
+#pragma region Map
 			case EPacketType::S_CHANGE_ZONE:
 			{
 				ChangeZonePacket* Pkt = reinterpret_cast<ChangeZonePacket*>(RemainingData.GetData());
@@ -415,13 +449,34 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->UpdatePlayer(Pkt->PlayerInfo);
 				break;
 			}
-			case EPacketType::S_PLAYER_DEAD:
+#pragma endregion
+#pragma region Shop
+			case EPacketType::S_SHOP_ITEM_LIST:
 			{
-				PlayerDeadPacket* Pkt = reinterpret_cast<PlayerDeadPacket*>(RemainingData.GetData());
-				ObjectMgr->HandlePlayerDeath(Pkt->PlayerID);
+				ShopItemListPacket* Pkt = reinterpret_cast<ShopItemListPacket*>(RemainingData.GetData());
+				ObjectMgr->ShowShopItems(Pkt->ItemCount, Pkt->ShopItems);
 				break;
 			}
-
+			case EPacketType::S_SHOP_BUY_RESULT:
+			{
+				BuyItemResultPacket* Pkt = reinterpret_cast<BuyItemResultPacket*>(RemainingData.GetData());
+				ObjectMgr->HandleBuyResult(Pkt->bSuccess, Pkt->ResultCode, Pkt->PlayerGold);
+				break;
+			}
+			case EPacketType::S_SHOP_SELL_RESULT:
+			{
+				SellItemResultPacket* Pkt = reinterpret_cast<SellItemResultPacket*>(RemainingData.GetData());
+				ObjectMgr->HandleSellResult(Pkt->bSuccess, Pkt->ResultCode, Pkt->PlayerGold);
+				break;
+			}
+#pragma endregion
+#pragma region Quest
+			case EPacketType::S_QUEST_REWARD:
+			{
+				QuestRewardPacket* Pkt = reinterpret_cast<QuestRewardPacket*>(RemainingData.GetData());
+				ObjectMgr->OnQuestReward(Pkt->Quest, Pkt->bSuccess, Pkt->ExpReward, Pkt->GoldReward);
+				break;
+			}
 #pragma endregion
 			default:
 				UE_LOG(LogTemp, Warning, TEXT("Unknown Packet Type received."));
