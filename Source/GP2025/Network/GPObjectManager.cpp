@@ -13,6 +13,9 @@
 #include "Skill/GPSkillCoolDownHandler.h"
 #include "UI/GPFloatingDamageText.h"
 #include "Inventory/GPInventory.h"
+#include "UI/GPInGameWidget.h"
+#include "UI/GPQuestListEntryWidget.h"
+#include "UI/GPQuestListWidget.h"
 #include "Inventory/GPEquippedItemSlot.h"
 #include "Kismet/GameplayStatics.h"
 #include "GPObjectManager.h"
@@ -456,25 +459,33 @@ void UGPObjectManager::HandleSellResult(bool bSuccess, DBResultCode Code, uint32
 
 void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpReward, uint32 GoldReward)
 {
-	//<<<<<< < HEAD
-	//	AGPCharacterPlayer * TargetPlayer = Players.FindRef(playerId);
-	//if (!TargetPlayer) return;
-	//AGPCharacterMyplayer* LocalMyPlayer = MyPlayer;
+	if (bSuccess)
+	{
+		switch (Quest)
+		{
+		case QuestType::None:
+			break;
 
-	//TargetPlayer->CombatHandler->HandleDeath();
-	//FTimerHandle HideTimerHandle;
-	//TargetPlayer->GetWorldTimerManager().SetTimer(HideTimerHandle, [TargetPlayer, LocalMyPlayer]()
-	//	{
+		case QuestType::TalkToNPC:
+			// NPC 대화 퀘스트 보상 처리
+			break;
 
-	//		if (TargetPlayer == LocalMyPlayer)
-	//		{
-	//			if (LocalMyPlayer->UIManager)
-	//			{
-	//				LocalMyPlayer->UIManager->ShowDeadScreen();
-	//			}
-	//		}
+		case QuestType::DefeatTinoboss:
+		{
+			// 티노보스 처치 퀘스트 보상 처리
+			UGPQuestListEntryWidget* LocalMyPlayerCurrentQuest
+				= MyPlayer->UIManager->GetInGameWidget()->QuestListWidget->TinoQuest;
 
-	//	}, 1.f, false);
-	//====== =
-	//	>>>>>> > c674ca79e0d9a58f8830b1d4e8016a5d32bd9f01
+			if (LocalMyPlayerCurrentQuest->EntryType == QuestType::DefeatTinoboss)
+			{
+				LocalMyPlayerCurrentQuest->SetQuestState(TEXT("Success"));
+			}
+			break;
+		}
+
+		default:
+			break;
+		}
+	}
+
 }

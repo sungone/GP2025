@@ -7,6 +7,7 @@
 #include "Character/GPCharacterNPC.h"
 #include "kismet/GameplayStatics.h"
 #include "UI/GPInGameWidget.h"
+#include "Network/GPNetworkManager.h"
 #include "UI/GPQuestListWidget.h"
 #include "Character/GPCharacterMyplayer.h"
 #include "Character/Modules/GPMyplayerUIManager.h"
@@ -30,6 +31,12 @@ void UGPQuestWidget::OnQuestAccepted()
 	if (MyPlayer && MyPlayer->UIManager)
 	{
 		MyPlayer->UIManager->GetInGameWidget()->QuestListWidget->ShowQuestEntry(TEXT("TinoQuest"));
+	}
+
+	UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+	if (NetMgr)
+	{
+		NetMgr->SendMyRequestQuest(QuestType::DefeatTinoboss); // 일단 티노보스 퀘스트 요청
 	}
 
 	OwningNPC->ExitInteraction(); 

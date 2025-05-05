@@ -8,25 +8,24 @@
 void UGPQuestListEntryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	//SetQuestState(TEXT("Unachieved"));
 }
 
-//void UGPQuestListEntryWidget::SetQuestState(const FString& StateText)
-//{
-//	if (!QuestStateText) return;
-//
-//	QuestStateText->SetText(FText::FromString(StateText));
-//
-//	FLinearColor StateColor = FLinearColor::Yellow; 
-//
-//	if (StateText == "Success")
-//	{
-//		StateColor = FLinearColor::Green;
-//	}
-//	else if (StateText == "Fail")
-//	{
-//		StateColor = FLinearColor::Red;
-//	}
-//
-//	QuestStateText->SetColorAndOpacity(FSlateColor(StateColor));
-//}
+void UGPQuestListEntryWidget::SetQuestState(const FString& StateText)
+{
+	if (!QuestStateText) return;
+
+	QuestStateText->SetText(FText::FromString(StateText));
+
+	FLinearColor StateColor = FLinearColor::Yellow; 
+
+	if (StateText == TEXT("Success"))
+	{
+		StateColor = FLinearColor::Green;
+	}
+	else if (StateText == TEXT("Failed"))
+	{
+		StateColor = FLinearColor::Red;
+	}
+
+	QuestStateText->SetColorAndOpacity(FSlateColor(StateColor));
+}
