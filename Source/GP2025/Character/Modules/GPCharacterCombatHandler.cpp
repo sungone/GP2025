@@ -3,6 +3,7 @@
 
 #include "Character/Modules/GPCharacterCombatHandler.h"
 #include "Character/GPCharacterBase.h"
+#include "Character/GPCharacterMyplayer.h"
 #include "Animation/AnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -47,6 +48,13 @@ void UGPCharacterCombatHandler::HandleDeath()
 
 	FTimerHandle DeadTimerHandle;
 	AGPCharacterBase* LocalOwner = Owner;
+
+	if (AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(LocalOwner))
+	{
+		LocalMyPlayer->SetActorHiddenInGame(true);
+		return;
+	}
+	
 	Owner->GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda([LocalOwner]()
 		{
 			if (LocalOwner)

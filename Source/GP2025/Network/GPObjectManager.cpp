@@ -422,20 +422,20 @@ void UGPObjectManager::HandlePlayerDeath(int32 playerId)
 {
 	AGPCharacterPlayer* TargetPlayer = Players.FindRef(playerId);
 	if (!TargetPlayer) return;
+	AGPCharacterMyplayer* LocalMyPlayer = MyPlayer;
 
-	TargetPlayer->CombatHandler->PlayDeadAnimation();
+	TargetPlayer->CombatHandler->HandleDeath();
 	FTimerHandle HideTimerHandle;
-	TargetPlayer->GetWorldTimerManager().SetTimer(HideTimerHandle, [TargetPlayer]()
+	TargetPlayer->GetWorldTimerManager().SetTimer(HideTimerHandle, [TargetPlayer , LocalMyPlayer]()
 		{
-			TargetPlayer->SetActorHiddenInGame(true);
-			TargetPlayer->SetActorEnableCollision(false);
-		}, 1.f, false);
 
-	if (TargetPlayer == MyPlayer)
-	{
-		if (MyPlayer->UIManager)
-		{
-			MyPlayer->UIManager->ShowDeadScreen();
-		}
-	}
+			if (TargetPlayer == LocalMyPlayer)
+			{
+				if (LocalMyPlayer->UIManager)
+				{
+					LocalMyPlayer->UIManager->ShowDeadScreen();
+				}
+			}
+
+		}, 1.f, false);
 }

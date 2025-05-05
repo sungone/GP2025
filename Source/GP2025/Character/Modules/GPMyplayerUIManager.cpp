@@ -194,6 +194,13 @@ void UGPMyplayerUIManager::ShowDeadScreen()
 	if (DeadScreenWidget && !DeadScreenWidget->IsInViewport())
 	{
 		DeadScreenWidget->AddToViewport();
+
+		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
+		if (PC)
+		{
+			PC->SetShowMouseCursor(true);
+			PC->SetInputMode(FInputModeGameAndUI());
+		}
 	}
 }
 
