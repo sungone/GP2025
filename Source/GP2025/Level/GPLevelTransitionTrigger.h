@@ -41,7 +41,7 @@ public:
 	void OnLevelLoaded();
 
 	FVector GetSpawnLocationForLevel(FName LoadLevelName , FName UnloadLevelName);
-
+	bool bRequiredLevelForOpenLevel(uint32 Level);
 
 public:
 	UPROPERTY()

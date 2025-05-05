@@ -61,6 +61,10 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 	CachedPlayer = Cast<AGPCharacterMyplayer>(OtherActor);
 	if (!CachedPlayer) return;
 
+	uint32 CurrentPlayerLevel = CachedPlayer->CharacterInfo.GetLevel();
+
+	if (!bRequiredLevelForOpenLevel(CurrentPlayerLevel)) return;
+
 	if (CachedPlayer && !LevelToLoad.IsNone())
 	{
 		UGPNetworkManager* NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
@@ -72,6 +76,7 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 			else if (LevelToLoad == "E")    NewZone = ZoneType::E;
 			else if (LevelToLoad == "gym")  NewZone = ZoneType::GYM;
 			else if (LevelToLoad == "TUK")  NewZone = ZoneType::TUK;
+			else if (LevelToLoad == "industry")  NewZone = ZoneType::INDUSTY;
 
 			NetworkMgr->SendMyZoneChangePacket(NewZone);
 		}
@@ -120,11 +125,43 @@ FVector AGPLevelTransitionTrigger::GetSpawnLocationForLevel(FName LoadLevelName,
 		return FVector(-4420.0, -12730.0, 837);
 	else if (LoadLevelName == "TUK" && UnloadLevelName == "gym")
 		return FVector(-4180.0, 5220.0, 147);
+	else if (LoadLevelName == "TUK" && UnloadLevelName == "industry")
+		return FVector(8721.06, -19229.73, 146.28);
 	else if (LoadLevelName == "tip")
 		return FVector(-100, 100, 147);
 	else if (LoadLevelName == "E")
 		return FVector(-150, 1500, 147);
 	else if (LoadLevelName == "gym")
 		return FVector(-2000, 0, 147);
+	else if (LoadLevelName == "industry")
+		return FVector(10, -7000, 180);
 	return FVector::ZeroVector;
+}
+
+bool AGPLevelTransitionTrigger::bRequiredLevelForOpenLevel(uint32 Level)
+{
+	if (LevelToLoad == "tip")
+	{
+		return Level >= 1 ? true : false;
+	}
+	else if (LevelToLoad == "E")
+	{
+		return Level >= 4 ? true : false;
+	}
+	else if (LevelToLoad == "gym")
+	{
+		return Level >= 10 ? true : false;
+	}
+	else if (LevelToLoad == "TUK")
+	{
+		return Level >= 1 ? true : false;
+	}
+	else if (LevelToLoad == "industry")
+	{
+		return Level >= 7 ? true : false;
+	}
+	else
+	{
+		return false;
+	}
 }
