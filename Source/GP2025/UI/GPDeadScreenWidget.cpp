@@ -11,6 +11,8 @@ void UGPDeadScreenWidget::OnRespawnButtonClicked()
 	UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
 	if (NetMgr)
 	{
-		NetMgr->SendMyRespawnPacket(ZoneType::TIP);
+		NetMgr->SendMyRespawnPacket(ZoneType::TUK);
 	}
+
+	this->RemoveFromParent();
 }

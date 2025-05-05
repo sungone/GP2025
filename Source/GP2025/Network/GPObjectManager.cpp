@@ -454,4 +454,25 @@ void UGPObjectManager::HandleSellResult(bool bSuccess, DBResultCode Code, uint32
 
 void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpReward, uint32 GoldReward)
 {
+<<<<<<< HEAD
+	AGPCharacterPlayer* TargetPlayer = Players.FindRef(playerId);
+	if (!TargetPlayer) return;
+	AGPCharacterMyplayer* LocalMyPlayer = MyPlayer;
+
+	TargetPlayer->CombatHandler->HandleDeath();
+	FTimerHandle HideTimerHandle;
+	TargetPlayer->GetWorldTimerManager().SetTimer(HideTimerHandle, [TargetPlayer , LocalMyPlayer]()
+		{
+
+			if (TargetPlayer == LocalMyPlayer)
+			{
+				if (LocalMyPlayer->UIManager)
+				{
+					LocalMyPlayer->UIManager->ShowDeadScreen();
+				}
+			}
+
+		}, 1.f, false);
+=======
+>>>>>>> c674ca79e0d9a58f8830b1d4e8016a5d32bd9f01
 }
