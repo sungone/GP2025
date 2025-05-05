@@ -7,7 +7,7 @@ struct Packet
 	struct PacketHeader
 	{
 		EPacketType PacketType;
-		uint8_t PacketSize;
+		uint32 PacketSize;
 
 		PacketHeader(EPacketType type, uint8_t size)
 			: PacketType(type), PacketSize(size) {
@@ -415,4 +415,103 @@ struct RespawnPacket : public Packet
 		Header.PacketSize = sizeof(RespawnPacket);
 	}
 };
+
+#pragma region Shop
+constexpr uint8 MAX_SHOP_ITEMS = 32;
+
+struct ShopItemInfo
+{
+	uint8  ItemType;
+	uint32 ItemID;
+	uint32 Price;
+};
+
+struct ShopItemListPacket : public Packet
+{
+	uint8          ItemCount;
+	ShopItemInfo   Items[MAX_SHOP_ITEMS];
+
+	ShopItemListPacket(uint8 count, const ShopItemInfo* items)
+		: Packet(EPacketType::S_SHOP_ITEM_LIST)
+		, ItemCount(count)
+	{
+		for (uint8 i = 0; i < count && i < MAX_SHOP_ITEMS; ++i)
+			Items[i] = items[i];
+
+		Header.PacketSize = sizeof(ShopItemListPacket);
+	}
+};
+
+struct BuyItemPacket : public Packet
+{
+	uint32 ItemID;
+	uint16 Quantity;
+
+	BuyItemPacket(uint32 itemId, uint16 qty)
+		: Packet(EPacketType::C_SHOP_BUY_ITEM)
+		, ItemID(itemId)
+		, Quantity(qty)
+	{
+		Header.PacketSize = sizeof(BuyItemPacket);
+	}
+};
+
+struct BuyItemResultPacket : public Packet
+{
+	bool          bSuccess;
+	DBResultCode  ResultCode;
+	uint32        NewGold;
+
+	BuyItemResultPacket(bool success, DBResultCode code, uint32 newGold)
+		: Packet(EPacketType::S_SHOP_BUY_RESULT)
+		, bSuccess(success)
+		, ResultCode(code)
+		, NewGold(newGold)
+	{
+		Header.PacketSize = sizeof(BuyItemResultPacket);
+	}
+};
+
+struct SellItemPacket : public Packet
+{
+	uint32 ItemID;
+	uint16 Quantity;
+
+	SellItemPacket(uint32 itemId, uint16 qty)
+		: Packet(EPacketType::C_SHOP_SELL_ITEM)
+		, ItemID(itemId)
+		, Quantity(qty)
+	{
+		Header.PacketSize = sizeof(SellItemPacket);
+	}
+};
+
+struct SellItemResultPacket : public Packet
+{
+	bool          bSuccess;
+	DBResultCode  ResultCode;
+	uint32        NewGold;
+
+	SellItemResultPacket(bool success, DBResultCode code, uint32 newGold)
+		: Packet(EPacketType::S_SHOP_SELL_RESULT)
+		, bSuccess(success)
+		, ResultCode(code)
+		, NewGold(newGold)
+	{
+		Header.PacketSize = sizeof(SellItemResultPacket);
+	}
+};
+
+struct ShopCurrencyUpdatePacket : public Packet
+{
+	uint32 NewGold;
+
+	ShopCurrencyUpdatePacket(uint32 newGold)
+		: Packet(EPacketType::S_SHOP_CURRENCY_UPDATE)
+		, NewGold(newGold)
+	{
+		Header.PacketSize = sizeof(ShopCurrencyUpdatePacket);
+	}
+};
+
 #pragma pack(pop)

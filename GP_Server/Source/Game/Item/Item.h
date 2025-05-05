@@ -23,7 +23,8 @@ public:
 	uint8 GetRandomItemType(uint32 monlv, Type::EPlayer playertype);
 	Type::EWeapon GetRandomWeapon(Type::EPlayer playertype);
 	Type::EArmor GetRandomArmor();
-	Type::EUseable GetRandomUseable();
+	Type::EUseable GetRandomBuffTem();
+	Type::EUseable GetRandomGold();
 	InventoryItem ToInventoryItem() const;
 
 	void SetPos(FVector pos) { _pos = pos; }
