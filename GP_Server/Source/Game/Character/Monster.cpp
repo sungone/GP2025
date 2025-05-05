@@ -151,7 +151,14 @@ void Monster::Attack()
 
 	if (player->IsDead())
 	{
-		//Todo: 플레이어 죽음처리
+		auto pkt = PlayerDeadPacket(playerID);
+		std::unordered_set<int32> vlist;
+		{
+			std::lock_guard lock(player->_vlLock);
+			vlist = player->GetViewList();
+		}
+		SessionManager::GetInst().SendPacket(playerID, &pkt);
+		SessionManager::GetInst().BroadcastToViewList(&pkt, vlist);
 	}
 }
 
