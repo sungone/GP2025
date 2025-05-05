@@ -42,8 +42,8 @@ public:
 	void DropItem(uint32 ItemID, uint8 ItemType, FVector Pos);
 	void AddInventoryItem(uint32 ItemID, uint8 ItemType);
 	void UseInventoryItem(uint32 ItemID);
-	void EquipItem(int32 PlayerID, uint8 ItemType, const FStatData& Stats);
-	void UnequipItem(int32 PlayerID, uint8 ItemType, const FStatData& Stats);
+	void EquipItem(int32 PlayerID, uint8 ItemType);
+	void UnequipItem(int32 PlayerID, uint8 ItemType);
 
 	void ChangeZone(ZoneType zone, const FVector& pos);
 	void RespawnMyPlayer(const FInfoData& info);

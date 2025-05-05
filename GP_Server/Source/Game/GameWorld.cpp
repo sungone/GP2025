@@ -435,7 +435,7 @@ void GameWorld::EquipInventoryItem(int32 playerId, uint32 itemId)
 		viewList = player->GetViewList();
 	}
 
-	auto pkt1 = ItemPkt::EquipItemPacket(playerId, itemTypeID, player->GetStats());
+	auto pkt1 = ItemPkt::EquipItemPacket(playerId, itemTypeID, player->GetInfo());
 	SessionManager::GetInst().BroadcastToViewList(&pkt1, viewList);
 }
 
@@ -453,7 +453,7 @@ void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
 		std::lock_guard lock(player->_vlLock);
 		viewList = player->GetViewList();
 	}
-	auto pkt1 = ItemPkt::UnequipItemPacket(playerId, itemTypeID, player->GetStats());
+	auto pkt1 = ItemPkt::UnequipItemPacket(playerId, itemTypeID, player->GetInfo());
 	SessionManager::GetInst().BroadcastToViewList(&pkt1, viewList);
 }
 

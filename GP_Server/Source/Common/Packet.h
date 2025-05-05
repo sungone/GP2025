@@ -351,10 +351,10 @@ namespace ItemPkt
 	{
 		int32 PlayerID;
 		uint8 ItemType;
-		FStatData Stats;
+		FInfoData PlayerInfo;
 
-		EquipItemPacket(int32 playerId, uint8 type, FStatData stats)
-			: Packet(EPacketType::S_EQUIP_ITEM), PlayerID(playerId), ItemType(type), Stats(stats)
+		EquipItemPacket(int32 playerId, uint8 type, const FInfoData& PlayerInfo_)
+			: Packet(EPacketType::S_EQUIP_ITEM), PlayerID(playerId), ItemType(type), PlayerInfo(PlayerInfo_)
 		{
 			Header.PacketSize = sizeof(EquipItemPacket);
 		}
@@ -364,10 +364,10 @@ namespace ItemPkt
 	{
 		int32 PlayerID;
 		uint8 ItemType;
-		FStatData Stats;
+		FInfoData PlayerInfo;
 
-		UnequipItemPacket(int32 playerId, uint8 type, FStatData stats)
-			: Packet(EPacketType::S_UNEQUIP_ITEM), PlayerID(playerId), ItemType(type), Stats(stats)
+		UnequipItemPacket(int32 playerId, uint8 type, const FInfoData& PlayerInfo_)
+			: Packet(EPacketType::S_UNEQUIP_ITEM), PlayerID(playerId), ItemType(type), PlayerInfo(PlayerInfo_)
 		{
 			Header.PacketSize = sizeof(UnequipItemPacket);
 		}
