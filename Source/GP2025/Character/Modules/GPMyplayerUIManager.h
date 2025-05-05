@@ -68,6 +68,10 @@ public:
 	UPROPERTY()
 	UUserWidget* DeadScreenWidget;
 
+	// 현재 NPC 가 열고있는 QuestWidget 이 있으면 저장
+	UPROPERTY()
+	class UGPQuestWidget* CurrentQuestWidget = nullptr;
+
 	UPROPERTY()
 	TSubclassOf<UUserWidget> InventoryWidgetClass;
 

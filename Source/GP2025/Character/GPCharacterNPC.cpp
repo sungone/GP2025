@@ -12,6 +12,7 @@
 #include "Character/Modules/GPMyplayerCameraHandler.h"
 #include "UI/GPQuestWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "Character/Modules/GPMyplayerUIManager.h"
 #include "Character/GPCharacterMyplayer.h"
 
 AGPCharacterNPC::AGPCharacterNPC()
@@ -36,7 +37,7 @@ AGPCharacterNPC::AGPCharacterNPC()
 
 	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionSphere"));
 	InteractionSphere->SetupAttachment(RootComponent);
-	InteractionSphere->SetSphereRadius(400.f);
+	InteractionSphere->SetSphereRadius(250.f);
 	InteractionSphere->SetCollisionProfileName(TEXT("Trigger"));
 	InteractionSphere->SetGenerateOverlapEvents(true);
 
@@ -90,7 +91,8 @@ void AGPCharacterNPC::CloseShopUI()
 {
 	if (ShopWidget)
 	{
-		ShopWidget->SetVisibility(ESlateVisibility::Hidden);
+		ShopWidget->RemoveFromParent();   
+		ShopWidget = nullptr;
 
 		APlayerController* PC = GetWorld()->GetFirstPlayerController();
 		if (PC)
@@ -99,6 +101,8 @@ void AGPCharacterNPC::CloseShopUI()
 			PC->bShowMouseCursor = false;
 		}
 	}
+
+	bIsInteracting = false;
 }
 
 void AGPCharacterNPC::OpenQuestUI(APlayerController* PlayerController)
@@ -112,14 +116,24 @@ void AGPCharacterNPC::OpenQuestUI(APlayerController* PlayerController)
 			if (UGPQuestWidget* LocalQuestWidget = Cast<UGPQuestWidget>(QuestWidget))
 			{
 				LocalQuestWidget->OwningNPC = this;
+
+				if (AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0)))
+				{
+					if (MyPlayer->UIManager)
+					{
+						MyPlayer->UIManager->CurrentQuestWidget = LocalQuestWidget;
+					}
+				}
 			}
 		}
 	}
 
 	if (QuestWidget)
 	{
-		QuestWidget->SetVisibility(ESlateVisibility::Visible);
-		PlayerController->SetInputMode(FInputModeUIOnly());
+		FInputModeGameAndUI InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		InputMode.SetHideCursorDuringCapture(false);
+		PlayerController->SetInputMode(InputMode);
 		PlayerController->bShowMouseCursor = true;
 	}
 }
@@ -128,8 +142,8 @@ void AGPCharacterNPC::CloseQuestUI()
 {
 	if (QuestWidget)
 	{
-		QuestWidget->SetVisibility(ESlateVisibility::Hidden);
-
+		QuestWidget->RemoveFromParent();     
+		QuestWidget = nullptr;
 		APlayerController* PC = GetWorld()->GetFirstPlayerController();
 		if (PC)
 		{
@@ -137,6 +151,8 @@ void AGPCharacterNPC::CloseQuestUI()
 			PC->bShowMouseCursor = false;
 		}
 	}
+
+	bIsInteracting = false;
 }
 
 void AGPCharacterNPC::OnInteractionStart(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -224,6 +240,8 @@ void AGPCharacterNPC::ExitInteraction()
 			{
 				MyPlayer->CameraHandler->StopDialogueCamera();
 			}
+
+			MyPlayer->UIManager->CurrentQuestWidget = nullptr;
 		}
 		CloseQuestUI();
 		break;
@@ -231,7 +249,7 @@ void AGPCharacterNPC::ExitInteraction()
 		break;
 	}
 
-	bIsInteracting = false;
+	// bIsInteracting = false;
 }
 
 void AGPCharacterNPC::OpenQuestUIDelayed()

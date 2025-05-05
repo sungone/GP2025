@@ -47,6 +47,5 @@ void UGPQuestWidget::OnQuestExit()
 	if (OwningNPC)
 	{
 		OwningNPC->ExitInteraction();
-		RemoveFromParent();
 	}
 }

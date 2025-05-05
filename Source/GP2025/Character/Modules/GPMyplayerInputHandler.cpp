@@ -16,7 +16,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Skill/GPSkillCoolDownHandler.h"
 #include "Player/GPPlayerController.h"
+#include "UI/GPQuestWidget.h"
 #include "Inventory/GPInventory.h"
+#include "UI/GPInGameWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "Network/GPNetworkManager.h"
 #include "Network/GPGameInstance.h"
@@ -52,6 +54,9 @@ UGPMyplayerInputHandler::UGPMyplayerInputHandler()
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_SkillQ.IA_SkillQ'"), SkillQAction);
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_SkillE.IA_SkillE'"), SkillEAction);
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_SkillR.IA_SkillR'"), SkillRAction);
+	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Accept.IA_Accept'"), AcceptAction);
+	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Refuse.IA_Refuse'"), RefuseAction);
+	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Interaction.IA_Interaction'"), InteractionAction);
 }
 
 void UGPMyplayerInputHandler::Initialize(AGPCharacterMyplayer* InOwner, UEnhancedInputComponent* InputComponent)
@@ -89,6 +94,10 @@ void UGPMyplayerInputHandler::SetupInputBindings(UEnhancedInputComponent* Enhanc
 	EnhancedInput->BindAction(SkillQAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::UseSkillQ);
 	EnhancedInput->BindAction(SkillEAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::UseSkillE);
 	EnhancedInput->BindAction(SkillRAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::UseSkillR);
+
+	EnhancedInput->BindAction(AcceptAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::Accept);
+	EnhancedInput->BindAction(RefuseAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::Refuse);
+	EnhancedInput->BindAction(InteractionAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::Interact);
 }
 
 
@@ -217,7 +226,27 @@ void UGPMyplayerInputHandler::OpenSettingWidget()
 	Owner->UIManager->OpenSettingWidget();
 }
 
-void UGPMyplayerInputHandler::TakeInteraction()
+void UGPMyplayerInputHandler::Accept()
+{
+	if (!Owner || !Owner->UIManager) return;
+
+	if (UGPQuestWidget* QuestWidget = Owner->UIManager->CurrentQuestWidget)
+	{
+		QuestWidget->OnQuestAccepted();
+	}
+}
+
+void UGPMyplayerInputHandler::Refuse()
+{
+	if (!Owner || !Owner->UIManager) return;
+
+	if (UGPQuestWidget* QuestWidget = Owner->UIManager->CurrentQuestWidget)
+	{
+		QuestWidget->OnQuestExit();
+	}
+}
+
+void UGPMyplayerInputHandler::Interact()
 {
 	if (!Owner) return;
 
@@ -226,16 +255,20 @@ void UGPMyplayerInputHandler::TakeInteraction()
 	{
 		NPC->CheckAndHandleInteraction(Cast<AGPCharacterMyplayer>(Owner));
 	}
-	else // Item Drop
-	{
-		bGetTakeItem = true;
-		Owner->GetWorldTimerManager().SetTimer(
-			GetInteractionResetTimerHandle,
-			[this]() { bGetTakeItem = false; },
-			1.f,
-			false
-		);
-	}
+}
+
+void UGPMyplayerInputHandler::TakeInteraction()
+{
+	if (!Owner) return;
+
+	bGetTakeItem = true;
+	Owner->GetWorldTimerManager().SetTimer(
+		GetInteractionResetTimerHandle,
+		[this]() { bGetTakeItem = false; },
+		1.f,
+		false
+	);
+	
 }
 
 void UGPMyplayerInputHandler::StartAiming()

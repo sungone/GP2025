@@ -69,6 +69,15 @@ public :
 	UPROPERTY()
 	TObjectPtr<UInputAction> SkillRAction;
 
+	UPROPERTY()
+	TObjectPtr<UInputAction> AcceptAction;
+
+	UPROPERTY()
+	TObjectPtr<UInputAction> RefuseAction;
+
+	UPROPERTY()
+	TObjectPtr<UInputAction> InteractionAction;
+
 public :
     void Move(const FInputActionValue& Value);
     void Look(const FInputActionValue& Value);
@@ -87,6 +96,10 @@ public :
 	void CloseInventory();
 
     void OpenSettingWidget();
+
+	void Accept();
+	void Refuse();
+	void Interact();
 	
 
 	void TakeInteraction();
