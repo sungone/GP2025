@@ -7,7 +7,7 @@ struct Packet
 	struct PacketHeader
 	{
 		EPacketType PacketType;
-		uint32 PacketSize;
+		int32 PacketSize;
 
 		PacketHeader(EPacketType type, uint8_t size)
 			: PacketType(type), PacketSize(size) {
