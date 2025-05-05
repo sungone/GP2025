@@ -81,6 +81,26 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 		HandleRespawnRequestPacket(sessionId, packet);
 		break;
 
+	case EPacketType::C_SHOP_BUY_ITEM:
+		LOG(LogType::RecvLog, std::format("ShopBuyItemPacket from [{}]", sessionId));
+		HandleShopBuyItemPacket(sessionId, packet);
+		break;
+
+	case EPacketType::C_SHOP_SELL_ITEM:
+		LOG(LogType::RecvLog, std::format("ShopSellItemPacket from [{}]", sessionId));
+		HandleShopSellItemPacket(sessionId, packet);
+		break;
+
+	case EPacketType::C_REQUEST_QUEST:
+		LOG(LogType::RecvLog, std::format("RequestQuestPacket from [{}]", sessionId));
+		HandleRequestQuestPacket(sessionId, packet);
+		break;
+
+	case EPacketType::C_COMPLETE_QUEST:
+		LOG(LogType::RecvLog, std::format("CompleteQuestPacket from [{}]", sessionId));
+		HandleCompleteQuestPacket(sessionId, packet);
+		break;
+
 	default:
 		LOG(LogType::RecvLog, "Unknown Packet Type");
 	}
@@ -270,4 +290,20 @@ void PacketManager::HandleRespawnRequestPacket(int32 sessionId, Packet* packet)
 	auto* p = static_cast<RespawnRequestPacket*>(packet);
 	ZoneType targetZone = p->TargetZone;
 	_gameWorld.RespawnPlayer(sessionId, targetZone);
+}
+
+void PacketManager::HandleShopBuyItemPacket(int32 sessionId, Packet* packet)
+{
+}
+
+void PacketManager::HandleShopSellItemPacket(int32 sessionId, Packet* packet)
+{
+}
+
+void PacketManager::HandleRequestQuestPacket(int32 sessionId, Packet* packet)
+{
+}
+
+void PacketManager::HandleCompleteQuestPacket(int32 sessionId, Packet* packet)
+{
 }

@@ -93,6 +93,20 @@ struct FEquitState
 	Type::EArmor Chest = Type::EArmor::NONE;
 };
 
+constexpr uint8 MAX_PLAYER_QUESTS = 5;
+struct QuestInfo
+{
+	QuestType QuestType;
+	uint8  Status;
+};
+
+struct ShopItemInfo
+{
+	uint8  ItemType;
+	uint32 ItemID;
+	uint32 Price;
+};
+
 struct FInfoData
 {
 	int32 ID;
@@ -110,6 +124,8 @@ struct FInfoData
 	FSkillState Skills;
 	FEquitState EquipState;
 	ZoneType CurrentZone;
+
+	QuestInfo Quests[MAX_PLAYER_QUESTS];
 
 	FInfoData()
 		: ID(0),

@@ -419,24 +419,17 @@ struct RespawnPacket : public Packet
 #pragma region Shop
 constexpr uint8 MAX_SHOP_ITEMS = 32;
 
-struct ShopItemInfo
-{
-	uint8  ItemType;
-	uint32 ItemID;
-	uint32 Price;
-};
-
 struct ShopItemListPacket : public Packet
 {
 	uint8          ItemCount;
-	ShopItemInfo   Items[MAX_SHOP_ITEMS];
+	ShopItemInfo   ShopItems[MAX_SHOP_ITEMS];
 
 	ShopItemListPacket(uint8 count, const ShopItemInfo* items)
 		: Packet(EPacketType::S_SHOP_ITEM_LIST)
 		, ItemCount(count)
 	{
 		for (uint8 i = 0; i < count && i < MAX_SHOP_ITEMS; ++i)
-			Items[i] = items[i];
+			ShopItems[i] = items[i];
 
 		Header.PacketSize = sizeof(ShopItemListPacket);
 	}
@@ -460,13 +453,13 @@ struct BuyItemResultPacket : public Packet
 {
 	bool          bSuccess;
 	DBResultCode  ResultCode;
-	uint32        NewGold;
+	uint32        PlayerGold;
 
-	BuyItemResultPacket(bool success, DBResultCode code, uint32 newGold)
+	BuyItemResultPacket(bool success, DBResultCode code, uint32 updateGold)
 		: Packet(EPacketType::S_SHOP_BUY_RESULT)
 		, bSuccess(success)
 		, ResultCode(code)
-		, NewGold(newGold)
+		, PlayerGold(updateGold)
 	{
 		Header.PacketSize = sizeof(BuyItemResultPacket);
 	}
@@ -490,28 +483,63 @@ struct SellItemResultPacket : public Packet
 {
 	bool          bSuccess;
 	DBResultCode  ResultCode;
-	uint32        NewGold;
+	uint32        PlayerGold;
 
-	SellItemResultPacket(bool success, DBResultCode code, uint32 newGold)
+	SellItemResultPacket(bool success, DBResultCode code, uint32 updateGold)
 		: Packet(EPacketType::S_SHOP_SELL_RESULT)
 		, bSuccess(success)
 		, ResultCode(code)
-		, NewGold(newGold)
+		, PlayerGold(updateGold)
 	{
 		Header.PacketSize = sizeof(SellItemResultPacket);
 	}
 };
 
-struct ShopCurrencyUpdatePacket : public Packet
-{
-	uint32 NewGold;
+#pragma endregion
 
-	ShopCurrencyUpdatePacket(uint32 newGold)
-		: Packet(EPacketType::S_SHOP_CURRENCY_UPDATE)
-		, NewGold(newGold)
+#pragma region Quest
+
+struct RequestQuestPacket : public Packet
+{
+	QuestType Quest;
+	RequestQuestPacket(QuestType quest)
+		: Packet(EPacketType::C_REQUEST_QUEST)
+		, Quest(quest)
 	{
-		Header.PacketSize = sizeof(ShopCurrencyUpdatePacket);
+		Header.PacketSize = sizeof(RequestQuestPacket);
 	}
 };
+
+struct CompleteQuestPacket : public Packet
+{
+	QuestType Quest;
+	CompleteQuestPacket(QuestType quest)
+		: Packet(EPacketType::C_COMPLETE_QUEST)
+		, Quest(quest)
+	{
+		Header.PacketSize = sizeof(CompleteQuestPacket);
+	}
+};
+
+struct QuestRewardPacket : public Packet
+{
+	QuestType Quest;
+	bool   bSuccess;
+	uint32 ExpReward;
+	uint32 GoldReward;
+
+	QuestRewardPacket(QuestType quest, bool ok, uint32 exp, uint32 gold)
+		: Packet(EPacketType::S_QUEST_REWARD)
+		, Quest(quest)
+		, bSuccess(ok)
+		, ExpReward(exp)
+		, GoldReward(gold)
+	{
+		Header.PacketSize = sizeof(QuestRewardPacket);
+	}
+};
+
+#pragma endregion
+
 
 #pragma pack(pop)

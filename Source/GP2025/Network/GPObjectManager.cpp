@@ -144,6 +144,28 @@ void UGPObjectManager::DamagedPlayer(const FInfoData& PlayerInfo)
 	}
 }
 
+void UGPObjectManager::HandlePlayerDeath(int32 playerId)
+{
+	AGPCharacterPlayer* TargetPlayer = Players.FindRef(playerId);
+	if (!TargetPlayer) return;
+
+	TargetPlayer->CombatHandler->PlayDeadAnimation();
+	FTimerHandle HideTimerHandle;
+	TargetPlayer->GetWorldTimerManager().SetTimer(HideTimerHandle, [TargetPlayer]()
+		{
+			TargetPlayer->SetActorHiddenInGame(true);
+			TargetPlayer->SetActorEnableCollision(false);
+		}, 1.f, false);
+
+	if (TargetPlayer == MyPlayer)
+	{
+		if (MyPlayer->UIManager)
+		{
+			MyPlayer->UIManager->ShowDeadScreen();
+		}
+	}
+}
+
 void UGPObjectManager::SkillUnlock(ESkillGroup SkillGID)
 {
 	if (MyPlayer->EffectHandler)
@@ -418,24 +440,18 @@ void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
 	}
 }
 
-void UGPObjectManager::HandlePlayerDeath(int32 playerId)
+void UGPObjectManager::ShowShopItems(uint8 Count, const ShopItemInfo* shopitems)
 {
-	AGPCharacterPlayer* TargetPlayer = Players.FindRef(playerId);
-	if (!TargetPlayer) return;
+}
 
-	TargetPlayer->CombatHandler->PlayDeadAnimation();
-	FTimerHandle HideTimerHandle;
-	TargetPlayer->GetWorldTimerManager().SetTimer(HideTimerHandle, [TargetPlayer]()
-		{
-			TargetPlayer->SetActorHiddenInGame(true);
-			TargetPlayer->SetActorEnableCollision(false);
-		}, 1.f, false);
+void UGPObjectManager::HandleBuyResult(bool bSuccess, DBResultCode Code, uint32 NewGold)
+{
+}
 
-	if (TargetPlayer == MyPlayer)
-	{
-		if (MyPlayer->UIManager)
-		{
-			MyPlayer->UIManager->ShowDeadScreen();
-		}
-	}
+void UGPObjectManager::HandleSellResult(bool bSuccess, DBResultCode Code, uint32 NewGold)
+{
+}
+
+void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpReward, uint32 GoldReward)
+{
 }
