@@ -32,7 +32,7 @@ void AGPFloatingDamageText::BeginPlay()
 	if (Widget)
 	{
 		DamageText = Cast<UTextBlock>(Widget->GetWidgetFromName(TEXT("DamageText")));
-		DamageText->SetColorAndOpacity(FSlateColor(FLinearColor::Blue));
+		DamageText->SetColorAndOpacity(FSlateColor(FLinearColor::White));
 	}
 
 	GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &AGPFloatingDamageText::DestroySelf, 1.0f, false);
@@ -55,6 +55,7 @@ void AGPFloatingDamageText::SetDamageText(float DamageAmount, bool bIsCrt)
 		if (DamageAmount <= 0.f)
 		{
 			DamageText->SetText(FText::FromString(TEXT("Miss")));
+			DamageText->SetColorAndOpacity(FSlateColor(FLinearColor::Gray));
 		}
 		else
 		{
@@ -62,11 +63,13 @@ void AGPFloatingDamageText::SetDamageText(float DamageAmount, bool bIsCrt)
 
 			if (bIsCrt)
 			{
-				DamageText->SetRenderScale(FVector2D(1.5f, 1.5f)); // 크리티컬일 때 크기 증가
+				DamageText->SetRenderScale(FVector2D(1.5f, 1.5f)); 
+				DamageText->SetColorAndOpacity(FSlateColor(FLinearColor::Red));
 			}
 			else
 			{
-				DamageText->SetRenderScale(FVector2D(0.5f, 0.5f)); // 기본 크기 유지
+				DamageText->SetRenderScale(FVector2D(0.5f, 0.5f)); 
+				DamageText->SetColorAndOpacity(FSlateColor(FLinearColor::White));
 			}
 		}
 	}
