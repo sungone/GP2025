@@ -445,7 +445,7 @@ void UGPObjectManager::ShowShopItems(uint8 Count, const ShopItemInfo* shopitems)
 }
 
 void UGPObjectManager::HandleBuyResult(bool bSuccess, DBResultCode Code, uint32 NewGold)
-{
+{ 
 }
 
 void UGPObjectManager::HandleSellResult(bool bSuccess, DBResultCode Code, uint32 NewGold)

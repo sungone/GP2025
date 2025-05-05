@@ -204,6 +204,30 @@ void UGPNetworkManager::SendMyRespawnPacket(ZoneType zone)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
+void UGPNetworkManager::SendMyShopBuyItem(int32 ItemID, int32 Quantity)
+{
+	BuyItemPacket Packet(ItemID, Quantity);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendMyShopSellItem(int32 ItemID, int32 Quantity)
+{
+	SellItemPacket Packet(ItemID, Quantity);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendMyRequestQuest(QuestType quest)
+{
+	RequestQuestPacket Packet(quest);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendMyCompleteQuest(QuestType quest)
+{
+	CompleteQuestPacket Packet(quest);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
 void UGPNetworkManager::ReceiveData()
 {
 	uint32 DataSize;
