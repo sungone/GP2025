@@ -38,8 +38,15 @@ bool Character::IsCollision(const FInfoData& target)
 
 bool Character::IsInAttackRange(const FInfoData& target)
 {
-	return IsInViewDistance(target.Pos, _info.AttackRadius + target.CollisionRadius)
-		&& IsInFieldOfView(target);
+	if (_info.CharacterType == (uint8)Type::EPlayer::GUNNER)
+	{
+		return IsInRectangularAttackRange(target, 100.f);
+	}
+	else
+	{
+		return IsInViewDistance(target.Pos, _info.AttackRadius + target.CollisionRadius)
+			&& IsInFieldOfView(target);
+	}
 }
 
 bool Character::IsInViewDistance(const FVector& targetPos, const float viewDist)
@@ -68,6 +75,21 @@ bool Character::HasLineOfSight(const FVector& targetPos, const std::vector<FVect
 		}
 	}
 	return true;
+}
+
+bool Character::IsInRectangularAttackRange(const FInfoData& target, float width)
+{
+	const float radYaw = _info.Yaw * (3.14159265f / 180.0f);
+	FVector forward(std::cos(radYaw), std::sin(radYaw), 0.f);
+	FVector toTarget = target.Pos - _info.Pos;
+
+	float forwardDist = forward.DotProduct(toTarget);
+	float sideDist = FVector(-forward.Y, forward.X, 0.f).DotProduct(toTarget);
+
+	const float range = _info.AttackRadius;
+
+	return (forwardDist >= 0 && forwardDist <= range) &&
+		(std::abs(sideDist) <= width * 0.5f);
 }
 
 bool Character::AddToViewList(int32 CharacterId)

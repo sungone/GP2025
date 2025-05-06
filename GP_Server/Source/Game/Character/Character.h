@@ -23,6 +23,7 @@ public:
 	bool IsInViewDistance(const FVector& targetPos, float viewDist);
 	bool IsInFieldOfView(const FInfoData& target);
 	bool HasLineOfSight(const FVector& targetPos, const std::vector<FVector>& obstacles);
+	bool IsInRectangularAttackRange(const FInfoData& target, float width);
 
 	virtual void UpdateViewList(std::shared_ptr<Character> other) {}
 	bool AddToViewList(int32 CharacterId);
