@@ -97,7 +97,7 @@ struct FEquitState
 constexpr uint8 MAX_PLAYER_QUESTS = 15;
 struct QuestStatus
 {
-	QuestType QuestType;
+	QuestType QuestType = QuestType::NONE;
 	EQuestStatus Status = EQuestStatus::NotStarted;
 };
 
