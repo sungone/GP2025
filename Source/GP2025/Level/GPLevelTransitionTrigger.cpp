@@ -151,7 +151,7 @@ bool AGPLevelTransitionTrigger::bRequiredLevelForOpenLevel(uint32 Level)
 	}
 	else if (LevelToLoad == "gym")
 	{
-		return Level >= 10 ? true : false;
+		return Level >= 1 ? true : false;
 	}
 	else if (LevelToLoad == "TUK")
 	{

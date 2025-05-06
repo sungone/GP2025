@@ -178,7 +178,8 @@ void AGPCharacterBase::SetNameByCharacterInfo()
 
 void AGPCharacterBase::HandleAutoAttackState()
 {
-	if (CharacterInfo.HasState(STATE_AUTOATTACK) && !CombatHandler->IsAutoAttacking()) // && !CharacterInfo.HasState(STATE_JUMP)
+	if (CharacterInfo.HasState(STATE_AUTOATTACK) && !CombatHandler->IsAutoAttacking() 
+		&& !CombatHandler->IsUsingSkill()) // && !CharacterInfo.HasState(STATE_JUMP)
 	{
 		CombatHandler->PlayAutoAttackMontage();
 		CharacterInfo.RemoveState(STATE_AUTOATTACK);
@@ -187,7 +188,8 @@ void AGPCharacterBase::HandleAutoAttackState()
 
 void AGPCharacterBase::HandleQSkillState()
 {
-	if (CharacterInfo.HasState(STATE_SKILL_Q) && !CombatHandler->IsUsingSkill())
+	if (CharacterInfo.HasState(STATE_SKILL_Q) && !CombatHandler->IsUsingSkill() 
+		&& !CombatHandler->IsAutoAttacking())
 	{
 		CombatHandler->PlayQSkillMontage();
 		CharacterInfo.RemoveState(STATE_SKILL_Q);
@@ -196,7 +198,8 @@ void AGPCharacterBase::HandleQSkillState()
 
 void AGPCharacterBase::HandleESkillState()
 {
-	if (CharacterInfo.HasState(STATE_SKILL_E) && !CombatHandler->IsUsingSkill())
+	if (CharacterInfo.HasState(STATE_SKILL_E) && !CombatHandler->IsUsingSkill() 
+		&& !CombatHandler->IsAutoAttacking())
 	{
 		CombatHandler->PlayESkillMontage();
 		CharacterInfo.RemoveState(STATE_SKILL_E);
@@ -205,7 +208,8 @@ void AGPCharacterBase::HandleESkillState()
 
 void AGPCharacterBase::HandleRSkillState()
 {
-	if (CharacterInfo.HasState(STATE_SKILL_R) && !CombatHandler->IsUsingSkill())
+	if (CharacterInfo.HasState(STATE_SKILL_R) && !CombatHandler->IsUsingSkill() 
+		&& !CombatHandler->IsAutoAttacking())
 	{
 		CombatHandler->PlayRSkillMontage();
 		CharacterInfo.RemoveState(STATE_SKILL_R);

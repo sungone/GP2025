@@ -328,18 +328,18 @@ void UGPMyplayerInputHandler::UseSkillQ()
 		return;
 	}
 
-	Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
-
 	if (Owner->bIsGunnerCharacter())
 	{
 		if (!Owner->CameraHandler->IsZooming()) return;
 
+		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_Q);
 		Owner->CombatHandler->PlayQSkillMontage();
 		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Throwing, Owner->GetControlRotation().Yaw);
 	}
 	else
 	{
+		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_Q);
 		Owner->CombatHandler->PlayQSkillMontage();
 		Owner->NetMgr->SendMyUseSkill(ESkillGroup::HitHard, Owner->GetControlRotation().Yaw);
@@ -363,18 +363,20 @@ void UGPMyplayerInputHandler::UseSkillE()
 		return;
 	}
 
-	Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
-
 	if (Owner->bIsGunnerCharacter())
 	{
 		if (!Owner->CameraHandler->IsZooming()) return;
 
+
+		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_E);
 		Owner->CombatHandler->PlayESkillMontage();
 		Owner->NetMgr->SendMyUseSkill(ESkillGroup::FThrowing, Owner->GetControlRotation().Yaw);
 	}
 	else
 	{
+
+		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_E);
 		Owner->CombatHandler->PlayESkillMontage();
 		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Clash, Owner->GetControlRotation().Yaw);
@@ -398,18 +400,19 @@ void UGPMyplayerInputHandler::UseSkillR()
 		return;
 	}
 
-	Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 
 	if (Owner->bIsGunnerCharacter())
 	{
 		if (!Owner->CameraHandler->IsZooming()) return;
 
+		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_R);
 		Owner->CombatHandler->PlayRSkillMontage();
 		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Anger, Owner->GetControlRotation().Yaw);
 	}
 	else
 	{
+		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_R);
 		Owner->CombatHandler->PlayRSkillMontage();
 		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Whirlwind, Owner->GetControlRotation().Yaw);

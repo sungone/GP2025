@@ -12,10 +12,12 @@
 #include "Character/Modules/GPPlayerEffectHandler.h"
 #include "Skill/GPSkillCoolDownHandler.h"
 #include "UI/GPFloatingDamageText.h"
+#include "Network/GPGameInstance.h"
 #include "Inventory/GPInventory.h"
 #include "UI/GPInGameWidget.h"
 #include "UI/GPQuestListEntryWidget.h"
 #include "UI/GPQuestListWidget.h"
+#include "Network/GPNetworkManager.h"
 #include "Inventory/GPEquippedItemSlot.h"
 #include "Kismet/GameplayStatics.h"
 #include "GPObjectManager.h"
@@ -227,6 +229,17 @@ void UGPObjectManager::RemoveMonster(int32 MonsterID)
 	UE_LOG(LogTemp, Warning, TEXT("Remove monster [%d]"), MonsterID);
 	if (Monsters.Contains(MonsterID))
 	{
+		// Quest : CH3_KILL_TINO 클리어
+		AGPCharacterMonster* Monster = Monsters[MonsterID];
+		if (Monster && Monster->CharacterInfo.CharacterType == static_cast<uint8>(Type::EMonster::TINO))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[QuestTrigger] TINO Boss killed! Sending quest completion."));
+			if (UGPNetworkManager* NetMgr = MyPlayer->GetGameInstance()->GetSubsystem<UGPNetworkManager>())
+			{
+				NetMgr->SendMyCompleteQuest(QuestType::CH3_KILL_TINO); 
+			}
+		}
+
 		Monsters[MonsterID]->CombatHandler->HandleDeath();
 		Monsters.Remove(MonsterID);
 	}
@@ -459,33 +472,58 @@ void UGPObjectManager::HandleSellResult(bool bSuccess, DBResultCode Code, uint32
 
 void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpReward, uint32 GoldReward)
 {
+	UE_LOG(LogTemp, Warning, TEXT("[QuestReward] Called: QuestType = %d, bSuccess = %s, Exp = %d, Gold = %d"),
+		static_cast<int32>(Quest),
+		bSuccess ? TEXT("true") : TEXT("false"),
+		ExpReward,
+		GoldReward);
+
 	if (bSuccess)
 	{
 		switch (Quest)
 		{
 		case QuestType::NONE:
+			UE_LOG(LogTemp, Warning, TEXT("[QuestReward] QuestType::NONE - No reward"));
 			break;
 
 		case QuestType::CH1_TALK_TO_STUDENT_A:
+			UE_LOG(LogTemp, Warning, TEXT("[QuestReward] CH1_TALK_TO_STUDENT_A reward handling"));
 			// NPC 대화 퀘스트 보상 처리
 			break;
 
 		case QuestType::CH3_KILL_TINO:
 		{
-			// 티노보스 처치 퀘스트 보상 처리
+			UE_LOG(LogTemp, Warning, TEXT("[QuestReward] CH3_KILL_TINO reward handling"));
+
 			UGPQuestListEntryWidget* LocalMyPlayerCurrentQuest
 				= MyPlayer->UIManager->GetInGameWidget()->QuestListWidget->TinoQuest;
 
-			if (LocalMyPlayerCurrentQuest->EntryType == QuestType::CH3_KILL_TINO)
+			if (LocalMyPlayerCurrentQuest)
 			{
-				LocalMyPlayerCurrentQuest->SetQuestState(TEXT("Success"));
+				if (LocalMyPlayerCurrentQuest->EntryType == QuestType::CH3_KILL_TINO)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("[QuestReward] Updating quest state to Success"));
+					LocalMyPlayerCurrentQuest->SetQuestState(TEXT("Success"));
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("[QuestReward] EntryType mismatch. Expected CH3_KILL_TINO, got %d"), static_cast<int32>(LocalMyPlayerCurrentQuest->EntryType));
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("[QuestReward] TinoQuest widget is nullptr!"));
 			}
 			break;
 		}
 
 		default:
+			UE_LOG(LogTemp, Warning, TEXT("[QuestReward] Unhandled QuestType: %d"), static_cast<int32>(Quest));
 			break;
 		}
 	}
-
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[QuestReward] bSuccess is false. No rewards applied."));
+	}
 }
