@@ -228,6 +228,13 @@ void UGPNetworkManager::SendMyCompleteQuest(QuestType quest)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
+void UGPNetworkManager::SendMyChatMessage(const FString& Message)
+{
+	FTCHARToUTF8 MsgUtf8(*Message);
+	ChatSendPacket Packet(MsgUtf8.Get());
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
 void UGPNetworkManager::ReceiveData()
 {
 	uint32 DataSize;
@@ -478,6 +485,20 @@ void UGPNetworkManager::ProcessPacket()
 				break;
 			}
 #pragma endregion
+#pragma region Chat
+			case EPacketType::S_CHAT_BROADCAST:
+			{
+				ChatBroadcastPacket* Pkt = reinterpret_cast<ChatBroadcastPacket*>(RemainingData.GetData());
+				FString SenderName = UTF8_TO_TCHAR(Pkt->SenderNickName);
+				FString ChatText = UTF8_TO_TCHAR(Pkt->Message);
+
+				UE_LOG(LogTemp, Log, TEXT("%s: %s"), *SenderName, *ChatText);
+
+				OnReceiveChat.Broadcast(SenderName, ChatText);
+				break;
+			}
+#pragma endregion
+
 			default:
 				UE_LOG(LogTemp, Warning, TEXT("Unknown Packet Type received."));
 				break;

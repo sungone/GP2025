@@ -10,6 +10,7 @@
 class AGPCharacterPlayer;
 class AGPCharacterMonster;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReceiveChat, const FString&, Sender, const FString&, Message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLoginFailed, FString, Message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterLobby);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterGame);
@@ -27,6 +28,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnEnterGame OnEnterGame;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnReceiveChat OnReceiveChat;
 public:
 	void ConnectToServer();
 	void DisconnectFromServer();
@@ -62,6 +66,8 @@ public:
 	void SendMyShopSellItem(int32 ItemID, int32 Quantity);
 	void SendMyRequestQuest(enum class QuestType quest);
 	void SendMyCompleteQuest(enum class QuestType quest);
+
+	void SendMyChatMessage(const FString& Message);
 
 private:
 	void SendPacket(uint8* Buf, int32 Size);

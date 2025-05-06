@@ -76,6 +76,10 @@ enum EPacketType : uint8
 	C_COMPLETE_QUEST,
 
 	S_QUEST_REWARD,
+
+	//--- Chat ---
+	C_CHAT_SEND,
+	S_CHAT_BROADCAST,
 };
 
 

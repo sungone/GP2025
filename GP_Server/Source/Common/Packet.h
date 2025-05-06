@@ -545,3 +545,38 @@ struct QuestRewardPacket : public Packet
 
 
 #pragma pack(pop)
+#pragma region Chat
+
+struct ChatSendPacket : public Packet
+{
+	char Message[CHAT_MESSAGE_LEN];
+
+	ChatSendPacket(const char* Msg)
+		: Packet(EPacketType::C_CHAT_SEND)
+	{
+		strncpy_s(Message, Msg, CHAT_MESSAGE_LEN - 1);
+		Message[CHAT_MESSAGE_LEN - 1] = '\0';
+
+		Header.PacketSize = sizeof(ChatSendPacket);
+	}
+};
+
+struct ChatBroadcastPacket : public Packet
+{
+	char SenderNickName[NICKNAME_LEN];
+	char Message[CHAT_MESSAGE_LEN];
+
+	ChatBroadcastPacket(const char* Sender, const char* Msg)
+		: Packet(EPacketType::S_CHAT_BROADCAST)
+	{
+		strncpy_s(SenderNickName, Sender, NICKNAME_LEN - 1);
+		SenderNickName[NICKNAME_LEN - 1] = '\0';
+
+		strncpy_s(Message, Msg, CHAT_MESSAGE_LEN - 1);
+		Message[CHAT_MESSAGE_LEN - 1] = '\0';
+
+		Header.PacketSize = sizeof(ChatBroadcastPacket);
+	}
+};
+
+#pragma endregion

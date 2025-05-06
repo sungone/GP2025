@@ -93,6 +93,31 @@ void PlayerSession::DoSend(const Packet* packet)
 	case S_UNEQUIP_ITEM:
 		LOG(LogType::SendLog, std::format("UnequipItem PKT to [{}]", _id));
 		break;
+
+	case S_CHANGE_ZONE:
+		LOG(LogType::SendLog, std::format("ChangeZone PKT to [{}]", _id));
+		break;
+	case S_RESPAWN:
+		LOG(LogType::SendLog, std::format("Respawn PKT to [{}]", _id));
+		break;
+
+	case S_SHOP_ITEM_LIST:
+		LOG(LogType::SendLog, std::format("ShopItemList PKT to [{}]", _id));
+		break;
+	case S_SHOP_BUY_RESULT:
+		LOG(LogType::SendLog, std::format("ShopBuyResult PKT to [{}]", _id));
+		break;
+	case S_SHOP_SELL_RESULT:
+		LOG(LogType::SendLog, std::format("ShopSellResult PKT to [{}]", _id));
+		break;
+	case S_QUEST_REWARD:
+		LOG(LogType::SendLog, std::format("QuestReward PKT to [{}]", _id));
+		break;
+
+	case S_CHAT_BROADCAST:
+		LOG(LogType::SendLog, std::format("ChatBroadcast PKT to [{}]", _id));
+		break;
+
 	default:
 		LOG(LogType::SendLog, "Unknown Packet Type");
 		break;

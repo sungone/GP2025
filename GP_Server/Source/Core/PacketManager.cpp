@@ -85,7 +85,6 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 		LOG(LogType::RecvLog, std::format("ShopBuyItemPacket from [{}]", sessionId));
 		HandleShopBuyItemPacket(sessionId, packet);
 		break;
-
 	case EPacketType::C_SHOP_SELL_ITEM:
 		LOG(LogType::RecvLog, std::format("ShopSellItemPacket from [{}]", sessionId));
 		HandleShopSellItemPacket(sessionId, packet);
@@ -95,10 +94,14 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 		LOG(LogType::RecvLog, std::format("RequestQuestPacket from [{}]", sessionId));
 		HandleRequestQuestPacket(sessionId, packet);
 		break;
-
 	case EPacketType::C_COMPLETE_QUEST:
 		LOG(LogType::RecvLog, std::format("CompleteQuestPacket from [{}]", sessionId));
 		HandleCompleteQuestPacket(sessionId, packet);
+		break;
+
+	case EPacketType::C_CHAT_SEND:
+		LOG(LogType::RecvLog, std::format("ChatSendPacket from [{}]", sessionId));
+		HandleChatSendPacket(sessionId, packet);
 		break;
 
 	default:
@@ -311,4 +314,19 @@ void PacketManager::HandleCompleteQuestPacket(int32 sessionId, Packet* packet)
 {
 	auto* p = static_cast<CompleteQuestPacket*>(packet);
 	_gameWorld.CompleteQuest(sessionId, p->Quest);
+}
+
+void PacketManager::HandleChatSendPacket(int32 sessionId, Packet* packet)
+{
+	auto* p = static_cast<ChatSendPacket*>(packet);
+	auto session = _sessionMgr.GetSession(sessionId);
+	if (!session || !session->IsInGame()) return;
+
+	auto player = session->GetPlayer();
+	if (!player) return;
+
+	const char* nickname = player->GetInfo().NickName;
+
+	ChatBroadcastPacket broadcastPkt(nickname, p->Message);
+	_sessionMgr.BroadcastToAll(&broadcastPkt);
 }

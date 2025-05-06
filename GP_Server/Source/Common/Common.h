@@ -14,6 +14,7 @@ constexpr int16 SERVER_PORT = 4000;
 constexpr uint32 BUFSIZE = 1024;
 constexpr int LOGIN_STR_LEN = 20 + 1;
 constexpr int NICKNAME_LEN = 30 + 1;
+constexpr int CHAT_MESSAGE_LEN = 100 + 1;
 
 #include "Type.h"
 #include "DataStruct.h"

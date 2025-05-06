@@ -41,6 +41,8 @@ public:
 	void HandleRequestQuestPacket(int32 sessionId, Packet* packet);
 	void HandleCompleteQuestPacket(int32 sessionId, Packet* packet);
 
+	void HandleChatSendPacket(int32 sessionId, Packet* packet);
+	
 private:
 	SessionManager& _sessionMgr = SessionManager::GetInst();
 	DBManager& _dbMgr = DBManager::GetInst();
