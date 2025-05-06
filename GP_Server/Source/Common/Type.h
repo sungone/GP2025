@@ -234,6 +234,8 @@ enum class ZoneType : uint8
 };
 
 enum class EQuestStatus { NotStarted, InProgress, Completed, };
+enum EQuestCategory { INTERACT, MOVE, KILL, ITEM };
+
 enum class QuestType : uint8
 {
 	NONE,

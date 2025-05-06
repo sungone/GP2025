@@ -1,5 +1,4 @@
 #pragma once
-enum EQuestCategory { INTERACT, MOVE, KILL, ITEM };
 struct QuestData
 {
 	QuestType QuestID;

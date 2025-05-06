@@ -33,11 +33,17 @@ void Player::SetCharacterType(Type::EPlayer type)
 	{
 		_info.fovAngle = 90;
 		_info.AttackRadius = 300;
+		_info.Skills.Q = FSkillData(ESkillGroup::HitHard, 0);
+		_info.Skills.E = FSkillData(ESkillGroup::Clash, 0);
+		_info.Skills.R = FSkillData(ESkillGroup::Whirlwind, 0);
 	}
 	else
 	{
 		_info.fovAngle = 10;
 		_info.AttackRadius = 1500;
+		_info.Skills.Q = FSkillData(ESkillGroup::Throwing, 0);
+		_info.Skills.E = FSkillData(ESkillGroup::FThrowing, 0);
+		_info.Skills.R = FSkillData(ESkillGroup::Anger, 0);
 	}
 }
 
@@ -290,7 +296,7 @@ void Player::UnlockSkillsOnLevelUp()
 	ESkillGroup groupId = static_cast<ESkillGroup>(skill->SkillGroup);
 
 	auto* curSkill = _info.GetSkillData(groupId);
-	if (!curSkill)
+	if (curSkill->IsValid())
 	{
 		LearnSkill(groupId);
 		auto pkt = SkillUnlockPacket(groupId);

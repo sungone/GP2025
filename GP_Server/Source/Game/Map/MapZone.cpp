@@ -39,3 +39,38 @@ NavMesh& Map::GetNavMesh(ZoneType type)
 
 	return it->second;
 }
+
+FVector Map::GetSpawnPosition(ZoneType from, ZoneType to) const
+{
+	if (to == ZoneType::TUK && from == ZoneType::TIP)
+		return FVector(-5270.0, 15050.0, 147);
+	else if (to == ZoneType::TUK && from == ZoneType::E)
+		return FVector(-4420.0, -12730.0, 837);
+	else if (to == ZoneType::TUK && from == ZoneType::GYM)
+		return FVector(-4180.0, 5220.0, 147);
+	else if (to == ZoneType::TUK && from == ZoneType::INDUSTY)
+		return FVector(8721.06, -19229.73, 146.28);
+	else if (to == ZoneType::TIP)
+		return FVector(-100, 100, 147);
+	else if (to == ZoneType::E)
+		return FVector(-150, 1500, 147);
+	else if (to == ZoneType::GYM)
+		return FVector(-2000, 0, 147);
+	else if (to == ZoneType::INDUSTY)
+		return FVector(10, -7000, 180);
+
+	return FVector();
+}
+
+bool Map::IsZoneAccessible(ZoneType zone, uint32 playerLevel) const
+{
+	switch (zone)
+	{
+	case ZoneType::TIP:       return playerLevel >= 1;
+	case ZoneType::TUK:       return playerLevel >= 1;
+	case ZoneType::E:         return playerLevel >= 4;
+	case ZoneType::INDUSTY:   return playerLevel >= 7;
+	case ZoneType::GYM:       return playerLevel >= 10;
+	default:                  return false;
+	}
+}
