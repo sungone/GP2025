@@ -6,7 +6,7 @@
 struct FVector
 {
     double X, Y, Z;
-
+    static const FVector ZeroVector;
     FVector() : X(0), Y(0), Z(0) {}
     FVector(double x, double y, double z) : X(x), Y(y), Z(z) {}
 
@@ -14,7 +14,10 @@ struct FVector
     FVector operator+(const FVector& Other) const { return FVector(X + Other.X, Y + Other.Y, Z + Other.Z); }
     FVector operator*(float Scalar) const { return FVector(X * Scalar, Y * Scalar, Z * Scalar); }
     FVector operator/(float Scalar) const { return (Scalar != 0) ? FVector(X / Scalar, Y / Scalar, Z / Scalar) : FVector(0, 0, 0); }
-
+    bool operator==(const FVector& Other) const
+    {
+        return X == Other.X && Y == Other.Y && Z == Other.Z;
+    }
     float Length() const { return std::sqrt(X * X + Y * Y + Z * Z); }
 
     FVector Normalize() const
@@ -67,3 +70,5 @@ struct FVector
         return oss.str();
     }
 };
+
+inline const FVector FVector::ZeroVector = FVector(0.0, 0.0, 0.0);

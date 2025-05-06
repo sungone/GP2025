@@ -223,16 +223,29 @@ enum ECharacterStateType : uint32
 	STATE_AIMING = 1 << 9,
 };
 
+#ifdef SERVER_BUILD
 enum class ZoneType : uint8
 {
-	PLAYGROUND,//test¿ë
-	TUK,
+	NONE = 0,
 	TIP,
+	TUK,
 	E,
-	INDUSTY,
 	GYM,
+	INDUSTY,
+	PLAYGROUND,//test¿ë
 };
-
+#else
+UENUM(BlueprintType)
+enum class ZoneType : uint8
+{
+	NONE UMETA(DisplayName = "None"),
+	TIP  UMETA(DisplayName = "Tip"),
+	TUK  UMETA(DisplayName = "TUK"),
+	E    UMETA(DisplayName = "E"),
+	GYM  UMETA(DisplayName = "Gym"),
+	INDUSTY UMETA(DisplayName = "Industry")
+};
+#endif
 enum class EQuestStatus { NotStarted, InProgress, Completed, };
 enum EQuestCategory { INTERACT, MOVE, KILL, ITEM };
 

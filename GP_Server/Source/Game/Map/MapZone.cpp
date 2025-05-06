@@ -9,7 +9,7 @@ bool Map::Init()
 	_navMeshs[ZoneType::E] = NavMesh(MapDataPath + "NavMeshData_E.json");
 	_navMeshs[ZoneType::INDUSTY] = NavMesh(MapDataPath + "NavMeshData_Industry.json");
 	_navMeshs[ZoneType::GYM] = NavMesh(MapDataPath + "NavMeshData_Gym.json");
-	
+
 	for (auto& [zone, navMesh] : _navMeshs)
 	{
 		if (!navMesh.IsLoaded())
@@ -28,7 +28,7 @@ FVector Map::GetRandomPos(ZoneType type, float collisionRadius) const
 	if (it != _navMeshs.end())
 		return it->second.GetRandomPositionWithRadius(collisionRadius);
 
-	return FVector(0, 0, 0);
+	return FVector::ZeroVector;
 }
 
 NavMesh& Map::GetNavMesh(ZoneType type)
@@ -42,35 +42,45 @@ NavMesh& Map::GetNavMesh(ZoneType type)
 
 FVector Map::GetSpawnPosition(ZoneType from, ZoneType to) const
 {
+	auto RandomOffset = [](float radius) {
+		float offsetX = RandomUtils::GetRandomFloat(-radius, radius);
+		float offsetY = RandomUtils::GetRandomFloat(-radius, radius);
+		return FVector(offsetX, offsetY, 0.0f);
+		};
+
+	FVector center;
+
 	if (to == ZoneType::TUK && from == ZoneType::TIP)
-		return FVector(-5270.0, 15050.0, 147);
+		center = FVector(-5270.0, 15050.0, 147);
 	else if (to == ZoneType::TUK && from == ZoneType::E)
-		return FVector(-4420.0, -12730.0, 837);
+		center = FVector(-4420.0, -12730.0, 837);
 	else if (to == ZoneType::TUK && from == ZoneType::GYM)
-		return FVector(-4180.0, 5220.0, 147);
+		center = FVector(-4180.0, 5220.0, 147);
 	else if (to == ZoneType::TUK && from == ZoneType::INDUSTY)
-		return FVector(8721.06, -19229.73, 146.28);
+		center = FVector(8721.06, -19229.73, 146.28);
 	else if (to == ZoneType::TIP)
-		return FVector(-100, 100, 147);
+		center = FVector(-100, 100, 147);
 	else if (to == ZoneType::E)
-		return FVector(-150, 1500, 147);
+		center = FVector(-150, 1500, 147);
 	else if (to == ZoneType::GYM)
-		return FVector(-2000, 0, 147);
+		center = FVector(-2000, 0, 147);
 	else if (to == ZoneType::INDUSTY)
-		return FVector(10, -7000, 180);
+		center = FVector(10, -7000, 180);
+	else
+		return FVector::ZeroVector;
 
-	return FVector();
+	const float radius = 300.0f; //범위 내에서
+	return center + RandomOffset(radius);
 }
-
 bool Map::IsZoneAccessible(ZoneType zone, uint32 playerLevel) const
 {
 	switch (zone)
 	{
-	case ZoneType::TIP:       return playerLevel >= 1;
-	case ZoneType::TUK:       return playerLevel >= 1;
-	case ZoneType::E:         return playerLevel >= 4;
-	case ZoneType::INDUSTY:   return playerLevel >= 7;
-	case ZoneType::GYM:       return playerLevel >= 10;
+	case ZoneType::TIP:       return playerLevel > 0;
+	case ZoneType::TUK:       return playerLevel > 0;
+	case ZoneType::E:         return playerLevel > 0;
+	case ZoneType::INDUSTY:   return playerLevel > 0;
+	case ZoneType::GYM:       return playerLevel > 0;
 	default:                  return false;
 	}
 }

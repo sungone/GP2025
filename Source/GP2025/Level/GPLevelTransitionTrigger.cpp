@@ -62,11 +62,7 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 	CachedPlayer = Cast<AGPCharacterMyplayer>(OtherActor);
 	if (!CachedPlayer) return;
 
-	uint32 CurrentPlayerLevel = CachedPlayer->CharacterInfo.GetLevel();
-
-	if (!bRequiredLevelForOpenLevel(CurrentPlayerLevel)) return;
-
-	if (CachedPlayer && !LevelToLoad.IsNone())
+	if (!LevelToLoad.IsNone())
 	{
 		UGPNetworkManager* NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
 		if (NetworkMgr)
@@ -81,88 +77,5 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 
 			NetworkMgr->SendMyZoneChangePacket(NewZone);
 		}
-	}
-
-	if (!LevelToUnload.IsNone())
-	{
-		UGameplayStatics::UnloadStreamLevel(this, LevelToUnload, FLatentActionInfo(), false);
-	}
-
-	if (!LevelToLoad.IsNone())
-	{
-		FLatentActionInfo LatentInfo;
-		LatentInfo.CallbackTarget = this;
-		LatentInfo.ExecutionFunction = FName("OnLevelLoaded");
-		LatentInfo.Linkage = 0;
-		LatentInfo.UUID = __LINE__;
-
-		UGameplayStatics::LoadStreamLevel(this, LevelToLoad, true, true, LatentInfo);
-	}
-}
-
-void AGPLevelTransitionTrigger::OnLevelLoaded()
-{
-	if (!CachedPlayer || LevelToLoad.IsNone()) return;
-
-	FVector SpawnLocation = GetSpawnLocationForLevel(LevelToLoad , LevelToUnload);
-	CachedPlayer->SetActorLocation(SpawnLocation);
-
-	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
-		{
-			if (CachedPlayer && CachedPlayer->AppearanceHandler)
-			{
-				CachedPlayer->AppearanceHandler->SetupLeaderPose();
-			}
-		});
-
-	UE_LOG(LogTemp, Log, TEXT("[Trigger] Player moved to spawn location after level load: %s"), *SpawnLocation.ToString());
-}
-
-FVector AGPLevelTransitionTrigger::GetSpawnLocationForLevel(FName LoadLevelName, FName UnloadLevelName)
-{
-	if (LoadLevelName == "TUK" && UnloadLevelName == "tip")
-		return FVector(-5270.0, 15050.0, 147);
-	else if (LoadLevelName == "TUK" && UnloadLevelName == "E")
-		return FVector(-4420.0, -12730.0, 837);
-	else if (LoadLevelName == "TUK" && UnloadLevelName == "gym")
-		return FVector(-4180.0, 5220.0, 147);
-	else if (LoadLevelName == "TUK" && UnloadLevelName == "industry")
-		return FVector(8721.06, -19229.73, 146.28);
-	else if (LoadLevelName == "tip")
-		return FVector(-100, 100, 147);
-	else if (LoadLevelName == "E")
-		return FVector(-150, 1500, 147);
-	else if (LoadLevelName == "gym")
-		return FVector(-2000, 0, 147);
-	else if (LoadLevelName == "industry")
-		return FVector(10, -7000, 180);
-	return FVector::ZeroVector;
-}
-
-bool AGPLevelTransitionTrigger::bRequiredLevelForOpenLevel(uint32 Level)
-{
-	if (LevelToLoad == "tip")
-	{
-		return Level >= 1 ? true : false;
-	}
-	else if (LevelToLoad == "E")
-	{
-		return Level >= 4 ? true : false;
-	}
-	else if (LevelToLoad == "gym")
-	{
-		return Level >= 1 ? true : false;
-	}
-	else if (LevelToLoad == "TUK")
-	{
-		return Level >= 1 ? true : false;
-	}
-	else if (LevelToLoad == "industry")
-	{
-		return Level >= 7 ? true : false;
-	}
-	else
-	{
-		return false;
 	}
 }

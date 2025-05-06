@@ -280,9 +280,7 @@ void PacketManager::HandleZoneChangeRequestPacket(int32 sessionId, Packet* packe
 	auto* p = static_cast<RequestZoneChangePacket*>(packet);
 	ZoneType targetZone = p->TargetZone;
 
-	FVector newPos = _gameWorld.TransferToZone(sessionId, targetZone);
-	ChangeZonePacket response(targetZone, newPos);
-	_sessionMgr.SendPacket(sessionId, &response);
+	_gameWorld.TransferToZone(sessionId, targetZone);
 }
 
 void PacketManager::HandleRespawnRequestPacket(int32 sessionId, Packet* packet)

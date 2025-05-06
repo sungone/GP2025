@@ -47,6 +47,8 @@ public:
 	void UnequipItem(int32 PlayerID, uint8 ItemType);
 
 	void ChangeZone(ZoneType zone, const FVector& pos);
+	UFUNCTION()
+	void OnZoneLevelLoaded();
 	void RespawnMyPlayer(const FInfoData& info);
 
 	void ShowShopItems(uint8 Count, const struct ShopItemInfo* shopitems);
@@ -74,4 +76,7 @@ private:
 private:
 	UPROPERTY()
 	class UGPInventory* InventoryWidget;
+
+	ZoneType PendingZone;
+	FVector PendingLocation;
 };

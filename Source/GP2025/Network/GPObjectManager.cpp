@@ -429,13 +429,48 @@ void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType)
 	UE_LOG(LogTemp, Warning, TEXT("Player [%d] unequipped item: %s"), PlayerID, *ItemData->ItemName.ToString());
 }
 
-void UGPObjectManager::ChangeZone(ZoneType zone, const FVector& RandomPos)
+void UGPObjectManager::ChangeZone(ZoneType newZone, const FVector& RandomPos)
 {
 	if (!MyPlayer) return;
-	MyPlayer->SetActorLocation(RandomPos);
-	MyPlayer->CharacterInfo.CurrentZone = zone;
 
-	// ChangeZone 안에서 Level Streaming 처리를 해야하나?
+	auto oldZone = MyPlayer->CharacterInfo.CurrentZone;
+	auto GetLevelName = [](ZoneType zone) -> FName {
+		switch (zone) {
+		case ZoneType::TIP: return "tip";
+		case ZoneType::TUK: return "TUK";
+		case ZoneType::E:   return "E";
+		case ZoneType::GYM: return "gym";
+		case ZoneType::INDUSTY: return "industry";
+		default: return NAME_None;
+		}
+		};
+	FName NewLevel = GetLevelName(newZone);
+	FName OldLevel = GetLevelName(oldZone);
+	if (!OldLevel.IsNone()&& !NewLevel.IsNone())
+	{
+		UGameplayStatics::UnloadStreamLevel(this, OldLevel, FLatentActionInfo(), false);
+		FLatentActionInfo LatentInfo;
+		LatentInfo.CallbackTarget = this;
+		LatentInfo.ExecutionFunction = FName("OnZoneLevelLoaded");
+		LatentInfo.Linkage = 0;
+		LatentInfo.UUID = __LINE__;
+
+		UGameplayStatics::LoadStreamLevel(this, NewLevel, true, true, LatentInfo);
+
+		PendingZone = newZone;
+		PendingLocation = RandomPos;
+	}
+}
+
+void UGPObjectManager::OnZoneLevelLoaded()
+{
+	MyPlayer->CharacterInfo.SetZone(PendingZone);
+	MyPlayer->SetActorLocation(PendingLocation);
+
+	if (MyPlayer->AppearanceHandler)
+	{
+		MyPlayer->AppearanceHandler->SetupLeaderPose();
+	}
 }
 
 void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)

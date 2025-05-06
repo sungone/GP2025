@@ -464,18 +464,24 @@ void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
 FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
 {
 	auto player = GetPlayerByID(playerId);
-	if (!player) return FVector();
+	if (!player) return FVector::ZeroVector;
+
+	uint32 playerLevel = player->GetInfo().GetLevel();
+	if (!Map::GetInst().IsZoneAccessible(targetZone, playerLevel))
+	{
+		LOG(std::format("Player [{}] cannot access due to level {}", playerId, playerLevel));
+		return FVector::ZeroVector;
+	}
 
 	ZoneType oldZone = player->GetZone();
-	float radius = playerCollision;
-	//Todo: 랜덤스폰이 아니라 입구 쪽 스폰으로 설정해줘야한다
-	FVector newPos;
-	do {
-		newPos = Map::GetInst().GetRandomPos(targetZone, radius);
-	} while (IsCollisionDetected(targetZone, newPos, radius));
+	FVector newPos = Map::GetInst().GetSpawnPosition(oldZone, targetZone);
+
+	if (newPos == FVector::ZeroVector)
+		return FVector::ZeroVector;
 
 	player->GetInfo().SetLocation(newPos);
 	player->GetInfo().SetZone(targetZone);
+
 	std::unordered_set<int32> oldvlist;
 	{
 		std::lock_guard lock(player->_vlLock);
@@ -486,14 +492,11 @@ FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
 		auto other = GetCharacterByID(mid);
 		if (!other) continue;
 		if (other->IsMonster())
-		{
 			player->RemoveMonsterFromViewList(other);
-		}
 		else
-		{
 			player->RemovePlayerFromViewList(other);
-		}
 	}
+
 	{
 		std::lock_guard lock(_mtPlayerZMap);
 		auto& oldMap = _playersByZone[oldZone];
@@ -503,22 +506,37 @@ FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
 	}
 
 	UpdateViewList(player);
-	return newPos;
+	ChangeZonePacket response(targetZone, newPos);
+	SessionManager::GetInst().SendPacket(playerId, &response);
 }
 
 void GameWorld::RespawnPlayer(int32 playerId, ZoneType targetZone)
 {
-	FVector respawnPos = TransferToZone(playerId, targetZone);
-
 	auto player = GetPlayerByID(playerId);
-	if (player) {
-		auto& info = player->GetInfo();
-		info.Stats.Hp = info.Stats.MaxHp;
-		info.State = ECharacterStateType::STATE_IDLE;
-
-		RespawnPacket pkt(info);
-		SessionManager::GetInst().SendPacket(playerId, &pkt);
+	if (!player) return;
+	FVector respawnPos;
+	if (targetZone == ZoneType::TUK)
+	{
+		do {
+			respawnPos = Map::GetInst().GetRandomPos(targetZone, playerCollision);
+		} while (GameWorld::GetInst().IsCollisionDetected(targetZone, respawnPos, playerCollision));
 	}
+	else
+	{
+		FVector respawnPos = TransferToZone(playerId, targetZone);
+		if (respawnPos == FVector::ZeroVector)
+		{
+			LOG("Failed Respawn");
+			return;
+		}
+	}
+	player->SetPos(respawnPos);
+	auto& info = player->GetInfo();
+	info.Stats.Hp = info.Stats.MaxHp;
+	info.State = ECharacterStateType::STATE_IDLE;
+
+	RespawnPacket pkt(info);
+	SessionManager::GetInst().SendPacket(playerId, &pkt);
 }
 
 void GameWorld::UpdateViewList(std::shared_ptr<Character> listOwner)

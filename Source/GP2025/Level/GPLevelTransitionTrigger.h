@@ -37,12 +37,6 @@ public:
 		const FHitResult& SweepResult
 	);
 
-	UFUNCTION()
-	void OnLevelLoaded();
-
-	FVector GetSpawnLocationForLevel(FName LoadLevelName , FName UnloadLevelName);
-	bool bRequiredLevelForOpenLevel(uint32 Level);
-
 public:
 	UPROPERTY()
 	class AGPCharacterMyplayer* CachedPlayer;
