@@ -376,7 +376,7 @@ uint8 Player::UnequipItem(uint32 itemId)
 
 bool Player::SetCurrentQuest(QuestType quest)
 {
-	if (_info.HasQuest(quest))
+	if (!_info.HasQuest(quest))
 	{
 		int res = _info.AddQuest({ quest,EQuestStatus::InProgress });
 		if (!res) return false;
