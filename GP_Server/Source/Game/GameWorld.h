@@ -48,6 +48,10 @@ public:
 	void UpdateViewList(std::shared_ptr<Character> character);
 	bool IsCollisionDetected(ZoneType zone, const FVector& pos, float dist);
 
+	//Quest
+	void RequestQuest(int32 playerId, QuestType quest);
+	void CompleteQuest(int32 playerId, QuestType quest);
+
 	std::shared_ptr<Player> GetPlayerByID(int32 id);
 	std::shared_ptr<Monster> GetMonsterByID(int32 id);
 	std::shared_ptr<Character> GetCharacterByID(int32 id);

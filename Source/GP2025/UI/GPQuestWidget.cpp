@@ -36,7 +36,7 @@ void UGPQuestWidget::OnQuestAccepted()
 	UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
 	if (NetMgr)
 	{
-		NetMgr->SendMyRequestQuest(QuestType::DefeatTinoboss); // 일단 티노보스 퀘스트 요청
+		NetMgr->SendMyRequestQuest(QuestType::CH3_KILL_TINO); // 일단 티노보스 퀘스트 요청
 	}
 
 	OwningNPC->ExitInteraction(); 

@@ -7,7 +7,9 @@ bool GameWorld::Init()
 		ItemTable::GetInst().LoadFromCSV("../DataTable/ItemTable.csv") &&
 		PlayerLevelTable::GetInst().LoadFromCSV("../DataTable/PlayerLevelTable.csv") &&
 		PlayerSkillTable::GetInst().LoadFromCSV("../DataTable/PlayerSkillTable.csv") &&
-		MonsterTable::GetInst().LoadFromCSV("../DataTable/MonsterTable.csv");
+		MonsterTable::GetInst().LoadFromCSV("../DataTable/MonsterTable.csv") &&
+		QuestTable::GetInst().LoadFromCSV("../DataTable/QuestTable.csv");
+
 	if (!res)
 	{
 		LOG(LogType::Warning, "LoadFromCSV");
@@ -573,3 +575,55 @@ bool GameWorld::IsCollisionDetected(ZoneType zone, const FVector& pos, float dis
 	}
 	return false;
 }
+
+void GameWorld::RequestQuest(int32 playerId, QuestType quest)
+{
+	auto player = GetPlayerByID(playerId);
+	if (!player)
+	{
+		LOG(Warning, "Invalid player for quest request");
+		return;
+	}
+
+	const QuestData* questData = QuestTable::GetInst().GetQuest(quest);
+	if (!questData)
+	{
+		LOG(Warning, "Invalid quest ID");
+		return;
+	}
+
+	player->SetCurrentQuest(quest);
+}
+
+void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
+{
+	auto player = GetPlayerByID(playerId);
+	if (!player)
+	{
+		LOG(Warning, "Invalid player");
+		return;
+	}
+
+	const QuestData* questData = QuestTable::GetInst().GetQuest(quest);
+	if (!questData)
+	{
+		LOG(Warning, "Invalid quest datatable");
+		return;
+	}
+	uint32 exp = 0, gold = 0;
+
+	bool ok = player->CompleteCurrentQuest();
+	if (ok)
+	{
+		player->AddExp(exp);
+		player->AddGold(gold);
+		exp = questData->ExpReward;
+		gold = questData->GoldReward;
+	}
+
+	auto pkt = QuestRewardPacket(quest, ok, exp, gold);
+	SessionManager::GetInst().SendPacket(playerId, &pkt);
+	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
+	SessionManager::GetInst().SendPacket(playerId, &infopkt);
+}
+

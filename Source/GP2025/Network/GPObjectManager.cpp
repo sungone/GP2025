@@ -463,20 +463,20 @@ void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpR
 	{
 		switch (Quest)
 		{
-		case QuestType::None:
+		case QuestType::NONE:
 			break;
 
-		case QuestType::TalkToNPC:
+		case QuestType::CH1_TALK_TO_STUDENT_A:
 			// NPC 대화 퀘스트 보상 처리
 			break;
 
-		case QuestType::DefeatTinoboss:
+		case QuestType::CH3_KILL_TINO:
 		{
 			// 티노보스 처치 퀘스트 보상 처리
 			UGPQuestListEntryWidget* LocalMyPlayerCurrentQuest
 				= MyPlayer->UIManager->GetInGameWidget()->QuestListWidget->TinoQuest;
 
-			if (LocalMyPlayerCurrentQuest->EntryType == QuestType::DefeatTinoboss)
+			if (LocalMyPlayerCurrentQuest->EntryType == QuestType::CH3_KILL_TINO)
 			{
 				LocalMyPlayerCurrentQuest->SetQuestState(TEXT("Success"));
 			}

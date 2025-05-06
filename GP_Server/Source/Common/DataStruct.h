@@ -93,11 +93,12 @@ struct FEquitState
 	Type::EArmor Chest = Type::EArmor::NONE;
 };
 
-constexpr uint8 MAX_PLAYER_QUESTS = 5;
-struct QuestInfo
+//constexpr uint8 MAX_PLAYER_QUESTS = static_cast<uint8>(QuestType::MAX);
+constexpr uint8 MAX_PLAYER_QUESTS = 15;
+struct QuestStatus
 {
 	QuestType QuestType;
-	uint8  Status;
+	EQuestStatus Status = EQuestStatus::NotStarted;
 };
 
 struct ShopItemInfo
@@ -109,7 +110,7 @@ struct ShopItemInfo
 
 struct FInfoData
 {
-	int32 ID;
+	int32 ID{};
 	char NickName[NICKNAME_LEN];
 	uint8 CharacterType;
 	FVector Pos;
@@ -125,7 +126,7 @@ struct FInfoData
 	FEquitState EquipState;
 	ZoneType CurrentZone;
 
-	QuestInfo Quests[MAX_PLAYER_QUESTS];
+	QuestStatus Quests[MAX_PLAYER_QUESTS];
 
 	FInfoData()
 		: ID(0),
@@ -254,7 +255,51 @@ struct FInfoData
 		}
 	}
 
+	bool HasQuest(QuestType quest) const
+	{
+		for (const auto& q : Quests)
+		{
+			if (q.QuestType == quest)
+				return true;
+		}
+		return false;
+	}
 
+	bool AddQuest(const QuestStatus& newQuest)
+	{
+		for (auto& q : Quests)
+		{
+			if (q.QuestType == QuestType::NONE)
+			{
+				q = newQuest;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool CompleteQuest(QuestType quest)
+	{
+		for (auto& q : Quests)
+		{
+			if (q.QuestType == quest && q.Status==EQuestStatus::InProgress)
+			{
+				q.Status = EQuestStatus::Completed;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	QuestStatus* GetQuestStatus(QuestType quest)
+	{
+		for (auto& q : Quests)
+		{
+			if (q.QuestType == quest)
+				return &q;
+		}
+		return nullptr;
+	}
 #ifdef SERVER_BUILD
 	void SetHp(float NewHp) { Stats.Hp = std::clamp(NewHp, 0.0f, Stats.MaxHp); }
 	void Heal(float Amount) { SetHp(Stats.Hp + Amount); }

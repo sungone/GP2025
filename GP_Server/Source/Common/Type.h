@@ -7,7 +7,7 @@ enum EPacketType : uint8
 	C_SIGNUP,
 	C_SELECT_CHARACTER,
 	C_ENTER_GAME,
-	
+
 	S_LOGIN_SUCCESS,
 	S_LOGIN_FAIL,
 	S_SIGNUP_SUCCESS,
@@ -233,16 +233,23 @@ enum class ZoneType : uint8
 	GYM,
 };
 
-enum class QuestType
+enum class EQuestStatus { NotStarted, InProgress, Completed, };
+enum class QuestType : uint8
 {
-	None, 
-	TalkToNPC,           // 특정 NPC와 대화
-	DefeatTinoboss,       // 티노보스를 해치우는 미션
-};
-
-enum class QuestStatus
-{
-	NotStarted,
-	InProgress,
-	Completed,
+	NONE,
+	CH1_GO_TO_E_BUILDING,         // 1. E동으로 이동
+	CH1_RETURN_TO_TIP,            // 2. TIP으로 돌아가기
+	CH1_TALK_TO_STUDENT_A,        // 3. 학생 A와 대화
+	CH1_FIND_JANITOR,             // 4. 경비아저씨 찾기
+	CH2_GO_TO_SANYUNG,            // 5. 산융으로 이동
+	CH2_CLEAR_SANYUNG,            // 6. 산융 몬스터 제거
+	CH2_FIND_KEY,                 // 7. 열쇠 획득
+	CH1_ENTER_E_BUILDING,         // 8. E동 입장
+	CH1_CLEAR_E_BUILDING,         // 9. E동 보스 제거
+	CH1_FIND_DOCUMENT,            // 10. 문서 획득
+	CH1_RETURN_WITH_DOCUMENT,     // 11. 문서 가지고 TIP로 돌아가기
+	CH2_CLEAR_SERVER_ROOM,        // 12. 서버룸 클리어
+	CH3_ENTER_GYM,                // 13. 체육관 입장
+	CH3_KILL_TINO,                // 14. 최종보스 제거
+	MAX
 };

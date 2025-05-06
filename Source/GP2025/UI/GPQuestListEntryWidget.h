@@ -24,5 +24,5 @@ public:
 	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "Quest")
 	class UTextBlock* QuestStateText;
 
-	enum class QuestType EntryType = QuestType::DefeatTinoboss;
+	enum class QuestType EntryType = QuestType::CH3_KILL_TINO;
 };

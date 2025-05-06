@@ -25,9 +25,13 @@ public:
 	void LearnSkill(ESkillGroup groupId);
 	void UpgradeSkill(ESkillGroup groupId);
 	void UnlockSkillsOnLevelUp();
+
 	void UseItem(uint32 itemId);
 	uint8 EquipItem(uint32 itemId);
 	uint8 UnequipItem(uint32 itemId);
+
+	bool SetCurrentQuest(QuestType quest);
+	bool CompleteCurrentQuest();
 
 	void AddItemStats(const ItemStats& stats);
 	void RemoveItemStats(const ItemStats& stats);
@@ -69,4 +73,5 @@ private:
 	std::unordered_set<int32> _viewList;
 	FStatData& _stats = _info.Stats;
 	uint32& _gold = _info.Gold;
+	QuestType _currentQuest;
 };
