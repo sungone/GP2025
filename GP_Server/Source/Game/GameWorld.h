@@ -17,7 +17,7 @@ public:
 	// Player
 	void PlayerEnterGame(std::shared_ptr<Player> player);
 	void PlayerLeaveGame(int32 playerId);
-	void PlayerSetYaw(int32 playerId, float yaw);
+	void PlayerSetLocation(int32 playerId, float yaw, FVector pos);
 	void PlayerAddState(int32 playerId, ECharacterStateType newState);
 	void PlayerRemoveState(int32 playerId, ECharacterStateType oldState);
 	void PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& time);

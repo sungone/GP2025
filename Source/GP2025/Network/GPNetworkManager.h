@@ -48,15 +48,15 @@ public:
 	void SendMyRespawnPacket(ZoneType zone);
 
 	void SendMyMovePacket();
-	void SendMyAttackPacket(float PlayerYaw);
-	void SendMyStartAiming(float PlayerYaw);
+	void SendMyAttackPacket(float PlayerYaw, FVector PlayerPos);
+	void SendMyStartAiming(float PlayerYaw, FVector PlayerPos);
 	void SendMyStopAiming();
 	void SendMyTakeItem(int32 ItemID);
 	void SendMyDropItem(int32 ItemID);
 	void SendMyUseItem(int32 ItemID);
 	void SendMyEquipItem(int32 ItemID);
 	void SendMyUnequipItem(int32 ItemID);
-	void SendMyUseSkill(ESkillGroup SkillGID, float PlayerYaw);
+	void SendMyUseSkill(ESkillGroup SkillGID, float PlayerYaw, FVector PlayerPos);
 
 	void SendMyShopBuyItem(int32 ItemID, int32 Quantity);
 	void SendMyShopSellItem(int32 ItemID, int32 Quantity);

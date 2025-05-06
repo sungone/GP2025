@@ -81,3 +81,7 @@ GP_StressTest/x64
 
 *.vcxproj.user
 GP_Server/gp_server_log.txt
+
+* text=auto
+*.cpp text eol=lf
+*.h   text eol=lf

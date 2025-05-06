@@ -196,7 +196,7 @@ void UGPMyplayerInputHandler::AutoAttack()
 	{
 		Owner->CharacterInfo.AddState(STATE_AUTOATTACK);
 		Owner->CombatHandler->PlayAutoAttackMontage();
-		Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw);
+		Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
 	}
 }
 
@@ -289,7 +289,7 @@ void UGPMyplayerInputHandler::StartAiming()
 
 	Owner->CameraHandler->bWantsToZoom = true;
 	Owner->CharacterInfo.AddState(STATE_AIMING);
-	Owner->NetMgr->SendMyStartAiming(Owner->GetActorRotation().Yaw);
+	Owner->NetMgr->SendMyStartAiming(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
 
 	if (Owner->UIManager->GunCrosshairWidget)
 	{
@@ -335,14 +335,14 @@ void UGPMyplayerInputHandler::UseSkillQ()
 		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_Q);
 		Owner->CombatHandler->PlayQSkillMontage();
-		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Throwing, Owner->GetControlRotation().Yaw);
+		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Throwing, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
 	}
 	else
 	{
 		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_Q);
 		Owner->CombatHandler->PlayQSkillMontage();
-		Owner->NetMgr->SendMyUseSkill(ESkillGroup::HitHard, Owner->GetControlRotation().Yaw);
+		Owner->NetMgr->SendMyUseSkill(ESkillGroup::HitHard, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
 	}
 
 }
@@ -371,7 +371,7 @@ void UGPMyplayerInputHandler::UseSkillE()
 		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_E);
 		Owner->CombatHandler->PlayESkillMontage();
-		Owner->NetMgr->SendMyUseSkill(ESkillGroup::FThrowing, Owner->GetControlRotation().Yaw);
+		Owner->NetMgr->SendMyUseSkill(ESkillGroup::FThrowing, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
 	}
 	else
 	{
@@ -379,7 +379,7 @@ void UGPMyplayerInputHandler::UseSkillE()
 		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_E);
 		Owner->CombatHandler->PlayESkillMontage();
-		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Clash, Owner->GetControlRotation().Yaw);
+		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Clash, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
 	}
 
 }
@@ -408,13 +408,13 @@ void UGPMyplayerInputHandler::UseSkillR()
 		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_R);
 		Owner->CombatHandler->PlayRSkillMontage();
-		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Anger, Owner->GetControlRotation().Yaw);
+		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Anger, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
 	}
 	else
 	{
 		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_R);
 		Owner->CombatHandler->PlayRSkillMontage();
-		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Whirlwind, Owner->GetControlRotation().Yaw);
+		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Whirlwind, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
 	}
 }

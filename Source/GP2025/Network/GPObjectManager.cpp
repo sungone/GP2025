@@ -229,17 +229,6 @@ void UGPObjectManager::RemoveMonster(int32 MonsterID)
 	UE_LOG(LogTemp, Warning, TEXT("Remove monster [%d]"), MonsterID);
 	if (Monsters.Contains(MonsterID))
 	{
-		// Quest : CH3_KILL_TINO 클리어
-		AGPCharacterMonster* Monster = Monsters[MonsterID];
-		if (Monster && Monster->CharacterInfo.CharacterType == static_cast<uint8>(Type::EMonster::TINO))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[QuestTrigger] TINO Boss killed! Sending quest completion."));
-			if (UGPNetworkManager* NetMgr = MyPlayer->GetGameInstance()->GetSubsystem<UGPNetworkManager>())
-			{
-				NetMgr->SendMyCompleteQuest(QuestType::CH3_KILL_TINO); 
-			}
-		}
-
 		Monsters[MonsterID]->CombatHandler->HandleDeath();
 		Monsters.Remove(MonsterID);
 	}

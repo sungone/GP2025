@@ -31,6 +31,7 @@ public:
 	uint8 UnequipItem(uint32 itemId);
 
 	bool SetCurrentQuest(QuestType quest);
+	QuestType GetCurrentQuest() { return _currentQuest; }
 	bool CompleteCurrentQuest();
 
 	void AddItemStats(const ItemStats& stats);

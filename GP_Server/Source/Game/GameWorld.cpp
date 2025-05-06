@@ -57,11 +57,12 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 	FVector newPos;
 	ZoneType startZone = ZoneType::TUK;
 	float radius = playerCollision;
-	do {
-		newPos = Map::GetInst().GetRandomPos(startZone, radius);
-	} while (GameWorld::GetInst().IsCollisionDetected(startZone, newPos, radius));
+	//do {
+	//	newPos = Map::GetInst().GetRandomPos(startZone, radius);
+	//} while (GameWorld::GetInst().IsCollisionDetected(startZone, newPos, radius));
+	//player->SetPos(newPos);
+	newPos = Map::GetInst().GetTIPEntryPos();
 	player->SetPos(newPos);
-
 	int32 id = player->GetInfo().ID;
 	player->GetInfo().SetZone(startZone);
 
@@ -121,7 +122,7 @@ void GameWorld::PlayerLeaveGame(int32 id)
 	}
 }
 
-void GameWorld::PlayerSetYaw(int32 playerId, float yaw)
+void GameWorld::PlayerSetLocation(int32 playerId, float yaw, FVector pos)
 {
 	auto player = GetPlayerByID(playerId);
 	if (!player)
@@ -130,6 +131,7 @@ void GameWorld::PlayerSetYaw(int32 playerId, float yaw)
 		return;
 	}
 	player->GetInfo().SetYaw(yaw);
+	player->SetPos(pos);
 }
 
 void GameWorld::PlayerAddState(int32 playerId, ECharacterStateType newState)
@@ -208,7 +210,8 @@ void GameWorld::PlayerAttack(int32 playerId)
 	{
 		if (!IsMonster(targetId)) continue;
 		auto monster = GetMonsterByID(targetId);
-		if (!monster) continue;
+		if (!monster)continue;
+		if (!player->IsInAttackRange(monster->GetInfo())) continue;
 		if (!player->Attack(monster)) continue;
 		if (monster->IsDead())
 		{
@@ -218,6 +221,14 @@ void GameWorld::PlayerAttack(int32 playerId)
 			FVector itemPos = { monster->GetInfo().Pos.X, monster->GetInfo().Pos.Y, monster->GetInfo().Pos.Z + 20 };
 			SpawnWorldItem(itemPos, monlv, playertype);
 			RemoveMonster(targetId);
+
+			//Todo: 현재는 티노 퀘스트만 처리 -> 확장해야함
+			auto mtype = monster->GetMonsterType();
+			auto quest = player->GetCurrentQuest();
+			if (mtype == Type::EMonster::TINO)
+			{
+				RequestQuest(playerId, quest);
+			}
 		}
 	}
 
@@ -479,7 +490,7 @@ FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
 	if (newPos == FVector::ZeroVector)
 		return FVector::ZeroVector;
 
-	player->GetInfo().SetLocation(newPos);
+	player->SetPos(newPos);
 	player->GetInfo().SetZone(targetZone);
 
 	std::unordered_set<int32> oldvlist;

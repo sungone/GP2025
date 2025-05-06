@@ -69,7 +69,7 @@ FVector Map::GetSpawnPosition(ZoneType from, ZoneType to) const
 	else
 		return FVector::ZeroVector;
 
-	const float radius = 300.0f; //범위 내에서
+	const float radius = 100.0f; //범위 내에서
 	return center + RandomOffset(radius);
 }
 bool Map::IsZoneAccessible(ZoneType zone, uint32 playerLevel) const
@@ -82,5 +82,22 @@ bool Map::IsZoneAccessible(ZoneType zone, uint32 playerLevel) const
 	case ZoneType::INDUSTY:   return playerLevel > 0;
 	case ZoneType::GYM:       return playerLevel > 0;
 	default:                  return false;
+	}
+}
+
+FVector Map::GetTIPEntryPos()
+{
+	return FVector(-5270.0, 15050.0, 147);
+}
+
+FVector Map::GetBossMonsterSpawnPos(Type::EMonster monster)
+{
+	using namespace Type;
+	switch (monster)
+	{
+	case EMonster::TINO:
+		return FVector(1500, 0, 100);
+	default:
+		return FVector::ZeroVector;
 	}
 }

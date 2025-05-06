@@ -18,6 +18,12 @@ public:
 	void UpdateViewList(std::shared_ptr<Character> other) override;
 	void Update();
 	void BehaviorTree();
+	Type::EMonster GetMonsterType() { return _monType; }
+	float GetAttackDamage() override { return _info.GetDamage(); }
+	void ChangeState(ECharacterStateType newState) override
+	{
+		_info.State = newState;
+	}
 
 private:
 	void Look();
@@ -28,14 +34,7 @@ private:
 	bool SetTarget();
 	bool IsTargetInAttackRange();
 	bool IsTargetInChaseRange();
-	float GetAttackDamage() override
-	{
-		return _info.GetDamage();
-	}
-	void ChangeState(ECharacterStateType newState) override
-	{
-		_info.State = newState;
-	}
+
 private:
 	ZoneType _zone;
 	Type::EMonster _monType;

@@ -215,7 +215,7 @@ void PacketManager::HandleMovePacket(int32 sessionId, Packet* packet)
 void PacketManager::HandleStartAimingPacket(int32 sessionId, Packet* packet)
 {
 	StartAimingPacket* p = static_cast<StartAimingPacket*>(packet);
-	_gameWorld.PlayerSetYaw(sessionId, p->PlayerYaw);
+	_gameWorld.PlayerSetLocation(sessionId, p->PlayerYaw, p->PlayerPos);
 	_gameWorld.PlayerAddState(sessionId, ECharacterStateType::STATE_AIMING);
 }
 
@@ -228,7 +228,7 @@ void PacketManager::HandleStopAimingPacket(int32 sessionId, Packet* packet)
 void PacketManager::HandleAttackPacket(int32 sessionId, Packet* packet)
 {
 	AttackPacket* p = static_cast<AttackPacket*>(packet);
-	_gameWorld.PlayerSetYaw(sessionId, p->PlayerYaw);
+	_gameWorld.PlayerSetLocation(sessionId, p->PlayerYaw, p->PlayerPos);
 	_gameWorld.PlayerAddState(sessionId, ECharacterStateType::STATE_AUTOATTACK);
 	_gameWorld.PlayerAttack(sessionId);
 }
@@ -236,7 +236,7 @@ void PacketManager::HandleAttackPacket(int32 sessionId, Packet* packet)
 void PacketManager::HandleUseSkillPacket(int32 sessionId, Packet* packet)
 {
 	UseSkillPacket* p = static_cast<UseSkillPacket*>(packet);
-	_gameWorld.PlayerSetYaw(sessionId, p->PlayerYaw);
+	_gameWorld.PlayerSetLocation(sessionId, p->PlayerYaw, p->PlayerPos);
 	_gameWorld.PlayerUseSkill(sessionId, p->SkillGID);
 }
 

@@ -138,15 +138,15 @@ void UGPNetworkManager::SendMyMovePacket()
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendMyAttackPacket(float PlayerYaw)
+void UGPNetworkManager::SendMyAttackPacket(float PlayerYaw, FVector PlayerPos)
 {
-	AttackPacket Packet(PlayerYaw);
+	AttackPacket Packet(PlayerYaw, PlayerPos);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendMyStartAiming(float PlayerYaw)
+void UGPNetworkManager::SendMyStartAiming(float PlayerYaw, FVector PlayerPos)
 {
-	StartAimingPacket Packet(PlayerYaw);
+	StartAimingPacket Packet(PlayerYaw, PlayerPos);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
@@ -186,9 +186,9 @@ void UGPNetworkManager::SendMyUnequipItem(int32 ItemID)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendMyUseSkill(ESkillGroup SkillGID, float PlayerYaw)
+void UGPNetworkManager::SendMyUseSkill(ESkillGroup SkillGID, float PlayerYaw, FVector PlayerPos)
 {
-	UseSkillPacket Packet(SkillGID, PlayerYaw);
+	UseSkillPacket Packet(SkillGID, PlayerYaw, PlayerPos);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 

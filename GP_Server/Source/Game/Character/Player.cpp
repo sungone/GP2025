@@ -146,10 +146,7 @@ WorldItem Player::DropItem(uint32 itemId)
 
 bool Player::Attack(std::shared_ptr<Character> monster)
 {
-	if (!IsInAttackRange(monster->GetInfo()))
-		return false;
-
-	float atkDamage = GetAttackDamage()*100;
+	float atkDamage = GetAttackDamage()*300;
 	if (atkDamage > 0.0f)
 	{
 		monster->OnDamaged(atkDamage);

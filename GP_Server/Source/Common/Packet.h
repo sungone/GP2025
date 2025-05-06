@@ -172,9 +172,9 @@ struct PlayerLevelUpPacket : public Packet
 struct AttackPacket : public Packet
 {
 	float PlayerYaw;
-
-	AttackPacket(float PlayerYaw_)
-		: Packet(EPacketType::C_ATTACK), PlayerYaw(PlayerYaw_)
+	FVector PlayerPos;
+	AttackPacket(float PlayerYaw_, FVector PlayerPos_)
+		: Packet(EPacketType::C_ATTACK), PlayerYaw(PlayerYaw_), PlayerPos(PlayerPos)
 	{
 		Header.PacketSize = sizeof(AttackPacket);
 	}
@@ -182,8 +182,9 @@ struct AttackPacket : public Packet
 struct StartAimingPacket : public Packet
 {
 	float PlayerYaw;
-	StartAimingPacket(float PlayerYaw_)
-		: Packet(EPacketType::C_START_AIMING), PlayerYaw(PlayerYaw_)
+	FVector PlayerPos;
+	StartAimingPacket(float PlayerYaw_, FVector PlayerPos_)
+		: Packet(EPacketType::C_START_AIMING), PlayerYaw(PlayerYaw_), PlayerPos(PlayerPos)
 	{
 		Header.PacketSize = sizeof(StartAimingPacket);
 	}
@@ -225,9 +226,10 @@ struct UseSkillPacket : public Packet
 {
 	ESkillGroup SkillGID;
 	float PlayerYaw;
+	FVector PlayerPos;
 
-	UseSkillPacket(ESkillGroup SkillGID_, float PlayerYaw_)
-		: Packet(EPacketType::C_USE_SKILL), SkillGID(SkillGID_), PlayerYaw(PlayerYaw_)
+	UseSkillPacket(ESkillGroup SkillGID_, float PlayerYaw_, FVector PlayerPos_)
+		: Packet(EPacketType::C_USE_SKILL), SkillGID(SkillGID_), PlayerYaw(PlayerYaw_), PlayerPos(PlayerPos_)
 	{
 		Header.PacketSize = sizeof(UseSkillPacket);
 	}
