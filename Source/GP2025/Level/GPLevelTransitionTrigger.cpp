@@ -44,6 +44,7 @@ void AGPLevelTransitionTrigger::BeginPlay()
 
 	if (TriggerBox)
 	{
+		TriggerBox->OnComponentBeginOverlap.RemoveDynamic(this, &AGPLevelTransitionTrigger::OnOverlapBegin);
 		TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AGPLevelTransitionTrigger::OnOverlapBegin);
 	}
 }

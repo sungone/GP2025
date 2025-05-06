@@ -168,6 +168,8 @@ void AGPCharacterNPC::OnInteractionExit(UPrimitiveComponent* OverlappedComp, AAc
 {
 	AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(OtherActor);
 	if (!MyPlayer) return;
+	InteractionWidgetComponent->SetVisibility(false);
+	MyPlayer->InputHandler->CurrentInteractionTarget = nullptr;
 
 	if (bIsInteracting)
 	{
@@ -191,13 +193,11 @@ void AGPCharacterNPC::OnInteractionExit(UPrimitiveComponent* OverlappedComp, AAc
 void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 {
 	if (!MyPlayer || !MyPlayer->InputHandler) return;
-	InteractionWidgetComponent->SetVisibility(false);
 
 	APlayerController* PC = Cast<APlayerController>(MyPlayer->GetController());
 	if (!PC) return;
 	if (bIsInteracting)
 	{
-		MyPlayer->InputHandler->CurrentInteractionTarget = nullptr;
 		return;
 	}
 
@@ -220,8 +220,6 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 	default:
 		break;
 	}
-
-	MyPlayer->InputHandler->CurrentInteractionTarget = nullptr;
 }
 
 void AGPCharacterNPC::ExitInteraction()

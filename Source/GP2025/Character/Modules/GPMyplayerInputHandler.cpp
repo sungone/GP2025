@@ -261,6 +261,7 @@ void UGPMyplayerInputHandler::TakeInteraction()
 {
 	if (!Owner) return;
 
+	// Item Drop
 	bGetTakeItem = true;
 	Owner->GetWorldTimerManager().SetTimer(
 		GetInteractionResetTimerHandle,

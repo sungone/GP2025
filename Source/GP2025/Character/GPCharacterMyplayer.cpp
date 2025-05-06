@@ -98,9 +98,10 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 	if (NetworkSyncHandler)
 		NetworkSyncHandler->Tick(DeltaTime);
 
-	if (!SkillCoolDownHandler || !IsValid(SkillCoolDownHandler))
-		return;
-	UpdateSkillCooldownBars();
+	if (SkillCoolDownHandler && IsValid(SkillCoolDownHandler))
+	{
+		UpdateSkillCooldownBars();
+	}
 }
 
 
@@ -220,47 +221,65 @@ void AGPCharacterMyplayer::UpdateSkillCooldownBars()
 		|| !UIManager->GetInGameWidget()->QSkillBar
 		|| !UIManager->GetInGameWidget()->ESkillBar
 		|| !UIManager->GetInGameWidget()->RSkillBar)
-		return;
-
-	if (!SkillCoolDownHandler || SkillCoolDownHandler->SkillCooldownTimes.Num() == 0)
 	{
+		UE_LOG(LogTemp, Error, TEXT("[CooldownUI] Widget references are invalid."));
 		return;
 	}
 
+	if (!SkillCoolDownHandler || SkillCoolDownHandler->SkillCooldownTimes.Num() == 0)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[CooldownUI] SkillCoolDownHandler invalid or not initialized."));
+		return;
+	}
+
+	// Q Skill
 	auto* QSkill = CharacterInfo.GetSkillData(bIsGunnerCharacter() ? ESkillGroup::Throwing : ESkillGroup::HitHard);
 	if (QSkill && QSkill->IsValid())
 	{
-		UIManager->GetInGameWidget()->QSkillBar->SetPercent(1 - GetSkillCooldownRatio(QSkill->SkillGID));
+		float Ratio = GetSkillCooldownRatio(QSkill->SkillGID);
+		UIManager->GetInGameWidget()->QSkillBar->SetPercent(1 - Ratio);
+		UE_LOG(LogTemp, Warning, TEXT("[CooldownUI] QSkill Group=%d, Ratio=%.2f, Bar=%.2f"),
+			(int32)QSkill->SkillGID, Ratio, 1 - Ratio);
 	}
 	else
 	{
 		UIManager->GetInGameWidget()->QSkillBar->SetPercent(0.f);
+		UE_LOG(LogTemp, Warning, TEXT("[CooldownUI] QSkill is invalid."));
 	}
 	UIManager->GetInGameWidget()->QSkillText->SetColorAndOpacity(UIManager->GetInGameWidget()->GetQSkillTextColor());
 
+	// E Skill
 	auto* ESkill = CharacterInfo.GetSkillData(bIsGunnerCharacter() ? ESkillGroup::FThrowing : ESkillGroup::Clash);
 	if (ESkill && ESkill->IsValid())
 	{
-		UIManager->GetInGameWidget()->ESkillBar->SetPercent(1 - GetSkillCooldownRatio(ESkill->SkillGID));
+		float Ratio = GetSkillCooldownRatio(ESkill->SkillGID);
+		UIManager->GetInGameWidget()->ESkillBar->SetPercent(1 - Ratio);
+		UE_LOG(LogTemp, Warning, TEXT("[CooldownUI] ESkill Group=%d, Ratio=%.2f, Bar=%.2f"),
+			(int32)ESkill->SkillGID, Ratio, 1 - Ratio);
 	}
 	else
 	{
 		UIManager->GetInGameWidget()->ESkillBar->SetPercent(0.f);
+		UE_LOG(LogTemp, Warning, TEXT("[CooldownUI] ESkill is invalid."));
 	}
 	UIManager->GetInGameWidget()->ESkillText->SetColorAndOpacity(UIManager->GetInGameWidget()->GetESkillTextColor());
 
+	// R Skill
 	auto* RSkill = CharacterInfo.GetSkillData(bIsGunnerCharacter() ? ESkillGroup::Anger : ESkillGroup::Whirlwind);
 	if (RSkill && RSkill->IsValid())
 	{
-		UIManager->GetInGameWidget()->RSkillBar->SetPercent(1 - GetSkillCooldownRatio(RSkill->SkillGID));
+		float Ratio = GetSkillCooldownRatio(RSkill->SkillGID);
+		UIManager->GetInGameWidget()->RSkillBar->SetPercent(1 - Ratio);
+		UE_LOG(LogTemp, Warning, TEXT("[CooldownUI] RSkill Group=%d, Ratio=%.2f, Bar=%.2f"),
+			(int32)RSkill->SkillGID, Ratio, 1 - Ratio);
 	}
 	else
 	{
 		UIManager->GetInGameWidget()->RSkillBar->SetPercent(0.f);
+		UE_LOG(LogTemp, Warning, TEXT("[CooldownUI] RSkill is invalid."));
 	}
 	UIManager->GetInGameWidget()->RSkillText->SetColorAndOpacity(UIManager->GetInGameWidget()->GetRSkillTextColor());
 }
-
 
 void AGPCharacterMyplayer::ChangePlayerType()
 {

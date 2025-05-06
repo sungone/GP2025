@@ -28,7 +28,6 @@ public :
     UPROPERTY()
     AGPCharacterMyplayer* Owner;
 
-    // UPROPERTY() 로 관리를 못하네?
     TMap<struct FSkillData, float> SkillCooldownTimes;
 
     TMap<struct FSkillData, float> LastSkillUseTimes;
