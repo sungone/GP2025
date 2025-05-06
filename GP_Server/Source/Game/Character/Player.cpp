@@ -144,9 +144,13 @@ WorldItem Player::DropItem(uint32 itemId)
 	return dropedItem;
 }
 
-bool Player::Attack(std::shared_ptr<Character> monster)
+bool Player::Attack(std::shared_ptr<Character> target)
 {
-	float atkDamage = GetAttackDamage()*300;
+	auto monster = std::dynamic_pointer_cast<Monster>(target);
+	if (!monster) return false;
+	if (!IsInAttackRange(monster->GetInfo()))return false;
+
+	float atkDamage = GetAttackDamage() * 300;
 	if (atkDamage > 0.0f)
 	{
 		monster->OnDamaged(atkDamage);

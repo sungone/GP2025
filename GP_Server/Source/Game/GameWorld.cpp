@@ -209,9 +209,8 @@ void GameWorld::PlayerAttack(int32 playerId)
 	for (int32 targetId : viewList)
 	{
 		if (!IsMonster(targetId)) continue;
-		auto monster = GetMonsterByID(targetId);
+		std::shared_ptr<Monster> monster = GetMonsterByID(targetId);
 		if (!monster)continue;
-		if (!player->IsInAttackRange(monster->GetInfo())) continue;
 		if (!player->Attack(monster)) continue;
 		if (monster->IsDead())
 		{
@@ -227,7 +226,7 @@ void GameWorld::PlayerAttack(int32 playerId)
 			auto quest = player->GetCurrentQuest();
 			if (mtype == Type::EMonster::TINO)
 			{
-				RequestQuest(playerId, quest);
+				CompleteQuest(playerId, quest);
 			}
 		}
 	}
