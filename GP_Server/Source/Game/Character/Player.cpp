@@ -367,6 +367,22 @@ uint8 Player::UnequipItem(uint32 itemId)
 	return itemType;
 }
 
+bool Player::SetCurrentQuest(QuestType quest)
+{
+	if (_info.HasQuest(quest))
+	{
+		int res = _info.AddQuest({ quest,EQuestStatus::InProgress });
+		if (!res) return false;
+	}
+	_currentQuest = quest;
+	return true;
+}
+
+bool Player::CompleteCurrentQuest()
+{
+	return _info.CompleteQuest(_currentQuest);
+}
+
 void Player::AddItemStats(const ItemStats& stats)
 {
 	_stats.Damage += stats.damage;

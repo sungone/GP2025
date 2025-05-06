@@ -180,6 +180,7 @@
     <ClInclude Include="Source\Game\DataTable\MonsterTable.h" />
     <ClInclude Include="Source\Game\DataTable\PlayerLevelTable.h" />
     <ClInclude Include="Source\Game\DataTable\PlayerSkillTable.h" />
+    <ClInclude Include="Source\Game\DataTable\QuestTable.h" />
     <ClInclude Include="Source\Game\GameWorld.h" />
     <ClInclude Include="Source\Game\Item\Inventory.h" />
     <ClInclude Include="Source\Game\Item\InventoryItem.h" />
@@ -210,6 +211,7 @@
     <ClCompile Include="Source\Game\DataTable\MonsterTable.cpp" />
     <ClCompile Include="Source\Game\DataTable\PlayerLevelTable.cpp" />
     <ClCompile Include="Source\Game\DataTable\PlayerSkillTable.cpp" />
+    <ClCompile Include="Source\Game\DataTable\QuestTable.cpp" />
     <ClCompile Include="Source\Game\GameWorld.cpp" />
     <ClCompile Include="Source\Game\Item\Inventory.cpp" />
     <ClCompile Include="Source\Game\Item\InventoryItem.cpp" />

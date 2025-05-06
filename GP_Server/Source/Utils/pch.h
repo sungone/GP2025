@@ -36,3 +36,4 @@
 #include "PlayerSkillTable.h"
 #include "PlayerLevelTable.h"
 #include "MonsterTable.h"
+#include "QuestTable.h"

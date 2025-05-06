@@ -20,18 +20,6 @@
     <Filter Include="Source Files\Game">
       <UniqueIdentifier>{053f68d3-c801-4234-820b-0898ac0fcda2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Game\GameObjects">
-      <UniqueIdentifier>{54a590bd-a49d-4bf5-8c7a-15c3aab5c80f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Game\GameObjects\Map">
-      <UniqueIdentifier>{8c3f90d3-fa86-4a55-8ae0-ca4c78604b0d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Game\GameObjects\Item">
-      <UniqueIdentifier>{1abc2927-eb8d-4991-bc38-72092992a49a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Game\GameObjects\Character">
-      <UniqueIdentifier>{0966d558-393f-4cde-bc3a-30a33c8d61fe}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Game\DataTable">
       <UniqueIdentifier>{5410e107-ebe2-467e-a7cd-01e4c2a5ac3c}</UniqueIdentifier>
     </Filter>
@@ -55,6 +43,24 @@
     </Filter>
     <Filter Include="Source Files\Common">
       <UniqueIdentifier>{a7a69939-add0-4a56-b879-98677decfb9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\GameWorld">
+      <UniqueIdentifier>{dfedfdfa-df4a-4465-aa0a-e8cd6ba3ff98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\GameObjects">
+      <UniqueIdentifier>{54a590bd-a49d-4bf5-8c7a-15c3aab5c80f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\GameObjects\Item">
+      <UniqueIdentifier>{1abc2927-eb8d-4991-bc38-72092992a49a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\GameObjects\Character">
+      <UniqueIdentifier>{0966d558-393f-4cde-bc3a-30a33c8d61fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\GameWorld\Map">
+      <UniqueIdentifier>{8c3f90d3-fa86-4a55-8ae0-ca4c78604b0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\GameWorld\Quest">
+      <UniqueIdentifier>{5508843b-2a1c-4f0c-966d-87dc41cb08ab}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -94,9 +100,6 @@
     <ClInclude Include="Source\Core\SessionSocket.h">
       <Filter>Source Files\Network\Session</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Game\GameWorld.h">
-      <Filter>Source Files\Game</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Utils\pch.h">
       <Filter>Source Files\PCH</Filter>
     </ClInclude>
@@ -116,13 +119,13 @@
       <Filter>Source Files\Game\GameObjects\Item</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\Map\BoundingBox.h">
-      <Filter>Source Files\Game\GameObjects\Map</Filter>
+      <Filter>Source Files\Game\GameWorld\Map</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\Map\MapZone.h">
-      <Filter>Source Files\Game\GameObjects\Map</Filter>
+      <Filter>Source Files\Game\GameWorld\Map</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\Map\NavMesh.h">
-      <Filter>Source Files\Game\GameObjects\Map</Filter>
+      <Filter>Source Files\Game\GameWorld\Map</Filter>
     </ClInclude>
     <ClInclude Include="Source\Core\IOCP\ExpOver.h">
       <Filter>Source Files\Utils\IOCP</Filter>
@@ -154,6 +157,12 @@
     <ClInclude Include="Source\ServerDefine.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Game\GameWorld.h">
+      <Filter>Source Files\Game\GameWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\DataTable\QuestTable.h">
+      <Filter>Source Files\Game\DataTable</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Core\PlayerSession.cpp">
@@ -174,9 +183,6 @@
     <ClCompile Include="Source\Core\SessionSocket.cpp">
       <Filter>Source Files\Network\Session</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Game\GameWorld.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Utils\pch.cpp">
       <Filter>Source Files\PCH</Filter>
     </ClCompile>
@@ -196,13 +202,13 @@
       <Filter>Source Files\Game\GameObjects\Item</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Map\BoundingBox.cpp">
-      <Filter>Source Files\Game\GameObjects\Map</Filter>
+      <Filter>Source Files\Game\GameWorld\Map</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Map\MapZone.cpp">
-      <Filter>Source Files\Game\GameObjects\Map</Filter>
+      <Filter>Source Files\Game\GameWorld\Map</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Map\NavMesh.cpp">
-      <Filter>Source Files\Game\GameObjects\Map</Filter>
+      <Filter>Source Files\Game\GameWorld\Map</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\IOCP\ExpOver.cpp">
       <Filter>Source Files\Utils\IOCP</Filter>
@@ -231,13 +237,19 @@
     <ClCompile Include="Source\DB\DBManager.cpp">
       <Filter>Source Files\DB</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Game\GameWorld.cpp">
+      <Filter>Source Files\Game\GameWorld</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\DataTable\QuestTable.cpp">
+      <Filter>Source Files\Game\DataTable</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Game\Map\MapJsonData\NavMeshData.json">
-      <Filter>Source Files\Game\GameObjects\Map</Filter>
+      <Filter>Source Files\Game\GameWorld\Map</Filter>
     </None>
     <None Include="Source\Game\Map\MapJsonData\PlaygroundNavData.json">
-      <Filter>Source Files\Game\GameObjects\Map</Filter>
+      <Filter>Source Files\Game\GameWorld\Map</Filter>
     </None>
     <None Include="Tools\backup_mysql.bat">
       <Filter>Source Files\DB\BatchFile</Filter>

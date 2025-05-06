@@ -192,7 +192,7 @@ void PacketManager::HandleEnterGamePacket(int32 sessionId, Packet* packet)
 	if (!player) return;
 	RequestEnterGamePacket* p = static_cast<RequestEnterGamePacket*>(packet);
 	auto newType = p->PlayerType;
-	if(newType != Type::EPlayer::NONE)
+	if (newType != Type::EPlayer::NONE)
 		player->SetCharacterType(p->PlayerType);
 
 	session->EnterGame();
@@ -294,16 +294,23 @@ void PacketManager::HandleRespawnRequestPacket(int32 sessionId, Packet* packet)
 
 void PacketManager::HandleShopBuyItemPacket(int32 sessionId, Packet* packet)
 {
+	auto* p = static_cast<BuyItemPacket*>(packet);
 }
 
 void PacketManager::HandleShopSellItemPacket(int32 sessionId, Packet* packet)
 {
+	auto* p = static_cast<SellItemPacket*>(packet);
+
 }
 
 void PacketManager::HandleRequestQuestPacket(int32 sessionId, Packet* packet)
 {
+	auto* p = static_cast<RequestQuestPacket*>(packet);
+	_gameWorld.RequestQuest(sessionId, p->Quest);
 }
 
 void PacketManager::HandleCompleteQuestPacket(int32 sessionId, Packet* packet)
 {
+	auto* p = static_cast<CompleteQuestPacket*>(packet);
+	_gameWorld.CompleteQuest(sessionId, p->Quest);
 }
