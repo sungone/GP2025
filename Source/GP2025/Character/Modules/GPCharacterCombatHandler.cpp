@@ -24,9 +24,26 @@ void UGPCharacterCombatHandler::PlayAutoAttackMontage()
 
 	FOnMontageEnded EndDelegate;
 	EndDelegate.BindUObject(this, &UGPCharacterCombatHandler::OnAutoAttackMontageEnded);
-
-	AnimInstance->Montage_Play(AttackMontage, 2.f);
+	AnimInstance->Montage_Play(AttackMontage, PlayRate);
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, AttackMontage);
+
+	// End 델리게이트 실패 방지용 코드
+	float MontageDuration = AttackMontage->GetPlayLength();
+	float AdjustedDuration = MontageDuration / PlayRate;
+	Owner->GetWorldTimerManager().SetTimer(
+		AutoAttackFailSafeHandle,
+		[this]()
+		{
+			if (bIsAutoAttacking)
+			{
+				UE_LOG(LogTemp, Error, TEXT("[Combat] Failsafe: Montage didn't end properly. Cleaning up manually."));
+				bIsAutoAttacking = false;
+				Owner->CharacterInfo.RemoveState(STATE_AUTOATTACK);
+			}
+		},
+		AdjustedDuration + 0.2f,
+		false
+	);
 }
 
 void UGPCharacterCombatHandler::OnAutoAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -35,6 +52,11 @@ void UGPCharacterCombatHandler::OnAutoAttackMontageEnded(UAnimMontage* Montage, 
 	bIsAutoAttacking = false;
 	Owner->CharacterInfo.RemoveState(STATE_AUTOATTACK);
 
+	// 실패 방지용 코드 타이머 제거
+	if (Owner->GetWorldTimerManager().IsTimerActive(AutoAttackFailSafeHandle))
+	{
+		Owner->GetWorldTimerManager().ClearTimer(AutoAttackFailSafeHandle);
+	}
 }
 
 void UGPCharacterCombatHandler::HandleDeath()
@@ -106,8 +128,33 @@ void UGPCharacterCombatHandler::PlaySkillMontage(UAnimMontage* SkillMontage)
 
 	FOnMontageEnded EndDelegate;
 	EndDelegate.BindUObject(this, &UGPCharacterCombatHandler::OnSkillMontageEnded);
-	AnimInstance->Montage_Play(SkillMontage, 2.f);
+	AnimInstance->Montage_Play(SkillMontage, PlayRate);
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, SkillMontage);
+
+	float AdjustedDuration = SkillMontage->GetPlayLength() / PlayRate;
+	CurrentSkillMontage = SkillMontage;
+
+	Owner->GetWorldTimerManager().SetTimer(
+		SkillFailSafeHandle,
+		[this]()
+		{
+			if (bIsUsingSkill)
+			{
+				UE_LOG(LogTemp, Error, TEXT("[Combat] Failsafe: Skill Montage did not end. Cleaning up manually."));
+				bIsUsingSkill = false;
+
+				// 상태 제거 (Q/E/R 중 어떤 것인지 확인 후 제거)
+				if (CurrentSkillMontage == QSkillMontage)
+					Owner->CharacterInfo.RemoveState(STATE_SKILL_Q);
+				else if (CurrentSkillMontage == ESkillMontage)
+					Owner->CharacterInfo.RemoveState(STATE_SKILL_E);
+				else if (CurrentSkillMontage == RSkillMontage)
+					Owner->CharacterInfo.RemoveState(STATE_SKILL_R);
+			}
+		},
+		AdjustedDuration + 0.2f,
+		false
+	);
 }
 
 void UGPCharacterCombatHandler::OnSkillMontageEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -127,6 +174,11 @@ void UGPCharacterCombatHandler::OnSkillMontageEnded(UAnimMontage* Montage, bool 
 
 		if (Owner->CharacterInfo.HasState(STATE_SKILL_R) && Montage == RSkillMontage)
 			Owner->CharacterInfo.RemoveState(STATE_SKILL_R);
+
+		if (Owner->GetWorldTimerManager().IsTimerActive(SkillFailSafeHandle))
+		{
+			Owner->GetWorldTimerManager().ClearTimer(SkillFailSafeHandle);
+		}
 	}
 }
 

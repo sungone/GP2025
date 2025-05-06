@@ -69,8 +69,19 @@ public:
 	UPROPERTY()
 	UAnimMontage* DeadMontage;
 
+private :
+	// AnimMontage PlayRate
+	const float PlayRate = 2.0f;
 private:
 	float DeadEventDelayTime = 0.5f;
 	bool bIsAutoAttacking = false;
 	bool bIsUsingSkill = false;
+
+	// 델리게이트 Montage End 처리 실패 방지용
+private :
+	FTimerHandle AutoAttackFailSafeHandle;
+	FTimerHandle SkillFailSafeHandle;
+
+	UPROPERTY()
+	UAnimMontage* CurrentSkillMontage = nullptr;
 };

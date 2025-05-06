@@ -144,12 +144,16 @@ void AGPCharacterBase::Tick(float DeltaTime)
 
 	if (Cast<AGPCharacterMyplayer>(this)) return;
 
-	// Move Sync
+	// Attack Sync
 	HandleAutoAttackState();
 	HandleQSkillState();
 	HandleESkillState();
 	HandleRSkillState();
+
+	// Move Sync
 	HandleRemoteMovementSync(DeltaTime);
+
+	// Jump Sync
 	HandleRemoteJumpSync();
 }
 
@@ -174,9 +178,10 @@ void AGPCharacterBase::SetNameByCharacterInfo()
 
 void AGPCharacterBase::HandleAutoAttackState()
 {
-	if (CharacterInfo.HasState(STATE_AUTOATTACK) && !CombatHandler->IsAutoAttacking())
+	if (CharacterInfo.HasState(STATE_AUTOATTACK) && !CombatHandler->IsAutoAttacking()) // && !CharacterInfo.HasState(STATE_JUMP)
 	{
 		CombatHandler->PlayAutoAttackMontage();
+		CharacterInfo.RemoveState(STATE_AUTOATTACK);
 	}
 }
 
@@ -185,6 +190,7 @@ void AGPCharacterBase::HandleQSkillState()
 	if (CharacterInfo.HasState(STATE_SKILL_Q) && !CombatHandler->IsUsingSkill())
 	{
 		CombatHandler->PlayQSkillMontage();
+		CharacterInfo.RemoveState(STATE_SKILL_Q);
 	}
 }
 
@@ -193,6 +199,7 @@ void AGPCharacterBase::HandleESkillState()
 	if (CharacterInfo.HasState(STATE_SKILL_E) && !CombatHandler->IsUsingSkill())
 	{
 		CombatHandler->PlayESkillMontage();
+		CharacterInfo.RemoveState(STATE_SKILL_E);
 	}
 }
 
@@ -201,6 +208,7 @@ void AGPCharacterBase::HandleRSkillState()
 	if (CharacterInfo.HasState(STATE_SKILL_R) && !CombatHandler->IsUsingSkill())
 	{
 		CombatHandler->PlayRSkillMontage();
+		CharacterInfo.RemoveState(STATE_SKILL_R);
 	}
 }
 
@@ -264,6 +272,7 @@ void AGPCharacterBase::HandleRemoteJumpSync()
 		GroundTraceElapsedTime = 0.f;
 	}
 
+	// 실제 점프 동기화
 	const float ZAcceptableRangeValues = 15.f;
 	float DeltaZ = FMath::Abs(GetActorLocation().Z - Ground_ZLocation);
 

@@ -151,24 +151,24 @@ void UGPObjectManager::DamagedPlayer(const FInfoData& PlayerInfo)
 
 void UGPObjectManager::HandlePlayerDeath(int32 playerId)
 {
-	AGPCharacterPlayer* TargetPlayer = Players.FindRef(playerId);
-	if (!TargetPlayer) return;
+	//AGPCharacterPlayer* TargetPlayer = Players.FindRef(playerId);
+	//if (!TargetPlayer) return;
 
-	TargetPlayer->CombatHandler->PlayDeadAnimation();
-	FTimerHandle HideTimerHandle;
-	TargetPlayer->GetWorldTimerManager().SetTimer(HideTimerHandle, [TargetPlayer]()
-		{
-			TargetPlayer->SetActorHiddenInGame(true);
-			TargetPlayer->SetActorEnableCollision(false);
-		}, 1.f, false);
+	//TargetPlayer->CombatHandler->PlayDeadAnimation();
+	//FTimerHandle HideTimerHandle;
+	//TargetPlayer->GetWorldTimerManager().SetTimer(HideTimerHandle, [TargetPlayer]()
+	//	{
+	//		TargetPlayer->SetActorHiddenInGame(true);
+	//		TargetPlayer->SetActorEnableCollision(false);
+	//	}, 1.f, false);
 
-	if (TargetPlayer == MyPlayer)
-	{
-		if (MyPlayer->UIManager)
-		{
-			MyPlayer->UIManager->ShowDeadScreen();
-		}
-	}
+	//if (TargetPlayer == MyPlayer)
+	//{
+	//	if (MyPlayer->UIManager)
+	//	{
+	//		MyPlayer->UIManager->ShowDeadScreen();
+	//	}
+	//}
 }
 
 void UGPObjectManager::SkillUnlock(ESkillGroup SkillGID)
@@ -427,22 +427,22 @@ void UGPObjectManager::ChangeZone(ZoneType zone, const FVector& RandomPos)
 
 void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
 {
-	auto PlayerID = info.ID;
-	AGPCharacterPlayer** FoundPlayerPtr = Players.Find(PlayerID);
-	if (!FoundPlayerPtr)
-	{
-		UE_LOG(LogTemp, Error, TEXT("[Respawn] No player found with ID: %d"), PlayerID);
-		return;
-	}
+	//auto PlayerID = info.ID;
+	//AGPCharacterPlayer** FoundPlayerPtr = Players.Find(PlayerID);
+	//if (!FoundPlayerPtr)
+	//{
+	//	UE_LOG(LogTemp, Error, TEXT("[Respawn] No player found with ID: %d"), PlayerID);
+	//	return;
+	//}
 
-	AGPCharacterPlayer* FoundPlayer = *FoundPlayerPtr;
-	if (FoundPlayer == MyPlayer)
-	{
-		UE_LOG(LogTemp, Log, TEXT("[Respawn] This is MyPlayer."));
+	//AGPCharacterPlayer* FoundPlayer = *FoundPlayerPtr;
+	//if (FoundPlayer == MyPlayer)
+	//{
+	//	UE_LOG(LogTemp, Log, TEXT("[Respawn] This is MyPlayer."));
 
-		MyPlayer->SetActorHiddenInGame(false);
-		MyPlayer->SetActorEnableCollision(true);
-	}
+	//	MyPlayer->SetActorHiddenInGame(false);
+	//	MyPlayer->SetActorEnableCollision(true);
+	//}
 }
 
 void UGPObjectManager::ShowShopItems(uint8 Count, const ShopItemInfo* shopitems)

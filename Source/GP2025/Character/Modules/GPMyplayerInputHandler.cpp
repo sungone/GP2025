@@ -80,7 +80,7 @@ void UGPMyplayerInputHandler::SetupInputBindings(UEnhancedInputComponent* Enhanc
 	EnhancedInput->BindAction(SprintAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::StartSprinting);
 	EnhancedInput->BindAction(SprintAction, ETriggerEvent::Completed, this, &UGPMyplayerInputHandler::StopSprinting);
 
-	EnhancedInput->BindAction(AutoAttackAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::AutoAttack);
+	EnhancedInput->BindAction(AutoAttackAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::AutoAttack);
 
 	EnhancedInput->BindAction(InventoryAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::ToggleInventory);
 	EnhancedInput->BindAction(InventoryAction, ETriggerEvent::Completed, this, &UGPMyplayerInputHandler::ResetInventoryToggle);
@@ -91,9 +91,9 @@ void UGPMyplayerInputHandler::SetupInputBindings(UEnhancedInputComponent* Enhanc
 	EnhancedInput->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::StartAiming);
 	EnhancedInput->BindAction(ZoomAction, ETriggerEvent::Completed, this, &UGPMyplayerInputHandler::StopAiming);
 
-	EnhancedInput->BindAction(SkillQAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::UseSkillQ);
-	EnhancedInput->BindAction(SkillEAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::UseSkillE);
-	EnhancedInput->BindAction(SkillRAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::UseSkillR);
+	EnhancedInput->BindAction(SkillQAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::UseSkillQ);
+	EnhancedInput->BindAction(SkillEAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::UseSkillE);
+	EnhancedInput->BindAction(SkillRAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::UseSkillR);
 
 	EnhancedInput->BindAction(AcceptAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::Accept);
 	EnhancedInput->BindAction(RefuseAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::Refuse);
@@ -153,8 +153,8 @@ void UGPMyplayerInputHandler::Jump()
 void UGPMyplayerInputHandler::StopJumping()
 {
 	if (!Owner) return;
-
 	Owner->StopJumping();
+
 	Owner->CharacterInfo.RemoveState(STATE_JUMP);
 }
 
@@ -163,6 +163,7 @@ void UGPMyplayerInputHandler::StartSprinting()
 	if (!Owner) return;
 
 	Owner->GetCharacterMovement()->MaxWalkSpeed = Owner->NetworkSyncHandler->SprintSpeed;
+	Owner->CharacterInfo.RemoveState(STATE_WALK);
 	Owner->CharacterInfo.AddState(STATE_RUN);
 }
 
@@ -172,21 +173,31 @@ void UGPMyplayerInputHandler::StopSprinting()
 
 	Owner->GetCharacterMovement()->MaxWalkSpeed = Owner->NetworkSyncHandler->WalkSpeed;
 	Owner->CharacterInfo.RemoveState(STATE_RUN);
+	Owner->CharacterInfo.AddState(STATE_WALK);
 }
 
 void UGPMyplayerInputHandler::AutoAttack()
 {
-	if (!Owner) return;
-
-	if (Owner->bIsGunnerCharacter() && !Owner->CameraHandler->IsZooming()) return;
-
-	if (!Owner->CombatHandler->IsAutoAttacking() && !Owner->CharacterInfo.HasState(STATE_AUTOATTACK))
+	if (!Owner)
 	{
-		Owner->CharacterInfo.AddState(STATE_AUTOATTACK);
-		Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw);
+		return;
 	}
 
-	Owner->CombatHandler->PlayAutoAttackMontage();
+	if (Owner->bIsGunnerCharacter() && !Owner->CameraHandler->IsZooming())
+	{
+		return;
+	}
+
+	bool bIsAlreadyAttacking = Owner->CombatHandler->IsAutoAttacking();
+	bool bIsUsingSkill = Owner->CombatHandler->IsUsingSkill();
+	// bool bHasAttackState = Owner->CharacterInfo.HasState(STATE_AUTOATTACK);
+
+	if (!bIsAlreadyAttacking  && !bIsUsingSkill)
+	{
+		Owner->CharacterInfo.AddState(STATE_AUTOATTACK);
+		Owner->CombatHandler->PlayAutoAttackMontage();
+		Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw);
+	}
 }
 
 void UGPMyplayerInputHandler::ToggleInventory()
@@ -303,7 +314,10 @@ void UGPMyplayerInputHandler::StopAiming()
 
 void UGPMyplayerInputHandler::UseSkillQ()
 {
-	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() || Owner->CharacterInfo.HasState(STATE_SKILL_Q)) return;
+	bool bIsAlreadyAttacking = Owner->CombatHandler->IsAutoAttacking();
+	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() 
+		 || bIsAlreadyAttacking) return;
+
 	ESkillGroup SkillGroup = Owner->bIsGunnerCharacter() ? ESkillGroup::Throwing : ESkillGroup::HitHard;
 	int32 SkillLevel = Owner->CharacterInfo.GetSkillLevel(SkillGroup);
 	if (SkillLevel == -1)
@@ -335,7 +349,10 @@ void UGPMyplayerInputHandler::UseSkillQ()
 
 void UGPMyplayerInputHandler::UseSkillE()
 {
-	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() || Owner->CharacterInfo.HasState(STATE_SKILL_E)) return;
+	bool bIsAlreadyAttacking = Owner->CombatHandler->IsAutoAttacking();
+	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() 
+		 || bIsAlreadyAttacking) return;
+
 	ESkillGroup SkillGroup = Owner->bIsGunnerCharacter() ? ESkillGroup::FThrowing : ESkillGroup::Clash;
 	int32 SkillLevel = Owner->CharacterInfo.GetSkillLevel(SkillGroup);
 	if (SkillLevel == -1)
@@ -367,7 +384,10 @@ void UGPMyplayerInputHandler::UseSkillE()
 
 void UGPMyplayerInputHandler::UseSkillR()
 {
-	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() || Owner->CharacterInfo.HasState(STATE_SKILL_R)) return;
+	bool bIsAlreadyAttacking = Owner->CombatHandler->IsAutoAttacking();
+	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() 
+		 || bIsAlreadyAttacking) return;
+
 	ESkillGroup SkillGroup = Owner->bIsGunnerCharacter() ? ESkillGroup::Anger : ESkillGroup::Whirlwind;
 	int32 SkillLevel = Owner->CharacterInfo.GetSkillLevel(SkillGroup);
 	if (SkillLevel == -1)
@@ -394,6 +414,4 @@ void UGPMyplayerInputHandler::UseSkillR()
 		Owner->CombatHandler->PlayRSkillMontage();
 		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Whirlwind, Owner->GetControlRotation().Yaw);
 	}
-
-	Owner->AppearanceHandler->SetupLeaderPose();
 }

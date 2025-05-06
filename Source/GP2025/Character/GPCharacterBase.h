@@ -64,4 +64,6 @@ public:
 	FOnHpChanged OnHpChanged;
 	FOnLevelChanged OnLevelChanged;
 	FOnNickNameChanged OnNickNameChanged;
+
+
 };
