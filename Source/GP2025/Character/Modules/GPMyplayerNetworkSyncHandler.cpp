@@ -8,7 +8,6 @@
 #include "Components/CapsuleComponent.h"
 #include "GPMyplayerNetworkSyncHandler.h"
 
-
 void UGPMyplayerNetworkSyncHandler::Initialize(AGPCharacterMyplayer* InOwner)
 {
 	Owner = InOwner;

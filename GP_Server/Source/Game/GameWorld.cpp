@@ -160,14 +160,16 @@ void GameWorld::PlayerRemoveState(int32 playerId, ECharacterStateType oldState)
 		LOG(Warning, "Invaild!");
 		return;
 	}
-	player->RemoveState(oldState);
-	auto upkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
-	std::unordered_set<int32> viewList;
+	if(player->RemoveState(oldState))
 	{
-		std::lock_guard lock(player->_vlLock);
-		viewList = player->GetViewList();
+		auto upkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
+		std::unordered_set<int32> viewList;
+		{
+			std::lock_guard lock(player->_vlLock);
+			viewList = player->GetViewList();
+		}
+		SessionManager::GetInst().BroadcastToViewList(&upkt, viewList);
 	}
-	SessionManager::GetInst().BroadcastToViewList(&upkt, viewList);
 }
 
 void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& time)
@@ -245,6 +247,14 @@ void GameWorld::PlayerUseSkill(int32 playerId, ESkillGroup groupId)
 		return;
 	}
 	player->UseSkill(groupId);
+	auto targetState = ECharacterStateType::STATE_NONE;
+	if (groupId == ESkillGroup::HitHard || groupId == ESkillGroup::Throwing)
+		targetState = ECharacterStateType::STATE_SKILL_Q;
+	else if (groupId == ESkillGroup::Clash || groupId == ESkillGroup::FThrowing)
+		targetState = ECharacterStateType::STATE_SKILL_E;
+	else if (groupId == ESkillGroup::Whirlwind || groupId == ESkillGroup::Anger)
+		targetState = ECharacterStateType::STATE_SKILL_R;
+	player->RemoveState(targetState);
 }
 
 void GameWorld::CreateMonster()

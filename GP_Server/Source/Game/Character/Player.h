@@ -60,12 +60,14 @@ public:
 			_info.AddState(newState);
 		}
 	}
-	void RemoveState(ECharacterStateType oldState)
+	bool RemoveState(ECharacterStateType oldState)
 	{
-		if (!_info.HasState(oldState))
+		if (_info.HasState(oldState))
 		{
 			_info.RemoveState(oldState);
+			return true;
 		}
+		return false;
 	}
 	FStatData& GetStats() const { return _stats; }
 private:
