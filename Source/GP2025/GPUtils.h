@@ -32,8 +32,9 @@ TArray<FBoundingBoxData> ExtractBoundingBoxData(ULevel* Level)
         UStaticMesh* StaticMesh = MeshComponent->GetStaticMesh();
         if (!StaticMesh) continue;
 
+
         FBoundingBoxData BoxData;
-        BoxData.Name = StaticMeshActor->GetActorLabel();
+        BoxData.Name = StaticMeshActor->GetActorLabel(); // 이거 패키징 할 때 오류
 
         USceneComponent* RootComponent = StaticMeshActor->GetRootComponent();
         if (!RootComponent) continue;

@@ -65,7 +65,7 @@ FVector Map::GetSpawnPosition(ZoneType from, ZoneType to) const
 	else if (to == ZoneType::GYM)
 		center = FVector(-2000, 0, 147);
 	else if (to == ZoneType::INDUSTY)
-		center = FVector(10, -7000, 180);
+		center = FVector(0, -10640.0, 147);
 	else
 		return FVector::ZeroVector;
 
