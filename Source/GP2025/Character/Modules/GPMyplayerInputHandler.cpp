@@ -57,6 +57,7 @@ UGPMyplayerInputHandler::UGPMyplayerInputHandler()
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Accept.IA_Accept'"), AcceptAction);
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Refuse.IA_Refuse'"), RefuseAction);
 	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_Interaction.IA_Interaction'"), InteractionAction);
+	LoadAction(TEXT("/Script/EnhancedInput.InputAction'/Game/PlayerInput/Actions/IA_EnterKey.IA_EnterKey'"), EnterKeyAction); 
 }
 
 void UGPMyplayerInputHandler::Initialize(AGPCharacterMyplayer* InOwner, UEnhancedInputComponent* InputComponent)
@@ -98,6 +99,8 @@ void UGPMyplayerInputHandler::SetupInputBindings(UEnhancedInputComponent* Enhanc
 	EnhancedInput->BindAction(AcceptAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::Accept);
 	EnhancedInput->BindAction(RefuseAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::Refuse);
 	EnhancedInput->BindAction(InteractionAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::Interact);
+	EnhancedInput->BindAction(EnterKeyAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::EnterChatting);
+
 }
 
 
@@ -266,6 +269,12 @@ void UGPMyplayerInputHandler::Interact()
 	{
 		NPC->CheckAndHandleInteraction(Cast<AGPCharacterMyplayer>(Owner));
 	}
+}
+
+void UGPMyplayerInputHandler::EnterChatting()
+{
+	if (!Owner || !Owner->UIManager) return;
+	Owner->UIManager->FocusChatInput();
 }
 
 void UGPMyplayerInputHandler::TakeInteraction()

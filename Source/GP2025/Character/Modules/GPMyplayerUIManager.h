@@ -68,6 +68,7 @@ public:
 	UPROPERTY()
 	UUserWidget* DeadScreenWidget;
 
+
 	// 현재 NPC 가 열고있는 QuestWidget 이 있으면 저장
 	UPROPERTY()
 	class UGPQuestWidget* CurrentQuestWidget = nullptr;
@@ -107,5 +108,9 @@ public :
 // Skill Level UP Text
 public :
 	void SpawnSkillLevelText(int32 NewLevel);
+
+	// Chat System
+	void FocusChatInput();     // 입력창 열기 + 포커스 + 마우스 표시
+	// void CloseChatInput();     // 입력 종료 + 마우스 숨김 + 인게임 복귀
 };
 

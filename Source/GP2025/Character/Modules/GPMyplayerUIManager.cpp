@@ -8,6 +8,7 @@
 #include "UI/GPLobbyWidget.h"
 #include "UI/GPInGameWidget.h"
 #include "Character/GPCharacterMyplayer.h"
+#include "UI/GPChatBoxWidget.h"
 #include "GPMyplayerUIManager.h"
 #include "UI/GPQuestListWidget.h"
 #include "UI/GPSkillLevelUpText.h"
@@ -334,3 +335,27 @@ void UGPMyplayerUIManager::SpawnSkillLevelText(int32 NewLevel)
 	UE_LOG(LogTemp, Log, TEXT("[SkillText] Actor spawned successfully. Setting level text for level %d"), NewLevel);
 	TextActor->SetSkillLevelUpText(NewLevel);
 }
+
+void UGPMyplayerUIManager::FocusChatInput()
+{
+	UGPInGameWidget* InGame = GetInGameWidget();
+	if (!InGame || !Owner) return;
+
+	if (UGPChatBoxWidget* Chat = InGame->ChatBoxWidget)
+	{
+		Chat->SetVisibility(ESlateVisibility::Visible);
+		Chat->SetKeyboardFocusToInput(); 
+
+		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
+		if (PC)
+		{
+			PC->SetShowMouseCursor(true);
+
+			FInputModeGameAndUI InputMode;
+			InputMode.SetWidgetToFocus(Chat->TakeWidget());
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			PC->SetInputMode(InputMode);
+		}
+	}
+}
+

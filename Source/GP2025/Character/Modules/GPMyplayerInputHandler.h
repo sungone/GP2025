@@ -78,6 +78,9 @@ public :
 	UPROPERTY()
 	TObjectPtr<UInputAction> InteractionAction;
 
+	UPROPERTY()
+	TObjectPtr<UInputAction> EnterKeyAction;
+
 public :
     void Move(const FInputActionValue& Value);
     void Look(const FInputActionValue& Value);
@@ -100,6 +103,7 @@ public :
 	void Accept();
 	void Refuse();
 	void Interact();
+	void EnterChatting();
 	
 
 	void TakeInteraction();

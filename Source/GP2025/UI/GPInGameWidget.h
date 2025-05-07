@@ -47,6 +47,9 @@ public :
     UPROPERTY(meta = (BindWidget))
     class UGPQuestListWidget* QuestListWidget;
 
+    UPROPERTY(meta = (BindWidget))
+    class UGPChatBoxWidget* ChatBoxWidget;
+
 public :
     void UpdateHealthBar(float Ratio);
     void UpdateExpBar(float Ratio);
