@@ -68,6 +68,7 @@ public:
 	void SendMyCompleteQuest(enum class QuestType quest);
 
 	void SendMyChatMessage(const FString& Message);
+	void SendMyRemoveStatePacket(uint32 State);
 
 private:
 	void SendPacket(uint8* Buf, int32 Size);

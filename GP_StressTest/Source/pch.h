@@ -29,7 +29,7 @@
 #include "MapZone.h"
 using namespace std::chrono;
 
-enum CompType
+enum class CompType
 {
 	RECV,
 	SEND,

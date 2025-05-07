@@ -1,6 +1,6 @@
 #pragma once
 
-enum CompType;
+enum class CompType;
 class ExpOver
 {
 public:

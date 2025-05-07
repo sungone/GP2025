@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "../../GP_Server/Source/Common/Common.h"
 #include "GPCharacterCombatHandler.generated.h"
 
 class AGPCharacterBase;

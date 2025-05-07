@@ -275,6 +275,18 @@ struct PlayerDeadPacket : public Packet
 	}
 };
 
+struct RemoveStatePacket : public Packet
+{
+	ECharacterStateType State;
+
+	RemoveStatePacket(ECharacterStateType State_)
+		: Packet(EPacketType::C_REMOVE_STATE), State(State_)
+	{
+		Header.PacketSize = sizeof(RemoveStatePacket);
+	}
+};
+
+
 #pragma endregion
 
 namespace ItemPkt

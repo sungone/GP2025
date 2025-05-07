@@ -39,6 +39,7 @@ void UGPCharacterCombatHandler::PlayAutoAttackMontage()
 				UE_LOG(LogTemp, Error, TEXT("[Combat] Failsafe: Montage didn't end properly. Cleaning up manually."));
 				bIsAutoAttacking = false;
 				Owner->CharacterInfo.RemoveState(STATE_AUTOATTACK);
+
 			}
 		},
 		AdjustedDuration + 0.2f,

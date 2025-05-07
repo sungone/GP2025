@@ -49,6 +49,10 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 		LOG(LogType::RecvLog, std::format("UseSkillPacket from [{}]", sessionId));
 		HandleUseSkillPacket(sessionId, packet);
 		break;
+	case EPacketType::C_REMOVE_STATE:
+		LOG(LogType::RecvLog, std::format("ChatSendPacket from [{}]", sessionId));
+		HandleRemoveStatePacket(sessionId, packet);
+		break;
 
 
 	case EPacketType::C_TAKE_ITEM:
@@ -243,6 +247,17 @@ void PacketManager::HandleUseSkillPacket(int32 sessionId, Packet* packet)
 	_gameWorld.PlayerUseSkill(sessionId, p->SkillGID);
 }
 
+void PacketManager::HandleRemoveStatePacket(int32 sessionId, Packet* packet)
+{
+	RemoveStatePacket* p = static_cast<RemoveStatePacket*>(packet);
+	auto session = _sessionMgr.GetSession(sessionId);
+	if (!session || !session->IsInGame()) return;
+
+	auto player = session->GetPlayer();
+	if (!player) return;
+	player->RemoveState(p->State);
+}
+
 void PacketManager::HandlePickUpItemPacket(int32 sessionId, Packet* packet)
 {
 	IDPacket* p = static_cast<IDPacket*>(packet);
@@ -296,6 +311,7 @@ void PacketManager::HandleRespawnRequestPacket(int32 sessionId, Packet* packet)
 void PacketManager::HandleShopBuyItemPacket(int32 sessionId, Packet* packet)
 {
 	auto* p = static_cast<BuyItemPacket*>(packet);
+	//_gameWorld.BuyItem(sessionId, p->ItemID, p->Quantity);
 }
 
 void PacketManager::HandleShopSellItemPacket(int32 sessionId, Packet* packet)

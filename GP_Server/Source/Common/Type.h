@@ -20,6 +20,7 @@ enum EPacketType : uint8
 	C_START_AIMING,
 	C_STOP_AIMING,
 	C_USE_SKILL,
+	C_REMOVE_STATE,
 
 	S_PLAYER_MOVE,
 	S_PLAYER_STATUS_UPDATE,
@@ -28,7 +29,6 @@ enum EPacketType : uint8
 	S_SKILL_UNLOCK,
 	S_SKILL_UPGRADE,
 	S_LEVEL_UP,
-
 	// --- Player Join/Leave ---
 	S_ADD_PLAYER,
 	S_REMOVE_PLAYER,
@@ -42,15 +42,15 @@ enum EPacketType : uint8
 
 	// --- Item ---
 	C_TAKE_ITEM,
-	C_DROP_ITEM,
+	C_DROP_ITEM,// -> 나중에
 	C_USE_ITEM,
 	C_EQUIP_ITEM,
 	C_UNEQUIP_ITEM,
 
 	S_ITEM_SPAWN,
-	S_ITEM_DESPAWN,
+	S_ITEM_DESPAWN, // -> 나중에
 	S_ITEM_PICKUP,
-	S_ITEM_DROP,
+	S_ITEM_DROP, // -> 나중에
 	S_ADD_INVENTORY_ITEM,
 	S_USE_INVENTORY_ITEM,
 	S_EQUIP_ITEM,
@@ -67,7 +67,7 @@ enum EPacketType : uint8
 	C_SHOP_BUY_ITEM,
 	C_SHOP_SELL_ITEM,
 
-	S_SHOP_ITEM_LIST,
+	S_SHOP_ITEM_LIST,// -> 나중에
 	S_SHOP_BUY_RESULT,
 	S_SHOP_SELL_RESULT,
 
@@ -214,11 +214,11 @@ enum class ESkillGroup
 
 enum ECharacterStateType : uint32
 {
-	STATE_NONE = 0, // 2^0
-	STATE_IDLE = 1 << 0,  // 2^1
-	STATE_RUN = 1 << 1,  // 2^2
-	STATE_JUMP = 1 << 2,  // 2^3
-	STATE_AUTOATTACK = 1 << 3, // 2^4
+	STATE_NONE = 0,
+	STATE_IDLE = 1 << 0,
+	STATE_RUN = 1 << 1,
+	STATE_JUMP = 1 << 2,
+	STATE_AUTOATTACK = 1 << 3,
 	STATE_DIE = 1 << 4,
 	STATE_WALK = 1 << 5,
 	STATE_SKILL_Q = 1 << 6,

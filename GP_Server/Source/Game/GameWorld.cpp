@@ -216,7 +216,7 @@ void GameWorld::PlayerAttack(int32 playerId)
 		{
 			uint32 monlv = monster->GetInfo().GetLevel();
 			Type::EPlayer playertype = (Type::EPlayer)player->GetInfo().CharacterType;
-			player->AddExp(10 * monster->GetInfo().GetLevel());
+			player->AddExp(TEST_VALUE * 10 * monster->GetInfo().GetLevel());
 			FVector itemPos = { monster->GetInfo().Pos.X, monster->GetInfo().Pos.Y, monster->GetInfo().Pos.Z + 20 };
 			SpawnWorldItem(itemPos, monlv, playertype);
 			RemoveMonster(targetId);

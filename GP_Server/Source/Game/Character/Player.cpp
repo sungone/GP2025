@@ -9,7 +9,7 @@ void Player::Init()
 #ifndef DB_LOCAL
 	_info.SetName(L"플레이어");
 	SetCharacterType(Type::EPlayer::WARRIOR);
-	_info.Stats.Level = 1;
+	_info.Stats.Level = 4;
 	_info.Stats.Speed = 200.f;
 	_info.CollisionRadius = playerCollision;
 	_info.State = ECharacterStateType::STATE_IDLE;
@@ -33,17 +33,17 @@ void Player::SetCharacterType(Type::EPlayer type)
 	{
 		_info.fovAngle = 90;
 		_info.AttackRadius = 300;
-		_info.Skills.Q = FSkillData(ESkillGroup::HitHard, 0);
-		_info.Skills.E = FSkillData(ESkillGroup::Clash, 0);
-		_info.Skills.R = FSkillData(ESkillGroup::Whirlwind, 0);
+		_info.Skills.Q = FSkillData(ESkillGroup::HitHard, 1);
+		_info.Skills.E = FSkillData(ESkillGroup::Clash, 1);
+		_info.Skills.R = FSkillData(ESkillGroup::Whirlwind, 1);
 	}
 	else
 	{
 		_info.fovAngle = 10;
 		_info.AttackRadius = 1500;
-		_info.Skills.Q = FSkillData(ESkillGroup::Throwing, 0);
-		_info.Skills.E = FSkillData(ESkillGroup::FThrowing, 0);
-		_info.Skills.R = FSkillData(ESkillGroup::Anger, 0);
+		_info.Skills.Q = FSkillData(ESkillGroup::Throwing, 1);
+		_info.Skills.E = FSkillData(ESkillGroup::FThrowing, 1);
+		_info.Skills.R = FSkillData(ESkillGroup::Anger, 1);
 	}
 }
 
@@ -150,7 +150,7 @@ bool Player::Attack(std::shared_ptr<Character> target)
 	if (!monster) return false;
 	if (!IsInAttackRange(monster->GetInfo()))return false;
 
-	float atkDamage = GetAttackDamage() * 300;
+	float atkDamage = GetAttackDamage() * TEST_VALUE;
 	if (atkDamage > 0.0f)
 	{
 		monster->OnDamaged(atkDamage);
@@ -179,6 +179,13 @@ void Player::UseSkill(ESkillGroup groupId)
 		return;
 	}
 	LOG(std::format("Use Skill - {}", static_cast<uint8>(groupId)));
+	if (groupId == ESkillGroup::HitHard || groupId == ESkillGroup::Throwing)
+		_info.AddState(STATE_SKILL_Q);
+	else if (groupId == ESkillGroup::Clash || groupId == ESkillGroup::FThrowing)
+		_info.AddState(STATE_SKILL_E);
+	else if (groupId == ESkillGroup::Whirlwind || groupId == ESkillGroup::Anger)
+		_info.AddState(STATE_SKILL_R);
+
 	auto pkt = PlayerUseSkillPacket(_id, groupId);
 	SessionManager::GetInst().SendPacket(_id, &pkt);
 	SessionManager::GetInst().BroadcastToViewList(&pkt, _viewList);

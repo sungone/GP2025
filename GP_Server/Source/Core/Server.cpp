@@ -124,13 +124,13 @@ void Server::WorkerThreadLoop()
 
 		switch (expOver->_compType)
 		{
-		case ::ACCEPT:
+		case CompType::ACCEPT:
 			HandleAccept();
 			break;
-		case ::RECV:
+		case CompType::RECV:
 			HandleRecv(static_cast<int32>(sessionId), recvByte, expOver);
 			break;
-		case ::SEND:
+		case CompType::SEND:
 			delete expOver;
 			break;
 		}
@@ -155,16 +155,16 @@ void Server::HandleCompletionError(ExpOver* ex_over, int32 id)
 
 	switch (ex_over->_compType)
 	{
-	case ::ACCEPT:
+	case CompType::ACCEPT:
 		LOG(Warning, std::format("CompType : ACCEPT[{}] Code={} Msg={}",
 			id, ex_over->errorCode, errMsg));
 		break;
-	case ::RECV:
+	case CompType::RECV:
 		LOG(Warning, std::format("CompType : RECV[{}] Code={} Msg={}",
 			id, ex_over->errorCode, errMsg));
 		SessionManager::GetInst().Disconnect(id);
 		break;
-	case ::SEND:
+	case CompType::SEND:
 		LOG(Warning, std::format("CompType : SEND[{}] Code={} Msg={}",
 			id, ex_over->errorCode, errMsg));
 		SessionManager::GetInst().Disconnect(id);
@@ -178,7 +178,7 @@ void Server::DoAccept()
 {
 	InitSocket(_acceptSocket, WSA_FLAG_OVERLAPPED);
 	ZeroMemory(&_acceptOver._wsaover, sizeof(_acceptOver._wsaover));
-	_acceptOver._compType = ACCEPT;
+	_acceptOver._compType = CompType::ACCEPT;
 	AcceptEx(_listenSocket, _acceptSocket, _acceptOver._buf, 0,
 		sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, 0, &_acceptOver._wsaover);
 }

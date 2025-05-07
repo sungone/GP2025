@@ -235,6 +235,12 @@ void UGPNetworkManager::SendMyChatMessage(const FString& Message)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
+void UGPNetworkManager::SendMyRemoveStatePacket(uint32 State)
+{
+	RemoveStatePacket Packet(static_cast<ECharacterStateType>(State));
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
 void UGPNetworkManager::ReceiveData()
 {
 	uint32 DataSize;

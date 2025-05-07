@@ -74,10 +74,10 @@ void DummyClientManager::WorkerThread()
 
 			switch (expOver->_compType)
 			{
-			case RECV:
+			case CompType::RECV:
 				HandleRecv(static_cast<int32>(id), rbyte, over);
 				break;
-			case SEND:
+			case CompType::SEND:
 				delete over;
 				break;
 			}
@@ -166,16 +166,16 @@ void DummyClientManager::HandleCompletionError(ExpOver* ex_over, int32 id)
 	if (!_clients[id].IsConnected())
 	{
 		LOG(std::format("Skip error handling for already disconnected client [{}]", id));
-		if (ex_over->_compType == SEND)
+		if (ex_over->_compType == CompType::SEND)
 			delete ex_over;
 		return;
 	}
 	std::string cmptype;
 	switch (ex_over->_compType)
 	{
-	case ::ACCEPT: cmptype = "ACCEPT"; break;
-	case ::RECV: cmptype = "RECV"; break;
-	case ::SEND: cmptype = "SEND"; break;
+	case CompType::ACCEPT: cmptype = "ACCEPT"; break;
+	case CompType::RECV: cmptype = "RECV"; break;
+	case CompType::SEND: cmptype = "SEND"; break;
 	}
 
 	LOG(Warning, std::format("CompType : {}[{}] Code={} Msg={}",
@@ -183,6 +183,6 @@ void DummyClientManager::HandleCompletionError(ExpOver* ex_over, int32 id)
 
 	Disconnect(id);
 
-	if (ex_over->_compType == SEND)
+	if (ex_over->_compType == CompType::SEND)
 		delete ex_over;
 }

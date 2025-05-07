@@ -23,7 +23,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include <random>
-#include "GPCharacterBase.h"
+
 static std::random_device rd;
 static std::mt19937 gen(rd());
 
@@ -183,6 +183,8 @@ void AGPCharacterBase::HandleAutoAttackState()
 	{
 		CombatHandler->PlayAutoAttackMontage();
 		CharacterInfo.RemoveState(STATE_AUTOATTACK);
+		auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+		NetworkMgr->SendMyRemoveStatePacket(STATE_AUTOATTACK);
 	}
 }
 
@@ -193,6 +195,8 @@ void AGPCharacterBase::HandleQSkillState()
 	{
 		CombatHandler->PlayQSkillMontage();
 		CharacterInfo.RemoveState(STATE_SKILL_Q);
+		auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+		NetworkMgr->SendMyRemoveStatePacket(STATE_AUTOATTACK);
 	}
 }
 
@@ -203,6 +207,8 @@ void AGPCharacterBase::HandleESkillState()
 	{
 		CombatHandler->PlayESkillMontage();
 		CharacterInfo.RemoveState(STATE_SKILL_E);
+		auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+		NetworkMgr->SendMyRemoveStatePacket(STATE_SKILL_E);
 	}
 }
 
@@ -213,6 +219,8 @@ void AGPCharacterBase::HandleRSkillState()
 	{
 		CombatHandler->PlayRSkillMontage();
 		CharacterInfo.RemoveState(STATE_SKILL_R);
+		auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+		NetworkMgr->SendMyRemoveStatePacket(STATE_SKILL_R);
 	}
 }
 
