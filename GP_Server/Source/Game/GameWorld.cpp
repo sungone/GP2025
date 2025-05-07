@@ -236,6 +236,7 @@ void GameWorld::PlayerAttack(int32 playerId)
 	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
 	SessionManager::GetInst().SendPacket(playerId, &infopkt);
 	SessionManager::GetInst().BroadcastToViewList(&infopkt, viewList);
+	player->RemoveState(ECharacterStateType::STATE_AUTOATTACK);
 }
 
 void GameWorld::PlayerUseSkill(int32 playerId, ESkillGroup groupId)

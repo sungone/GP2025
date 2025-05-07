@@ -250,7 +250,7 @@ void PacketManager::HandleUseSkillPacket(int32 sessionId, Packet* packet)
 void PacketManager::HandleRemoveStatePacket(int32 sessionId, Packet* packet)
 {
 	RemoveStatePacket* p = static_cast<RemoveStatePacket*>(packet);
-	//_gameWorld.PlayerRemoveState(sessionId, p->State);
+	_gameWorld.PlayerRemoveState(sessionId, p->State);
 }
 
 void PacketManager::HandlePickUpItemPacket(int32 sessionId, Packet* packet)
