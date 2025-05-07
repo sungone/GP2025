@@ -10,10 +10,10 @@
 #include "Network/GPGameInstance.h"
 #include "Character/GPCharacterPlayer.h"
 
-void UGPNetworkManager::ConnectToServer()
+bool UGPNetworkManager::ConnectToServer()
 {
 	Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("ClientSocket"));
-	Socket->SetNonBlocking(true);
+	Socket->SetNonBlocking(false); // 임시로 blocking
 
 	FIPv4Address Ip;
 	FIPv4Address::Parse(IpAddress, Ip);
@@ -22,18 +22,21 @@ void UGPNetworkManager::ConnectToServer()
 	InternetAddr->SetIp(Ip.Value);
 	InternetAddr->SetPort(Port);
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Connecting To Server...")));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Connecting To Server..."));
 
-	Socket->Connect(*InternetAddr);
-
-	if (Socket->GetConnectionState() == SCS_Connected)
+	bool bConnected = Socket->Connect(*InternetAddr);
+	if (bConnected)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Connection Success")));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Connection Success"));
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Connection Failed")));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Connection Failed"));
 	}
+
+	// 다시 non-blocking으로 전환 (원한다면)
+	//Socket->SetNonBlocking(true);
+	return bConnected;
 }
 
 void UGPNetworkManager::DisconnectFromServer()

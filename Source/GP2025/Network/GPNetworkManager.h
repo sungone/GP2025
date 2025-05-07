@@ -32,7 +32,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnReceiveChat OnReceiveChat;
 public:
-	void ConnectToServer();
+	bool ConnectToServer();
 	void DisconnectFromServer();
 	void ProcessPacket();
 

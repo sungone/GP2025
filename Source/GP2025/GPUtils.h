@@ -32,9 +32,15 @@ TArray<FBoundingBoxData> ExtractBoundingBoxData(ULevel* Level)
         UStaticMesh* StaticMesh = MeshComponent->GetStaticMesh();
         if (!StaticMesh) continue;
 
-
         FBoundingBoxData BoxData;
-        BoxData.Name = StaticMeshActor->GetActorLabel(); // 이거 패키징 할 때 오류
+
+#if WITH_EDITOR
+        // 에디터 환경에서만 유효한 함수
+        BoxData.Name = StaticMeshActor->GetActorLabel();
+#else
+        // 패키징된 빌드에서는 Actor 이름을 그대로 사용
+        BoxData.Name = StaticMeshActor->GetName();
+#endif
 
         USceneComponent* RootComponent = StaticMeshActor->GetRootComponent();
         if (!RootComponent) continue;
@@ -42,7 +48,7 @@ TArray<FBoundingBoxData> ExtractBoundingBoxData(ULevel* Level)
         FVector Location = RootComponent->GetRelativeLocation();
         FRotator Rotation = RootComponent->GetRelativeRotation();
         FVector Scale = RootComponent->GetRelativeScale3D();
-		FTransform ActorTransform = FTransform(Rotation, Location, Scale);
+        FTransform ActorTransform = FTransform(Rotation, Location, Scale);
 
         FBox LocalAABB = StaticMesh->GetBoundingBox();
 
