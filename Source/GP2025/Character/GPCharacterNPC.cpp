@@ -74,7 +74,12 @@ void AGPCharacterNPC::OpenShopUI(APlayerController* PlayerController)
 			ShopWidget->AddToViewport();
 			if (UGPShop* LocalShopWidget = Cast<UGPShop>(ShopWidget))
 			{
-				LocalShopWidget->OwningNPC = this;
+				LocalShopWidget->SetOwningNPC(this);
+				AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(PlayerController->GetPawn());
+				if (MyPlayer)
+				{
+					LocalShopWidget->SetMyPlayer(MyPlayer);
+				}
 			}
 		}
 	}

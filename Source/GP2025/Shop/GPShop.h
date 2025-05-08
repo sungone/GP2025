@@ -34,6 +34,32 @@ public :
 	UPROPERTY()
 	class AGPCharacterNPC* OwningNPC;
 
+	UPROPERTY()
+	class AGPCharacterMyplayer* MyPlayer;
+
 	UFUNCTION()
 	void OnShopExit();
+
+	UFUNCTION()
+	void UpdateMoneyText(int32 PlayerMoney);
+
+	void SetMyPlayer(AGPCharacterMyplayer* Player);
+	void SetOwningNPC(AGPCharacterNPC* NPC);
+
+	UFUNCTION()
+	void OnBuyItemClicked();
+
+public:
+
+	UPROPERTY(meta = (BindWidget))
+	class UWrapBox* ItemWrapBox;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	TSubclassOf<class UGPItemSlot> SlotClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Data")
+	class UDataTable* ItemDataTable;
+
+	/** 상점 아이템 슬롯을 생성하는 함수 */
+	void PopulateShopItems();
 };
