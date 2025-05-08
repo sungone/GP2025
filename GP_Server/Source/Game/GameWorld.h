@@ -39,6 +39,8 @@ public:
 	// World Item
 	bool RemoveWorldItem(std::shared_ptr<WorldItem> item);
 	std::shared_ptr<WorldItem> FindWorldItemById(uint32 itemId);
+	void SpawnGoldItem(FVector position);
+
 	void SpawnWorldItem(FVector position, uint32 monlv, Type::EPlayer playertype);
 	void SpawnWorldItem(WorldItem newItem);
 
@@ -51,6 +53,9 @@ public:
 	//Quest
 	void RequestQuest(int32 playerId, QuestType quest);
 	void CompleteQuest(int32 playerId, QuestType quest);
+
+	void BuyItem(int32 playerId, uint8 itemType, uint16 quantity);
+
 
 	std::shared_ptr<Player> GetPlayerByID(int32 id);
 	std::shared_ptr<Monster> GetMonsterByID(int32 id);

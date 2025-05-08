@@ -207,9 +207,9 @@ void UGPNetworkManager::SendMyRespawnPacket(ZoneType zone)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendMyShopBuyItem(int32 ItemID, int32 Quantity)
+void UGPNetworkManager::SendMyShopBuyItem(uint8 ItemTypeID, int32 Quantity)
 {
-	BuyItemPacket Packet(ItemID, Quantity);
+	BuyItemPacket Packet(ItemTypeID, Quantity);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 

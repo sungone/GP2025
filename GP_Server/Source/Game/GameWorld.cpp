@@ -4,11 +4,11 @@
 bool GameWorld::Init()
 {
 	bool res =
-		ItemTable::GetInst().LoadFromCSV("../DataTable/ItemTable.csv") &&
-		PlayerLevelTable::GetInst().LoadFromCSV("../DataTable/PlayerLevelTable.csv") &&
-		PlayerSkillTable::GetInst().LoadFromCSV("../DataTable/PlayerSkillTable.csv") &&
-		MonsterTable::GetInst().LoadFromCSV("../DataTable/MonsterTable.csv") &&
-		QuestTable::GetInst().LoadFromCSV("../DataTable/QuestTable.csv");
+		ItemTable::GetInst().LoadFromCSV(DataTablePath + "ItemTable.csv") &&
+		PlayerLevelTable::GetInst().LoadFromCSV(DataTablePath + "PlayerLevelTable.csv") &&
+		PlayerSkillTable::GetInst().LoadFromCSV(DataTablePath + "PlayerSkillTable.csv") &&
+		MonsterTable::GetInst().LoadFromCSV(DataTablePath + "MonsterTable.csv") &&
+		QuestTable::GetInst().LoadFromCSV(DataTablePath + "QuestTable.csv");
 
 	if (!res)
 	{
@@ -160,7 +160,7 @@ void GameWorld::PlayerRemoveState(int32 playerId, ECharacterStateType oldState)
 		LOG(Warning, "Invaild!");
 		return;
 	}
-	if(player->RemoveState(oldState))
+	if (player->RemoveState(oldState))
 	{
 		auto upkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
 		std::unordered_set<int32> viewList;
@@ -219,8 +219,14 @@ void GameWorld::PlayerAttack(int32 playerId)
 			uint32 monlv = monster->GetInfo().GetLevel();
 			Type::EPlayer playertype = (Type::EPlayer)player->GetInfo().CharacterType;
 			player->AddExp(TEST_VALUE * 10 * monster->GetInfo().GetLevel());
-			FVector itemPos = { monster->GetInfo().Pos.X, monster->GetInfo().Pos.Y, monster->GetInfo().Pos.Z + 20 };
+
+			FVector basePos = monster->GetInfo().Pos;
+
+			FVector itemPos = basePos + FVector(30.f, 0.f, 20.f);
 			SpawnWorldItem(itemPos, monlv, playertype);
+			FVector goldPos = basePos + FVector(-30.f, 0.f, 20.f);
+			SpawnGoldItem(goldPos);
+
 			RemoveMonster(targetId);
 
 			//Todo: 현재는 티노 퀘스트만 처리 -> 확장해야함
@@ -367,6 +373,16 @@ std::shared_ptr<WorldItem> GameWorld::FindWorldItemById(uint32 itemId)
 		return *it;
 	}
 	return nullptr;
+}
+
+void GameWorld::SpawnGoldItem(FVector position)
+{
+	std::lock_guard<std::mutex> lock(_mtItem);
+	auto newItem = std::make_shared<WorldItem>(position);
+
+	ItemPkt::SpawnPacket packet(newItem->GetItemID(), newItem->GetItemTypeID(), position);
+	_worldItems.emplace_back(newItem);
+	SessionManager::GetInst().BroadcastToAll(&packet);
 }
 
 void GameWorld::SpawnWorldItem(FVector position, uint32 monlv, Type::EPlayer playertype)
@@ -664,5 +680,38 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
 	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
 	SessionManager::GetInst().SendPacket(playerId, &infopkt);
+}
+
+void GameWorld::BuyItem(int32 playerId, uint8 itemType, uint16 quantity)
+{
+	auto player = GetPlayerByID(playerId);
+	if (!player)
+	{
+		LOG(Warning, "Invalid player");
+		return;
+	}
+	auto itemData = ItemTable::GetInst().GetItemByTypeId(itemType);
+	if (!itemData)
+	{
+		LOG(Warning, "Invalid item data");
+		return;
+	}
+	uint32 price = itemData->Price * quantity;
+	auto targetItem = WorldItem(itemType);
+	bool bSuccess = player->BuyItem(targetItem, price, quantity);
+
+	if (bSuccess)
+	{
+		auto pkt = ItemPkt::AddInventoryPacket(targetItem.GetItemID(), targetItem.GetItemTypeID());
+		SessionManager::GetInst().SendPacket(playerId, &pkt);
+
+		uint32 curgold = player->GetGold();
+		DBResultCode  ResultCode = DBResultCode::SUCCESS;//추후 DB설계해야함
+		auto pkt1 = BuyItemResultPacket(bSuccess, ResultCode, curgold);
+	}
+	else
+	{
+		LOG("Failed BuyItem");
+	}
 }
 

@@ -17,9 +17,15 @@ class InventoryItem;
 class WorldItem : public Item
 {
 public:
+	WorldItem(FVector pos);
+	WorldItem(uint8 itemTypeID);
 	WorldItem(uint32 itemId, uint8 itemTypeID) : Item(itemId, itemTypeID) {}
 	WorldItem(FVector pos, uint32 monlv, Type::EPlayer playertype);
-
+	uint32 GenerateItemID()
+	{
+		static int i = 300;
+		return i++;
+	}
 	uint8 GetRandomItemType(uint32 monlv, Type::EPlayer playertype);
 	Type::EWeapon GetRandomWeapon(Type::EPlayer playertype);
 	Type::EArmor GetRandomArmor();

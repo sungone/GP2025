@@ -26,7 +26,7 @@ bool DummyClient::Connect(IOCP& hIocp)
 	sockaddr_in addr;
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(SERVER_PORT);
-	inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
+	inet_pton(AF_INET,SERVER_IP, &addr.sin_addr);
 
 	if (connect(_socket, (struct sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR)
 	{

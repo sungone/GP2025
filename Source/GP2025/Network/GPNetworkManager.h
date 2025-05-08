@@ -62,7 +62,7 @@ public:
 	void SendMyUnequipItem(int32 ItemID);
 	void SendMyUseSkill(ESkillGroup SkillGID, float PlayerYaw, FVector PlayerPos);
 
-	void SendMyShopBuyItem(int32 ItemID, int32 Quantity);
+	void SendMyShopBuyItem(uint8 ItemTypeID, int32 Quantity);
 	void SendMyShopSellItem(int32 ItemID, int32 Quantity);
 	void SendMyRequestQuest(enum class QuestType quest);
 	void SendMyCompleteQuest(enum class QuestType quest);
