@@ -3,7 +3,7 @@
 #define DB_LOCAL
 #endif
 
-inline constexpr int TEST_VALUE = 100;// »½Æ¢±â¿ë
+inline constexpr int TEST_VALUE = 10;// »½Æ¢±â¿ë
 
 inline constexpr size_t MAX_CLIENT = 10000;
 inline constexpr size_t MAX_PLAYER = MAX_CLIENT;
