@@ -120,6 +120,20 @@ void UGPItemSlot::ClickItem()
 
     case ESlotOwnerType::Shop:
     {
+        UE_LOG(LogTemp, Warning, TEXT("Shop Slot Clicked"));
+
+        if (ShopWidget)
+        {
+            ShopWidget->SetCurrentSlot(this);
+            UE_LOG(LogTemp, Warning, TEXT("Shop's Current Slot set to: %s"), *GetName());
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("OwningShop is NULL"));
+        }
+
+        break;
+
         break;
     }
 
@@ -231,5 +245,13 @@ void UGPItemSlot::UpdatePlayerEquippedItemSlot(AGPCharacterPlayer* Player)
         default:
             break;
         }
+    }
+}
+
+void UGPItemSlot::SetOwningShop(UGPShop* InShop)
+{
+    if (InShop)
+    {
+        ShopWidget = InShop;
     }
 }

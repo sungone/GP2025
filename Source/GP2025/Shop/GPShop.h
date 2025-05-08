@@ -16,6 +16,7 @@ class GP2025_API UGPShop : public UUserWidget
 	
 public:
 	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 
 public :
 
@@ -59,6 +60,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Data")
 	class UDataTable* ItemDataTable;
+
+	// 슬롯 정보를 저장할 포인터
+	UPROPERTY()
+	class UGPItemSlot* CurrentSlot;
+
+	void SetCurrentSlot(UGPItemSlot* InSlot);
 
 	/** 상점 아이템 슬롯을 생성하는 함수 */
 	void PopulateShopItems();

@@ -19,13 +19,18 @@ void UGPShop::NativeConstruct()
 		QuitButton->OnClicked.AddDynamic(this, &UGPShop::OnShopExit);
 	}
 
-	//static ConstructorHelpers::FObjectFinder<UDataTable> DataTableRef(TEXT("/Game/Item/GPItemTable.GPItemTable"));
-	//if (DataTableRef.Succeeded())
-	//{
-	//	ItemDataTable = DataTableRef.Object;
-	//}
+	if (BuyButton)
+	{
+		BuyButton->OnClicked.AddDynamic(this, &UGPShop::OnBuyItemClicked);
+	}
 
 	PopulateShopItems();
+}
+
+void UGPShop::NativeDestruct()
+{
+	Super::NativeDestruct();
+	CurrentSlot = nullptr;
 }
 
 void UGPShop::OnShopExit()
@@ -62,11 +67,40 @@ void UGPShop::SetOwningNPC(AGPCharacterNPC* NPC)
 
 void UGPShop::OnBuyItemClicked()
 {
+	if (!MyPlayer)
+	{
+		return;
+	}
+
+	if (!CurrentSlot)
+	{
+		return;
+	}
+
 	if (UGPNetworkManager* NetworkMgr = MyPlayer->GetGameInstance()->GetSubsystem<UGPNetworkManager>())
 	{
-		int32 ItemID = 1;
-		int32 Quantity = 1;
+		const FName RowName = CurrentSlot->SlotData.ItemID.RowName;
+		const FString RowNameString = RowName.ToString();
+		const int32 ItemID = FCString::Atoi(*RowNameString);
+
+		if (ItemID == 0 && RowNameString != "0")
+		{
+			return;
+		}
+
+		const int32 Quantity = 1;
 		NetworkMgr->SendMyShopBuyItem(ItemID, Quantity);
+
+		UE_LOG(LogTemp, Log, TEXT("BuyItem Sent to Server - ItemID: %d, Quantity: %d"), ItemID, Quantity);
+	}
+}
+
+void UGPShop::SetCurrentSlot(UGPItemSlot* InSlot)
+{
+	if (InSlot)
+	{
+		CurrentSlot = InSlot;
+		UE_LOG(LogTemp, Log, TEXT("CurrentSlot set to: %s"), *InSlot->GetName());
 	}
 }
 
@@ -86,8 +120,8 @@ void UGPShop::PopulateShopItems()
 		UGPItemSlot* NewSlot = CreateWidget<UGPItemSlot>(this, SlotClass);
 		if (!NewSlot) continue;
 
-
-		NewSlot->SlotOwnerType = ESlotOwnerType::Inventory;
+		NewSlot->SetOwningShop(this);
+		NewSlot->SlotOwnerType = ESlotOwnerType::Shop;
 		NewSlot->SlotData.ItemID.DataTable = ItemDataTable;
 		NewSlot->SlotData.ItemID.RowName = RowName;
 		NewSlot->SlotData.Quantity = 1;

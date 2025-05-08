@@ -64,4 +64,6 @@ public:
     void UpdateQuantityText();
 
     void UpdatePlayerEquippedItemSlot(class AGPCharacterPlayer* Player);
+
+    void SetOwningShop(UGPShop* InShop);
 };
