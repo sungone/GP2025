@@ -690,10 +690,17 @@ void GameWorld::BuyItem(int32 playerId, uint8 itemType, uint16 quantity)
 		LOG(Warning, "Invalid player");
 		return;
 	}
+
+	bool bSuccess = false;
+	DBResultCode  ResultCode = DBResultCode::SUCCESS;
+
 	auto itemData = ItemTable::GetInst().GetItemByTypeId(itemType);
 	if (!itemData)
 	{
 		LOG(Warning, "Invalid item data");
+		ResultCode = DBResultCode::ITEM_NOT_FOUND;
+		auto respkt = BuyItemResultPacket(bSuccess, ResultCode, 0);
+		SessionManager::GetInst().SendPacket(playerId, &respkt);
 		return;
 	}
 	uint32 price = itemData->Price * quantity;
@@ -702,16 +709,17 @@ void GameWorld::BuyItem(int32 playerId, uint8 itemType, uint16 quantity)
 
 	if (bSuccess)
 	{
+		uint32 curgold = player->GetGold();
 		auto pkt = ItemPkt::AddInventoryPacket(targetItem.GetItemID(), targetItem.GetItemTypeID());
 		SessionManager::GetInst().SendPacket(playerId, &pkt);
-
-		uint32 curgold = player->GetGold();
-		DBResultCode  ResultCode = DBResultCode::SUCCESS;//추후 DB설계해야함
-		auto pkt1 = BuyItemResultPacket(bSuccess, ResultCode, curgold);
+		auto respkt = BuyItemResultPacket(bSuccess, ResultCode, curgold);
+		SessionManager::GetInst().SendPacket(playerId, &respkt);
 	}
 	else
 	{
-		LOG("Failed BuyItem");
+		ResultCode = DBResultCode::NOT_ENOUGH_GOLD;
+		auto respkt = BuyItemResultPacket(bSuccess, ResultCode, 0);
+		SessionManager::GetInst().SendPacket(playerId, &respkt);
 	}
 }
 

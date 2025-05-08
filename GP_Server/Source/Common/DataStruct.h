@@ -7,7 +7,14 @@ enum class DBResultCode : int32
 	INVALID_USER = -1,
 	INVALID_PASSWORD = -2,
 	DUPLICATE_ID = -3,
+
+	//Shop
+	NOT_ENOUGH_GOLD = -10,
+	ITEM_NOT_FOUND = -11,
+
+
 	DB_ERROR = -99
+
 };
 
 #pragma pack(push,1)
@@ -124,7 +131,7 @@ struct FInfoData
 	uint32 Gold;
 	FSkillState Skills;
 	FEquitState EquipState;
-	ZoneType CurrentZone{ZoneType::TUK};
+	ZoneType CurrentZone{ ZoneType::TUK };
 
 	QuestStatus Quests[MAX_PLAYER_QUESTS];
 
@@ -282,7 +289,7 @@ struct FInfoData
 	{
 		for (auto& q : Quests)
 		{
-			if (q.QuestType == quest && q.Status==EQuestStatus::InProgress)
+			if (q.QuestType == quest && q.Status == EQuestStatus::InProgress)
 			{
 				q.Status = EQuestStatus::Completed;
 				return true;
