@@ -17,6 +17,7 @@ class InventoryItem;
 class WorldItem : public Item
 {
 public:
+	WorldItem(FVector pos);
 	WorldItem(uint8 itemTypeID);
 	WorldItem(uint32 itemId, uint8 itemTypeID) : Item(itemId, itemTypeID) {}
 	WorldItem(FVector pos, uint32 monlv, Type::EPlayer playertype);

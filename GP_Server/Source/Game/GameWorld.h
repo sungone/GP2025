@@ -39,6 +39,8 @@ public:
 	// World Item
 	bool RemoveWorldItem(std::shared_ptr<WorldItem> item);
 	std::shared_ptr<WorldItem> FindWorldItemById(uint32 itemId);
+	void SpawnGoldItem(FVector position);
+
 	void SpawnWorldItem(FVector position, uint32 monlv, Type::EPlayer playertype);
 	void SpawnWorldItem(WorldItem newItem);
 

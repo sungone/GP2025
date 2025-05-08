@@ -219,8 +219,14 @@ void GameWorld::PlayerAttack(int32 playerId)
 			uint32 monlv = monster->GetInfo().GetLevel();
 			Type::EPlayer playertype = (Type::EPlayer)player->GetInfo().CharacterType;
 			player->AddExp(TEST_VALUE * 10 * monster->GetInfo().GetLevel());
-			FVector itemPos = { monster->GetInfo().Pos.X, monster->GetInfo().Pos.Y, monster->GetInfo().Pos.Z + 20 };
+
+			FVector basePos = monster->GetInfo().Pos;
+
+			FVector itemPos = basePos + FVector(30.f, 0.f, 20.f);
 			SpawnWorldItem(itemPos, monlv, playertype);
+			FVector goldPos = basePos + FVector(-30.f, 0.f, 20.f);
+			SpawnGoldItem(goldPos);
+
 			RemoveMonster(targetId);
 
 			//Todo: 현재는 티노 퀘스트만 처리 -> 확장해야함
@@ -367,6 +373,16 @@ std::shared_ptr<WorldItem> GameWorld::FindWorldItemById(uint32 itemId)
 		return *it;
 	}
 	return nullptr;
+}
+
+void GameWorld::SpawnGoldItem(FVector position)
+{
+	std::lock_guard<std::mutex> lock(_mtItem);
+	auto newItem = std::make_shared<WorldItem>(position);
+
+	ItemPkt::SpawnPacket packet(newItem->GetItemID(), newItem->GetItemTypeID(), position);
+	_worldItems.emplace_back(newItem);
+	SessionManager::GetInst().BroadcastToAll(&packet);
 }
 
 void GameWorld::SpawnWorldItem(FVector position, uint32 monlv, Type::EPlayer playertype)

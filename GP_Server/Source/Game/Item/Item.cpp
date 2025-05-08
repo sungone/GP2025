@@ -2,12 +2,19 @@
 #include "Item.h"
 #include "InventoryItem.h"
 
+
 WorldItem::WorldItem(uint8 itemTypeID)
 {
 	//Todo: ShopItem생성으로 사용함 -> 추후 shopitem만들어야함
 	_itemID = GenerateItemID();
 	_pos = FVector::ZeroVector;
 	_itemTypeID = itemTypeID;
+}
+WorldItem::WorldItem(FVector pos)
+	: _pos(pos)
+{
+	_itemTypeID = static_cast<uint8>(GetRandomGold());
+	_itemID = GenerateItemID();
 }
 WorldItem::WorldItem(FVector pos, uint32 monlv, Type::EPlayer playertype)
 	: _pos(pos)
