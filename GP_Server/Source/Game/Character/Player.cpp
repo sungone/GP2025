@@ -125,6 +125,19 @@ void Player::RemovePlayerFromViewList(std::shared_ptr<Character> player)
 	}
 }
 
+bool Player::BuyItem(WorldItem item, uint32 price, uint16 quantity)
+{
+	uint32 totalPrice = price * quantity;
+
+	if (SpendGold(totalPrice))
+	{
+		LOG("Not enough gold");
+		return false;
+	}
+	auto invItem = item.ToInventoryItem();
+	return _inventory.AddInventoryItem(invItem);
+}
+
 bool Player::TakeWorldItem(const std::shared_ptr<WorldItem> item)
 {
 	float detectDist = 500.f;

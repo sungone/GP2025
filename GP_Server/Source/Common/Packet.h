@@ -451,12 +451,12 @@ struct ShopItemListPacket : public Packet
 
 struct BuyItemPacket : public Packet
 {
-	uint32 ItemID;
+	uint8 ItemType;
 	uint16 Quantity;
 
-	BuyItemPacket(uint32 itemId, uint16 qty)
+	BuyItemPacket(uint8 itype, uint16 qty)
 		: Packet(EPacketType::C_SHOP_BUY_ITEM)
-		, ItemID(itemId)
+		, ItemType(itype)
 		, Quantity(qty)
 	{
 		Header.PacketSize = sizeof(BuyItemPacket);
@@ -466,7 +466,7 @@ struct BuyItemPacket : public Packet
 struct BuyItemResultPacket : public Packet
 {
 	bool          bSuccess;
-	DBResultCode  ResultCode;
+	DBResultCode  ResultCode;// 추후 사용
 	uint32        PlayerGold;
 
 	BuyItemResultPacket(bool success, DBResultCode code, uint32 updateGold)

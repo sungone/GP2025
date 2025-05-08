@@ -160,7 +160,7 @@ void GameWorld::PlayerRemoveState(int32 playerId, ECharacterStateType oldState)
 		LOG(Warning, "Invaild!");
 		return;
 	}
-	if(player->RemoveState(oldState))
+	if (player->RemoveState(oldState))
 	{
 		auto upkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
 		std::unordered_set<int32> viewList;
@@ -664,5 +664,39 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
 	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
 	SessionManager::GetInst().SendPacket(playerId, &infopkt);
+}
+
+void GameWorld::BuyItem(int32 playerId, uint8 itemType, uint16 quantity)
+{
+	auto player = GetPlayerByID(playerId);
+	if (!player)
+	{
+		LOG(Warning, "Invalid player");
+		return;
+	}
+	bool bSuccess = false;
+	auto itemData = ItemTable::GetInst().GetItemByTypeId(itemType);
+	if (!itemData)
+	{
+		LOG(Warning, "Invalid item data");
+		return;
+	}
+	uint32 price = itemData->Price * quantity;
+	auto targetItem = WorldItem(itemType);
+	bool bSuccess = player->BuyItem(targetItem, price, quantity);
+
+	if (bSuccess)
+	{
+		auto pkt = ItemPkt::AddInventoryPacket(targetItem.GetItemID(), targetItem.GetItemTypeID());
+		SessionManager::GetInst().SendPacket(playerId, &pkt);
+
+		uint32 curgold = player->GetGold();
+		DBResultCode  ResultCode = DBResultCode::SUCCESS;//추후 DB설계해야함
+		auto pkt1 = BuyItemResultPacket(bSuccess, ResultCode, curgold);
+	}
+	else
+	{
+		LOG("Failed BuyItem");
+	}
 }
 

@@ -52,6 +52,9 @@ public:
 	void RequestQuest(int32 playerId, QuestType quest);
 	void CompleteQuest(int32 playerId, QuestType quest);
 
+	void BuyItem(int32 playerId, uint8 itemType, uint16 quantity);
+
+
 	std::shared_ptr<Player> GetPlayerByID(int32 id);
 	std::shared_ptr<Monster> GetMonsterByID(int32 id);
 	std::shared_ptr<Character> GetCharacterByID(int32 id);

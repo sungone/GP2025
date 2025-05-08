@@ -306,7 +306,7 @@ void PacketManager::HandleRespawnRequestPacket(int32 sessionId, Packet* packet)
 void PacketManager::HandleShopBuyItemPacket(int32 sessionId, Packet* packet)
 {
 	auto* p = static_cast<BuyItemPacket*>(packet);
-	//_gameWorld.BuyItem(sessionId, p->ItemID, p->Quantity);
+	_gameWorld.BuyItem(sessionId, p->ItemType, p->Quantity);
 }
 
 void PacketManager::HandleShopSellItemPacket(int32 sessionId, Packet* packet)
