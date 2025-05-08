@@ -10,6 +10,7 @@ inline constexpr size_t MAX_PLAYER = MAX_CLIENT;
 inline constexpr size_t MAX_MONSTER = 500;
 inline constexpr size_t MAX_CHARACTER = MAX_PLAYER + MAX_MONSTER;
 const std::string MapDataPath = "MapJsonData/";
+const std::string DataTablePath = "DataTable/";
 enum class CompType
 {
 	RECV,

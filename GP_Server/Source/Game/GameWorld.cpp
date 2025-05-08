@@ -4,11 +4,11 @@
 bool GameWorld::Init()
 {
 	bool res =
-		ItemTable::GetInst().LoadFromCSV("../DataTable/ItemTable.csv") &&
-		PlayerLevelTable::GetInst().LoadFromCSV("../DataTable/PlayerLevelTable.csv") &&
-		PlayerSkillTable::GetInst().LoadFromCSV("../DataTable/PlayerSkillTable.csv") &&
-		MonsterTable::GetInst().LoadFromCSV("../DataTable/MonsterTable.csv") &&
-		QuestTable::GetInst().LoadFromCSV("../DataTable/QuestTable.csv");
+		ItemTable::GetInst().LoadFromCSV(DataTablePath + "ItemTable.csv") &&
+		PlayerLevelTable::GetInst().LoadFromCSV(DataTablePath + "PlayerLevelTable.csv") &&
+		PlayerSkillTable::GetInst().LoadFromCSV(DataTablePath + "PlayerSkillTable.csv") &&
+		MonsterTable::GetInst().LoadFromCSV(DataTablePath + "MonsterTable.csv") &&
+		QuestTable::GetInst().LoadFromCSV(DataTablePath + "QuestTable.csv");
 
 	if (!res)
 	{
@@ -674,7 +674,6 @@ void GameWorld::BuyItem(int32 playerId, uint8 itemType, uint16 quantity)
 		LOG(Warning, "Invalid player");
 		return;
 	}
-	bool bSuccess = false;
 	auto itemData = ItemTable::GetInst().GetItemByTypeId(itemType);
 	if (!itemData)
 	{
