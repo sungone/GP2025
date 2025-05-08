@@ -705,7 +705,7 @@ void GameWorld::BuyItem(int32 playerId, uint8 itemType, uint16 quantity)
 	}
 	uint32 price = itemData->Price * quantity;
 	auto targetItem = WorldItem(itemType);
-	bool bSuccess = player->BuyItem(targetItem, price, quantity);
+	bSuccess = player->BuyItem(targetItem, price, quantity);
 
 	if (bSuccess)
 	{
