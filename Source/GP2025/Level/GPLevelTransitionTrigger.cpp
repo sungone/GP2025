@@ -58,6 +58,8 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 	const FHitResult& SweepResult)
 {
 	if (!OtherActor) return;
+	if (!ensure(OtherActor != nullptr)) return;
+	if (!ensure(TriggerBox != nullptr)) return;
 
 	CachedPlayer = Cast<AGPCharacterMyplayer>(OtherActor);
 	if (!CachedPlayer) return;

@@ -28,6 +28,8 @@ void UGPSkillCoolDownHandler::Init(AGPCharacterMyplayer* InOwner)
         return;
     }
 
+    SkillCooldownTimes.Empty();
+    LastSkillUseTimes.Empty(); 
     // SkillCooldownTimes.Empty(); // Init할 때 무조건 한번 비워줌 (중복 방지)
 
     TArray<FGPSkillStruct*> AllRows;
@@ -38,7 +40,10 @@ void UGPSkillCoolDownHandler::Init(AGPCharacterMyplayer* InOwner)
         if (Row)
         {
             FSkillData Skill(static_cast<ESkillGroup>(Row->skil_group), Row->skill_lv);
-            SkillCooldownTimes.Add(Skill, Row->cooltime);
+            if (!SkillCooldownTimes.Contains(Skill))
+            {
+                SkillCooldownTimes.Add(Skill, Row->cooltime);
+            }
 
             UE_LOG(LogTemp, Warning, TEXT("[SkillCoolDownHandler] Loaded: Group=%d Level=%d Cooldown=%.2fs"), Row->skil_group, Row->skill_lv, Row->cooltime);
         }
@@ -49,7 +54,7 @@ void UGPSkillCoolDownHandler::Init(AGPCharacterMyplayer* InOwner)
 
 bool UGPSkillCoolDownHandler::CanUseSkill(ESkillGroup SkillGroup, int32 SkillLevel) const
 {
-    if (!Owner || !IsValid(Owner))
+    if (!Owner || !IsValid(Owner) || !IsValid(this))
     {
         UE_LOG(LogTemp, Error, TEXT("[SkillCoolDownHandler] Owner is NULL!"));
         return false;
@@ -77,15 +82,14 @@ bool UGPSkillCoolDownHandler::CanUseSkill(ESkillGroup SkillGroup, int32 SkillLev
     }
 
     const float CurrentTime = Owner->GetWorld()->GetTimeSeconds();
-
     const float* LastUseTime = LastSkillUseTimes.Find(Skill);
+
     if (!LastUseTime)
     {
         return true;
     }
 
     float ElapsedTime = CurrentTime - *LastUseTime;
-
     bool bCanUse = (ElapsedTime >= *CooldownTime);
     if (!bCanUse)
     {
@@ -98,6 +102,8 @@ bool UGPSkillCoolDownHandler::CanUseSkill(ESkillGroup SkillGroup, int32 SkillLev
 
 void UGPSkillCoolDownHandler::StartCoolDown(ESkillGroup SkillGroup, int32 SkillLevel)
 {
+    if (!IsValid(this) || !IsValid(Owner)) return;
+
     FSkillData Skill(SkillGroup, SkillLevel);
     LastSkillUseTimes.Add(Skill, Owner->GetWorld()->GetTimeSeconds());
 }
@@ -117,7 +123,6 @@ float UGPSkillCoolDownHandler::GetRemainingCooldownTime(ESkillGroup SkillGroup, 
     }
 
     FSkillData Skill(SkillGroup, SkillLevel);
-
     const float* CooldownTime = SkillCooldownTimes.Find(Skill);
     const float* LastUseTime = LastSkillUseTimes.Find(Skill);
 
@@ -154,7 +159,6 @@ float UGPSkillCoolDownHandler::GetTotalCooldownTime(ESkillGroup SkillGroup, int3
     }
 
     FSkillData Skill(SkillGroup, SkillLevel);
-
     const float* CooldownTime = SkillCooldownTimes.Find(Skill);
 
     if (!CooldownTime)
