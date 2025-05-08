@@ -116,7 +116,7 @@ void AGPCharacterPlayer::SetCharacterType(ECharacterType NewCharacterControlType
 
 bool AGPCharacterPlayer::bIsGunnerCharacter() const
 {
-    return (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER);
+    return (CurrentCharacterType == static_cast<uint8>(Type::EPlayer::GUNNER));
 }
 
 USkeletalMeshComponent* AGPCharacterPlayer::GetCharacterMesh() const

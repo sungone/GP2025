@@ -326,19 +326,9 @@ void AGPCharacterBase::SetCharacterData(const UGPCharacterControlData* Character
 	{
 		CombatHandler->SetAttackMontage(CharacterData->AttackAnimMontage);
 		CombatHandler->SetDeadMontage(CharacterData->DeadAnimMontage);
-
-		if (CurrentCharacterType == (uint8)Type::EPlayer::GUNNER)
-		{
-			CombatHandler->SetQSkillMontage(CharacterData->QSkillAnimMontage);  
-			CombatHandler->SetESkillMontage(CharacterData->ESkillAnimMontage);  
-			CombatHandler->SetRSkillMontage(CharacterData->RSkillAnimMontage);  
-		}
-		else
-		{
-			CombatHandler->SetQSkillMontage(CharacterData->QSkillAnimMontage);  
-			CombatHandler->SetESkillMontage(CharacterData->ESkillAnimMontage);  
-			CombatHandler->SetRSkillMontage(CharacterData->RSkillAnimMontage);  
-		}
+		CombatHandler->SetQSkillMontage(CharacterData->QSkillAnimMontage);  
+		CombatHandler->SetESkillMontage(CharacterData->ESkillAnimMontage);  
+		CombatHandler->SetRSkillMontage(CharacterData->RSkillAnimMontage);  
 	}
 }
 
