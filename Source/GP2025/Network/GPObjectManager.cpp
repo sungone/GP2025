@@ -115,55 +115,68 @@ void UGPObjectManager::AddPlayer(const FInfoData& PlayerInfo)
 		Player->SetNameByCharacterInfo();
 	}
 	Player->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
-	Players.Add(PlayerInfo.ID, Player);
+	Players.Add(PlayerInfo.ID, Player); 
 }
 
 void UGPObjectManager::RemovePlayer(int32 PlayerID)
 {
-	if (Players.Contains(PlayerID))
+	if (TWeakObjectPtr<AGPCharacterPlayer>* WeakPlayerPtr = Players.Find(PlayerID))
 	{
-		Players[PlayerID]->Destroy();
+		if (WeakPlayerPtr->IsValid())
+		{
+			WeakPlayerPtr->Get()->Destroy();
+		}
+
 		Players.Remove(PlayerID);
 	}
 }
 
 void UGPObjectManager::UpdatePlayer(const FInfoData& PlayerInfo)
 {
-	auto PlayerID = PlayerInfo.ID;
-	if (Players.Contains(PlayerID))
+	if (TWeakObjectPtr<AGPCharacterPlayer>* WeakPlayerPtr = Players.Find(PlayerInfo.ID))
 	{
-		Players[PlayerID]->SetCharacterInfo(PlayerInfo);
+		if (WeakPlayerPtr->IsValid())
+		{
+			WeakPlayerPtr->Get()->SetCharacterInfo(PlayerInfo);
+		}
 	}
 }
 
 void UGPObjectManager::PlayerUseSkill(int32 PlayerID, ESkillGroup SkillGID)
 {
-	if (Players.Contains(PlayerID))
+	if (TWeakObjectPtr<AGPCharacterPlayer>* WeakPlayerPtr = Players.Find(PlayerID))
 	{
-		if (SkillGID == ESkillGroup::HitHard || SkillGID == ESkillGroup::Throwing)
+		if (WeakPlayerPtr->IsValid())
 		{
-			Players[PlayerID]->CharacterInfo.AddState(STATE_SKILL_Q);
-			Players[PlayerID]->CombatHandler->PlayQSkillMontage();
-		}
-		else if (SkillGID == ESkillGroup::Clash || SkillGID == ESkillGroup::FThrowing)
-		{
-			Players[PlayerID]->CharacterInfo.AddState(STATE_SKILL_E);
-			Players[PlayerID]->CombatHandler->PlayESkillMontage();
-		}
-		else if (SkillGID == ESkillGroup::Whirlwind || SkillGID == ESkillGroup::Anger)
-		{
-			Players[PlayerID]->CharacterInfo.AddState(STATE_SKILL_R);
-			Players[PlayerID]->CombatHandler->PlayRSkillMontage();
+			AGPCharacterPlayer* Player = WeakPlayerPtr->Get();
+
+			if (SkillGID == ESkillGroup::HitHard || SkillGID == ESkillGroup::Throwing)
+			{
+				Player->CharacterInfo.AddState(STATE_SKILL_Q);
+				Player->CombatHandler->PlayQSkillMontage();
+			}
+			else if (SkillGID == ESkillGroup::Clash || SkillGID == ESkillGroup::FThrowing)
+			{
+				Player->CharacterInfo.AddState(STATE_SKILL_E);
+				Player->CombatHandler->PlayESkillMontage();
+			}
+			else if (SkillGID == ESkillGroup::Whirlwind || SkillGID == ESkillGroup::Anger)
+			{
+				Player->CharacterInfo.AddState(STATE_SKILL_R);
+				Player->CombatHandler->PlayRSkillMontage();
+			}
 		}
 	}
 }
 
 void UGPObjectManager::DamagedPlayer(const FInfoData& PlayerInfo)
 {
-	auto PlayerID = PlayerInfo.ID;
-	if (Players.Contains(PlayerID))
+	if (TWeakObjectPtr<AGPCharacterPlayer>* WeakPlayerPtr = Players.Find(PlayerInfo.ID))
 	{
-		Players[PlayerID]->SetCharacterInfo(PlayerInfo);
+		if (WeakPlayerPtr->IsValid())
+		{
+			WeakPlayerPtr->Get()->SetCharacterInfo(PlayerInfo);
+		}
 	}
 }
 
@@ -243,44 +256,67 @@ void UGPObjectManager::AddMonster(const FInfoData& MonsterInfo)
 void UGPObjectManager::RemoveMonster(int32 MonsterID)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Remove monster [%d]"), MonsterID);
-	if (Monsters.Contains(MonsterID))
+
+	if (TWeakObjectPtr<AGPCharacterMonster>* WeakMonsterPtr = Monsters.Find(MonsterID))
 	{
-		Monsters[MonsterID]->CombatHandler->HandleDeath();
+		if (WeakMonsterPtr->IsValid())
+		{
+			AGPCharacterMonster* Monster = WeakMonsterPtr->Get();
+			Monster->CombatHandler->HandleDeath();
+		}
 		Monsters.Remove(MonsterID);
 	}
 }
 
 void UGPObjectManager::UpdateMonster(const FInfoData& MonsterInfo)
 {
-	if (Monsters.Contains(MonsterInfo.ID))
+	if (TWeakObjectPtr<AGPCharacterMonster>* WeakMonsterPtr = Monsters.Find(MonsterInfo.ID))
 	{
-		if (MonsterInfo.HasState(ECharacterStateType::STATE_DIE))
+		if (WeakMonsterPtr->IsValid())
 		{
-			return;
-		}
-		Monsters[MonsterInfo.ID]->SetCharacterInfo(MonsterInfo);
+			AGPCharacterMonster* Monster = WeakMonsterPtr->Get();
 
-		UE_LOG(LogTemp, Warning, TEXT("Update monster [%d]"), MonsterInfo.ID);
+			if (MonsterInfo.HasState(ECharacterStateType::STATE_DIE))
+			{
+				return;
+			}
+
+			Monster->SetCharacterInfo(MonsterInfo);
+
+			UE_LOG(LogTemp, Warning, TEXT("Update monster [%d]"), MonsterInfo.ID);
+		}
 	}
 }
 
 void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage)
 {
-	if (Monsters.Contains(MonsterInfo.ID))
+	if (TWeakObjectPtr<AGPCharacterMonster>* WeakMonsterPtr = Monsters.Find(MonsterInfo.ID))
 	{
-		Monsters[MonsterInfo.ID]->SetCharacterInfo(MonsterInfo);
-
-		FVector SpawnLocation = Monsters[MonsterInfo.ID]->GetActorLocation() + FVector(0, 0, 100);
-		FActorSpawnParameters SpawnParams;
-		AGPFloatingDamageText* DamageText = World->SpawnActor<AGPFloatingDamageText>(AGPFloatingDamageText::StaticClass(),
-			SpawnLocation, FRotator::ZeroRotator, SpawnParams);
-		bool isCrt = (MyPlayer->CharacterInfo.GetDamage() != Damage);
-		if (DamageText)
+		if (WeakMonsterPtr->IsValid())
 		{
-			DamageText->SetDamageText(Damage, isCrt);
-		}
+			AGPCharacterMonster* Monster = WeakMonsterPtr->Get();
 
-		UE_LOG(LogTemp, Warning, TEXT("Damaged monster [%d]"), MonsterInfo.ID);
+			Monster->SetCharacterInfo(MonsterInfo);
+
+			FVector SpawnLocation = Monster->GetActorLocation() + FVector(0, 0, 100);
+			FActorSpawnParameters SpawnParams;
+
+			AGPFloatingDamageText* DamageText = World->SpawnActor<AGPFloatingDamageText>(
+				AGPFloatingDamageText::StaticClass(),
+				SpawnLocation,
+				FRotator::ZeroRotator,
+				SpawnParams
+			);
+
+			bool isCrt = (MyPlayer && MyPlayer->CharacterInfo.GetDamage() != Damage);
+
+			if (DamageText)
+			{
+				DamageText->SetDamageText(Damage, isCrt);
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("Damaged monster [%d]"), MonsterInfo.ID);
+		}
 	}
 }
 
@@ -380,18 +416,14 @@ void UGPObjectManager::UseInventoryItem(uint32 ItemID)
 
 void UGPObjectManager::EquipItem(int32 PlayerID, uint8 ItemType)
 {
-	if (!Players.Contains(PlayerID))
+	TWeakObjectPtr<AGPCharacterPlayer>* PlayerPtr = Players.Find(PlayerID);
+	if (!PlayerPtr || !PlayerPtr->IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("EquipItem Failed: PlayerID [%d] not found"), PlayerID);
+		UE_LOG(LogTemp, Warning, TEXT("EquipItem Failed: PlayerID [%d] not found or invalid"), PlayerID);
 		return;
 	}
 
-	AGPCharacterPlayer* TargetPlayer = Players[PlayerID];
-	if (!TargetPlayer)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UGPObjectManager::EquipItem , TargetPlayer Not Found"));
-		return;
-	}
+	AGPCharacterPlayer* TargetPlayer = PlayerPtr->Get();
 
 	static const FString DataTablePath = TEXT("/Game/Item/GPItemTable.GPItemTable");
 	UDataTable* DataTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath));
@@ -400,9 +432,9 @@ void UGPObjectManager::EquipItem(int32 PlayerID, uint8 ItemType)
 		UE_LOG(LogTemp, Warning, TEXT("UGPObjectManager::EquipItem , DataTable Not Found"));
 		return;
 	}
+
 	FString ContextString;
 	FGPItemStruct* ItemData = DataTable->FindRow<FGPItemStruct>(*FString::FromInt(ItemType), ContextString);
-
 	if (!ItemData)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("EquipItem Failed: No matching item found for ItemType [%d]"), ItemType);
@@ -413,23 +445,20 @@ void UGPObjectManager::EquipItem(int32 PlayerID, uint8 ItemType)
 	{
 		TargetPlayer->AppearanceHandler->EquipItemOnCharacter(*ItemData);
 	}
+
 	UE_LOG(LogTemp, Warning, TEXT("Player [%d] equipped item: %s"), PlayerID, *ItemData->ItemName.ToString());
 }
 
 void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType)
 {
-	if (!Players.Contains(PlayerID))
+	TWeakObjectPtr<AGPCharacterPlayer>* PlayerPtr = Players.Find(PlayerID);
+	if (!PlayerPtr || !PlayerPtr->IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UnequipItem Failed: PlayerID [%d] not found"), PlayerID);
+		UE_LOG(LogTemp, Warning, TEXT("UnequipItem Failed: PlayerID [%d] not found or invalid"), PlayerID);
 		return;
 	}
 
-	AGPCharacterPlayer* TargetPlayer = Players[PlayerID];
-	if (!TargetPlayer)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UGPObjectManager::UnequipItem , TargetPlayer Not Found"));
-		return;
-	}
+	AGPCharacterPlayer* TargetPlayer = PlayerPtr->Get();
 
 	static const FString DataTablePath = TEXT("/Game/Item/GPItemTable.GPItemTable");
 	UDataTable* DataTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath));

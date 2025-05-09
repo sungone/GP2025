@@ -47,6 +47,9 @@ public:
 
 
 public :
+	UFUNCTION()
 	void OnLevelRemoved(ULevel* Level, UWorld* World);
+
+	UFUNCTION()
 	void OnLevelAdded(ULevel* Level, UWorld* World);
 };

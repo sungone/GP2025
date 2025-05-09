@@ -66,9 +66,9 @@ private:
 	UPROPERTY()
 	class AGPCharacterMyplayer* MyPlayer;
 
-	TMap<int32, AGPCharacterPlayer*> Players;
+	TMap<int32, TWeakObjectPtr<AGPCharacterPlayer>> Players;
 
-	TMap<int32, AGPCharacterMonster*> Monsters;
+	TMap<int32, TWeakObjectPtr<AGPCharacterMonster>> Monsters;
 
 	TMap<int32, TWeakObjectPtr<AGPItem>> Items;
 
