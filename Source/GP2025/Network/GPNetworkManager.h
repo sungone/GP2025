@@ -33,6 +33,7 @@ public:
 	FOnReceiveChat OnReceiveChat;
 public:
 	bool ConnectToServer();
+	// void ConnectToServer();
 	void DisconnectFromServer();
 	void ProcessPacket();
 

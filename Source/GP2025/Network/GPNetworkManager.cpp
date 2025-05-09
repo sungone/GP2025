@@ -34,10 +34,37 @@ bool UGPNetworkManager::ConnectToServer()
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Connection Failed"));
 	}
 
-	// 다시 non-blocking으로 전환 (원한다면)
-	//Socket->SetNonBlocking(true);
+	//  다시 non-blocking으로 전환 (원한다면)
+	// Socket->SetNonBlocking(true);
 	return bConnected;
 }
+//
+//void UGPNetworkManager::ConnectToServer()
+//{
+//	Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("ClientSocket"));
+//	Socket->SetNonBlocking(true);
+//
+//	FIPv4Address Ip;
+//	FIPv4Address::Parse(IpAddress, Ip);
+//
+//	TSharedRef<FInternetAddr> InternetAddr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
+//	InternetAddr->SetIp(Ip.Value);
+//	InternetAddr->SetPort(Port);
+//
+//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Connecting To Server...")));
+//
+//	Socket->Connect(*InternetAddr);
+//
+//	if (Socket->GetConnectionState() == SCS_Connected)
+//	{
+//		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Connection Success")));
+//	}
+//	else
+//	{
+//		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Connection Failed")));
+//	}
+//}
+
 
 void UGPNetworkManager::DisconnectFromServer()
 {

@@ -167,7 +167,7 @@ float UGPSkillCoolDownHandler::GetTotalCooldownTime(ESkillGroup SkillGroup, int3
         return 0.f;
     }
 
-    UE_LOG(LogTemp, Log, TEXT("[GetTotalCooldownTime] Cooldown FOUND! SkillGroup: %d, SkillLevel: %d, CooldownTime: %.2f"), SkillGroup, SkillLevel, *CooldownTime);
+   //  UE_LOG(LogTemp, Log, TEXT("[GetTotalCooldownTime] Cooldown FOUND! SkillGroup: %d, SkillLevel: %d, CooldownTime: %.2f"), SkillGroup, SkillLevel, *CooldownTime);
 
     return *CooldownTime;
 }

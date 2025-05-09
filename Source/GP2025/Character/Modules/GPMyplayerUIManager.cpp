@@ -127,7 +127,8 @@ void UGPMyplayerUIManager::OpenInventory()
 
 	if (!InventoryWidget->IsInViewport())
 	{
-		if (UGPInventory* Inventory = Cast<UGPInventory>(InventoryWidget))
+		UGPInventory* Inventory = Cast<UGPInventory>(InventoryWidget);
+		if (Inventory)
 		{
 			Inventory->SetGold(Owner->CharacterInfo.Gold);
 		}

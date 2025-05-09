@@ -238,8 +238,8 @@ void AGPCharacterMyplayer::UpdateSkillCooldownBars()
 	{
 		float Ratio = GetSkillCooldownRatio(QSkill->SkillGID);
 		UIManager->GetInGameWidget()->QSkillBar->SetPercent(1 - Ratio);
-		UE_LOG(LogTemp, Warning, TEXT("[CooldownUI] QSkill Group=%d, Ratio=%.2f, Bar=%.2f"),
-			(int32)QSkill->SkillGID, Ratio, 1 - Ratio);
+		//UE_LOG(LogTemp, Warning, TEXT("[CooldownUI] QSkill Group=%d, Ratio=%.2f, Bar=%.2f"),
+		//	(int32)QSkill->SkillGID, Ratio, 1 - Ratio);
 	}
 	else
 	{
@@ -254,8 +254,8 @@ void AGPCharacterMyplayer::UpdateSkillCooldownBars()
 	{
 		float Ratio = GetSkillCooldownRatio(ESkill->SkillGID);
 		UIManager->GetInGameWidget()->ESkillBar->SetPercent(1 - Ratio);
-		UE_LOG(LogTemp, Warning, TEXT("[CooldownUI] ESkill Group=%d, Ratio=%.2f, Bar=%.2f"),
-			(int32)ESkill->SkillGID, Ratio, 1 - Ratio);
+		//UE_LOG(LogTemp, Warning, TEXT("[CooldownUI] ESkill Group=%d, Ratio=%.2f, Bar=%.2f"),
+		//	(int32)ESkill->SkillGID, Ratio, 1 - Ratio);
 	}
 	else
 	{
@@ -270,8 +270,8 @@ void AGPCharacterMyplayer::UpdateSkillCooldownBars()
 	{
 		float Ratio = GetSkillCooldownRatio(RSkill->SkillGID);
 		UIManager->GetInGameWidget()->RSkillBar->SetPercent(1 - Ratio);
-		UE_LOG(LogTemp, Warning, TEXT("[CooldownUI] RSkill Group=%d, Ratio=%.2f, Bar=%.2f"),
-			(int32)RSkill->SkillGID, Ratio, 1 - Ratio);
+		//UE_LOG(LogTemp, Warning, TEXT("[CooldownUI] RSkill Group=%d, Ratio=%.2f, Bar=%.2f"),
+		//	(int32)RSkill->SkillGID, Ratio, 1 - Ratio);
 	}
 	else
 	{

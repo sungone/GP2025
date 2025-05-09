@@ -48,7 +48,14 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
     UE_LOG(LogTemp, Warning, TEXT("Item Found - ItemName: %s | Category: %d"),
         *ItemData->ItemName.ToString(), static_cast<int32>(ItemData->Category));
 
-    UGPItemSlot* NewSlot = CreateWidget<UGPItemSlot>(GetWorld(), SlotClass);
+    UWorld* World = GetWorld();
+    if (!World)
+    {
+        UE_LOG(LogTemp, Error, TEXT("GetWorld() returned nullptr in AddItemToInventory"));
+        return;
+    }
+
+    UGPItemSlot* NewSlot = CreateWidget<UGPItemSlot>(World, SlotClass);
     if (!NewSlot)
     {
         UE_LOG(LogTemp, Error, TEXT("Failed to Create WBP_Slot Widget"));
@@ -61,6 +68,7 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
     NewSlot->SlotData.Quantity = Quantity;
     NewSlot->CurrentItem = *ItemData;
     NewSlot->SlotData.ItemUniqueID = ItemID;
+
 
     // 만약 Gold 라면 바로 Use 해서 Money 업데이트
     if (ItemData->Category == ECategory::Gold)
@@ -100,6 +108,8 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
         return;
     }
 
+    if (!TargetArray) return;
+
     for (UGPItemSlot* ExistingSlot : *TargetArray)
     {
         if (ExistingSlot->SlotData.ItemID.RowName == RowName)
@@ -111,7 +121,14 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
         }
     }
 
+    if (!NewSlot) return;
     TargetArray->Add(NewSlot);
+
+    if (!WeaponsWrapBox || !ArmorsWrapBox || !EatablesWrapBox)
+    {
+        UE_LOG(LogTemp, Error, TEXT("WrapBoxes are not properly initialized."));
+        return;
+    }
 
     // UI 추가
     switch (ItemData->Category)
@@ -143,7 +160,7 @@ void UGPInventory::UseItemFromInventory(uint32 ItemID)
 {
     auto HandleRemoveLogic = [ItemID](TArray<UGPItemSlot*>& SlotArray, UWrapBox* WrapBox) -> bool
         {
-            for (int32 i = 0; i < SlotArray.Num(); ++i)
+            for (int32 i = SlotArray.Num() - 1; i >= 0; --i)
             {
                 UGPItemSlot* Slot = SlotArray[i];
 

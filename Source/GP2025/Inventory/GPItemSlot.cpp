@@ -78,11 +78,10 @@ void UGPItemSlot::ClickItem()
             UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
             if (NetworkManager)
             {
+                if (!Player->AppearanceHandler) return;
                 Player->AppearanceHandler->EquipItemOnCharacter(GetItemData());
                 int32* FoundID = Player->EquippedItemIDs.Find(CurrentItem.Category);
-
-                if (FoundID == nullptr)
-                    return;
+                if (!FoundID)  return;
 
                 if (*FoundID == -1)
                 {

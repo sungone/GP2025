@@ -286,7 +286,7 @@ void UGPObjectManager::ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos)
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("matching item found for ID [%d]"), ItemType);
+	UE_LOG(LogTemp, Warning, TEXT("matching item found for TypeID [%d]"), ItemType);
 
 	if (!World)
 		return;
@@ -486,7 +486,6 @@ void UGPObjectManager::ShowShopItems(uint8 Count, const ShopItemInfo* shopitems)
 {
 	if (!MyPlayer)
 		return;
-
 }
 
 void UGPObjectManager::HandleBuyResult(bool bSuccess, DBResultCode Code, uint32 NewGold)

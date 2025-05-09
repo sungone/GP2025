@@ -22,7 +22,6 @@ AGPLevelTransitionTrigger::AGPLevelTransitionTrigger()
 	TriggerBox->SetCollisionProfileName(CPROFILE_GPTRIGGER);
 	TriggerBox->SetGenerateOverlapEvents(true);
 
-
 	// 이펙트 생성
 	PortalEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("PortalEffect"));
 	PortalEffect->SetupAttachment(RootComponent);
@@ -78,6 +77,7 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 			else if (LevelToLoad == "industry")  NewZone = ZoneType::INDUSTY;
 
 			NetworkMgr->SendMyZoneChangePacket(NewZone);
+			UE_LOG(LogTemp, Error, TEXT("[AGPLevelTransitionTrigger] SendMyZoneChangePacket Send Success"));
 		}
 	}
 }
