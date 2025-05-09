@@ -11,6 +11,9 @@
 #include "Physics/GPCollision.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Engine/World.h"
+#include "Engine/LevelStreaming.h"
+#include "Engine/Engine.h"
 
 AGPLevelTransitionTrigger::AGPLevelTransitionTrigger()
 {
@@ -46,6 +49,18 @@ void AGPLevelTransitionTrigger::BeginPlay()
 		TriggerBox->OnComponentBeginOverlap.RemoveDynamic(this, &AGPLevelTransitionTrigger::OnOverlapBegin);
 		TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AGPLevelTransitionTrigger::OnOverlapBegin);
 	}
+
+	FWorldDelegates::LevelRemovedFromWorld.AddUObject(this, &AGPLevelTransitionTrigger::OnLevelRemoved);
+	FWorldDelegates::LevelAddedToWorld.AddUObject(this, &AGPLevelTransitionTrigger::OnLevelAdded);
+}
+
+void AGPLevelTransitionTrigger::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	// 콜백 해제
+	FWorldDelegates::LevelRemovedFromWorld.RemoveAll(this);
+	FWorldDelegates::LevelAddedToWorld.RemoveAll(this);
 }
 
 void AGPLevelTransitionTrigger::OnOverlapBegin(
@@ -57,11 +72,14 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 	const FHitResult& SweepResult)
 {
 	if (!OtherActor) return;
-	if (!ensure(OtherActor != nullptr)) return;
-	if (!ensure(TriggerBox != nullptr)) return;
+	if (!TriggerBox) return;
 
 	CachedPlayer = Cast<AGPCharacterMyplayer>(OtherActor);
-	if (!CachedPlayer) return;
+	if (!CachedPlayer || !IsValid(CachedPlayer))
+	{
+		UE_LOG(LogTemp, Error, TEXT("CachedPlayer is invalid or pending kill in OnOverlapBegin."));
+		return;
+	}
 
 	if (!LevelToLoad.IsNone())
 	{
@@ -77,7 +95,24 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 			else if (LevelToLoad == "industry")  NewZone = ZoneType::INDUSTY;
 
 			NetworkMgr->SendMyZoneChangePacket(NewZone);
-			UE_LOG(LogTemp, Error, TEXT("[AGPLevelTransitionTrigger] SendMyZoneChangePacket Send Success"));
+			UE_LOG(LogTemp, Log, TEXT("[AGPLevelTransitionTrigger] SendMyZoneChangePacket Send Success"));
 		}
+	}
+}
+
+void AGPLevelTransitionTrigger::OnLevelRemoved(ULevel* Level, UWorld* World)
+{
+	if (Level && World)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Level %s removed from world %s"), *Level->GetName(), *World->GetName());
+		CachedPlayer = nullptr;
+	}
+}
+
+void AGPLevelTransitionTrigger::OnLevelAdded(ULevel* Level, UWorld* World)
+{
+	if (Level && World)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Level %s added to world %s"), *Level->GetName(), *World->GetName());
 	}
 }

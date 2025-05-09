@@ -33,6 +33,22 @@ void UGPObjectManager::Initialize(FSubsystemCollectionBase& Collection)
 void UGPObjectManager::Deinitialize()
 {
 	Super::Deinitialize();
+
+	for (auto& ItemPair : Items)
+	{
+		TWeakObjectPtr<AGPItem> ItemPtr = ItemPair.Value;
+
+		if (ItemPtr.IsValid())
+		{
+			AGPItem* Item = ItemPtr.Get();
+			if (IsValid(Item))
+			{
+				Item->Destroy();
+			}
+		}
+	}
+
+	Items.Empty();
 }
 
 void UGPObjectManager::SetMyPlayer(AGPCharacterPlayer* InMyPlayer)
@@ -288,8 +304,12 @@ void UGPObjectManager::ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos)
 
 	UE_LOG(LogTemp, Warning, TEXT("matching item found for TypeID [%d]"), ItemType);
 
-	if (!World)
+	if (!World)  return;
+	if (Items.Contains(ItemID))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Item with ID [%d] already exists, skipping spawn"), ItemID);
 		return;
+	}
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -309,11 +329,28 @@ void UGPObjectManager::ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos)
 
 void UGPObjectManager::ItemDespawn(uint32 ItemID)
 {
-	if (Items.Contains(ItemID))
+	if (!Items.Contains(ItemID))
 	{
-		Items[ItemID]->Destroy();
-		Items.Remove(ItemID);
+		return;
 	}
+
+	TWeakObjectPtr<AGPItem> ItemPtr = Items[ItemID];
+	if (!ItemPtr.IsValid())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ItemDespawn: Item [%d] is already destroyed or invalid"), ItemID);
+		Items.Remove(ItemID);
+		return;
+	}
+
+	AGPItem* Item = ItemPtr.Get();
+
+	if (IsValid(Item))
+	{
+		Item->Destroy();
+		UE_LOG(LogTemp, Log, TEXT("Item [%d] successfully destroyed"), ItemID);
+	}
+
+	Items.Remove(ItemID);
 }
 
 void UGPObjectManager::DropItem(uint32 ItemID, uint8 ItemType, FVector Pos)

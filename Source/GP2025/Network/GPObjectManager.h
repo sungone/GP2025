@@ -70,8 +70,9 @@ private:
 
 	TMap<int32, AGPCharacterMonster*> Monsters;
 
-	TMap<int32, AGPItem*> Items;
+	TMap<int32, TWeakObjectPtr<AGPItem>> Items;
 
+	UPROPERTY()
 	UWorld* World;
 private:
 	UPROPERTY()

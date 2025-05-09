@@ -35,7 +35,7 @@ bool UGPNetworkManager::ConnectToServer()
 	}
 
 	//  다시 non-blocking으로 전환 (원한다면)
-	// Socket->SetNonBlocking(true);
+	Socket->SetNonBlocking(true);
 	return bConnected;
 }
 //

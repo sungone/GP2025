@@ -16,6 +16,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
 	UPROPERTY(VisibleAnywhere, Category = "Trigger")
@@ -43,4 +44,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "Effect")
 	class UNiagaraComponent* PortalEffect;
+
+
+public :
+	void OnLevelRemoved(ULevel* Level, UWorld* World);
+	void OnLevelAdded(ULevel* Level, UWorld* World);
 };
