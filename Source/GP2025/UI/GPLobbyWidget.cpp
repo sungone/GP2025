@@ -7,6 +7,9 @@
 #include "Network/GPNetworkManager.h"
 #include "GPLobbyWidget.h"
 #include "Components/Button.h"
+#include "Components/Image.h"
+#include "Engine/Texture2D.h"
+#include "Kismet/GameplayStatics.h"
 
 void UGPLobbyWidget::NativeConstruct()
 {
@@ -33,6 +36,37 @@ void UGPLobbyWidget::NativeConstruct()
 void UGPLobbyWidget::OnCharacterSelected(uint8 NewType)
 {
 	SelectedType = static_cast<Type::EPlayer>(NewType);
+
+	FString SelectedImagePath;
+
+	if (SelectedType == Type::EPlayer::WARRIOR)
+	{
+		SelectedImagePath = ManImagePath;
+	}
+	else if (SelectedType == Type::EPlayer::GUNNER)
+	{
+		SelectedImagePath = WomanImagePath;
+	}
+
+	UpdatePreviewImage(SelectedImagePath);
+}
+
+void UGPLobbyWidget::UpdatePreviewImage(const FString& ImagePath)
+{
+	if (!PreviewImage) return;
+
+	// 이미지 로드
+	UTexture2D* NewTexture = LoadObject<UTexture2D>(nullptr, *ImagePath);
+	if (NewTexture)
+	{
+		FSlateBrush Brush;
+		Brush.SetResourceObject(NewTexture);
+		PreviewImage->SetBrush(Brush);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to load texture at path: %s"), *ImagePath);
+	}
 }
 
 void UGPLobbyWidget::OnGameStartPressed()
@@ -42,8 +76,7 @@ void UGPLobbyWidget::OnGameStartPressed()
 	{
 		if (SelectedType != Type::EPlayer::NONE)
 			NetMgr->SendMyEnterGamePacket(SelectedType);
-		else 
+		else
 			NetMgr->SendMyEnterGamePacket();
 	}
 }
-

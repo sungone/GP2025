@@ -188,7 +188,6 @@ void AGPCharacterBase::HandleAutoAttackState()
 		&& !CombatHandler->IsUsingSkill()) // && !CharacterInfo.HasState(STATE_JUMP)
 	{
 		CombatHandler->PlayAutoAttackMontage();
-		CharacterInfo.RemoveState(STATE_AUTOATTACK);
 	}
 }
 
@@ -198,7 +197,6 @@ void AGPCharacterBase::HandleQSkillState()
 		&& !CombatHandler->IsAutoAttacking())
 	{
 		CombatHandler->PlayQSkillMontage();
-		CharacterInfo.RemoveState(STATE_SKILL_Q);
 	}
 }
 
@@ -208,7 +206,6 @@ void AGPCharacterBase::HandleESkillState()
 		&& !CombatHandler->IsAutoAttacking())
 	{
 		CombatHandler->PlayESkillMontage();
-		CharacterInfo.RemoveState(STATE_SKILL_E);
 	}
 }
 
@@ -218,7 +215,6 @@ void AGPCharacterBase::HandleRSkillState()
 		&& !CombatHandler->IsAutoAttacking())
 	{
 		CombatHandler->PlayRSkillMontage();
-		CharacterInfo.RemoveState(STATE_SKILL_R);
 	}
 }
 
