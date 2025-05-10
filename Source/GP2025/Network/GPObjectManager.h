@@ -51,10 +51,6 @@ public:
 	void OnZoneLevelLoaded();
 	void RespawnMyPlayer(const FInfoData& info);
 
-	void ShowShopItems(uint8 Count, const struct ShopItemInfo* shopitems);
-	void HandleBuyResult(bool bSuccess, DBResultCode Code, uint32 NewGold);
-	void HandleSellResult(bool bSuccess, DBResultCode Code, uint32 NewGold);
-
 	void OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpReward, uint32 GoldReward);
 private:
 	UPROPERTY()

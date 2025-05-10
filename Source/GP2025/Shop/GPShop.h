@@ -7,18 +7,18 @@
 #include "GPShop.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class GP2025_API UGPShop : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
 public:
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 
-public :
+public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* BuyButton;
@@ -31,6 +31,9 @@ public :
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* MoneyText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* ResultMessage;
 
 	UPROPERTY()
 	class AGPCharacterNPC* OwningNPC;
@@ -50,6 +53,13 @@ public :
 	UFUNCTION()
 	void OnBuyItemClicked();
 
+	FTimerHandle HideResultMsgTimerHandle;
+
+	UFUNCTION()
+	void HandleBuyItemResult(bool bSuccess, uint32 CurrentGold, const FString& Message);
+	void ShowResultMessage(const FString& Message, float Duration);
+
+	void HideResultMessage();
 public:
 
 	UPROPERTY(meta = (BindWidget))

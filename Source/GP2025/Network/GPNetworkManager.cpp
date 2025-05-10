@@ -34,37 +34,9 @@ bool UGPNetworkManager::ConnectToServer()
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Connection Failed"));
 	}
 
-	//  다시 non-blocking으로 전환 (원한다면)
 	Socket->SetNonBlocking(true);
 	return bConnected;
 }
-//
-//void UGPNetworkManager::ConnectToServer()
-//{
-//	Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("ClientSocket"));
-//	Socket->SetNonBlocking(true);
-//
-//	FIPv4Address Ip;
-//	FIPv4Address::Parse(IpAddress, Ip);
-//
-//	TSharedRef<FInternetAddr> InternetAddr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
-//	InternetAddr->SetIp(Ip.Value);
-//	InternetAddr->SetPort(Port);
-//
-//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Connecting To Server...")));
-//
-//	Socket->Connect(*InternetAddr);
-//
-//	if (Socket->GetConnectionState() == SCS_Connected)
-//	{
-//		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Connection Success")));
-//	}
-//	else
-//	{
-//		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Connection Failed")));
-//	}
-//}
-
 
 void UGPNetworkManager::DisconnectFromServer()
 {
@@ -90,7 +62,7 @@ void UGPNetworkManager::SendPacket(uint8* Buf, int32 Size)
 	Socket->Send(Buf, Size, BytesSent);
 }
 
-void UGPNetworkManager::PrintFailMessege(DBResultCode ResultCode)
+void UGPNetworkManager::HandleUserAuthFailure(DBResultCode ResultCode)
 {
 	FString ErrorMessage;
 
@@ -114,7 +86,32 @@ void UGPNetworkManager::PrintFailMessege(DBResultCode ResultCode)
 
 	UE_LOG(LogTemp, Error, TEXT("%s"), *ErrorMessage);
 
-	OnLoginFailed.Broadcast(ErrorMessage);
+	OnUserAuthFailed.Broadcast(ErrorMessage);
+}
+
+void UGPNetworkManager::HandleBuyItemResult(bool bSuccess, uint32 CurrentGold, DBResultCode ResultCode)
+{
+	FString ResultMessage;
+
+	switch (ResultCode)
+	{
+	case DBResultCode::SUCCESS:
+		ResultMessage = TEXT("구매완료!");
+		break;
+	case DBResultCode::NOT_ENOUGH_GOLD:
+		ResultMessage = TEXT("골드가 부족합니다");
+		break;
+	case DBResultCode::ITEM_NOT_FOUND:
+		ResultMessage = TEXT("없는 아이템입니다");
+		break;
+	default:
+		ResultMessage = TEXT("알 수 없는 오류가 발생했습니다");
+		break;
+	}
+
+	UE_LOG(LogTemp, Error, TEXT("%s"), *ResultMessage);
+
+	OnBuyItemResult.Broadcast(bSuccess, CurrentGold, ResultMessage);
 }
 
 void UGPNetworkManager::SendMyLoginPacket(const FString& AccountID, const FString& AccountPW)
@@ -319,7 +316,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_LOGIN_FAIL:
 			{
 				LoginFailPacket* Pkt = reinterpret_cast<LoginFailPacket*>(RemainingData.GetData());
-				PrintFailMessege(Pkt->ResultCode);
+				HandleUserAuthFailure(Pkt->ResultCode);
 				break;
 			}
 			case EPacketType::S_SIGNUP_SUCCESS:
@@ -331,7 +328,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_SIGNUP_FAIL:
 			{
 				SignUpFailPacket* Pkt = reinterpret_cast<SignUpFailPacket*>(RemainingData.GetData());
-				PrintFailMessege(Pkt->ResultCode);
+				HandleUserAuthFailure(Pkt->ResultCode);
 				break;
 			}
 			case EPacketType::S_ENTER_GAME:
@@ -497,19 +494,17 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_SHOP_ITEM_LIST:
 			{
 				ShopItemListPacket* Pkt = reinterpret_cast<ShopItemListPacket*>(RemainingData.GetData());
-				ObjectMgr->ShowShopItems(Pkt->ItemCount, Pkt->ShopItems);
 				break;
 			}
 			case EPacketType::S_SHOP_BUY_RESULT:
 			{
 				BuyItemResultPacket* Pkt = reinterpret_cast<BuyItemResultPacket*>(RemainingData.GetData());
-				ObjectMgr->HandleBuyResult(Pkt->bSuccess, Pkt->ResultCode, Pkt->PlayerGold);
+				HandleBuyItemResult(Pkt->bSuccess, Pkt->PlayerGold, Pkt->ResultCode);
 				break;
 			}
 			case EPacketType::S_SHOP_SELL_RESULT:
 			{
 				SellItemResultPacket* Pkt = reinterpret_cast<SellItemResultPacket*>(RemainingData.GetData());
-				ObjectMgr->HandleSellResult(Pkt->bSuccess, Pkt->ResultCode, Pkt->PlayerGold);
 				break;
 			}
 #pragma endregion

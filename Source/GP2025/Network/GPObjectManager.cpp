@@ -660,47 +660,6 @@ void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
 	//}
 }
 
-void UGPObjectManager::ShowShopItems(uint8 Count, const ShopItemInfo* shopitems)
-{
-	if (!MyPlayer)
-		return;
-}
-
-void UGPObjectManager::HandleBuyResult(bool bSuccess, DBResultCode Code, uint32 NewGold)
-{
-	if (!MyPlayer)
-		return;
-
-	if (bSuccess)
-	{
-		MyPlayer->CharacterInfo.Gold = NewGold;
-	}
-	else
-	{
-		switch (Code)
-		{
-		case DBResultCode::NOT_ENOUGH_GOLD:
-			UE_LOG(LogTemp, Warning, TEXT("[BuyResult] Not enough gold"));
-			break;
-		case DBResultCode::ITEM_NOT_FOUND:
-			UE_LOG(LogTemp, Warning, TEXT("[BuyResult] Item not found"));
-			break;
-		default:
-			UE_LOG(LogTemp, Warning, TEXT("[BuyResult] Unknown error"));
-			break;
-		}
-	}
-
-}
-
-void UGPObjectManager::HandleSellResult(bool bSuccess, DBResultCode Code, uint32 NewGold)
-{
-	if (!MyPlayer)
-		return;
-
-
-}
-
 void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpReward, uint32 GoldReward)
 {
 	UE_LOG(LogTemp, Warning, TEXT("[QuestReward] Called: QuestType = %d, bSuccess = %s, Exp = %d, Gold = %d"),

@@ -25,6 +25,10 @@ void UGPShop::NativeConstruct()
 	}
 
 	PopulateShopItems();
+	if (UGPNetworkManager* Mgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>())
+	{
+		Mgr->OnBuyItemResult.AddDynamic(this, &UGPShop::HandleBuyItemResult);
+	}
 }
 
 void UGPShop::NativeDestruct()
@@ -92,6 +96,44 @@ void UGPShop::OnBuyItemClicked()
 		NetworkMgr->SendMyShopBuyItem(ItemID, Quantity);
 
 		UE_LOG(LogTemp, Log, TEXT("BuyItem Sent to Server - ItemID: %d, Quantity: %d"), ItemID, Quantity);
+	}
+}
+
+void UGPShop::HandleBuyItemResult(bool bSuccess, uint32 CurrentGold, const FString& Message)
+{
+	if (bSuccess)
+	{
+		UpdateMoneyText(CurrentGold);
+		MyPlayer->CharacterInfo.Gold = CurrentGold;
+	}
+
+	if (ResultMessage)
+	{
+		ShowResultMessage(Message, 3.0f);
+	}
+}
+
+void UGPShop::ShowResultMessage(const FString& Message, float Duration)
+{
+	if (!ResultMessage) return;
+
+	ResultMessage->SetText(FText::FromString(Message));
+	ResultMessage->SetVisibility(ESlateVisibility::Visible);
+
+	GetWorld()->GetTimerManager().SetTimer(
+		HideResultMsgTimerHandle,
+		this,
+		&UGPShop::HideResultMessage,
+		Duration,
+		false
+	);
+}
+
+void UGPShop::HideResultMessage()
+{
+	if (ResultMessage)
+	{
+		ResultMessage->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 

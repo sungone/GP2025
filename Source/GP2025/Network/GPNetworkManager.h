@@ -11,9 +11,12 @@ class AGPCharacterPlayer;
 class AGPCharacterMonster;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReceiveChat, const FString&, Sender, const FString&, Message);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLoginFailed, FString, Message);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnBuyItemResult, bool, bSuccess, uint32, CurrentGold, const FString&, Message);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUserAuthFailed, FString, Message);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterLobby);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterGame);
+
 
 UCLASS()
 class GP2025_API UGPNetworkManager : public UGameInstanceSubsystem
@@ -21,7 +24,7 @@ class GP2025_API UGPNetworkManager : public UGameInstanceSubsystem
 	GENERATED_BODY()
 public:
 	UPROPERTY(BlueprintAssignable)
-	FOnLoginFailed OnLoginFailed;
+	FOnUserAuthFailed OnUserAuthFailed;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnEnterLobby OnEnterLobby;
@@ -31,16 +34,20 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnReceiveChat OnReceiveChat;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnBuyItemResult OnBuyItemResult;
+
 public:
 	bool ConnectToServer();
-	// void ConnectToServer();
 	void DisconnectFromServer();
 	void ProcessPacket();
 
 	void SetMyPlayer(AGPCharacterPlayer* InMyPlayer);
 public:
-	void PrintFailMessege(DBResultCode ResultCode);
-
+	void HandleUserAuthFailure(DBResultCode ResultCode);
+	void HandleBuyItemResult(bool bSuccess, uint32 CurrentGold, DBResultCode ResultCode);
+public:
 	UFUNCTION(BlueprintCallable)
 	void SendMySelectCharacter(uint8 PlayerType);
 	UFUNCTION(BlueprintCallable)

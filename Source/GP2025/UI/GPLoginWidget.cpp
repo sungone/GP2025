@@ -44,7 +44,7 @@ void UGPLoginWidget::NativeConstruct()
 
 	if (UGPNetworkManager* Mgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>())
 	{
-		Mgr->OnLoginFailed.AddDynamic(this, &UGPLoginWidget::HandleLoginFail);
+		Mgr->OnUserAuthFailed.AddDynamic(this, &UGPLoginWidget::HandleLoginFail);
 	}
 }
 
