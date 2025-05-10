@@ -350,6 +350,8 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->RemovePlayer(Pkt->Data);
 				break;
 			}
+			case EPacketType::S_PLAYER_MOVE:
+				break;
 			case EPacketType::S_PLAYER_STATUS_UPDATE:
 			{
 				InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
@@ -531,7 +533,8 @@ void UGPNetworkManager::ProcessPacket()
 #pragma endregion
 
 			default:
-				UE_LOG(LogTemp, Warning, TEXT("Unknown Packet Type received."));
+				UE_LOG(LogTemp, Warning, TEXT("Unknown Packet Type received: type [%d] - size %d"),
+					PacketHeader->PacketType, PacketHeader->PacketSize);
 				break;
 			}
 
