@@ -129,7 +129,7 @@ bool Player::BuyItem(WorldItem item, uint32 price, uint16 quantity)
 {
 	uint32 totalPrice = price * quantity;
 
-	if (SpendGold(totalPrice))
+	if (!SpendGold(totalPrice))
 	{
 		LOG("Not enough gold");
 		return false;
