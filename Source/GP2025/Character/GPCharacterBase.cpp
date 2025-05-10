@@ -135,6 +135,12 @@ void AGPCharacterBase::BeginPlay()
 			UIHandler->OnBeginPlay();       
 		}
 	}
+
+#if WITH_EDITOR
+	GetCapsuleComponent()->SetHiddenInGame(false);
+#else
+	GetCapsuleComponent()->SetHiddenInGame(true);
+#endif
 }
 
 void AGPCharacterBase::Tick(float DeltaTime)
