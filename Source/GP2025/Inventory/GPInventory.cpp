@@ -153,7 +153,7 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
         break;
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("Item Successfully Added to Inventory - %s"), *ItemData->ItemName.ToString());
+    UE_LOG(LogTemp, Warning, TEXT("Item Successfully Added to Inventory - %s [ItemUniqueID : %d]"), *ItemData->ItemName.ToString() , ItemID);
 }
 
 void UGPInventory::UseItemFromInventory(uint32 ItemID)

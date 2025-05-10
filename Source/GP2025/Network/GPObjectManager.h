@@ -74,6 +74,10 @@ private:
 
 	UPROPERTY()
 	UWorld* World;
+
+	UPROPERTY()
+	UDataTable* ItemDataTable;
+
 private:
 	UPROPERTY()
 	class UGPInventory* InventoryWidget;

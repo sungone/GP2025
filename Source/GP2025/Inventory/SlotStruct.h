@@ -14,7 +14,7 @@ struct FSlotStruct
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-    int32 ItemUniqueID;
+    int32 ItemUniqueID; 
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
     FDataTableRowHandle ItemID;

@@ -102,16 +102,17 @@ void UGPMyplayerUIManager::OnSetUpInGameWidgets()
 
 void UGPMyplayerUIManager::ToggleInventory()
 {
-	if (!Owner || bInventoryToggled) return;
+	if (!Owner || bInventoryToggled || !InventoryWidget || !IsValid(InventoryWidget)) return;
 
 	bInventoryToggled = true;
 
-	if (InventoryWidget)
+	if (InventoryWidget->IsInViewport())
 	{
-		if (InventoryWidget->IsInViewport())
-			CloseInventory();
-		else
-			OpenInventory();
+		CloseInventory();
+	}
+	else
+	{
+		OpenInventory();
 	}
 }
 
@@ -123,7 +124,7 @@ void UGPMyplayerUIManager::ResetToggleInventory()
 
 void UGPMyplayerUIManager::OpenInventory()
 {
-	if (!Owner || !InventoryWidget) return;
+	if (!Owner || !IsValid(InventoryWidget)) return;
 
 	if (!InventoryWidget->IsInViewport())
 	{
@@ -151,7 +152,7 @@ void UGPMyplayerUIManager::OpenInventory()
 
 void UGPMyplayerUIManager::CloseInventory()
 {
-	if (!Owner || !InventoryWidget) return;
+	if (!Owner || !IsValid(InventoryWidget)) return;
 
 	if (InventoryWidget->IsInViewport())
 	{

@@ -21,6 +21,7 @@
 #include "Inventory/GPEquippedItemSlot.h"
 #include "Kismet/GameplayStatics.h"
 #include "GPObjectManager.h"
+#include "TimerManager.h"
 
 void UGPObjectManager::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -28,27 +29,76 @@ void UGPObjectManager::Initialize(FSubsystemCollectionBase& Collection)
 	World = GetWorld();
 	OtherPlayerClass = AGPCharacterPlayer::StaticClass();
 	MonsterClass = AGPCharacterMonster::StaticClass();
+
+	static const FString DataTablePath = TEXT("/Game/Item/GPItemTable.GPItemTable");
+	ItemDataTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath));
 }
 
 void UGPObjectManager::Deinitialize()
 {
 	Super::Deinitialize();
 
+	UE_LOG(LogTemp, Log, TEXT("Deinitializing Object Manager..."));
+
+	if (ItemDataTable)
+	{
+		ItemDataTable = nullptr;
+		UE_LOG(LogTemp, Log, TEXT("[ObjectManager] ItemDataTable cache cleared"));
+	}
+
 	for (auto& ItemPair : Items)
 	{
 		TWeakObjectPtr<AGPItem> ItemPtr = ItemPair.Value;
-
 		if (ItemPtr.IsValid())
 		{
 			AGPItem* Item = ItemPtr.Get();
 			if (IsValid(Item))
 			{
+				UE_LOG(LogTemp, Log, TEXT("Destroying Item: ID [%d]"), ItemPair.Key);
 				Item->Destroy();
 			}
 		}
 	}
-
 	Items.Empty();
+
+	for (auto& PlayerPair : Players)
+	{
+		TWeakObjectPtr<AGPCharacterPlayer> PlayerPtr = PlayerPair.Value;
+		if (PlayerPtr.IsValid())
+		{
+			AGPCharacterPlayer* Player = PlayerPtr.Get();
+			if (IsValid(Player))
+			{
+				UE_LOG(LogTemp, Log, TEXT("Destroying Player: ID [%d]"), PlayerPair.Key);
+				Player->Destroy();
+			}
+		}
+	}
+	Players.Empty();
+
+	for (auto& MonsterPair : Monsters)
+	{
+		TWeakObjectPtr<AGPCharacterMonster> MonsterPtr = MonsterPair.Value;
+		if (MonsterPtr.IsValid())
+		{
+			AGPCharacterMonster* Monster = MonsterPtr.Get();
+			if (IsValid(Monster))
+			{
+				UE_LOG(LogTemp, Log, TEXT("Destroying Monster: ID [%d]"), MonsterPair.Key);
+				Monster->Destroy();
+			}
+		}
+	}
+	Monsters.Empty();
+
+	if (IsValid(MyPlayer))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Destroying MyPlayer"));
+		MyPlayer->Destroy();
+		MyPlayer = nullptr;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Object Manager Deinitialized"));
 }
 
 void UGPObjectManager::SetMyPlayer(AGPCharacterPlayer* InMyPlayer)
@@ -234,13 +284,13 @@ void UGPObjectManager::AddMonster(const FInfoData& MonsterInfo)
 
 	if (Monster == nullptr)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to spawn monster [%d] at location (%f, %f, %f)."),
-			MonsterInfo.ID, SpawnLocation.X, SpawnLocation.Y, SpawnLocation.Z);
+		// UE_LOG(LogTemp, Error, TEXT("Failed to spawn monster [%d] at location (%f, %f, %f)."),
+			//MonsterInfo.ID, SpawnLocation.X, SpawnLocation.Y, SpawnLocation.Z);
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Spawned Monster [%d] at (%f, %f, %f) with rotation (%f)."),
-		MonsterInfo.ID, SpawnLocation.X, SpawnLocation.Y, SpawnLocation.Z, SpawnRotation.Yaw);
+	// UE_LOG(LogTemp, Warning, TEXT("Spawned Monster [%d] at (%f, %f, %f) with rotation (%f)."),
+		//MonsterInfo.ID, SpawnLocation.X, SpawnLocation.Y, SpawnLocation.Z, SpawnRotation.Yaw);
 
 	Monster->SetCharacterInfo(MonsterInfo);
 	Monster->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
@@ -255,7 +305,7 @@ void UGPObjectManager::AddMonster(const FInfoData& MonsterInfo)
 
 void UGPObjectManager::RemoveMonster(int32 MonsterID)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Remove monster [%d]"), MonsterID);
+	// UE_LOG(LogTemp, Warning, TEXT("Remove monster [%d]"), MonsterID);
 
 	if (TWeakObjectPtr<AGPCharacterMonster>* WeakMonsterPtr = Monsters.Find(MonsterID))
 	{
@@ -283,7 +333,7 @@ void UGPObjectManager::UpdateMonster(const FInfoData& MonsterInfo)
 
 			Monster->SetCharacterInfo(MonsterInfo);
 
-			UE_LOG(LogTemp, Warning, TEXT("Update monster [%d]"), MonsterInfo.ID);
+			// UE_LOG(LogTemp, Warning, TEXT("Update monster [%d]"), MonsterInfo.ID);
 		}
 	}
 }
@@ -308,7 +358,7 @@ void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage
 				SpawnParams
 			);
 
-			bool isCrt = (MyPlayer && MyPlayer->CharacterInfo.GetDamage() != Damage);
+			bool isCrt = (MyPlayer && MyPlayer->CharacterInfo.GetDamage() * 10 < Damage);
 
 			if (DamageText)
 			{
@@ -322,30 +372,36 @@ void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage
 
 void UGPObjectManager::ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos)
 {
-	UE_LOG(LogTemp, Warning, TEXT("ItemSpawn [%d]"), ItemID);
-
-	static const FString DataTablePath = TEXT("/Game/Item/GPItemTable.GPItemTable");
-	UDataTable* DataTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath));
-	if (!DataTable)
+	if (!World || !IsValid(World))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[ItemSpawn] World is invalid"));
 		return;
+	}
+	UE_LOG(LogTemp, Log, TEXT("[ItemSpawn] World is valid"));
+
+	if (!ItemDataTable)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[ItemSpawn] ItemDataTable is not loaded"));
+		return;
+	}
+	UE_LOG(LogTemp, Log, TEXT("[ItemSpawn] ItemDataTable is valid"));
+
+	if (Items.Contains(ItemID))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[ItemSpawn] Item with ID [%d] already exists, skipping spawn"), ItemID);
+		return;
+	}
+	UE_LOG(LogTemp, Log, TEXT("[ItemSpawn] Item ID [%d] is not in Items map"), ItemID);
 
 	FString ContextString;
-	FGPItemStruct* ItemData = DataTable->FindRow<FGPItemStruct>(*FString::FromInt(ItemType), ContextString);
+	FGPItemStruct* ItemData = ItemDataTable->FindRow<FGPItemStruct>(*FString::FromInt(ItemType), ContextString);
 
 	if (!ItemData)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ItemSpawn failed: No matching item found for ID [%d]"), ItemType);
+		UE_LOG(LogTemp, Warning, TEXT("[ItemSpawn] No matching item found for ItemType [%d]"), ItemType);
 		return;
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("matching item found for TypeID [%d]"), ItemType);
-
-	if (!World)  return;
-	if (Items.Contains(ItemID))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Item with ID [%d] already exists, skipping spawn"), ItemID);
-		return;
-	}
+	UE_LOG(LogTemp, Log, TEXT("[ItemSpawn] Item data found for ItemType [%d]: %s"), ItemType, *ItemData->ItemName.ToString());
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -353,42 +409,62 @@ void UGPObjectManager::ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos)
 
 	if (!SpawnedItem)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ItemSpawn failed: Could not spawn item actor"));
+		UE_LOG(LogTemp, Warning, TEXT("[ItemSpawn] Failed to spawn item actor"));
 		return;
 	}
+	UE_LOG(LogTemp, Log, TEXT("[ItemSpawn] Item actor spawned successfully for ItemID [%d]"), ItemID);
 
 	SpawnedItem->SetupItem(ItemID, ItemType, 0);
-	Items.Add(ItemID, SpawnedItem);
+	UE_LOG(LogTemp, Log, TEXT("[ItemSpawn] Item setup completed for ItemID [%d]"), ItemID);
 
-	UE_LOG(LogTemp, Warning, TEXT("ItemSpawn success: Spawned Item ID [%d] at [%s]"), ItemID, *Pos.ToString());
+	Items.Add(ItemID, SpawnedItem);
+	UE_LOG(LogTemp, Log, TEXT("[ItemSpawn] Item [%d] successfully added to Items map"), ItemID);
 }
 
 void UGPObjectManager::ItemDespawn(uint32 ItemID)
 {
-	if (!Items.Contains(ItemID))
+	if (!World || !IsValid(World))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("[ItemDespawn] World is invalid"));
 		return;
 	}
+	UE_LOG(LogTemp, Log, TEXT("[ItemDespawn] World is valid"));
 
-	TWeakObjectPtr<AGPItem> ItemPtr = Items[ItemID];
-	if (!ItemPtr.IsValid())
+	TWeakObjectPtr<AGPItem>* ItemPtr = Items.Find(ItemID);
+	if (!ItemPtr || !ItemPtr->IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ItemDespawn: Item [%d] is already destroyed or invalid"), ItemID);
+		UE_LOG(LogTemp, Warning, TEXT("[ItemDespawn] Item [%d] not found or already destroyed"), ItemID);
 		Items.Remove(ItemID);
 		return;
 	}
+	UE_LOG(LogTemp, Log, TEXT("[ItemDespawn] Item found in Items map for ItemID [%d]"), ItemID);
 
-	AGPItem* Item = ItemPtr.Get();
 
+	AGPItem* Item = ItemPtr->Get();
 	if (IsValid(Item))
 	{
+		UE_LOG(LogTemp, Log, TEXT("[ItemDespawn] Destroying Item [%d]"), ItemID);
 		Item->Destroy();
-		UE_LOG(LogTemp, Log, TEXT("Item [%d] successfully destroyed"), ItemID);
+
+		FTimerHandle TimerHandle;
+		World->GetTimerManager().SetTimer(TimerHandle, [this, ItemID]()
+			{
+				if (Items.Remove(ItemID) > 0)
+				{
+					UE_LOG(LogTemp, Log, TEXT("[ItemDespawn] Item [%d] successfully removed from Items map"), ItemID);
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("[ItemDespawn] Item [%d] was not found in Items map during removal"), ItemID);
+				}
+			}, 0.1f, false);
 	}
-
-	Items.Remove(ItemID);
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[ItemDespawn] Item [%d] is invalid, removing directly"), ItemID);
+		Items.Remove(ItemID);
+	}
 }
-
 void UGPObjectManager::DropItem(uint32 ItemID, uint8 ItemType, FVector Pos)
 {
 	//Todo : ItemSpawn()과 비슷하지만 둥둥 뜨지 않고 땅바닥에 스폰하도록 
@@ -397,91 +473,127 @@ void UGPObjectManager::DropItem(uint32 ItemID, uint8 ItemType, FVector Pos)
 void UGPObjectManager::AddInventoryItem(uint32 ItemID, uint8 ItemType)
 {
 	if (!MyPlayer)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[AddInventoryItem] MyPlayer is null"));
 		return;
+	}
+	UE_LOG(LogTemp, Log, TEXT("[AddInventoryItem] MyPlayer is valid. Attempting to add ItemID [%d], ItemType [%d]"), ItemID, ItemType);
 
 	UGPInventory* Inventory = MyPlayer->UIManager->GetInventoryWidget();
-	if (Inventory)
-		Inventory->AddItemToInventory(ItemID, ItemType, 1);
+	if (!Inventory)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[AddInventoryItem] Inventory Widget is null"));
+		return;
+	}
+	UE_LOG(LogTemp, Log, TEXT("[AddInventoryItem] Inventory Widget is valid"));
+
+	// Add item to inventory
+	Inventory->AddItemToInventory(ItemID, ItemType, 1);
 }
 
 void UGPObjectManager::UseInventoryItem(uint32 ItemID)
 {
 	if (!MyPlayer)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[UseInventoryItem] MyPlayer is null"));
 		return;
+	}
+	UE_LOG(LogTemp, Log, TEXT("[UseInventoryItem] MyPlayer is valid. Attempting to use ItemID [%d]"), ItemID);
 
 	UGPInventory* Inventory = MyPlayer->UIManager->GetInventoryWidget();
-	if (Inventory)
-		Inventory->UseItemFromInventory(ItemID);
+	if (!Inventory)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[UseInventoryItem] Inventory Widget is null"));
+		return;
+	}
+	UE_LOG(LogTemp, Log, TEXT("[UseInventoryItem] Inventory Widget is valid"));
+
+	// Use the item
+	Inventory->UseItemFromInventory(ItemID);
 }
 
 void UGPObjectManager::EquipItem(int32 PlayerID, uint8 ItemType)
 {
+	UE_LOG(LogTemp, Log, TEXT("[EquipItem] Attempting to equip ItemType [%d] for PlayerID [%d]"), ItemType, PlayerID);
+
 	TWeakObjectPtr<AGPCharacterPlayer>* PlayerPtr = Players.Find(PlayerID);
 	if (!PlayerPtr || !PlayerPtr->IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("EquipItem Failed: PlayerID [%d] not found or invalid"), PlayerID);
+		UE_LOG(LogTemp, Warning, TEXT("[EquipItem] PlayerID [%d] not found or invalid"), PlayerID);
 		return;
 	}
-
 	AGPCharacterPlayer* TargetPlayer = PlayerPtr->Get();
+	UE_LOG(LogTemp, Log, TEXT("[EquipItem] Player found: %s"), *TargetPlayer->GetName());
 
-	static const FString DataTablePath = TEXT("/Game/Item/GPItemTable.GPItemTable");
-	UDataTable* DataTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath));
-	if (!DataTable)
+	if (!ItemDataTable)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UGPObjectManager::EquipItem , DataTable Not Found"));
+		UE_LOG(LogTemp, Warning, TEXT("[EquipItem] ItemDataTable is null"));
 		return;
 	}
+	UE_LOG(LogTemp, Log, TEXT("[EquipItem] ItemDataTable is valid"));
 
 	FString ContextString;
-	FGPItemStruct* ItemData = DataTable->FindRow<FGPItemStruct>(*FString::FromInt(ItemType), ContextString);
+	FGPItemStruct* ItemData = ItemDataTable->FindRow<FGPItemStruct>(*FString::FromInt(ItemType), ContextString);
 	if (!ItemData)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("EquipItem Failed: No matching item found for ItemType [%d]"), ItemType);
+		UE_LOG(LogTemp, Warning, TEXT("[EquipItem] No matching item found for ItemType [%d]"), ItemType);
 		return;
 	}
+	UE_LOG(LogTemp, Log, TEXT("[EquipItem] Item found for ItemType [%d]: %s"), ItemType, *ItemData->ItemName.ToString());
 
 	if (TargetPlayer->AppearanceHandler)
 	{
+		UE_LOG(LogTemp, Log, TEXT("[EquipItem] Equipping item: %s on Player [%d]"), *ItemData->ItemName.ToString(), PlayerID);
 		TargetPlayer->AppearanceHandler->EquipItemOnCharacter(*ItemData);
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[EquipItem] AppearanceHandler is null for Player [%d]"), PlayerID);
+	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Player [%d] equipped item: %s"), PlayerID, *ItemData->ItemName.ToString());
+	UE_LOG(LogTemp, Log, TEXT("[EquipItem] Player [%d] successfully equipped item: %s"), PlayerID, *ItemData->ItemName.ToString());
 }
 
 void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType)
 {
+	UE_LOG(LogTemp, Log, TEXT("[UnequipItem] Attempting to unequip ItemType [%d] for PlayerID [%d]"), ItemType, PlayerID);
+
 	TWeakObjectPtr<AGPCharacterPlayer>* PlayerPtr = Players.Find(PlayerID);
 	if (!PlayerPtr || !PlayerPtr->IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UnequipItem Failed: PlayerID [%d] not found or invalid"), PlayerID);
+		UE_LOG(LogTemp, Warning, TEXT("[UnequipItem] PlayerID [%d] not found or invalid"), PlayerID);
 		return;
 	}
-
 	AGPCharacterPlayer* TargetPlayer = PlayerPtr->Get();
+	UE_LOG(LogTemp, Log, TEXT("[UnequipItem] Player found: %s"), *TargetPlayer->GetName());
 
-	static const FString DataTablePath = TEXT("/Game/Item/GPItemTable.GPItemTable");
-	UDataTable* DataTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath));
-	if (!DataTable)
+	if (!ItemDataTable)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UGPObjectManager::UnequipItem , DataTable Not Found"));
+		UE_LOG(LogTemp, Warning, TEXT("[UnequipItem] ItemDataTable is null"));
 		return;
 	}
+	UE_LOG(LogTemp, Log, TEXT("[UnequipItem] ItemDataTable is valid"));
 
 	FString ContextString;
-	FGPItemStruct* ItemData = DataTable->FindRow<FGPItemStruct>(*FString::FromInt(ItemType), ContextString);
+	FGPItemStruct* ItemData = ItemDataTable->FindRow<FGPItemStruct>(*FString::FromInt(ItemType), ContextString);
 	if (!ItemData)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UnequipItem Failed: No matching item found for ItemType [%d]"), ItemType);
+		UE_LOG(LogTemp, Warning, TEXT("[UnequipItem] No matching item found for ItemType [%d]"), ItemType);
 		return;
 	}
+	UE_LOG(LogTemp, Log, TEXT("[UnequipItem] Item found for ItemType [%d]: %s"), ItemType, *ItemData->ItemName.ToString());
 
 	if (TargetPlayer->AppearanceHandler)
 	{
+		UE_LOG(LogTemp, Log, TEXT("[UnequipItem] Unequipping item of category: %d for Player [%d]"), ItemData->Category, PlayerID);
 		TargetPlayer->AppearanceHandler->UnequipItemFromCharacter(ItemData->Category);
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[UnequipItem] AppearanceHandler is null for Player [%d]"), PlayerID);
+	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Player [%d] unequipped item: %s"), PlayerID, *ItemData->ItemName.ToString());
+	UE_LOG(LogTemp, Log, TEXT("[UnequipItem] Player [%d] successfully unequipped item: %s"), PlayerID, *ItemData->ItemName.ToString());
 }
 
 void UGPObjectManager::ChangeZone(ZoneType newZone, const FVector& RandomPos)

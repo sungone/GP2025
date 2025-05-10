@@ -9,7 +9,7 @@ void Player::Init()
 #ifndef DB_LOCAL
 	_info.SetName(L"플레이어");
 	SetCharacterType(Type::EPlayer::WARRIOR);
-	_info.Stats.Level = 4;
+	_info.Stats.Level = 1;
 	_info.Stats.Speed = 200.f;
 	_info.CollisionRadius = playerCollision;
 	_info.State = ECharacterStateType::STATE_IDLE;
