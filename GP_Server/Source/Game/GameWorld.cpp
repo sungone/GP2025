@@ -62,6 +62,12 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 	int32 id = player->GetInfo().ID;
 	player->GetInfo().SetZone(startZone);
 
+	//for test
+	player->AddGold(1000);
+
+	auto& playerInfo = player->GetInfo();
+	EnterGamePacket enterpkt(playerInfo);
+	SessionManager::GetInst().SendPacket(id, &enterpkt);
 	{
 		std::lock_guard lock(_mtPlayers);
 		_players[id] = player;
@@ -71,7 +77,6 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 		std::lock_guard lock(_mtPlayerZMap);
 		_playersByZone[startZone][id] = player;
 	}
-
 	UpdateViewList(player);
 	ChangeZonePacket pkt(startZone, newPos);
 	SessionManager::GetInst().SendPacket(id, &pkt);
@@ -273,7 +278,6 @@ void GameWorld::CreateMonster()
 		{
 			int32 id = GenerateMonsterId();
 			auto monster = std::make_shared<Monster>(id, zone, typeId);
-			monster->Init();
 			{
 				std::lock_guard lock(_mtMonZMap);
 				zoneMap[id] = monster;

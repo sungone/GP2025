@@ -251,9 +251,6 @@ void Player::ExecuteSkillEffect(const FSkillTableData& skill)
 
 void Player::LearnSkill(ESkillGroup groupId)
 {
-	if (_info.GetSkillData(groupId) != nullptr)
-		return;
-
 	FSkillState& skills = _info.Skills;
 
 	if (!skills.Q.IsValid())

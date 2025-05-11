@@ -204,10 +204,6 @@ void PacketManager::HandleEnterGamePacket(int32 sessionId, Packet* packet)
 
 	session->EnterGame();
 	_gameWorld.PlayerEnterGame(player);
-	auto& playerInfo = player->GetInfo();
-	EnterGamePacket enterpkt(playerInfo);
-	_sessionMgr.SendPacket(sessionId, &enterpkt);
-	//실패처리를 따로 할까나말까나..
 }
 
 void PacketManager::HandleMovePacket(int32 sessionId, Packet* packet)
