@@ -411,7 +411,7 @@ void UGPMyplayerInputHandler::UseSkillR()
 
 	if (Owner->bIsGunnerCharacter())
 	{
-		if (!Owner->CameraHandler->IsZooming()) return;
+		 // if (!Owner->CameraHandler->IsZooming()) return;
 
 		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_R);
