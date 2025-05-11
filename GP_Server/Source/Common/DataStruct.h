@@ -261,6 +261,9 @@ struct FInfoData
 			}
 		}
 	}
+	Type::EWeapon GetEquippedWeapon() const { return EquipState.Sword; }
+	Type::EArmor  GetEquippedHelmet() const { return EquipState.Helmet; }
+	Type::EArmor  GetEquippedChest() const { return EquipState.Chest; }
 
 	bool HasQuest(QuestType quest) const
 	{
