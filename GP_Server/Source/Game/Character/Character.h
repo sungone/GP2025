@@ -1,9 +1,6 @@
 #pragma once
 #include "Common.h"
 
-constexpr float VIEW_DIST = 5000.f;
-constexpr float playerCollision = 50.f;
-
 class Character
 {
 public:

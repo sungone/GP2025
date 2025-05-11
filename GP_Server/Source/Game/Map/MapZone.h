@@ -17,7 +17,7 @@ public:
 	FVector GetSpawnPosition(ZoneType from, ZoneType to) const;
 	bool IsZoneAccessible(ZoneType zone, uint32 playerLevel) const;
 	
-	FVector GetTIPEntryPos();
+	FVector GetStartPos(ZoneType startZone);
 	FVector GetBossMonsterSpawnPos(Type::EMonster monster);
 private:
 	std::unordered_map<ZoneType, NavMesh> _navMeshs;

@@ -56,12 +56,8 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 {
 	FVector newPos;
 	ZoneType startZone = ZoneType::TUK;
-	float radius = playerCollision;
-	//do {
-	//	newPos = Map::GetInst().GetRandomPos(startZone, radius);
-	//} while (GameWorld::GetInst().IsCollisionDetected(startZone, newPos, radius));
-	//player->SetPos(newPos);
-	newPos = Map::GetInst().GetTIPEntryPos();
+
+	newPos = Map::GetInst().GetStartPos(startZone);
 	player->SetPos(newPos);
 	int32 id = player->GetInfo().ID;
 	player->GetInfo().SetZone(startZone);
@@ -77,6 +73,8 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 	}
 
 	UpdateViewList(player);
+	ChangeZonePacket pkt(startZone, newPos);
+	SessionManager::GetInst().SendPacket(id, &pkt);
 }
 
 void GameWorld::PlayerLeaveGame(int32 id)

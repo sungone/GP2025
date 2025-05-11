@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "MapZone.h"
+#include "GameWorld.h"
 
 bool Map::Init()
 {
@@ -9,6 +10,7 @@ bool Map::Init()
 	_navMeshs[ZoneType::E] = NavMesh(MapDataPath + "NavMeshData_E.json");
 	_navMeshs[ZoneType::INDUSTY] = NavMesh(MapDataPath + "NavMeshData_Industry.json");
 	_navMeshs[ZoneType::GYM] = NavMesh(MapDataPath + "NavMeshData_Gym.json");
+	_navMeshs[ZoneType::TIP] = NavMesh(MapDataPath + "NavMeshData_TIP.json");
 
 	for (auto& [zone, navMesh] : _navMeshs)
 	{
@@ -85,9 +87,14 @@ bool Map::IsZoneAccessible(ZoneType zone, uint32 playerLevel) const
 	}
 }
 
-FVector Map::GetTIPEntryPos()
+FVector Map::GetStartPos(ZoneType startZone)
 {
-	return FVector(-5270.0, 15050.0, 147);
+	FVector newPos;
+	float radius = playerCollision;
+	do {
+		newPos = Map::GetInst().GetRandomPos(startZone, radius);
+	} while (GameWorld::GetInst().IsCollisionDetected(startZone, newPos, radius));
+	return newPos;
 }
 
 FVector Map::GetBossMonsterSpawnPos(Type::EMonster monster)

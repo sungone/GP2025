@@ -10,6 +10,9 @@ inline constexpr size_t MAX_PLAYER = MAX_CLIENT;
 inline constexpr size_t MAX_MONSTER = 500;
 inline constexpr size_t MAX_CHARACTER = MAX_PLAYER + MAX_MONSTER;
 
+inline constexpr float VIEW_DIST = 5000.f;
+inline constexpr float playerCollision = 50.f;
+
 const std::string BasePath = std::filesystem::current_path().string();
 
 const std::string MapDataPath = BasePath + "/MapJsonData/";
