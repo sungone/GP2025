@@ -55,7 +55,7 @@ bool GameWorld::IsMonster(int32 id)
 void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 {
 	FVector newPos;
-	ZoneType startZone = ZoneType::TUK;
+	ZoneType startZone = ZoneType::TIP;
 
 	newPos = Map::GetInst().GetStartPos(startZone);
 	player->SetPos(newPos);
@@ -216,7 +216,7 @@ void GameWorld::PlayerAttack(int32 playerId)
 		{
 			uint32 monlv = monster->GetInfo().GetLevel();
 			Type::EPlayer playertype = (Type::EPlayer)player->GetInfo().CharacterType;
-			player->AddExp(TEST_VALUE * 10 * monster->GetInfo().GetLevel());
+			player->AddExp(TEST_EXP_WEIGHT * 10 * monster->GetInfo().GetLevel());
 
 			FVector basePos = monster->GetInfo().Pos;
 
