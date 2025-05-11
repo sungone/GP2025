@@ -34,7 +34,7 @@ UGPMyplayerUIManager::UGPMyplayerUIManager()
 	}
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> GunCrosshairWidgetBPClass(TEXT("/Game/UI/WBP_GunCrosshair"));
-	if (GunCrosshairWidgetBPClass.Succeeded())
+	if (GunCrosshairWidgetBPClass.Succeeded()) 
 	{
 		GunCrosshairWidgetClass = GunCrosshairWidgetBPClass.Class;
 	}
@@ -81,6 +81,17 @@ void UGPMyplayerUIManager::OnSetUpInGameWidgets()
 	if (DeadScreenWidgetClass)
 	{
 		DeadScreenWidget = CreateWidget<UUserWidget>(World, DeadScreenWidgetClass);
+	}
+
+	if (GunCrosshairWidgetClass && Owner->bIsGunnerCharacter())
+	{
+		GunCrosshairWidget = CreateWidget<UUserWidget>(World, GunCrosshairWidgetClass);
+
+		if (GunCrosshairWidget)
+		{
+			GunCrosshairWidget->AddToViewport();
+			GunCrosshairWidget->SetVisibility(ESlateVisibility::Hidden); 
+		}
 	}
 
 	if (InGameWidgetClass)

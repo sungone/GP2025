@@ -40,6 +40,7 @@ void UGPLobbyWidget::OnCharacterSelected(uint8 NewType)
 	FString SelectedImagePath;
 
 	if (SelectedType == Type::EPlayer::WARRIOR)
+
 	{
 		SelectedImagePath = ManImagePath;
 	}

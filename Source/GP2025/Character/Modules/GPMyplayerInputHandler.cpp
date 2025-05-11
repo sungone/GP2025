@@ -304,7 +304,6 @@ void UGPMyplayerInputHandler::StartAiming()
 	{
 		Owner->UIManager->GunCrosshairWidget->SetVisibility(ESlateVisibility::Visible);
 	}
-
 }
 
 void UGPMyplayerInputHandler::StopAiming()
