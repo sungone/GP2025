@@ -690,7 +690,7 @@ void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpR
 				if (LocalMyPlayerCurrentQuest->EntryType == QuestType::CH3_KILL_TINO)
 				{
 					UE_LOG(LogTemp, Warning, TEXT("[QuestReward] Updating quest state to Success"));
-					LocalMyPlayerCurrentQuest->SetQuestState(TEXT("Success"));
+					LocalMyPlayerCurrentQuest->SetQuestState(true);
 				}
 				else
 				{

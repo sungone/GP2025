@@ -18,7 +18,7 @@ class GP2025_API UGPQuestListEntryWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
-	void SetQuestState(const FString& StateText);
+	void SetQuestState(bool bIsSuccess);
 
 public:
 	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "Quest")

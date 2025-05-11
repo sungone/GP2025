@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "UI/GPQuestListEntryWidget.h"
@@ -10,22 +10,14 @@ void UGPQuestListEntryWidget::NativeConstruct()
 	Super::NativeConstruct();
 }
 
-void UGPQuestListEntryWidget::SetQuestState(const FString& StateText)
+void UGPQuestListEntryWidget::SetQuestState(bool bIsSuccess)
 {
 	if (!QuestStateText) return;
 
+	FString StateText = bIsSuccess ? TEXT("성공") : TEXT("실패");
+
 	QuestStateText->SetText(FText::FromString(StateText));
 
-	FLinearColor StateColor = FLinearColor::Yellow; 
-
-	if (StateText == TEXT("Success"))
-	{
-		StateColor = FLinearColor::Green;
-	}
-	else if (StateText == TEXT("Failed"))
-	{
-		StateColor = FLinearColor::Red;
-	}
-
+	FLinearColor StateColor = bIsSuccess ? FLinearColor::Green : FLinearColor::Red;
 	QuestStateText->SetColorAndOpacity(FSlateColor(StateColor));
 }
