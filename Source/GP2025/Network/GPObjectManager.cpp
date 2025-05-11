@@ -165,6 +165,19 @@ void UGPObjectManager::AddPlayer(const FInfoData& PlayerInfo)
 		Player->SetNameByCharacterInfo();
 	}
 	Player->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
+
+	auto Weapon = Player->CharacterInfo.GetEquippedWeapon();
+	if (Weapon != Type::EWeapon::NONE)
+		EquipItem(PlayerInfo.ID, (uint8)Weapon);
+
+	auto Helmet = Player->CharacterInfo.GetEquippedHelmet();
+	if (Helmet != Type::EArmor::NONE)
+		EquipItem(PlayerInfo.ID, (uint8)Helmet);
+
+	auto Chest = Player->CharacterInfo.GetEquippedChest();
+	if (Chest != Type::EArmor::NONE)
+		EquipItem(PlayerInfo.ID, (uint8)Chest);
+
 	Players.Add(PlayerInfo.ID, Player); 
 }
 
@@ -174,6 +187,18 @@ void UGPObjectManager::RemovePlayer(int32 PlayerID)
 	{
 		if (WeakPlayerPtr->IsValid())
 		{
+			auto Weapon = WeakPlayerPtr->Get()->CharacterInfo.GetEquippedWeapon();
+			if (Weapon != Type::EWeapon::NONE)
+				UnequipItem(PlayerID, (uint8)Weapon);
+
+			auto Helmet = WeakPlayerPtr->Get()->CharacterInfo.GetEquippedHelmet();
+			if (Helmet != Type::EArmor::NONE)
+				UnequipItem(PlayerID, (uint8)Helmet);
+
+			auto Chest = WeakPlayerPtr->Get()->CharacterInfo.GetEquippedChest();
+			if (Chest != Type::EArmor::NONE)
+				UnequipItem(PlayerID, (uint8)Chest);
+
 			WeakPlayerPtr->Get()->Destroy();
 		}
 
