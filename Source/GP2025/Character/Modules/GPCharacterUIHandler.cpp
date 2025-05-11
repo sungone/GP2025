@@ -27,11 +27,6 @@ void UGPCharacterUIHandler::Initialize(AGPCharacterBase* InOwner)
 	}
 }
 
-void UGPCharacterUIHandler::OnBeginPlay()
-{
-
-}
-
 void UGPCharacterUIHandler::CreateCharacterStatusWidget()
 {
 	CharacterStatusWidget = CreateWidgetComponent(

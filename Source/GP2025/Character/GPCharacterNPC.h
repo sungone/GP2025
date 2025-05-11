@@ -42,10 +42,7 @@ public :
 	void OpenShopUI(APlayerController* PlayerController);
 	void CloseShopUI();
 
-	void OpenQuestUI(APlayerController* PlayerController);
-	void CloseQuestUI();
-
-
+	// <Interact with players>
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision", meta = (AllowPrivateAccess = "true"))
 	class USphereComponent* InteractionSphere;
 
@@ -66,7 +63,7 @@ public :
 	UPROPERTY()
 	bool bIsInteracting = false;
 
-	// <Desc UI>
+	// <Description UI>
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
 	class UWidgetComponent* InteractionWidgetComponent;
 
@@ -85,4 +82,7 @@ public :
 
 	UFUNCTION()
 	void OpenQuestUIDelayed();
+
+	void OpenQuestUI(APlayerController* PlayerController);
+	void CloseQuestUI();
 };

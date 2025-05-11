@@ -24,13 +24,16 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	// <Network>
+
+	// <Login>
 	UFUNCTION()
 	void OnPlayerEnterGame();
 
+	// <Lobby>
 	UFUNCTION()
 	void OnPlayerEnterLobby();
 
+	// <Network>
 	UPROPERTY()
 	class UGPNetworkManager* NetMgr;
 

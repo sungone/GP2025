@@ -131,8 +131,7 @@ void AGPCharacterBase::BeginPlay()
 		UIHandler = NewObject<UGPCharacterUIHandler>(this);
 		if (UIHandler)
 		{
-			UIHandler->Initialize(this);     
-			UIHandler->OnBeginPlay();       
+			UIHandler->Initialize(this);          
 		}
 	}
 
@@ -185,7 +184,7 @@ void AGPCharacterBase::SetNameByCharacterInfo()
 void AGPCharacterBase::HandleAutoAttackState()
 {
 	if (CharacterInfo.HasState(STATE_AUTOATTACK) && !CombatHandler->IsAutoAttacking() 
-		&& !CombatHandler->IsUsingSkill()) // && !CharacterInfo.HasState(STATE_JUMP)
+		&& !CombatHandler->IsUsingSkill())
 	{
 		CombatHandler->PlayAutoAttackMontage();
 	}

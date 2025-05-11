@@ -21,7 +21,7 @@ void AGPCharacterMonster::BeginPlay()
 	Super::BeginPlay();
 	SetCharacterType(CurrentCharacterType);
 
-	/// 플레이어와 충돌 설정 - 카메라 때문에 설정
+	// 플레이어와 충돌 설정 (카메라 시야 방해 때문에 설정)
 	USkeletalMeshComponent* MyMesh = GetMesh();
 	MyMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	MyMesh->SetCollisionResponseToAllChannels(ECR_Ignore);

@@ -202,17 +202,14 @@ void UGPObjectManager::PlayerUseSkill(int32 PlayerID, ESkillGroup SkillGID)
 
 			if (SkillGID == ESkillGroup::HitHard || SkillGID == ESkillGroup::Throwing)
 			{
-				Player->CharacterInfo.AddState(STATE_SKILL_Q);
 				Player->CombatHandler->PlayQSkillMontage();
 			}
 			else if (SkillGID == ESkillGroup::Clash || SkillGID == ESkillGroup::FThrowing)
 			{
-				Player->CharacterInfo.AddState(STATE_SKILL_E);
 				Player->CombatHandler->PlayESkillMontage();
 			}
 			else if (SkillGID == ESkillGroup::Whirlwind || SkillGID == ESkillGroup::Anger)
 			{
-				Player->CharacterInfo.AddState(STATE_SKILL_R);
 				Player->CombatHandler->PlayRSkillMontage();
 			}
 		}

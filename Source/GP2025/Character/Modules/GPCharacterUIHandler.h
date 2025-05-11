@@ -16,7 +16,6 @@ class GP2025_API UGPCharacterUIHandler : public UObject
 
 public:
 	void Initialize(class AGPCharacterBase* InOwner);
-	void OnBeginPlay();
 	void CreateCharacterStatusWidget();
 	void UpdateWidgetVisibility();
 
