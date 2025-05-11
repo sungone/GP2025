@@ -166,6 +166,8 @@ void UGPObjectManager::AddPlayer(const FInfoData& PlayerInfo)
 	}
 	Player->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
 
+	Players.Add(PlayerInfo.ID, Player); 
+
 	auto Weapon = Player->CharacterInfo.GetEquippedWeapon();
 	if (Weapon != Type::EWeapon::NONE)
 		EquipItem(PlayerInfo.ID, (uint8)Weapon);
@@ -177,8 +179,6 @@ void UGPObjectManager::AddPlayer(const FInfoData& PlayerInfo)
 	auto Chest = Player->CharacterInfo.GetEquippedChest();
 	if (Chest != Type::EArmor::NONE)
 		EquipItem(PlayerInfo.ID, (uint8)Chest);
-
-	Players.Add(PlayerInfo.ID, Player); 
 }
 
 void UGPObjectManager::RemovePlayer(int32 PlayerID)
