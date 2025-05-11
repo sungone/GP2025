@@ -103,7 +103,7 @@ FVector Map::GetBossMonsterSpawnPos(Type::EMonster monster)
 	switch (monster)
 	{
 	case EMonster::TINO:
-		return FVector(1500, 0, 147);
+		return FVector(1500, 0, 170);
 	default:
 		return FVector::ZeroVector;
 	}

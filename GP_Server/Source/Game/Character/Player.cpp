@@ -6,6 +6,7 @@
 void Player::Init()
 {
 	Character::Init();
+	SetCharacterType(Type::EPlayer::WARRIOR);
 #ifndef DB_LOCAL
 	_info.SetName(L"플레이어");
 	SetCharacterType(Type::EPlayer::WARRIOR);

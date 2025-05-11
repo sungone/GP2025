@@ -76,6 +76,8 @@ DerivedDataCache/*
 
 GP_Server/x64/Debug/*.pdb
 GP_Server/x64/Release/*.pdb
+GP_Server/x64/Release/DataTable/*
+GP_Server/x64/Release/MapJsonData/*
 GP_Server/GP_Server/x64/
 GP_StressTest/x64
 

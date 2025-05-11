@@ -156,20 +156,28 @@ void Server::HandleCompletionError(ExpOver* ex_over, int32 id)
 	switch (ex_over->_compType)
 	{
 	case CompType::ACCEPT:
+	{
 		LOG(Warning, std::format("CompType : ACCEPT[{}] Code={} Msg={}",
 			id, ex_over->errorCode, errMsg));
 		break;
+	}
 	case CompType::RECV:
+	{
 		LOG(Warning, std::format("CompType : RECV[{}] Code={} Msg={}",
 			id, ex_over->errorCode, errMsg));
+		GameWorld::GetInst().PlayerLeaveGame(id);
 		SessionManager::GetInst().Disconnect(id);
 		break;
+	}
 	case CompType::SEND:
+	{
 		LOG(Warning, std::format("CompType : SEND[{}] Code={} Msg={}",
 			id, ex_over->errorCode, errMsg));
+		GameWorld::GetInst().PlayerLeaveGame(id);
 		SessionManager::GetInst().Disconnect(id);
 		delete ex_over;
 		break;
+	}
 	}
 
 }

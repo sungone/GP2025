@@ -17,7 +17,7 @@ bool GameWorld::Init()
 	}
 
 	CreateMonster();
-	TimerQueue::AddTimer([] { GameWorld::GetInst().UpdateAllMonsters(); }, 2000, true);
+	TimerQueue::AddTimer([] { GameWorld::GetInst().UpdateAllMonsters(); }, 1500, true);
 
 	return true;
 }
