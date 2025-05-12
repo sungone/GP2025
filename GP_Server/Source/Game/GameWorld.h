@@ -71,7 +71,7 @@ public:
 		{ ZoneType::TUK, Type::EMonster::COFFEE, 100},
 		{ ZoneType::E, Type::EMonster::MOUSE, 5},
 		{ ZoneType::E, Type::EMonster::KEYBOARD, 5},
-		{ ZoneType::E, Type::EMonster::DESKTOP, 1},
+		{ ZoneType::E, Type::EMonster::DESKMON, 1},
 		{ ZoneType::INDUSTY, Type::EMonster::COGWHEEL, 5},
 		{ ZoneType::INDUSTY, Type::EMonster::BOLT_NUT, 5},
 		{ ZoneType::INDUSTY, Type::EMonster::DRILL, 1},

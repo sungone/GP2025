@@ -106,7 +106,7 @@ namespace Type
 
 		MOUSE,
 		KEYBOARD,
-		DESKTOP,
+		DESKMON,
 
 		COGWHEEL,
 		BOLT_NUT,
