@@ -162,7 +162,7 @@ FVector NavMesh::GetRandomPositionWithRadius(float radius) const
 	if (Triangles.empty() || Vertices.empty())
 		return FVector(0, 0, 0);
 
-	for (int attempt = 0; attempt < 10; ++attempt)
+	for (int attempt = 0; attempt < 30; ++attempt)
 	{
 		int RandomTriangleIndex = RandomUtils::GetRandomInt(0, Triangles.size() - 1);
 		const Triangle& tri = Triangles[RandomTriangleIndex];

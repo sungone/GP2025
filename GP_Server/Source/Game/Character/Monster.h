@@ -12,7 +12,6 @@ public:
 	Monster(int32 id, ZoneType zone, Type::EMonster monType)
 		: Character(id), _zone(zone), _monType(monType)
 	{
-		Init();
 	}
 	void Init() override;
 	void UpdateViewList(std::shared_ptr<Character> other) override;

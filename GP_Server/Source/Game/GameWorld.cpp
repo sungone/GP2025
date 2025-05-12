@@ -55,7 +55,7 @@ bool GameWorld::IsMonster(int32 id)
 void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 {
 	FVector newPos;
-	ZoneType startZone = ZoneType::TIP;
+	ZoneType startZone = ZoneType::TUK;
 
 	newPos = Map::GetInst().GetStartPos(startZone);
 	player->SetPos(newPos);
@@ -74,14 +74,11 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 		std::lock_guard lock(_mtPlayerZMap);
 		_playersByZone[startZone][id] = player;
 	}
-	ChangeZonePacket pkt(startZone, newPos);
-	SessionManager::GetInst().SendPacket(id, &pkt);
 	auto& playerInfo = player->GetInfo();
+	UpdateViewList(player);
 
 	EnterGamePacket enterpkt(playerInfo);
 	SessionManager::GetInst().SendPacket(id, &enterpkt);
-
-	UpdateViewList(player);
 }
 
 void GameWorld::PlayerLeaveGame(int32 id)
@@ -280,10 +277,8 @@ void GameWorld::CreateMonster()
 		{
 			int32 id = GenerateMonsterId();
 			auto monster = std::make_shared<Monster>(id, zone, typeId);
-			{
-				std::lock_guard lock(_mtMonZMap);
-				zoneMap[id] = monster;
-			}
+			monster->Init();
+			zoneMap[id] = monster;
 		}
 	}
 }

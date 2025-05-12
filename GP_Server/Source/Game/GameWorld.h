@@ -68,7 +68,7 @@ public:
 		{ ZoneType::GYM, Type::EMonster::TINO, 1},
 		{ ZoneType::TUK, Type::EMonster::ENERGY_DRINK, 100},
 		{ ZoneType::TUK, Type::EMonster::BUBBLE_TEA, 100},
-		{ ZoneType::TUK, Type::EMonster::COFFEE, 50},
+		{ ZoneType::TUK, Type::EMonster::COFFEE, 100},
 		{ ZoneType::E, Type::EMonster::MOUSE, 5},
 		{ ZoneType::E, Type::EMonster::KEYBOARD, 5},
 		{ ZoneType::E, Type::EMonster::DESKTOP, 1},
