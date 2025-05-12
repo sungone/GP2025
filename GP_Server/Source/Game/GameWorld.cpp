@@ -65,9 +65,6 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 	//for test
 	player->AddGold(1000);
 
-	auto& playerInfo = player->GetInfo();
-	EnterGamePacket enterpkt(playerInfo);
-	SessionManager::GetInst().SendPacket(id, &enterpkt);
 	{
 		std::lock_guard lock(_mtPlayers);
 		_players[id] = player;
@@ -77,9 +74,14 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 		std::lock_guard lock(_mtPlayerZMap);
 		_playersByZone[startZone][id] = player;
 	}
-	UpdateViewList(player);
 	ChangeZonePacket pkt(startZone, newPos);
 	SessionManager::GetInst().SendPacket(id, &pkt);
+	auto& playerInfo = player->GetInfo();
+
+	EnterGamePacket enterpkt(playerInfo);
+	SessionManager::GetInst().SendPacket(id, &enterpkt);
+
+	UpdateViewList(player);
 }
 
 void GameWorld::PlayerLeaveGame(int32 id)
