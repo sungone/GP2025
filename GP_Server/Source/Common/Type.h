@@ -99,7 +99,7 @@ namespace Type
 
 	enum class EMonster : uint8
 	{
-		START = EPlayer::END,
+		START = static_cast<uint8>(EPlayer::END),
 		ENERGY_DRINK = START,
 		BUBBLE_TEA,
 		COFFEE,
@@ -118,7 +118,7 @@ namespace Type
 
 	enum class ENpc : uint8
 	{
-		START = EMonster::END,
+		START = static_cast<uint8>(EPlayer::END),
 		PROFESSOR = START,
 		GUARD,
 		STUDENT,

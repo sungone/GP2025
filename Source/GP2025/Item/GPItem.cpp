@@ -87,7 +87,9 @@ void AGPItem::UpdateFloatingEffect()
 void AGPItem::ShowInteractionWidget()
 {
 	if (!ItemInteractionWidgetComp->IsVisible())
+	{
 		ItemInteractionWidgetComp->SetVisibility(true);
+	}
 
 		APlayerController* PC = GetWorld()->GetFirstPlayerController();
 		if (!PC) return;

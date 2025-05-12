@@ -72,8 +72,8 @@ public:
 
 	void SendMyShopBuyItem(uint8 ItemTypeID, int32 Quantity);
 	void SendMyShopSellItem(int32 ItemID, int32 Quantity);
-	void SendMyRequestQuest(enum class QuestType quest);
-	void SendMyCompleteQuest(enum class QuestType quest);
+	void SendMyRequestQuest(QuestType quest);
+	void SendMyCompleteQuest(QuestType quest);
 
 	void SendMyChatMessage(const FString& Message);
 	void SendMyRemoveStatePacket(uint32 State);

@@ -53,6 +53,7 @@ public:
 	// 게임 시작
 	UFUNCTION()
 	void OnGameStartPressed();
+
 private:
-	enum class Type::EPlayer SelectedType = Type::EPlayer::NONE;
+	Type::EPlayer SelectedType = Type::EPlayer::NONE;
 };
