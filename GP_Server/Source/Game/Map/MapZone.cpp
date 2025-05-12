@@ -89,12 +89,23 @@ bool Map::IsZoneAccessible(ZoneType zone, uint32 playerLevel) const
 
 FVector Map::GetStartPos(ZoneType startZone)
 {
-	FVector newPos;
-	float radius = playerCollision;
-	do {
-		newPos = Map::GetInst().GetRandomPos(startZone, radius);
-	} while (GameWorld::GetInst().IsCollisionDetected(startZone, newPos, radius));
-	return newPos;
+	switch (startZone)
+	{
+	case ZoneType::TIP:
+	{
+		FVector newPos;
+		float radius = playerCollision;
+		do {
+			newPos = Map::GetInst().GetRandomPos(startZone, radius);
+		} while (GameWorld::GetInst().IsCollisionDetected(startZone, newPos, radius));
+		return newPos;
+	}
+	case ZoneType::TUK:
+	{
+		return FVector(-5270.0, 15050.0, 147);
+	}
+	}
+
 }
 
 FVector Map::GetBossMonsterSpawnPos(Type::EMonster monster)
