@@ -168,17 +168,23 @@ void UGPObjectManager::AddPlayer(const FInfoData& PlayerInfo)
 
 	Players.Add(PlayerInfo.ID, Player); 
 
-	auto Weapon = Player->CharacterInfo.GetEquippedWeapon();
-	if (Weapon != Type::EWeapon::NONE)
-		EquipItem(PlayerInfo.ID, (uint8)Weapon);
+	if (TWeakObjectPtr<AGPCharacterPlayer>* WeakPlayerPtr = Players.Find(PlayerInfo.ID))
+	{
+		if (WeakPlayerPtr->IsValid())
+		{
+			auto Weapon = Player->CharacterInfo.GetEquippedWeapon();
+			if (Weapon != Type::EWeapon::NONE)
+				EquipItem(PlayerInfo.ID, (uint8)Weapon);
 
-	auto Helmet = Player->CharacterInfo.GetEquippedHelmet();
-	if (Helmet != Type::EArmor::NONE)
-		EquipItem(PlayerInfo.ID, (uint8)Helmet);
+			auto Helmet = Player->CharacterInfo.GetEquippedHelmet();
+			if (Helmet != Type::EArmor::NONE)
+				EquipItem(PlayerInfo.ID, (uint8)Helmet);
 
-	auto Chest = Player->CharacterInfo.GetEquippedChest();
-	if (Chest != Type::EArmor::NONE)
-		EquipItem(PlayerInfo.ID, (uint8)Chest);
+			auto Chest = Player->CharacterInfo.GetEquippedChest();
+			if (Chest != Type::EArmor::NONE)
+				EquipItem(PlayerInfo.ID, (uint8)Chest);
+		}
+	}
 }
 
 void UGPObjectManager::RemovePlayer(int32 PlayerID)
