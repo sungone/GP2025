@@ -33,7 +33,8 @@ void AGPCharacterMonster::BeginPlay()
 void AGPCharacterMonster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	UIHandler->UpdateWidgetVisibility();
+	if (UIHandler)
+		UIHandler->UpdateWidgetVisibility();
 }
 
 void AGPCharacterMonster::SetCharacterData(const UGPCharacterControlData* CharacterControlData)

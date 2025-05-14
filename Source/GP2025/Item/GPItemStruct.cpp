@@ -23,7 +23,6 @@ FGPItemStruct::FGPItemStruct()
 	, ItemStaticMesh(nullptr) // 기본 StaticMesh 없음
 	,ItemSkeletalMesh_Man(nullptr)
 	, ItemSkeletalMesh_Woman(nullptr)
-	, WeaponClass(nullptr)
 {
 
 }

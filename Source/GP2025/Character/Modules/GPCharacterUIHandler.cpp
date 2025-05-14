@@ -41,28 +41,53 @@ void UGPCharacterUIHandler::CreateCharacterStatusWidget()
 
 void UGPCharacterUIHandler::UpdateWidgetVisibility()
 {
+	if (!Owner) return;
+
 	APlayerController* PC = UGameplayStatics::GetPlayerController(Owner->GetWorld(), 0);
 	AGPCharacterBase* LocalPlayer = Cast<AGPCharacterBase>(PC ? PC->GetPawn() : nullptr);
 	if (!LocalPlayer) return;
 
-	float Distance = FVector::Dist(Owner->GetActorLocation(), LocalPlayer->GetActorLocation());
-	bool bVisible = Distance <= Owner->CharacterInfo.CollisionRadius + LocalPlayer->CharacterInfo.AttackRadius;
-
 	AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(LocalPlayer);
+	bool bIsGunnerZooming = LocalMyPlayer && LocalMyPlayer->bIsGunnerCharacter() && LocalMyPlayer->CameraHandler->IsZooming();
+
+	if (LocalMyPlayer && LocalMyPlayer->bIsGunnerCharacter() && !LocalMyPlayer->CameraHandler->IsZooming())
+	{
+		CharacterStatusWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
+		return;
+	}
+
+	float Distance = FVector::Dist(Owner->GetActorLocation(), LocalPlayer->GetActorLocation());
+	float AttackRadius = 300.0f; 
+
 	if (LocalMyPlayer)
 	{
-		if (LocalMyPlayer->bIsGunnerCharacter() && !LocalMyPlayer->CameraHandler->IsZooming())
-		{
-			bVisible = Distance <= Owner->CharacterInfo.CollisionRadius + LocalPlayer->CharacterInfo.AttackRadius / 12;
-		}
+		AttackRadius = LocalMyPlayer->CharacterInfo.AttackRadius;
 	}
 
-	ESlateVisibility Visibility = bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden;
-
-	if (CharacterStatusWidgetInstance)
+	if (bIsGunnerZooming)
 	{
-		CharacterStatusWidgetInstance->SetVisibility(Visibility);
+		float MinScaleDistance = 300.0f;  // 최대 크기 거리
+		float MaxScaleDistance = 5000.0f; // 최소 크기 거리
+
+		float DistanceFactor = FMath::Clamp((Distance - MinScaleDistance) / (MaxScaleDistance - MinScaleDistance), 0.0f, 1.0f);
+
+		// ✅ 가까울 때 커지고, 멀리 있을 때 작아지도록 설정
+		float ScaleFactor = FMath::Clamp(
+			2.0f - DistanceFactor * 1.9f,  // 2.0f에서 0.1f까지 감소
+			0.1f,  // 최소 크기 (멀리 있을 때)
+			2.0f   // 최대 크기 (가까이 있을 때)
+		);
+
+		CharacterStatusWidget->SetRelativeScale3D(FVector(ScaleFactor, ScaleFactor, ScaleFactor));
 	}
+	else
+	{
+		CharacterStatusWidget->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
+	}
+
+	bool bVisible = Distance <= (Owner->CharacterInfo.CollisionRadius + AttackRadius);
+	ESlateVisibility Visibility = bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden;
+	CharacterStatusWidgetInstance->SetVisibility(Visibility);
 }
 
 UGPWidgetComponent* UGPCharacterUIHandler::CreateWidgetComponent(

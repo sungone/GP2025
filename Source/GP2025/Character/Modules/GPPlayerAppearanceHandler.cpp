@@ -5,7 +5,6 @@
 #include "Character/GPCharacterMyPlayer.h"
 #include "Character/GPCharacterControlData.h"
 #include "Item/GPItemStruct.h"
-#include "Weapons/GPWeaponBase.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -18,6 +17,12 @@ void UGPPlayerAppearanceHandler::Initialize(AGPCharacterPlayer* InOwner)
 	if (Owner && Owner->GetMesh())
 	{
 		Owner->GetMesh()->SetSkeletalMesh(nullptr);
+	}
+
+	if (Owner && Owner->WeaponMesh)
+	{
+		Owner->WeaponMesh->SetStaticMesh(nullptr);
+		Owner->WeaponMesh->SetVisibility(false);
 	}
 }
 
@@ -45,32 +50,20 @@ void UGPPlayerAppearanceHandler::ApplyCharacterPartsFromData(const UGPCharacterC
 		Owner->LegMesh->SetSkeletalMesh(CharacterData->LegMesh);
 	}
 
-	EquipWeaponFromData(CharacterData);
+	if (CharacterData->WeaponMesh && Owner->WeaponMesh)
+	{
+		Owner->WeaponMesh->SetStaticMesh(CharacterData->WeaponMesh);
+		Owner->WeaponMesh->SetVisibility(true);
+	}
+	else
+	{
+		Owner->WeaponMesh->SetStaticMesh(nullptr);
+		Owner->WeaponMesh->SetVisibility(false);
+	}
+
 	SetupLeaderPose();
 }
 
-void UGPPlayerAppearanceHandler::EquipWeaponFromData(const UGPCharacterControlData* CharacterData)
-{
-	if (!Owner || !CharacterData) return;
-
-	if (Owner->WeaponActor)
-	{
-		Owner->WeaponActor->Destroy();
-		Owner->WeaponActor = nullptr;
-	}
-
-	if (CharacterData->WeaponClass)
-	{
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = Owner;
-
-		Owner->WeaponActor = Owner->GetWorld()->SpawnActor<AGPWeaponBase>(CharacterData->WeaponClass, Owner->GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
-		if (Owner->WeaponActor && Owner->BodyMesh && Owner->BodyMesh->DoesSocketExist(TEXT("WeaponSocket")))
-		{
-			Owner->WeaponActor->AttachToComponent(Owner->BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
-		}
-	}
-}
 
 USkeletalMesh* UGPPlayerAppearanceHandler::GetBodyMeshByCharacterType(const FGPItemStruct& ItemData, uint8 CurrentCharacterType)
 {
@@ -102,7 +95,6 @@ void UGPPlayerAppearanceHandler::EquipItemOnCharacter(FGPItemStruct& ItemData)
 		Owner->HelmetMesh->SetVisibility(MeshToApply != nullptr);
 
 		SetupLeaderPose();
-		AttachWeaponToBodyMesh();
 	}
 
 	// Chest 교체 시 메시만 바꿔끼움
@@ -119,7 +111,6 @@ void UGPPlayerAppearanceHandler::EquipItemOnCharacter(FGPItemStruct& ItemData)
 		}
 
 		SetupLeaderPose();
-		AttachWeaponToBodyMesh();
 
 		if (Owner->HelmetMesh)
 			Owner->HelmetMesh->SetRelativeLocation(FVector(0.f, 0.f, -4.f));
@@ -128,39 +119,8 @@ void UGPPlayerAppearanceHandler::EquipItemOnCharacter(FGPItemStruct& ItemData)
 	// 무기 교체
 	if (ItemData.Category == ECategory::sword || ItemData.Category == ECategory::bow)
 	{
-		if (Owner->WeaponActor)
-		{
-			Owner->WeaponActor->Destroy();
-			Owner->WeaponActor = nullptr;
-		}
-
-		if (!ItemData.WeaponClass || !Owner->BodyMesh) return;
-
-		if (!Owner->BodyMesh->DoesSocketExist(TEXT("WeaponSocket")))
-		{
-			UE_LOG(LogTemp, Error, TEXT("WeaponSocket not found on BodyMesh."));
-			return;
-		}
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = Owner;
-
-		Owner->WeaponActor = Owner->GetWorld()->SpawnActor<AGPWeaponBase>(
-			ItemData.WeaponClass,
-			Owner->GetActorLocation(),
-			FRotator::ZeroRotator,
-			SpawnParams
-		);
-
-		if (Owner->WeaponActor)
-		{
-			Owner->WeaponActor->AttachToComponent(
-				Owner->BodyMesh,
-				FAttachmentTransformRules::SnapToTargetIncludingScale,
-				TEXT("WeaponSocket")
-			);
-			Owner->WeaponActor->SetWeaponMesh(ItemData.ItemStaticMesh);
-		}
+		Owner->WeaponMesh->SetStaticMesh(ItemData.ItemStaticMesh);
+		Owner->WeaponMesh->SetVisibility(ItemData.ItemStaticMesh != nullptr);
 	}
 }
 
@@ -179,7 +139,6 @@ void UGPPlayerAppearanceHandler::UnequipItemFromCharacter(ECategory Category)
 		}
 
 		SetupLeaderPose();
-		AttachWeaponToBodyMesh();
 		break;
 	}
 
@@ -196,17 +155,16 @@ void UGPPlayerAppearanceHandler::UnequipItemFromCharacter(ECategory Category)
 			Owner->BodyMesh->SetAnimInstanceClass(Owner->GetMesh()->GetAnimClass());
 		}
 		SetupLeaderPose();
-		AttachWeaponToBodyMesh();
 
 		break;
 	}
 
 	case ECategory::sword:
 	case ECategory::bow:
-		if (Owner->WeaponActor)
+		if (Owner->WeaponMesh)
 		{
-			Owner->WeaponActor->Destroy();
-			Owner->WeaponActor = nullptr;
+			Owner->WeaponMesh->SetStaticMesh(nullptr);
+			Owner->WeaponMesh->SetVisibility(false);
 		}
 		break;
 
@@ -230,16 +188,5 @@ void UGPPlayerAppearanceHandler::SetupLeaderPose()
 	if (Owner->LegMesh)
 	{
 		Owner->LegMesh->SetLeaderPoseComponent(Owner->BodyMesh, true);
-	}
-}
-
-void UGPPlayerAppearanceHandler::AttachWeaponToBodyMesh()
-{
-	if (Owner->WeaponActor && Owner->WeaponActor->GetWeaponMesh() && Owner->BodyMesh)
-	{
-		Owner->WeaponActor->GetWeaponMesh()->AttachToComponent(
-			Owner->BodyMesh,
-			FAttachmentTransformRules::SnapToTargetIncludingScale,
-			TEXT("WeaponSocket"));
 	}
 }

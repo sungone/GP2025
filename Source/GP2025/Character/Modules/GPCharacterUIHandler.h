@@ -33,4 +33,7 @@ public:
 	class UUserWidget* CharacterStatusWidgetInstance;
 
 	void SetNameByCharacterInfo();
+
+public :
+	FTimerHandle VisibilityUpdateTimer;
 };

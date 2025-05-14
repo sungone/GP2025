@@ -100,7 +100,4 @@ public :
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	USkeletalMesh* ItemSkeletalMesh_Woman;
 
-	// 무기 클래스일 때 지정
-	UPROPERTY(EditAnywhere , BlueprintReadWrite , Category = "Item")
-	TSubclassOf<class AGPWeaponBase> WeaponClass;
 };

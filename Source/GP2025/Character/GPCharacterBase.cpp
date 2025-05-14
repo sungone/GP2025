@@ -12,7 +12,6 @@
 #include "Physics/GPCollision.h"
 #include "Animation/GPCharacterAnimInstance.h"
 #include "UI/GPHpBarWidget.h"
-#include "Weapons/GPSword.h"
 #include "UI/GPLevelWidget.h"
 #include "UI/GPWidgetComponent.h"
 #include "NiagaraFunctionLibrary.h"

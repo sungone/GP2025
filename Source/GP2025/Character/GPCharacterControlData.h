@@ -90,9 +90,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "PlayerMesh")
 	USkeletalMesh* LegMesh;
 
-	// 무기 타입
-	UPROPERTY(EditAnywhere, Category = "WeaponType")
-	TSubclassOf<class AGPWeaponBase> WeaponClass;
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	UStaticMesh* WeaponMesh;
 
 	// 몬스터의 캡슐 세팅
 	UPROPERTY(EditAnywhere, Category = "Capsule")

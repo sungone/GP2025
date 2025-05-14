@@ -45,8 +45,8 @@ public :
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts")
 	TObjectPtr<USkeletalMeshComponent> LegMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class AGPWeaponBase> WeaponActor;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts")
+	TObjectPtr<UStaticMeshComponent> WeaponMesh;
 
 	virtual USkeletalMeshComponent* GetCharacterMesh() const override;
 	bool bDidLeaderPoseSetup = false;

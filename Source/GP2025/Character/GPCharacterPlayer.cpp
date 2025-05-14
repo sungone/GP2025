@@ -4,8 +4,7 @@
 #include "Character/GPCharacterPlayer.h"
 #include "Character/GPCharacterControlData.h"
 #include "Item/GPItemStruct.h"
-#include "Weapons/GPWeaponBase.h"
-#include "Engine/SkeletalMeshSocket.h"
+// #include "Engine/SkeletalMeshSocket.h"
 #include "Character/Modules/GPPlayerAppearanceHandler.h"
 #include "Character/Modules/GPPlayerEffectHandler.h"
 #include "Character/Modules/GPCharacterUIHandler.h"
@@ -25,6 +24,10 @@ AGPCharacterPlayer::AGPCharacterPlayer()
     LegMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LegMesh"));
     LegMesh->SetupAttachment(BodyMesh);
 
+    WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
+    WeaponMesh->SetupAttachment(BodyMesh, TEXT("WeaponSocket"));  
+    WeaponMesh->SetVisibility(false);
+
     EquippedItemIDs.Add(ECategory::bow, -1);
     EquippedItemIDs.Add(ECategory::sword, -1);
     EquippedItemIDs.Add(ECategory::helmet, -1);
@@ -42,9 +45,7 @@ void AGPCharacterPlayer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
     if (UIHandler)
-    {
         UIHandler->UpdateWidgetVisibility();
-    }
 }
 
 void AGPCharacterPlayer::PostInitializeComponents()
