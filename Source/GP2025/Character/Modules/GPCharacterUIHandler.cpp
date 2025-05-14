@@ -53,7 +53,7 @@ void UGPCharacterUIHandler::UpdateWidgetVisibility()
 	{
 		if (LocalMyPlayer->bIsGunnerCharacter() && !LocalMyPlayer->CameraHandler->IsZooming())
 		{
-			bVisible = Distance <= Owner->CharacterInfo.CollisionRadius;
+			bVisible = Distance <= Owner->CharacterInfo.CollisionRadius + LocalPlayer->CharacterInfo.AttackRadius / 12;
 		}
 	}
 
