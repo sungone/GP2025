@@ -26,4 +26,11 @@ public:
 private:
 	UPROPERTY()
 	class UGPNetworkManager* NetworkMgr;
+
+
+
+ // Android 권한 요청
+#if PLATFORM_ANDROID
+	void RequestAndroidPermissions();
+#endif
 };

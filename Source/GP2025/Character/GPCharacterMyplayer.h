@@ -66,7 +66,7 @@ public:
 
 	// <Skill Cool UI System>
 public :
-	float GetSkillCooldownRatio(enum class ESkillGroup SkillGroup);
+	float GetSkillCooldownRatio(ESkillGroup SkillGroup);
 	void UpdateSkillCooldownBars();
 	
 	// <CharacterType> 

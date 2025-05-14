@@ -53,7 +53,7 @@ public :
 public :
     void UpdateHealthBar(float Ratio);
     void UpdateExpBar(float Ratio);
-    void UpdatePlayerLevel(__int32 NewLevel);
+    void UpdatePlayerLevel(int32_t NewLevel);
 
     struct FSlateColor GetQSkillTextColor();
     struct FSlateColor GetESkillTextColor();

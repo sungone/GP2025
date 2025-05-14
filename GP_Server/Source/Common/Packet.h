@@ -43,10 +43,10 @@ struct LoginPacket : public Packet
 	LoginPacket(const char* AccountID_, const char* AccountPW_)
 		: Packet(EPacketType::C_LOGIN)
 	{
-		strncpy_s(AccountID, AccountID_, LOGIN_STR_LEN - 1);
+		SAFE_STRCPY(AccountID, AccountID_, LOGIN_STR_LEN - 1);
 		AccountID[LOGIN_STR_LEN - 1] = '\0';
 
-		strncpy_s(AccountPW, AccountPW_, LOGIN_STR_LEN - 1);
+		SAFE_STRCPY(AccountPW, AccountPW_, LOGIN_STR_LEN - 1);
 		AccountPW[LOGIN_STR_LEN - 1] = '\0';
 
 		Header.PacketSize = sizeof(LoginPacket);
@@ -62,13 +62,13 @@ struct SignUpPacket : public Packet
 	SignUpPacket(const char* InAccountID, const char* InAccountPW, const char* InNickName)
 		: Packet(EPacketType::C_SIGNUP)
 	{
-		strncpy_s(AccountID, InAccountID, LOGIN_STR_LEN - 1);
+		SAFE_STRCPY(AccountID, InAccountID, LOGIN_STR_LEN - 1);
 		AccountID[LOGIN_STR_LEN - 1] = '\0';
 
-		strncpy_s(AccountPW, InAccountPW, LOGIN_STR_LEN - 1);
+		SAFE_STRCPY(AccountPW, InAccountPW, LOGIN_STR_LEN - 1);
 		AccountPW[LOGIN_STR_LEN - 1] = '\0';
 
-		strncpy_s(NickName, InNickName, NICKNAME_LEN - 1);
+		SAFE_STRCPY(NickName, InNickName, NICKNAME_LEN - 1);
 		NickName[NICKNAME_LEN - 1] = '\0';
 
 		Header.PacketSize = sizeof(SignUpPacket);
@@ -566,7 +566,7 @@ struct ChatSendPacket : public Packet
 	ChatSendPacket(const char* Msg)
 		: Packet(EPacketType::C_CHAT_SEND)
 	{
-		strncpy_s(Message, Msg, CHAT_MESSAGE_LEN - 1);
+		SAFE_STRCPY(Message, Msg, CHAT_MESSAGE_LEN - 1);
 		Message[CHAT_MESSAGE_LEN - 1] = '\0';
 
 		Header.PacketSize = sizeof(ChatSendPacket);
@@ -581,10 +581,10 @@ struct ChatBroadcastPacket : public Packet
 	ChatBroadcastPacket(const char* Sender, const char* Msg)
 		: Packet(EPacketType::S_CHAT_BROADCAST)
 	{
-		strncpy_s(SenderNickName, Sender, NICKNAME_LEN - 1);
+		SAFE_STRCPY(SenderNickName, Sender, NICKNAME_LEN - 1);
 		SenderNickName[NICKNAME_LEN - 1] = '\0';
 
-		strncpy_s(Message, Msg, CHAT_MESSAGE_LEN - 1);
+		SAFE_STRCPY(Message, Msg, CHAT_MESSAGE_LEN - 1);
 		Message[CHAT_MESSAGE_LEN - 1] = '\0';
 
 		Header.PacketSize = sizeof(ChatBroadcastPacket);

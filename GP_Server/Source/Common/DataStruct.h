@@ -343,14 +343,14 @@ struct FInfoData
 	void SetName(std::wstring InNick)
 	{
 		if (InNick.empty()) {
-			strncpy_s(NickName, "None", NICKNAME_LEN - 1);
+			SAFE_STRCPY(NickName, "None", NICKNAME_LEN - 1);
 			NickName[NICKNAME_LEN - 1] = '\0';
 			return;
 		}
 
 		int utf8Length = WideCharToMultiByte(CP_UTF8, 0, InNick.c_str(), -1, nullptr, 0, nullptr, nullptr);
 		if (utf8Length <= 0) {
-			strncpy_s(NickName, "Invalid", NICKNAME_LEN - 1);
+			SAFE_STRCPY(NickName, "Invalid", NICKNAME_LEN - 1);
 			NickName[NICKNAME_LEN - 1] = '\0';
 			return;
 		}
@@ -358,7 +358,7 @@ struct FInfoData
 		std::string utf8Str(utf8Length, 0);
 		WideCharToMultiByte(CP_UTF8, 0, InNick.c_str(), -1, &utf8Str[0], utf8Length, nullptr, nullptr);
 
-		strncpy_s(NickName, utf8Str.c_str(), NICKNAME_LEN - 1);
+		SAFE_STRCPY(NickName, utf8Str.c_str(), NICKNAME_LEN - 1);
 		NickName[NICKNAME_LEN - 1] = '\0';
 	}
 

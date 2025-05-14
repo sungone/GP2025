@@ -91,7 +91,11 @@ void UGPMyplayerCameraHandler::StopZoom()
 
 bool UGPMyplayerCameraHandler::IsZooming() const
 {
+#if UE_BUILD_SHIPPING
+	return bWantsToZoom;
+#else
 	return this && bWantsToZoom;
+#endif
 }
 
 void UGPMyplayerCameraHandler::ConfigureCameraCollision()

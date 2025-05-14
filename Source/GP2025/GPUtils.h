@@ -125,31 +125,41 @@ void SaveRecastDebugGeometryToJson(const FRecastDebugGeometry& NavMeshGeometry, 
 void ExtractNavMeshData(UWorld* World, const FString& PathName)
 {
     auto* NavigationSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(World);
-	if (!NavigationSys) {
-		UE_LOG(LogTemp, Error, TEXT("NavigationSystem not found!"));
-		return;
-	}
+    if (!NavigationSys) {
+        UE_LOG(LogTemp, Error, TEXT("NavigationSystem not found!"));
+        return;
+    }
+
     auto* NavData = NavigationSys->GetMainNavData();
     if (!NavData) {
         UE_LOG(LogTemp, Error, TEXT("NavData not found!"));
         return;
     }
-    ARecastNavMesh* NavMesh = Cast<ARecastNavMesh>(NavData);
 
+    ARecastNavMesh* NavMesh = Cast<ARecastNavMesh>(NavData);
     if (!NavMesh) {
         UE_LOG(LogTemp, Error, TEXT("NavMesh not found!"));
         return;
     }
 
+    FString FullSavePath = FPaths::ProjectDir() + PathName;
+
     int32 NumTiles = NavMesh->GetNavMeshTilesCount();
     UE_LOG(LogTemp, Log, TEXT("NavMesh Tiles: %d"), NumTiles);
 
-    FRecastDebugGeometry NavMeshGeometry;
-    NavMesh->GetDebugGeometry(NavMeshGeometry);
+    for (int32 TileIndex = 0; TileIndex < NumTiles; ++TileIndex)
+    {
+        FRecastDebugGeometry NavMeshGeometry;
 
-    FString FullSavePath = FPaths::ProjectDir() + PathName;
-
-    SaveRecastDebugGeometryToJson(NavMeshGeometry, NumTiles, FullSavePath);
+        if (NavMesh->GetDebugGeometryForTile(NavMeshGeometry, TileIndex))
+        {
+            SaveRecastDebugGeometryToJson(NavMeshGeometry, TileIndex, FullSavePath);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Failed to get debug geometry for tile index %d"), TileIndex);
+        }
+    }
 }
 
 void SaveRecastDebugGeometryToJson(const FRecastDebugGeometry& NavMeshGeometry, int32 NumTiles, const FString& FilePath)

@@ -3,11 +3,19 @@
 #include "Kismet/GameplayStatics.h"
 #include "GPUtils.h"
 
+#if PLATFORM_ANDROID
+#include "AndroidPermissionFunctionLibrary.h"
+#endif
+
 void UGPGameInstance::Init()
 {
 	Super::Init();
 	NetworkMgr = GetSubsystem<UGPNetworkManager>();
 	NetworkMgr->ConnectToServer();
+
+#if PLATFORM_ANDROID
+	RequestAndroidPermissions();
+#endif
 }
 
 void UGPGameInstance::Shutdown()
@@ -28,3 +36,40 @@ void UGPGameInstance::SaveNavData(bool IsSave)
 	if (IsSave)
 		ExtractNavMeshData(GetWorld(), TEXT("GP_Server/NavMeshData.json"));
 }
+
+
+
+#if PLATFORM_ANDROID
+	void UGPGameInstance::RequestAndroidPermissions()
+	{
+        TArray<FString> Permissions;
+
+        Permissions.Add("android.permission.READ_MEDIA_IMAGES");
+        Permissions.Add("android.permission.READ_MEDIA_VIDEO");
+        Permissions.Add("android.permission.READ_MEDIA_AUDIO");
+
+        Permissions.Add("android.permission.READ_EXTERNAL_STORAGE");
+        Permissions.Add("android.permission.WRITE_EXTERNAL_STORAGE");
+        Permissions.Add("android.permission.MANAGE_EXTERNAL_STORAGE");
+
+        Permissions.Add("android.permission.POST_NOTIFICATIONS");
+
+        Permissions.Add("android.permission.INTERNET");
+        Permissions.Add("android.permission.ACCESS_NETWORK_STATE");
+        Permissions.Add("android.permission.ACCESS_WIFI_STATE");
+
+        Permissions.Add("android.permission.BLUETOOTH_SCAN");
+        Permissions.Add("android.permission.BLUETOOTH_CONNECT");
+        Permissions.Add("android.permission.BLUETOOTH_ADVERTISE");
+
+        Permissions.Add("android.permission.VIBRATE");
+        Permissions.Add("android.permission.SCHEDULE_EXACT_ALARM");
+
+        Permissions.Add("android.permission.FOREGROUND_SERVICE");
+
+        Permissions.Add("android.permission.RECORD_AUDIO");
+
+        UAndroidPermissionFunctionLibrary::AcquirePermissions(Permissions);
+	}
+#endif
+

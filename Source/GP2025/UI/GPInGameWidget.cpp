@@ -29,7 +29,7 @@ void UGPInGameWidget::UpdateExpBar(float Ratio)
     }
 }
 
-void UGPInGameWidget::UpdatePlayerLevel(__int32 NewLevel)
+void UGPInGameWidget::UpdatePlayerLevel(int32_t NewLevel)
 {
     if (LevelText)
     {
