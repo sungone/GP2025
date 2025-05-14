@@ -1,5 +1,5 @@
 ﻿#include "Character/Modules/GPCharacterUIHandler.h"
-#include "Character/GPCharacterPlayer.h"
+#include "Character/GPCharacterMyplayer.h"
 #include "UI/GPWidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/TextBlock.h"
@@ -9,6 +9,7 @@
 #include "Components/ProgressBar.h"
 #include "Blueprint/UserWidget.h"
 #include "Character/GPCharacterMonster.h"
+#include "Character/Modules/GPMyplayerCameraHandler.h"
 #include "UI/GPCharacterStatusWidget.h"
 #include "GameFramework/PlayerController.h"
 
@@ -46,6 +47,15 @@ void UGPCharacterUIHandler::UpdateWidgetVisibility()
 
 	float Distance = FVector::Dist(Owner->GetActorLocation(), LocalPlayer->GetActorLocation());
 	bool bVisible = Distance <= Owner->CharacterInfo.CollisionRadius + LocalPlayer->CharacterInfo.AttackRadius;
+
+	AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(LocalPlayer);
+	if (LocalMyPlayer)
+	{
+		if (LocalMyPlayer->bIsGunnerCharacter() && !LocalMyPlayer->CameraHandler->IsZooming())
+		{
+			bVisible = Distance <= Owner->CharacterInfo.CollisionRadius;
+		}
+	}
 
 	ESlateVisibility Visibility = bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden;
 
