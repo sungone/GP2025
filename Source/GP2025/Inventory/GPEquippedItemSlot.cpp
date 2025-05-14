@@ -61,7 +61,6 @@ void UGPEquippedItemSlot::ClickEquippedItemSlot()
     SlotData = FSlotStruct();  
     CurrentItem = FGPItemStruct();  
     SetImage(); 
-
 }
 
 void UGPEquippedItemSlot::InitializeInventoryWidget()

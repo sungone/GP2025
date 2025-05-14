@@ -35,26 +35,14 @@ void UGPPlayerAppearanceHandler::ApplyCharacterPartsFromData(const UGPCharacterC
 		}
 	}
 
-	if (CharacterData->HeadMesh && Owner->HeadMesh)
+	if (CharacterData->HelmetMesh && Owner->HelmetMesh)
 	{
-		Owner->HeadMesh->SetSkeletalMesh(CharacterData->HeadMesh);
+		Owner->HelmetMesh->SetSkeletalMesh(CharacterData->HelmetMesh);
 	}
 
 	if (CharacterData->LegMesh && Owner->LegMesh)
 	{
 		Owner->LegMesh->SetSkeletalMesh(CharacterData->LegMesh);
-	}
-
-	if (CharacterData->HelmetMesh && Owner->Helmet)
-	{
-		Owner->Helmet->SetSkeletalMesh(CharacterData->HelmetMesh);
-		Owner->Helmet->AttachToComponent(Owner->BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("HelmetSocket"));
-		Owner->Helmet->SetVisibility(true);
-	}
-	else if (Owner->Helmet)
-	{
-		Owner->Helmet->SetSkeletalMesh(nullptr);
-		Owner->Helmet->SetVisibility(false);
 	}
 
 	EquipWeaponFromData(CharacterData);
@@ -80,7 +68,6 @@ void UGPPlayerAppearanceHandler::EquipWeaponFromData(const UGPCharacterControlDa
 		if (Owner->WeaponActor && Owner->BodyMesh && Owner->BodyMesh->DoesSocketExist(TEXT("WeaponSocket")))
 		{
 			Owner->WeaponActor->AttachToComponent(Owner->BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
-			Owner->WeaponActor->SetWeaponMesh(CharacterData->WeaponMesh);
 		}
 	}
 }
@@ -106,18 +93,16 @@ void UGPPlayerAppearanceHandler::EquipItemOnCharacter(FGPItemStruct& ItemData)
 	if (!Owner) return;
 
 	// Helmet 장착 처리
-	if (ItemData.Category == ECategory::helmet && Owner->Helmet)
+	if (ItemData.Category == ECategory::helmet && Owner->HelmetMesh)
 	{
-		Owner->Helmet->SetSkeletalMesh(ItemData.ItemSkeletalMesh);
-		Owner->Helmet->SetVisibility(ItemData.ItemSkeletalMesh != nullptr);
+		USkeletalMesh* MeshToApply = GetBodyMeshByCharacterType(ItemData, Owner->CurrentCharacterType);
+		if (!MeshToApply || !Owner->HelmetMesh) return;
 
-		if (Owner->BodyMesh && Owner->BodyMesh->DoesSocketExist(TEXT("HelmetSocket")))
-		{
-			Owner->Helmet->AttachToComponent(
-				Owner->BodyMesh,
-				FAttachmentTransformRules::SnapToTargetIncludingScale,
-				TEXT("HelmetSocket"));
-		}
+		Owner->HelmetMesh->SetSkeletalMesh(MeshToApply);
+		Owner->HelmetMesh->SetVisibility(MeshToApply != nullptr);
+
+		SetupLeaderPose();
+		AttachWeaponToBodyMesh();
 	}
 
 	// Chest 교체 시 메시만 바꿔끼움
@@ -136,8 +121,8 @@ void UGPPlayerAppearanceHandler::EquipItemOnCharacter(FGPItemStruct& ItemData)
 		SetupLeaderPose();
 		AttachWeaponToBodyMesh();
 
-		if (Owner->HeadMesh)
-			Owner->HeadMesh->SetRelativeLocation(FVector(0.f, 0.f, -4.f));
+		if (Owner->HelmetMesh)
+			Owner->HelmetMesh->SetRelativeLocation(FVector(0.f, 0.f, -4.f));
 	}
 
 	// 무기 교체
@@ -186,12 +171,17 @@ void UGPPlayerAppearanceHandler::UnequipItemFromCharacter(ECategory Category)
 	switch (Category)
 	{
 	case ECategory::helmet:
-		if (Owner->Helmet)
+	{
+		auto* ControlData = Owner->CharacterTypeManager.Find(Owner->CurrentCharacterType);
+		if (ControlData && *ControlData && (*ControlData)->IsValidLowLevelFast())
 		{
-			Owner->Helmet->SetSkeletalMesh(nullptr);
-			Owner->Helmet->SetVisibility(false);
+			Owner->HelmetMesh->SetSkeletalMesh((*ControlData)->HelmetMesh);
 		}
+
+		SetupLeaderPose();
+		AttachWeaponToBodyMesh();
 		break;
+	}
 
 	case ECategory::chest:
 	{
@@ -233,21 +223,13 @@ void UGPPlayerAppearanceHandler::SetupLeaderPose()
 		return;
 	}
 	 
-	if (Owner->HeadMesh)
+	if (Owner->HelmetMesh)
 	{
-		Owner->HeadMesh->SetLeaderPoseComponent(Owner->BodyMesh, true);
+		Owner->HelmetMesh->SetLeaderPoseComponent(Owner->BodyMesh, true);
 	}
 	if (Owner->LegMesh)
 	{
 		Owner->LegMesh->SetLeaderPoseComponent(Owner->BodyMesh, true);
-	}
-	if (Owner->Helmet)
-	{
-		if (Owner->BodyMesh->DoesSocketExist(TEXT("HelmetSocket")))
-		{
-			Owner->Helmet->AttachToComponent(Owner->BodyMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("HelmetSocket"));
-			Owner->Helmet->SetVisibility(true);
-		}
 	}
 }
 

@@ -37,16 +37,13 @@ public :
 	class UGPPlayerAppearanceHandler* AppearanceHandler;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts")
-	TObjectPtr<USkeletalMeshComponent> HeadMesh;
+	TObjectPtr<USkeletalMeshComponent> HelmetMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts")
 	TObjectPtr<USkeletalMeshComponent> BodyMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts")
 	TObjectPtr<USkeletalMeshComponent> LegMesh;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class USkeletalMeshComponent> Helmet;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class AGPWeaponBase> WeaponActor;

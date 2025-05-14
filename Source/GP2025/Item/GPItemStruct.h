@@ -95,9 +95,6 @@ public :
 	UStaticMesh* ItemStaticMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	USkeletalMesh* ItemSkeletalMesh;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	USkeletalMesh* ItemSkeletalMesh_Man;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")

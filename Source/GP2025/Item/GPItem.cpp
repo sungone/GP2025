@@ -22,9 +22,9 @@ AGPItem::AGPItem()
 	ItemStaticMesh->SetupAttachment(RootComponent);
 	ItemStaticMesh->SetCollisionProfileName(TEXT("NoCollision"));
 
-	ItemSkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ItemSkeletalMesh"));
-	ItemSkeletalMesh->SetupAttachment(RootComponent);
-	ItemSkeletalMesh->SetCollisionProfileName(TEXT("NoCollision"));
+	//ItemSkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ItemSkeletalMesh"));
+	//ItemSkeletalMesh->SetupAttachment(RootComponent);
+	//ItemSkeletalMesh->SetCollisionProfileName(TEXT("NoCollision"));
 
 	ItemInteractionWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("ItemInteractionWidgetComp"));
 	ItemInteractionWidgetComp->SetupAttachment(RootComponent);
@@ -142,13 +142,6 @@ void AGPItem::SetupItem(int32 NewItemID, uint8 NewItemtype, int32 NewAmount)
 	{
 		ItemStaticMesh->SetStaticMesh(ItemData->ItemStaticMesh);
 		ItemStaticMesh->SetVisibility(true);
-		ItemSkeletalMesh->SetVisibility(false);
-	}
-	else if (ItemData->ItemSkeletalMesh)
-	{
-		ItemSkeletalMesh->SetSkeletalMesh(ItemData->ItemSkeletalMesh);
-		ItemStaticMesh->SetVisibility(false);
-		ItemSkeletalMesh->SetVisibility(true);
 	}
 }
 

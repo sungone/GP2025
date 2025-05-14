@@ -18,14 +18,9 @@ AGPCharacterPlayer::AGPCharacterPlayer()
     BodyMesh->SetupAttachment(GetMesh());
     BodyMesh->SetCollisionProfileName(TEXT("NoCollision"));
 
-    Helmet = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Helmet"));
-    Helmet->SetupAttachment(BodyMesh, TEXT("HelmetSocket"));
-    Helmet->SetCollisionProfileName(TEXT("NoCollision"));
-    Helmet->SetVisibility(true);
-
-    HeadMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HeadMesh"));
-    HeadMesh->SetupAttachment(BodyMesh);
-    HeadMesh->SetRelativeLocation(FVector(0.f, 0.f, -4.0f));
+    HelmetMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HeadMesh"));
+    HelmetMesh->SetupAttachment(BodyMesh);
+    HelmetMesh->SetRelativeLocation(FVector(0.f, 0.f, -4.0f));
 
     LegMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LegMesh"));
     LegMesh->SetupAttachment(BodyMesh);

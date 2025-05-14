@@ -81,15 +81,8 @@ public:
 	UAnimMontage* DeadAnimMontage;
 
 	// 장비 아이템 설정
-	UPROPERTY(EditAnywhere, Category = "PlayerEquipment")
-	USkeletalMesh* HelmetMesh;
-
-	UPROPERTY(EditAnywhere, Category = "PlayerEquipment")
-	UStaticMesh* WeaponMesh;
-
-	// 플레이어 마스터 포즈 컴포넌트
 	UPROPERTY(EditAnywhere, Category = "PlayerMesh")
-	USkeletalMesh* HeadMesh;
+	USkeletalMesh* HelmetMesh;
 
 	UPROPERTY(EditAnywhere, Category = "PlayerMesh")
 	USkeletalMesh* BodyMesh;

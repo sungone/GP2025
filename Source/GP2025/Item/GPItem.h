@@ -27,8 +27,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	class UStaticMeshComponent* ItemStaticMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
-	class USkeletalMeshComponent* ItemSkeletalMesh;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+	//class USkeletalMeshComponent* ItemSkeletalMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	class UWidgetComponent* ItemInteractionWidgetComp;
