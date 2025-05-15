@@ -48,13 +48,22 @@ public:
 	void SetESkillMontage(UAnimMontage* Montage);
 	void SetRSkillMontage(UAnimMontage* Montage);
 
-	// <GunenrPlayer R>
+	// <GunenrPlayer R Skill Ability>
 	void ApplyAttackSpeedBoost(float BoostPlayRate, float Duration);
 	void ResetAttackSpeed();
-
 	float DefaultPlayRate = 2.0f;
-
 	FTimerHandle AttackSpeedResetTimer;
+
+
+	// <Warrior R Skil Ability>
+private:
+	int32 RemainingHits = 0;
+	float HitInterval = 0.5f; 
+	FTimerHandle MultiHitTimerHandle;
+
+public:
+	void PlayMultiHitSkill(int32 HitCount, float Interval);
+	void ExecuteMultiHit();
 
 private:
 	void PlaySkillMontage(UAnimMontage* SkillMontage);

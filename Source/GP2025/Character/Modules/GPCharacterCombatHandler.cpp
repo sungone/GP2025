@@ -2,9 +2,9 @@
 
 
 #include "Character/Modules/GPCharacterCombatHandler.h"
-#include "Character/GPCharacterBase.h"
 #include "Character/GPCharacterMyplayer.h"
 #include "Animation/AnimInstance.h"
+#include "Network/GPNetworkManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -116,6 +116,57 @@ void UGPCharacterCombatHandler::PlayESkillMontage()
 void UGPCharacterCombatHandler::PlayRSkillMontage()
 {
 	PlaySkillMontage(RSkillMontage);
+}
+
+void UGPCharacterCombatHandler::PlayMultiHitSkill(int32 HitCount, float Interval)
+{
+	if (!Owner) return;
+
+	// 기존 타이머가 남아있으면 제거
+	if (Owner->GetWorldTimerManager().IsTimerActive(MultiHitTimerHandle))
+	{
+		Owner->GetWorldTimerManager().ClearTimer(MultiHitTimerHandle);
+	}
+
+	// 초기화
+	RemainingHits = HitCount;
+	HitInterval = Interval;
+
+	// 첫 번째 공격 실행
+	ExecuteMultiHit();
+
+	// 이후 타이머로 반복 실행
+	Owner->GetWorldTimerManager().SetTimer(
+		MultiHitTimerHandle,
+		this,
+		&UGPCharacterCombatHandler::ExecuteMultiHit,
+		HitInterval,
+		true
+	);
+}
+
+void UGPCharacterCombatHandler::ExecuteMultiHit()
+{
+	if (RemainingHits <= 0)
+	{
+		// 공격이 끝났으면 타이머 해제
+		Owner->GetWorldTimerManager().ClearTimer(MultiHitTimerHandle);
+		return;
+	}
+
+	AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(Owner);
+	if (!LocalMyPlayer) return;
+
+	if (LocalMyPlayer && LocalMyPlayer->NetMgr)
+	{
+		FVector Location = LocalMyPlayer->GetActorLocation();
+		float Yaw = LocalMyPlayer->GetControlRotation().Yaw;
+
+		UE_LOG(LogTemp, Log, TEXT("MultiHit Attack: %d hits remaining"), RemainingHits);
+		LocalMyPlayer->NetMgr->SendMyUseSkill(ESkillGroup::Whirlwind, Yaw, Location);
+	}
+
+	RemainingHits--;
 }
 
 void UGPCharacterCombatHandler::PlaySkillMontage(UAnimMontage* SkillMontage)

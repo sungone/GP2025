@@ -413,8 +413,8 @@ void UGPMyplayerInputHandler::UseSkillR()
 	{
 		 // if (!Owner->CameraHandler->IsZooming()) return;
 
-		float BoostPlayRate = 4.0f;
-		float BoostDuration = 10.f;
+		float BoostPlayRate = 4.0f; // 공격속도 몽타지 증가 시간
+		float BoostDuration = 10.f; // 공격속도 증가 지속 시간
 		Owner->CombatHandler->ApplyAttackSpeedBoost(BoostPlayRate, BoostDuration);
 
 		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
@@ -425,9 +425,13 @@ void UGPMyplayerInputHandler::UseSkillR()
 	}
 	else
 	{
+		int32 HitCount = 3;      // 공격 횟수
+		float Interval = 0.4f;   // 공격 간격
+
 		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_R);
 		Owner->CombatHandler->PlayRSkillMontage();
-		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Whirlwind, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
+		// Owner->NetMgr->SendMyUseSkill(ESkillGroup::Whirlwind, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
+		Owner->CombatHandler->PlayMultiHitSkill(HitCount, Interval);
 	}
 }
