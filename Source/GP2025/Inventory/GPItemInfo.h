@@ -23,5 +23,4 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Item Info")
     void InitializeItemInfo(const FSlotStruct& NewSlotData);
-
 };

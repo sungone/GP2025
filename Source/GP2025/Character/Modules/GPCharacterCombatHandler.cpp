@@ -203,6 +203,35 @@ void UGPCharacterCombatHandler::SetRSkillMontage(UAnimMontage* Montage)
 	RSkillMontage = Montage;
 }
 
+void UGPCharacterCombatHandler::ApplyAttackSpeedBoost(float BoostPlayRate, float Duration)
+{
+	if (!Owner) return;
+
+	if (Owner->GetWorldTimerManager().IsTimerActive(AttackSpeedResetTimer))
+	{
+		Owner->GetWorldTimerManager().ClearTimer(AttackSpeedResetTimer);
+	}
+
+	// 공격 속도 증가
+	PlayRate = BoostPlayRate;
+	UE_LOG(LogTemp, Log, TEXT("Attack Speed Boosted to %f for %f seconds"), PlayRate, Duration);
+
+	// 일정 시간 후에 원래 속도로 복귀
+	Owner->GetWorldTimerManager().SetTimer(
+		AttackSpeedResetTimer,
+		this,
+		&UGPCharacterCombatHandler::ResetAttackSpeed,
+		Duration,
+		false
+	);
+}
+
+void UGPCharacterCombatHandler::ResetAttackSpeed()
+{
+	PlayRate = DefaultPlayRate;
+	UE_LOG(LogTemp, Log, TEXT("Attack Speed Reset to %f"), PlayRate);
+}
+
 void UGPCharacterCombatHandler::SetDeadMontage(UAnimMontage* Montage)
 {
 	DeadMontage = Montage;

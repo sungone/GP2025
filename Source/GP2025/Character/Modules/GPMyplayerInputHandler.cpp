@@ -413,8 +413,13 @@ void UGPMyplayerInputHandler::UseSkillR()
 	{
 		 // if (!Owner->CameraHandler->IsZooming()) return;
 
+		float BoostPlayRate = 4.0f;
+		float BoostDuration = 10.f;
+		Owner->CombatHandler->ApplyAttackSpeedBoost(BoostPlayRate, BoostDuration);
+
 		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_R);
+
 		Owner->CombatHandler->PlayRSkillMontage();
 		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Anger, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
 	}

@@ -48,6 +48,14 @@ public:
 	void SetESkillMontage(UAnimMontage* Montage);
 	void SetRSkillMontage(UAnimMontage* Montage);
 
+	// <GunenrPlayer R>
+	void ApplyAttackSpeedBoost(float BoostPlayRate, float Duration);
+	void ResetAttackSpeed();
+
+	float DefaultPlayRate = 2.0f;
+
+	FTimerHandle AttackSpeedResetTimer;
+
 private:
 	void PlaySkillMontage(UAnimMontage* SkillMontage);
 
@@ -72,7 +80,7 @@ public:
 
 private :
 	// AnimMontage PlayRate
-	const float PlayRate = 2.0f;
+	float PlayRate = 2.0f;
 private:
 	float DeadEventDelayTime = 0.5f;
 	bool bIsAutoAttacking = false;
