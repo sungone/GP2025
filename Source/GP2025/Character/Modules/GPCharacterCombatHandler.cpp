@@ -129,6 +129,9 @@ void UGPCharacterCombatHandler::StartDash()
 	// 이동을 막고, 이동 모드 변경
 	Owner->GetCharacterMovement()->DisableMovement();
 
+	// E 스킬 몽타지 재생
+	PlaySkillMontage(ESkillMontage);
+
 	// 일정 시간 후에 돌진 종료 및 스킬 애니메이션 재생
 	Owner->GetWorld()->GetTimerManager().SetTimer(
 		DashTimerHandle,
@@ -151,9 +154,9 @@ void UGPCharacterCombatHandler::FinishDash()
 
 	bIsDashing = false;
 	DashElapsedTime = 0.0f;
-	
+
 	// E 스킬 몽타지 재생
-	PlaySkillMontage(ESkillMontage);
+	//PlaySkillMontage(ESkillMontage);
 
 	// 공격 패킷 전송 (데미지 처리)
 	AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(Owner);
