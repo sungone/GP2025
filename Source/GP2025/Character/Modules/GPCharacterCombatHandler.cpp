@@ -118,6 +118,72 @@ void UGPCharacterCombatHandler::PlayRSkillMontage()
 	PlaySkillMontage(RSkillMontage);
 }
 
+void UGPCharacterCombatHandler::StartDash()
+{
+	if (!Owner) return;
+
+	FVector ForwardDirection = Owner->GetActorForwardVector();
+	DashStartLocation = Owner->GetActorLocation();
+	DashEndLocation = DashStartLocation + (ForwardDirection * DashDistance);
+
+	// 이동을 막고, 이동 모드 변경
+	Owner->GetCharacterMovement()->DisableMovement();
+
+	// 일정 시간 후에 돌진 종료 및 스킬 애니메이션 재생
+	Owner->GetWorld()->GetTimerManager().SetTimer(
+		DashTimerHandle,
+		this,
+		&UGPCharacterCombatHandler::UpdateDash,
+		0.01f, 
+		true
+	);
+}
+
+void UGPCharacterCombatHandler::FinishDash()
+{
+	if (!Owner) return;
+
+	//// 이동 모드 복원
+	Owner->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
+	UE_LOG(LogTemp, Log, TEXT("Dash finished, playing skill montage"));
+
+
+	bIsDashing = false;
+	DashElapsedTime = 0.0f;
+	
+	// E 스킬 몽타지 재생
+	PlaySkillMontage(ESkillMontage);
+
+	// 공격 패킷 전송 (데미지 처리)
+	AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(Owner);
+	if (LocalMyPlayer && LocalMyPlayer->NetMgr)
+	{
+		FVector Location = LocalMyPlayer->GetActorLocation();
+		float Yaw = LocalMyPlayer->GetControlRotation().Yaw;
+
+		LocalMyPlayer->NetMgr->SendMyUseSkill(ESkillGroup::Clash, Yaw, Location);
+	}
+}
+
+void UGPCharacterCombatHandler::UpdateDash()
+{
+	if (!Owner) return;
+
+	DashElapsedTime += 0.01f;
+
+	float Alpha = FMath::Clamp(DashElapsedTime / DashDuration, 0.0f, 1.0f);
+
+	FVector NewLocation = FMath::Lerp(DashStartLocation, DashEndLocation, Alpha);
+	Owner->SetActorLocation(NewLocation);
+
+	if (Alpha >= 1.0f)
+	{
+		Owner->GetWorld()->GetTimerManager().ClearTimer(DashTimerHandle);
+		FinishDash();
+	}
+}
+
 void UGPCharacterCombatHandler::PlayMultiHitSkill(int32 HitCount, float Interval)
 {
 	if (!Owner) return;
@@ -199,7 +265,14 @@ void UGPCharacterCombatHandler::PlaySkillMontage(UAnimMontage* SkillMontage)
 				if (CurrentSkillMontage == QSkillMontage)
 					Owner->CharacterInfo.RemoveState(STATE_SKILL_Q);
 				else if (CurrentSkillMontage == ESkillMontage)
+				{
 					Owner->CharacterInfo.RemoveState(STATE_SKILL_E);
+					if (Owner->CharacterInfo.CharacterType == static_cast<uint8>(Type::EPlayer::WARRIOR))
+					{
+						bIsDashing = false;
+						Owner->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+					}
+				}
 				else if (CurrentSkillMontage == RSkillMontage)
 					Owner->CharacterInfo.RemoveState(STATE_SKILL_R);
 			}
@@ -222,7 +295,13 @@ void UGPCharacterCombatHandler::OnSkillMontageEnded(UAnimMontage* Montage, bool 
 			Owner->CharacterInfo.RemoveState(STATE_SKILL_Q);
 
 		if (Owner->CharacterInfo.HasState(STATE_SKILL_E) && Montage == ESkillMontage)
+		{
 			Owner->CharacterInfo.RemoveState(STATE_SKILL_E);
+			if (Owner->CharacterInfo.CharacterType == static_cast<uint8>(Type::EPlayer::WARRIOR))
+			{
+				Owner->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+			}
+		}
 
 		if (Owner->CharacterInfo.HasState(STATE_SKILL_R) && Montage == RSkillMontage)
 			Owner->CharacterInfo.RemoveState(STATE_SKILL_R);

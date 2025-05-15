@@ -54,12 +54,26 @@ public:
 	float DefaultPlayRate = 2.0f;
 	FTimerHandle AttackSpeedResetTimer;
 
-
-	// <Warrior R Skil Ability>
+	// <Warrior R Skill Ability>
 private:
 	int32 RemainingHits = 0;
 	float HitInterval = 0.5f; 
 	FTimerHandle MultiHitTimerHandle;
+
+	// <Warrior E Skill Ability>
+private:
+	FTimerHandle DashTimerHandle;
+	bool bIsDashing = false;
+	float DashDistance = 600.f; // 돌진 거리
+	float DashDuration = 0.05f;   // 돌진 시간
+	float DashElapsedTime = 0.0f;
+	FVector DashStartLocation;
+	FVector DashEndLocation;
+
+public:
+	void StartDash();
+	void FinishDash();
+	void UpdateDash();
 
 public:
 	void PlayMultiHitSkill(int32 HitCount, float Interval);

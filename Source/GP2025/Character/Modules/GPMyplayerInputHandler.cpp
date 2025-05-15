@@ -386,8 +386,8 @@ void UGPMyplayerInputHandler::UseSkillE()
 
 		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_E);
-		Owner->CombatHandler->PlayESkillMontage();
-		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Clash, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
+		Owner->CombatHandler->StartDash(); // 여기서 공격 처리 중
+		// Owner->NetMgr->SendMyUseSkill(ESkillGroup::Clash, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
 	}
 
 }
@@ -430,8 +430,8 @@ void UGPMyplayerInputHandler::UseSkillR()
 
 		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_R);
-		Owner->CombatHandler->PlayRSkillMontage();
+		Owner->CombatHandler->PlayRSkillMontage(); 
 		// Owner->NetMgr->SendMyUseSkill(ESkillGroup::Whirlwind, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
-		Owner->CombatHandler->PlayMultiHitSkill(HitCount, Interval);
+		Owner->CombatHandler->PlayMultiHitSkill(HitCount, Interval); // 여기서 공격 처리 중
 	}
 }
