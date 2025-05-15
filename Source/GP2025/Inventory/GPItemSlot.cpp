@@ -254,3 +254,36 @@ void UGPItemSlot::SetOwningShop(UGPShop* InShop)
         ShopWidget = InShop;
     }
 }
+
+void UGPItemSlot::SetOwningNPC(AGPCharacterNPC* InNPC)
+{
+    OwningNPC = InNPC;
+
+    if (OwningNPC && OwningNPC->ShopWidget)
+    {
+        ShopWidget = Cast<UGPShop>(OwningNPC->ShopWidget);
+        if (ShopWidget)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Successfully set ShopWidget in GPItemSlot from NPC: %s"), *OwningNPC->GetName());
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("OwningNPC or ShopWidget is null"));
+    }
+}
+
+void UGPItemSlot::SetShopWidget(UGPShop* InShopWidget, AGPCharacterNPC* InNPC)
+{
+    if (InShopWidget)
+    {
+        ShopWidget = InShopWidget;
+        OwningNPC = InNPC;
+
+        UE_LOG(LogTemp, Warning, TEXT("Successfully set ShopWidget in GPItemSlot from NPC: %s"), *OwningNPC->GetName());
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Failed to set ShopWidget in GPItemSlot - InShopWidget is nullptr"));
+    }
+}

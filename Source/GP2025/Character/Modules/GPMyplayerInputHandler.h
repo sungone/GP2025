@@ -110,7 +110,6 @@ public :
 	UPROPERTY()
 	AActor* CurrentInteractionTarget = nullptr;
 
-
     void StartAiming();
     void StopAiming();
 

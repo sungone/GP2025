@@ -31,5 +31,9 @@
 			"Name": "RigLogic",
 			"Enabled": true
 		}
+	],
+	"TargetPlatforms": [
+		"Windows",
+		"Android"
 	]
 }

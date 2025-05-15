@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Item/GPItemStruct.h"
 #include "GPShop.generated.h"
+
 
 /**
  *
@@ -79,4 +81,10 @@ public:
 
 	/** 상점 아이템 슬롯을 생성하는 함수 */
 	void PopulateShopItems();
+
+	// 어떤 상점인지 지정
+	UPROPERTY(BlueprintReadOnly, Category = "Shop")
+	EShopType CurrentShopType = EShopType::NONE;
+
+	void SetShopType(EShopType NewShopType);
 };

@@ -10,8 +10,10 @@ UENUM(BlueprintType)
 enum class ENPCType : uint8
 {
 	NONE       UMETA(DisplayName = "None"),
-	SHOP       UMETA(DisplayName = "ShopNPC"),
-	QUEST      UMETA(DisplayName = "QuestNPC"),
+	GSSHOP     UMETA(DisplayName = "GSShop"),
+	SUITSHOP   UMETA(DisplayName = "SuitShop"),
+	JUICESHOP  UMETA(DisplayName = "JuiceShop"),
+	QUEST      UMETA(DisplayName = "QuestNPC")
 };
 
 /**

@@ -66,4 +66,13 @@ public:
     void UpdatePlayerEquippedItemSlot(class AGPCharacterPlayer* Player);
 
     void SetOwningShop(UGPShop* InShop);
+
+
+    // Shop
+    UPROPERTY()
+    class AGPCharacterNPC* OwningNPC;
+
+    void SetOwningNPC(AGPCharacterNPC* InNPC);
+
+    void SetShopWidget(UGPShop* InShopWidget, AGPCharacterNPC* InNPC);
 };

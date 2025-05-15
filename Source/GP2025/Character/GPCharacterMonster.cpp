@@ -9,6 +9,8 @@
 #include "UI/GPLevelWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
+#include "UI/GPWidgetComponent.h"
+#include "Components/SceneComponent.h"
 
 AGPCharacterMonster::AGPCharacterMonster()
 {

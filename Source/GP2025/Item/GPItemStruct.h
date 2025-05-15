@@ -29,6 +29,15 @@ enum class EAbilityType : uint8
 	Gold UMETA(DisplayName = "Gold Bonus")
 };
 
+UENUM()
+enum class EShopType : uint8
+{
+	NONE       UMETA(DisplayName = "None"),
+	GSSHOP     UMETA(DisplayName = "GS Shop"),
+	SUITSHOP   UMETA(DisplayName = "Suit Shop"),
+	JUICESHOP  UMETA(DisplayName = "Juice Shop"),
+};
+
 USTRUCT(BlueprintType)
 struct FGPItemStruct : public FTableRowBase
 {
@@ -100,4 +109,6 @@ public :
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	USkeletalMesh* ItemSkeletalMesh_Woman;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shop")
+	EShopType ShopType = EShopType::NONE;
 };

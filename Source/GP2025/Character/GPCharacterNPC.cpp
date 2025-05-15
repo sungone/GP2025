@@ -11,6 +11,7 @@
 #include "Character/Modules/GPMyplayerInputHandler.h"
 #include "Character/Modules/GPMyplayerCameraHandler.h"
 #include "UI/GPQuestWidget.h"
+#include "Inventory/GPItemSlot.h"
 #include "Kismet/GameplayStatics.h"
 #include "Character/Modules/GPMyplayerUIManager.h"
 #include "Character/GPCharacterMyplayer.h"
@@ -71,16 +72,60 @@ void AGPCharacterNPC::OpenShopUI(APlayerController* PlayerController)
 		ShopWidget = CreateWidget<UUserWidget>(PlayerController, ShopWidgetClass);
 		if (ShopWidget)
 		{
-			ShopWidget->AddToViewport();
+			AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(PlayerController->GetPawn());
+
 			if (UGPShop* LocalShopWidget = Cast<UGPShop>(ShopWidget))
 			{
-				LocalShopWidget->SetOwningNPC(this);
-				AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(PlayerController->GetPawn());
+				LocalShopWidget->SetOwningNPC(this);  // Owning NPC ¼³Á¤
+
 				if (MyPlayer)
 				{
 					LocalShopWidget->SetMyPlayer(MyPlayer);
 				}
+
+				EShopType ShopType = static_cast<EShopType>(NPCType);
+				LocalShopWidget->SetShopType(ShopType);
+
+				if (!LocalShopWidget->ItemDataTable)
+				{
+					FString DataTablePath = "/Game/Item/GPItemTable.GPItemTable";
+					LocalShopWidget->ItemDataTable = Cast<UDataTable>(
+						StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath)
+					);
+
+					if (!LocalShopWidget->ItemDataTable)
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Failed to load DataTable: %s"), *DataTablePath);
+					}
+					else
+					{
+						UE_LOG(LogTemp, Log, TEXT("ItemDataTable successfully loaded: %s"), *DataTablePath);
+					}
+				}
+
+				if (!LocalShopWidget->SlotClass)
+				{
+					static const FString SlotClassPath = "/Game/Shop/Widgets/WBP_SlotForShop.WBP_SlotForShop_C";
+					UClass* LoadedSlotClass = Cast<UClass>(
+						StaticLoadObject(UClass::StaticClass(), nullptr, *SlotClassPath)
+					);
+
+					if (LoadedSlotClass)
+					{
+						LocalShopWidget->SlotClass = LoadedSlotClass;
+						UE_LOG(LogTemp, Log, TEXT("SlotClass successfully loaded: %s"), *SlotClassPath);
+					}
+					else
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Failed to load SlotClass: %s"), *SlotClassPath);
+						LocalShopWidget->SlotClass = UGPItemSlot::StaticClass(); 
+					}
+				}
+
+				LocalShopWidget->PopulateShopItems();
 			}
+
+			ShopWidget->AddToViewport();
 		}
 	}
 
@@ -180,7 +225,13 @@ void AGPCharacterNPC::OnInteractionExit(UPrimitiveComponent* OverlappedComp, AAc
 	{
 		switch (NPCType)
 		{
-		case ENPCType::SHOP:
+		case ENPCType::GSSHOP:
+			CloseShopUI();
+			break;
+		case ENPCType::SUITSHOP:
+			CloseShopUI();
+			break;
+		case ENPCType::JUICESHOP:
 			CloseShopUI();
 			break;
 		case ENPCType::QUEST:
@@ -208,7 +259,15 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 
 	switch (NPCType)
 	{
-	case ENPCType::SHOP:
+	case ENPCType::GSSHOP:
+		OpenShopUI(PC);
+		bIsInteracting = true;
+		break;
+	case ENPCType::SUITSHOP:
+		OpenShopUI(PC);
+		bIsInteracting = true;
+		break;
+	case ENPCType::JUICESHOP:
 		OpenShopUI(PC);
 		bIsInteracting = true;
 		break;
@@ -233,7 +292,13 @@ void AGPCharacterNPC::ExitInteraction()
 
 	switch (NPCType)
 	{
-	case ENPCType::SHOP:
+	case ENPCType::GSSHOP:
+		CloseShopUI();
+		break;
+	case ENPCType::SUITSHOP:
+		CloseShopUI();
+		break;
+	case ENPCType::JUICESHOP:
 		CloseShopUI();
 		break;
 	case ENPCType::QUEST:

@@ -66,17 +66,14 @@ void UGPCharacterUIHandler::UpdateWidgetVisibility()
 
 	if (bIsGunnerZooming)
 	{
-		float MinScaleDistance = 300.0f;  // 최대 크기 거리
-		float MaxScaleDistance = 5000.0f; // 최소 크기 거리
+		float MinScaleDistance = 300.0f;   
+		float MaxScaleDistance = 5000.0f; 
 
-		float DistanceFactor = FMath::Clamp((Distance - MinScaleDistance) / (MaxScaleDistance - MinScaleDistance), 0.0f, 1.0f);
+		float DistanceFactor = FMath::Clamp((MaxScaleDistance - Distance) / (MaxScaleDistance - MinScaleDistance), 0.0f, 1.0f);
 
-		// ✅ 가까울 때 커지고, 멀리 있을 때 작아지도록 설정
-		float ScaleFactor = FMath::Clamp(
-			2.0f - DistanceFactor * 1.9f,  // 2.0f에서 0.1f까지 감소
-			0.1f,  // 최소 크기 (멀리 있을 때)
-			2.0f   // 최대 크기 (가까이 있을 때)
-		);
+		float ScaleFactor = FMath::Lerp(0.0001f , 1.f, DistanceFactor);
+
+		UE_LOG(LogTemp, Log, TEXT("Distance: %.2f | DistanceFactor: %.2f | ScaleFactor: %.2f"), Distance, DistanceFactor, ScaleFactor);
 
 		CharacterStatusWidget->SetRelativeScale3D(FVector(ScaleFactor, ScaleFactor, ScaleFactor));
 	}

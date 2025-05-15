@@ -24,7 +24,7 @@ void UGPShop::NativeConstruct()
 		BuyButton->OnClicked.AddDynamic(this, &UGPShop::OnBuyItemClicked);
 	}
 
-	PopulateShopItems();
+	// PopulateShopItems();
 	if (UGPNetworkManager* Mgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>())
 	{
 		Mgr->OnBuyItemResult.AddDynamic(this, &UGPShop::HandleBuyItemResult);
@@ -148,29 +148,71 @@ void UGPShop::SetCurrentSlot(UGPItemSlot* InSlot)
 
 void UGPShop::PopulateShopItems()
 {
-	if (!ItemDataTable || !SlotClass || !ItemWrapBox) return;
+	UE_LOG(LogTemp, Log, TEXT("PopulateShopItems Called - ShopType: %d"), static_cast<int32>(CurrentShopType));
+
+	if (!ItemDataTable)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ItemDataTable is nullptr"));
+		return;
+	}
+
+	if (!SlotClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SlotClass is nullptr"));
+		return;
+	}
+
+	if (!ItemWrapBox)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ItemWrapBox is nullptr"));
+		return;
+	}
+
 	ItemWrapBox->ClearChildren();
 
 	TArray<FName> RowNames = ItemDataTable->GetRowNames();
+	if (RowNames.Num() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No items found in ItemDataTable"));
+		return;
+	}
+
 	for (const FName& RowName : RowNames)
 	{
-		// 아이템 데이터 가져오기
 		FGPItemStruct* ItemData = ItemDataTable->FindRow<FGPItemStruct>(RowName, TEXT("PopulateShopItems"));
 		if (!ItemData) continue;
 
-		// 슬롯 생성
-		UGPItemSlot* NewSlot = CreateWidget<UGPItemSlot>(this, SlotClass);
-		if (!NewSlot) continue;
+		UE_LOG(LogTemp, Log, TEXT("Item: %s | ShopType: %d"), *ItemData->ItemName.ToString(), static_cast<int32>(ItemData->ShopType));
 
-		NewSlot->SetOwningShop(this);
-		NewSlot->SlotOwnerType = ESlotOwnerType::Shop;
-		NewSlot->SlotData.ItemID.DataTable = ItemDataTable;
-		NewSlot->SlotData.ItemID.RowName = RowName;
-		NewSlot->SlotData.Quantity = 1;
-		NewSlot->CurrentItem = *ItemData;
-		NewSlot->SlotData.ItemUniqueID = 1;
+		if (ItemData->ShopType == CurrentShopType)
+		{
+			UGPItemSlot* NewSlot = CreateWidget<UGPItemSlot>(this, SlotClass);
+			if (!SlotClass)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("SlotClass is nullptr - Unable to create UGPItemSlot"));
+				return;
+			}
 
-		// WrapBox에 추가
-		ItemWrapBox->AddChild(NewSlot);
+			if (!NewSlot) continue;
+
+			NewSlot->SetOwningShop(this);
+			NewSlot->SetOwningNPC(OwningNPC); 
+			NewSlot->SlotOwnerType = ESlotOwnerType::Shop;
+			NewSlot->SlotData.ItemID.DataTable = ItemDataTable;
+			NewSlot->SlotData.ItemID.RowName = RowName;
+			NewSlot->SlotData.Quantity = 1;
+			NewSlot->CurrentItem = *ItemData;
+
+			ItemWrapBox->AddChild(NewSlot);
+
+			UE_LOG(LogTemp, Log, TEXT("Added Item: %s to Shop"), *ItemData->ItemName.ToString());
+		}
 	}
+
+	ItemWrapBox->SetVisibility(ESlateVisibility::Visible);
+}
+void UGPShop::SetShopType(EShopType NewShopType)
+{
+	CurrentShopType = NewShopType;
+	UE_LOG(LogTemp, Log, TEXT("SetShopType - CurrentShopType: %d"), static_cast<int32>(CurrentShopType));
 }

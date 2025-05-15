@@ -142,19 +142,19 @@ float UGPSkillCoolDownHandler::GetTotalCooldownTime(ESkillGroup SkillGroup, int3
 {
     if (!IsValid(this))
     {
-        UE_LOG(LogTemp, Error, TEXT("[GetTotalCooldownTime] THIS is invalid!"));
+        //UE_LOG(LogTemp, Error, TEXT("[GetTotalCooldownTime] THIS is invalid!"));
         return 0.f;
     }
 
     if (!IsValid(Owner))
     {
-        UE_LOG(LogTemp, Error, TEXT("[GetTotalCooldownTime] Owner is invalid!"));
+        //UE_LOG(LogTemp, Error, TEXT("[GetTotalCooldownTime] Owner is invalid!"));
         return 0.f;
     }
 
     if (SkillCooldownTimes.Num() == 0)
     {
-        UE_LOG(LogTemp, Warning, TEXT("[GetTotalCooldownTime] SkillCooldownTimes is EMPTY!"));
+        //UE_LOG(LogTemp, Warning, TEXT("[GetTotalCooldownTime] SkillCooldownTimes is EMPTY!"));
         const_cast<UGPSkillCoolDownHandler*>(this)->Init(Owner);
     }
 
@@ -163,7 +163,7 @@ float UGPSkillCoolDownHandler::GetTotalCooldownTime(ESkillGroup SkillGroup, int3
 
     if (!CooldownTime)
     {
-        UE_LOG(LogTemp, Warning, TEXT("[GetTotalCooldownTime] Cooldown data NOT FOUND! SkillGroup: %d, SkillLevel: %d"), SkillGroup, SkillLevel);
+        //UE_LOG(LogTemp, Warning, TEXT("[GetTotalCooldownTime] Cooldown data NOT FOUND! SkillGroup: %d, SkillLevel: %d"), SkillGroup, SkillLevel);
         return 0.f;
     }
 
