@@ -214,7 +214,9 @@ void Player::ExecuteSkillEffect(const FSkillTableData& skill)
 		float prevAtkR = _info.AttackRadius;
 		float prevFov = _info.fovAngle;
 
-		_stats.Damage += skill.Value0;
+		float percent = skill.Value0;
+		_stats.Damage += static_cast<int>(_stats.Damage * (percent / 100.0f));
+
 
 		switch (skill.Type1)
 		{
