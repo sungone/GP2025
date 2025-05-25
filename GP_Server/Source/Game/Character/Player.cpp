@@ -221,13 +221,11 @@ void Player::ExecuteSkillEffect(const FSkillTableData& skill)
 		switch (skill.Type1)
 		{
 		case ESkillType::Dash:
-			//myplayer위치는 서버가 바꿔도 클라가 movepkt보내면
-			//값이 덮어씌워져서 서버가 처리하는건 소용없음..
-			//클라에서 처리해줘야함
 			_info.SetLocation(_info.Pos + _info.GetFrontVector() * skill.Value1);
 			break;
 		case ESkillType::RangeAtk:
-			_info.AttackRadius += 100.f * skill.Value1;
+			_info.AttackRadius = 100.f * skill.Value1;
+			_info.fovAngle = 360;
 			break;
 		case ESkillType::SectorAtk:
 			_info.fovAngle += skill.Value1;
@@ -236,9 +234,12 @@ void Player::ExecuteSkillEffect(const FSkillTableData& skill)
 			break;
 		}
 		GameWorld::GetInst().PlayerAttack(_id);
-		_stats.Damage = prevDmg;
-		_info.AttackRadius = prevAtkR;
-		_info.fovAngle = prevFov;
+		ResetSkillEffect(prevDmg, prevAtkR, prevFov);
+		//TimerQueue::AddTimer([=] {
+		//	if (auto player = GameWorld::GetInst().GetPlayerByID(_id)) {
+		//		player->ResetSkillEffect(prevDmg, prevAtkR, prevFov);
+		//	}
+		//	}, 1000, true);
 	}
 	else if (skill.Type0 == ESkillType::BuffTime)
 	{
@@ -249,6 +250,13 @@ void Player::ExecuteSkillEffect(const FSkillTableData& skill)
 		}
 
 	}
+}
+
+void Player::ResetSkillEffect(float prevDmg, float prevAtkR, float prevFov)
+{
+	_stats.Damage = prevDmg;
+	_info.AttackRadius = prevAtkR;
+	_info.fovAngle = prevFov;
 }
 
 void Player::LearnSkill(ESkillGroup groupId)
@@ -340,7 +348,6 @@ void Player::UseItem(uint32 itemId)
 	if (!targetItem) return;
 
 	const ItemStats& stats = targetItem->GetStats();
-	const ItemMeta& meta = targetItem->GetMeta();
 	const EAbilityType ability = targetItem->GetAbilityType();
 	const float value = targetItem->GetAbilityValue();
 

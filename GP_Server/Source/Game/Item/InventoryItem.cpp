@@ -19,12 +19,6 @@ InventoryItem::InventoryItem(uint32 itemId, uint8 itemType)
 		data->MoveSpeed
 	);
 
-	_meta = ItemMeta(
-		data->FromMonster,
-		data->ResellPrice,
-		data->bSellable,
-		data->bBuyable
-	);
 	_abilityType = data->AbilityType;
 	_abilityValue = data->AbilityValue;
 }

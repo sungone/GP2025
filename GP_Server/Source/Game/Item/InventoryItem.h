@@ -14,18 +14,6 @@ struct ItemStats
 	}
 };
 
-struct ItemMeta
-{
-	bool fromMonster;
-	int resellPrice;
-	bool isSellable;
-	bool isBuyable;
-
-	ItemMeta(bool fromMob = false, int resell = 0, bool sellable = false, bool buyable = false)
-		: fromMonster(fromMob), resellPrice(resell), isSellable(sellable), isBuyable(buyable) {
-	}
-};
-
 class InventoryItem : public Item
 {
 public:
@@ -33,13 +21,11 @@ public:
 	InventoryItem(uint32 itemId, uint8 itemType);
 	WorldItem ToWorldItem() const;
 	const ItemStats& GetStats() const { return _stats; }
-	const ItemMeta& GetMeta() const { return _meta; }
 	EAbilityType GetAbilityType() const { return _abilityType; }
 	float GetAbilityValue() const { return _abilityValue; }
 
 private:
 	ItemStats _stats;
-	ItemMeta _meta;
 	EAbilityType _abilityType;
 	float _abilityValue;
 };

@@ -23,6 +23,7 @@ public:
 
 	void UseSkill(ESkillGroup groupId);
 	void ExecuteSkillEffect(const FSkillTableData& skill);
+	void ResetSkillEffect(float prevDmg, float prevAtkR, float prevFov);
 	void LearnSkill(ESkillGroup groupId);
 	void UpgradeSkill(ESkillGroup groupId);
 	void UnlockSkillsOnLevelUp();
