@@ -1,10 +1,10 @@
 #include "pch.h"
 #include "Inventory.h"
 
-bool Inventory::AddInventoryItem(const InventoryItem& item)
+bool Inventory::AddInventoryItem(const Item& item)
 {
     int itemType = item.GetItemTypeID();
-    _slots[itemType].slotItems.emplace_back(std::make_shared<InventoryItem>(item));
+    _slots[itemType].slotItems.emplace_back(std::make_shared<Item>(item));
     return true;
 }
 
@@ -25,7 +25,7 @@ bool Inventory::RemoveInventoryItemById(uint32 itemId)
     return false;
 }
 
-std::shared_ptr<InventoryItem> Inventory::FindInventoryItemById(uint32_t itemId)
+std::shared_ptr<Item> Inventory::FindInventoryItemById(uint32_t itemId)
 {
     for (auto& [itemType, slot] : _slots)
     {

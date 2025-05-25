@@ -260,7 +260,7 @@ void PacketManager::HandleDropItemPacket(int32 sessionId, Packet* packet)
 {
 	IDPacket* p = static_cast<IDPacket*>(packet);
 	auto itemid = p->Data;
-	_gameWorld.DropInventoryItem(sessionId, itemid);
+	//_gameWorld.DropInventoryItem(sessionId, itemid);
 }
 
 void PacketManager::HandleUseItemPacket(int32 sessionId, Packet* packet)

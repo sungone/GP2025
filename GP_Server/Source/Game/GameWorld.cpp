@@ -434,19 +434,6 @@ void GameWorld::PickUpWorldItem(int32 playerId, uint32 itemId)
 	}
 }
 
-void GameWorld::DropInventoryItem(int32 playerId, uint32 itemId)
-{
-	auto player = GetPlayerByID(playerId);
-	if (!player)
-	{
-		LOG(Warning, "Invalid");
-		return;
-	}
-
-	WorldItem dropedItem = player->DropItem(itemId);
-	SpawnWorldItem(dropedItem);
-}
-
 void GameWorld::UseInventoryItem(int32 playerId, uint32 itemId)
 {
 	auto player = GetPlayerByID(playerId);

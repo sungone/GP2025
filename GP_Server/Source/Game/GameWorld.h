@@ -31,7 +31,6 @@ public:
 
 	// Inventory
 	void PickUpWorldItem(int32 playerId, uint32 itemId);
-	void DropInventoryItem(int32 playerId, uint32 itemId);
 	void UseInventoryItem(int32 playerId, uint32 itemId);
 	void EquipInventoryItem(int32 playerId, uint32 itemId);
 	void UnequipInventoryItem(int32 playerId, uint32 itemId);

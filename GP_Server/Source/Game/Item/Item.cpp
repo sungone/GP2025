@@ -1,7 +1,27 @@
 #include "pch.h"
 #include "Item.h"
-#include "InventoryItem.h"
 
+Item::Item(uint32 itemID, uint8 itemTypeID)
+	: _itemID(itemID), _itemTypeID(itemTypeID)
+{
+	auto data = ItemTable::GetInst().GetItemByTypeId(itemTypeID);
+	if (!data)
+	{
+		LOG(Warning, "Invaild");
+		return;
+	}
+
+	_stats = ItemStats(
+		static_cast<int>(data->Damage),
+		static_cast<int>(data->Hp),
+		data->CrtRate,
+		data->DodgeRate,
+		data->MoveSpeed
+	);
+
+	_abilityType = data->AbilityType;
+	_abilityValue = data->AbilityValue;
+}
 
 WorldItem::WorldItem(uint8 itemTypeID)
 {
@@ -88,10 +108,4 @@ Type::EUseable WorldItem::GetRandomGold()
 			static_cast<uint8>(Type::EUseable::GOLD_LAST)
 		)
 		);
-}
-
-InventoryItem WorldItem::ToInventoryItem() const
-{
-	InventoryItem invItem(_itemID, _itemTypeID);
-	return invItem;
 }

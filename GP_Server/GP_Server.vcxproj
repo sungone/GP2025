@@ -183,7 +183,6 @@
     <ClInclude Include="Source\Game\DataTable\QuestTable.h" />
     <ClInclude Include="Source\Game\GameWorld.h" />
     <ClInclude Include="Source\Game\Item\Inventory.h" />
-    <ClInclude Include="Source\Game\Item\InventoryItem.h" />
     <ClInclude Include="Source\Game\Item\Item.h" />
     <ClInclude Include="Source\Game\Map\BoundingBox.h" />
     <ClInclude Include="Source\Game\Map\MapZone.h" />
@@ -214,7 +213,6 @@
     <ClCompile Include="Source\Game\DataTable\QuestTable.cpp" />
     <ClCompile Include="Source\Game\GameWorld.cpp" />
     <ClCompile Include="Source\Game\Item\Inventory.cpp" />
-    <ClCompile Include="Source\Game\Item\InventoryItem.cpp" />
     <ClCompile Include="Source\Game\Item\Item.cpp" />
     <ClCompile Include="Source\Game\Map\BoundingBox.cpp" />
     <ClCompile Include="Source\Game\Map\MapZone.cpp" />

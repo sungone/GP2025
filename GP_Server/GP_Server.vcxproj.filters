@@ -136,9 +136,6 @@
     <ClInclude Include="Source\Utils\TimerQueue.h">
       <Filter>Source Files\Utils\Timer</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Game\Item\InventoryItem.h">
-      <Filter>Source Files\Game\GameObjects\Item</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Game\DataTable\ItemTable.h">
       <Filter>Source Files\Game\DataTable</Filter>
     </ClInclude>
@@ -218,9 +215,6 @@
     </ClCompile>
     <ClCompile Include="Source\Utils\TimerQueue.cpp">
       <Filter>Source Files\Utils\Timer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Game\Item\InventoryItem.cpp">
-      <Filter>Source Files\Game\GameObjects\Item</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\DataTable\ItemTable.cpp">
       <Filter>Source Files\Game\DataTable</Filter>

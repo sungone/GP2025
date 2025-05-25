@@ -135,8 +135,7 @@ bool Player::BuyItem(WorldItem item, uint32 price, uint16 quantity)
 		LOG("Not enough gold");
 		return false;
 	}
-	auto invItem = item.ToInventoryItem();
-	return _inventory.AddInventoryItem(invItem);
+	return _inventory.AddInventoryItem(item);
 }
 
 bool Player::SellItem(uint32 itemId)
@@ -186,18 +185,7 @@ bool Player::TakeWorldItem(const std::shared_ptr<WorldItem> item)
 	float detectDist = 500.f;
 	if (!IsCollision(item->GetPos(), detectDist))
 		return false;
-	auto invItem = item->ToInventoryItem();
-	return _inventory.AddInventoryItem(invItem);
-}
-
-WorldItem Player::DropItem(uint32 itemId)
-{
-	auto targetItem = _inventory.FindInventoryItemById(itemId);
-	WorldItem dropedItem = targetItem->ToWorldItem();
-	_inventory.RemoveInventoryItemById(itemId);
-	auto dropPos = _info.Pos + _info.GetFrontVector() * 100;
-	dropedItem.SetPos(dropPos);
-	return dropedItem;
+	return _inventory.AddInventoryItem(*item);
 }
 
 bool Player::Attack(std::shared_ptr<Character> target)
