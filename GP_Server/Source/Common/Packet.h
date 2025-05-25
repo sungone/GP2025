@@ -348,7 +348,15 @@ namespace ItemPkt
 			Header.PacketSize = sizeof(AddInventoryPacket);
 		}
 	};
-
+	struct RemoveInventoryPacket : public Packet
+	{
+		uint32 ItemID;
+		RemoveInventoryPacket(uint32 itemId)
+			: Packet(EPacketType::S_REMOVE_INVENTORY_ITEM), ItemID(itemId)
+		{
+			Header.PacketSize = sizeof(RemoveInventoryPacket);
+		}
+	};
 	struct ItemUsedPacket : public Packet
 	{
 		uint32 ItemID;
@@ -482,12 +490,9 @@ struct BuyItemResultPacket : public Packet
 struct SellItemPacket : public Packet
 {
 	uint32 ItemID;
-	uint16 Quantity;
-
-	SellItemPacket(uint32 itemId, uint16 qty)
+	SellItemPacket(uint32 itemId)
 		: Packet(EPacketType::C_SHOP_SELL_ITEM)
 		, ItemID(itemId)
-		, Quantity(qty)
 	{
 		Header.PacketSize = sizeof(SellItemPacket);
 	}

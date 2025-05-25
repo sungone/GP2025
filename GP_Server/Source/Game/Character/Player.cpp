@@ -139,6 +139,48 @@ bool Player::BuyItem(WorldItem item, uint32 price, uint16 quantity)
 	return _inventory.AddInventoryItem(invItem);
 }
 
+bool Player::SellItem(uint32 itemId)
+{
+	bool bSuccess = false;
+	DBResultCode resultCode = DBResultCode::SUCCESS;
+	uint32 resellPrice = 0;
+
+	auto item = _inventory.FindInventoryItemById(itemId);
+	if (!item)
+	{
+		LOG(Warning, "Invalid item");
+		resultCode = DBResultCode::ITEM_NOT_FOUND;
+	}
+	else
+	{
+		auto itemType = item->GetItemTypeID();
+		auto itemData = ItemTable::GetInst().GetItemByTypeId(itemType);
+
+		if (!itemData)
+		{
+			LOG(Warning, "Invalid item data");
+			resultCode = DBResultCode::ITEM_NOT_FOUND;
+		}
+		else if (!_inventory.RemoveInventoryItemById(itemId))
+		{
+			LOG(Warning, "Failed remove item");
+			resultCode = DBResultCode::ITEM_NOT_FOUND;
+		}
+		else
+		{
+			auto pkt = ItemPkt::RemoveInventoryPacket(itemId);
+			SessionManager::GetInst().SendPacket(_id, &pkt);
+			resellPrice = itemData->ResellPrice;
+			AddGold(resellPrice);
+			bSuccess = true;
+		}
+	}
+	uint32 curgold = GetGold();
+	auto respkt = SellItemResultPacket(bSuccess, resultCode, curgold);
+	SessionManager::GetInst().SendPacket(_id, &respkt);
+	return bSuccess;
+}
+
 bool Player::TakeWorldItem(const std::shared_ptr<WorldItem> item)
 {
 	float detectDist = 500.f;
@@ -240,6 +282,8 @@ void Player::ExecuteSkillEffect(const FSkillTableData& skill)
 		//		player->ResetSkillEffect(prevDmg, prevAtkR, prevFov);
 		//	}
 		//	}, 1000, true);
+		// Todo: 스킬 개선
+		// R스킬 여러번 보내는듯해서 타이머 여러번 호출되면 꼬인다..
 	}
 	else if (skill.Type0 == ESkillType::BuffTime)
 	{

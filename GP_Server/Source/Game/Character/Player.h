@@ -17,6 +17,8 @@ public:
 	void RemovePlayerFromViewList(std::shared_ptr<Character> player);
 
 	bool BuyItem(WorldItem item, uint32 price, uint16 quantity);
+	bool SellItem(uint32 itemId);
+
 	bool TakeWorldItem(const std::shared_ptr<WorldItem> item);
 	WorldItem DropItem(uint32 itemId);
 	bool Attack(std::shared_ptr<Character> target);

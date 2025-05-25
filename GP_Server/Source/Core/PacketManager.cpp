@@ -308,7 +308,7 @@ void PacketManager::HandleShopBuyItemPacket(int32 sessionId, Packet* packet)
 void PacketManager::HandleShopSellItemPacket(int32 sessionId, Packet* packet)
 {
 	auto* p = static_cast<SellItemPacket*>(packet);
-
+	_gameWorld.SellItem(sessionId, p->ItemID);
 }
 
 void PacketManager::HandleRequestQuestPacket(int32 sessionId, Packet* packet)

@@ -722,3 +722,14 @@ void GameWorld::BuyItem(int32 playerId, uint8 itemType, uint16 quantity)
 	}
 }
 
+void GameWorld::SellItem(int32 playerId, uint32 itemId)
+{
+	auto player = GetPlayerByID(playerId);
+	if (!player)
+	{
+		LOG(Warning, "Invalid player");
+		return;
+	}
+	player->SellItem(itemId);
+}
+

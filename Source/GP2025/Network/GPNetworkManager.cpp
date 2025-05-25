@@ -237,9 +237,9 @@ void UGPNetworkManager::SendMyShopBuyItem(uint8 ItemTypeID, int32 Quantity)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendMyShopSellItem(int32 ItemID, int32 Quantity)
+void UGPNetworkManager::SendMyShopSellItem(int32 ItemID)
 {
-	SellItemPacket Packet(ItemID, Quantity);
+	SellItemPacket Packet(ItemID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
