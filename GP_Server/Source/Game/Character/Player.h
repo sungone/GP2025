@@ -1,6 +1,7 @@
 #pragma once
 #include "Character.h"
 #include "Inventory.h"
+#include "WorldItem.h"
 
 class Player : public Character
 {
@@ -16,7 +17,8 @@ public:
 	void RemoveMonsterFromViewList(std::shared_ptr<Character> monster);
 	void RemovePlayerFromViewList(std::shared_ptr<Character> player);
 
-	bool BuyItem(WorldItem item, uint32 price, uint16 quantity);
+	bool AddInventoryItem(std::shared_ptr<Item> item);
+	bool BuyItem(std::shared_ptr<Item> item, uint32 price, uint16 quantity);
 	bool SellItem(uint32 itemId);
 
 	bool TakeWorldItem(const std::shared_ptr<WorldItem> item);

@@ -160,6 +160,9 @@
     <ClInclude Include="Source\Game\DataTable\QuestTable.h">
       <Filter>Source Files\Game\DataTable</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Game\Item\WorldItem.h">
+      <Filter>Source Files\Game\GameObjects\Item</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Core\PlayerSession.cpp">
@@ -236,6 +239,9 @@
     </ClCompile>
     <ClCompile Include="Source\Game\DataTable\QuestTable.cpp">
       <Filter>Source Files\Game\DataTable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Item\WorldItem.cpp">
+      <Filter>Source Files\Game\GameObjects\Item</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

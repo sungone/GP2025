@@ -10,9 +10,9 @@ class Inventory
 {
 public:
 
-    bool AddInventoryItem(const Item& item);
-    bool RemoveInventoryItemById(uint32 itemId);
-    std::shared_ptr<Item> FindInventoryItemById(uint32_t itemId);
+    bool AddItem(const Item& item);
+    bool RemoveItemById(uint32 itemId);
+    std::shared_ptr<Item> FindItemById(uint32 itemId);
 
 private:
     std::unordered_map<int, ItemSlot> _slots;

@@ -151,6 +151,10 @@ void PlayerSession::Login(const DBLoginResult& dbRes)
 	{
 		_dbId = dbRes.dbId;
 		_player->SetInfo(dbRes.info);
+		for (auto& [itemID, itemTypeID] : dbRes.items)
+		{
+			_player->AddInventoryItem(std::make_shared<Item>(itemID, itemTypeID));
+		}
 	}
 #endif
 }

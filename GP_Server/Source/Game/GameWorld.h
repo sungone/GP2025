@@ -3,6 +3,7 @@
 #include "PlayerSession.h"
 #include "SessionManager.h"
 #include "Item.h"
+#include "WorldItem.h"
 
 class GameWorld
 {

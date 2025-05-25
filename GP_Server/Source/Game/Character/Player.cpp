@@ -126,7 +126,12 @@ void Player::RemovePlayerFromViewList(std::shared_ptr<Character> player)
 	}
 }
 
-bool Player::BuyItem(WorldItem item, uint32 price, uint16 quantity)
+bool Player::AddInventoryItem(std::shared_ptr<Item> item)
+{
+	return _inventory.AddItem(*item);
+}
+
+bool Player::BuyItem(std::shared_ptr<Item> item, uint32 price, uint16 quantity)
 {
 	uint32 totalPrice = price * quantity;
 
@@ -135,7 +140,7 @@ bool Player::BuyItem(WorldItem item, uint32 price, uint16 quantity)
 		LOG("Not enough gold");
 		return false;
 	}
-	return _inventory.AddInventoryItem(item);
+	return AddInventoryItem(item);
 }
 
 bool Player::SellItem(uint32 itemId)
@@ -144,7 +149,7 @@ bool Player::SellItem(uint32 itemId)
 	DBResultCode resultCode = DBResultCode::SUCCESS;
 	uint32 resellPrice = 0;
 
-	auto item = _inventory.FindInventoryItemById(itemId);
+	auto item = _inventory.FindItemById(itemId);
 	if (!item)
 	{
 		LOG(Warning, "Invalid item");
@@ -160,7 +165,7 @@ bool Player::SellItem(uint32 itemId)
 			LOG(Warning, "Invalid item data");
 			resultCode = DBResultCode::ITEM_NOT_FOUND;
 		}
-		else if (!_inventory.RemoveInventoryItemById(itemId))
+		else if (!_inventory.RemoveItemById(itemId))
 		{
 			LOG(Warning, "Failed remove item");
 			resultCode = DBResultCode::ITEM_NOT_FOUND;
@@ -185,7 +190,7 @@ bool Player::TakeWorldItem(const std::shared_ptr<WorldItem> item)
 	float detectDist = 500.f;
 	if (!IsCollision(item->GetPos(), detectDist))
 		return false;
-	return _inventory.AddInventoryItem(*item);
+	return  AddInventoryItem(item);
 }
 
 bool Player::Attack(std::shared_ptr<Character> target)
@@ -376,7 +381,7 @@ void Player::UnlockSkillsOnLevelUp()
 
 void Player::UseItem(uint32 itemId)
 {
-	auto targetItem = _inventory.FindInventoryItemById(itemId);
+	auto targetItem = _inventory.FindItemById(itemId);
 	if (!targetItem) return;
 
 	const ItemStats& stats = targetItem->GetStats();
@@ -402,12 +407,12 @@ void Player::UseItem(uint32 itemId)
 	}
 	auto pkt = ItemPkt::ItemUsedPacket(itemId, _info);
 	SessionManager::GetInst().SendPacket(_id, &pkt);
-	_inventory.RemoveInventoryItemById(itemId);
+	_inventory.RemoveItemById(itemId);
 }
 
 uint8 Player::EquipItem(uint32 itemId)
 {
-	auto targetItem = _inventory.FindInventoryItemById(itemId);
+	auto targetItem = _inventory.FindItemById(itemId);
 	if (!targetItem) return 0;
 
 	const ItemStats& itemStats = targetItem->GetStats();
@@ -421,7 +426,7 @@ uint8 Player::EquipItem(uint32 itemId)
 
 uint8 Player::UnequipItem(uint32 itemId)
 {
-	auto targetItem = _inventory.FindInventoryItemById(itemId);
+	auto targetItem = _inventory.FindItemById(itemId);
 	if (!targetItem) return 0;
 
 	const ItemStats& itemStats = targetItem->GetStats();

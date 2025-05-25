@@ -690,13 +690,13 @@ void GameWorld::BuyItem(int32 playerId, uint8 itemType, uint16 quantity)
 		return;
 	}
 	uint32 price = itemData->Price * quantity;
-	auto targetItem = WorldItem(itemType);
+	auto targetItem = std::make_shared<Item>(itemType);
 	bSuccess = player->BuyItem(targetItem, price, quantity);
 
 	if (bSuccess)
 	{
 		uint32 curgold = player->GetGold();
-		auto pkt = ItemPkt::AddInventoryPacket(targetItem.GetItemID(), targetItem.GetItemTypeID());
+		auto pkt = ItemPkt::AddInventoryPacket(targetItem->GetItemID(), targetItem->GetItemTypeID());
 		SessionManager::GetInst().SendPacket(playerId, &pkt);
 		auto respkt = BuyItemResultPacket(bSuccess, ResultCode, curgold);
 		SessionManager::GetInst().SendPacket(playerId, &respkt);

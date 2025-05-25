@@ -155,7 +155,21 @@ DBLoginResult DBManager::CheckLogin(int32 sessionId, const std::string& login_id
 		info.Skills.E = FSkillData((ESkillGroup)row[24].get<int>(), row[25].get<int>());
 		info.Skills.R = FSkillData((ESkillGroup)row[26].get<int>(), row[27].get<int>());
 
-		return { DBResultCode::SUCCESS, dbId, info };
+		std::vector<std::pair<uint32, uint8>> itemList;
+
+		auto itemResult = _db->getTable("user_items")
+			.select("item_uid", "item_type_id")
+			.where("user_id = :uid")
+			.bind("uid", dbId)
+			.execute();
+
+		for (auto row : itemResult)
+		{
+			uint32 itemID = static_cast<uint32>(row[0].get<int>());
+			uint8 itemTypeID = static_cast<uint8>(row[1].get<int>());
+			itemList.emplace_back(itemID, itemTypeID);
+		}
+		return { DBResultCode::SUCCESS, dbId, info, itemList };
 	}
 	catch (const mysqlx::Error& e) {
 		LOG(LogType::Error, std::format("MySQL Error (CheckLogin - login_id: {}): {}", login_id, e.what()));
@@ -207,6 +221,43 @@ bool DBManager::UpdatePlayerInfo(uint32 dbId, const FInfoData& info)
 	}
 }
 
+bool DBManager::AddUserItem(uint32 dbId, uint32 itemID, uint8 itemTypeID)
+{
+	try {
+		_db->getTable("user_items")
+			.insert("item_uid", "user_id", "item_type_id")
+			.values(itemID, dbId, itemTypeID)
+			.execute();
+
+		return true;
+	}
+	catch (const mysqlx::Error& e)
+	{
+		LOG(LogType::Error, std::format("MySQL Error (AddUserItem): {}", e.what()));
+		return false;
+	}
+}
+
+
+bool DBManager::RemoveUserItem(uint32 dbId, uint32 itemID)
+{
+	try {
+		_db->getTable("user_items")
+			.remove()
+			.where("item_uid = :uid AND user_id = :userid")
+			.bind("uid", itemID)
+			.bind("userid", dbId)
+			.execute();
+
+		LOG(std::format("Remove Item - userId: {}, itemUID: {}", dbId, itemID));
+		return true;
+	}
+	catch (const mysqlx::Error& e)
+	{
+		LOG(LogType::Error, std::format("MySQL Error (RemoveUserItem): {}", e.what()));
+		return false;
+	}
+}
 
 mysqlx::Table DBManager::GetUsersTable()
 {
