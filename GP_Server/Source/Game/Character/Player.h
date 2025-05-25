@@ -10,6 +10,7 @@ public:
 	void Init() override;
 	void SaveToDB(uint32 dbId);
 	void SetCharacterType(Type::EPlayer type);
+	void OnEnterGame();
 
 	void UpdateViewList(std::shared_ptr<Character> other) override;
 	void AddMonsterToViewList(std::shared_ptr<Character> monster);
@@ -18,6 +19,7 @@ public:
 	void RemovePlayerFromViewList(std::shared_ptr<Character> player);
 
 	bool AddInventoryItem(std::shared_ptr<Item> item);
+	bool LoadInventoryItem(std::shared_ptr<Item> item);
 	bool BuyItem(std::shared_ptr<Item> item, uint32 price, uint16 quantity);
 	bool SellItem(uint32 itemId);
 

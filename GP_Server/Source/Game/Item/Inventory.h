@@ -1,19 +1,21 @@
 #pragma once
 #include "Item.h"
 
-struct ItemSlot
+struct InventoryItem
 {
-    std::vector<std::shared_ptr<Item>> slotItems;
+    std::shared_ptr<Item> item;
+    bool saved = false;
 };
-
 class Inventory
 {
 public:
-
-    bool AddItem(const Item& item);
-    bool RemoveItemById(uint32 itemId);
-    std::shared_ptr<Item> FindItemById(uint32 itemId);
+    bool LoadItem(const std::shared_ptr<Item>& item);
+    bool AddItem(const std::shared_ptr<Item>& item);
+    bool RemoveItem(uint32 itemId);
+    std::shared_ptr<Item> FindItem(uint32 itemId);
+    bool SaveToDB(uint32 dbId);
+    const std::unordered_map<int, std::shared_ptr<InventoryItem>>& GetItems() const { return _items; }
 
 private:
-    std::unordered_map<int, ItemSlot> _slots;
+    std::unordered_map<int, std::shared_ptr<InventoryItem>> _items;
 };

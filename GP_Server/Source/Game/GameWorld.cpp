@@ -79,6 +79,7 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 
 	EnterGamePacket enterpkt(playerInfo);
 	SessionManager::GetInst().SendPacket(id, &enterpkt);
+	player->OnEnterGame();
 }
 
 void GameWorld::PlayerLeaveGame(int32 id)

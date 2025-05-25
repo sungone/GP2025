@@ -1,41 +1,78 @@
 #include "pch.h"
 #include "Inventory.h"
 
-bool Inventory::AddItem(const Item& item)
+bool Inventory::LoadItem(const std::shared_ptr<Item>& item)
 {
-    int itemType = item.GetItemTypeID();
-    _slots[itemType].slotItems.emplace_back(std::make_shared<Item>(item));
-    return true;
+	if (!item) return false;
+
+	uint32 itemId = item->GetItemID();
+
+	if (_items.contains(itemId))
+	{
+		LOG(LogType::Warning, std::format("LoadItem failed - duplicate itemID: {}", itemId));
+		return false;
+	}
+
+	auto inventoryItem = std::make_shared<InventoryItem>();
+	inventoryItem->item = item;
+	inventoryItem->saved = true;
+
+	_items[itemId] = inventoryItem;
+	return true;
 }
 
-bool Inventory::RemoveItemById(uint32 itemId)
+bool Inventory::AddItem(const std::shared_ptr<Item>& item)
 {
-    for (auto& [itemType, slot] : _slots)
-    {
-        auto& items = slot.slotItems;
-        for (auto it = items.begin(); it != items.end(); ++it)
-        {
-            if ((*it)->GetItemID() == itemId)
-            {
-                items.erase(it);
-                return true;
-            }
-        }
-    }
-    return false;
+	if (!item) return false;
+
+	uint32 itemId = item->GetItemID();
+
+	if (_items.contains(itemId))
+	{
+		LOG(LogType::Warning, std::format("AddItem failed - duplicate itemID: {}", itemId));
+		return false;
+	}
+
+	auto inventoryItem = std::make_shared<InventoryItem>();
+	inventoryItem->item = std::make_shared<Item>(*item);
+	inventoryItem->saved = false;
+
+	_items[itemId] = inventoryItem;
+	return true;
 }
 
-std::shared_ptr<Item> Inventory::FindItemById(uint32 itemId)
+bool Inventory::RemoveItem(uint32 itemId)
 {
-    for (auto& [itemType, slot] : _slots)
-    {
-        for (auto& item : slot.slotItems)
-        {
-            if (item->GetItemID() == itemId)
-            {
-                return item;
-            }
-        }
-    }
-    return nullptr;
+	auto it = _items.find(itemId);
+	if (it == _items.end())
+	{
+		LOG(LogType::Warning, std::format("RemoveItem failed - itemId {} not found", itemId));
+		return false;
+	}
+
+	_items.erase(it);
+	return true;
+}
+
+std::shared_ptr<Item> Inventory::FindItem(uint32 itemId)
+{
+	auto it = _items.find(itemId);
+	return (it != _items.end()) ? it->second->item : nullptr;
+}
+
+bool Inventory::SaveToDB(uint32 dbId)
+{
+	for (auto& [id, invItem] : _items)
+	{
+		if (invItem->saved) continue;
+		if (DBManager::GetInst().AddUserItem(dbId, invItem->item->GetItemID(), invItem->item->GetItemTypeID()))
+		{
+			invItem->saved = true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	return true;
 }
