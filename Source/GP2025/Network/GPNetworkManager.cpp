@@ -114,6 +114,28 @@ void UGPNetworkManager::HandleBuyItemResult(bool bSuccess, uint32 CurrentGold, D
 	OnBuyItemResult.Broadcast(bSuccess, CurrentGold, ResultMessage);
 }
 
+void UGPNetworkManager::HandleSellItemResult(bool bSuccess, uint32 CurrentGold, DBResultCode ResultCode)
+{
+	FString ResultMessage;
+
+	switch (ResultCode)
+	{
+	case DBResultCode::SUCCESS:
+		ResultMessage = TEXT("판매완료!");
+		break;
+	case DBResultCode::ITEM_NOT_FOUND:
+		ResultMessage = TEXT("없는 아이템입니다");
+		break;
+	default:
+		ResultMessage = TEXT("알 수 없는 오류가 발생했습니다");
+		break;
+	}
+
+	UE_LOG(LogTemp, Error, TEXT("%s"), *ResultMessage);
+
+	OnSellItemResult.Broadcast(bSuccess, CurrentGold, ResultMessage);
+}
+
 void UGPNetworkManager::SendMyLoginPacket(const FString& AccountID, const FString& AccountPW)
 {
 	FTCHARToUTF8 IDUtf8(*AccountID);
@@ -507,6 +529,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_SHOP_SELL_RESULT:
 			{
 				SellItemResultPacket* Pkt = reinterpret_cast<SellItemResultPacket*>(RemainingData.GetData());
+				
 				break;
 			}
 #pragma endregion

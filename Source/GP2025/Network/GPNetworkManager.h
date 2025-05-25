@@ -12,6 +12,7 @@ class AGPCharacterMonster;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReceiveChat, const FString&, Sender, const FString&, Message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnBuyItemResult, bool, bSuccess, uint32, CurrentGold, const FString&, Message);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnSellItemResult, bool, bSuccess, uint32, CurrentGold, const FString&, Message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUserAuthFailed, FString, Message);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterLobby);
@@ -37,7 +38,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnBuyItemResult OnBuyItemResult;
-
+	UPROPERTY(BlueprintAssignable)
+	FOnSellItemResult OnSellItemResult;
 public:
 	bool ConnectToServer();
 	void DisconnectFromServer();
@@ -47,6 +49,8 @@ public:
 public:
 	void HandleUserAuthFailure(DBResultCode ResultCode);
 	void HandleBuyItemResult(bool bSuccess, uint32 CurrentGold, DBResultCode ResultCode);
+	void HandleSellItemResult(bool bSuccess, uint32 CurrentGold, DBResultCode ResultCode);
+	
 public:
 	UFUNCTION(BlueprintCallable)
 	void SendMySelectCharacter(uint8 PlayerType);
