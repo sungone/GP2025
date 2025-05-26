@@ -7,6 +7,7 @@ struct QuestData
 	int32 TargetID;
 	int32 ExpReward;
 	int32 GoldReward;
+	QuestType NextQuestID = QuestType::NONE;
 };
 
 class QuestTable
@@ -23,5 +24,5 @@ public:
 	const std::vector<const QuestData*>* GetQuestsByChapter(uint8 chapter) const;
 private:
 	std::unordered_map<uint32, QuestData> _quests;
-	std::unordered_map<uint8, std::vector<const QuestData*>> _questsByChapter; // √©≈Õ∫∞ ∏ «Œ √ﬂ∞°
+	std::unordered_map<uint8, std::vector<const QuestData*>> _questsByChapter;
 };

@@ -540,6 +540,17 @@ struct CompleteQuestPacket : public Packet
 	}
 };
 
+struct QuestStartPacket : public Packet
+{
+	QuestType Quest;
+	QuestStartPacket(QuestType quest)
+		: Packet(EPacketType::S_START_QUEST)
+		, Quest(quest)
+	{
+		Header.PacketSize = sizeof(QuestStartPacket);
+	}
+};
+
 struct QuestRewardPacket : public Packet
 {
 	QuestType Quest;

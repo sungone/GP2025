@@ -661,12 +661,18 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 		player->AddGold(gold);
 		exp = questData->ExpReward;
 		gold = questData->GoldReward;
+		if (questData->NextQuestID != QuestType::NONE)
+		{
+			player->SetCurrentQuest(questData->NextQuestID);
+			auto nextpkt = QuestStartPacket(questData->NextQuestID);
+			SessionManager::GetInst().SendPacket(playerId, &nextpkt);
+		}
+		auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
+		SessionManager::GetInst().SendPacket(playerId, &infopkt);
 	}
 
 	auto pkt = QuestRewardPacket(quest, ok, exp, gold);
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
-	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
-	SessionManager::GetInst().SendPacket(playerId, &infopkt);
 }
 
 void GameWorld::BuyItem(int32 playerId, uint8 itemType, uint16 quantity)

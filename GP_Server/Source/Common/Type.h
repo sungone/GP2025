@@ -76,6 +76,7 @@ enum EPacketType : uint8
 	C_REQUEST_QUEST,
 	C_COMPLETE_QUEST,
 
+	S_START_QUEST,
 	S_QUEST_REWARD,
 
 	//--- Chat ---
@@ -280,7 +281,13 @@ enum class QuestType : uint8
 	CH2_CLEAR_SERVER_ROOM,        // 10. 서버룸 클리어
 	CH3_ENTER_GYM,                // 11. 체육관 입장
 	CH3_KILL_TINO,                // 12. 최종보스 Tino 제거
-	MAX
+
+	TUT_MOVE = 100,				// 100 - TIP 밖으로 이동하기
+	TUT_KILL_ONE_MON, 			// 101 - 몬스터 한 마리 처치하기
+	TUT_USE_ITEM, 				// 102 - 회복아이템 사용해보기
+	TUT_BUY_ITEM, 				// 103 - 장비 아이템 구매하기
+	TUT_EQUIP_ITEM, 			// 104 - 장비 아이템 착용하기
+	TUT_COMPLETE, 				// 105 - 튜토리얼 완료
 };
 #else
 UENUM(BlueprintType)
