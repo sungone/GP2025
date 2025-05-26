@@ -25,7 +25,7 @@ void Player::LoadFromDB(const DBLoginResult& dbRes)
 	{
 		LoadInventoryItem(std::make_shared<Item>(itemID, itemTypeID));
 	}
-	//Todo: 퀘스트 DB연동
+
 }
 
 void Player::SaveToDB(uint32 dbId)

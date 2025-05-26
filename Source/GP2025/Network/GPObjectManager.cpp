@@ -135,6 +135,18 @@ void UGPObjectManager::AddMyPlayer(const FInfoData& PlayerInfo)
 	}
 	auto Player = Cast<AGPCharacterPlayer>(MyPlayer);
 	Players.Add(PlayerInfo.ID, Player);
+
+	auto Weapon = MyPlayer->CharacterInfo.GetEquippedWeapon();
+	if (Weapon != Type::EWeapon::NONE)
+		EquipItem(PlayerInfo.ID, (uint8)Weapon);
+
+	auto Helmet = MyPlayer->CharacterInfo.GetEquippedHelmet();
+	if (Helmet != Type::EArmor::NONE)
+		EquipItem(PlayerInfo.ID, (uint8)Helmet);
+
+	auto Chest = MyPlayer->CharacterInfo.GetEquippedChest();
+	if (Chest != Type::EArmor::NONE)
+		EquipItem(PlayerInfo.ID, (uint8)Chest);
 }
 
 
@@ -166,7 +178,7 @@ void UGPObjectManager::AddPlayer(const FInfoData& PlayerInfo)
 	}
 	Player->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
 
-	Players.Add(PlayerInfo.ID, Player); 
+	Players.Add(PlayerInfo.ID, Player);
 
 	if (TWeakObjectPtr<AGPCharacterPlayer>* WeakPlayerPtr = Players.Find(PlayerInfo.ID))
 	{
@@ -641,7 +653,7 @@ void UGPObjectManager::ChangeZone(ZoneType newZone, const FVector& RandomPos)
 		};
 	FName NewLevel = GetLevelName(newZone);
 	FName OldLevel = GetLevelName(oldZone);
-	if (!OldLevel.IsNone()&& !NewLevel.IsNone())
+	if (!OldLevel.IsNone() && !NewLevel.IsNone())
 	{
 		UGameplayStatics::UnloadStreamLevel(this, OldLevel, FLatentActionInfo(), false);
 		FLatentActionInfo LatentInfo;

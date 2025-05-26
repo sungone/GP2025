@@ -57,6 +57,11 @@ CREATE TABLE `player_info` (
   `skill2_level` int unsigned NOT NULL DEFAULT '0',
   `skill3_gid` tinyint unsigned NOT NULL DEFAULT '0',
   `skill3_level` int unsigned NOT NULL DEFAULT '0',
+  `current_quest_type` tinyint unsigned NOT NULL DEFAULT '0',
+  `current_quest_status` tinyint unsigned NOT NULL DEFAULT '0',
+  `equip_weapon` tinyint unsigned NOT NULL DEFAULT '0',
+  `equip_helmet` tinyint unsigned NOT NULL DEFAULT '0',
+  `equip_chest` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   CONSTRAINT `player_info_ibfk_1` FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -68,7 +73,7 @@ CREATE TABLE `player_info` (
 
 LOCK TABLES `player_info` WRITE;
 /*!40000 ALTER TABLE `player_info` DISABLE KEYS */;
-INSERT INTO `player_info` VALUES (1,1,7356.34,19489.6,160,-52.4654,50,150,90,10,0,600,550,550,75,0.3,3,0.25,200,0,1,1,2,1,3,1);
+INSERT INTO `player_info` VALUES (1,1,7356.34,19489.6,160,-52.4654,50,150,90,10,0,600,550,550,75,0.3,3,0.25,200,0,1,1,2,1,3,1,0,0,0,0,0);
 /*!40000 ALTER TABLE `player_info` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -135,4 +140,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-25 16:58:15
+-- Dump completed on 2025-05-26 20:51:02
