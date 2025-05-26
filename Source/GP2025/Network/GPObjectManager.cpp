@@ -688,6 +688,12 @@ void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
 	//}
 }
 
+void UGPObjectManager::OnQuestStart(QuestType Quest)
+{
+	//Todo:
+	//퀘스트 메세지 UI로 띄우기 -> 튜토리얼은 상호작용 npc없이 그냥 UI로 바로 출력하면 좋을듯? 
+}
+
 void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpReward, uint32 GoldReward)
 {
 	UE_LOG(LogTemp, Warning, TEXT("[QuestReward] Called: QuestType = %d, bSuccess = %s, Exp = %d, Gold = %d"),

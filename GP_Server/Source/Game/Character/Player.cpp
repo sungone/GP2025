@@ -18,12 +18,20 @@ void Player::Init()
 #endif
 }
 
+void Player::LoadFromDB(const DBLoginResult& dbRes)
+{
+	SetInfo(dbRes.info);
+	for (auto& [itemID, itemTypeID] : dbRes.items)
+	{
+		LoadInventoryItem(std::make_shared<Item>(itemID, itemTypeID));
+	}
+	//Todo: 퀘스트 DB연동
+}
+
 void Player::SaveToDB(uint32 dbId)
 {
-#ifdef DB_LOCAL
 	DBManager::GetInst().UpdatePlayerInfo(dbId, _info);
 	_inventory.SaveToDB(dbId);
-#endif
 }
 
 void Player::SetCharacterType(Type::EPlayer type)
@@ -58,6 +66,18 @@ void Player::OnEnterGame()
 			auto pkt = ItemPkt::AddInventoryPacket(invItem->item->GetItemID(), invItem->item->GetItemTypeID());
 			SessionManager::GetInst().SendPacket(_id, &pkt);
 		}
+	}
+	{
+		QuestType quest = GetCurrentQuest();
+		const QuestData* questData = QuestTable::GetInst().GetQuest(quest);
+		if (!questData)
+		{
+			LOG(Warning, "Invalid quest datatable");
+			return;
+		}
+		SetCurrentQuest(questData->NextQuestID);
+		auto questpkt = QuestStartPacket(questData->NextQuestID);
+		SessionManager::GetInst().SendPacket(_id, &questpkt);
 	}
 }
 

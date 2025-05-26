@@ -544,7 +544,7 @@ struct QuestStartPacket : public Packet
 {
 	QuestType Quest;
 	QuestStartPacket(QuestType quest)
-		: Packet(EPacketType::S_START_QUEST)
+		: Packet(EPacketType::S_QUEST_START)
 		, Quest(quest)
 	{
 		Header.PacketSize = sizeof(QuestStartPacket);

@@ -52,6 +52,7 @@ bool QuestTable::LoadFromCSV(const std::string& filePath)
 		std::getline(ss, cell, ','); data.TargetID = std::stoi(cell);
 		std::getline(ss, cell, ','); data.ExpReward = std::stoi(cell);
 		std::getline(ss, cell, ','); data.GoldReward = std::stoi(cell);
+		std::getline(ss, cell, ','); data.RewarditemType = std::stoi(cell);
 		std::getline(ss, cell, ','); data.NextQuestID = static_cast<QuestType>(std::stoi(cell));
 
 		_quests[idx] = data;

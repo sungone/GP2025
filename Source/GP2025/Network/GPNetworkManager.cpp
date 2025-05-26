@@ -534,6 +534,12 @@ void UGPNetworkManager::ProcessPacket()
 			}
 #pragma endregion
 #pragma region Quest
+			case EPacketType::S_QUEST_START:
+			{
+				QuestStartPacket* Pkt = reinterpret_cast<QuestStartPacket*>(RemainingData.GetData());
+				ObjectMgr->OnQuestStart(Pkt->Quest);
+				break;
+			}
 			case EPacketType::S_QUEST_REWARD:
 			{
 				QuestRewardPacket* Pkt = reinterpret_cast<QuestRewardPacket*>(RemainingData.GetData());

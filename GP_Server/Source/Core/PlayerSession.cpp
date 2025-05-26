@@ -150,11 +150,7 @@ void PlayerSession::Login(const DBLoginResult& dbRes)
 #ifdef DB_LOCAL
 	{
 		_dbId = dbRes.dbId;
-		_player->SetInfo(dbRes.info);
-		for (auto& [itemID, itemTypeID] : dbRes.items)
-		{
-			_player->LoadInventoryItem(std::make_shared<Item>(itemID, itemTypeID));
-		}
+		_player->LoadFromDB(dbRes);
 	}
 #endif
 }
@@ -169,7 +165,9 @@ void PlayerSession::Logout()
 	if(IsLogin())
 	{
 		_state = SessionState::None;
+#ifdef DB_LOCAL
 		_player->SaveToDB(_dbId);
+#endif
 	}
 }
 

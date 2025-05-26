@@ -76,7 +76,7 @@ enum EPacketType : uint8
 	C_REQUEST_QUEST,
 	C_COMPLETE_QUEST,
 
-	S_START_QUEST,
+	S_QUEST_START,
 	S_QUEST_REWARD,
 
 	//--- Chat ---
@@ -306,7 +306,14 @@ enum class QuestType : uint8
 	CH2_CLEAR_SERVER_ROOM     UMETA(DisplayName = "Clear Server Room"),
 	CH3_ENTER_GYM             UMETA(DisplayName = "Enter Gym"),
 	CH3_KILL_TINO             UMETA(DisplayName = "Kill Tino"),
-	MAX                       UMETA(Hidden)
+	// Æ©Åä¸®¾ó Äù½ºÆ® (100¹ø´ë)
+	TUT_MOVE                      UMETA(DisplayName = "Move Outside TIP"),
+	TUT_KILL_ONE_MON              UMETA(DisplayName = "Kill One Monster"),
+	TUT_USE_ITEM                  UMETA(DisplayName = "Use Recovery Item"),
+	TUT_BUY_ITEM                  UMETA(DisplayName = "Buy an Item"),
+	TUT_EQUIP_ITEM                UMETA(DisplayName = "Equip an Item"),
+	TUT_COMPLETE                  UMETA(DisplayName = "Complete Tutorial"),
+
 };
 #endif
-
+ 

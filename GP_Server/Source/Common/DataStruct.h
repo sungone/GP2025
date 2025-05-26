@@ -310,6 +310,16 @@ struct FInfoData
 		}
 		return nullptr;
 	}
+
+	QuestType GetCurrentQuest() const
+	{
+		for (const auto& quest : Quests)
+		{
+			if (quest.Status == EQuestStatus::InProgress)
+				return quest.QuestType;
+		}
+		return QuestType::NONE;
+	}
 #ifdef SERVER_BUILD
 	void SetHp(float NewHp) { Stats.Hp = std::clamp(NewHp, 0.0f, Stats.MaxHp); }
 	void Heal(float Amount) { SetHp(Stats.Hp + Amount); }

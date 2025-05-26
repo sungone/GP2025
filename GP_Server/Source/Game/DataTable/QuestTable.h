@@ -8,6 +8,7 @@ struct QuestData
 	int32 ExpReward;
 	int32 GoldReward;
 	QuestType NextQuestID = QuestType::NONE;
+	uint8 RewarditemType;
 };
 
 class QuestTable
