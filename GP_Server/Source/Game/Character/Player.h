@@ -38,9 +38,12 @@ public:
 	uint8 EquipItem(uint32 itemId);
 	uint8 UnequipItem(uint32 itemId);
 
+	bool CheckQuestProgress(int32 targetID = -1);
 	bool SetCurrentQuest(QuestType quest);
-	QuestType GetCurrentQuest() { return _currentQuest; }
+	bool IsQuestInProgress(QuestType quest) const;
+	bool StartQuest(QuestType newQuest);
 	bool CompleteCurrentQuest();
+	QuestType GetCurrentQuest() { return _curQuest.QuestType; }
 
 	void AddItemStats(const ItemStats& stats);
 	void RemoveItemStats(const ItemStats& stats);
@@ -84,5 +87,5 @@ private:
 	std::unordered_set<int32> _viewList;
 	FStatData& _stats = _info.Stats;
 	uint32& _gold = _info.Gold;
-	QuestType _currentQuest;
+	QuestStatus& _curQuest = _info.CurrentQuest;
 };

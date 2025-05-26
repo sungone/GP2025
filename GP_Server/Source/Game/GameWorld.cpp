@@ -230,15 +230,8 @@ void GameWorld::PlayerAttack(int32 playerId)
 			FVector goldPos = basePos + FVector(-30.f, 0.f, 20.f);
 			SpawnGoldItem(goldPos);
 
+			player->CheckQuestProgress(static_cast<int32>(monster->GetMonsterType()));
 			RemoveMonster(targetId);
-
-			//Todo: 현재는 티노 퀘스트만 처리 -> 확장해야함
-			auto mtype = monster->GetMonsterType();
-			auto quest = player->GetCurrentQuest();
-			if (mtype == Type::EMonster::TINO)
-			{
-				CompleteQuest(playerId, quest);
-			}
 		}
 	}
 
@@ -623,14 +616,7 @@ void GameWorld::RequestQuest(int32 playerId, QuestType quest)
 	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
-		LOG(Warning, "Invalid player for quest request");
-		return;
-	}
-
-	const QuestData* questData = QuestTable::GetInst().GetQuest(quest);
-	if (!questData)
-	{
-		LOG(Warning, "Invalid quest ID");
+		LOG(Warning, "Invalid player");
 		return;
 	}
 
@@ -645,34 +631,7 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 		LOG(Warning, "Invalid player");
 		return;
 	}
-
-	const QuestData* questData = QuestTable::GetInst().GetQuest(quest);
-	if (!questData)
-	{
-		LOG(Warning, "Invalid quest datatable");
-		return;
-	}
-	uint32 exp = 0, gold = 0;
-
-	bool ok = player->CompleteCurrentQuest();
-	if (ok)
-	{
-		player->AddExp(exp);
-		player->AddGold(gold);
-		exp = questData->ExpReward;
-		gold = questData->GoldReward;
-		if (questData->NextQuestID != QuestType::NONE)
-		{
-			player->SetCurrentQuest(questData->NextQuestID);
-			auto nextpkt = QuestStartPacket(questData->NextQuestID);
-			SessionManager::GetInst().SendPacket(playerId, &nextpkt);
-		}
-		auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
-		SessionManager::GetInst().SendPacket(playerId, &infopkt);
-	}
-
-	auto pkt = QuestRewardPacket(quest, ok, exp, gold);
-	SessionManager::GetInst().SendPacket(playerId, &pkt);
+	player->CheckQuestProgress();
 }
 
 void GameWorld::BuyItem(int32 playerId, uint8 itemType, uint16 quantity)

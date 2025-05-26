@@ -133,7 +133,7 @@ struct FInfoData
 	FEquitState EquipState;
 	ZoneType CurrentZone{ ZoneType::TUK };
 
-	QuestStatus Quests[MAX_PLAYER_QUESTS];
+	QuestStatus CurrentQuest;
 
 	FInfoData()
 		: ID(0),
@@ -265,61 +265,9 @@ struct FInfoData
 	Type::EArmor  GetEquippedHelmet() const { return EquipState.Helmet; }
 	Type::EArmor  GetEquippedChest() const { return EquipState.Chest; }
 
-	bool HasQuest(QuestType quest) const
-	{
-		for (const auto& q : Quests)
-		{
-			if (q.QuestType == quest)
-				return true;
-		}
-		return false;
-	}
+	
+	const QuestStatus& GetCurrentQuest() const { return CurrentQuest; }
 
-	bool AddQuest(const QuestStatus& newQuest)
-	{
-		for (auto& q : Quests)
-		{
-			if (q.QuestType == QuestType::NONE)
-			{
-				q = newQuest;
-				return true;
-			}
-		}
-		return false;
-	}
-
-	bool CompleteQuest(QuestType quest)
-	{
-		for (auto& q : Quests)
-		{
-			if (q.QuestType == quest && q.Status == EQuestStatus::InProgress)
-			{
-				q.Status = EQuestStatus::Completed;
-				return true;
-			}
-		}
-		return false;
-	}
-
-	QuestStatus* GetQuestStatus(QuestType quest)
-	{
-		for (auto& q : Quests)
-		{
-			if (q.QuestType == quest)
-				return &q;
-		}
-		return nullptr;
-	}
-
-	QuestType GetCurrentQuest() const
-	{
-		for (const auto& quest : Quests)
-		{
-			if (quest.Status == EQuestStatus::InProgress)
-				return quest.QuestType;
-		}
-		return QuestType::NONE;
-	}
 #ifdef SERVER_BUILD
 	void SetHp(float NewHp) { Stats.Hp = std::clamp(NewHp, 0.0f, Stats.MaxHp); }
 	void Heal(float Amount) { SetHp(Stats.Hp + Amount); }

@@ -68,8 +68,7 @@ void Player::OnEnterGame()
 		}
 	}
 	{
-		QuestType quest = GetCurrentQuest();
-		const QuestData* questData = QuestTable::GetInst().GetQuest(quest);
+		const QuestData* questData = QuestTable::GetInst().GetQuest(_curQuest.QuestType);
 		if (!questData)
 		{
 			LOG(Warning, "Invalid quest datatable");
@@ -476,20 +475,77 @@ uint8 Player::UnequipItem(uint32 itemId)
 	return itemType;
 }
 
+bool Player::CheckQuestProgress(int32 targetID)
+{
+	auto quest = GetCurrentQuest();
+	const QuestData* questData = QuestTable::GetInst().GetQuest(quest);
+	if (!questData)
+	{
+		LOG(Warning, "Invalid quest datatable");
+		return false;
+	}
+
+	if (targetID != -1 && questData->TargetID != targetID)
+		return false;
+
+	uint32 exp = 0, gold = 0;
+	bool res = CompleteCurrentQuest();
+	if (res)
+	{
+		exp = questData->ExpReward;
+		gold = questData->GoldReward;
+		AddExp(exp);
+		AddGold(gold);
+		auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, GetInfo());
+		SessionManager::GetInst().SendPacket(_id, &infopkt);
+
+		if (questData->NextQuestID != QuestType::NONE)
+		{
+			SetCurrentQuest(questData->NextQuestID);
+			auto nextpkt = QuestStartPacket(questData->NextQuestID);
+			SessionManager::GetInst().SendPacket(_id, &nextpkt);
+		}
+	}
+
+	auto pkt = QuestRewardPacket(quest, res, exp, gold);
+	SessionManager::GetInst().SendPacket(_id, &pkt);
+}
+
 bool Player::SetCurrentQuest(QuestType quest)
 {
-	if (!_info.HasQuest(quest))
+	const QuestData* questData = QuestTable::GetInst().GetQuest(quest);
+	if (!questData)
 	{
-		int res = _info.AddQuest({ quest,EQuestStatus::InProgress });
-		if (!res) return false;
+		LOG(Warning, "Invalid quest ID");
+		return false;
 	}
-	_currentQuest = quest;
+	if (!StartQuest(quest)) return false;
+	return true;
+}
+
+bool Player::IsQuestInProgress(QuestType quest) const
+{
+	return _curQuest.QuestType == quest && _curQuest.Status == EQuestStatus::InProgress;
+}
+
+bool Player::StartQuest(QuestType newQuest)
+{
+	if (_curQuest.Status == EQuestStatus::InProgress)
+		return false;
+
+	_curQuest.QuestType = newQuest;
+	_curQuest.Status = EQuestStatus::InProgress;
 	return true;
 }
 
 bool Player::CompleteCurrentQuest()
 {
-	return _info.CompleteQuest(_currentQuest);
+	if (_curQuest.QuestType != QuestType::NONE && _curQuest.Status == EQuestStatus::InProgress)
+	{
+		_curQuest.Status = EQuestStatus::Completed;
+		return true;
+	}
+	return false;
 }
 
 void Player::AddItemStats(const ItemStats& stats)
