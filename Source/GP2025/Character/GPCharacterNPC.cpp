@@ -123,6 +123,7 @@ void AGPCharacterNPC::OpenShopUI(APlayerController* PlayerController)
 				}
 
 				LocalShopWidget->PopulateShopItems();
+				LocalShopWidget->PopulateSellItems();
 			}
 
 			ShopWidget->AddToViewport();

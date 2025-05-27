@@ -9,6 +9,8 @@
 #include "Network/GPNetworkManager.h"
 #include "Inventory/GPItemSlot.h"
 #include "Engine/DataTable.h"
+#include "Character/Modules/GPMyplayerUIManager.h"
+#include "Inventory/GPInventory.h"
 #include "Item/GPItemStruct.h"
 #include "Components/WrapBox.h"
 
@@ -162,13 +164,13 @@ void UGPShop::PopulateShopItems()
 		return;
 	}
 
-	if (!ItemWrapBox)
+	if (!BuyWrapBox)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ItemWrapBox is nullptr"));
 		return;
 	}
 
-	ItemWrapBox->ClearChildren();
+	BuyWrapBox->ClearChildren();
 
 	TArray<FName> RowNames = ItemDataTable->GetRowNames();
 	if (RowNames.Num() == 0)
@@ -203,14 +205,46 @@ void UGPShop::PopulateShopItems()
 			NewSlot->SlotData.Quantity = 1;
 			NewSlot->CurrentItem = *ItemData;
 
-			ItemWrapBox->AddChild(NewSlot);
+			BuyWrapBox->AddChild(NewSlot);
 
 			UE_LOG(LogTemp, Log, TEXT("Added Item: %s to Shop"), *ItemData->ItemName.ToString());
 		}
 	}
 
-	ItemWrapBox->SetVisibility(ESlateVisibility::Visible);
+	BuyWrapBox->SetVisibility(ESlateVisibility::Visible);
 }
+
+void UGPShop::PopulateSellItems()
+{
+	if (!MyPlayer || !SellWrapBox || !SlotClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PopulateSellItems - Required components are null"));
+		return;
+	}
+
+	SellWrapBox->ClearChildren();
+	const TArray<UGPItemSlot*> InventorySlots = MyPlayer->UIManager->GetInventoryWidget()->GetAllInventoryItemData();
+
+	for (UGPItemSlot* InventorySlot : InventorySlots)
+	{
+		if (!InventorySlot || InventorySlot->SlotData.Quantity <= 0) continue;
+
+		UGPItemSlot* NewSlot = CreateWidget<UGPItemSlot>(this, SlotClass);
+		if (!NewSlot) continue;
+
+		NewSlot->SlotOwnerType = ESlotOwnerType::Sell;
+		NewSlot->SlotData = InventorySlot->SlotData;
+		NewSlot->CurrentItem = InventorySlot->CurrentItem;
+		NewSlot->SetOwningShop(this);
+		NewSlot->SetOwningNPC(OwningNPC);
+
+		SellWrapBox->AddChild(NewSlot);
+
+		UE_LOG(LogTemp, Log, TEXT("Added Sell Slot - %s | Quantity: %d"),
+			*NewSlot->CurrentItem.ItemName.ToString(), NewSlot->SlotData.Quantity);
+	}
+}
+
 void UGPShop::SetShopType(EShopType NewShopType)
 {
 	CurrentShopType = NewShopType;

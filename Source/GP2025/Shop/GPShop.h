@@ -29,6 +29,12 @@ public:
 	class UButton* SellButton;
 
 	UPROPERTY(meta = (BindWidget))
+	class UButton* BuyWidgetSwitchButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* SellWidgetSwitchButton;
+
+	UPROPERTY(meta = (BindWidget))
 	class UButton* QuitButton;
 
 	UPROPERTY(meta = (BindWidget))
@@ -65,7 +71,11 @@ public:
 public:
 
 	UPROPERTY(meta = (BindWidget))
-	class UWrapBox* ItemWrapBox;
+	class UWrapBox* BuyWrapBox;
+
+
+	UPROPERTY(meta = (BindWidget))
+	class UWrapBox* SellWrapBox;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<class UGPItemSlot> SlotClass;
@@ -81,6 +91,9 @@ public:
 
 	/** 상점 아이템 슬롯을 생성하는 함수 */
 	void PopulateShopItems();
+
+	/* 판매 슬롯창을 생성하는 함수 */
+	void PopulateSellItems();
 
 	// 어떤 상점인지 지정
 	UPROPERTY(BlueprintReadOnly, Category = "Shop")

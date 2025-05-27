@@ -215,3 +215,12 @@ void UGPInventory::HandlePlayerStatUpdate()
     }
 }
 
+TArray<UGPItemSlot*> UGPInventory::GetAllInventoryItemData() const
+{
+    TArray<UGPItemSlot*> AllSlots;
+    AllSlots.Append(WeaponSlots);
+    AllSlots.Append(ArmorSlots);
+    AllSlots.Append(EatableSlots);
+    return AllSlots;
+}
+

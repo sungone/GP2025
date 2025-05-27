@@ -17,7 +17,8 @@ UENUM(BlueprintType)
 enum class ESlotOwnerType : uint8
 {
     Inventory,
-    Shop
+    Shop,
+    Sell,
 };
 
 /**
