@@ -110,16 +110,16 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
 
     if (!TargetArray) return;
 
-    for (UGPItemSlot* ExistingSlot : *TargetArray)
-    {
-        if (ExistingSlot->SlotData.ItemID.RowName == RowName)
-        {
-            ExistingSlot->SlotData.Quantity += Quantity;
-            UE_LOG(LogTemp, Warning, TEXT("Updated Existing Item - %s | Quantity: %d"),
-                *ItemData->ItemName.ToString(), ExistingSlot->SlotData.Quantity);
-            return;
-        }
-    }
+    //for (UGPItemSlot* ExistingSlot : *TargetArray)
+    //{
+    //    if (ExistingSlot->SlotData.ItemID.RowName == RowName)
+    //    {
+    //        ExistingSlot->SlotData.Quantity += Quantity;
+    //        UE_LOG(LogTemp, Warning, TEXT("Updated Existing Item - %s | Quantity: %d"),
+    //            *ItemData->ItemName.ToString(), ExistingSlot->SlotData.Quantity);
+    //        return;
+    //    }
+    //}
 
     if (!NewSlot) return;
     TargetArray->Add(NewSlot);
