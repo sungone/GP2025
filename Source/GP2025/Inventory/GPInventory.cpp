@@ -110,6 +110,7 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
 
     if (!TargetArray) return;
 
+    /// 이거 지운 이유: 아이템이 2개 이상이면 같은 아이템에서 개별적으로 UniqueID 에 접근할 수 없음. 대표되는 아이템에 모두 덮어쓰여짐 
     //for (UGPItemSlot* ExistingSlot : *TargetArray)
     //{
     //    if (ExistingSlot->SlotData.ItemID.RowName == RowName)
