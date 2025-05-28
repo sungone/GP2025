@@ -26,10 +26,15 @@ void UGPShop::NativeConstruct()
 		BuyButton->OnClicked.AddDynamic(this, &UGPShop::OnBuyItemClicked);
 	}
 
-	// PopulateShopItems();
+	if (SellButton)
+	{
+		SellButton->OnClicked.AddDynamic(this, &UGPShop::OnSellItemClicked);
+	}
+
 	if (UGPNetworkManager* Mgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>())
 	{
 		Mgr->OnBuyItemResult.AddDynamic(this, &UGPShop::HandleBuyItemResult);
+		Mgr->OnSellItemResult.AddDynamic(this, &UGPShop::HandleSellItemResult);
 	}
 }
 
@@ -136,6 +141,58 @@ void UGPShop::HideResultMessage()
 	if (ResultMessage)
 	{
 		ResultMessage->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void UGPShop::OnSellItemClicked()
+{
+	if (!MyPlayer || !CurrentSlot)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SellItemClicked - Player or Slot is null"));
+		return;
+	}
+
+	if (CurrentSlot->SlotOwnerType != ESlotOwnerType::Sell)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SellItemClicked - CurrentSlot is not Sell type"));
+		return;
+	}
+
+	uint32 ItemUniqueID = CurrentSlot->SlotData.ItemUniqueID;
+	// uint32 Quantity = 1;
+
+	if (UGPNetworkManager* NetworkMgr = MyPlayer->GetGameInstance()->GetSubsystem<UGPNetworkManager>())
+	{
+		NetworkMgr->SendMyShopSellItem(ItemUniqueID);
+
+		UE_LOG(LogTemp, Log, TEXT("SellItem Sent to Server - ItemUniqueID: %d"), ItemUniqueID);
+	}
+}
+
+void UGPShop::HandleSellItemResult(bool bSuccess, uint32 NewGold, const FString& Message)
+{
+	if (bSuccess)
+	{
+		UpdateMoneyText(NewGold);
+		MyPlayer->CharacterInfo.Gold = NewGold;
+
+		if (CurrentSlot)
+		{
+			if (UGPInventory* Inventory = MyPlayer->UIManager->GetInventoryWidget())
+			{
+				Inventory->RemoveItemByUniqueID(CurrentSlot->SlotData.ItemUniqueID);
+			}
+
+			CurrentSlot = nullptr;
+		}
+
+		// 판매 슬롯 재구성
+		PopulateSellItems();
+	}
+
+	if (ResultMessage)
+	{
+		ShowResultMessage(Message, 3.0f);
 	}
 }
 

@@ -38,6 +38,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnBuyItemResult OnBuyItemResult;
+
 	UPROPERTY(BlueprintAssignable)
 	FOnSellItemResult OnSellItemResult;
 public:

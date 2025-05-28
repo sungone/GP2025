@@ -132,6 +132,21 @@ void UGPItemSlot::ClickItem()
         }
 
         break;
+    }
+
+    case ESlotOwnerType::Sell:
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Sell Slot Clicked"));
+
+        if (ShopWidget)
+        {
+            ShopWidget->SetCurrentSlot(this);
+            UE_LOG(LogTemp, Warning, TEXT("Sell Slot - CurrentSlot set to: %s"), *GetName());
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Sell Slot - ShopWidget is NULL"));
+        }
 
         break;
     }

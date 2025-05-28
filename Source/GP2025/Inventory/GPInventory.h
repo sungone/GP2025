@@ -23,6 +23,7 @@ public :
 
 	void AddItemToInventory(uint32 ItemID , uint8 ItemType , uint32 Quantity);
 	void UseItemFromInventory(uint32 ItemID);
+	void RemoveItemByUniqueID(uint32 ItemUniqueID);
 
 	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "UI")
 	class UWidgetSwitcher* TabWidgetSwitcher;

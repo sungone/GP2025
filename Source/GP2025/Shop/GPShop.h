@@ -68,6 +68,12 @@ public:
 	void ShowResultMessage(const FString& Message, float Duration);
 
 	void HideResultMessage();
+
+	UFUNCTION()
+	void OnSellItemClicked();
+
+	UFUNCTION()
+	void HandleSellItemResult(bool bSuccess, uint32 NewGold, const FString& Message);
 public:
 
 	UPROPERTY(meta = (BindWidget))

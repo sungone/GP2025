@@ -199,6 +199,47 @@ void UGPInventory::UseItemFromInventory(uint32 ItemID)
     UE_LOG(LogTemp, Warning, TEXT("RemoveItemFromInventory: Item [%d] not found in inventory"), ItemID);
 }
 
+void UGPInventory::RemoveItemByUniqueID(uint32 ItemUniqueID)
+{
+    auto RemoveFromInventory = [ItemUniqueID](TArray<UGPItemSlot*>& SlotArray, UWrapBox* WrapBox) -> bool
+        {
+            for (int32 i = SlotArray.Num() - 1; i >= 0; --i)
+            {
+                UGPItemSlot* Slot = SlotArray[i];
+
+                if (Slot->SlotData.ItemUniqueID == ItemUniqueID)
+                {
+                    if (Slot->SlotData.Quantity > 1)
+                    {
+                        Slot->SlotData.Quantity--;
+                        Slot->UpdateQuantityText();
+                        UE_LOG(LogTemp, Warning, TEXT("[RemoveItemByUniqueID] Item [%d] Quantity decreased to %d"), ItemUniqueID, Slot->SlotData.Quantity);
+                    }
+                    else
+                    {
+                        if (WrapBox)
+                        {
+                            WrapBox->RemoveChild(Slot);
+                        }
+
+                        Slot->RemoveFromParent();
+                        SlotArray.RemoveAt(i);
+
+                        UE_LOG(LogTemp, Warning, TEXT("[RemoveItemByUniqueID] Item [%d] removed from inventory"), ItemUniqueID);
+                    }
+                    return true;
+                }
+            }
+            return false;
+        };
+
+    if (RemoveFromInventory(WeaponSlots, WeaponsWrapBox)) return;
+    if (RemoveFromInventory(ArmorSlots, ArmorsWrapBox)) return;
+    if (RemoveFromInventory(EatableSlots, EatablesWrapBox)) return;
+
+    UE_LOG(LogTemp, Warning, TEXT("[RemoveItemByUniqueID] Item [%d] not found in inventory"), ItemUniqueID);
+}
+
 void UGPInventory::SetGold(int32 Amount)
 {
     if (MoneyText)

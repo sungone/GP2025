@@ -529,7 +529,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_SHOP_SELL_RESULT:
 			{
 				SellItemResultPacket* Pkt = reinterpret_cast<SellItemResultPacket*>(RemainingData.GetData());
-				
+				HandleSellItemResult(Pkt->bSuccess, Pkt->PlayerGold, Pkt->ResultCode);
 				break;
 			}
 #pragma endregion
