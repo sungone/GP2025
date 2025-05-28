@@ -112,6 +112,8 @@ void UGPShop::HandleBuyItemResult(bool bSuccess, uint32 CurrentGold, const FStri
 	{
 		UpdateMoneyText(CurrentGold);
 		MyPlayer->CharacterInfo.Gold = CurrentGold;
+
+		PopulateSellItems();
 	}
 
 	if (ResultMessage)
