@@ -186,20 +186,33 @@ void UGPMyplayerInputHandler::AutoAttack()
 		return;
 	}
 
-	if (Owner->bIsGunnerCharacter() && !Owner->CameraHandler->IsZooming())
-	{
-		return;
-	}
-
 	bool bIsAlreadyAttacking = Owner->CombatHandler->IsAutoAttacking();
 	bool bIsUsingSkill = Owner->CombatHandler->IsUsingSkill();
+	bool bHasWeapon = Owner->HasWeaponEquipped();
 	// bool bHasAttackState = Owner->CharacterInfo.HasState(STATE_AUTOATTACK);
 
-	if (!bIsAlreadyAttacking  && !bIsUsingSkill)
+	if (bHasWeapon)
 	{
-		Owner->CharacterInfo.AddState(STATE_AUTOATTACK);
-		Owner->CombatHandler->PlayAutoAttackMontage();
-		Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
+		if (Owner->bIsGunnerCharacter() && !Owner->CameraHandler->IsZooming())
+		{
+			return;
+		}
+
+		if (!bIsAlreadyAttacking && !bIsUsingSkill)
+		{
+			Owner->CharacterInfo.AddState(STATE_AUTOATTACK);
+			Owner->CombatHandler->PlayAutoAttackMontage();
+			Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
+		}
+	}
+	else
+	{
+		if (!bIsAlreadyAttacking && !bIsUsingSkill)
+		{
+			Owner->CharacterInfo.AddState(STATE_AUTOATTACK);
+			Owner->CombatHandler->PlayAutoAttackMontage();
+			Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
+		}
 	}
 }
 
@@ -324,7 +337,7 @@ void UGPMyplayerInputHandler::UseSkillQ()
 {
 	bool bIsAlreadyAttacking = Owner->CombatHandler->IsAutoAttacking();
 	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() 
-		 || bIsAlreadyAttacking) return;
+		 || bIsAlreadyAttacking || !Owner->HasWeaponEquipped()) return;
 
 	ESkillGroup SkillGroup = Owner->bIsGunnerCharacter() ? ESkillGroup::Throwing : ESkillGroup::HitHard;
 	int32 SkillLevel = Owner->CharacterInfo.GetSkillLevel(SkillGroup);
@@ -359,7 +372,7 @@ void UGPMyplayerInputHandler::UseSkillE()
 {
 	bool bIsAlreadyAttacking = Owner->CombatHandler->IsAutoAttacking();
 	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() 
-		 || bIsAlreadyAttacking) return;
+		 || bIsAlreadyAttacking || !Owner->HasWeaponEquipped()) return;
 
 	ESkillGroup SkillGroup = Owner->bIsGunnerCharacter() ? ESkillGroup::FThrowing : ESkillGroup::Clash;
 	int32 SkillLevel = Owner->CharacterInfo.GetSkillLevel(SkillGroup);
@@ -396,7 +409,7 @@ void UGPMyplayerInputHandler::UseSkillR()
 {
 	bool bIsAlreadyAttacking = Owner->CombatHandler->IsAutoAttacking();
 	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() 
-		 || bIsAlreadyAttacking) return;
+		 || bIsAlreadyAttacking || !Owner->HasWeaponEquipped()) return;
 
 	ESkillGroup SkillGroup = Owner->bIsGunnerCharacter() ? ESkillGroup::Anger : ESkillGroup::Whirlwind;
 	int32 SkillLevel = Owner->CharacterInfo.GetSkillLevel(SkillGroup);
@@ -407,7 +420,6 @@ void UGPMyplayerInputHandler::UseSkillR()
 	{
 		return;
 	}
-
 
 	if (Owner->bIsGunnerCharacter())
 	{
