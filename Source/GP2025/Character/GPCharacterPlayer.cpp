@@ -119,3 +119,8 @@ USkeletalMeshComponent* AGPCharacterPlayer::GetCharacterMesh() const
 {
     return BodyMesh;
 }
+
+bool AGPCharacterPlayer::HasWeaponEquipped() const
+{
+    return WeaponMesh && WeaponMesh->GetStaticMesh() != nullptr;
+}

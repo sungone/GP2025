@@ -65,5 +65,9 @@ public:
 	FOnLevelChanged OnLevelChanged;
 	FOnNickNameChanged OnNickNameChanged;
 
+	// <현재 무기가 장착중인지 판별>
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	virtual bool HasWeaponEquipped() const { return false; }
+
 
 };

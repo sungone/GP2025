@@ -58,4 +58,6 @@ public :
 	// <Effect Viewing>
 	UPROPERTY()
 	class UGPPlayerEffectHandler* EffectHandler;
+
+	virtual bool HasWeaponEquipped() const override;
 };

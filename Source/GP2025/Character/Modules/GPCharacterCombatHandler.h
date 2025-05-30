@@ -43,6 +43,7 @@ public:
 	bool IsUsingSkill() const { return bIsUsingSkill; }
 
 	// 애니메이션 세팅
+	void SetAttackWithoutWeaponMontage(UAnimMontage* Montage);
 	void SetAttackMontage(UAnimMontage* Montage);
 	void SetQSkillMontage(UAnimMontage* Montage);
 	void SetESkillMontage(UAnimMontage* Montage);
@@ -86,6 +87,9 @@ private:
 public:
 	UPROPERTY()
 	AGPCharacterBase* Owner;
+
+	UPROPERTY()
+	UAnimMontage* AttackWithoutWeaponMontage;
 
 	UPROPERTY()
 	UAnimMontage* AttackMontage;

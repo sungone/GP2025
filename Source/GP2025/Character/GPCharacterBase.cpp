@@ -324,6 +324,7 @@ void AGPCharacterBase::SetCharacterData(const UGPCharacterControlData* Character
 
 	if (CombatHandler)
 	{
+		CombatHandler->SetAttackWithoutWeaponMontage(CharacterData->AttackWithoutWeaponAnimMontage);
 		CombatHandler->SetAttackMontage(CharacterData->AttackAnimMontage);
 		CombatHandler->SetDeadMontage(CharacterData->DeadAnimMontage);
 		CombatHandler->SetQSkillMontage(CharacterData->QSkillAnimMontage);  

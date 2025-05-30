@@ -15,20 +15,66 @@ void UGPCharacterCombatHandler::Initialize(AGPCharacterBase* InOwner)
 
 void UGPCharacterCombatHandler::PlayAutoAttackMontage()
 {
-	if (!Owner || !AttackMontage) return;
+	if (!Owner)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Combat] Owner is null. Cannot play auto attack montage."));
+		return;
+	}
+
+	UAnimMontage* MontageToPlay = nullptr;
+
+	bool bHasWeapon = Owner->HasWeaponEquipped();
+
+	if (bHasWeapon)
+	{
+		MontageToPlay = AttackMontage;
+		UE_LOG(LogTemp, Log, TEXT("[Combat] Selected AttackMontage (with weapon)."));
+	}
+	else
+	{
+		MontageToPlay = AttackWithoutWeaponMontage;
+		UE_LOG(LogTemp, Log, TEXT("[Combat] Selected AttackWithoutWeaponMontage (unarmed)."));
+	}
+
+	if (!MontageToPlay)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Combat] Selected Montage is null. Cannot play animation."));
+		return;
+	}
 
 	UAnimInstance* AnimInstance = Owner->GetCharacterMesh()->GetAnimInstance();
-	if (!AnimInstance || AnimInstance->Montage_IsPlaying(AttackMontage)) return;
+	if (!AnimInstance)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Combat] AnimInstance is null. Cannot play montage."));
+		return;
+	}
+
+	if (AnimInstance->Montage_IsPlaying(MontageToPlay))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Combat] Montage is already playing. Skipping playback."));
+		return;
+	}
 
 	bIsAutoAttacking = true;
 
 	FOnMontageEnded EndDelegate;
 	EndDelegate.BindUObject(this, &UGPCharacterCombatHandler::OnAutoAttackMontageEnded);
-	AnimInstance->Montage_Play(AttackMontage, PlayRate);
-	AnimInstance->Montage_SetEndDelegate(EndDelegate, AttackMontage);
 
-	// End 델리게이트 실패 방지용 코드
-	float MontageDuration = AttackMontage->GetPlayLength();
+	float Result = AnimInstance->Montage_Play(MontageToPlay, PlayRate);
+	if (Result == 0.f)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Combat] Montage_Play failed. PlayRate: %f, Montage: %s"), PlayRate, *MontageToPlay->GetName());
+		return;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("[Combat] Montage_Play succeeded. Playing: %s at rate %f"), *MontageToPlay->GetName(), PlayRate);
+	}
+
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, MontageToPlay);
+
+	// Fail-safe timer
+	float MontageDuration = MontageToPlay->GetPlayLength();
 	float AdjustedDuration = MontageDuration / PlayRate;
 	Owner->GetWorldTimerManager().SetTimer(
 		AutoAttackFailSafeHandle,
@@ -39,7 +85,6 @@ void UGPCharacterCombatHandler::PlayAutoAttackMontage()
 				UE_LOG(LogTemp, Error, TEXT("[Combat] Failsafe: Montage didn't end properly. Cleaning up manually."));
 				bIsAutoAttacking = false;
 				Owner->CharacterInfo.RemoveState(STATE_AUTOATTACK);
-
 			}
 		},
 		AdjustedDuration + 0.2f,
@@ -314,6 +359,11 @@ void UGPCharacterCombatHandler::OnSkillMontageEnded(UAnimMontage* Montage, bool 
 			Owner->GetWorldTimerManager().ClearTimer(SkillFailSafeHandle);
 		}
 	}
+}
+
+void UGPCharacterCombatHandler::SetAttackWithoutWeaponMontage(UAnimMontage* Montage)
+{
+	AttackWithoutWeaponMontage = Montage;
 }
 
 void UGPCharacterCombatHandler::SetAttackMontage(UAnimMontage* Montage)
