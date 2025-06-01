@@ -91,9 +91,11 @@ void UGPMyplayerCameraHandler::StopZoom()
 
 bool UGPMyplayerCameraHandler::IsZooming() const
 {
-#if UE_BUILD_SHIPPING
+#if UE_BUILD_SHIPPING || PLATFORM_ANDROID
+	// Shipping 또는 Android 플랫폼에서는 안전한 코드만
 	return bWantsToZoom;
 #else
+	// 개발 플랫폼(PC 등)에서는 디버깅 목적의 this 체크 허용
 	return this && bWantsToZoom;
 #endif
 }

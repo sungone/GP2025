@@ -60,4 +60,7 @@ protected:
 public :
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character")
 	uint8 bIsZooming : 1;
+
+	UPROPERTY()
+	class UGPMyplayerCameraHandler* CachedCameraHandler;
 };

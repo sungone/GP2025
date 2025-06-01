@@ -17,10 +17,9 @@ void UGPCharacterAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 	Owner = Cast<ACharacter>(GetOwningActor());
-
-	if (Owner)
+	if (AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(Owner))
 	{
-		Movement = Owner->GetCharacterMovement();
+		CachedCameraHandler = MyPlayer->CameraHandler; 
 	}
 
 }
@@ -28,6 +27,20 @@ void UGPCharacterAnimInstance::NativeInitializeAnimation()
 void UGPCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
+
+	if (!Owner)
+	{
+		Owner = Cast<AGPCharacterBase>(TryGetPawnOwner());
+		if (Owner)
+		{
+			Movement = Owner->GetCharacterMovement();
+
+			if (AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(Owner))
+			{
+				CachedCameraHandler = MyPlayer->CameraHandler;
+			}
+		}
+	}
 
 	if (Movement)
 	{
@@ -40,16 +53,13 @@ void UGPCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if (Owner)
 	{
-		AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(Owner);
-		if (MyPlayer)
+		if (AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(Owner))
 		{
-			bIsZooming = MyPlayer->CameraHandler->IsZooming();
+			bIsZooming = (CachedCameraHandler != nullptr) ? CachedCameraHandler->IsZooming() : false;
 		}
-		else
+		else if (AGPCharacterPlayer* Player = Cast<AGPCharacterPlayer>(Owner))
 		{
-			AGPCharacterPlayer* Player = Cast<AGPCharacterPlayer>(Owner);
-			if (Player)
-				bIsZooming = Player->CharacterInfo.HasState(STATE_AIMING);
+			bIsZooming = Player->CharacterInfo.HasState(STATE_AIMING);
 		}
 	}
 }
