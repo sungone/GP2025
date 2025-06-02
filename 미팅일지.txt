@@ -435,3 +435,28 @@
     1. Concurrency Visualizer로 서버 bottle neck 어디인가 검사
     1. 실제 모바일 기계 실행 (왠 권한 설정????) => 이런 흔한 문제는 인터넷 뒤지면 답이 있을 것임.
     취업 포트폴리오를 위해서 여러가지 퀄리티 업을 시도해 볼것. => 작업일지에 잘 적을 것 => 2학기떄 포트폴리오에 옮겨 적을 예정
+
+2025-06-02
+------------
+0. 김병현 결석
+1. 진행상황 
+  - 안드로이드 에뮬 실행
+  - 상거래 추가
+  - 편의점 Object들 추가
+  - 썰렁한 TINO 구현
+
+2. 문제점 
+ - CRASH 발생 : sparse_delegate.h
+ - void Add(FScriptDelegate InDelegate)
+{
+	bIsBound |= FSparseDelegateStorage::Add(GetDelegateOwner(), GetDelegateName(), MoveTemp(InDelegate));
+	
+
+3. 다음 미팅
+ - 최종 보스 티노 스킬 구현
+ - CRASH 잡을 것
+ - 중점연구과제 진행
+    1. Concurrency Visualizer로 서버 bottle neck 어디인가 검사    <= Dummy Client 실행가능하게 할 것
+    1. 실제 모바일 기계 실행 (왠 권한 설정????) => 이런 흔한 문제는 인터넷 뒤지면 답이 있을 것임.
+    1. 취업 포트폴리오를 위해서 여러가지 퀄리티 업을 시도해 볼것. => 작업일지에 잘 적을 것 => 2학기떄 포트폴리오에 옮겨 적을 예정
+ - 6월 23일 월요일 오후 4시 30분 
