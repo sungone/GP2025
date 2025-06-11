@@ -41,7 +41,14 @@ public:
 	void ShowDeadScreen();
 	
 	// Quest
-	void AcceptQuest(const FString& QuestID);
+	// Quest Entry 직접 추가용 함수
+	void AddQuestEntry(uint8 QuestType, bool bIsSuccess = false);
+
+	// Quest Entry 상태 갱신용 함수
+	void UpdateQuestState(uint8 QuestType, bool bIsSuccess);
+
+	// QuestList 전체 접근용 Getter (참고로 만들면 확장성도 좋음)
+	class UGPQuestListWidget* GetQuestListWidget();
 
 public:
 	UPROPERTY()

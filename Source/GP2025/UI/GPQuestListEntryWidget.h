@@ -19,10 +19,15 @@ public:
 	virtual void NativeConstruct() override;
 
 	void SetQuestState(bool bIsSuccess);
+	void SetQuestTask(uint8 InQuestType);
 
 public:
 	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "Quest")
 	class UTextBlock* QuestStateText;
 
-	QuestType EntryType = QuestType::CH3_KILL_TINO;
+	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "Quest")
+	class UTextBlock* QuestTaskText;
+
+	// QuestType EntryType;
+	uint8 EntryType;
 };

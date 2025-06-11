@@ -218,13 +218,34 @@ void UGPMyplayerUIManager::ShowDeadScreen()
 	}
 }
 
-void UGPMyplayerUIManager::AcceptQuest(const FString& QuestID)
+void UGPMyplayerUIManager::AddQuestEntry(uint8 QuestType, bool bIsSuccess)
 {
-
-	if (GetInGameWidget() && GetInGameWidget()->QuestListWidget)
+	UGPQuestListWidget* QuestList = GetQuestListWidget();
+	if (QuestList)
 	{
-		GetInGameWidget()->QuestListWidget->ShowQuestEntry(QuestID);
+		QuestList->AddQuestEntry(QuestType, bIsSuccess);
 	}
+}
+
+void UGPMyplayerUIManager::UpdateQuestState(uint8 QuestType, bool bIsSuccess)
+{
+	UGPQuestListWidget* QuestList = GetQuestListWidget();
+	if (QuestList)
+	{
+		QuestList->UpdateQuestState(QuestType, bIsSuccess);
+	}
+}
+
+
+
+UGPQuestListWidget* UGPMyplayerUIManager::GetQuestListWidget()
+{
+	UGPInGameWidget* InGame = GetInGameWidget();
+	if (InGame)
+	{
+		return InGame->QuestListWidget;
+	}
+	return nullptr;
 }
 
 UGPInGameWidget* UGPMyplayerUIManager::GetInGameWidget()

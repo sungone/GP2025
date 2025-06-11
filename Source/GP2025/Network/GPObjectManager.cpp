@@ -702,8 +702,11 @@ void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
 
 void UGPObjectManager::OnQuestStart(QuestType Quest)
 {
-	//Todo:
-	//퀘스트 메세지 UI로 띄우기 -> 튜토리얼은 상호작용 npc없이 그냥 UI로 바로 출력하면 좋을듯? 
+	if (MyPlayer && MyPlayer->UIManager)
+	{
+		uint8 QuestID = static_cast<uint8>(Quest);
+		MyPlayer->UIManager->AddQuestEntry(QuestID, false);
+	}
 }
 
 void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpReward, uint32 GoldReward)
@@ -714,52 +717,90 @@ void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpR
 		ExpReward,
 		GoldReward);
 
-	if (bSuccess)
+	if (!bSuccess)
 	{
-		switch (Quest)
-		{
-		case QuestType::NONE:
-			UE_LOG(LogTemp, Warning, TEXT("[QuestReward] QuestType::NONE - No reward"));
-			break;
-
-		case QuestType::CH1_TALK_TO_STUDENT_A:
-			UE_LOG(LogTemp, Warning, TEXT("[QuestReward] CH1_TALK_TO_STUDENT_A reward handling"));
-			// NPC 대화 퀘스트 보상 처리
-			break;
-
-		case QuestType::CH3_KILL_TINO:
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[QuestReward] CH3_KILL_TINO reward handling"));
-
-			UGPQuestListEntryWidget* LocalMyPlayerCurrentQuest
-				= MyPlayer->UIManager->GetInGameWidget()->QuestListWidget->TinoQuest;
-
-			if (LocalMyPlayerCurrentQuest)
-			{
-				if (LocalMyPlayerCurrentQuest->EntryType == QuestType::CH3_KILL_TINO)
-				{
-					UE_LOG(LogTemp, Warning, TEXT("[QuestReward] Updating quest state to Success"));
-					LocalMyPlayerCurrentQuest->SetQuestState(true);
-				}
-				else
-				{
-					UE_LOG(LogTemp, Warning, TEXT("[QuestReward] EntryType mismatch. Expected CH3_KILL_TINO, got %d"), static_cast<int32>(LocalMyPlayerCurrentQuest->EntryType));
-				}
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error, TEXT("[QuestReward] TinoQuest widget is nullptr!"));
-			}
-			break;
-		}
-
-		default:
-			UE_LOG(LogTemp, Warning, TEXT("[QuestReward] Unhandled QuestType: %d"), static_cast<int32>(Quest));
-			break;
-		}
+		UE_LOG(LogTemp, Warning, TEXT("[QuestReward] Quest Failed. No reward applied."));
+		return;
 	}
-	else
+
+	FString RewardMessage;
+
+	switch (Quest)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[QuestReward] bSuccess is false. No rewards applied."));
+	case QuestType::CH1_TALK_TO_STUDENT_A:
+		RewardMessage = TEXT("학생 A와의 대화를 완료했습니다!");
+		break;
+
+	case QuestType::CH1_GO_TO_E_FIRST:
+		RewardMessage = TEXT("E동으로 이동 완료!");
+		break;
+
+	case QuestType::CH1_FIND_JANITOR:
+		RewardMessage = TEXT("경비아저씨를 찾았습니다!");
+		break;
+
+	case QuestType::CH1_GO_TO_BUNKER:
+		RewardMessage = TEXT("벙커로 성공적으로 이동했습니다.");
+		break;
+
+	case QuestType::CH1_BUNKER_CLEANUP:
+		RewardMessage = TEXT("벙커의 몬스터를 제거했습니다!");
+		break;
+
+	case QuestType::CH1_FIND_KEY_ITEM:
+		RewardMessage = TEXT("열쇠 아이템을 획득했습니다.");
+		break;
+
+	case QuestType::CH1_ENTER_E_BUILDING:
+		RewardMessage = TEXT("E동에 입장 성공!");
+		break;
+
+	case QuestType::CH1_CLEAR_E_BUILDING:
+		RewardMessage = TEXT("E동을 클리어했습니다.");
+		break;
+
+	case QuestType::CH1_RETURN_TO_TIP_WITH_DOC:
+		RewardMessage = TEXT("문서를 무사히 전달했습니다.");
+		break;
+
+	case QuestType::CH2_CLEAR_SERVER_ROOM:
+		RewardMessage = TEXT("서버룸을 클리어했습니다.");
+		break;
+
+	case QuestType::CH3_ENTER_GYM:
+		RewardMessage = TEXT("체육관 입장 완료!");
+		break;
+
+	case QuestType::CH3_KILL_TINO:
+		RewardMessage = TEXT("최종 보스 티노를 처치했습니다!");
+		break;
+
+	case QuestType::TUT_MOVE:
+		RewardMessage = TEXT("튜토리얼: 이동 완료!");
+		break;
+
+	case QuestType::TUT_KILL_ONE_MON:
+		RewardMessage = TEXT("튜토리얼: 몬스터 처치 완료!");
+		break;
+
+	case QuestType::TUT_USE_ITEM:
+		RewardMessage = TEXT("튜토리얼: 아이템 사용 완료!");
+		break;
+
+	case QuestType::TUT_BUY_ITEM:
+		RewardMessage = TEXT("튜토리얼: 아이템 구매 완료!");
+		break;
+
+	case QuestType::TUT_EQUIP_ITEM:
+		RewardMessage = TEXT("튜토리얼: 장비 착용 완료!");
+		break;
+
+	case QuestType::TUT_COMPLETE:
+		RewardMessage = TEXT("튜토리얼 완료! 본격적인 모험을 시작하세요.");
+		break;
+
+	default:
+		RewardMessage = TEXT("알 수 없는 퀘스트 보상이 도착했습니다.");
+		break;
 	}
 }

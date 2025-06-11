@@ -27,19 +27,19 @@ void UGPQuestWidget::OnQuestAccepted()
 {
 	if (!OwningNPC) return;
 
-	AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0));
-	if (MyPlayer && MyPlayer->UIManager)
-	{
-		MyPlayer->UIManager->GetInGameWidget()->QuestListWidget->ShowQuestEntry(TEXT("TinoQuest"));
-	}
+	//AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	//if (MyPlayer && MyPlayer->UIManager)
+	//{
+	//	MyPlayer->UIManager->GetInGameWidget()->QuestListWidget->ShowQuestEntry(TEXT("TinoQuest"));
+	//}
 
-	UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-	if (NetMgr)
-	{
-		NetMgr->SendMyRequestQuest(QuestType::CH3_KILL_TINO); // 일단 티노보스 퀘스트 요청
-	}
+	//UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+	//if (NetMgr)
+	//{
+	//	NetMgr->SendMyRequestQuest(QuestType::CH3_KILL_TINO); // 일단 티노보스 퀘스트 요청
+	//}
 
-	OwningNPC->ExitInteraction(); 
+	//OwningNPC->ExitInteraction(); 
 }
 
 void UGPQuestWidget::OnQuestExit()

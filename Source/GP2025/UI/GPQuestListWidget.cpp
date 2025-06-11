@@ -1,23 +1,35 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "UI/GPQuestListWidget.h"
 #include "UI/GPQuestListEntryWidget.h"
+#include "Components/ScrollBox.h"
 
 void UGPQuestListWidget::NativeConstruct()
 {
-	Super::NativeConstruct();
-
-	if (TinoQuest)
-	{
-		TinoQuest->SetVisibility(ESlateVisibility::Hidden);
-	}
+    Super::NativeConstruct();
+    QuestEntries.Empty();
 }
 
-void UGPQuestListWidget::ShowQuestEntry(const FString& QuestID)
+void UGPQuestListWidget::AddQuestEntry(uint8 QuestType, bool bIsSuccess)
 {
-	if (QuestID == "TinoQuest" && TinoQuest)
-	{
-		TinoQuest->SetVisibility(ESlateVisibility::Visible);
-	}
+	if (!QuestListEntryClass || !QuestListScrollBox)
+		return;
+
+	if (QuestEntries.Contains(QuestType))
+		return;
+
+	UGPQuestListEntryWidget* NewEntry = CreateWidget<UGPQuestListEntryWidget>(GetWorld(), QuestListEntryClass);
+	NewEntry->EntryType = QuestType;
+
+	NewEntry->SetQuestTask(QuestType);
+	NewEntry->SetQuestState(bIsSuccess);
+
+	QuestListScrollBox->AddChild(NewEntry);
+	QuestEntries.Add(QuestType, NewEntry);
+}
+
+void UGPQuestListWidget::UpdateQuestState(uint8 QuestType, bool bIsSuccess)
+{
+    if (UGPQuestListEntryWidget** FoundEntry = QuestEntries.Find(QuestType))
+    {
+        (*FoundEntry)->SetQuestState(bIsSuccess);
+    }
 }
