@@ -537,6 +537,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_QUEST_START:
 			{
 				QuestStartPacket* Pkt = reinterpret_cast<QuestStartPacket*>(RemainingData.GetData());
+				UE_LOG(LogTemp, Warning, TEXT("=== [Packet] S_QUEST_START received, Quest = %d ==="), static_cast<uint8>(Pkt->Quest));
 				ObjectMgr->OnQuestStart(Pkt->Quest);
 				break;
 			}

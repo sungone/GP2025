@@ -132,6 +132,12 @@ void AGPCharacterMyplayer::OnPlayerEnterGame()
 
 		UIManager->OnSetUpInGameWidgets();
 	}
+
+	// 1-1 CH1_TALK_TO_STUDENT_A Äù½ºÆ® ¿äÃ»
+	if (NetMgr)
+	{
+		NetMgr->SendMyRequestQuest(QuestType::CH1_TALK_TO_STUDENT_A);
+	}
 }
 
 void AGPCharacterMyplayer::OnPlayerEnterLobby()

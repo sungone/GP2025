@@ -220,10 +220,17 @@ void UGPMyplayerUIManager::ShowDeadScreen()
 
 void UGPMyplayerUIManager::AddQuestEntry(uint8 QuestType, bool bIsSuccess)
 {
+	UE_LOG(LogTemp, Warning, TEXT("=== [UIManager] AddQuestEntry called: QuestType = %d, bIsSuccess = %s ==="), QuestType, bIsSuccess ? TEXT("true") : TEXT("false"));
+
 	UGPQuestListWidget* QuestList = GetQuestListWidget();
 	if (QuestList)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("=== [UIManager] QuestListWidget is valid. Calling AddQuestEntry to QuestListWidget ==="));
 		QuestList->AddQuestEntry(QuestType, bIsSuccess);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("[UIManager] QuestListWidget is NULL"));
 	}
 }
 

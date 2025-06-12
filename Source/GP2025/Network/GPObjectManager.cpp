@@ -702,10 +702,17 @@ void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
 
 void UGPObjectManager::OnQuestStart(QuestType Quest)
 {
+	UE_LOG(LogTemp, Warning, TEXT("=== [ObjectManager] OnQuestStart called: QuestType = %d ==="), static_cast<uint8>(Quest));
+
 	if (MyPlayer && MyPlayer->UIManager)
 	{
 		uint8 QuestID = static_cast<uint8>(Quest);
+		UE_LOG(LogTemp, Warning, TEXT("=== [ObjectManager] Calling UIManager->AddQuestEntry(%d) ==="), QuestID);
 		MyPlayer->UIManager->AddQuestEntry(QuestID, false);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("[ObjectManager] MyPlayer or UIManager is NULL"));
 	}
 }
 
