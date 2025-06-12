@@ -519,7 +519,11 @@ bool Player::SetCurrentQuest(QuestType quest)
 		LOG(Warning, "Invalid quest ID");
 		return false;
 	}
-	if (!StartQuest(quest)) return false;
+	if (!StartQuest(quest))
+		return false;
+
+	auto qpkt = QuestStartPacket(questData->QuestID);
+	SessionManager::GetInst().SendPacket(_id, &qpkt);
 	return true;
 }
 
