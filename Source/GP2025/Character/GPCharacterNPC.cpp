@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Character/GPCharacterNPC.h"
@@ -15,6 +15,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Character/Modules/GPMyplayerUIManager.h"
 #include "Character/GPCharacterMyplayer.h"
+#include "Network/GPNetworkManager.h"
 
 AGPCharacterNPC::AGPCharacterNPC()
 {
@@ -42,7 +43,7 @@ AGPCharacterNPC::AGPCharacterNPC()
 	InteractionSphere->SetCollisionProfileName(TEXT("Trigger"));
 	InteractionSphere->SetGenerateOverlapEvents(true);
 
-	// ���� UI
+	// 설명 UI
 	InteractionWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractionWidget"));
 	InteractionWidgetComponent->SetupAttachment(RootComponent);
 	InteractionWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
@@ -76,7 +77,7 @@ void AGPCharacterNPC::OpenShopUI(APlayerController* PlayerController)
 
 			if (UGPShop* LocalShopWidget = Cast<UGPShop>(ShopWidget))
 			{
-				LocalShopWidget->SetOwningNPC(this);  // Owning NPC ����
+				LocalShopWidget->SetOwningNPC(this);  // Owning NPC 설정
 
 				if (MyPlayer)
 				{
@@ -168,6 +169,25 @@ void AGPCharacterNPC::OpenQuestUI(APlayerController* PlayerController)
 			{
 				LocalQuestWidget->OwningNPC = this;
 
+				switch (NPCType)
+				{
+				case ENPCType::QUEST:
+					LocalQuestWidget->SetQuestTitle(TEXT("퀘스트 시작"));
+					LocalQuestWidget->SetQuestDescription(TEXT("새로운 퀘스트를 시작하시겠습니까?"));
+					break;
+
+				case ENPCType::STUDENT:
+					LocalQuestWidget->SetQuestTitle(TEXT("학생 A"));
+					LocalQuestWidget->SetQuestDescription(TEXT("안녕하세요! 도와주실 수 있나요?"));
+					break;
+
+				default:
+					LocalQuestWidget->SetQuestTitle(TEXT("대화"));
+					LocalQuestWidget->SetQuestDescription(TEXT("이 NPC는 특별한 대화가 없습니다."));
+					break;
+				}
+
+				// MyPlayer 바인딩 유지
 				if (AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0)))
 				{
 					if (MyPlayer->UIManager)
@@ -273,6 +293,7 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 		bIsInteracting = true;
 		break;
 	case ENPCType::QUEST:
+	case ENPCType::STUDENT:
 		MyPlayer->CameraHandler->StartDialogueCamera(GetActorLocation());
 		GetWorld()->GetTimerManager().SetTimer(
 			QuestOpenUITimerHandle,
@@ -282,6 +303,7 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 			false
 		);
 		break;
+
 	default:
 		break;
 	}
@@ -294,15 +316,13 @@ void AGPCharacterNPC::ExitInteraction()
 	switch (NPCType)
 	{
 	case ENPCType::GSSHOP:
-		CloseShopUI();
-		break;
 	case ENPCType::SUITSHOP:
-		CloseShopUI();
-		break;
 	case ENPCType::JUICESHOP:
 		CloseShopUI();
 		break;
+
 	case ENPCType::QUEST:
+	case ENPCType::STUDENT:
 		if (AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0)))
 		{
 			if (MyPlayer->CameraHandler)

@@ -23,23 +23,56 @@ void UGPQuestWidget::NativeConstruct()
 	}
 }
 
+void UGPQuestWidget::SetQuestDescription(const FString& Description)
+{
+	if (QuestDescriptionText)
+	{
+		QuestDescriptionText->SetText(FText::FromString(Description));
+	}
+}
+
+void UGPQuestWidget::SetQuestTitle(const FString& Title)
+{
+	if (QuestTypeText)
+	{
+		QuestTypeText->SetText(FText::FromString(Title));
+	}
+}
+
 void UGPQuestWidget::OnQuestAccepted()
 {
 	if (!OwningNPC) return;
 
-	//AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0));
-	//if (MyPlayer && MyPlayer->UIManager)
-	//{
-	//	MyPlayer->UIManager->GetInGameWidget()->QuestListWidget->ShowQuestEntry(TEXT("TinoQuest"));
-	//}
+	// 플레이어 접근
+	AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!MyPlayer) return;
 
-	//UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-	//if (NetMgr)
-	//{
-	//	NetMgr->SendMyRequestQuest(QuestType::CH3_KILL_TINO); // 일단 티노보스 퀘스트 요청
-	//}
+	UGPNetworkManager* NetMgr = MyPlayer->NetMgr;
+	if (!NetMgr) return;
 
-	//OwningNPC->ExitInteraction(); 
+	// NPC 타입에 따라 처리 분기
+	switch (OwningNPC->NPCType)
+	{
+	case ENPCType::STUDENT:
+	{
+		// STUDENT 퀘스트 완료 요청 → 서버로 패킷 전송
+		NetMgr->SendMyCompleteQuest(QuestType::CH1_TALK_TO_STUDENT_A);
+		UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] STUDENT NPC: SendMyCompleteQuest(CH1_TALK_TO_STUDENT_A)"));
+		break;
+	}
+	case ENPCType::QUEST:
+	{
+		// 추후 일반 퀘스트 NPC는 여기에 확장
+		break;
+	}
+	default:
+	{
+		break;
+	}
+	}
+
+	// UI 종료
+	OwningNPC->ExitInteraction();
 }
 
 void UGPQuestWidget::OnQuestExit()

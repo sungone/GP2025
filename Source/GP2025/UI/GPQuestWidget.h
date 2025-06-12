@@ -16,6 +16,9 @@ class GP2025_API UGPQuestWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
+	// Setter Ãß°¡
+	void SetQuestDescription(const FString& Description);
+	void SetQuestTitle(const FString& Title);
 public:
 
 	UPROPERTY(meta = (BindWidget))
