@@ -113,7 +113,9 @@ void PlayerSession::DoSend(const Packet* packet)
 	case S_QUEST_REWARD:
 		LOG(LogType::SendLog, std::format("QuestReward PKT to [{}]", _id));
 		break;
-
+	case S_QUEST_START:
+		LOG(LogType::SendLog, std::format("QuestStart PKT to [{}]", _id));
+		break;
 	case S_CHAT_BROADCAST:
 		LOG(LogType::SendLog, std::format("ChatBroadcast PKT to [{}]", _id));
 		break;
