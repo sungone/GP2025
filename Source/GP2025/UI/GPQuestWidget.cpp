@@ -67,9 +67,11 @@ void UGPQuestWidget::OnQuestAccepted()
 		UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] SECURITY NPC: SendMyCompleteQuest(CH1_FIND_JANITOR)"));
 		break;
 	}
-	case ENPCType::QUEST:
+	case ENPCType::PROFESSOR:
 	{
-		// 추후 일반 퀘스트 NPC는 여기에 확장
+		// STUDENT 퀘스트 완료 요청 → 서버로 패킷 전송
+		NetMgr->SendMyCompleteQuest(QuestType::CH1_RETURN_TO_TIP_WITH_DOC); // 일단 임시
+		UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] SECURITY NPC: SendMyCompleteQuest(CH1_FIND_JANITOR)"));
 		break;
 	}
 	default:

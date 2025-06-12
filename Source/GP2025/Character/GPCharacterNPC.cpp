@@ -171,9 +171,9 @@ void AGPCharacterNPC::OpenQuestUI(APlayerController* PlayerController)
 
 				switch (NPCType)
 				{
-				case ENPCType::QUEST:
-					LocalQuestWidget->SetQuestTitle(TEXT("퀘스트 시작"));
-					LocalQuestWidget->SetQuestDescription(TEXT("새로운 퀘스트를 시작하시겠습니까?"));
+				case ENPCType::PROFESSOR:
+					LocalQuestWidget->SetQuestTitle(TEXT("교수님"));
+					LocalQuestWidget->SetQuestDescription(TEXT("어서오게나"));
 					break;
 
 				case ENPCType::STUDENT:
@@ -258,7 +258,7 @@ void AGPCharacterNPC::OnInteractionExit(UPrimitiveComponent* OverlappedComp, AAc
 		case ENPCType::JUICESHOP:
 			CloseShopUI();
 			break;
-		case ENPCType::QUEST:
+		case ENPCType::PROFESSOR:
 		case ENPCType::SECURITY:
 		case ENPCType::STUDENT:
 			MyPlayer->CameraHandler->StopDialogueCamera();
@@ -297,7 +297,7 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 		OpenShopUI(PC);
 		bIsInteracting = true;
 		break;
-	case ENPCType::QUEST:
+	case ENPCType::PROFESSOR:
 	case ENPCType::STUDENT:
 	case ENPCType::SECURITY:
 		MyPlayer->CameraHandler->StartDialogueCamera(GetActorLocation());
@@ -327,7 +327,7 @@ void AGPCharacterNPC::ExitInteraction()
 		CloseShopUI();
 		break;
 
-	case ENPCType::QUEST:
+	case ENPCType::PROFESSOR:
 	case ENPCType::STUDENT:
 	case ENPCType::SECURITY:
 		if (AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0)))

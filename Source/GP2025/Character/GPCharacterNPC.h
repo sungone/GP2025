@@ -13,9 +13,10 @@ enum class ENPCType : uint8
 	GSSHOP     UMETA(DisplayName = "GSShop"),
 	SUITSHOP   UMETA(DisplayName = "SuitShop"),
 	JUICESHOP  UMETA(DisplayName = "JuiceShop"),
-	QUEST      UMETA(DisplayName = "QuestNPC"),
 	STUDENT    UMETA(DisplayName = "StudentNPC"),
-	SECURITY   UMETA(DisplayName = "SecurityNPC")
+	SECURITY   UMETA(DisplayName = "SecurityNPC"),
+	PROFESSOR  UMETA(DisplayName = "ProfessorNPC")
+
 };
 
 /**

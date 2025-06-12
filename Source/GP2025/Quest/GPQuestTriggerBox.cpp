@@ -24,7 +24,10 @@ void AGPQuestTriggerBox::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherAc
 		// Quest 분기 처리
 		switch (TriggerQuestType)
 		{
-		case 4:
+		case 2: // CH1_GO_TO_E_FIRST
+			MyPlayer->NetMgr->SendMyCompleteQuest(QuestType::CH1_GO_TO_E_FIRST);
+
+		case 4: // CH1_GO_TO_BUNKER
 			MyPlayer->NetMgr->SendMyCompleteQuest(QuestType::CH1_GO_TO_BUNKER);
 			break;
 
