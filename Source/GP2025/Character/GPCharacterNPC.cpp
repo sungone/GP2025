@@ -180,7 +180,10 @@ void AGPCharacterNPC::OpenQuestUI(APlayerController* PlayerController)
 					LocalQuestWidget->SetQuestTitle(TEXT("학생 A"));
 					LocalQuestWidget->SetQuestDescription(TEXT("안녕하세요! 도와주실 수 있나요?"));
 					break;
-
+				case ENPCType::SECURITY:
+					LocalQuestWidget->SetQuestTitle(TEXT("경비 아저씨"));
+					LocalQuestWidget->SetQuestDescription(TEXT("안녕하세요! 도와주실 수 있나요?"));
+					break;
 				default:
 					LocalQuestWidget->SetQuestTitle(TEXT("대화"));
 					LocalQuestWidget->SetQuestDescription(TEXT("이 NPC는 특별한 대화가 없습니다."));
@@ -256,6 +259,8 @@ void AGPCharacterNPC::OnInteractionExit(UPrimitiveComponent* OverlappedComp, AAc
 			CloseShopUI();
 			break;
 		case ENPCType::QUEST:
+		case ENPCType::SECURITY:
+		case ENPCType::STUDENT:
 			MyPlayer->CameraHandler->StopDialogueCamera();
 			CloseQuestUI();
 			break;
@@ -294,6 +299,7 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 		break;
 	case ENPCType::QUEST:
 	case ENPCType::STUDENT:
+	case ENPCType::SECURITY:
 		MyPlayer->CameraHandler->StartDialogueCamera(GetActorLocation());
 		GetWorld()->GetTimerManager().SetTimer(
 			QuestOpenUITimerHandle,
@@ -323,6 +329,7 @@ void AGPCharacterNPC::ExitInteraction()
 
 	case ENPCType::QUEST:
 	case ENPCType::STUDENT:
+	case ENPCType::SECURITY:
 		if (AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0)))
 		{
 			if (MyPlayer->CameraHandler)

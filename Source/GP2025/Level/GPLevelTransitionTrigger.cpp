@@ -96,6 +96,31 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 
 			NetworkMgr->SendMyZoneChangePacket(NewZone);
 			UE_LOG(LogTemp, Log, TEXT("[AGPLevelTransitionTrigger] SendMyZoneChangePacket Send Success"));
+
+			if (NewZone == ZoneType::E)
+			{
+				NetworkMgr->SendMyCompleteQuest(QuestType::CH1_GO_TO_E_FIRST);
+				UE_LOG(LogTemp, Log, TEXT("[AGPLevelTransitionTrigger] CH1_GO_TO_E_FIRST Quest Complete Packet Sent"));
+			}
+
+			// 퀘스트 E동으로 이동한다 : 보상 -> 문이 잠겨있어 경비아저씨를 찾는다 : 퀘스트 시작
+			//if (NewZone == ZoneType::E)
+			//{
+			//	if (CachedPlayer)
+			//	{
+			//		QuestStatus CurQuest = CachedPlayer->CharacterInfo.CurrentQuest;
+			//		if (CurQuest.QuestType == QuestType::CH1_GO_TO_E_FIRST
+			//			&& CurQuest.Status == EQuestStatus::InProgress)
+			//		{
+			//			NetworkMgr->SendMyCompleteQuest(CurQuest.QuestType);
+			//			UE_LOG(LogTemp, Log, TEXT("[AGPLevelTransitionTrigger] Correct Quest -> CH1_GO_TO_E_FIRST Complete Sent"));
+			//		}
+			//		else
+			//		{
+			//			UE_LOG(LogTemp, Warning, TEXT("[AGPLevelTransitionTrigger] Entered E zone, but quest mismatch or not active"));
+			//		}
+			//	}
+			//}
 		}
 	}
 }
