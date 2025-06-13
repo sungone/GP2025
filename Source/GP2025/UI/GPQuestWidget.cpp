@@ -55,21 +55,18 @@ void UGPQuestWidget::OnQuestAccepted()
 	{
 	case ENPCType::STUDENT:
 	{
-		// STUDENT 퀘스트 완료 요청 → 서버로 패킷 전송
 		NetMgr->SendMyCompleteQuest(QuestType::CH1_TALK_TO_STUDENT_A);
 		UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] STUDENT NPC: SendMyCompleteQuest(CH1_TALK_TO_STUDENT_A)"));
 		break;
 	}
 	case ENPCType::SECURITY:
 	{
-		// STUDENT 퀘스트 완료 요청 → 서버로 패킷 전송
 		NetMgr->SendMyCompleteQuest(QuestType::CH1_FIND_JANITOR);
 		UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] SECURITY NPC: SendMyCompleteQuest(CH1_FIND_JANITOR)"));
 		break;
 	}
 	case ENPCType::PROFESSOR:
 	{
-		// STUDENT 퀘스트 완료 요청 → 서버로 패킷 전송
 		NetMgr->SendMyCompleteQuest(QuestType::CH1_RETURN_TO_TIP_WITH_DOC); // 일단 임시
 		UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] SECURITY NPC: SendMyCompleteQuest(CH1_FIND_JANITOR)"));
 		break;
