@@ -9,7 +9,9 @@
 #include "Character/GPCharacterMyplayer.h"
 #include "Network/GPNetworkManager.h"
 #include "Physics/GPCollision.h"
+#include "Inventory/GPInventory.h"
 #include "NiagaraComponent.h"
+#include "Character/Modules/GPMyplayerUIManager.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Engine/World.h"
 #include "Engine/LevelStreaming.h"
@@ -84,43 +86,47 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 	if (!LevelToLoad.IsNone())
 	{
 		UGPNetworkManager* NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-		if (NetworkMgr)
+		if (!NetworkMgr) return;
+
+		ZoneType NewZone = ZoneType::TUK;
+
+		if (LevelToLoad == "tip")       NewZone = ZoneType::TIP;
+		else if (LevelToLoad == "E")    NewZone = ZoneType::E;
+		else if (LevelToLoad == "gym")  NewZone = ZoneType::GYM;
+		else if (LevelToLoad == "TUK")  NewZone = ZoneType::TUK;
+		else if (LevelToLoad == "industry")  NewZone = ZoneType::INDUSTY;
+
+		// 이 부분이 핵심:
+		if (NewZone == ZoneType::E)
 		{
-			ZoneType NewZone = ZoneType::TUK;
-
-			if (LevelToLoad == "tip")       NewZone = ZoneType::TIP;
-			else if (LevelToLoad == "E")    NewZone = ZoneType::E;
-			else if (LevelToLoad == "gym")  NewZone = ZoneType::GYM;
-			else if (LevelToLoad == "TUK")  NewZone = ZoneType::TUK;
-			else if (LevelToLoad == "industry")  NewZone = ZoneType::INDUSTY;
-
-			NetworkMgr->SendMyZoneChangePacket(NewZone);
-			UE_LOG(LogTemp, Log, TEXT("[AGPLevelTransitionTrigger] SendMyZoneChangePacket Send Success"));
-
-			if (NewZone == ZoneType::E)
+			// 1. 인벤토리 접근
+			if (CachedPlayer->UIManager && CachedPlayer->UIManager->GetInventoryWidget())
 			{
-				NetworkMgr->SendMyCompleteQuest(QuestType::CH1_GO_TO_E_FIRST);
-				UE_LOG(LogTemp, Log, TEXT("[AGPLevelTransitionTrigger] CH1_GO_TO_E_FIRST Quest Complete Packet Sent"));
-			}
+				UGPInventory* Inventory = CachedPlayer->UIManager->GetInventoryWidget();
 
-			// 퀘스트 E동으로 이동한다 : 보상 -> 문이 잠겨있어 경비아저씨를 찾는다 : 퀘스트 시작
-			//if (NewZone == ZoneType::E)
-			//{
-			//	if (CachedPlayer)
-			//	{
-			//		QuestStatus CurQuest = CachedPlayer->CharacterInfo.CurrentQuest;
-			//		if (CurQuest.QuestType == QuestType::CH1_GO_TO_E_FIRST
-			//			&& CurQuest.Status == EQuestStatus::InProgress)
-			//		{
-			//			NetworkMgr->SendMyCompleteQuest(CurQuest.QuestType);
-			//			UE_LOG(LogTemp, Log, TEXT("[AGPLevelTransitionTrigger] Correct Quest -> CH1_GO_TO_E_FIRST Complete Sent"));
-			//		}
-			//		else
-			//		{
-			//			UE_LOG(LogTemp, Warning, TEXT("[AGPLevelTransitionTrigger] Entered E zone, but quest mismatch or not active"));
-			//		}
-			//	}
-			//}
+				// 2. RowName 25번 아이템 보유 확인
+				if (Inventory->HasItemByType(25)) // 망고 바나나 아이템이 있을 때에만 포탈 이동 가능
+				{
+					// 아이템 있음 → 정상 입장 처리
+					NetworkMgr->SendMyZoneChangePacket(NewZone);
+					UE_LOG(LogTemp, Log, TEXT("[LevelTransitionTrigger] ZoneChange + QuestComplete Success"));
+				}
+				else
+				{
+					NetworkMgr->SendMyCompleteQuest(QuestType::CH1_GO_TO_E_FIRST);
+					UE_LOG(LogTemp, Warning, TEXT("[LevelTransitionTrigger] Item Type 25 not found. Cannot enter Zone E."));
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("[LevelTransitionTrigger] Inventory not valid."));
+			}
+		}
+		else
+		{
+			// E가 아닌 일반적인 존 이동
+			NetworkMgr->SendMyZoneChangePacket(NewZone);
+			UE_LOG(LogTemp, Log, TEXT("[LevelTransitionTrigger] SendMyZoneChangePacket Send Success"));
 		}
 	}
 }

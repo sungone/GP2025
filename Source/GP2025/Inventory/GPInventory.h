@@ -77,4 +77,8 @@ public :
 	// 플레이어가 가지고 있는 모든 아이템 가져오기 //
 	UFUNCTION(BlueprintCallable)
 	TArray<UGPItemSlot*> GetAllInventoryItemData() const;
+
+	// 아이템이 있는 지 확인
+	UFUNCTION(BlueprintCallable)
+	bool HasItemByType(uint8 ItemType) const;
 };

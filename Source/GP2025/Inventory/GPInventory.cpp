@@ -266,3 +266,25 @@ TArray<UGPItemSlot*> UGPInventory::GetAllInventoryItemData() const
     return AllSlots;
 }
 
+bool UGPInventory::HasItemByType(uint8 ItemType) const
+{
+    FName RowName = FName(*FString::FromInt(static_cast<int32>(ItemType)));
+    auto CheckItem = [RowName](const TArray<UGPItemSlot*>& Slots) -> bool
+        {
+            for (const auto& Slot : Slots)
+            {
+                if (Slot->SlotData.ItemID.RowName == RowName)
+                {
+                    return true; 
+                }
+            }
+            return false;
+        };
+
+    if (CheckItem(WeaponSlots)) return true;
+    if (CheckItem(ArmorSlots)) return true;
+    if (CheckItem(EatableSlots)) return true;
+
+    return false;
+}
+
