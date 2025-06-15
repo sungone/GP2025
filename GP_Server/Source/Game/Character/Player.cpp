@@ -524,6 +524,9 @@ bool Player::SetCurrentQuest(QuestType quest)
 
 	auto qpkt = QuestStartPacket(questData->QuestID);
 	SessionManager::GetInst().SendPacket(_id, &qpkt);
+	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, GetInfo());
+	SessionManager::GetInst().SendPacket(_id, &infopkt);
+
 	return true;
 }
 

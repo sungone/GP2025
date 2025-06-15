@@ -12,6 +12,7 @@ public:
 	Type::EWeapon GetRandomWeapon(Type::EPlayer playertype);
 	Type::EArmor GetRandomArmor();
 	Type::EUseable GetRandomBuffTem();
+	Type::EUseable GetRandomQuestTem();//for test
 	Type::EUseable GetRandomGold();
 
 	void SetPos(FVector pos) { _pos = pos; }

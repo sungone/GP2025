@@ -23,7 +23,10 @@ WorldItem::WorldItem(FVector pos, uint32 monlv, Type::EPlayer playertype)
 
 uint8 WorldItem::GetRandomItemType(uint32 monlv, Type::EPlayer playertype)
 {
-	uint8 itemCategory = RandomUtils::GetRandomUint8(0, 2);
+	uint8 itemCategory 
+		= RandomUtils::GetRandomUint8(
+			static_cast<uint8>(EItemCategory::Useable),
+			static_cast<uint8>(EItemCategory::Quest));
 
 	switch (itemCategory)
 	{
@@ -33,6 +36,8 @@ uint8 WorldItem::GetRandomItemType(uint32 monlv, Type::EPlayer playertype)
 		return static_cast<uint8>(GetRandomArmor());
 	case static_cast<uint8>(EItemCategory::Useable):
 		return static_cast<uint8>(GetRandomBuffTem());
+	case static_cast<uint8>(EItemCategory::Quest):
+		return static_cast<uint8>(GetRandomQuestTem());
 	}
 }
 
@@ -63,7 +68,7 @@ Type::EArmor WorldItem::GetRandomArmor()
 	return static_cast<Type::EArmor>(
 		RandomUtils::GetRandomUint8(
 			static_cast<uint8>(Type::EArmor::START),
-			static_cast<uint8>(Type::EArmor::END) - 1
+			static_cast<uint8>(Type::EArmor::END)
 		)
 		);
 }
@@ -77,6 +82,17 @@ Type::EUseable WorldItem::GetRandomBuffTem()
 		)
 		);
 }
+
+Type::EUseable WorldItem::GetRandomQuestTem()
+{
+	return static_cast<Type::EUseable>(
+		RandomUtils::GetRandomUint8(
+			static_cast<uint8>(Type::EQuestItem::START),
+			static_cast<uint8>(Type::EQuestItem::END)
+		)
+		);
+}
+
 
 Type::EUseable WorldItem::GetRandomGold()
 {

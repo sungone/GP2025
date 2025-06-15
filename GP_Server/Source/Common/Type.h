@@ -190,7 +190,7 @@ namespace Type
 		START = 50,
 		KEY = START,
 		DOCUMENT,
-		END
+		END = DOCUMENT
 	};
 }
 
