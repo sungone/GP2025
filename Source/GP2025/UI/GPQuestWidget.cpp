@@ -10,6 +10,7 @@
 #include "Network/GPNetworkManager.h"
 #include "UI/GPQuestListWidget.h"
 #include "Character/GPCharacterMyplayer.h"
+#include "Inventory/GPInventory.h"
 #include "Character/Modules/GPMyplayerUIManager.h"
 
 void UGPQuestWidget::NativeConstruct()
@@ -67,8 +68,26 @@ void UGPQuestWidget::OnQuestAccepted()
 	}
 	case ENPCType::PROFESSOR:
 	{
-		NetMgr->SendMyCompleteQuest(QuestType::CH1_RETURN_TO_TIP_WITH_DOC); // 일단 임시
-		UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] SECURITY NPC: SendMyCompleteQuest(CH1_FIND_JANITOR)"));
+		// 인벤토리 접근
+		if (MyPlayer->UIManager && MyPlayer->UIManager->GetInventoryWidget())
+		{
+			UGPInventory* Inventory = MyPlayer->UIManager->GetInventoryWidget();
+
+			if (Inventory->HasItemByType(51))  // 51번 아이템이 있는 경우에만 퀘스트 성공
+			{
+				NetMgr->SendMyCompleteQuest(QuestType::CH1_RETURN_TO_TIP_WITH_DOC);
+				UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] PROFESSOR NPC: Quest Complete Sent"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] PROFESSOR NPC: Missing Item 51 -> Cannot Complete Quest"));
+				// 필요 시 여기서 UI 메시지 출력 가능 (예: "문서를 가지고 있지 않습니다.")
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("[QuestWidget] Inventory Not Found!"));
+		}
 		break;
 	}
 	default:

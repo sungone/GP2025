@@ -527,6 +527,11 @@ void UGPObjectManager::AddInventoryItem(uint32 ItemID, uint8 ItemType)
 	}
 	UE_LOG(LogTemp, Log, TEXT("[AddInventoryItem] Inventory Widget is valid"));
 
+	if (MyPlayer->NetMgr && ItemType == 50) // 열쇠 아이템을 획득했을 때 퀘스트 클리어
+	{
+		MyPlayer->NetMgr->SendMyCompleteQuest(QuestType::CH1_FIND_KEY_ITEM);
+	}
+
 	// Add item to inventory
 	Inventory->AddItemToInventory(ItemID, ItemType, 1);
 }

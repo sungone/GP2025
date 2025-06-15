@@ -105,18 +105,19 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 				UGPInventory* Inventory = CachedPlayer->UIManager->GetInventoryWidget();
 
 				// 2. RowName 25번 아이템 보유 확인
-				if (Inventory->HasItemByType(25)) // 망고 바나나 아이템이 있을 때에만 포탈 이동 가능
+				if (Inventory->HasItemByType(50)) // 열쇠 아이템이 있을 때에만 포탈 이동 가능
 				{
 					// 아이템 있음 → 정상 입장 처리
 					NetworkMgr->SendMyZoneChangePacket(NewZone);
+					NetworkMgr->SendMyCompleteQuest(QuestType::CH1_ENTER_E_BUILDING);
 					UE_LOG(LogTemp, Log, TEXT("[LevelTransitionTrigger] ZoneChange + QuestComplete Success"));
 				}
 				else
 				{
-					NetworkMgr->SendMyCompleteQuest(QuestType::CH1_GO_TO_E_FIRST);
 					UE_LOG(LogTemp, Warning, TEXT("[LevelTransitionTrigger] Item Type 25 not found. Cannot enter Zone E."));
 				}
 			}
+
 			else
 			{
 				UE_LOG(LogTemp, Error, TEXT("[LevelTransitionTrigger] Inventory not valid."));
