@@ -203,22 +203,24 @@ void Monster::Chase()
 
 void Monster::Patrol()
 {
-	static auto& nav = Map::GetInst().GetNavMesh(_zone);
-	int currentTriIdx = nav.FindIdxFromPos(_pos);
-	if (currentTriIdx == -1) return;
+	//static auto& nav = Map::GetInst().GetNavMesh(_zone);
+	//int currentTriIdx = nav.FindIdxFromPos(_pos);
+	//if (currentTriIdx == -1)
+	//	return;
 
-	const auto& neighbors = nav.GetNeighbors(currentTriIdx);
-	if (neighbors.empty()) return;
+	//const auto& neighbors = nav.GetNeighbors(currentTriIdx);
+	//if (neighbors.empty())
+	//	return;
 
-	int randIdx = RandomUtils::GetRandomInt(0, static_cast<int>(neighbors.size()) - 1);
-	auto it = neighbors.begin();
-	std::advance(it, randIdx);
-	int nextTriIdx = *it;
+	//int randIdx = RandomUtils::GetRandomInt(0, static_cast<int>(neighbors.size()) - 1);
+	//auto it = neighbors.begin();
+	//std::advance(it, randIdx);
+	//int nextTriIdx = *it;
 
-	FVector nextPos = nav.GetTriangleCenter(nextTriIdx);
-	nextPos.Z = _pos.Z;
+	//FVector nextPos = nav.GetTriangleCenter(nextTriIdx);
+	//nextPos.Z = _pos.Z;
 
-	_info.SetLocationAndYaw(nextPos);
+	//_info.SetLocationAndYaw(nextPos);
 }
 
 
