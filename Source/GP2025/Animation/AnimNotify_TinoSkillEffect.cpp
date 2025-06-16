@@ -2,29 +2,35 @@
 
 
 #include "Animation/AnimNotify_TinoSkillEffect.h"
+#include "GameFramework/Actor.h"
+#include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
-#include "Components/SkeletalMeshComponent.h"
+#include "Engine/World.h"
+#include "DrawDebugHelpers.h"
 
 void UAnimNotify_TinoSkillEffect::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
-	if (!MeshComp || !SkillEffect) return;
+	if (!MeshComp || !ProjectileEffectClass) return;
 
 	AActor* OwnerActor = MeshComp->GetOwner();
 	if (!OwnerActor) return;
 
-	UNiagaraComponent* EffectComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
-		SkillEffect,
-		MeshComp,
-		SocketName,
-		FVector::ZeroVector,
-		FRotator::ZeroRotator,
-		EAttachLocation::SnapToTargetIncludingScale,
-		true);
+	FTransform SocketTransform = MeshComp->GetSocketTransform(FName("MuzzleSocket"));
+	FVector MuzzleLocation = MeshComp->GetSocketLocation(FName("MuzzleSocket")) + MuzzleOffset;
 
-	if (EffectComp)
-	{
-		EffectComp->SetRelativeScale3D(FVector(2.f)); // ★ 스케일 5배 적용
-	}
+	// 몬스터의 정면 방향으로 발사 (몬스터는 플레이어 조준이 아니라 AI LookAt으로 해결)
+	FVector ForwardDir = SocketTransform.GetUnitAxis(EAxis::Z);
+	FRotator FireRotation = ForwardDir.Rotation();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	OwnerActor->GetWorld()->SpawnActor<AActor>(
+		ProjectileEffectClass,
+		MuzzleLocation,
+		FireRotation,
+		SpawnParams
+	);
 }
-

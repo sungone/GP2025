@@ -16,10 +16,10 @@ class GP2025_API UAnimNotify_TinoSkillEffect : public UAnimNotify
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
-	class UNiagaraSystem* SkillEffect;
+	TSubclassOf<AActor> ProjectileEffectClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
-	FName SocketName = FName("Spine");
+	FVector MuzzleOffset = FVector(0.f, 0.f, 0.f);
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 };
