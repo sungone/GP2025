@@ -631,7 +631,8 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 		LOG(Warning, "Invalid player");
 		return;
 	}
-	player->CheckQuestProgress();
+	if(player->IsQuestInProgress(quest))
+		player->CheckQuestProgress();
 }
 
 void GameWorld::BuyItem(int32 playerId, uint8 itemType, uint16 quantity)
