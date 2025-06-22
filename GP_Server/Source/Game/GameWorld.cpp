@@ -8,6 +8,7 @@ bool GameWorld::Init()
 		PlayerLevelTable::GetInst().LoadFromCSV(DataTablePath + "PlayerLevelTable.csv") &&
 		PlayerSkillTable::GetInst().LoadFromCSV(DataTablePath + "PlayerSkillTable.csv") &&
 		MonsterTable::GetInst().LoadFromCSV(DataTablePath + "MonsterTable.csv") &&
+		SpawnTable::GetInst().LoadFromCSV(DataTablePath + "SpawnTable.csv") &&
 		QuestTable::GetInst().LoadFromCSV(DataTablePath + "QuestTable.csv");
 
 	if (!res)
@@ -262,17 +263,39 @@ void GameWorld::PlayerUseSkill(int32 playerId, ESkillGroup groupId)
 
 void GameWorld::CreateMonster()
 {
-	for (auto const& tpl : _spawnTable)
+	auto table = SpawnTable::GetInst();
+	for (ZoneType zone : { ZoneType::GYM, ZoneType::TUK, ZoneType::E, ZoneType::INDUSTY, ZoneType::BUNKER })
 	{
-		auto [zone, typeId, count] = tpl;
+		const auto& spawns = table.GetSpawnsByZone(zone);
 		auto& zoneMap = _monstersByZone[zone];
 
-		for (int i = 0; i < count; ++i)
+		for (const auto& info : spawns)
 		{
-			int32 id = GenerateMonsterId();
-			auto monster = std::make_shared<Monster>(id, zone, typeId);
-			monster->Init();
-			zoneMap[id] = monster;
+			for (int i = 0; i < info.Count; ++i)
+			{
+				int32 id = GenerateMonsterId();
+
+				auto monster = std::make_shared<Monster>(id, zone, info.MonsterType);
+				FVector pos;
+				float radius = monster->GetInfo().CollisionRadius;
+				if (info.bIsBoss || !info.bRandomSpawn)
+				{
+					pos = info.SpawnPos;
+				}
+				else
+				{
+					do
+					{
+						pos = Map::GetInst().GetRandomPos(info.Zone, radius);
+					} while (IsCollisionDetected(info.Zone, pos, radius));
+				}
+				monster->SetPos(pos);
+				if (info.DropItemID != 0)
+					monster->SetDropItem(info.DropItemID);
+				monster->Init();
+
+				zoneMap[id] = monster;
+			}
 		}
 	}
 }
@@ -631,7 +654,7 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 		LOG(Warning, "Invalid player");
 		return;
 	}
-	if(player->IsQuestInProgress(quest))
+	if (player->IsQuestInProgress(quest))
 		player->CheckQuestProgress();
 }
 

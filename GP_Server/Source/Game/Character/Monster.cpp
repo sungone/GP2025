@@ -15,18 +15,6 @@ void Monster::Init()
 	}
 	FVector newPos{};
 
-	bool isBoss = false;
-	if (_monType == Type::EMonster::TINO) isBoss = true;
-	if (isBoss)
-	{
-		newPos = Map::GetInst().GetBossMonsterSpawnPos(_monType);
-	}
-	else
-	{
-		do { newPos = Map::GetInst().GetRandomPos(_zone, _info.CollisionRadius); } while (GameWorld::GetInst().IsCollisionDetected(_zone, newPos, _info.CollisionRadius));
-	}
-	_info.SetLocation(newPos);
-
 	//_info.SetName(ConvertToWString(data->Name) + std::to_wstring(_id));
 	_info.SetName(ConvertToWString(data->Name));
 	_info.CharacterType = data->TypeId;

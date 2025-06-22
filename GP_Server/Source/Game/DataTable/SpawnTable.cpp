@@ -23,6 +23,7 @@ bool SpawnTable::LoadFromCSV(const std::string& filePath)
         std::getline(ss, cell, ','); spawn.Zone = ParseZoneType(cell);
         std::getline(ss, cell, ','); spawn.MonsterType = ParseMonsterType(cell);
         std::getline(ss, cell, ','); spawn.Count = std::stoi(cell);
+        std::getline(ss, cell, ','); spawn.bRandomSpawn = (cell == "1");
         std::getline(ss, cell, ','); spawn.SpawnPos.X = std::stof(cell);
         std::getline(ss, cell, ','); spawn.SpawnPos.Y = std::stof(cell);
         std::getline(ss, cell, ','); spawn.SpawnPos.Z = std::stof(cell);

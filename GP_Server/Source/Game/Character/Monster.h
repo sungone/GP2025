@@ -17,6 +17,7 @@ public:
 	void UpdateViewList(std::shared_ptr<Character> other) override;
 	void Update();
 	void BehaviorTree();
+	void SetDropItem(uint32 itemId) { _dropItemId = itemId; }
 	Type::EMonster GetMonsterType() { return _monType; }
 	float GetAttackDamage() override { return _info.GetDamage(); }
 	void ChangeState(ECharacterStateType newState) override
@@ -39,5 +40,6 @@ private:
 	Type::EMonster _monType;
 	FVector& _pos = _info.Pos;
 	std::shared_ptr<Player> _target = nullptr;
+	uint32 _dropItemId = 0;
 };
 
