@@ -11,6 +11,7 @@
 #include "UI/GPChatBoxWidget.h"
 #include "GPMyplayerUIManager.h"
 #include "UI/GPQuestListWidget.h"
+#include "Character/Modules/GPMyplayerSoundManager.h"
 #include "UI/GPSkillLevelUpText.h"
 
 UGPMyplayerUIManager::UGPMyplayerUIManager()
@@ -320,6 +321,10 @@ void UGPMyplayerUIManager::ShowLoginUI()
 	if (LoginWidget && !LoginWidget->IsInViewport())
 	{
 		LoginWidget->AddToViewport();
+		if (Owner->SoundManager)
+		{
+			Owner->SoundManager->PlayLoginBGM(); // Login Sound
+		}
 	}
 
 	// 마우스 커서와 입력 모드 설정

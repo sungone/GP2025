@@ -73,7 +73,6 @@ public :
 	UFUNCTION()
 	void HandlePlayerStatUpdate();
 
-
 	// 플레이어가 가지고 있는 모든 아이템 가져오기 //
 	UFUNCTION(BlueprintCallable)
 	TArray<UGPItemSlot*> GetAllInventoryItemData() const;

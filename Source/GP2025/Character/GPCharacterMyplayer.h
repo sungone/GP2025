@@ -64,6 +64,10 @@ public:
 	UPROPERTY()
 	class UGPSkillCoolDownHandler* SkillCoolDownHandler;
 
+	// <Sound Handler>
+	UPROPERTY()
+	class UGPMyplayerSoundManager* SoundManager;
+
 	// <Skill Cool UI System>
 public :
 	float GetSkillCooldownRatio(ESkillGroup SkillGroup);

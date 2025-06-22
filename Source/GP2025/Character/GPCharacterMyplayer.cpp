@@ -18,6 +18,7 @@
 #include "Character/Modules/GPMyplayerUIManager.h"
 #include "Character/Modules/GPMyplayerCameraHandler.h"
 #include "Character/Modules/GPMyplayerNetworkSyncHandler.h"
+#include "Character/Modules/GPMyplayerSoundManager.h"
 #include "Skill/GPSkillCoolDownHandler.h"
 #include "Components/TextBlock.h"
 #include "kismet/GameplayStatics.h"
@@ -45,6 +46,13 @@ void AGPCharacterMyplayer::BeginPlay()
 		NetMgr->SetMyPlayer(Cast<AGPCharacterPlayer>(this));
 		NetMgr->OnEnterGame.AddDynamic(this, &AGPCharacterMyplayer::OnPlayerEnterGame);
 		NetMgr->OnEnterLobby.AddDynamic(this, &AGPCharacterMyplayer::OnPlayerEnterLobby);
+	}
+
+	// Sound Handler
+	SoundManager = NewObject<UGPMyplayerSoundManager>(this, UGPMyplayerSoundManager::StaticClass());
+	if (SoundManager)
+	{
+		SoundManager->Initialize(this);
 	}
 
 	// Camera Handler 
