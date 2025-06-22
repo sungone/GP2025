@@ -225,10 +225,16 @@ void GameWorld::PlayerAttack(int32 playerId)
 			player->AddExp(TEST_EXP_WEIGHT * 10 * monster->GetInfo().GetLevel());
 
 			FVector basePos = monster->GetInfo().Pos;
-
-			FVector itemPos = basePos + FVector(30.f, 0.f, 20.f);
+			if(monster->HasDropItem())
+			{
+				uint32 dropId = monster->GetDropItemId();
+				FVector itemPos = basePos + FVector(0.f, 0.f, 50.f);
+				auto dropedItem = WorldItem(dropId, itemPos);
+				SpawnWorldItem(dropedItem);
+			}
+			FVector itemPos = basePos + FVector(50.f, 0.f, 20.f);
 			SpawnWorldItem(itemPos, monlv, playertype);
-			FVector goldPos = basePos + FVector(-30.f, 0.f, 20.f);
+			FVector goldPos = basePos + FVector(-50.f, 0.f, 20.f);
 			SpawnGoldItem(goldPos);
 
 			player->CheckQuestProgress(static_cast<int32>(monster->GetMonsterType()));

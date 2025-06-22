@@ -4,8 +4,9 @@
 class WorldItem : public Item
 {
 public:
-	WorldItem(FVector pos);
 	WorldItem(uint8 itemTypeID);
+	WorldItem(FVector pos);
+	WorldItem(uint8 itemTypeID, FVector pos);
 	WorldItem(FVector pos, uint32 monlv, Type::EPlayer playertype);
 
 	uint8 GetRandomItemType(uint32 monlv, Type::EPlayer playertype);
