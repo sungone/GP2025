@@ -8,10 +8,33 @@
 
 UGPMyplayerSoundManager::UGPMyplayerSoundManager()
 {
-	static ConstructorHelpers::FObjectFinder<USoundBase> LoginSoundAsset(TEXT("/Game/Sound/BGM/LoginSound.LoginSound"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> LoginSoundAsset(TEXT("/Game/Sound/BackgroundBGM/LoginLobbySound.LoginLobbySound"));
 	if (LoginSoundAsset.Succeeded())
 	{
 		LoginSound = LoginSoundAsset.Object;
+	}
+
+	struct FSoundLoadInfo
+	{
+		FName LevelName;
+		const TCHAR* AssetPath;
+	};
+
+	FSoundLoadInfo SoundInfos[] = {
+		{ "TIP", TEXT("/Game/Sound/BackgroundBGM/TIPSound.TIPSound") },
+		{ "TUWorld", TEXT("/Game/Sound/BackgroundBGM/OutsideSound.OutsideSound") },
+		{ "E", TEXT("/Game/Sound/BackgroundBGM/ESound.ESound") },
+		{ "Industry", TEXT("/Game/Sound/BackgroundBGM/IndustrySound.IndustrySound") },
+		{ "Gym", TEXT("/Game/Sound/BackgroundBGM/GymSound.GymSound") }
+	};
+
+	for (const FSoundLoadInfo& Info : SoundInfos)
+	{
+		ConstructorHelpers::FObjectFinder<USoundBase> SoundObj(Info.AssetPath);
+		if (SoundObj.Succeeded())
+		{
+			LevelBGMSounds.Add(Info.LevelName, SoundObj.Object);
+		}
 	}
 }
 
@@ -19,7 +42,6 @@ void UGPMyplayerSoundManager::Initialize(AGPCharacterMyplayer* InOwner)
 {
 	Owner = InOwner;
 
-	// BGMComponent 초기화
 	if (Owner)
 	{
 		BGMComponent = NewObject<UAudioComponent>(Owner);
@@ -43,29 +65,13 @@ void UGPMyplayerSoundManager::PlayBGM(USoundBase* Sound, float Volume, bool bLoo
 
 	if (bLoop)
 	{
-		// 이전 델리게이트 바인딩 제거
 		BGMComponent->OnAudioFinished.Clear();
-
-		// 재생이 끝나면 다시 실행
 		BGMComponent->OnAudioFinished.AddDynamic(this, &UGPMyplayerSoundManager::HandleLoopBGM);
 	}
 	else
 	{
 		BGMComponent->OnAudioFinished.Clear();
 	}
-}
-
-void UGPMyplayerSoundManager::HandleLoopBGM()
-{
-	if (BGMComponent && BGMComponent->Sound)
-	{
-		BGMComponent->Play(); // 다시 재생
-	}
-}
-
-void UGPMyplayerSoundManager::PlayLoginBGM()
-{
-	PlayBGM(LoginSound);
 }
 
 void UGPMyplayerSoundManager::StopBGM()
@@ -76,10 +82,41 @@ void UGPMyplayerSoundManager::StopBGM()
 	}
 }
 
+void UGPMyplayerSoundManager::PlayLoginBGM()
+{
+	PlayBGM(LoginSound);
+}
+
+void UGPMyplayerSoundManager::PlayBGMForCurrentLevel()
+{
+	if (!Owner || !Owner->GetWorld()) return;
+
+	FString FullMapName = Owner->GetWorld()->GetMapName();
+	FString ShortMapName = FPackageName::GetShortName(FullMapName);
+	FName LevelName(*ShortMapName);
+
+	if (USoundBase** FoundSound = LevelBGMSounds.Find(LevelName))
+	{
+		PlayBGM(*FoundSound);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[SoundManager] No BGM mapped for level: %s"), *ShortMapName);
+	}
+}
+
 void UGPMyplayerSoundManager::PlaySFX(USoundBase* Sound, float Volume)
 {
 	if (Sound && Owner)
 	{
 		UGameplayStatics::PlaySound2D(Owner->GetWorld(), Sound, Volume);
+	}
+}
+
+void UGPMyplayerSoundManager::HandleLoopBGM()
+{
+	if (BGMComponent && BGMComponent->Sound)
+	{
+		BGMComponent->Play(); // 다시 재생
 	}
 }
