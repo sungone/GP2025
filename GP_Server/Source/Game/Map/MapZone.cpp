@@ -43,7 +43,7 @@ NavMesh& Map::GetNavMesh(ZoneType type)
 	return it->second;
 }
 
-FVector Map::GetSpawnPosition(ZoneType from, ZoneType to) const
+FVector Map::GetRandomSpawnPosition(ZoneType from, ZoneType to) const
 {
 	auto RandomOffset = [](float radius) {
 		float offsetX = RandomUtils::GetRandomFloat(-radius, radius);

@@ -30,8 +30,8 @@ bool UGPGameInstance::SaveNavData(bool IsSave)
 #if !PLATFORM_ANDROID
 	if (IsSave)
 		return ExtractNavMeshData(GetWorld(), TEXT("GP_Server/NavMeshData.json"));
-    return false;
 #endif
+    return false;
 }
 
 
