@@ -11,6 +11,7 @@
 #include "Physics/GPCollision.h"
 #include "Inventory/GPInventory.h"
 #include "NiagaraComponent.h"
+#include "Character/Modules/GPMyplayerSoundManager.h"
 #include "Character/Modules/GPMyplayerUIManager.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Engine/World.h"
@@ -145,6 +146,13 @@ void AGPLevelTransitionTrigger::OnLevelAdded(ULevel* Level, UWorld* World)
 {
 	if (Level && World)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Level %s added to world %s"), *Level->GetName(), *World->GetName());
+		const FString RawLevelName = Level->GetOuter()->GetName();  // 정확한 레벨 이름
+		UE_LOG(LogTemp, Warning, TEXT("Level %s added to world %s"), *RawLevelName, *World->GetName());
+
+		if (CachedPlayer && CachedPlayer->SoundManager)
+		{
+			CachedPlayer->SoundManager->StopBGM();
+			CachedPlayer->SoundManager->PlayBGMByLevelName(FName(*RawLevelName));
+		}
 	}
 }

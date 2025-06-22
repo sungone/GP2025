@@ -141,6 +141,13 @@ void AGPCharacterMyplayer::OnPlayerEnterGame()
 		UIManager->OnSetUpInGameWidgets();
 	}
 
+	// LoginSound 중지 -> 현재 레벨에 맞는 Background Sound 재생
+	if (SoundManager)
+	{
+		SoundManager->StopBGM();             
+		SoundManager->PlayBGMForCurrentLevel(); 
+	}
+
 	// 1-1 CH1_TALK_TO_STUDENT_A 퀘스트 요청
 	if (NetMgr)
 	{

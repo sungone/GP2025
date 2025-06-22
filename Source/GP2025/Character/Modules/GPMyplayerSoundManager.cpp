@@ -23,6 +23,7 @@ UGPMyplayerSoundManager::UGPMyplayerSoundManager()
 	FSoundLoadInfo SoundInfos[] = {
 		{ "TIP", TEXT("/Game/Sound/BackgroundBGM/TIPSound.TIPSound") },
 		{ "TUWorld", TEXT("/Game/Sound/BackgroundBGM/OutsideSound.OutsideSound") },
+		{ "TUK", TEXT("/Game/Sound/BackgroundBGM/OutsideSound.OutsideSound") },
 		{ "E", TEXT("/Game/Sound/BackgroundBGM/ESound.ESound") },
 		{ "Industry", TEXT("/Game/Sound/BackgroundBGM/IndustrySound.IndustrySound") },
 		{ "Gym", TEXT("/Game/Sound/BackgroundBGM/GymSound.GymSound") }
@@ -93,15 +94,39 @@ void UGPMyplayerSoundManager::PlayBGMForCurrentLevel()
 
 	FString FullMapName = Owner->GetWorld()->GetMapName();
 	FString ShortMapName = FPackageName::GetShortName(FullMapName);
+
+	// PIE 접두어 제거
+	ShortMapName = ShortMapName.Replace(TEXT("UEDPIE_0_"), TEXT(""));
+
 	FName LevelName(*ShortMapName);
 
 	if (USoundBase** FoundSound = LevelBGMSounds.Find(LevelName))
 	{
-		PlayBGM(*FoundSound);
+		if (*FoundSound)
+		{
+			UE_LOG(LogTemp, Log, TEXT("[SoundManager] Playing BGM for level: %s → %s"),
+				*ShortMapName,
+				*(*FoundSound)->GetName());
+
+			PlayBGM(*FoundSound);
+		}
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[SoundManager] No BGM mapped for level: %s"), *ShortMapName);
+	}
+}
+
+void UGPMyplayerSoundManager::PlayBGMByLevelName(const FName& LevelName)
+{
+	if (USoundBase** FoundSound = LevelBGMSounds.Find(LevelName))
+	{
+		PlayBGM(*FoundSound);
+		UE_LOG(LogTemp, Log, TEXT("[SoundManager] Playing BGM for level: %s"), *LevelName.ToString());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[SoundManager] No BGM mapped for level: %s"), *LevelName.ToString());
 	}
 }
 
