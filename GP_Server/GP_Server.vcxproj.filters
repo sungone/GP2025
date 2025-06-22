@@ -142,9 +142,6 @@
     <ClInclude Include="Source\Game\DataTable\PlayerLevelTable.h">
       <Filter>Source Files\Game\DataTable</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Game\DataTable\MonsterTable.h">
-      <Filter>Source Files\Game\DataTable</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Game\DataTable\PlayerSkillTable.h">
       <Filter>Source Files\Game\DataTable</Filter>
     </ClInclude>
@@ -162,6 +159,12 @@
     </ClInclude>
     <ClInclude Include="Source\Game\Item\WorldItem.h">
       <Filter>Source Files\Game\GameObjects\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\DataTable\MonsterTable.h">
+      <Filter>Source Files\Game\DataTable</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\DataTable\SpawnTable.h">
+      <Filter>Source Files\Game\DataTable</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -225,9 +228,6 @@
     <ClCompile Include="Source\Game\DataTable\PlayerLevelTable.cpp">
       <Filter>Source Files\Game\DataTable</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Game\DataTable\MonsterTable.cpp">
-      <Filter>Source Files\Game\DataTable</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Game\DataTable\PlayerSkillTable.cpp">
       <Filter>Source Files\Game\DataTable</Filter>
     </ClCompile>
@@ -242,6 +242,12 @@
     </ClCompile>
     <ClCompile Include="Source\Game\Item\WorldItem.cpp">
       <Filter>Source Files\Game\GameObjects\Item</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\DataTable\MonsterTable.cpp">
+      <Filter>Source Files\Game\DataTable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\DataTable\SpawnTable.cpp">
+      <Filter>Source Files\Game\DataTable</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

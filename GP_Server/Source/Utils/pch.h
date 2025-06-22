@@ -37,3 +37,4 @@
 #include "PlayerLevelTable.h"
 #include "MonsterTable.h"
 #include "QuestTable.h"
+#include "SpawnTable.h"
