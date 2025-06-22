@@ -108,15 +108,3 @@ FVector Map::GetStartPos(ZoneType startZone)
 	}
 
 }
-
-FVector Map::GetBossMonsterSpawnPos(Type::EMonster monster)
-{
-	using namespace Type;
-	switch (monster)
-	{
-	case EMonster::TINO:
-		return FVector(1500, 0, 170);
-	default:
-		return FVector::ZeroVector;
-	}
-}

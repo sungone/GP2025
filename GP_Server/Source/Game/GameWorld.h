@@ -64,19 +64,6 @@ public:
 
 	bool IsMonster(int32 id);
 	int32 GenerateMonsterId() { return _nextMonsterId++; }
-
-	static inline const std::vector<std::tuple<ZoneType, Type::EMonster, int>> _spawnTable = {
-		{ ZoneType::GYM, Type::EMonster::TINO, 1},
-		{ ZoneType::TUK, Type::EMonster::ENERGY_DRINK, 100},
-		{ ZoneType::TUK, Type::EMonster::BUBBLE_TEA, 100},
-		{ ZoneType::TUK, Type::EMonster::COFFEE, 100},
-		{ ZoneType::E, Type::EMonster::MOUSE, 5},
-		{ ZoneType::E, Type::EMonster::KEYBOARD, 5},
-		{ ZoneType::E, Type::EMonster::DESKMON, 1},
-		{ ZoneType::INDUSTY, Type::EMonster::COGWHEEL, 5},
-		{ ZoneType::INDUSTY, Type::EMonster::BOLT_NUT, 5},
-		{ ZoneType::INDUSTY, Type::EMonster::DRILL, 1},
-	};
 private:
 	std::array<std::shared_ptr<Player>, MAX_PLAYER> _players;
 	std::unordered_map<ZoneType, std::unordered_map<int32, std::shared_ptr<Player>>> _playersByZone;
