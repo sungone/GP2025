@@ -11,6 +11,7 @@ bool Map::Init()
 	_navMeshs[ZoneType::INDUSTY] = NavMesh(MapDataPath + "NavMeshData_Industry.json");
 	_navMeshs[ZoneType::GYM] = NavMesh(MapDataPath + "NavMeshData_Gym.json");
 	_navMeshs[ZoneType::TIP] = NavMesh(MapDataPath + "NavMeshData_TIP.json");
+	_navMeshs[ZoneType::BUNKER] = NavMesh(MapDataPath + "NavMeshData_Bunker.json");
 
 	for (auto& [zone, navMesh] : _navMeshs)
 	{

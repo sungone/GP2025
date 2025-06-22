@@ -238,6 +238,7 @@ enum class ZoneType : uint8
 	E,
 	GYM,
 	INDUSTY,
+	BUNKER,
 	PLAYGROUND,//test¿ë
 };
 #else

@@ -24,19 +24,15 @@ void UGPGameInstance::Shutdown()
 	Super::Shutdown();
 }
 
-//AABB박스 추출 -> TUK level BP에서 호출하고 있음
-void UGPGameInstance::SaveBoundingBoxData(ULevel* Level)
-{
-	ExportLevelBoundingBoxData(Level, TEXT("GP_Server/BoundingBoxData.json"));
-}
-
 //NavMesh 추출
-void UGPGameInstance::SaveNavData(bool IsSave)
+bool UGPGameInstance::SaveNavData(bool IsSave)
 {
+#if !PLATFORM_ANDROID
 	if (IsSave)
-		ExtractNavMeshData(GetWorld(), TEXT("GP_Server/NavMeshData.json"));
+		return ExtractNavMeshData(GetWorld(), TEXT("GP_Server/NavMeshData.json"));
+    return false;
+#endif
 }
-
 
 
 #if PLATFORM_ANDROID

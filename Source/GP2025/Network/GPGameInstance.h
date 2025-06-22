@@ -19,10 +19,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void SaveBoundingBoxData(ULevel* Level);
-	UFUNCTION(BlueprintCallable)
-	void SaveNavData(bool IsSave);
-
+	bool SaveNavData(bool IsSave);
 private:
 	UPROPERTY()
 	class UGPNetworkManager* NetworkMgr;
