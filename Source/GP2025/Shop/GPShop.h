@@ -106,4 +106,10 @@ public:
 	EShopType CurrentShopType = EShopType::NONE;
 
 	void SetShopType(EShopType NewShopType);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* ClickSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* SellAndBuySound;
 };

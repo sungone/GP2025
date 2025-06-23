@@ -80,4 +80,7 @@ public :
 	void ShowLoginErrorMessage(const FString& Message, float Duration);
 	void ShowSignUpErrorMessage(const FString& Message, float Duration);
 	void HideErrorMessage();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* ClickSound;
 };

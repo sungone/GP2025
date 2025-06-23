@@ -51,6 +51,11 @@ void UGPQuestWidget::OnQuestAccepted()
 	UGPNetworkManager* NetMgr = MyPlayer->NetMgr;
 	if (!NetMgr) return;
 
+	if (ClickSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
+	}
+
 	// NPC 타입에 따라 처리 분기
 	switch (OwningNPC->NPCType)
 	{
@@ -102,6 +107,11 @@ void UGPQuestWidget::OnQuestAccepted()
 
 void UGPQuestWidget::OnQuestExit()
 {
+	if (ClickSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
+	}
+
 	if (OwningNPC)
 	{
 		OwningNPC->ExitInteraction();

@@ -47,6 +47,11 @@ void UGPChatBoxWidget::OnChatCommitted(const FText& Text, ETextCommit::Type Comm
 
 void UGPChatBoxWidget::OnEnterButtonClicked()
 {
+	if (ClickSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
+	}
+
 	HandleSendMessage();
 }
 

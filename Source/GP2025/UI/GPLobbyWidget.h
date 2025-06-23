@@ -56,4 +56,8 @@ public:
 
 private:
 	Type::EPlayer SelectedType = Type::EPlayer::NONE;
+public :
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* ClickSound;
+
 };

@@ -80,4 +80,9 @@ void UGPLobbyWidget::OnGameStartPressed()
 		else
 			NetMgr->SendMyEnterGamePacket();
 	}
+
+	if (ClickSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
+	}
 }

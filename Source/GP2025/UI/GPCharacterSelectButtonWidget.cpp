@@ -5,6 +5,7 @@
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
+#include "Kismet/GameplayStatics.h"
 
 void UGPCharacterSelectButtonWidget::NativeConstruct()
 {
@@ -18,5 +19,10 @@ void UGPCharacterSelectButtonWidget::NativeConstruct()
 
 void UGPCharacterSelectButtonWidget::HandleClicked()
 {
+	if (ClickSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
+	}
+
 	OnCharacterSelected.Broadcast(CharacterType);
 }

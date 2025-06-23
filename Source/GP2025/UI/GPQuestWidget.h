@@ -19,6 +19,9 @@ public:
 	// Setter Ãß°¡
 	void SetQuestDescription(const FString& Description);
 	void SetQuestTitle(const FString& Title);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* ClickSound;
 public:
 
 	UPROPERTY(meta = (BindWidget))

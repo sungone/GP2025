@@ -57,4 +57,7 @@ public:
 public:
 	UPROPERTY(EditAnywhere, Category = "Chat")
 	TSubclassOf<class UGPChatMessageWidget> ChatMessageWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* ClickSound;
 };

@@ -12,6 +12,7 @@
 #include "Character/Modules/GPMyplayerUIManager.h"
 #include "Inventory/GPInventory.h"
 #include "Item/GPItemStruct.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/WrapBox.h"
 
 void UGPShop::NativeConstruct()
@@ -46,6 +47,11 @@ void UGPShop::NativeDestruct()
 
 void UGPShop::OnShopExit()
 {
+	if (ClickSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
+	}
+
 	if (OwningNPC)
 	{
 		OwningNPC->ExitInteraction();
@@ -78,6 +84,11 @@ void UGPShop::SetOwningNPC(AGPCharacterNPC* NPC)
 
 void UGPShop::OnBuyItemClicked()
 {
+	if (ClickSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), SellAndBuySound);
+	}
+
 	if (!MyPlayer)
 	{
 		return;
@@ -148,6 +159,11 @@ void UGPShop::HideResultMessage()
 
 void UGPShop::OnSellItemClicked()
 {
+	if (ClickSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), SellAndBuySound);
+	}
+
 	if (!MyPlayer || !CurrentSlot)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("SellItemClicked - Player or Slot is null"));

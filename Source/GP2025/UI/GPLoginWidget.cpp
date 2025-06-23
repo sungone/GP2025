@@ -56,6 +56,11 @@ void UGPLoginWidget::SwitchWidget()
 		int32 NextIndex = (CurrentIndex == 0) ? 1 : 0;
 		LoginSwitcher->SetActiveWidgetIndex(NextIndex);
 	}
+
+	if (ClickSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
+	}
 }
 
 void UGPLoginWidget::OnEntered(const FText& Text, ETextCommit::Type CommitMethod)
@@ -79,6 +84,11 @@ void UGPLoginWidget::OnEntered(const FText& Text, ETextCommit::Type CommitMethod
 
 void UGPLoginWidget::OnExitClicked()
 {
+	if (ClickSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
+	}
+
 	APlayerController* PC = GetOwningPlayer();
 	if (PC && GetWorld())
 	{
@@ -129,6 +139,11 @@ void UGPLoginWidget::TryLogin()
 	}
 	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
 	NetworkMgr->SendMyLoginPacket(ID_Str, PW_Str);
+
+	if (ClickSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
+	}
 }
 
 void UGPLoginWidget::TrySignUp()
@@ -162,6 +177,11 @@ void UGPLoginWidget::TrySignUp()
 	}
 	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
 	NetworkMgr->SendMySignUpPacket(ID_Str, PW_Str, Nname_Str);
+
+	if (ClickSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
+	}
 }
 
 void UGPLoginWidget::ShowLoginErrorMessage(const FString& Message, float Duration)

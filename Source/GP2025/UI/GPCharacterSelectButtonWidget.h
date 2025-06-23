@@ -36,4 +36,7 @@ public :
 
 	UFUNCTION()
 	void HandleClicked();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* ClickSound;
 };
