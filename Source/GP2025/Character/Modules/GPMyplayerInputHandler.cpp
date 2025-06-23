@@ -84,21 +84,21 @@ void UGPMyplayerInputHandler::SetupInputBindings(UEnhancedInputComponent* Enhanc
 
 	EnhancedInput->BindAction(AutoAttackAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::AutoAttack);
 
-	EnhancedInput->BindAction(InventoryAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::ToggleInventory);
+	EnhancedInput->BindAction(InventoryAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::ToggleInventory);
 	EnhancedInput->BindAction(InventoryAction, ETriggerEvent::Completed, this, &UGPMyplayerInputHandler::ResetInventoryToggle);
 
-	EnhancedInput->BindAction(SettingAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::OpenSettingWidget);
+	EnhancedInput->BindAction(SettingAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::OpenSettingWidget);
 	EnhancedInput->BindAction(TakeInteractionAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::TakeInteraction);
 
-	EnhancedInput->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::StartAiming);
+	EnhancedInput->BindAction(ZoomAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::StartAiming);
 	EnhancedInput->BindAction(ZoomAction, ETriggerEvent::Completed, this, &UGPMyplayerInputHandler::StopAiming);
 
 	EnhancedInput->BindAction(SkillQAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::UseSkillQ);
 	EnhancedInput->BindAction(SkillEAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::UseSkillE);
 	EnhancedInput->BindAction(SkillRAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::UseSkillR);
 
-	EnhancedInput->BindAction(AcceptAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::Accept);
-	EnhancedInput->BindAction(RefuseAction, ETriggerEvent::Triggered, this, &UGPMyplayerInputHandler::Refuse);
+	EnhancedInput->BindAction(AcceptAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::Accept);
+	EnhancedInput->BindAction(RefuseAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::Refuse);
 	EnhancedInput->BindAction(InteractionAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::Interact);
 	EnhancedInput->BindAction(EnterKeyAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::EnterChatting);
 
@@ -225,9 +225,15 @@ void UGPMyplayerInputHandler::AutoAttack()
 void UGPMyplayerInputHandler::ToggleInventory()
 {
 	if (!Owner) return;
+
 	if (Owner->UIManager)
 	{
 		Owner->UIManager->ToggleInventory();
+	}
+
+	if (Owner->SoundManager)
+	{
+		Owner->SoundManager->PlaySFX(Owner->SoundManager->ClickSound);
 	}
 }
 
@@ -267,6 +273,11 @@ void UGPMyplayerInputHandler::Accept()
 	{
 		QuestWidget->OnQuestAccepted();
 	}
+
+	if (Owner->SoundManager)
+	{
+		Owner->SoundManager->PlaySFX(Owner->SoundManager->ClickSound);
+	}
 }
 
 void UGPMyplayerInputHandler::Refuse()
@@ -276,6 +287,11 @@ void UGPMyplayerInputHandler::Refuse()
 	if (UGPQuestWidget* QuestWidget = Owner->UIManager->CurrentQuestWidget)
 	{
 		QuestWidget->OnQuestExit();
+	}
+
+	if (Owner->SoundManager)
+	{
+		Owner->SoundManager->PlaySFX(Owner->SoundManager->ClickSound);
 	}
 }
 
@@ -287,6 +303,11 @@ void UGPMyplayerInputHandler::Interact()
 	if (AGPCharacterNPC* NPC = Cast<AGPCharacterNPC>(CurrentInteractionTarget))
 	{
 		NPC->CheckAndHandleInteraction(Cast<AGPCharacterMyplayer>(Owner));
+	}
+
+	if (Owner->SoundManager)
+	{
+		Owner->SoundManager->PlaySFX(Owner->SoundManager->ClickSound);
 	}
 }
 
@@ -314,6 +335,11 @@ void UGPMyplayerInputHandler::TakeInteraction()
 void UGPMyplayerInputHandler::StartAiming()
 {
 	if (!Owner || !Owner->bIsGunnerCharacter()) return;
+
+	if (Owner->SoundManager)
+	{
+		Owner->SoundManager->PlaySFX(Owner->SoundManager->GunnerPlayerZoomSound);
+	}
 
 	Owner->CameraHandler->bWantsToZoom = true;
 	Owner->CharacterInfo.AddState(STATE_AIMING);
