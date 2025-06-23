@@ -9,6 +9,7 @@
 #include "GPItemStruct.h"
 #include "Components/WidgetComponent.h"
 #include "Character/Modules/GPMyplayerInputHandler.h"
+#include "Character/Modules/GPMyplayerSoundManager.h"
 #include "GameFramework/PlayerController.h"
 
 // Sets default values
@@ -119,6 +120,11 @@ void AGPItem::TryTakeItem()
 	{
 		NetworkMgr->SendMyTakeItem(ItemID);
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("SendPlayerTakeItem!"));
+	}
+
+	if (OverlappingPlayer && OverlappingPlayer->SoundManager && OverlappingPlayer->SoundManager->PickUpItemSound)
+	{
+		OverlappingPlayer->SoundManager->PlaySFX(OverlappingPlayer->SoundManager->PickUpItemSound);
 	}
 
 	OverlappingPlayer = nullptr;

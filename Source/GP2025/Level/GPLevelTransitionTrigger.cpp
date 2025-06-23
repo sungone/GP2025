@@ -108,6 +108,11 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 				// 2. RowName 25번 아이템 보유 확인
 				if (Inventory->HasItemByType(50)) // 열쇠 아이템이 있을 때에만 포탈 이동 가능
 				{
+					if (CachedPlayer->SoundManager && CachedPlayer->SoundManager->TeleportationSound)
+					{
+						CachedPlayer->SoundManager->PlaySFX(CachedPlayer->SoundManager->TeleportationSound);
+					}
+
 					// 아이템 있음 → 정상 입장 처리
 					NetworkMgr->SendMyZoneChangePacket(NewZone);
 					NetworkMgr->SendMyCompleteQuest(QuestType::CH1_ENTER_E_BUILDING);
@@ -115,10 +120,14 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 				}
 				else
 				{
+					if (CachedPlayer->SoundManager && CachedPlayer->SoundManager->WarningSound)
+					{
+						CachedPlayer->SoundManager->PlaySFX(CachedPlayer->SoundManager->WarningSound);
+					}
+
 					UE_LOG(LogTemp, Warning, TEXT("[LevelTransitionTrigger] Item Type 25 not found. Cannot enter Zone E."));
 				}
 			}
-
 			else
 			{
 				UE_LOG(LogTemp, Error, TEXT("[LevelTransitionTrigger] Inventory not valid."));
@@ -127,6 +136,12 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 		else
 		{
 			// E가 아닌 일반적인 존 이동
+
+			if (CachedPlayer->SoundManager && CachedPlayer->SoundManager->TeleportationSound)
+			{
+				CachedPlayer->SoundManager->PlaySFX(CachedPlayer->SoundManager->TeleportationSound);
+			}
+
 			NetworkMgr->SendMyZoneChangePacket(NewZone);
 			UE_LOG(LogTemp, Log, TEXT("[LevelTransitionTrigger] SendMyZoneChangePacket Send Success"));
 		}

@@ -58,6 +58,9 @@ UGPMyplayerSoundManager::UGPMyplayerSoundManager()
 	LOAD_SFX(WarriorESkillSound, WarriorESkillSound);
 	LOAD_SFX(WarriorQSkillSound, WarriorQSkillSound);
 	LOAD_SFX(WarriorRSkillSound, WarriorRSkillSound);
+	LOAD_SFX(TeleportationSound, TeleportationSound);
+	LOAD_SFX(WarningSound, WarningSound);
+	LOAD_SFX(PickUpItemSound, PickUpItemSound);
 }
 
 void UGPMyplayerSoundManager::Initialize(AGPCharacterMyplayer* InOwner)

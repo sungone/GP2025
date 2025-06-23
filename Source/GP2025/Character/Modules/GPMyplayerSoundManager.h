@@ -95,4 +95,13 @@ public :
 
 	UPROPERTY()
 	USoundBase* MonsterHitSound;
+
+	UPROPERTY()
+	USoundBase* TeleportationSound;
+
+	UPROPERTY()
+	USoundBase* WarningSound;
+
+	UPROPERTY()
+	USoundBase* PickUpItemSound;
 };
