@@ -27,7 +27,7 @@ public:
 	void PlayBGMForCurrentLevel(); // 맵 이름 기반 자동 재생
 	void PlayBGMByLevelName(const FName& LevelName);
 	// 효과음
-	void PlaySFX(class USoundBase* Sound, float Volume = 1.f);
+	void PlaySFX(class USoundBase* Sound, float Pitch = 1.f, float Volume = 1.f);
 
 private:
 	UPROPERTY()
@@ -45,4 +45,51 @@ private:
 	// 루프용
 	UFUNCTION()
 	void HandleLoopBGM();
+
+public :
+	// 효과음(SFX)
+	UPROPERTY()
+	USoundBase* ClickSound;
+
+	UPROPERTY()
+	USoundBase* GunnerAttackSound;
+
+	UPROPERTY()
+	USoundBase* GunnerESkillSound;
+
+	UPROPERTY()
+	USoundBase* GunnerPlayerZoomSound;
+
+	UPROPERTY()
+	USoundBase* GunnerQSkillSound;
+
+	UPROPERTY()
+	USoundBase* LevelUpSound;
+
+	UPROPERTY()
+	USoundBase* MonsterHitSound;
+
+	UPROPERTY()
+	USoundBase* PlayerJumpSound;
+
+	UPROPERTY()
+	USoundBase* PlayerPunchSound;
+
+	UPROPERTY()
+	USoundBase* PlayerWalkSound;
+
+	UPROPERTY()
+	USoundBase* QuestClearSound;
+
+	UPROPERTY()
+	USoundBase* WarriorAttackSound;
+
+	UPROPERTY()
+	USoundBase* WarriorESkillSound;
+
+	UPROPERTY()
+	USoundBase* WarriorQSkillSound;
+
+	UPROPERTY()
+	USoundBase* WarriorRSkillSound;
 };

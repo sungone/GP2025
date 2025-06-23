@@ -6,6 +6,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "Character/GPCharacterMyplayer.h"
 
+#define LOAD_SFX(SoundVar, AssetName) \
+	static ConstructorHelpers::FObjectFinder<USoundBase> SoundVar##Obj(TEXT("/Game/Sound/SFX/" #AssetName "." #AssetName)); \
+	if (SoundVar##Obj.Succeeded()) SoundVar = SoundVar##Obj.Object;
+
 UGPMyplayerSoundManager::UGPMyplayerSoundManager()
 {
 	static ConstructorHelpers::FObjectFinder<USoundBase> LoginSoundAsset(TEXT("/Game/Sound/BackgroundBGM/LoginLobbySound.LoginLobbySound"));
@@ -37,6 +41,22 @@ UGPMyplayerSoundManager::UGPMyplayerSoundManager()
 			LevelBGMSounds.Add(Info.LevelName, SoundObj.Object);
 		}
 	}
+
+	LOAD_SFX(ClickSound, ClickSound);
+	LOAD_SFX(GunnerAttackSound, GunnerAttackSound);
+	LOAD_SFX(GunnerESkillSound, GunnerESkillSound);
+	LOAD_SFX(GunnerPlayerZoomSound, GunnerPlayerZoomSound);
+	LOAD_SFX(GunnerQSkillSound, GunnerQSkillSound);
+	LOAD_SFX(LevelUpSound, LevelUpSound);
+	LOAD_SFX(MonsterHitSound, MonsterHitSound);
+	LOAD_SFX(PlayerJumpSound, PlayerJumpSound);
+	LOAD_SFX(PlayerPunchSound, PlayerPunchSound);
+	LOAD_SFX(PlayerWalkSound, PlayerWalkSound);
+	LOAD_SFX(QuestClearSound, QuestClearSound);
+	LOAD_SFX(WarriorAttackSound, WarriorAttackSound);
+	LOAD_SFX(WarriorESkillSound, WarriorESkillSound);
+	LOAD_SFX(WarriorQSkillSound, WarriorQSkillSound);
+	LOAD_SFX(WarriorRSkillSound, WarriorRSkillSound);
 }
 
 void UGPMyplayerSoundManager::Initialize(AGPCharacterMyplayer* InOwner)
@@ -130,12 +150,23 @@ void UGPMyplayerSoundManager::PlayBGMByLevelName(const FName& LevelName)
 	}
 }
 
-void UGPMyplayerSoundManager::PlaySFX(USoundBase* Sound, float Volume)
+void UGPMyplayerSoundManager::PlaySFX(USoundBase* Sound, float Pitch, float Volume)
 {
-	if (Sound && Owner)
+	if (!Sound)
 	{
-		UGameplayStatics::PlaySound2D(Owner->GetWorld(), Sound, Volume);
+		UE_LOG(LogTemp, Warning, TEXT("[SoundManager] PlaySFX failed: Sound is null"));
+		return;
 	}
+
+	if (!Owner)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[SoundManager] PlaySFX failed: Owner is null"));
+		return;
+	}
+
+	UGameplayStatics::PlaySound2D(Owner->GetWorld(), Sound, Volume, Pitch);
+
+	UE_LOG(LogTemp, Log, TEXT("[SoundManager] PlaySFX: Playing '%s' at Volume %.2f, Pitch %.2f"), *Sound->GetName(), Volume, Pitch);
 }
 
 void UGPMyplayerSoundManager::HandleLoopBGM()

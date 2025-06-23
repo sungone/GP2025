@@ -6,6 +6,7 @@
 #include "Animation/AnimInstance.h"
 #include "Network/GPNetworkManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Character/Modules/GPMyplayerSoundManager.h"
 
 
 void UGPCharacterCombatHandler::Initialize(AGPCharacterBase* InOwner)
@@ -53,6 +54,30 @@ void UGPCharacterCombatHandler::PlayAutoAttackMontage()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[Combat] Montage is already playing. Skipping playback."));
 		return;
+	}
+
+	// Sound
+	if (AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(Owner))
+	{
+		if (MyPlayer->SoundManager)
+		{
+			USoundBase* AttackSound = nullptr;
+			float SoundPlayRate = 1.f;
+			if (MyPlayer->bIsGunnerCharacter())
+			{
+				AttackSound = MyPlayer->SoundManager->GunnerAttackSound;
+			}
+			else
+			{
+				AttackSound = MyPlayer->SoundManager->WarriorAttackSound;
+				SoundPlayRate = 0.8f;
+			}
+
+			if (AttackSound)
+			{
+				MyPlayer->SoundManager->PlaySFX(AttackSound , SoundPlayRate);
+			}
+		}
 	}
 
 	bIsAutoAttacking = true;
@@ -151,6 +176,7 @@ void UGPCharacterCombatHandler::SetDeadEventDelay(float Delay)
 void UGPCharacterCombatHandler::PlayQSkillMontage()
 {
 	PlaySkillMontage(QSkillMontage);
+
 }
 
 void UGPCharacterCombatHandler::PlayESkillMontage()
@@ -289,6 +315,45 @@ void UGPCharacterCombatHandler::PlaySkillMontage(UAnimMontage* SkillMontage)
 
 	UAnimInstance* AnimInstance = Owner->GetCharacterMesh()->GetAnimInstance();
 	if (!AnimInstance || AnimInstance->Montage_IsPlaying(SkillMontage)) return;
+
+	if (AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(Owner))
+	{
+		if (MyPlayer->SoundManager)
+		{
+			USoundBase* SkillSound = nullptr;
+			float SoundPlayRate = 1.f;
+			float SoundVolume = 1.f;
+
+			if (SkillMontage == QSkillMontage)
+			{
+				SkillSound = MyPlayer->bIsGunnerCharacter() ?
+					MyPlayer->SoundManager->GunnerQSkillSound :
+					MyPlayer->SoundManager->WarriorQSkillSound;
+			}
+			else if (SkillMontage == ESkillMontage)
+			{
+				SkillSound = MyPlayer->bIsGunnerCharacter() ?
+					MyPlayer->SoundManager->GunnerESkillSound :
+					MyPlayer->SoundManager->WarriorESkillSound;
+
+				if (!MyPlayer->bIsGunnerCharacter())
+				{
+					SoundPlayRate = 1.2;
+					SoundVolume = 1.5;
+				}
+			}
+			else if (SkillMontage == RSkillMontage)
+			{
+				// Gunner는 R 스킬이 없고 Warrior만 R을 사용한다고 가정
+				SkillSound = MyPlayer->SoundManager->WarriorRSkillSound;
+			}
+
+			if (SkillSound)
+			{
+				MyPlayer->SoundManager->PlaySFX(SkillSound , SoundPlayRate, SoundVolume);
+			}
+		}
+	}
 
 	bIsUsingSkill = true;
 
