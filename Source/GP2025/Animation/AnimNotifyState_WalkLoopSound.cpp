@@ -16,7 +16,7 @@ void UAnimNotifyState_WalkLoopSound::NotifyTick(USkeletalMeshComponent* MeshComp
 {
     AccumulatedTime += FrameDeltaTime;
 
-    if (AccumulatedTime >= 0.6f) // 원하는 주기 (예: 0.45초마다 걷는 소리)
+    if (AccumulatedTime >= 0.65f) // 원하는 주기 (예: 0.45초마다 걷는 소리)
     {
         AActor* OwnerActor = MeshComp->GetOwner();
         if (AGPCharacterMyplayer* Player = Cast<AGPCharacterMyplayer>(OwnerActor))

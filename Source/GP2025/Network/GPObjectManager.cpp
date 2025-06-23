@@ -17,6 +17,7 @@
 #include "UI/GPInGameWidget.h"
 #include "UI/GPQuestListEntryWidget.h"
 #include "UI/GPQuestListWidget.h"
+#include "Character/Modules/GPMyplayerSoundManager.h"
 #include "Network/GPNetworkManager.h"
 #include "Inventory/GPEquippedItemSlot.h"
 #include "Kismet/GameplayStatics.h"
@@ -737,6 +738,11 @@ void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpR
 
 	if (MyPlayer && MyPlayer->UIManager)
 	{
+		if (MyPlayer->SoundManager && MyPlayer->SoundManager->QuestClearSound)
+		{
+			MyPlayer->SoundManager->PlaySFX(MyPlayer->SoundManager->QuestClearSound);
+		}
+
 		uint8 QuestID = static_cast<uint8>(Quest);
 		MyPlayer->UIManager->UpdateQuestState(QuestID, true);
 	}

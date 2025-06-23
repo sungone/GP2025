@@ -64,12 +64,6 @@ public :
 	USoundBase* GunnerQSkillSound;
 
 	UPROPERTY()
-	USoundBase* LevelUpSound;
-
-	UPROPERTY()
-	USoundBase* MonsterHitSound;
-
-	UPROPERTY()
 	USoundBase* PlayerJumpSound;
 
 	UPROPERTY()
@@ -77,9 +71,6 @@ public :
 
 	UPROPERTY()
 	USoundBase* PlayerWalkSound;
-
-	UPROPERTY()
-	USoundBase* QuestClearSound;
 
 	UPROPERTY()
 	USoundBase* WarriorAttackSound;
@@ -92,4 +83,13 @@ public :
 
 	UPROPERTY()
 	USoundBase* WarriorRSkillSound;
+
+	UPROPERTY()
+	USoundBase* QuestClearSound;
+
+	UPROPERTY()
+	USoundBase* LevelUpSound;
+
+	UPROPERTY()
+	USoundBase* MonsterHitSound;
 };

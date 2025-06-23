@@ -332,6 +332,11 @@ void AGPCharacterMyplayer::SetCharacterInfo(const FInfoData& CharacterInfo_)
 	{
 		// UIManager->SpawnSkillLevelText(CharacterInfo_.Stats.Level);
 		PrevLevel = CharacterInfo_.Stats.Level;
+
+		if (SoundManager && SoundManager->LevelUpSound)
+		{
+			SoundManager->PlaySFX(SoundManager->LevelUpSound);
+		}
 	}
 
 	if (UIManager && UIManager->GetInventoryWidget())
