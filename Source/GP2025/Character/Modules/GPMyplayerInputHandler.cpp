@@ -7,6 +7,7 @@
 #include "Character/Modules/GPMyplayerCameraHandler.h"
 #include "Character/Modules/GPMyplayerNetworkSyncHandler.h"
 #include "Character/Modules/GPPlayerAppearanceHandler.h"
+#include "Character/Modules/GPMyplayerSoundManager.h"
 #include "Character/Modules/GPCharacterCombatHandler.h"
 #include "Character/GPCharacterNPC.h"
 #include "EnhancedInputComponent.h"
@@ -137,6 +138,11 @@ void UGPMyplayerInputHandler::Jump()
 
 	Owner->Jump();
 	bCanJump = false;
+
+	if (Owner->SoundManager && Owner->SoundManager->PlayerJumpSound)
+	{
+		Owner->SoundManager->PlaySFX(Owner->SoundManager->PlayerJumpSound);
+	}
 
 	Owner->NetworkSyncHandler->isJumpStart = true;
 	Owner->CharacterInfo.RemoveState(STATE_IDLE);

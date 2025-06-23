@@ -63,19 +63,24 @@ void UGPCharacterCombatHandler::PlayAutoAttackMontage()
 		{
 			USoundBase* AttackSound = nullptr;
 			float SoundPlayRate = 1.f;
-			if (MyPlayer->bIsGunnerCharacter())
+			if (!bHasWeapon)
+			{
+				// 맨손 공격일 경우
+				AttackSound = MyPlayer->SoundManager->PlayerPunchSound; 
+			}
+			else if (MyPlayer->bIsGunnerCharacter())
 			{
 				AttackSound = MyPlayer->SoundManager->GunnerAttackSound;
 			}
 			else
 			{
 				AttackSound = MyPlayer->SoundManager->WarriorAttackSound;
-				SoundPlayRate = 0.8f;
+				SoundPlayRate = 0.8f; // Warrior는 약간 느리게
 			}
 
 			if (AttackSound)
 			{
-				MyPlayer->SoundManager->PlaySFX(AttackSound , SoundPlayRate);
+				MyPlayer->SoundManager->PlaySFX(AttackSound, 1.f, SoundPlayRate); // Volume, Pitch
 			}
 		}
 	}
