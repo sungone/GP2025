@@ -45,6 +45,7 @@ UGPMyplayerSoundManager::UGPMyplayerSoundManager()
 	LOAD_SFX(ClickSound, ClickSound);
 	LOAD_SFX(GunnerAttackSound, GunnerAttackSound);
 	LOAD_SFX(GunnerESkillSound, GunnerESkillSound);
+	LOAD_SFX(GunnerRSkillSound, GunnerRSkillSound);
 	LOAD_SFX(GunnerPlayerZoomSound, GunnerPlayerZoomSound);
 	LOAD_SFX(GunnerQSkillSound, GunnerQSkillSound);
 	LOAD_SFX(LevelUpSound, LevelUpSound);

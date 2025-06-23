@@ -64,6 +64,9 @@ public :
 	USoundBase* GunnerQSkillSound;
 
 	UPROPERTY()
+	USoundBase* GunnerRSkillSound;
+
+	UPROPERTY()
 	USoundBase* PlayerJumpSound;
 
 	UPROPERTY()

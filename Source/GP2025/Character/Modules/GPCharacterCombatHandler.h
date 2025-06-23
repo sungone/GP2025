@@ -20,6 +20,7 @@ class GP2025_API UGPCharacterCombatHandler : public UObject
 	
 
 public:
+	UGPCharacterCombatHandler();
 	void Initialize(AGPCharacterBase* InOwner);
 
 	// 기본 공격
@@ -121,4 +122,15 @@ private :
 
 	UPROPERTY()
 	UAnimMontage* CurrentSkillMontage = nullptr;
+
+	// 몬스터가 가지는 사운드
+public :
+	UPROPERTY()
+	USoundBase* BunkerMonsterAttackSound;
+
+	UPROPERTY()
+	USoundBase* EMonsterAttackSound;
+
+	UPROPERTY()
+	USoundBase* IndustryMonsterAttackSound;
 };
