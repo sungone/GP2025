@@ -23,6 +23,7 @@ bool SpawnTable::LoadFromCSV(const std::string& filePath)
         std::getline(ss, cell, ','); spawn.Zone = ParseZoneType(cell);
         std::getline(ss, cell, ','); spawn.MonsterType = ParseMonsterType(cell);
         std::getline(ss, cell, ','); spawn.Count = std::stoi(cell);
+        std::getline(ss, cell, ','); spawn.bRandomSpawn = (cell == "1");
         std::getline(ss, cell, ','); spawn.SpawnPos.X = std::stof(cell);
         std::getline(ss, cell, ','); spawn.SpawnPos.Y = std::stof(cell);
         std::getline(ss, cell, ','); spawn.SpawnPos.Z = std::stof(cell);
@@ -73,8 +74,8 @@ Type::EMonster SpawnTable::ParseMonsterType(const std::string& str)
 
 int32 SpawnTable::ParseDropItem(const std::string& str)
 {
-    if (str == "ENERGY_SWORD") return static_cast<int32>(Type::EWeapon::ENERGY_SWORD);
-    if (str == "COFFEE") return static_cast<int32>(Type::EUseable::COFFEE);
+    if (str == "TUCLOTHES") return static_cast<int32>(Type::EArmor::TUCLOTHES);
+    if (str == "DOCUMENT") return static_cast<int32>(Type::EQuestItem::DOCUMENT);
     if (str == "KEY") return static_cast<int32>(Type::EQuestItem::KEY);
     return -1;
 }

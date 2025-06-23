@@ -5,17 +5,23 @@ struct SpawnInfo
     ZoneType Zone;
     Type::EMonster MonsterType;
     int Count;
+    bool bRandomSpawn;
     FVector SpawnPos;
     float SpawnDelaySec;
-    int32 DropItemID;
+    int DropItemID;
     bool bIsBoss;
 };
 
 class SpawnTable
 {
 public:
-    bool LoadFromCSV(const std::string& filePath);
+    static SpawnTable& GetInst()
+    {
+        static SpawnTable inst;
+        return inst;
+    }
 
+    bool LoadFromCSV(const std::string& filePath);
     const std::vector<SpawnInfo>& GetSpawnsByZone(ZoneType zone) const;
 
 private:

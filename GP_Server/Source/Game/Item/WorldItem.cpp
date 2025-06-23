@@ -4,7 +4,13 @@
 WorldItem::WorldItem(uint8 itemTypeID) //ShopItem생성으로 사용함
 	: Item(itemTypeID), _pos(FVector::ZeroVector)
 {
-	
+
+}
+WorldItem::WorldItem(uint8 itemTypeID, FVector pos)//보스 스폰템
+	: Item(itemTypeID), _pos(pos)
+{
+	_itemID = GenerateItemID();
+	Item::Init(_itemTypeID);
 }
 WorldItem::WorldItem(FVector pos)
 	: _pos(pos)
@@ -23,10 +29,10 @@ WorldItem::WorldItem(FVector pos, uint32 monlv, Type::EPlayer playertype)
 
 uint8 WorldItem::GetRandomItemType(uint32 monlv, Type::EPlayer playertype)
 {
-	uint8 itemCategory 
-		= RandomUtils::GetRandomUint8(
+	uint8 itemCategory = static_cast<uint8>(EItemCategory::Useable);
+		/*= RandomUtils::GetRandomUint8(
 			static_cast<uint8>(EItemCategory::Useable),
-			static_cast<uint8>(EItemCategory::Quest));
+			static_cast<uint8>(EItemCategory::Quest));*/
 
 	switch (itemCategory)
 	{
@@ -36,8 +42,8 @@ uint8 WorldItem::GetRandomItemType(uint32 monlv, Type::EPlayer playertype)
 		return static_cast<uint8>(GetRandomArmor());
 	case static_cast<uint8>(EItemCategory::Useable):
 		return static_cast<uint8>(GetRandomBuffTem());
-	case static_cast<uint8>(EItemCategory::Quest):
-		return static_cast<uint8>(GetRandomQuestTem());
+	//case static_cast<uint8>(EItemCategory::Quest):
+	//	return static_cast<uint8>(GetRandomQuestTem());
 	}
 }
 
