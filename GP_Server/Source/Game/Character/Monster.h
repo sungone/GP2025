@@ -17,18 +17,23 @@ public:
 	void UpdateViewList(std::shared_ptr<Character> other) override;
 	void Update();
 	void BehaviorTree();
-	void SetDropItem(int32 itemId) { _dropItemId = itemId; }
-	uint32 GetDropItemId() { return _dropItemId; }
-	bool HasDropItem() { return (_dropItemId != -1); }
+
 	Type::EMonster GetMonsterType() { return _monType; }
 	float GetAttackDamage() override { return _info.GetDamage(); }
 	void ChangeState(ECharacterStateType newState) override
 	{
 		_info.State = newState;
 	}
+
+	void SetDropItem(int32 itemId) { _dropItemId = itemId; }
+	uint32 GetDropItemId() { return _dropItemId; }
+	bool HasDropItem() { return (_dropItemId != -1); }
+
 	bool IsActive() { return _active; }
 	void SetActive(bool value) { _active = value; }
 
+	void SetQuestID(QuestType quest) { _questID = quest; }
+	QuestType GetQuestID() { return _questID; }
 private:
 	void Look();
 	void Attack();
@@ -44,6 +49,7 @@ private:
 	FVector& _pos = _info.Pos;
 	std::shared_ptr<Player> _target = nullptr;
 	int32 _dropItemId = -1;
+	QuestType _questID;
 	bool _active = false;
 };
 

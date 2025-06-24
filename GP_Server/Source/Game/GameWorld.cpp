@@ -237,6 +237,14 @@ void GameWorld::PlayerAttack(int32 playerId)
 				FVector itemPos = basePos + RandomUtils::GetRandomOffset();
 				auto dropedItem = WorldItem(dropId, itemPos);
 				SpawnWorldItem(dropedItem);
+				if (dropId == Type::EQuestItem::KEY)
+				{
+					CompleteQuest(playerId, QuestType::CH1_BUNKER_CLEANUP);
+				}
+				else if (dropId == Type::EQuestItem::DOCUMENT)
+				{
+					CompleteQuest(playerId, QuestType::CH1_CLEAR_E_BUILDING);
+				}
 			}
 			FVector itemPos = basePos + RandomUtils::GetRandomOffset();
 			SpawnWorldItem(itemPos, monlv, playertype);
@@ -276,9 +284,10 @@ void GameWorld::PlayerUseSkill(int32 playerId, ESkillGroup groupId)
 void GameWorld::CreateMonster()
 {
 	auto table = SpawnTable::GetInst();
-	for (ZoneType zone : { ZoneType::GYM, ZoneType::TUK, ZoneType::E, ZoneType::INDUSTY, ZoneType::BUNKER })
+	for (ZoneType z : { ZoneType::GYM, ZoneType::TUK, ZoneType::E, ZoneType::INDUSTY, ZoneType::BUNKER })
 	{
-		const auto& spawns = table.GetSpawnsByZone(zone);
+		const auto& spawns = table.GetSpawnsByZone(z);
+		ZoneType zone = (z == ZoneType::BUNKER) ? ZoneType::TUK : z;
 		auto& zoneMap = _monstersByZone[zone];
 
 		for (const auto& info : spawns)
@@ -286,19 +295,6 @@ void GameWorld::CreateMonster()
 			for (int i = 0; i < info.Count; ++i)
 			{
 				int32 id = GenerateMonsterId();
-
-				if (info.bIsBoss && info.QuestID != 0)
-				{
-					auto boss = std::make_shared<Monster>(id, zone, info.MonsterType);
-					boss->SetActive(false);
-					boss->SetPos(info.SpawnPos);
-					boss->SetDropItem(info.DropItemID);
-					boss->Init();
-
-					_questBossMonsters[info.QuestID] = boss;
-					continue; // 일반 스폰에는 포함시키지 않음
-				}
-
 				auto monster = std::make_shared<Monster>(id, zone, info.MonsterType);
 				FVector pos;
 				float radius = monster->GetInfo().CollisionRadius;
@@ -310,17 +306,19 @@ void GameWorld::CreateMonster()
 				{
 					do
 					{
-						pos = Map::GetInst().GetRandomPos(zone, radius);
+						pos = Map::GetInst().GetRandomPos(z, radius);
 					} while (IsCollisionDetected(zone, pos, radius));
 				}
 				monster->SetPos(pos);
 				monster->Init();
+				monster->SetQuestID(static_cast<QuestType>(info.QuestID));
 				if (info.DropItemID != -1)
 				{
 					monster->SetDropItem(info.DropItemID);
 				}
 
-
+				if (info.QuestID == -1)
+					monster->SetActive(true);
 				zoneMap[id] = monster;
 			}
 		}
@@ -344,7 +342,8 @@ void GameWorld::RemoveMonster(int32 id)
 		}
 		SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
 
-		zoneMap.erase(it);
+		//zoneMap.erase(it);
+		monster->SetActive(false);
 		break;
 	}
 	{
@@ -633,7 +632,7 @@ void GameWorld::UpdateViewList(std::shared_ptr<Character> listOwner)
 			std::lock_guard lock(_mtMonZMap);
 			for (auto& [mid, monster] : _monstersByZone[ownerZone])
 			{
-				if (monster)
+				if (monster && monster->IsActive())
 					listOwner->UpdateViewList(monster);
 			}
 		}
@@ -683,6 +682,22 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 	}
 	if (player->IsQuestInProgress(quest))
 		player->CheckQuestProgress();
+}
+
+void GameWorld::QuestSpawn(QuestType quest)
+{
+	std::lock_guard lock(_mtMonZMap);
+	for (auto& [zone, monMap] : _monstersByZone)
+	{
+		for (auto& [id, mon] : monMap)
+		{
+			if (!mon) continue;
+			if (!mon->IsActive() && mon->GetQuestID() == quest)
+			{
+				mon->SetActive(true);
+			}
+		}
+	}
 }
 
 void GameWorld::BuyItem(int32 playerId, uint8 itemType, uint16 quantity)
