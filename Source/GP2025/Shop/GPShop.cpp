@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Shop/GPShop.h"
@@ -84,10 +84,6 @@ void UGPShop::SetOwningNPC(AGPCharacterNPC* NPC)
 
 void UGPShop::OnBuyItemClicked()
 {
-	if (ClickSound)
-	{
-		UGameplayStatics::PlaySound2D(GetWorld(), SellAndBuySound);
-	}
 
 	if (!MyPlayer)
 	{
@@ -104,10 +100,52 @@ void UGPShop::OnBuyItemClicked()
 		const FName RowName = CurrentSlot->SlotData.ItemID.RowName;
 		const FString RowNameString = RowName.ToString();
 		const int32 ItemID = FCString::Atoi(*RowNameString);
+		const FString FailedMessage = TEXT("구매할 수 없습니다");
 
 		if (ItemID == 0 && RowNameString != "0")
 		{
+			if (ClickSound)
+			{
+				UGameplayStatics::PlaySound2D(GetWorld(), ErrorSound);
+			}
 			return;
+		}
+
+		if (MyPlayer->bIsGunnerCharacter() &&
+			(ItemID == 4 || ItemID == 5 || ItemID == 6))
+		{
+			if (ResultMessage)
+			{
+				ShowResultMessage(FailedMessage, 3.0f);
+			}
+
+			if (ClickSound)
+			{
+				UGameplayStatics::PlaySound2D(GetWorld(), ErrorSound);
+			}
+
+			return;
+		}
+
+		if (!MyPlayer->bIsGunnerCharacter() &&
+			(ItemID == 1 || ItemID == 2 || ItemID == 3))
+		{
+			if (ResultMessage)
+			{
+				ShowResultMessage(FailedMessage, 3.0f);
+			}
+
+			if (ClickSound)
+			{
+				UGameplayStatics::PlaySound2D(GetWorld(), ErrorSound);
+			}
+
+			return;
+		}
+
+		if (ClickSound)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), SellAndBuySound);
 		}
 
 		const int32 Quantity = 1;
@@ -204,7 +242,7 @@ void UGPShop::HandleSellItemResult(bool bSuccess, uint32 NewGold, const FString&
 			CurrentSlot = nullptr;
 		}
 
-		// �Ǹ� ���� �籸��
+		// 판매 슬롯 재구성
 		PopulateSellItems();
 	}
 
