@@ -38,7 +38,7 @@ public:
 	uint8 EquipItem(uint32 itemId);
 	uint8 UnequipItem(uint32 itemId);
 
-	bool CheckQuestProgress(int32 targetID = -1);
+	bool GiveQuestReward(QuestType quest);
 	bool SetCurrentQuest(QuestType quest);
 	bool IsQuestInProgress(QuestType quest) const;
 	bool StartQuest(QuestType newQuest);
@@ -88,4 +88,5 @@ private:
 	FStatData& _stats = _info.Stats;
 	uint32& _gold = _info.Gold;
 	QuestStatus& _curQuest = _info.CurrentQuest;
+	const QuestData* _curQuestData = nullptr;
 };

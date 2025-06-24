@@ -49,7 +49,6 @@ bool QuestTable::LoadFromCSV(const std::string& filePath)
 		else
 			data.Catagory = EQuestCategory::MOVE;
 
-		std::getline(ss, cell, ','); data.TargetID = std::stoi(cell);
 		std::getline(ss, cell, ','); data.ExpReward = std::stoi(cell);
 		std::getline(ss, cell, ','); data.GoldReward = std::stoi(cell);
 		std::getline(ss, cell, ','); data.RewarditemType = std::stoi(cell);

@@ -115,7 +115,7 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 
 					// 아이템 있음 → 정상 입장 처리
 					NetworkMgr->SendMyZoneChangePacket(NewZone);
-					NetworkMgr->SendMyCompleteQuest(QuestType::CH1_ENTER_E_BUILDING);
+					NetworkMgr->SendMyCompleteQuest(QuestType::CH2_ENTER_E_BUILDING);
 					UE_LOG(LogTemp, Log, TEXT("[LevelTransitionTrigger] ZoneChange + QuestComplete Success"));
 				}
 				else

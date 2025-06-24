@@ -231,27 +231,20 @@ void GameWorld::PlayerAttack(int32 playerId)
 
 			FVector basePos = monster->GetInfo().Pos;
 
+			uint32 dropId = monster->GetDropItemId();
 			if (monster->HasDropItem())
 			{
-				uint32 dropId = monster->GetDropItemId();
 				FVector itemPos = basePos + RandomUtils::GetRandomOffset();
 				auto dropedItem = WorldItem(dropId, itemPos);
 				SpawnWorldItem(dropedItem);
-				if (dropId == Type::EQuestItem::KEY)
-				{
-					CompleteQuest(playerId, QuestType::CH1_BUNKER_CLEANUP);
-				}
-				else if (dropId == Type::EQuestItem::DOCUMENT)
-				{
-					CompleteQuest(playerId, QuestType::CH1_CLEAR_E_BUILDING);
-				}
+				
+				player->GiveQuestReward(monster->GetQuestID());
 			}
 			FVector itemPos = basePos + RandomUtils::GetRandomOffset();
 			SpawnWorldItem(itemPos, monlv, playertype);
 			FVector goldPos = basePos + RandomUtils::GetRandomOffset();
 			SpawnGoldItem(goldPos);
 
-			player->CheckQuestProgress(static_cast<int32>(monster->GetMonsterType()));
 			RemoveMonster(targetId);
 		}
 	}
@@ -362,7 +355,7 @@ void GameWorld::UpdateAllMonsters()
 		{
 			for (auto& [id, monster] : zoneMap)
 			{
-				if (!monster) continue;
+				if (!monster || monster->IsActive()) continue;
 				monster->Update();
 				snaps.emplace_back(id, monster->GetInfo());
 			}
@@ -681,7 +674,7 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 		return;
 	}
 	if (player->IsQuestInProgress(quest))
-		player->CheckQuestProgress();
+		player->GiveQuestReward(quest);
 }
 
 void GameWorld::QuestSpawn(QuestType quest)
