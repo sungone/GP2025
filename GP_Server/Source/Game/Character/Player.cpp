@@ -527,6 +527,7 @@ bool Player::SetCurrentQuest(QuestType quest)
 	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, GetInfo());
 	SessionManager::GetInst().SendPacket(_id, &infopkt);
 
+	//퀘스트 타입에 따라 몬스터 스폰
 	return true;
 }
 

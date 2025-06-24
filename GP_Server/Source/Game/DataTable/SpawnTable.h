@@ -10,6 +10,7 @@ struct SpawnInfo
     float SpawnDelaySec;
     int DropItemID;
     bool bIsBoss;
+    int QuestID;
 };
 
 class SpawnTable

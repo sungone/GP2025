@@ -39,7 +39,7 @@ namespace RandomUtils
         return dist(GetRandomEngine()) == 1;
     }
 
-    inline FVector GetRandomOffset(float minDist = 100.f, float maxDist = 200.f, float z = 20.f)
+    inline FVector GetRandomOffset(float minDist = 150.f, float maxDist = 300.f, float z = 20.f)
     {
         const float PI = 3.14159265358979323846f;
         float angle = GetRandomFloat(0.f, 2 * PI);

@@ -63,9 +63,6 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 	int32 id = player->GetInfo().ID;
 	player->GetInfo().SetZone(startZone);
 
-	//for test
-	player->AddGold(1000);
-
 	{
 		std::lock_guard lock(_mtPlayers);
 		_players[id] = player;
@@ -75,6 +72,14 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 		std::lock_guard lock(_mtPlayerZMap);
 		_playersByZone[startZone][id] = player;
 	}
+
+	//for test
+	player->AddGold(10000);
+	//for test
+	BuyItem(id, (uint8)Type::EWeapon::POSITRON, 1);
+	BuyItem(id, (uint8)Type::EWeapon::ENERGY_SWORD, 1);
+
+
 	auto& playerInfo = player->GetInfo();
 	UpdateViewList(player);
 
@@ -226,7 +231,7 @@ void GameWorld::PlayerAttack(int32 playerId)
 
 			FVector basePos = monster->GetInfo().Pos;
 
-			if(monster->HasDropItem())
+			if (monster->HasDropItem())
 			{
 				uint32 dropId = monster->GetDropItemId();
 				FVector itemPos = basePos + RandomUtils::GetRandomOffset();
@@ -282,10 +287,22 @@ void GameWorld::CreateMonster()
 			{
 				int32 id = GenerateMonsterId();
 
+				if (info.bIsBoss && info.QuestID != 0)
+				{
+					auto boss = std::make_shared<Monster>(id, zone, info.MonsterType);
+					boss->SetActive(false);
+					boss->SetPos(info.SpawnPos);
+					boss->SetDropItem(info.DropItemID);
+					boss->Init();
+
+					_questBossMonsters[info.QuestID] = boss;
+					continue; // 일반 스폰에는 포함시키지 않음
+				}
+
 				auto monster = std::make_shared<Monster>(id, zone, info.MonsterType);
 				FVector pos;
 				float radius = monster->GetInfo().CollisionRadius;
-				if (info.bIsBoss || !info.bRandomSpawn)
+				if (!info.bRandomSpawn)
 				{
 					pos = info.SpawnPos;
 				}
@@ -293,13 +310,16 @@ void GameWorld::CreateMonster()
 				{
 					do
 					{
-						pos = Map::GetInst().GetRandomPos(info.Zone, radius);
-					} while (IsCollisionDetected(info.Zone, pos, radius));
+						pos = Map::GetInst().GetRandomPos(zone, radius);
+					} while (IsCollisionDetected(zone, pos, radius));
 				}
 				monster->SetPos(pos);
-				if (info.DropItemID != 0)
-					monster->SetDropItem(info.DropItemID);
 				monster->Init();
+				if (info.DropItemID != -1)
+				{
+					monster->SetDropItem(info.DropItemID);
+				}
+
 
 				zoneMap[id] = monster;
 			}

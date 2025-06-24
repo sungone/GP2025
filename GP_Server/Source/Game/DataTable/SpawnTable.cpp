@@ -30,6 +30,7 @@ bool SpawnTable::LoadFromCSV(const std::string& filePath)
         std::getline(ss, cell, ','); spawn.SpawnDelaySec = std::stof(cell);
         std::getline(ss, cell, ','); spawn.DropItemID = ParseDropItem(cell);
         std::getline(ss, cell, ','); spawn.bIsBoss = (cell == "1");
+        std::getline(ss, cell, ','); spawn.QuestID = std::stoi(cell);
 
         _spawnMap[spawn.Zone].push_back(spawn);
     }

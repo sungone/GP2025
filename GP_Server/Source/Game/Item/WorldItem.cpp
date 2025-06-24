@@ -29,10 +29,11 @@ WorldItem::WorldItem(FVector pos, uint32 monlv, Type::EPlayer playertype)
 
 uint8 WorldItem::GetRandomItemType(uint32 monlv, Type::EPlayer playertype)
 {
-	uint8 itemCategory = static_cast<uint8>(EItemCategory::Useable);
-		/*= RandomUtils::GetRandomUint8(
-			static_cast<uint8>(EItemCategory::Useable),
-			static_cast<uint8>(EItemCategory::Quest));*/
+	uint8 itemCategory
+		// = static_cast<uint8>(EItemCategory::Useable);
+		= RandomUtils::GetRandomUint8(
+			static_cast<uint8>(EItemCategory::Weapon),
+			static_cast<uint8>(EItemCategory::Useable));//for test
 
 	switch (itemCategory)
 	{

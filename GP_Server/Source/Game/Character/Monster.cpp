@@ -34,6 +34,7 @@ void Monster::Init()
 void Monster::UpdateViewList(std::shared_ptr<Character> other)
 {
 	if (!other) { LOG(Warning, "Invaild!"); return; }
+
 	auto player = std::dynamic_pointer_cast<Player>(other);
 	if (!player) return;
 	auto playerId = other->GetInfo().ID;
@@ -58,9 +59,12 @@ void Monster::UpdateViewList(std::shared_ptr<Character> other)
 
 void Monster::Update()
 {
+	if (!IsActive()) return;
+
 	if (IsDead())
 	{
 		ChangeState(ECharacterStateType::STATE_DIE);
+		SetActive(false);
 		return;
 	}
 
