@@ -53,7 +53,7 @@ public:
 	//Quest
 	void RequestQuest(int32 playerId, QuestType quest);
 	void CompleteQuest(int32 playerId, QuestType quest);
-
+	void QuestSpawn(QuestType quest);
 	void BuyItem(int32 playerId, uint8 itemType, uint16 quantity);
 	void SellItem(int32 playerId, uint32 itemId);
 

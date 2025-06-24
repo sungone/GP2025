@@ -75,6 +75,7 @@ void Player::OnEnterGame()
 			return;
 		}
 		SetCurrentQuest(questData->NextQuestID);
+
 		auto questpkt = QuestStartPacket(questData->NextQuestID);
 		SessionManager::GetInst().SendPacket(_id, &questpkt);
 	}
@@ -502,13 +503,12 @@ bool Player::CheckQuestProgress(int32 targetID)
 		if (questData->NextQuestID != QuestType::NONE)
 		{
 			SetCurrentQuest(questData->NextQuestID);
-			auto nextpkt = QuestStartPacket(questData->NextQuestID);
-			SessionManager::GetInst().SendPacket(_id, &nextpkt);
 		}
 	}
 
-	auto pkt = QuestRewardPacket(quest, res, exp, gold);
+	auto pkt = QuestRewardPacket(quest, res, exp, gold);//결과 
 	SessionManager::GetInst().SendPacket(_id, &pkt);
+	return true;
 }
 
 bool Player::SetCurrentQuest(QuestType quest)
@@ -527,7 +527,7 @@ bool Player::SetCurrentQuest(QuestType quest)
 	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, GetInfo());
 	SessionManager::GetInst().SendPacket(_id, &infopkt);
 
-	//퀘스트 타입에 따라 몬스터 스폰
+	GameWorld::GetInst().QuestSpawn(quest);
 	return true;
 }
 
