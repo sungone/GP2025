@@ -7,7 +7,7 @@
 6,1,CH1_FIND_KEY_ITEM,열쇠 아이템을 획득한다,ITEM,0,20,10,0,7
 7,2,CH1_ENTER_E_BUILDING,열쇠로 E동에 들어간다,MOVE,0,10,5,0,8
 8,2,CH1_CLEAR_E_BUILDING,E동의 몬스터와 보스 제거,KILL,0,80,30,0,9
-9,3,CH1_RETURN_TO_TIP_WITH_DOC,문서를 가지고 산융으로 간다,MOVE,0,20,10,0,10
+9,3,CH1_RETURN_TO_TIP_WITH_DOC,문서를 가지고 교수를 찾아 산융으로 간다,MOVE,0,20,10,0,10
 10,3,CH2_CLEAR_SERVER_ROOM,서버를 지키는 몬스터 제거한다.,KILL,0,100,40,0,11
 11,4,CH3_ENTER_GYM,프로그램 종료를 위해 체육관으로 이동한다,MOVE,0,15,5,0,12
 12,4,CH3_KILL_TINO,최종 보스 타락 티노를 제거한다,KILL,0,200,100,0,13
