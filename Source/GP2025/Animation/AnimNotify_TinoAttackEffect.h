@@ -19,7 +19,7 @@ public:
 	class UNiagaraSystem* AttackEffect;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
-	FName SocketName = FName("Hips");
+	FName SocketName = FName("HipsSocket");
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 };

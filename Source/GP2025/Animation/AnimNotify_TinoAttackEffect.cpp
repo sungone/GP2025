@@ -18,13 +18,13 @@ void UAnimNotify_TinoAttackEffect::Notify(USkeletalMeshComponent* MeshComp, UAni
 		MeshComp,
 		SocketName,
 		FVector::ZeroVector,
-		FRotator::ZeroRotator,
+		FRotator(0.f, 0.f, 0.f),
 		EAttachLocation::SnapToTargetIncludingScale,
 		true);
 
 	if (EffectComp)
 	{
-		EffectComp->SetRelativeScale3D(FVector(1.3f)); 
+		EffectComp->SetRelativeScale3D(FVector(3.f)); 
 	}
 }
 
