@@ -237,6 +237,14 @@ void GameWorld::PlayerAttack(int32 playerId)
 				FVector itemPos = basePos + RandomUtils::GetRandomOffset();
 				auto dropedItem = WorldItem(dropId, itemPos);
 				SpawnWorldItem(dropedItem);
+				if (dropId == Type::EQuestItem::KEY)
+				{
+					CompleteQuest(playerId, QuestType::CH1_BUNKER_CLEANUP);
+				}
+				else if (dropId == Type::EQuestItem::DOCUMENT)
+				{
+					CompleteQuest(playerId, QuestType::CH1_CLEAR_E_BUILDING);
+				}
 			}
 			FVector itemPos = basePos + RandomUtils::GetRandomOffset();
 			SpawnWorldItem(itemPos, monlv, playertype);
