@@ -230,20 +230,39 @@ void GameWorld::PlayerAttack(int32 playerId)
 			player->AddExp(TEST_EXP_WEIGHT * 10 * monster->GetInfo().GetLevel());
 
 			FVector basePos = monster->GetInfo().Pos;
+			auto mquest = monster->GetQuestID();
+			if (mquest != QuestType::NONE)
+			{
+				uint32 dropId = monster->GetDropItemId();
+				if (monster->IsBoss())
+				{
+					if(monster->HasDropItem())
+					{
+						FVector itemPos = basePos + RandomUtils::GetRandomOffset();
+						auto dropedItem = WorldItem(dropId, itemPos);
+						SpawnWorldItem(dropedItem);
+					}
 
-			uint32 dropId = monster->GetDropItemId();
-			if (monster->HasDropItem())
+					player->GiveQuestReward(mquest);
+				}
+				else if (mquest == QuestType::CH2_CLEAR_E_BUILDING || mquest == QuestType::CH3_CLEAR_SERVER_ROOM)
+				{
+					auto zone = monster->GetZone();
+					_monsterCnt[zone]--;
+					if (_monsterCnt[zone] == 1)
+					{
+						player->GiveQuestReward(mquest);
+					}
+				}
+			}
+
+			//todo: 아이템 드랍테이블로 스폰하자
 			{
 				FVector itemPos = basePos + RandomUtils::GetRandomOffset();
-				auto dropedItem = WorldItem(dropId, itemPos);
-				SpawnWorldItem(dropedItem);
-				
-				player->GiveQuestReward(monster->GetQuestID());
+				SpawnWorldItem(itemPos, monlv, playertype);
+				FVector goldPos = basePos + RandomUtils::GetRandomOffset();
+				SpawnGoldItem(goldPos);
 			}
-			FVector itemPos = basePos + RandomUtils::GetRandomOffset();
-			SpawnWorldItem(itemPos, monlv, playertype);
-			FVector goldPos = basePos + RandomUtils::GetRandomOffset();
-			SpawnGoldItem(goldPos);
 
 			RemoveMonster(targetId);
 		}
@@ -312,9 +331,11 @@ void GameWorld::CreateMonster()
 
 				if (info.QuestID == -1)
 					monster->SetActive(true);
+				monster->SetBoss(info.bIsBoss);
 				zoneMap[id] = monster;
 			}
 		}
+		_monsterCnt[zone] = zoneMap.size();
 	}
 }
 

@@ -10,8 +10,9 @@ class Monster : public Character, public std::enable_shared_from_this<Monster>
 public:
 	Monster(int32 id) : Character(id) { Init(); }
 	Monster(int32 id, ZoneType zone, Type::EMonster monType)
-		: Character(id), _zone(zone), _monType(monType)
+		: Character(id), _monType(monType)
 	{
+		_zone = zone;
 	}
 	void Init() override;
 	void UpdateViewList(std::shared_ptr<Character> other) override;
@@ -29,6 +30,8 @@ public:
 	uint32 GetDropItemId() { return _dropItemId; }
 	bool HasDropItem() { return (_dropItemId != -1); }
 
+	bool IsBoss() { return _isBoss; }
+	void SetBoss(bool value) { _isBoss = value; }
 	bool IsActive() { return _active; }
 	void SetActive(bool value) { _active = value; }
 
@@ -44,12 +47,13 @@ private:
 	bool IsTargetInAttackRange();
 	bool IsTargetInChaseRange();
 private:
-	ZoneType _zone;
+	ZoneType& _zone = _info.CurrentZone;
 	Type::EMonster _monType;
 	FVector& _pos = _info.Pos;
 	std::shared_ptr<Player> _target = nullptr;
 	int32 _dropItemId = -1;
-	QuestType _questID;
+	QuestType _questID = QuestType::NONE;
 	bool _active = false;
+	bool _isBoss;
 };
 
