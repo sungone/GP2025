@@ -69,12 +69,12 @@ private:
 	std::unordered_map<ZoneType, std::unordered_map<int32, std::shared_ptr<Player>>> _playersByZone;
 	std::unordered_map<ZoneType, std::unordered_map<int32, std::shared_ptr<Monster>>> _monstersByZone;
 	std::vector<std::shared_ptr<WorldItem>> _worldItems;
-	std::unordered_map<int32, std::shared_ptr<Monster>> _questBossMonsters; // QuestID ¡æ Monster
 
 	std::mutex _mtPlayers;
 	std::mutex _mtPlayerZMap;
 	std::mutex _mtMonZMap;
 	std::mutex _mtItem;
 	int32 _nextMonsterId = MAX_PLAYER;
+	std::unordered_map<ZoneType, int32> _monsterCnt;
 };
 
