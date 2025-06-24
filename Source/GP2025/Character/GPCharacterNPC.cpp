@@ -12,6 +12,8 @@
 #include "Character/Modules/GPMyplayerCameraHandler.h"
 #include "UI/GPQuestWidget.h"
 #include "Inventory/GPItemSlot.h"
+#include "Components/TextBlock.h"
+#include "UI/GPNPCInteractionText.h"
 #include "Kismet/GameplayStatics.h"
 #include "Character/Modules/GPMyplayerUIManager.h"
 #include "Character/GPCharacterMyplayer.h"
@@ -63,6 +65,35 @@ void AGPCharacterNPC::BeginPlay()
 	if (WBPClass_NPCInteraction && InteractionWidgetComponent)
 	{
 		InteractionWidgetComponent->SetWidgetClass(WBPClass_NPCInteraction);
+	}
+
+	if (InteractionWidgetComponent)
+	{
+		if (UGPNPCInteractionText* InteractionTextWidget = Cast<UGPNPCInteractionText>(InteractionWidgetComponent->GetUserWidgetObject()))
+		{
+			FText DescText;
+
+			switch (NPCType)
+			{
+			case ENPCType::GSSHOP:
+			case ENPCType::SUITSHOP:
+			case ENPCType::JUICESHOP:
+				DescText = FText::FromString(TEXT("상점 열기"));
+				break;
+			case ENPCType::PROFESSOR:
+			case ENPCType::STUDENT:
+			case ENPCType::SECURITY:
+				DescText = FText::FromString(TEXT("대화하기"));
+				break;
+			default:
+				break;
+			}
+
+			if (InteractionTextWidget->NPCText)
+			{
+				InteractionTextWidget->NPCText->SetText(DescText);
+			}
+		}
 	}
 }
 
