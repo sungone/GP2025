@@ -44,7 +44,7 @@ public:
 	bool StartQuest(QuestType newQuest);
 	bool CompleteCurrentQuest();
 	QuestType GetCurrentQuest() { return _curQuest.QuestType; }
-
+	const QuestData* GetCurrentQuestData() { return _curQuestData; }
 	void AddItemStats(const ItemStats& stats);
 	void RemoveItemStats(const ItemStats& stats);
 

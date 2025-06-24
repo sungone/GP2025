@@ -236,7 +236,7 @@ void GameWorld::PlayerAttack(int32 playerId)
 				uint32 dropId = monster->GetDropItemId();
 				if (monster->IsBoss())
 				{
-					if(monster->HasDropItem())
+					if (monster->HasDropItem())
 					{
 						FVector itemPos = basePos + RandomUtils::GetRandomOffset();
 						auto dropedItem = WorldItem(dropId, itemPos);
@@ -552,7 +552,28 @@ FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
 		LOG(std::format("Player [{}] cannot access due to level {}", playerId, playerLevel));
 		return FVector::ZeroVector;
 	}
-
+	auto questData = player->GetCurrentQuestData();
+	if (questData->Catagory == EQuestCategory::MOVE)
+	{
+		auto quest = questData->QuestID;
+		switch (quest)
+		{
+		case QuestType::CH1_GO_TO_BUNKER:
+			break;
+		case QuestType::CH1_GO_TO_E_FIRST:
+			break;
+		case QuestType::CH2_ENTER_E_BUILDING:
+			break;
+		case QuestType::CH3_RETURN_TO_TIP_WITH_DOC:
+			break;
+		case QuestType::CH4_ENTER_GYM:
+			if (targetZone == ZoneType::GYM)
+			{
+				CompleteQuest(playerId, quest);
+			}
+			break;
+		}
+	}
 	ZoneType oldZone = player->GetZone();
 	FVector newPos = Map::GetInst().GetRandomSpawnPosition(oldZone, targetZone);
 
