@@ -37,6 +37,27 @@ void UGPShop::NativeConstruct()
 		Mgr->OnBuyItemResult.AddDynamic(this, &UGPShop::HandleBuyItemResult);
 		Mgr->OnSellItemResult.AddDynamic(this, &UGPShop::HandleSellItemResult);
 	}
+
+	if (OwningNPC)
+	{
+		switch (OwningNPC->NPCType)
+		{
+		case ENPCType::SUITSHOP:
+		case ENPCType::JUICESHOP:
+			if (BuyWidgetSwitchButton)
+			{
+				BuyWidgetSwitchButton->SetVisibility(ESlateVisibility::Collapsed);
+			}
+			if (SellWidgetSwitchButton)
+			{
+				SellWidgetSwitchButton->SetVisibility(ESlateVisibility::Collapsed);
+			}
+			break;
+
+		default:
+			break;
+		}
+	}
 }
 
 void UGPShop::NativeDestruct()
