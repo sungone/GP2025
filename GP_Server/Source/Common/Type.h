@@ -254,67 +254,95 @@ enum class ZoneType : uint8
 };
 #endif
 enum class EQuestStatus { NotStarted, InProgress, Completed, };
+
 #ifdef SERVER_BUILD
-enum EQuestCategory { INTERACT, MOVE, KILL, ITEM };
+enum class EQuestCategory : uint8
+{
+	INTERACT,
+	MOVE,
+	KILL,
+	ITEM
+};
 #else
 UENUM(BlueprintType)
 enum class EQuestCategory : uint8
 {
-	INTERACT  UMETA(DisplayName = "Interact"),
-	MOVE      UMETA(DisplayName = "Move"),
-	KILL      UMETA(DisplayName = "Kill"),
-	ITEM      UMETA(DisplayName = "Item")
+	INTERACT   UMETA(DisplayName = "Interact"),
+	MOVE       UMETA(DisplayName = "Move"),
+	KILL       UMETA(DisplayName = "Kill"),
+	ITEM       UMETA(DisplayName = "Item")
 };
 #endif
+
 #ifdef SERVER_BUILD
 enum class QuestType : uint8
 {
-	NONE,
-	CH1_TALK_TO_STUDENT_A,        // 1. 학생 A와 대화
-	CH1_GO_TO_E_FIRST,            // 2. E동으로 먼저 이동
-	CH1_FIND_JANITOR,             // 3. 경비 아저씨 찾기
-	CH1_GO_TO_BUNKER,             // 4. 벙커로 이동
-	CH1_BUNKER_CLEANUP,           // 5. 벙커 청소
-	CH1_FIND_KEY_ITEM,            // 6. 열쇠 아이템 찾기
-	CH1_ENTER_E_BUILDING,         // 7. E동 입장
-	CH1_CLEAR_E_BUILDING,         // 8. E동 보스 제거
-	CH1_RETURN_TO_TIP_WITH_DOC,   // 9. 문서 가지고 TIP으로 돌아가기
-	CH2_CLEAR_SERVER_ROOM,        // 10. 서버룸 클리어
-	CH3_ENTER_GYM,                // 11. 체육관 입장
-	CH3_KILL_TINO,                // 12. 최종보스 Tino 제거
+	NONE = 0,
 
-	TUT_MOVE = 100,				// 100 - TIP 밖으로 이동하기
-	TUT_KILL_ONE_MON, 			// 101 - 몬스터 한 마리 처치하기
-	TUT_USE_ITEM, 				// 102 - 회복아이템 사용해보기
-	TUT_BUY_ITEM, 				// 103 - 장비 아이템 구매하기
-	TUT_EQUIP_ITEM, 			// 104 - 장비 아이템 착용하기
-	TUT_COMPLETE, 				// 105 - 튜토리얼 완료
+	// Chapter 1
+	CH1_TALK_TO_STUDENT_A = 1,
+	CH1_GO_TO_E_FIRST,
+	CH1_FIND_JANITOR,
+	CH1_GO_TO_BUNKER,
+	CH1_BUNKER_CLEANUP,
+	CH1_FIND_KEY_ITEM,
+
+	// Chapter 2
+	CH2_ENTER_E_BUILDING,
+	CH2_CLEAR_E_BUILDING,
+	CH2_KILL_DESKMON,
+
+	// Chapter 3
+	CH3_RETURN_TO_TIP_WITH_DOC,
+	CH3_CLEAR_SERVER_ROOM,
+	CH3_KILL_DRILL,
+
+	// Chapter 4
+	CH4_ENTER_GYM,
+	CH4_KILL_TINO,
+
+	// Tutorial
+	TUT_MOVE = 100,
+	TUT_KILL_ONE_MON,
+	TUT_USE_ITEM,
+	TUT_BUY_ITEM,
+	TUT_EQUIP_ITEM,
+	TUT_COMPLETE
 };
 #else
 UENUM(BlueprintType)
 enum class QuestType : uint8
 {
-	NONE                      UMETA(DisplayName = "None"),
+	NONE UMETA(DisplayName = "None"),
+
+	// Chapter 1
 	CH1_TALK_TO_STUDENT_A     UMETA(DisplayName = "Talk to Student A"),
-	CH1_GO_TO_E_FIRST         UMETA(DisplayName = "Go to E building first"),
+	CH1_GO_TO_E_FIRST         UMETA(DisplayName = "Go to E First"),
 	CH1_FIND_JANITOR          UMETA(DisplayName = "Find Janitor"),
 	CH1_GO_TO_BUNKER          UMETA(DisplayName = "Go to Bunker"),
 	CH1_BUNKER_CLEANUP        UMETA(DisplayName = "Bunker Cleanup"),
 	CH1_FIND_KEY_ITEM         UMETA(DisplayName = "Find Key Item"),
-	CH1_ENTER_E_BUILDING      UMETA(DisplayName = "Enter E Building"),
-	CH1_CLEAR_E_BUILDING      UMETA(DisplayName = "Clear E Building"),
-	CH1_RETURN_TO_TIP_WITH_DOC UMETA(DisplayName = "Return to TIP with Document"),
-	CH2_CLEAR_SERVER_ROOM     UMETA(DisplayName = "Clear Server Room"),
-	CH3_ENTER_GYM             UMETA(DisplayName = "Enter Gym"),
-	CH3_KILL_TINO             UMETA(DisplayName = "Kill Tino"),
-	// 튜토리얼 퀘스트 (100번대)
-	TUT_MOVE                      UMETA(DisplayName = "Move Outside TIP"),
-	TUT_KILL_ONE_MON              UMETA(DisplayName = "Kill One Monster"),
-	TUT_USE_ITEM                  UMETA(DisplayName = "Use Recovery Item"),
-	TUT_BUY_ITEM                  UMETA(DisplayName = "Buy an Item"),
-	TUT_EQUIP_ITEM                UMETA(DisplayName = "Equip an Item"),
-	TUT_COMPLETE                  UMETA(DisplayName = "Complete Tutorial"),
 
+	// Chapter 2
+	CH2_ENTER_E_BUILDING      UMETA(DisplayName = "Enter E Building"),
+	CH2_CLEAR_E_BUILDING      UMETA(DisplayName = "Clear E Building"),
+	CH2_KILL_DESKMON          UMETA(DisplayName = "Kill Deskmon"),
+
+	// Chapter 3
+	CH3_RETURN_TO_TIP_WITH_DOC UMETA(DisplayName = "Return to TIP with Document"),
+	CH3_CLEAR_SERVER_ROOM     UMETA(DisplayName = "Clear Server Room"),
+	CH3_KILL_DRILL            UMETA(DisplayName = "Kill Drill"),
+
+	// Chapter 4
+	CH4_ENTER_GYM             UMETA(DisplayName = "Enter Gym"),
+	CH4_KILL_TINO             UMETA(DisplayName = "Kill Tino"),
+
+	// Tutorial
+	TUT_MOVE                  UMETA(DisplayName = "Tutorial - Move"),
+	TUT_KILL_ONE_MON          UMETA(DisplayName = "Tutorial - Kill One Monster"),
+	TUT_USE_ITEM              UMETA(DisplayName = "Tutorial - Use Item"),
+	TUT_BUY_ITEM              UMETA(DisplayName = "Tutorial - Buy Item"),
+	TUT_EQUIP_ITEM            UMETA(DisplayName = "Tutorial - Equip Item"),
+	TUT_COMPLETE              UMETA(DisplayName = "Tutorial - Complete")
 };
 #endif
- 

@@ -80,7 +80,7 @@ void UGPQuestWidget::OnQuestAccepted()
 
 			if (Inventory->HasItemByType(51))  // 51번 아이템이 있는 경우에만 퀘스트 성공
 			{
-				NetMgr->SendMyCompleteQuest(QuestType::CH1_RETURN_TO_TIP_WITH_DOC);
+				NetMgr->SendMyCompleteQuest(QuestType::CH3_RETURN_TO_TIP_WITH_DOC);
 				UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] PROFESSOR NPC: Quest Complete Sent"));
 			}
 			else

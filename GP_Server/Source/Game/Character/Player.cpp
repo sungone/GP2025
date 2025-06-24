@@ -476,37 +476,34 @@ uint8 Player::UnequipItem(uint32 itemId)
 	return itemType;
 }
 
-bool Player::CheckQuestProgress(int32 targetID)
+bool Player::GiveQuestReward(QuestType quest)
 {
-	auto quest = GetCurrentQuest();
-	const QuestData* questData = QuestTable::GetInst().GetQuest(quest);
-	if (!questData)
+	if (!IsQuestInProgress(quest))
+		return false;
+	
+	const QuestData* questData = _curQuestData;
+	if (!_curQuestData)
 	{
 		LOG(Warning, "Invalid quest datatable");
 		return false;
 	}
 
-	if (targetID != -1 && questData->TargetID != targetID)
-		return false;
-
 	uint32 exp = 0, gold = 0;
 	bool res = CompleteCurrentQuest();
-	if (res)
-	{
-		exp = questData->ExpReward;
-		gold = questData->GoldReward;
-		AddExp(exp);
-		AddGold(gold);
-		auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, GetInfo());
-		SessionManager::GetInst().SendPacket(_id, &infopkt);
+	if (!res) return false;
+	exp = questData->ExpReward;
+	gold = questData->GoldReward;
+	AddExp(exp);
+	AddGold(gold);
+	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, GetInfo());
+	SessionManager::GetInst().SendPacket(_id, &infopkt);
 
-		if (questData->NextQuestID != QuestType::NONE)
-		{
-			SetCurrentQuest(questData->NextQuestID);
-		}
+	if (questData->NextQuestID != QuestType::NONE)
+	{
+		SetCurrentQuest(questData->NextQuestID);
 	}
 
-	auto pkt = QuestRewardPacket(quest, res, exp, gold);//결과 
+	auto pkt = QuestRewardPacket(quest, res, exp, gold);
 	SessionManager::GetInst().SendPacket(_id, &pkt);
 	return true;
 }
@@ -519,15 +516,17 @@ bool Player::SetCurrentQuest(QuestType quest)
 		LOG(Warning, "Invalid quest ID");
 		return false;
 	}
+	_curQuestData = questData;
+
 	if (!StartQuest(quest))
 		return false;
-
 	auto qpkt = QuestStartPacket(questData->QuestID);
+
 	SessionManager::GetInst().SendPacket(_id, &qpkt);
 	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, GetInfo());
 	SessionManager::GetInst().SendPacket(_id, &infopkt);
-
-	GameWorld::GetInst().QuestSpawn(quest);
+	if (questData->Catagory == EQuestCategory::KILL)
+		GameWorld::GetInst().QuestSpawn(quest);
 	return true;
 }
 

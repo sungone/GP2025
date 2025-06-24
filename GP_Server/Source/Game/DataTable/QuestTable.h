@@ -4,7 +4,6 @@ struct QuestData
 	QuestType QuestID;
 	uint8 Chapter;
 	EQuestCategory Catagory;
-	int32 TargetID;
 	int32 ExpReward;
 	int32 GoldReward;
 	QuestType NextQuestID = QuestType::NONE;
