@@ -14,7 +14,7 @@ struct FSlotStruct
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-    int32 ItemUniqueID; 
+    TArray<int32> ItemUniqueIDs;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
     FDataTableRowHandle ItemID;
@@ -25,6 +25,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
     EItemTypes ItemType;
 
+    //UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+    //int32 ItemUniqueID;
+
     FSlotStruct()
-        : Quantity(0), ItemType(EItemTypes::Weapon), ItemUniqueID(-1) {}
+        : Quantity(0), ItemType(EItemTypes::Weapon) {}
 };

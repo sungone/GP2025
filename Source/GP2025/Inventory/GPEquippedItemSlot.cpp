@@ -51,16 +51,28 @@ void UGPEquippedItemSlot::ClickEquippedItemSlot()
     if (!NetworkManager)
         return;
 
-    NetworkManager->SendMyUnequipItem(SlotData.ItemUniqueID);
+    // 1. UniqueID 중 하나 선택 (첫 번째로)
+    if (SlotData.ItemUniqueIDs.Num() > 0)
+    {
+        int32 UnequipID = SlotData.ItemUniqueIDs[0];
+        NetworkManager->SendMyUnequipItem(UnequipID);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("UGPEquippedItemSlot: No UniqueID to unequip."));
+        return;
+    }
 
+    // 2. 외형 해제
     if (MyPlayer->AppearanceHandler)
     {
         MyPlayer->AppearanceHandler->UnequipItemFromCharacter(CurrentItem.Category);
     }
 
-    SlotData = FSlotStruct();  
-    CurrentItem = FGPItemStruct();  
-    SetImage(); 
+    // 3. 데이터 및 UI 초기화
+    SlotData = FSlotStruct();
+    CurrentItem = FGPItemStruct();
+    SetImage();
 }
 
 void UGPEquippedItemSlot::InitializeInventoryWidget()

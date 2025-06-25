@@ -225,24 +225,26 @@ void UGPShop::OnSellItemClicked()
 
 	if (!MyPlayer || !CurrentSlot)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SellItemClicked - Player or Slot is null"));
 		return;
 	}
 
 	if (CurrentSlot->SlotOwnerType != ESlotOwnerType::Sell)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SellItemClicked - CurrentSlot is not Sell type"));
 		return;
 	}
 
-	uint32 ItemUniqueID = CurrentSlot->SlotData.ItemUniqueID;
-	// uint32 Quantity = 1;
+	if (CurrentSlot->SlotData.ItemUniqueIDs.Num() == 0)
+	{
+		return;
+	}
+
+	// 첫 번째 고유 ID만 사용
+	uint32 ItemUniqueIDToSell = CurrentSlot->SlotData.ItemUniqueIDs[0];
 
 	if (UGPNetworkManager* NetworkMgr = MyPlayer->GetGameInstance()->GetSubsystem<UGPNetworkManager>())
 	{
-		NetworkMgr->SendMyShopSellItem(ItemUniqueID);
-
-		UE_LOG(LogTemp, Log, TEXT("SellItem Sent to Server - ItemUniqueID: %d"), ItemUniqueID);
+		NetworkMgr->SendMyShopSellItem(ItemUniqueIDToSell);
+		UE_LOG(LogTemp, Log, TEXT("SellItem Sent to Server - ItemUniqueID: %d"), ItemUniqueIDToSell);
 	}
 }
 
@@ -257,7 +259,12 @@ void UGPShop::HandleSellItemResult(bool bSuccess, uint32 NewGold, const FString&
 		{
 			if (UGPInventory* Inventory = MyPlayer->UIManager->GetInventoryWidget())
 			{
-				Inventory->RemoveItemByUniqueID(CurrentSlot->SlotData.ItemUniqueID);
+				// 판매한 아이템 ID를 현재 슬롯에서 첫 번째 값으로 가져옴
+				if (CurrentSlot->SlotData.ItemUniqueIDs.Num() > 0)
+				{
+					int32 SoldID = CurrentSlot->SlotData.ItemUniqueIDs[0];
+					Inventory->RemoveItemByUniqueID(SoldID);  // 내부에서 UniqueIDs 배열과 Quantity를 업데이트하도록 구현됨
+				}
 			}
 
 			CurrentSlot = nullptr;

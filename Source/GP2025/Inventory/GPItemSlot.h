@@ -68,6 +68,7 @@ public:
 
     void SetOwningShop(UGPShop* InShop);
 
+    int32 GetAnyValidUniqueID() const;
 
     // Shop
     UPROPERTY()
@@ -76,4 +77,6 @@ public:
     void SetOwningNPC(AGPCharacterNPC* InNPC);
 
     void SetShopWidget(UGPShop* InShopWidget, AGPCharacterNPC* InNPC);
+
+
 };

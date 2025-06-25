@@ -49,9 +49,7 @@ void UGPItemSlot::ClickItem()
 {
     switch (SlotOwnerType)
     {
-
     case ESlotOwnerType::Inventory:
-
     {
         UE_LOG(LogTemp, Warning, TEXT("Success"));
 
@@ -61,7 +59,6 @@ void UGPItemSlot::ClickItem()
             return;
         }
 
-        // 현재 플레이어를 찾음
         AGPCharacterPlayer* Player = Cast<AGPCharacterPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
         if (!Player)
         {
@@ -69,49 +66,52 @@ void UGPItemSlot::ClickItem()
             return;
         }
 
-        // 장착 가능한 아이템인지 확인
+        UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+        if (!NetworkManager)
+        {
+            UE_LOG(LogTemp, Error, TEXT("NetworkManager is NULL"));
+            return;
+        }
+
+        const int32 UniqueIDToSend = GetAnyValidUniqueID();
+        if (UniqueIDToSend == -1)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("No valid UniqueID to send"));
+            return;
+        }
+
         if (CurrentItem.Category == ECategory::helmet ||
             CurrentItem.Category == ECategory::chest ||
             CurrentItem.Category == ECategory::sword ||
             CurrentItem.Category == ECategory::bow)
         {
-            UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-            if (NetworkManager)
+            if (!Player->AppearanceHandler) return;
+
+            Player->AppearanceHandler->EquipItemOnCharacter(GetItemData());
+
+            int32* FoundID = Player->EquippedItemIDs.Find(CurrentItem.Category);
+            if (!FoundID) return;
+
+            if (*FoundID == -1)
             {
-                if (!Player->AppearanceHandler) return;
-                Player->AppearanceHandler->EquipItemOnCharacter(GetItemData());
-                int32* FoundID = Player->EquippedItemIDs.Find(CurrentItem.Category);
-                if (!FoundID)  return;
-
-                if (*FoundID == -1)
-                {
-                    NetworkManager->SendMyEquipItem(SlotData.ItemUniqueID);
-                }
-                else
-                {
-                    NetworkManager->SendMyUnequipItem(*FoundID);
-                    NetworkManager->SendMyEquipItem(SlotData.ItemUniqueID);
-                }
-
-                Player->EquippedItemIDs[CurrentItem.Category] = SlotData.ItemUniqueID;
-                UpdatePlayerEquippedItemSlot(Player);
+                NetworkManager->SendMyEquipItem(UniqueIDToSend);
             }
             else
             {
-                UE_LOG(LogTemp, Error, TEXT("EquipItem: NetworkManager is NULL"));
+                NetworkManager->SendMyUnequipItem(*FoundID);
+                NetworkManager->SendMyEquipItem(UniqueIDToSend);
             }
+
+            Player->EquippedItemIDs[CurrentItem.Category] = UniqueIDToSend;
+            UpdatePlayerEquippedItemSlot(Player);
         }
         else if (CurrentItem.Category == ECategory::consumable)
         {
-            UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-            if (NetworkManager)
-            {
-                NetworkManager->SendMyUseItem(SlotData.ItemUniqueID);
-            }
+            NetworkManager->SendMyUseItem(UniqueIDToSend);
         }
         else
         {
-            UE_LOG(LogTemp, Warning, TEXT("can't equip item"));
+            UE_LOG(LogTemp, Warning, TEXT("Can't equip item"));
         }
 
         break;
@@ -150,7 +150,6 @@ void UGPItemSlot::ClickItem()
 
         break;
     }
-
     }
 }
 
@@ -202,72 +201,79 @@ void UGPItemSlot::UpdateQuantityText()
         QuantityText->SetText(FText::AsNumber(SlotData.Quantity));
     }
 }
+
 void UGPItemSlot::UpdatePlayerEquippedItemSlot(AGPCharacterPlayer* Player)
 {
-    if (Player)
+    if (!Player) return;
+
+    AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(Player);
+    if (!MyPlayer)
     {
-        AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(Player);
-        if (!MyPlayer)
+        UE_LOG(LogTemp, Error, TEXT("[UpdatePlayerStatInfo] Failed to cast Player to MyPlayer"));
+        return;
+    }
+
+    if (SlotData.ItemType == EItemTypes::Eatables)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[UpdatePlayerStatInfo] ItemType is 'Eatables' - skipping stat update"));
+        return;
+    }
+
+    UGPInventory* Inventory = MyPlayer->UIManager->GetInventoryWidget();
+    if (!Inventory)
+    {
+        UE_LOG(LogTemp, Error, TEXT("[UpdatePlayerStatInfo] InventoryWidget is NULL"));
+        return;
+    }
+
+    FName RowName = SlotData.ItemID.RowName;
+    int32 RepresentativeID = GetAnyValidUniqueID(); // 대표 고유 ID 사용
+
+    switch (GetItemData().Category)
+    {
+    case ECategory::helmet:
+        if (Inventory->HelmetViewerSlot)
         {
-            UE_LOG(LogTemp, Error, TEXT("[UpdatePlayerStatInfo] Failed to cast Player to MyPlayer"));
-            return;
+            Inventory->HelmetViewerSlot->SetSlotDataFromRowName(RowName);
+            Inventory->HelmetViewerSlot->SlotData.ItemUniqueIDs = SlotData.ItemUniqueIDs;
+            // Inventory->HelmetViewerSlot->SlotData.ItemUniqueID = RepresentativeID;
         }
+        break;
 
-        if (SlotData.ItemType == EItemTypes::Eatables)
+    case ECategory::chest:
+        if (Inventory->ArmorViewerSlot)
         {
-            UE_LOG(LogTemp, Warning, TEXT("[UpdatePlayerStatInfo] ItemType is 'Eatables' - skipping stat update"));
-            return;
+            Inventory->ArmorViewerSlot->SetSlotDataFromRowName(RowName);
+            Inventory->ArmorViewerSlot->SlotData.ItemUniqueIDs = SlotData.ItemUniqueIDs;
+            // Inventory->ArmorViewerSlot->SlotData.ItemUniqueID = RepresentativeID;
         }
+        break;
 
-        UGPInventory* Inventory = MyPlayer->UIManager->GetInventoryWidget();
-        if (!Inventory)
+    case ECategory::sword:
+    case ECategory::bow:
+        if (Inventory->WeaponViewerSlot)
         {
-            UE_LOG(LogTemp, Error, TEXT("[UpdatePlayerStatInfo] InventoryWidget is NULL"));
-            return;
+            Inventory->WeaponViewerSlot->SetSlotDataFromRowName(RowName);
+            Inventory->WeaponViewerSlot->SlotData.ItemUniqueIDs = SlotData.ItemUniqueIDs;
+            // Inventory->WeaponViewerSlot->SlotData.ItemUniqueID = RepresentativeID;
         }
+        break;
 
-        FName RowName = SlotData.ItemID.RowName;
-        FString ItemCategoryNameStr = UEnum::GetValueAsString(GetItemData().Category);
-
-        switch (GetItemData().Category)
-        {
-        case ECategory::helmet:
-            if (Inventory->HelmetViewerSlot)
-            {
-                Inventory->HelmetViewerSlot->SetSlotDataFromRowName(RowName);
-                Inventory->HelmetViewerSlot->SlotData.ItemUniqueID = SlotData.ItemUniqueID;
-            }
-            break;
-
-        case ECategory::chest:
-            if (Inventory->ArmorViewerSlot)
-            {
-                Inventory->ArmorViewerSlot->SetSlotDataFromRowName(RowName);
-                Inventory->ArmorViewerSlot->SlotData.ItemUniqueID = SlotData.ItemUniqueID;
-            }
-            break;
-
-        case ECategory::sword:
-        case ECategory::bow:
-            if (Inventory->WeaponViewerSlot)
-            {
-                Inventory->WeaponViewerSlot->SetSlotDataFromRowName(RowName);
-                Inventory->WeaponViewerSlot->SlotData.ItemUniqueID = SlotData.ItemUniqueID;
-            }
-            break;
-
-        default:
-            break;
-        }
+    default:
+        break;
     }
 }
-
 void UGPItemSlot::SetOwningShop(UGPShop* InShop)
 {
     if (InShop)
     {
         ShopWidget = InShop;
     }
+}
+
+int32 UGPItemSlot::GetAnyValidUniqueID() const
+{
+    return (SlotData.ItemUniqueIDs.Num() > 0) ? SlotData.ItemUniqueIDs[0] : -1;
 }
 
 void UGPItemSlot::SetOwningNPC(AGPCharacterNPC* InNPC)

@@ -24,13 +24,11 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
 {
     if (!ItemDataTable)
     {
-        UE_LOG(LogTemp, Error, TEXT("AddItemToInventory - ItemDataTable is NULL!"));
         return;
     }
 
     if (!SlotClass)
     {
-        UE_LOG(LogTemp, Error, TEXT("AddItemToInventory - SlotClass is NULL!"));
         return;
     }
 
@@ -41,93 +39,88 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
 
     if (!ItemData)
     {
-        UE_LOG(LogTemp, Error, TEXT("AddItemToInventory - Invalid ItemType or No Data Found for ItemType: %d"), ItemType);
         return;
     }
 
     UE_LOG(LogTemp, Warning, TEXT("Item Found - ItemName: %s | Category: %d"),
         *ItemData->ItemName.ToString(), static_cast<int32>(ItemData->Category));
 
+    // If Gold
+    if (ItemData->Category == ECategory::Gold)
+    {
+        UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+        if (NetworkManager)
+        {
+            NetworkManager->SendMyUseItem(ItemID);
+        }
+        return;
+    }
+
+    TArray<UGPItemSlot*>* TargetArray = nullptr;
+    EItemTypes ThisItemType = EItemTypes::Weapon;
+
+    switch (ItemData->Category)
+    {
+    case ECategory::sword:
+    case ECategory::bow:
+        TargetArray = &WeaponSlots;
+        break;
+
+    case ECategory::helmet:
+    case ECategory::chest:
+        TargetArray = &ArmorSlots;
+        ThisItemType = EItemTypes::Armor;
+        break;
+
+    case ECategory::consumable:
+    case ECategory::Quest:
+        TargetArray = &EatableSlots;
+        ThisItemType = EItemTypes::Eatables;
+        break;
+    default:
+        UE_LOG(LogTemp, Error, TEXT("Unknown Item Category"));
+        return;
+    }
+
+    if (!TargetArray) return;
+
+        for (UGPItemSlot* ExistingSlot : *TargetArray)
+    {
+        if (ExistingSlot->SlotData.ItemID.RowName == RowName)
+        {
+            ExistingSlot->SlotData.Quantity += Quantity;
+            ExistingSlot->SlotData.ItemUniqueIDs.Add(ItemID);
+            ExistingSlot->UpdateQuantityText();
+            UE_LOG(LogTemp, Warning, TEXT("Updated Existing Item - %s | Quantity: %d"),
+                *ItemData->ItemName.ToString(), ExistingSlot->SlotData.Quantity);
+            return;
+        }
+    }
+
     UWorld* World = GetWorld();
     if (!World)
     {
-        UE_LOG(LogTemp, Error, TEXT("GetWorld() returned nullptr in AddItemToInventory"));
         return;
     }
 
     UGPItemSlot* NewSlot = CreateWidget<UGPItemSlot>(World, SlotClass);
     if (!NewSlot)
     {
-        UE_LOG(LogTemp, Error, TEXT("Failed to Create WBP_Slot Widget"));
         return;
     }
 
     NewSlot->SlotOwnerType = ESlotOwnerType::Inventory;
+    NewSlot->CurrentItem = *ItemData;
     NewSlot->SlotData.ItemID.DataTable = ItemDataTable;
     NewSlot->SlotData.ItemID.RowName = RowName;
     NewSlot->SlotData.Quantity = Quantity;
-    NewSlot->CurrentItem = *ItemData;
-    NewSlot->SlotData.ItemUniqueID = ItemID;
-
-
-    // 만약 Gold 라면 바로 Use 해서 Money 업데이트
-    if (ItemData->Category == ECategory::Gold)
-    {
-        UGPNetworkManager* NetworkManager = GetWorld()->GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-        if (NetworkManager)
-        {
-            NetworkManager->SendMyUseItem(NewSlot->SlotData.ItemUniqueID);
-        }
-        return;
-    }
+    NewSlot->SlotData.ItemType = ThisItemType;
+    NewSlot->SlotData.ItemUniqueIDs.Add(ItemID);
     
-    TArray<UGPItemSlot*>* TargetArray = nullptr;
-
-    switch (ItemData->Category)
-    {
-    case ECategory::sword:
-    case ECategory::bow:
-        NewSlot->SlotData.ItemType = EItemTypes::Weapon;
-        TargetArray = &WeaponSlots;
-        break;
-
-    case ECategory::helmet:
-    case ECategory::chest:
-        NewSlot->SlotData.ItemType = EItemTypes::Armor;
-        TargetArray = &ArmorSlots;
-        break;
-
-    case ECategory::consumable:
-    case ECategory::Quest:
-        NewSlot->SlotData.ItemType = EItemTypes::Eatables;
-        TargetArray = &EatableSlots;
-        break;
-
-    default:
-        UE_LOG(LogTemp, Error, TEXT("Unknown ItemType - Item not added"));
-        return;
-    }
-
-    if (!TargetArray) return;
-
-    /// 이거 지운 이유: 아이템이 2개 이상이면 같은 아이템에서 개별적으로 UniqueID 에 접근할 수 없음. 대표되는 아이템에 모두 덮어쓰여짐 
-    //for (UGPItemSlot* ExistingSlot : *TargetArray)
-    //{
-    //    if (ExistingSlot->SlotData.ItemID.RowName == RowName)
-    //    {
-    //        ExistingSlot->SlotData.Quantity += Quantity;
-    //        UE_LOG(LogTemp, Warning, TEXT("Updated Existing Item - %s | Quantity: %d"),
-    //            *ItemData->ItemName.ToString(), ExistingSlot->SlotData.Quantity);
-    //        return;
-    //    }
-    //}
-
-    if (!NewSlot) return;
     TargetArray->Add(NewSlot);
 
     if (!WeaponsWrapBox || !ArmorsWrapBox || !EatablesWrapBox)
     {
-        UE_LOG(LogTemp, Error, TEXT("WrapBoxes are not properly initialized."));
         return;
     }
 
@@ -164,16 +157,15 @@ void UGPInventory::UseItemFromInventory(uint32 ItemID)
             for (int32 i = SlotArray.Num() - 1; i >= 0; --i)
             {
                 UGPItemSlot* Slot = SlotArray[i];
+                TArray<int32>& UniqueIDs = Slot->SlotData.ItemUniqueIDs;
 
-                if (Slot->SlotData.ItemUniqueID == ItemID)
+                if (UniqueIDs.Contains(ItemID))
                 {
-                    if (Slot->SlotData.Quantity > 1)
-                    {
-                        Slot->SlotData.Quantity--;
-                        Slot->UpdateQuantityText();
-                        UE_LOG(LogTemp, Warning, TEXT("Item [%d] Quantity decreased to %d"), ItemID, Slot->SlotData.Quantity);
-                    }
-                    else
+                    UniqueIDs.RemoveSingle(ItemID);
+                    Slot->SlotData.Quantity = UniqueIDs.Num();
+                    Slot->UpdateQuantityText();
+
+                    if (Slot->SlotData.Quantity == 0)
                     {
                         if (WrapBox)
                         {
@@ -185,6 +177,11 @@ void UGPInventory::UseItemFromInventory(uint32 ItemID)
 
                         UE_LOG(LogTemp, Warning, TEXT("Item [%d] completely removed from inventory"), ItemID);
                     }
+                    else
+                    {
+                        UE_LOG(LogTemp, Warning, TEXT("Item [%d] quantity decreased. Remaining: %d"), ItemID, Slot->SlotData.Quantity);
+                    }
+
                     return true;
                 }
             }
@@ -192,12 +189,11 @@ void UGPInventory::UseItemFromInventory(uint32 ItemID)
             return false;
         };
 
-    // 카테고리별로 탐색
     if (HandleRemoveLogic(WeaponSlots, WeaponsWrapBox)) return;
     if (HandleRemoveLogic(ArmorSlots, ArmorsWrapBox)) return;
     if (HandleRemoveLogic(EatableSlots, EatablesWrapBox)) return;
 
-    UE_LOG(LogTemp, Warning, TEXT("RemoveItemFromInventory: Item [%d] not found in inventory"), ItemID);
+    UE_LOG(LogTemp, Warning, TEXT("UseItemFromInventory: Item [%d] not found in inventory"), ItemID);
 }
 
 void UGPInventory::RemoveItemByUniqueID(uint32 ItemUniqueID)
@@ -207,16 +203,19 @@ void UGPInventory::RemoveItemByUniqueID(uint32 ItemUniqueID)
             for (int32 i = SlotArray.Num() - 1; i >= 0; --i)
             {
                 UGPItemSlot* Slot = SlotArray[i];
+                TArray<int32>& UniqueIDs = Slot->SlotData.ItemUniqueIDs;
 
-                if (Slot->SlotData.ItemUniqueID == ItemUniqueID)
+                if (UniqueIDs.Contains(ItemUniqueID))
                 {
-                    if (Slot->SlotData.Quantity > 1)
-                    {
-                        Slot->SlotData.Quantity--;
-                        Slot->UpdateQuantityText();
-                        UE_LOG(LogTemp, Warning, TEXT("[RemoveItemByUniqueID] Item [%d] Quantity decreased to %d"), ItemUniqueID, Slot->SlotData.Quantity);
-                    }
-                    else
+                    // 1. 서버로 보낸 ID 삭제
+                    UniqueIDs.RemoveSingle(ItemUniqueID);
+
+                    // 2. 수량 갱신
+                    Slot->SlotData.Quantity = UniqueIDs.Num();
+                    Slot->UpdateQuantityText();
+
+                    // 3. 만약 UniqueIDs가 모두 없어졌다면 슬롯 제거
+                    if (Slot->SlotData.Quantity == 0)
                     {
                         if (WrapBox)
                         {
@@ -226,11 +225,19 @@ void UGPInventory::RemoveItemByUniqueID(uint32 ItemUniqueID)
                         Slot->RemoveFromParent();
                         SlotArray.RemoveAt(i);
 
-                        UE_LOG(LogTemp, Warning, TEXT("[RemoveItemByUniqueID] Item [%d] removed from inventory"), ItemUniqueID);
+                        UE_LOG(LogTemp, Warning, TEXT("[RemoveItemByUniqueID] Item [%d] - Slot completely removed"), ItemUniqueID);
                     }
+                    else
+                    {
+                        // 4. 남은 UniqueID들이 있다면 슬롯 유지
+                        UE_LOG(LogTemp, Warning, TEXT("[RemoveItemByUniqueID] Item [%d] removed. Remaining count: %d"),
+                            ItemUniqueID, Slot->SlotData.Quantity);
+                    }
+
                     return true;
                 }
             }
+
             return false;
         };
 
@@ -240,6 +247,7 @@ void UGPInventory::RemoveItemByUniqueID(uint32 ItemUniqueID)
 
     UE_LOG(LogTemp, Warning, TEXT("[RemoveItemByUniqueID] Item [%d] not found in inventory"), ItemUniqueID);
 }
+
 
 void UGPInventory::SetGold(int32 Amount)
 {
