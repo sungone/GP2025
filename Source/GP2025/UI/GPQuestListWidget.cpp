@@ -32,26 +32,17 @@ void UGPQuestListWidget::AddQuestEntry(uint8 QuestType, bool bIsSuccess)
 {
 	UE_LOG(LogTemp, Warning, TEXT("=== [QuestListWidget] AddQuestEntry called: QuestType = %d ==="), QuestType);
 
-	if (!QuestListEntryClass)
-	{
+	if (!QuestListEntryClass || QuestEntries.Contains(QuestType))
 		return;
-	}
 
-	if (QuestEntries.Contains(QuestType))
-	{
-		return;
-	}
-
+	// 이전 퀘스트 완료 처리
 	if (QuestEntryQueue.Num() > 0)
 	{
-		UGPQuestListEntryWidget* LastQuest = QuestEntryQueue.Last();
-		if (LastQuest)
+		if (UGPQuestListEntryWidget* LastQuest = QuestEntryQueue.Last())
 		{
-			LastQuest->SetQuestState(true); // 바로 이전 퀘스트를 성공 처리
+			LastQuest->SetQuestState(true);
 		}
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("[QuestListWidget] Creating new QuestListEntryWidget"));
 
 	UGPQuestListEntryWidget* NewEntry = CreateWidget<UGPQuestListEntryWidget>(GetWorld(), QuestListEntryClass);
 	if (!NewEntry)
@@ -63,15 +54,15 @@ void UGPQuestListWidget::AddQuestEntry(uint8 QuestType, bool bIsSuccess)
 	NewEntry->EntryType = QuestType;
 	NewEntry->SetQuestTask(QuestType);
 	NewEntry->SetQuestState(bIsSuccess);
-
-	//QuestListScrollBox->AddChild(NewEntry);
 	QuestEntries.Add(QuestType, NewEntry);
 
-	if (QuestEntryQueue.Num() >= 4)
+	// 최대 3개까지만 유지 (큐 구조)
+	if (QuestEntryQueue.Num() >= 3)
 	{
 		QuestEntryQueue.RemoveAt(0);
-		PlayQuestListAnimation();
+		PlayQuestListAnimation(); // 전환 애니메이션
 	}
+
 	QuestEntryQueue.Add(NewEntry);
 	RefreshQuestSlotWidgets();
 }
@@ -86,10 +77,11 @@ void UGPQuestListWidget::UpdateQuestState(uint8 QuestType, bool bIsSuccess)
 
 void UGPQuestListWidget::RefreshQuestSlotWidgets()
 {
+	// 초기화: 다 숨기고 시작
 	List0->SetVisibility(ESlateVisibility::Hidden);
 	List1->SetVisibility(ESlateVisibility::Hidden);
 	List2->SetVisibility(ESlateVisibility::Hidden);
-	List3->SetVisibility(ESlateVisibility::Hidden);
+	List3->SetVisibility(ESlateVisibility::Hidden); // 여전히 숨김 처리
 
 	for (int32 i = 0; i < QuestEntryQueue.Num(); ++i)
 	{
@@ -101,7 +93,6 @@ void UGPQuestListWidget::RefreshQuestSlotWidgets()
 		case 0: List0->CopyFrom(Data); List0->SetVisibility(ESlateVisibility::Visible); break;
 		case 1: List1->CopyFrom(Data); List1->SetVisibility(ESlateVisibility::Visible); break;
 		case 2: List2->CopyFrom(Data); List2->SetVisibility(ESlateVisibility::Visible); break;
-		case 3: List3->CopyFrom(Data); List3->SetVisibility(ESlateVisibility::Visible); break;
 		}
 	}
 }
