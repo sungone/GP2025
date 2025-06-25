@@ -111,7 +111,7 @@ private :
 	// AnimMontage PlayRate
 	float PlayRate = 2.0f;
 private:
-	float DeadEventDelayTime = 0.5f;
+	float DeadEventDelayTime = 2.f;
 	bool bIsAutoAttacking = false;
 	bool bIsUsingSkill = false;
 

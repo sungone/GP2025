@@ -273,24 +273,19 @@ void UGPObjectManager::DamagedPlayer(const FInfoData& PlayerInfo)
 
 void UGPObjectManager::HandlePlayerDeath(int32 playerId)
 {
-	//AGPCharacterPlayer* TargetPlayer = Players.FindRef(playerId);
-	//if (!TargetPlayer) return;
+	TWeakObjectPtr<AGPCharacterPlayer> WeakPlayer = Players.FindRef(playerId);
+	AGPCharacterPlayer* TargetPlayer = WeakPlayer.Get();
+	if (!TargetPlayer) return;
 
-	//TargetPlayer->CombatHandler->PlayDeadAnimation();
-	//FTimerHandle HideTimerHandle;
-	//TargetPlayer->GetWorldTimerManager().SetTimer(HideTimerHandle, [TargetPlayer]()
-	//	{
-	//		TargetPlayer->SetActorHiddenInGame(true);
-	//		TargetPlayer->SetActorEnableCollision(false);
-	//	}, 1.f, false);
+	TargetPlayer->CombatHandler->HandleDeath();
 
-	//if (TargetPlayer == MyPlayer)
-	//{
-	//	if (MyPlayer->UIManager)
-	//	{
-	//		MyPlayer->UIManager->ShowDeadScreen();
-	//	}
-	//}
+	if (TargetPlayer == MyPlayer)
+	{
+		if (MyPlayer->UIManager)
+		{
+			MyPlayer->UIManager->ShowDeadScreen();
+		}
+	}
 }
 
 void UGPObjectManager::SkillUnlock(ESkillGroup SkillGID)

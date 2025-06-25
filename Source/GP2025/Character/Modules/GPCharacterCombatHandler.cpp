@@ -209,7 +209,7 @@ void UGPCharacterCombatHandler::PlayDeadAnimation()
 	if (!AnimInstance) return;
 
 	AnimInstance->StopAllMontages(0.f);
-	AnimInstance->Montage_Play(DeadMontage, 1.f);
+	AnimInstance->Montage_Play(DeadMontage, 0.5f);
 }
 
 void UGPCharacterCombatHandler::SetDeadEventDelay(float Delay)
