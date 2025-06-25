@@ -30,41 +30,44 @@ void UGPQuestListWidget::NativeConstruct()
 
 void UGPQuestListWidget::AddQuestEntry(uint8 QuestType, bool bIsSuccess)
 {
-	UE_LOG(LogTemp, Warning, TEXT("=== [QuestListWidget] AddQuestEntry called: QuestType = %d ==="), QuestType);
-
 	if (!QuestListEntryClass || QuestEntries.Contains(QuestType))
 		return;
 
-	// 이전 퀘스트 완료 처리
 	if (QuestEntryQueue.Num() > 0)
 	{
-		if (UGPQuestListEntryWidget* LastQuest = QuestEntryQueue.Last())
-		{
+		UGPQuestListEntryWidget* LastQuest = QuestEntryQueue.Last();
+		if (LastQuest)
 			LastQuest->SetQuestState(true);
-		}
 	}
 
 	UGPQuestListEntryWidget* NewEntry = CreateWidget<UGPQuestListEntryWidget>(GetWorld(), QuestListEntryClass);
 	if (!NewEntry)
-	{
-		UE_LOG(LogTemp, Error, TEXT("[QuestListWidget] Failed to create QuestListEntryWidget"));
 		return;
-	}
 
 	NewEntry->EntryType = QuestType;
 	NewEntry->SetQuestTask(QuestType);
 	NewEntry->SetQuestState(bIsSuccess);
+
 	QuestEntries.Add(QuestType, NewEntry);
 
-	// 최대 3개까지만 유지 (큐 구조)
+	List2->CopyFrom(List1);
+	List2->SetQuestState(true);
+	List1->CopyFrom(List0);
+	List1->SetQuestState(true);
+	List0->CopyFrom(NewEntry);
+
+	List0->SetVisibility(ESlateVisibility::Visible);
+	List1->SetVisibility(List1->HasValidData() ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	List2->SetVisibility(List2->HasValidData() ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+
+	PlayQuestListAnimation();
+
 	if (QuestEntryQueue.Num() >= 3)
 	{
 		QuestEntryQueue.RemoveAt(0);
-		PlayQuestListAnimation(); // 전환 애니메이션
 	}
 
 	QuestEntryQueue.Add(NewEntry);
-	RefreshQuestSlotWidgets();
 }
 
 void UGPQuestListWidget::UpdateQuestState(uint8 QuestType, bool bIsSuccess)
@@ -73,27 +76,5 @@ void UGPQuestListWidget::UpdateQuestState(uint8 QuestType, bool bIsSuccess)
     {
         (*FoundEntry)->SetQuestState(bIsSuccess);
     }
-}
-
-void UGPQuestListWidget::RefreshQuestSlotWidgets()
-{
-	// 초기화: 다 숨기고 시작
-	List0->SetVisibility(ESlateVisibility::Hidden);
-	List1->SetVisibility(ESlateVisibility::Hidden);
-	List2->SetVisibility(ESlateVisibility::Hidden);
-	List3->SetVisibility(ESlateVisibility::Hidden); // 여전히 숨김 처리
-
-	for (int32 i = 0; i < QuestEntryQueue.Num(); ++i)
-	{
-		UGPQuestListEntryWidget* Data = QuestEntryQueue[i];
-		if (!Data) continue;
-
-		switch (i)
-		{
-		case 0: List0->CopyFrom(Data); List0->SetVisibility(ESlateVisibility::Visible); break;
-		case 1: List1->CopyFrom(Data); List1->SetVisibility(ESlateVisibility::Visible); break;
-		case 2: List2->CopyFrom(Data); List2->SetVisibility(ESlateVisibility::Visible); break;
-		}
-	}
 }
 

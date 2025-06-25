@@ -32,4 +32,6 @@ public:
 	uint8 EntryType;
 
 	void CopyFrom(UGPQuestListEntryWidget* Source);
+
+	bool HasValidData() const;
 };

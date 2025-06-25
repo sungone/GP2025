@@ -42,8 +42,8 @@ protected :
 
 	UPROPERTY()
 	TArray<UGPQuestListEntryWidget*> QuestEntryQueue;
-	void RefreshQuestSlotWidgets();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Quest")
 	void PlayQuestListAnimation();
+
 };

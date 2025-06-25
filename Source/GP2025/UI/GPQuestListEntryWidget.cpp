@@ -127,3 +127,8 @@ void UGPQuestListEntryWidget::CopyFrom(UGPQuestListEntryWidget* Source)
 
     this->QuestStateText->SetColorAndOpacity(Source->QuestStateText->ColorAndOpacity);
 }
+
+bool UGPQuestListEntryWidget::HasValidData() const
+{
+    return EntryType != 0;
+}
