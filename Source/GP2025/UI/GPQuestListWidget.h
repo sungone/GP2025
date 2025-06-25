@@ -18,8 +18,8 @@ public:
 	void UpdateQuestState(uint8 QuestType, bool bIsSuccess);
 
 protected:
-	UPROPERTY(meta = (BindWidget), BlueprintReadWrite)
-	class UScrollBox* QuestListScrollBox;
+	//UPROPERTY(meta = (BindWidget), BlueprintReadWrite)
+	//class UScrollBox* QuestListScrollBox;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
 	TSubclassOf<class UGPQuestListEntryWidget> QuestListEntryClass;

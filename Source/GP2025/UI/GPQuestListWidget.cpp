@@ -32,11 +32,11 @@ void UGPQuestListWidget::AddQuestEntry(uint8 QuestType, bool bIsSuccess)
 		return;
 	}
 
-	if (!QuestListScrollBox)
-	{
-		UE_LOG(LogTemp, Error, TEXT("[QuestListWidget] QuestListScrollBox is NULL"));
-		return;
-	}
+	//if (!QuestListScrollBox)
+	//{
+	//	UE_LOG(LogTemp, Error, TEXT("[QuestListWidget] QuestListScrollBox is NULL"));
+	//	return;
+	//}
 
 	if (QuestEntries.Contains(QuestType))
 	{
@@ -57,7 +57,7 @@ void UGPQuestListWidget::AddQuestEntry(uint8 QuestType, bool bIsSuccess)
 	NewEntry->SetQuestTask(QuestType);
 	NewEntry->SetQuestState(bIsSuccess);
 
-	QuestListScrollBox->AddChild(NewEntry);
+	//QuestListScrollBox->AddChild(NewEntry);
 	QuestEntries.Add(QuestType, NewEntry);
 
 	UE_LOG(LogTemp, Warning, TEXT("[QuestListWidget] QuestEntry %d added to ScrollBox"), QuestType);
