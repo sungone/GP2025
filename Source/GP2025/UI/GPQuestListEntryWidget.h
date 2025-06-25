@@ -30,4 +30,6 @@ public:
 
 	// QuestType EntryType;
 	uint8 EntryType;
+
+	void CopyFrom(UGPQuestListEntryWidget* Source);
 };

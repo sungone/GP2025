@@ -115,3 +115,15 @@ void UGPQuestListEntryWidget::SetQuestTask(uint8 InQuestType)
     QuestTaskText->SetText(FText::FromString(TaskDescription));
     UE_LOG(LogTemp, Warning, TEXT("[QuestListEntryWidget] TaskDescription set to: %s"), *TaskDescription);
 }
+
+void UGPQuestListEntryWidget::CopyFrom(UGPQuestListEntryWidget* Source)
+{
+    if (!Source) return;
+
+    this->EntryType = Source->EntryType;
+
+    this->QuestTaskText->SetText(Source->QuestTaskText->GetText());
+    this->QuestStateText->SetText(Source->QuestStateText->GetText());
+
+    this->QuestStateText->SetColorAndOpacity(Source->QuestStateText->ColorAndOpacity);
+}
