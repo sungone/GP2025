@@ -510,7 +510,6 @@ void UGPNetworkManager::ProcessPacket()
 			{
 				RespawnPacket* Pkt = reinterpret_cast<RespawnPacket*>(RemainingData.GetData());
 				ObjectMgr->RespawnMyPlayer(Pkt->PlayerInfo);
-				ObjectMgr->UpdatePlayer(Pkt->PlayerInfo);
 				break;
 			}
 #pragma endregion

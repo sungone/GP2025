@@ -139,7 +139,7 @@ void Monster::Look()
 
 void Monster::Attack()
 {
-	if (!_target) return;
+	if (!_target||_target->IsDead()) return;
 
 	auto player = _target;
 	auto playerID = player->GetInfo().ID;
@@ -155,14 +155,10 @@ void Monster::Attack()
 
 	if (player->IsDead())
 	{
-		auto pkt = PlayerDeadPacket(playerID);
-		std::unordered_set<int32> vlist;
-		{
-			std::lock_guard lock(player->_vlLock);
-			vlist = player->GetViewList();
-		}
-		SessionManager::GetInst().SendPacket(playerID, &pkt);
-		SessionManager::GetInst().BroadcastToViewList(&pkt, vlist);
+		//temp
+		//todo: 잡큐로 분리하자..
+		TimerQueue::AddTimer([playerID] { GameWorld::GetInst().PlayerDead(playerID);}, 10, false);
+		TimerQueue::AddTimer([playerID] { GameWorld::GetInst().RespawnPlayer(playerID, ZoneType::TUK);}, 3000, false);
 	}
 }
 
@@ -195,24 +191,7 @@ void Monster::Chase()
 
 void Monster::Patrol()
 {
-	//static auto& nav = Map::GetInst().GetNavMesh(_zone);
-	//int currentTriIdx = nav.FindIdxFromPos(_pos);
-	//if (currentTriIdx == -1)
-	//	return;
 
-	//const auto& neighbors = nav.GetNeighbors(currentTriIdx);
-	//if (neighbors.empty())
-	//	return;
-
-	//int randIdx = RandomUtils::GetRandomInt(0, static_cast<int>(neighbors.size()) - 1);
-	//auto it = neighbors.begin();
-	//std::advance(it, randIdx);
-	//int nextTriIdx = *it;
-
-	//FVector nextPos = nav.GetTriangleCenter(nextTriIdx);
-	//nextPos.Z = _pos.Z;
-
-	//_info.SetLocationAndYaw(nextPos);
 }
 
 

@@ -683,22 +683,8 @@ void UGPObjectManager::OnZoneLevelLoaded()
 
 void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
 {
-	//auto PlayerID = info.ID;
-	//AGPCharacterPlayer** FoundPlayerPtr = Players.Find(PlayerID);
-	//if (!FoundPlayerPtr)
-	//{
-	//	UE_LOG(LogTemp, Error, TEXT("[Respawn] No player found with ID: %d"), PlayerID);
-	//	return;
-	//}
-
-	//AGPCharacterPlayer* FoundPlayer = *FoundPlayerPtr;
-	//if (FoundPlayer == MyPlayer)
-	//{
-	//	UE_LOG(LogTemp, Log, TEXT("[Respawn] This is MyPlayer."));
-
-	//	MyPlayer->SetActorHiddenInGame(false);
-	//	MyPlayer->SetActorEnableCollision(true);
-	//}
+	//리스폰시 changezonepkt 보내줌
+	UpdatePlayer(info);
 }
 
 void UGPObjectManager::OnQuestStart(QuestType Quest)
