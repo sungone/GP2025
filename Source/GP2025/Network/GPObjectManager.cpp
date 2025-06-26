@@ -15,6 +15,7 @@
 #include "UI/GPInGameWidget.h"
 #include "UI/GPQuestListEntryWidget.h"
 #include "UI/GPQuestListWidget.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Character/Modules/GPMyplayerSoundManager.h"
 #include "Network/GPNetworkManager.h"
 #include "Inventory/GPEquippedItemSlot.h"
@@ -773,8 +774,35 @@ void UGPObjectManager::OnZoneLevelLoaded()
 
 void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
 {
-	//리스폰시 changezonepkt 보내줌
+	// 리스폰 시 player 정보 갱신
 	UpdatePlayer(info);
+
+	if (MyPlayer)
+	{
+		MyPlayer->SetActorHiddenInGame(false);
+
+		MyPlayer->SetActorEnableCollision(true);
+
+		MyPlayer->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
+		// 캐릭터 외형 정보 적용
+		//UGPCharacterControlData** FoundData = MyPlayer->CharacterTypeManager.Find(MyPlayer->CurrentCharacterType);
+		//if (FoundData)
+		//{
+		//	if (*FoundData)
+		//	{
+		//		UE_LOG(LogTemp, Log, TEXT("[Respawn] Found UGPCharacterControlData for type: %d"), (int32)MyPlayer->CurrentCharacterType);
+		//		if (MyPlayer->AppearanceHandler)
+		//		{
+		//			MyPlayer->AppearanceHandler->ApplyCharacterPartsFromData(*FoundData);
+		//			UE_LOG(LogTemp, Log, TEXT("[Respawn] ApplyCharacterPartsFromData() called"));
+		//		}
+		//	}
+		//}
+
+		MyPlayer->GetMesh()->SetVisibility(true, true);
+		MyPlayer->GetMesh()->SetHiddenInGame(false);
+	}
 }
 
 void UGPObjectManager::OnQuestStart(QuestType Quest)
