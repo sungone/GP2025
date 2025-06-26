@@ -30,6 +30,10 @@ public:
 	void CreateMonster();
 	void RemoveMonster(int32 id);
 	void UpdateAllMonsters();
+	void UpdateMonsterState(int32 id, ECharacterStateType newState);
+
+	//Tino
+	void HandleEarthQuakeImpact(const FVector& rockPos);
 
 	// Inventory
 	void PickUpWorldItem(int32 playerId, uint32 itemId);

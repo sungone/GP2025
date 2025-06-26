@@ -40,6 +40,10 @@ enum EPacketType : uint8
 	S_DAMAGED_MONSTER,
 	S_PLAYER_DEAD,
 
+	//--- Tino ---
+	S_EARTH_QUAKE,
+	S_FLAME_BREATH,
+
 	// --- Item ---
 	C_TAKE_ITEM,
 	C_DROP_ITEM,// -> ³ªÁß¿¡
@@ -82,6 +86,7 @@ enum EPacketType : uint8
 	//--- Chat ---
 	C_CHAT_SEND,
 	S_CHAT_BROADCAST,
+
 };
 
 

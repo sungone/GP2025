@@ -5,6 +5,13 @@
 
 const float detectDist = 1000.f;
 
+enum class EAttackPattern
+{
+	MeleeAttack,
+	FlameBreath,
+	EarthQuake
+};
+
 class Monster : public Character, public std::enable_shared_from_this<Monster>
 {
 public:
@@ -40,6 +47,13 @@ public:
 private:
 	void Look();
 	void Attack();
+
+	void BossAttack();
+	void PerformEarthQuake();
+	void PerformFlameBreath();
+	void PerformMeleeAttack();
+	void SetNextPattern();
+
 	void Chase();
 	void Patrol();
 
@@ -55,5 +69,6 @@ private:
 	QuestType _questID = QuestType::NONE;
 	bool _active = false;
 	bool _isBoss;
+	EAttackPattern _currentPattern;
 };
 

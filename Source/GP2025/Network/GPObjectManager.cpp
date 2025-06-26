@@ -406,6 +406,64 @@ void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage
 	}
 }
 
+void UGPObjectManager::PlayEarthQuakeEffect(const FVector& RockPos, bool bDebug)
+{
+	UWorld* WorldContext = GetWorld();
+	if (!WorldContext) return;
+
+	// 색상 강조: 진한 주황색과 빨간색
+	const FColor SphereColor = (bDebug) ? FColor::Red : FColor::Yellow;
+	const FColor LineColor = FColor::Yellow;
+
+	DrawDebugSphere(
+		WorldContext,
+		RockPos,
+		100.f,
+		24,
+		SphereColor,
+		false,
+		2.0f
+	);
+	DrawDebugLine(
+		WorldContext,
+		RockPos + FVector(0, 0, 500.f),
+		RockPos,
+		LineColor,
+		false,
+		3.0f,
+		0,
+		2.0f
+	);
+}
+
+void UGPObjectManager::PlayFlameBreathEffect(const FVector& Origin, const FVector& Dir, float Range, float Angle)
+{
+	UWorld* WorldContext = GetWorld();
+	if (!WorldContext) return;
+
+	// 단위 벡터로 정규화된 방향
+	FVector NormalizedDir = Dir.GetSafeNormal();
+
+	// 디버그 콘 (원뿔 모양)
+	DrawDebugCone(
+		WorldContext,
+		Origin,
+		NormalizedDir,
+		Range,
+		FMath::DegreesToRadians(Angle), // Half Angle in Radians
+		FMath::DegreesToRadians(Angle),
+		12,
+		FColor::Orange,
+		false,
+		2.0f,
+		0,
+		2.0f
+	);
+
+	// 방향 벡터 디버그 라인
+	DrawDebugLine(WorldContext, Origin, Origin + NormalizedDir * Range, FColor::Red, false, 2.0f, 0, 1.5f);
+}
+
 void UGPObjectManager::ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos)
 {
 	if (!World || !IsValid(World))

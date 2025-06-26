@@ -608,3 +608,31 @@ struct ChatBroadcastPacket : public Packet
 };
 
 #pragma endregion
+
+namespace Tino
+{
+	struct EarthQuakePacket : public Packet
+	{
+		FVector RockPos;
+		bool bDebug;
+		EarthQuakePacket(const FVector& rockPos, bool debug = false)
+			:Packet(EPacketType::S_EARTH_QUAKE), RockPos(rockPos), bDebug(debug)
+		{
+			Header.PacketSize = sizeof(EarthQuakePacket);
+		}
+	};
+	struct FlameBreathPacket : public Packet
+	{
+		FVector Origin;     // 시작 위치 (몬스터 위치)
+		FVector Direction;  // 전방 방향 단위 벡터
+		float Range;        // 길이 (ex. 600.f)
+		float AngleDeg;     // 각도 (ex. 30.f)
+		FlameBreathPacket(const FVector& origin, const FVector& direction, float range, float angle)
+			:Packet(EPacketType::S_FLAME_BREATH),
+			Origin(origin), Direction(direction), Range(range), AngleDeg(angle)
+		{
+			Header.PacketSize = sizeof(FlameBreathPacket);
+		}
+	};
+
+}

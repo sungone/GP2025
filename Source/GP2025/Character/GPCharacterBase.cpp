@@ -149,10 +149,10 @@ void AGPCharacterBase::Tick(float DeltaTime)
 	if (Cast<AGPCharacterMyplayer>(this)) return;
 
 	// Attack Sync
-	HandleAutoAttackState();
 	HandleQSkillState();
 	HandleESkillState();
 	HandleRSkillState();
+	HandleAutoAttackState();
 
 	// Move Sync
 	HandleRemoteMovementSync(DeltaTime);

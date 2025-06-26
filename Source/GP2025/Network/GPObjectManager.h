@@ -37,6 +37,8 @@ public:
 	void RemoveMonster(int32 MonsterID);
 	void UpdateMonster(const FInfoData& MonsterInfo);
 	void DamagedMonster(const FInfoData& MonsterInfo, float Damage);
+	void PlayEarthQuakeEffect(const FVector& RockPos, bool bDebug);
+	void PlayFlameBreathEffect(const FVector& Origin, const FVector& Dir, float Range, float Angle);
 
 	void ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos);
 	void ItemDespawn(uint32 ItemID);

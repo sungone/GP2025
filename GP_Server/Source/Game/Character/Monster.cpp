@@ -73,9 +73,42 @@ void Monster::Update()
 
 void Monster::BehaviorTree()
 {
-	switch (_info.State)
+	if (_info.HasState(ECharacterStateType::STATE_DIE))
+		return;
+
+	if (_info.HasState(ECharacterStateType::STATE_SKILL_Q) || _info.HasState(ECharacterStateType::STATE_SKILL_E))
+		return; // 스킬 중이면 아무것도 안함
+
+	if (_info.HasState(ECharacterStateType::STATE_AUTOATTACK))
 	{
-	case ECharacterStateType::STATE_IDLE:
+		if (!_target)
+		{
+			ChangeState(ECharacterStateType::STATE_IDLE);
+		}
+		else if (!IsTargetInAttackRange())
+		{
+			ChangeState(ECharacterStateType::STATE_WALK);
+			Chase();
+		}
+		else
+		{
+			Attack();
+		}
+		return;
+	}
+
+	if (_info.HasState(ECharacterStateType::STATE_WALK))
+	{
+		if (_target)
+			Chase();
+		else if (SetTarget())
+			Chase();
+		else
+			Patrol();
+		return;
+	}
+
+	if (_info.HasState(ECharacterStateType::STATE_IDLE))
 	{
 		if (SetTarget())
 		{
@@ -86,49 +119,12 @@ void Monster::BehaviorTree()
 		{
 			ChangeState(ECharacterStateType::STATE_WALK);
 		}
-		break;
+		return;
 	}
-	case ECharacterStateType::STATE_WALK:
-	{
-		if (_target)
-		{
-			Chase();
-			break;
-		}
 
-		if (SetTarget())
-		{
-			Chase();
-		}
-		else
-		{
-			Patrol();
-		}
-		break;
-	}
-	case ECharacterStateType::STATE_AUTOATTACK:
-	{
-		if (!_target)
-		{
-			ChangeState(ECharacterStateType::STATE_IDLE);
-			break;
-		}
-
-		if (!IsTargetInAttackRange())
-		{
-			ChangeState(ECharacterStateType::STATE_WALK);
-			Chase();
-		}
-		else
-		{
-			Attack();
-		}
-		break;
-	}
-	default:
-		LOG(Warning, std::format("Invaild State :{}", _info.State));
-	}
+	LOG(Warning, std::format("Invalid state bits: {}", static_cast<uint32>(_info.State)));
 }
+
 
 void Monster::Look()
 {
@@ -139,28 +135,124 @@ void Monster::Look()
 
 void Monster::Attack()
 {
-	if (!_target||_target->IsDead()) return;
+	ChangeState(ECharacterStateType::STATE_AUTOATTACK);
 
-	auto player = _target;
-	auto playerID = player->GetInfo().ID;
-
-	float atkDamage = this->GetAttackDamage();
-	if (atkDamage > 0.0f)
+	if (!_target || _target->IsDead()) return;
+	if (IsBoss())
 	{
-		player->OnDamaged(atkDamage);
+		BossAttack();
+	}
+	else
+		PerformMeleeAttack();
+}
+
+void Monster::BossAttack()
+{
+	switch (_currentPattern)
+	{
+	case EAttackPattern::MeleeAttack:
+		PerformMeleeAttack();
+		break;
+	case EAttackPattern::FlameBreath:
+		//_info.AddState(ECharacterStateType::STATE_SKILL_Q);
+		//PerformFlameBreath();
+		break;
+	case EAttackPattern::EarthQuake:
+		_info.AddState(ECharacterStateType::STATE_SKILL_E);
+		PerformEarthQuake();
+		break;
 	}
 
-	auto pkt = InfoPacket(EPacketType::S_DAMAGED_PLAYER, player->GetInfo());
-	SessionManager::GetInst().SendPacket(playerID, &pkt);
+	SetNextPattern();
+}
 
-	if (player->IsDead())
+void Monster::PerformEarthQuake()
+{
+	LOG("EarthQuake!");
+
+	int rockCount = 5;
+	if (_info.GetHp() / _info.GetMaxHp() < 0.3f)
+		rockCount = 8;
+
+	for (int i = 0; i < rockCount; ++i)
 	{
-		//temp
-		//todo: 잡큐로 분리하자..
-		TimerQueue::AddTimer([playerID] { GameWorld::GetInst().PlayerDead(playerID);}, 10, false);
-		TimerQueue::AddTimer([playerID] { GameWorld::GetInst().RespawnPlayer(playerID, ZoneType::TUK);}, 3000, false);
+		FVector rockPos = _target->GetInfo().Pos + RandomUtils::GetRandomOffset(0, 500, 0);
+
+		std::unordered_set<int32> viewListCopy;
+		{
+			std::lock_guard lock(_vlLock);
+			viewListCopy = GetViewList();
+		}
+		auto pkt = Tino::EarthQuakePacket(rockPos);
+		SessionManager::GetInst().BroadcastToViewList(&pkt, viewListCopy);
+		auto id = _id;
+		TimerQueue::AddTimer([rockPos, id] { 
+			GameWorld::GetInst().HandleEarthQuakeImpact(rockPos);
+			GameWorld::GetInst().UpdateMonsterState(id, ECharacterStateType::STATE_IDLE);
+			}, 500, false);
 	}
 }
+
+void Monster::PerformFlameBreath()
+{
+	LOG("FlameBreath!");
+
+	const float range = 600.f;
+	const float angleDeg = 30.f;
+	const float maxDamage = 40.f;
+
+	FVector origin = _pos;
+	FVector forward = _info.GetFrontVector();
+
+	std::unordered_set<int32> viewListCopy;
+	{
+		std::lock_guard lock(_vlLock);
+		viewListCopy = GetViewList();
+	}
+
+	for (int32 id : viewListCopy)
+	{
+		auto player = GameWorld::GetInst().GetPlayerByID(id);
+		if (!player || player->IsDead()) continue;
+
+		const FVector& targetPos = player->GetInfo().Pos;
+		FVector toTarget = (targetPos - origin);
+		float distance = toTarget.Length();
+		if (distance > range) continue;
+
+		FVector toTargetNorm = toTarget.Normalize();
+		float dot = forward.DotProduct(toTargetNorm);
+		float angleToTarget = std::acos(dot) * (180.0f / 3.14159265f);
+
+		if (angleToTarget > angleDeg / 2.0f) continue;
+
+		float ratio = 1.0f - (distance / range);
+		float damage = maxDamage * ratio;
+
+		//player->OnDamaged(damage);
+
+		LOG(std::format("FlameBreath hit player [{}] - dist: {:.1f}, damage: {:.1f}", id, distance, damage));
+		auto flamePkt = Tino::FlameBreathPacket(origin, forward, range, angleDeg);
+		SessionManager::GetInst().BroadcastToViewList(&flamePkt, viewListCopy);
+	}
+}
+
+
+void Monster::PerformMeleeAttack()
+{
+	if (IsTargetInAttackRange())
+	{
+		//_target->OnDamaged(GetAttackDamage());
+	}
+}
+
+void Monster::SetNextPattern()
+{
+
+	int randomIndex = RandomUtils::GetRandomInt(0, (GetMonsterType() == Type::EMonster::TINO) ? 2 : 1);
+	_currentPattern = static_cast<EAttackPattern>(randomIndex);
+}
+
 
 void Monster::Chase()
 {
@@ -175,18 +267,9 @@ void Monster::Chase()
 	}
 
 	LOG("Chase!");
-	auto playerPos = _target->GetInfo().Pos;
-	FVector dir = (playerPos - _pos).Normalize();
-	FVector dist = dir * _info.GetSpeed();
-	if (dist.Length() < _pos.DistanceTo(playerPos) - _info.AttackRadius)
-	{
-		_info.SetLocationAndYaw(_pos + dist);
-	}
-	else
-	{
-		_info.SetLocationAndYaw(playerPos - dir * _info.AttackRadius);
-		ChangeState(ECharacterStateType::STATE_AUTOATTACK);
-	}
+	//todo: 길찾기로 처리 하자
+	Look();
+	ChangeState(ECharacterStateType::STATE_AUTOATTACK);
 }
 
 void Monster::Patrol()
