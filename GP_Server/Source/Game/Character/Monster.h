@@ -51,6 +51,7 @@ private:
 	void BossAttack();
 	void PerformEarthQuake();
 	void PerformFlameBreath();
+	void PerformFlameBreathRotate();
 	void PerformMeleeAttack();
 	void SetNextPattern();
 

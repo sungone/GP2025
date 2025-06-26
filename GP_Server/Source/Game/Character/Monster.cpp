@@ -198,8 +198,63 @@ void Monster::PerformEarthQuake()
 
 void Monster::PerformFlameBreath()
 {
-	LOG("Rotating FlameBreath!");
+	LOG("FlameBreath Start!");
 
+	const float range = _info.AttackRadius;
+	const float halfAngleDeg = 15.f;
+	const float maxDamage = 40.f;
+	const int delayMs = 500; // 이펙트 먼저 보여주고 0.5초 후 판정
+
+	FVector origin = _pos;
+	FVector forward = _info.GetFrontVector().Normalize();
+
+	std::unordered_set<int32> viewListCopy;
+	{
+		std::lock_guard lock(_vlLock);
+		viewListCopy = GetViewList();
+	}
+
+	auto flamePkt = Tino::FlameBreathPacket(origin, forward, range, halfAngleDeg * 2);
+	SessionManager::GetInst().BroadcastToViewList(&flamePkt, viewListCopy);
+
+	int monsterId = _id;
+
+	TimerQueue::AddTimer([=]() {
+		auto monster = GameWorld::GetInst().GetMonsterByID(monsterId);
+		if (!monster) return;
+
+		for (int32 pid : viewListCopy)
+		{
+			auto player = GameWorld::GetInst().GetPlayerByID(pid);
+			if (!player || player->IsDead()) continue;
+
+			FVector toTarget = player->GetInfo().Pos - origin;
+			toTarget.Z = 0.0f;
+
+			if (toTarget.LengthSquared() > range * range) continue;
+
+			FVector toTargetNorm = toTarget.Normalize();
+			float dot = forward.DotProduct(toTargetNorm);
+			float angle = std::acos(dot) * (180.0f / 3.14159265f);
+			if (angle > halfAngleDeg) continue;
+
+			float dist = std::sqrt(toTarget.LengthSquared());
+			float ratio = 1.0f - (dist / range);
+			float damage = maxDamage * ratio;
+
+			LOG(std::format("FlameBreath HIT [{}] dmg: {:.1f}", pid, damage));
+			player->OnDamaged(damage);
+		}
+
+		GameWorld::GetInst().UpdateMonsterState(monsterId, ECharacterStateType::STATE_IDLE);
+		}, delayMs, false);
+}
+
+
+
+void Monster::PerformFlameBreathRotate()
+{
+	LOG("Rotating FlameBreath!");
 	const float range = _info.AttackRadius;
 	const float halfAngleDeg = 15.f;
 	const float maxDamage = 40.f;
@@ -211,7 +266,7 @@ void Monster::PerformFlameBreath()
 	FVector forward = _info.GetFrontVector().Normalize();
 	forward.Z = 0.0f;
 
-	float startYawRad = DegreesToRadians(-180.f); 
+	float startYawRad = DegreesToRadians(-180.f);
 
 	std::unordered_set<int32> viewListCopy;
 	{
@@ -253,7 +308,7 @@ void Monster::PerformFlameBreath()
 				float damage = maxDamage * ratio;
 
 				LOG(std::format("[Tick {}] FlameBreath hit [{}] - dist: {:.1f}, dmg: {:.1f}", i, pid, dist, damage));
-				//player->OnDamaged(damage);
+				player->OnDamaged(damage);
 			}
 
 			auto flamePkt = Tino::FlameBreathPacket(origin, dir, range, halfAngleDeg * 2);
@@ -272,7 +327,7 @@ void Monster::PerformMeleeAttack()
 {
 	if (IsTargetInAttackRange())
 	{
-		//_target->OnDamaged(GetAttackDamage());
+		_target->OnDamaged(GetAttackDamage());
 	}
 }
 

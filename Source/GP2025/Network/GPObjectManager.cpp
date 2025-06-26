@@ -368,6 +368,9 @@ void UGPObjectManager::UpdateMonster(const FInfoData& MonsterInfo)
 			}
 
 			Monster->SetCharacterInfo(MonsterInfo);
+			FRotator CurrentRot = Monster->GetActorRotation();
+			CurrentRot.Yaw = MonsterInfo.Yaw;
+			Monster->SetActorRotation(CurrentRot);
 
 			// UE_LOG(LogTemp, Warning, TEXT("Update monster [%d]"), MonsterInfo.ID);
 		}
@@ -411,29 +414,36 @@ void UGPObjectManager::PlayEarthQuakeEffect(const FVector& RockPos, bool bDebug)
 	UWorld* WorldContext = GetWorld();
 	if (!WorldContext) return;
 
-	// 색상 강조: 진한 주황색과 빨간색
-	const FColor SphereColor = (bDebug) ? FColor::Red : FColor::Yellow;
-	const FColor LineColor = FColor::Yellow;
+	//서버 값 처리 확인용
+	{
 
-	DrawDebugSphere(
-		WorldContext,
-		RockPos,
-		100.f,
-		24,
-		SphereColor,
-		false,
-		1.0f
-	);
-	DrawDebugLine(
-		WorldContext,
-		RockPos + FVector(0, 0, 500.f),
-		RockPos,
-		LineColor,
-		false,
-		3.0f,
-		0,
-		1.0f
-	);
+		const FColor SphereColor = (bDebug) ? FColor::Red : FColor::Yellow;
+		const FColor LineColor = FColor::Yellow;
+
+		DrawDebugSphere(
+			WorldContext,
+			RockPos,
+			100.f,
+			24,
+			SphereColor,
+			false,
+			1.0f
+		);
+		DrawDebugLine(
+			WorldContext,
+			RockPos + FVector(0, 0, 500.f),
+			RockPos,
+			LineColor,
+			false,
+			3.0f,
+			0,
+			1.0f
+		);
+
+		if (bDebug) return;
+	}
+
+	//todo: 돌떨어뜨리는거 넣기
 }
 
 void UGPObjectManager::PlayFlameBreathEffect(const FVector& Origin, const FVector& Dir, float Range, float Angle)
@@ -441,29 +451,32 @@ void UGPObjectManager::PlayFlameBreathEffect(const FVector& Origin, const FVecto
 	UWorld* WorldContext = GetWorld();
 	if (!WorldContext) return;
 
-	const int32 NumSegments = 16; // 부채꼴 선 개수
-	const float HalfAngleRad = FMath::DegreesToRadians(Angle / 2.0f);
-
-	FVector ForwardDir = Dir.GetSafeNormal2D(); // Z는 무시하고 XY 평면 기준
-
-	// ForwardDir 기준 각도
-	float BaseYawRad = FMath::Atan2(ForwardDir.Y, ForwardDir.X);
-
-	for (int32 i = 0; i <= NumSegments; ++i)
+	//서버 값 처리 확인용
 	{
-		float T = (float)i / NumSegments;
-		float OffsetAngleRad = -HalfAngleRad + T * (2.0f * HalfAngleRad);
-		float FinalYaw = BaseYawRad + OffsetAngleRad;
+		const int32 NumSegments = 16;
+		const float HalfAngleRad = FMath::DegreesToRadians(Angle / 2.0f);
 
-		FVector Direction = FVector(FMath::Cos(FinalYaw), FMath::Sin(FinalYaw), 0.0f);
-		FVector EndPoint = Origin + Direction * Range;
+		FVector ForwardDir = Dir.GetSafeNormal2D();
 
-		DrawDebugLine(WorldContext, Origin, EndPoint, FColor::Orange, false, 2.0f, 0, 1.5f);
+		float BaseYawRad = FMath::Atan2(ForwardDir.Y, ForwardDir.X);
+
+		for (int32 i = 0; i <= NumSegments; ++i)
+		{
+			float T = (float)i / NumSegments;
+			float OffsetAngleRad = -HalfAngleRad + T * (2.0f * HalfAngleRad);
+			float FinalYaw = BaseYawRad + OffsetAngleRad;
+
+			FVector Direction = FVector(FMath::Cos(FinalYaw), FMath::Sin(FinalYaw), 0.0f);
+			FVector EndPoint = Origin + Direction * Range;
+
+			DrawDebugLine(WorldContext, Origin, EndPoint, FColor::Orange, false, 2.0f, 0, 1.5f);
+		}
+
+		FVector CenterDir = FVector(FMath::Cos(BaseYawRad), FMath::Sin(BaseYawRad), 0.0f);
+		DrawDebugLine(WorldContext, Origin, Origin + CenterDir * Range, FColor::Red, false, 2.0f, 0, 2.0f);
 	}
 
-	// 중심선 강조 (빨간색)
-	FVector CenterDir = FVector(FMath::Cos(BaseYawRad), FMath::Sin(BaseYawRad), 0.0f);
-	DrawDebugLine(WorldContext, Origin, Origin + CenterDir * Range, FColor::Red, false, 2.0f, 0, 2.0f);
+	//todo: 불브레스
 }
 
 
