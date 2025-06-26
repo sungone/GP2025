@@ -1,6 +1,4 @@
-﻿﻿// Fill out your copyright notice in the Description page of Project Settings.﻿
-
-#include "Network/GPObjectManager.h"
+﻿#include "Network/GPObjectManager.h"
 #include "Character/GPCharacterPlayer.h"
 #include "Character/GPCharacterMonster.h"
 #include "Item/GPItemStruct.h"
