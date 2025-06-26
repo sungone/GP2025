@@ -446,7 +446,7 @@ void UGPObjectManager::PlayEarthQuakeEffect(const FVector& RockPos, bool bDebug)
 	//todo: 돌떨어뜨리는거 넣기
 }
 
-void UGPObjectManager::PlayFlameBreathEffect(const FVector& Origin, const FVector& Dir, float Range, float Angle)
+void UGPObjectManager::PlayFlameBreathEffect(const FVector& Origin, const FVector& Dir, float Range, float Angle, bool bDebug)
 {
 	UWorld* WorldContext = GetWorld();
 	if (!WorldContext) return;
@@ -457,8 +457,9 @@ void UGPObjectManager::PlayFlameBreathEffect(const FVector& Origin, const FVecto
 		const float HalfAngleRad = FMath::DegreesToRadians(Angle / 2.0f);
 
 		FVector ForwardDir = Dir.GetSafeNormal2D();
-
 		float BaseYawRad = FMath::Atan2(ForwardDir.Y, ForwardDir.X);
+
+		const FColor Color = bDebug ? FColor::Orange : FColor::Yellow;
 
 		for (int32 i = 0; i <= NumSegments; ++i)
 		{
@@ -469,11 +470,11 @@ void UGPObjectManager::PlayFlameBreathEffect(const FVector& Origin, const FVecto
 			FVector Direction = FVector(FMath::Cos(FinalYaw), FMath::Sin(FinalYaw), 0.0f);
 			FVector EndPoint = Origin + Direction * Range;
 
-			DrawDebugLine(WorldContext, Origin, EndPoint, FColor::Orange, false, 2.0f, 0, 1.5f);
+			DrawDebugLine(WorldContext, Origin, EndPoint, Color, false, 2.0f, 0, 1.f);
 		}
 
 		FVector CenterDir = FVector(FMath::Cos(BaseYawRad), FMath::Sin(BaseYawRad), 0.0f);
-		DrawDebugLine(WorldContext, Origin, Origin + CenterDir * Range, FColor::Red, false, 2.0f, 0, 2.0f);
+		DrawDebugLine(WorldContext, Origin, Origin + CenterDir * Range, Color, false, 2.0f, 0, 1.0f);
 	}
 
 	//todo: 불브레스

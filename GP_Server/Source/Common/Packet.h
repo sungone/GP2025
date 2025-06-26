@@ -614,7 +614,7 @@ namespace Tino
 	struct EarthQuakePacket : public Packet
 	{
 		FVector RockPos;
-		bool bDebug;
+		bool bDebug = false;
 		EarthQuakePacket(const FVector& rockPos, bool debug = false)
 			:Packet(EPacketType::S_EARTH_QUAKE), RockPos(rockPos), bDebug(debug)
 		{
@@ -627,9 +627,11 @@ namespace Tino
 		FVector Direction;  // 전방 방향 단위 벡터
 		float Range;        // 길이 (ex. 600.f)
 		float AngleDeg;     // 각도 (ex. 30.f)
-		FlameBreathPacket(const FVector& origin, const FVector& direction, float range, float angle)
+		bool bDebug = false;
+
+		FlameBreathPacket(const FVector& origin, const FVector& direction, float range, float angle, bool debug = false)
 			:Packet(EPacketType::S_FLAME_BREATH),
-			Origin(origin), Direction(direction), Range(range), AngleDeg(angle)
+			Origin(origin), Direction(direction), Range(range), AngleDeg(angle), bDebug(debug)
 		{
 			Header.PacketSize = sizeof(FlameBreathPacket);
 		}

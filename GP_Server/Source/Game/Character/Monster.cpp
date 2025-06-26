@@ -244,6 +244,8 @@ void Monster::PerformFlameBreath()
 
 			LOG(std::format("FlameBreath HIT [{}] dmg: {:.1f}", pid, damage));
 			player->OnDamaged(damage);
+			auto hitDebugPkt = Tino::FlameBreathPacket(origin, forward, range, halfAngleDeg * 2, true);
+			SessionManager::GetInst().BroadcastToViewList(&hitDebugPkt, viewListCopy);
 		}
 
 		GameWorld::GetInst().UpdateMonsterState(monsterId, ECharacterStateType::STATE_IDLE);
