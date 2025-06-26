@@ -614,10 +614,11 @@ namespace Tino
 	struct EarthQuakePacket : public Packet
 	{
 		FVector RockPos;
-		EarthQuakePacket(const FVector& rockPos)
-			:Packet(EPacketType::S_EARTH_QUAKE), RockPos(rockPos)
+		bool bDebug;
+		EarthQuakePacket(const FVector& rockPos, bool debug = false)
+			:Packet(EPacketType::S_EARTH_QUAKE), RockPos(rockPos), bDebug(debug)
 		{
-
+			Header.PacketSize = sizeof(EarthQuakePacket);
 		}
 	};
 	struct FlameBreathPacket : public Packet
@@ -630,7 +631,7 @@ namespace Tino
 			:Packet(EPacketType::S_FLAME_BREATH),
 			Origin(origin), Direction(direction), Range(range), AngleDeg(angle)
 		{
-
+			Header.PacketSize = sizeof(FlameBreathPacket);
 		}
 	};
 

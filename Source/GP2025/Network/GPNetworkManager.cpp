@@ -444,6 +444,18 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->DamagedMonster(Pkt->Target, Pkt->Damage);
 				break;
 			}
+			case EPacketType::S_EARTH_QUAKE:
+			{
+				Tino::EarthQuakePacket* Pkt = reinterpret_cast<Tino::EarthQuakePacket*>(RemainingData.GetData());
+				ObjectMgr->PlayEarthQuakeEffect(Pkt->RockPos);
+				break;
+			}
+			case EPacketType::S_FLAME_BREATH:
+			{
+				Tino::FlameBreathPacket* Pkt = reinterpret_cast<Tino::FlameBreathPacket*>(RemainingData.GetData());
+				ObjectMgr->PlayFlameBreathEffect(Pkt->Origin, Pkt->Direction, Pkt->Range, Pkt->AngleDeg);
+				break;
+			}
 #pragma endregion
 #pragma region Item
 			case EPacketType::S_ITEM_SPAWN:

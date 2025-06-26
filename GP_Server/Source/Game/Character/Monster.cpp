@@ -150,20 +150,22 @@ void Monster::Attack()
 
 void Monster::TinoAttack()
 {
-	switch (_currentPattern)
-	{
-	case EAttackPattern::EarthQuake:
-		PerformEarthQuake();
-		break;
-	case EAttackPattern::FlameBreath:
-		PerformFlameBreath();
-		break;
-	case EAttackPattern::MeleeAttack:
-		PerformMeleeAttack();
-		break;
-	}
+	PerformEarthQuake();
 
-	SetNextPattern();
+	//switch (_currentPattern)
+	//{
+	//case EAttackPattern::EarthQuake:
+	//	PerformEarthQuake();
+	//	break;
+	//case EAttackPattern::FlameBreath:
+	//	PerformFlameBreath();
+	//	break;
+	//case EAttackPattern::MeleeAttack:
+	//	PerformMeleeAttack();
+	//	break;
+	//}
+
+	//SetNextPattern();
 }
 
 void Monster::PerformEarthQuake()
@@ -176,7 +178,7 @@ void Monster::PerformEarthQuake()
 
 	for (int i = 0; i < rockCount; ++i)
 	{
-		FVector rockPos = _pos + RandomUtils::GetRandomOffset();
+		FVector rockPos = _target->GetInfo().Pos + RandomUtils::GetRandomOffset(100, 300, 0);
 
 		std::unordered_set<int32> viewListCopy;
 		{
@@ -226,7 +228,7 @@ void Monster::PerformFlameBreath()
 		float ratio = 1.0f - (distance / range);
 		float damage = maxDamage * ratio;
 
-		player->OnDamaged(damage);
+		//player->OnDamaged(damage);
 
 		LOG(std::format("FlameBreath hit player [{}] - dist: {:.1f}, damage: {:.1f}", id, distance, damage));
 		auto flamePkt = Tino::FlameBreathPacket(origin, forward, range, angleDeg);
@@ -239,7 +241,7 @@ void Monster::PerformMeleeAttack()
 {
 	if (IsTargetInAttackRange())
 	{
-		_target->OnDamaged(GetAttackDamage());
+		//_target->OnDamaged(GetAttackDamage());
 	}
 }
 
@@ -263,21 +265,9 @@ void Monster::Chase()
 	}
 
 	LOG("Chase!");
-	//todo: 길찾기로 처리 하자 지금
-	auto playerPos = _target->GetInfo().Pos;
-	playerPos.Z = _target->GetInfo().Pos.Z;
-
-	FVector dir = (playerPos - _pos).Normalize();
-	FVector dist = dir * _info.GetSpeed();
-	if (dist.Length() < _pos.DistanceTo(playerPos) - _info.AttackRadius)
-	{
-		_info.SetLocationAndYaw(_pos + dist);
-	}
-	else
-	{
-		_info.SetLocationAndYaw(playerPos - dir * _info.AttackRadius);
-		ChangeState(ECharacterStateType::STATE_AUTOATTACK);
-	}
+	//todo: 길찾기로 처리 하자
+	Look();
+	ChangeState(ECharacterStateType::STATE_AUTOATTACK);
 }
 
 void Monster::Patrol()

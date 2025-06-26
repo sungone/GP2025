@@ -119,7 +119,12 @@ void PlayerSession::DoSend(const Packet* packet)
 	case S_CHAT_BROADCAST:
 		LOG(LogType::SendLog, std::format("ChatBroadcast PKT to [{}]", _id));
 		break;
-
+	case S_EARTH_QUAKE:
+		LOG(LogType::SendLog, std::format("EarthQuake PKT to [{}]", _id));
+		break;
+	case S_FLAME_BREATH:
+		LOG(LogType::SendLog, std::format("FlameBreath PKT to [{}]", _id));
+		break;
 	default:
 		LOG(LogType::SendLog, "Unknown Packet Type");
 		break;

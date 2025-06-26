@@ -440,8 +440,10 @@ void GameWorld::HandleEarthQuakeImpact(const FVector& rockPos)
 			float ratio = 1.0f - (dist / damageRadius);
 			float damage = maxDamage * ratio;
 
-			LOG(std::format("EarthQuake hit player [{}] for {:.1f} damage", id, damage));
-			player->OnDamaged(damage);
+			LOG(std::format("EarthQuake hit player [{}] for {:.1f} damage", id, playerPos.ToString(), damage));
+			auto pkt = Tino::EarthQuakePacket(rockPos, true);
+			SessionManager::GetInst().SendPacket(player->GetInfo().ID, &pkt);
+			//player->OnDamaged(damage);
 		}
 	}
 }
