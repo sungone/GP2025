@@ -93,6 +93,9 @@ public:
 	UPROPERTY()
 	class UGPItemSlot* CurrentSlot;
 
+	UPROPERTY(meta = (BindWidget), BlueprintReadOnly)
+	class UGPShopItemViewerSlot* ShopViewerSlot;
+
 	void SetCurrentSlot(UGPItemSlot* InSlot);
 
 	/** 상점 아이템 슬롯을 생성하는 함수 */

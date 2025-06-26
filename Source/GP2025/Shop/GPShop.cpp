@@ -10,6 +10,7 @@
 #include "Inventory/GPItemSlot.h"
 #include "Engine/DataTable.h"
 #include "Character/Modules/GPMyplayerUIManager.h"
+#include "Shop/GPShopItemViewerSlot.h"
 #include "Inventory/GPInventory.h"
 #include "Item/GPItemStruct.h"
 #include "Kismet/GameplayStatics.h"
@@ -286,6 +287,11 @@ void UGPShop::SetCurrentSlot(UGPItemSlot* InSlot)
 	{
 		CurrentSlot = InSlot;
 		UE_LOG(LogTemp, Log, TEXT("CurrentSlot set to: %s"), *InSlot->GetName());
+
+		if (ShopViewerSlot)
+		{
+			ShopViewerSlot->SetItemData(CurrentSlot->CurrentItem);
+		}
 	}
 }
 
