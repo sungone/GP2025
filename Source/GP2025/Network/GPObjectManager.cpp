@@ -422,7 +422,7 @@ void UGPObjectManager::PlayEarthQuakeEffect(const FVector& RockPos, bool bDebug)
 		24,
 		SphereColor,
 		false,
-		2.0f
+		1.0f
 	);
 	DrawDebugLine(
 		WorldContext,
@@ -432,7 +432,7 @@ void UGPObjectManager::PlayEarthQuakeEffect(const FVector& RockPos, bool bDebug)
 		false,
 		3.0f,
 		0,
-		2.0f
+		1.0f
 	);
 }
 
@@ -441,28 +441,32 @@ void UGPObjectManager::PlayFlameBreathEffect(const FVector& Origin, const FVecto
 	UWorld* WorldContext = GetWorld();
 	if (!WorldContext) return;
 
-	// 단위 벡터로 정규화된 방향
-	FVector NormalizedDir = Dir.GetSafeNormal();
+	const int32 NumSegments = 16; // 부채꼴 선 개수
+	const float HalfAngleRad = FMath::DegreesToRadians(Angle / 2.0f);
 
-	// 디버그 콘 (원뿔 모양)
-	DrawDebugCone(
-		WorldContext,
-		Origin,
-		NormalizedDir,
-		Range,
-		FMath::DegreesToRadians(Angle), // Half Angle in Radians
-		FMath::DegreesToRadians(Angle),
-		12,
-		FColor::Orange,
-		false,
-		2.0f,
-		0,
-		2.0f
-	);
+	FVector ForwardDir = Dir.GetSafeNormal2D(); // Z는 무시하고 XY 평면 기준
 
-	// 방향 벡터 디버그 라인
-	DrawDebugLine(WorldContext, Origin, Origin + NormalizedDir * Range, FColor::Red, false, 2.0f, 0, 1.5f);
+	// ForwardDir 기준 각도
+	float BaseYawRad = FMath::Atan2(ForwardDir.Y, ForwardDir.X);
+
+	for (int32 i = 0; i <= NumSegments; ++i)
+	{
+		float T = (float)i / NumSegments;
+		float OffsetAngleRad = -HalfAngleRad + T * (2.0f * HalfAngleRad);
+		float FinalYaw = BaseYawRad + OffsetAngleRad;
+
+		FVector Direction = FVector(FMath::Cos(FinalYaw), FMath::Sin(FinalYaw), 0.0f);
+		FVector EndPoint = Origin + Direction * Range;
+
+		DrawDebugLine(WorldContext, Origin, EndPoint, FColor::Orange, false, 2.0f, 0, 1.5f);
+	}
+
+	// 중심선 강조 (빨간색)
+	FVector CenterDir = FVector(FMath::Cos(BaseYawRad), FMath::Sin(BaseYawRad), 0.0f);
+	DrawDebugLine(WorldContext, Origin, Origin + CenterDir * Range, FColor::Red, false, 2.0f, 0, 2.0f);
 }
+
+
 
 void UGPObjectManager::ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos)
 {

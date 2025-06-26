@@ -148,14 +148,17 @@ void Monster::Attack()
 
 void Monster::BossAttack()
 {
+	//PerformFlameBreath();
+
+
 	switch (_currentPattern)
 	{
 	case EAttackPattern::MeleeAttack:
 		PerformMeleeAttack();
 		break;
 	case EAttackPattern::FlameBreath:
-		//_info.AddState(ECharacterStateType::STATE_SKILL_Q);
-		//PerformFlameBreath();
+		_info.AddState(ECharacterStateType::STATE_SKILL_Q);
+		PerformFlameBreath();
 		break;
 	case EAttackPattern::EarthQuake:
 		_info.AddState(ECharacterStateType::STATE_SKILL_E);
@@ -186,7 +189,7 @@ void Monster::PerformEarthQuake()
 		auto pkt = Tino::EarthQuakePacket(rockPos);
 		SessionManager::GetInst().BroadcastToViewList(&pkt, viewListCopy);
 		auto id = _id;
-		TimerQueue::AddTimer([rockPos, id] { 
+		TimerQueue::AddTimer([rockPos, id] {
 			GameWorld::GetInst().HandleEarthQuakeImpact(rockPos);
 			GameWorld::GetInst().UpdateMonsterState(id, ECharacterStateType::STATE_IDLE);
 			}, 500, false);
@@ -195,14 +198,20 @@ void Monster::PerformEarthQuake()
 
 void Monster::PerformFlameBreath()
 {
-	LOG("FlameBreath!");
+	LOG("Rotating FlameBreath!");
 
-	const float range = 600.f;
-	const float angleDeg = 30.f;
+	const float range = _info.AttackRadius;
+	const float halfAngleDeg = 15.f;
 	const float maxDamage = 40.f;
+	const int tickCount = 10;
+	const float tickIntervalMs = 100.f;
+	const float rotationPerTickDeg = 9.f;
 
 	FVector origin = _pos;
-	FVector forward = _info.GetFrontVector();
+	FVector forward = _info.GetFrontVector().Normalize();
+	forward.Z = 0.0f;
+
+	float startYawRad = DegreesToRadians(-180.f); 
 
 	std::unordered_set<int32> viewListCopy;
 	{
@@ -210,31 +219,52 @@ void Monster::PerformFlameBreath()
 		viewListCopy = GetViewList();
 	}
 
-	for (int32 id : viewListCopy)
+	int32 monsterId = _id;
+
+	for (int i = 0; i < tickCount; ++i)
 	{
-		auto player = GameWorld::GetInst().GetPlayerByID(id);
-		if (!player || player->IsDead()) continue;
+		TimerQueue::AddTimer([=]() {
+			auto monster = GameWorld::GetInst().GetMonsterByID(monsterId);
+			if (!monster) return;
 
-		const FVector& targetPos = player->GetInfo().Pos;
-		FVector toTarget = (targetPos - origin);
-		float distance = toTarget.Length();
-		if (distance > range) continue;
+			// 현재 틱의 회전 각도 (시계방향으로 감소)
+			float yaw = startYawRad - DegreesToRadians(rotationPerTickDeg * i);
+			FVector dir(std::cos(yaw), std::sin(yaw), 0.f);
 
-		FVector toTargetNorm = toTarget.Normalize();
-		float dot = forward.DotProduct(toTargetNorm);
-		float angleToTarget = std::acos(dot) * (180.0f / 3.14159265f);
+			for (int32 pid : viewListCopy)
+			{
+				auto player = GameWorld::GetInst().GetPlayerByID(pid);
+				if (!player || player->IsDead()) continue;
 
-		if (angleToTarget > angleDeg / 2.0f) continue;
+				FVector toTarget = player->GetInfo().Pos - origin;
+				toTarget.Z = 0.f;
 
-		float ratio = 1.0f - (distance / range);
-		float damage = maxDamage * ratio;
+				float distSq = toTarget.LengthSquared();
+				if (distSq > range * range) continue;
 
-		//player->OnDamaged(damage);
+				FVector toTargetNorm = toTarget.Normalize();
+				float dot = dir.DotProduct(toTargetNorm);
+				float angleToTarget = std::acos(dot) * (180.0f / 3.14159265f);
 
-		LOG(std::format("FlameBreath hit player [{}] - dist: {:.1f}, damage: {:.1f}", id, distance, damage));
-		auto flamePkt = Tino::FlameBreathPacket(origin, forward, range, angleDeg);
-		SessionManager::GetInst().BroadcastToViewList(&flamePkt, viewListCopy);
+				if (angleToTarget > halfAngleDeg) continue;
+
+				float dist = std::sqrt(distSq);
+				float ratio = 1.0f - (dist / range);
+				float damage = maxDamage * ratio;
+
+				LOG(std::format("[Tick {}] FlameBreath hit [{}] - dist: {:.1f}, dmg: {:.1f}", i, pid, dist, damage));
+				//player->OnDamaged(damage);
+			}
+
+			auto flamePkt = Tino::FlameBreathPacket(origin, dir, range, halfAngleDeg * 2);
+			SessionManager::GetInst().BroadcastToViewList(&flamePkt, viewListCopy);
+
+			}, i * tickIntervalMs, false);
 	}
+
+	TimerQueue::AddTimer([monsterId] {
+		GameWorld::GetInst().UpdateMonsterState(monsterId, ECharacterStateType::STATE_IDLE);
+		}, tickCount * tickIntervalMs, false);
 }
 
 
