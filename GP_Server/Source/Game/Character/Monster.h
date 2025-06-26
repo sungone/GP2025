@@ -7,9 +7,9 @@ const float detectDist = 1000.f;
 
 enum class EAttackPattern
 {
-	EarthQuake,
+	MeleeAttack,
 	FlameBreath,
-	MeleeAttack
+	EarthQuake
 };
 
 class Monster : public Character, public std::enable_shared_from_this<Monster>
@@ -48,7 +48,7 @@ private:
 	void Look();
 	void Attack();
 
-	void TinoAttack();
+	void BossAttack();
 	void PerformEarthQuake();
 	void PerformFlameBreath();
 	void PerformMeleeAttack();

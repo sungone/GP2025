@@ -418,6 +418,13 @@ void GameWorld::UpdateAllMonsters()
 	}
 }
 
+void GameWorld::UpdateMonsterState(int32 id, ECharacterStateType newState)
+{
+	auto monster = GetMonsterByID(id);
+	if (!monster) return;
+	monster->ChangeState(newState);
+}
+
 void GameWorld::HandleEarthQuakeImpact(const FVector& rockPos)
 {
 	const float damageRadius = 120.f;

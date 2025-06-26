@@ -73,9 +73,42 @@ void Monster::Update()
 
 void Monster::BehaviorTree()
 {
-	switch (_info.State)
+	if (_info.HasState(ECharacterStateType::STATE_DIE))
+		return;
+
+	if (_info.HasState(ECharacterStateType::STATE_SKILL_Q) || _info.HasState(ECharacterStateType::STATE_SKILL_E))
+		return; // 스킬 중이면 아무것도 안함
+
+	if (_info.HasState(ECharacterStateType::STATE_AUTOATTACK))
 	{
-	case ECharacterStateType::STATE_IDLE:
+		if (!_target)
+		{
+			ChangeState(ECharacterStateType::STATE_IDLE);
+		}
+		else if (!IsTargetInAttackRange())
+		{
+			ChangeState(ECharacterStateType::STATE_WALK);
+			Chase();
+		}
+		else
+		{
+			Attack();
+		}
+		return;
+	}
+
+	if (_info.HasState(ECharacterStateType::STATE_WALK))
+	{
+		if (_target)
+			Chase();
+		else if (SetTarget())
+			Chase();
+		else
+			Patrol();
+		return;
+	}
+
+	if (_info.HasState(ECharacterStateType::STATE_IDLE))
 	{
 		if (SetTarget())
 		{
@@ -86,49 +119,12 @@ void Monster::BehaviorTree()
 		{
 			ChangeState(ECharacterStateType::STATE_WALK);
 		}
-		break;
+		return;
 	}
-	case ECharacterStateType::STATE_WALK:
-	{
-		if (_target)
-		{
-			Chase();
-			break;
-		}
 
-		if (SetTarget())
-		{
-			Chase();
-		}
-		else
-		{
-			Patrol();
-		}
-		break;
-	}
-	case ECharacterStateType::STATE_AUTOATTACK:
-	{
-		if (!_target)
-		{
-			ChangeState(ECharacterStateType::STATE_IDLE);
-			break;
-		}
-
-		if (!IsTargetInAttackRange())
-		{
-			ChangeState(ECharacterStateType::STATE_WALK);
-			Chase();
-		}
-		else
-		{
-			Attack();
-		}
-		break;
-	}
-	default:
-		LOG(Warning, std::format("Invaild State :{}", _info.State));
-	}
+	LOG(Warning, std::format("Invalid state bits: {}", static_cast<uint32>(_info.State)));
 }
+
 
 void Monster::Look()
 {
@@ -139,33 +135,35 @@ void Monster::Look()
 
 void Monster::Attack()
 {
+	ChangeState(ECharacterStateType::STATE_AUTOATTACK);
+
 	if (!_target || _target->IsDead()) return;
-	if (GetMonsterType() == Type::EMonster::TINO)
+	if (IsBoss())
 	{
-		TinoAttack();
+		BossAttack();
 	}
 	else
 		PerformMeleeAttack();
 }
 
-void Monster::TinoAttack()
+void Monster::BossAttack()
 {
-	PerformEarthQuake();
+	switch (_currentPattern)
+	{
+	case EAttackPattern::MeleeAttack:
+		PerformMeleeAttack();
+		break;
+	case EAttackPattern::FlameBreath:
+		//_info.AddState(ECharacterStateType::STATE_SKILL_Q);
+		//PerformFlameBreath();
+		break;
+	case EAttackPattern::EarthQuake:
+		_info.AddState(ECharacterStateType::STATE_SKILL_E);
+		PerformEarthQuake();
+		break;
+	}
 
-	//switch (_currentPattern)
-	//{
-	//case EAttackPattern::EarthQuake:
-	//	PerformEarthQuake();
-	//	break;
-	//case EAttackPattern::FlameBreath:
-	//	PerformFlameBreath();
-	//	break;
-	//case EAttackPattern::MeleeAttack:
-	//	PerformMeleeAttack();
-	//	break;
-	//}
-
-	//SetNextPattern();
+	SetNextPattern();
 }
 
 void Monster::PerformEarthQuake()
@@ -178,7 +176,7 @@ void Monster::PerformEarthQuake()
 
 	for (int i = 0; i < rockCount; ++i)
 	{
-		FVector rockPos = _target->GetInfo().Pos + RandomUtils::GetRandomOffset(0, 300, 0);
+		FVector rockPos = _target->GetInfo().Pos + RandomUtils::GetRandomOffset(0, 500, 0);
 
 		std::unordered_set<int32> viewListCopy;
 		{
@@ -187,8 +185,11 @@ void Monster::PerformEarthQuake()
 		}
 		auto pkt = Tino::EarthQuakePacket(rockPos);
 		SessionManager::GetInst().BroadcastToViewList(&pkt, viewListCopy);
-
-		TimerQueue::AddTimer([rockPos] { GameWorld::GetInst().HandleEarthQuakeImpact(rockPos);}, 500, false);
+		auto id = _id;
+		TimerQueue::AddTimer([rockPos, id] { 
+			GameWorld::GetInst().HandleEarthQuakeImpact(rockPos);
+			GameWorld::GetInst().UpdateMonsterState(id, ECharacterStateType::STATE_IDLE);
+			}, 500, false);
 	}
 }
 
@@ -247,7 +248,8 @@ void Monster::PerformMeleeAttack()
 
 void Monster::SetNextPattern()
 {
-	int randomIndex = RandomUtils::GetRandomInt(0, 2);
+
+	int randomIndex = RandomUtils::GetRandomInt(0, (GetMonsterType() == Type::EMonster::TINO) ? 2 : 1);
 	_currentPattern = static_cast<EAttackPattern>(randomIndex);
 }
 
