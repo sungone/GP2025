@@ -1,18 +1,46 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "UI/GPDeadScreenWidget.h"
 #include "Character/GPCharacterMyplayer.h"
 #include "Kismet/GameplayStatics.h"
 #include "Network/GPNetworkManager.h"
+#include "Components/TextBlock.h"    
 
-void UGPDeadScreenWidget::OnRespawnButtonClicked()
+
+void UGPDeadScreenWidget::UpdateRespawnMessage(int32 SecondsLeft)
 {
-	UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-	if (NetMgr)
-	{
-		NetMgr->SendMyRespawnPacket(ZoneType::TUK);
-	}
+    if (!RespawnCount) return;
 
-	this->RemoveFromParent();
+    FString Message = FString::Printf(TEXT("%d초 뒤에 부활합니다"), SecondsLeft);
+    RespawnCount->SetText(FText::FromString(Message));
+}
+
+void UGPDeadScreenWidget::StartRespawnCountdown(int32 StartSeconds)
+{
+    SecondsRemaining = StartSeconds;
+    UpdateRespawnMessage(SecondsRemaining);
+
+    GetWorld()->GetTimerManager().SetTimer(
+        CountdownTimerHandle,
+        this,
+        &UGPDeadScreenWidget::TickCountdown,
+        1.0f,
+        true
+    );
+}
+void UGPDeadScreenWidget::TickCountdown()
+{
+    SecondsRemaining--;
+
+    if (SecondsRemaining >= 0)
+    {
+        UpdateRespawnMessage(SecondsRemaining);
+    }
+
+    if (SecondsRemaining < 0)
+    {
+        GetWorld()->GetTimerManager().ClearTimer(CountdownTimerHandle);
+        RemoveFromParent(); 
+    }
 }

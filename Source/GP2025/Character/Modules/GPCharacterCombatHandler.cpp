@@ -186,19 +186,21 @@ void UGPCharacterCombatHandler::HandleDeath()
 	FTimerHandle DeadTimerHandle;
 	AGPCharacterBase* LocalOwner = Owner;
 
-	if (AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(LocalOwner))
-	{
-		LocalMyPlayer->SetActorHiddenInGame(true);
-		return;
-	}
-	
+	float DeathAnimDuration = DeadMontage ? DeadMontage->GetPlayLength() : 2.0f;
+
 	Owner->GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda([LocalOwner]()
 		{
-			if (LocalOwner)
+			if (!LocalOwner) return;
+
+			if (AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(LocalOwner))
+			{
+				LocalMyPlayer->SetActorHiddenInGame(true);
+			}
+			else
 			{
 				LocalOwner->Destroy();
 			}
-		}), DeadEventDelayTime, false);
+		}), DeathAnimDuration - 0.3f, false);
 }
 
 void UGPCharacterCombatHandler::PlayDeadAnimation()
@@ -209,7 +211,7 @@ void UGPCharacterCombatHandler::PlayDeadAnimation()
 	if (!AnimInstance) return;
 
 	AnimInstance->StopAllMontages(0.f);
-	AnimInstance->Montage_Play(DeadMontage, 0.5f);
+	AnimInstance->Montage_Play(DeadMontage);
 }
 
 void UGPCharacterCombatHandler::SetDeadEventDelay(float Delay)

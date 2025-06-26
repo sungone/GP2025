@@ -275,8 +275,6 @@ void UGPObjectManager::HandlePlayerDeath(int32 playerId)
 	AGPCharacterPlayer* TargetPlayer = WeakPlayer.Get();
 	if (!TargetPlayer) return;
 
-	TargetPlayer->CombatHandler->HandleDeath();
-
 	if (TargetPlayer == MyPlayer)
 	{
 		if (MyPlayer->UIManager)
@@ -284,6 +282,8 @@ void UGPObjectManager::HandlePlayerDeath(int32 playerId)
 			MyPlayer->UIManager->ShowDeadScreen();
 		}
 	}
+
+	TargetPlayer->CombatHandler->HandleDeath();
 }
 
 void UGPObjectManager::SkillUnlock(ESkillGroup SkillGID)

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Character/Modules/GPMyplayerUIManager.h"
@@ -10,6 +10,7 @@
 #include "Character/GPCharacterMyplayer.h"
 #include "UI/GPChatBoxWidget.h"
 #include "GPMyplayerUIManager.h"
+#include "UI/GPDeadScreenWidget.h"
 #include "UI/GPQuestListWidget.h"
 #include "Character/Modules/GPMyplayerSoundManager.h"
 #include "UI/GPSkillLevelUpText.h"
@@ -206,16 +207,34 @@ void UGPMyplayerUIManager::ShowInGameUI()
 
 void UGPMyplayerUIManager::ShowDeadScreen()
 {
-	if (DeadScreenWidget && !DeadScreenWidget->IsInViewport())
-	{
-		DeadScreenWidget->AddToViewport();
+	UE_LOG(LogTemp, Warning, TEXT("ShowDeadScreen() called")); // â‘  í•¨ìˆ˜ ì§„ì… í™•ì¸
 
-		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
-		if (PC)
+	if (!DeadScreenWidgetClass)
+	{
+		UE_LOG(LogTemp, Error, TEXT("DeadScreenWidgetClass is NULL"));
+		return;
+	}
+
+	if (!DeadScreenWidget)
+	{
+		DeadScreenWidget = CreateWidget<UGPDeadScreenWidget>(GetWorld(), DeadScreenWidgetClass);
+	}
+
+	UGPDeadScreenWidget* TypedWidget = Cast<UGPDeadScreenWidget>(DeadScreenWidget);
+	if (TypedWidget)
+	{
+		if (UGPInGameWidget* LocalInGameWidget = Cast<UGPInGameWidget>(InGameWidget))
 		{
-			PC->SetShowMouseCursor(true);
-			PC->SetInputMode(FInputModeGameAndUI());
+			LocalInGameWidget->ShowGameMessage(TEXT("ëª¬ìŠ¤í„°ì—ê²Œ ì‚¬ë§í•˜ì…¨ìŠµë‹ˆë‹¤"), 2.f);
 		}
+
+		TypedWidget->AddToViewport();
+		TypedWidget->PlayFadeOut();
+		TypedWidget->StartRespawnCountdown(3);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to cast DeadScreenWidget to UGPDeadScreenWidget"));
 	}
 }
 
@@ -311,13 +330,13 @@ void UGPMyplayerUIManager::ShowLoginUI()
 	UWorld* World = Owner->GetWorld();
 	if (!World) return;
 
-	// À§Á¬ÀÌ ¾ÆÁ÷ »ı¼ºµÇÁö ¾Ê¾Ò´Ù¸é »ı¼º
+	// ìœ„ì ¯ì´ ì•„ì§ ìƒì„±ë˜ì§€ ì•Šì•˜ë‹¤ë©´ ìƒì„±
 	if (!LoginWidget && LoginWidgetClass)
 	{
 		LoginWidget = CreateWidget<UUserWidget>(World, LoginWidgetClass);
 	}
 
-	// ÀÌ¹Ì Viewport¿¡ ¾øÀ¸¸é Ãß°¡
+	// ì´ë¯¸ Viewportì— ì—†ìœ¼ë©´ ì¶”ê°€
 	if (LoginWidget && !LoginWidget->IsInViewport())
 	{
 		LoginWidget->AddToViewport();
@@ -327,7 +346,7 @@ void UGPMyplayerUIManager::ShowLoginUI()
 		}
 	}
 
-	// ¸¶¿ì½º Ä¿¼­¿Í ÀÔ·Â ¸ğµå ¼³Á¤
+	// ë§ˆìš°ìŠ¤ ì»¤ì„œì™€ ì…ë ¥ ëª¨ë“œ ì„¤ì •
 	if (Owner && Owner->IsPlayerControlled())
 	{
 		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
@@ -361,7 +380,7 @@ void UGPMyplayerUIManager::SpawnSkillLevelText(int32 NewLevel)
 	FVector SpawnLocation = Owner->GetActorLocation() + FVector(0, 0, 0);
 	UE_LOG(LogTemp, Log, TEXT("[SkillText] Spawn location: %s"), *SpawnLocation.ToString());
 
-	// ÅØ½ºÆ® Å¬·¡½º ·Îµù
+	// í…ìŠ¤íŠ¸ í´ë˜ìŠ¤ ë¡œë”©
 	TSubclassOf<AGPSkillLevelUpText> TextClass = LoadClass<AGPSkillLevelUpText>(nullptr, TEXT("/Game/Blueprint/BP_SkillLevelUpText.BP_SkillLevelUpText_C"));
 	if (!TextClass)
 	{
@@ -369,7 +388,7 @@ void UGPMyplayerUIManager::SpawnSkillLevelText(int32 NewLevel)
 		return;
 	}
 
-	// ¾×ÅÍ »ı¼º
+	// ì•¡í„° ìƒì„±
 	AGPSkillLevelUpText* TextActor = World->SpawnActor<AGPSkillLevelUpText>(TextClass, SpawnLocation, FRotator::ZeroRotator);
 	if (!TextActor)
 	{
@@ -377,7 +396,7 @@ void UGPMyplayerUIManager::SpawnSkillLevelText(int32 NewLevel)
 		return;
 	}
 
-	// ÅØ½ºÆ® ¼³Á¤
+	// í…ìŠ¤íŠ¸ ì„¤ì •
 	UE_LOG(LogTemp, Log, TEXT("[SkillText] Actor spawned successfully. Setting level text for level %d"), NewLevel);
 	TextActor->SetSkillLevelUpText(NewLevel);
 }

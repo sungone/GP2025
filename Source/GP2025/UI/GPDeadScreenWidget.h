@@ -16,6 +16,19 @@ class GP2025_API UGPDeadScreenWidget : public UUserWidget
 	
 
 public:
-	UFUNCTION(BlueprintCallable)
-	void OnRespawnButtonClicked();
+    UFUNCTION(BlueprintImplementableEvent)
+    void PlayFadeOut();
+
+    void UpdateRespawnMessage(int32 SecondsLeft);
+
+    void StartRespawnCountdown(int32 StartSeconds);
+
+private:
+    FTimerHandle CountdownTimerHandle;
+    int32 SecondsRemaining;
+
+    void TickCountdown(); // 내부 호출용
+
+    UPROPERTY(meta = (BindWidget))
+    class UTextBlock* RespawnCount;
 };

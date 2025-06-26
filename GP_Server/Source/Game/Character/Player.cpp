@@ -625,7 +625,7 @@ void Player::ApplyLevelStats(uint32 level)
 
 	//for test
 	//_stats.MaxHp = newStats->MaxHp;
-	_stats.MaxHp = 10000;
+	_stats.MaxHp = 100;
 
 	_stats.Hp = _stats.MaxHp;
 	_stats.Damage = newStats->Damage;
