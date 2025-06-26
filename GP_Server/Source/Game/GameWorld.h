@@ -31,6 +31,9 @@ public:
 	void RemoveMonster(int32 id);
 	void UpdateAllMonsters();
 
+	//Tino
+	void HandleEarthQuakeImpact(const FVector& rockPos);
+
 	// Inventory
 	void PickUpWorldItem(int32 playerId, uint32 itemId);
 	void UseInventoryItem(int32 playerId, uint32 itemId);

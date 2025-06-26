@@ -139,28 +139,116 @@ void Monster::Look()
 
 void Monster::Attack()
 {
-	if (!_target||_target->IsDead()) return;
-
-	auto player = _target;
-	auto playerID = player->GetInfo().ID;
-
-	float atkDamage = this->GetAttackDamage();
-	if (atkDamage > 0.0f)
+	if (!_target || _target->IsDead()) return;
+	if (GetMonsterType() == Type::EMonster::TINO)
 	{
-		player->OnDamaged(atkDamage);
+		TinoAttack();
+	}
+	else
+		PerformMeleeAttack();
+}
+
+void Monster::TinoAttack()
+{
+	switch (_currentPattern)
+	{
+	case EAttackPattern::EarthQuake:
+		PerformEarthQuake();
+		break;
+	case EAttackPattern::FlameBreath:
+		PerformFlameBreath();
+		break;
+	case EAttackPattern::MeleeAttack:
+		PerformMeleeAttack();
+		break;
 	}
 
-	auto pkt = InfoPacket(EPacketType::S_DAMAGED_PLAYER, player->GetInfo());
-	SessionManager::GetInst().SendPacket(playerID, &pkt);
+	SetNextPattern();
+}
 
-	if (player->IsDead())
+void Monster::PerformEarthQuake()
+{
+	LOG("EarthQuake!");
+
+	int rockCount = 5;
+	if (_info.GetHp() / _info.GetMaxHp() < 0.3f)
+		rockCount = 8;
+
+	for (int i = 0; i < rockCount; ++i)
 	{
-		//temp
-		//todo: 잡큐로 분리하자..
-		TimerQueue::AddTimer([playerID] { GameWorld::GetInst().PlayerDead(playerID);}, 10, false);
-		TimerQueue::AddTimer([playerID] { GameWorld::GetInst().RespawnPlayer(playerID, ZoneType::TUK);}, 3000, false);
+		FVector rockPos = _pos + RandomUtils::GetRandomOffset();
+
+		std::unordered_set<int32> viewListCopy;
+		{
+			std::lock_guard lock(_vlLock);
+			viewListCopy = GetViewList();
+		}
+		auto pkt = Tino::EarthQuakePacket(rockPos);
+		SessionManager::GetInst().BroadcastToViewList(&pkt, viewListCopy);
+
+		TimerQueue::AddTimer([rockPos] { GameWorld::GetInst().HandleEarthQuakeImpact(rockPos);}, 1500, false);
 	}
 }
+
+void Monster::PerformFlameBreath()
+{
+	LOG("FlameBreath!");
+
+	const float range = 600.f;
+	const float angleDeg = 30.f;
+	const float maxDamage = 40.f;
+
+	FVector origin = _pos;
+	FVector forward = _info.GetFrontVector();
+
+	std::unordered_set<int32> viewListCopy;
+	{
+		std::lock_guard lock(_vlLock);
+		viewListCopy = GetViewList();
+	}
+
+	for (int32 id : viewListCopy)
+	{
+		auto player = GameWorld::GetInst().GetPlayerByID(id);
+		if (!player || player->IsDead()) continue;
+
+		const FVector& targetPos = player->GetInfo().Pos;
+		FVector toTarget = (targetPos - origin);
+		float distance = toTarget.Length();
+		if (distance > range) continue;
+
+		FVector toTargetNorm = toTarget.Normalize();
+		float dot = forward.DotProduct(toTargetNorm);
+		float angleToTarget = std::acos(dot) * (180.0f / 3.14159265f);
+
+		if (angleToTarget > angleDeg / 2.0f) continue;
+
+		float ratio = 1.0f - (distance / range);
+		float damage = maxDamage * ratio;
+
+		player->OnDamaged(damage);
+
+		LOG(std::format("FlameBreath hit player [{}] - dist: {:.1f}, damage: {:.1f}", id, distance, damage));
+		auto flamePkt = Tino::FlameBreathPacket(origin, forward, range, angleDeg);
+		SessionManager::GetInst().BroadcastToViewList(&flamePkt, viewListCopy);
+	}
+}
+
+
+void Monster::PerformMeleeAttack()
+{
+	if (IsTargetInAttackRange())
+	{
+		_target->OnDamaged(GetAttackDamage());
+	}
+}
+
+void Monster::SetNextPattern()
+{
+	int randomIndex = RandomUtils::GetRandomInt(0, 2);
+	_currentPattern = static_cast<EAttackPattern>(randomIndex);
+}
+
 
 void Monster::Chase()
 {
@@ -175,7 +263,10 @@ void Monster::Chase()
 	}
 
 	LOG("Chase!");
+	//todo: 길찾기로 처리 하자 지금
 	auto playerPos = _target->GetInfo().Pos;
+	playerPos.Z = _target->GetInfo().Pos.Z;
+
 	FVector dir = (playerPos - _pos).Normalize();
 	FVector dist = dir * _info.GetSpeed();
 	if (dist.Length() < _pos.DistanceTo(playerPos) - _info.AttackRadius)

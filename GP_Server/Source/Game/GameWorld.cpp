@@ -418,6 +418,34 @@ void GameWorld::UpdateAllMonsters()
 	}
 }
 
+void GameWorld::HandleEarthQuakeImpact(const FVector& rockPos)
+{
+	const float damageRadius = 120.f;
+	const float maxDamage = 50.f;
+
+	std::lock_guard lock(_mtPlayerZMap);
+
+	auto it = _playersByZone.find(ZoneType::GYM);
+	if (it == _playersByZone.end()) return;
+
+	for (auto& [id, player] : it->second)
+	{
+		if (!player || player->IsDead()) continue;
+
+		const FVector& playerPos = player->GetInfo().Pos;
+		float distSq = (playerPos - rockPos).LengthSquared();
+		if (distSq <= damageRadius * damageRadius)
+		{
+			float dist = std::sqrt(distSq);
+			float ratio = 1.0f - (dist / damageRadius);
+			float damage = maxDamage * ratio;
+
+			LOG(std::format("EarthQuake hit player [{}] for {:.1f} damage", id, damage));
+			player->OnDamaged(damage);
+		}
+	}
+}
+
 
 bool GameWorld::RemoveWorldItem(std::shared_ptr<WorldItem> item)
 {
