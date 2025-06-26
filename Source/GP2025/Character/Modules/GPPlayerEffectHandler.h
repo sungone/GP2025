@@ -33,4 +33,9 @@ public:
 
     UPROPERTY(EditDefaultsOnly, Category = "Effects")
     class UNiagaraSystem* LevelUpEffect;
+
+    void PlayEarthQuakeRock(const FVector& RockPos);
+
+    UPROPERTY(EditDefaultsOnly, Category = "Effects")
+    TSubclassOf<class AGPEarthQuakeRockActor> EarthQuakeRockActorClass;
 };

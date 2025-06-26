@@ -408,32 +408,71 @@ void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage
 
 void UGPObjectManager::PlayEarthQuakeEffect(const FVector& RockPos, bool bDebug)
 {
+	if (!MyPlayer)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[PlayEarthQuakeEffect] MyPlayer is nullptr"));
+		return;
+	}
+
+	if (!MyPlayer->EffectHandler)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[PlayEarthQuakeEffect] EffectHandler is nullptr"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("[PlayEarthQuakeEffect] Call with RockPos: %s, bDebug: %s"),
+		*RockPos.ToString(),
+		bDebug ? TEXT("true") : TEXT("false"));
+
 	UWorld* WorldContext = GetWorld();
 	if (!WorldContext) return;
 
-	// 색상 강조: 진한 주황색과 빨간색
-	const FColor SphereColor = (bDebug) ? FColor::Red : FColor::Yellow;
-	const FColor LineColor = FColor::Yellow;
+	{
 
-	DrawDebugSphere(
-		WorldContext,
-		RockPos,
-		100.f,
-		24,
-		SphereColor,
-		false,
-		1.0f
+		const FColor SphereColor = (bDebug) ? FColor::Red : FColor::Yellow;
+		const FColor LineColor = FColor::Yellow;
+
+		DrawDebugSphere(
+			WorldContext,
+			RockPos,
+			100.f,
+			24,
+			SphereColor,
+			false,
+			1.0f
+		);
+		DrawDebugLine(
+			WorldContext,
+			RockPos + FVector(0, 0, 500.f),
+			RockPos,
+			LineColor,
+			false,
+			3.0f,
+			0,
+			1.0f
+		);
+
+		if (bDebug) return;
+	}
+
+	FTimerDelegate DelayedRockDelegate;
+	DelayedRockDelegate.BindLambda([=, this]()
+		{
+			if (MyPlayer && MyPlayer->EffectHandler)
+			{
+				MyPlayer->EffectHandler->PlayEarthQuakeRock(RockPos);
+				UE_LOG(LogTemp, Log, TEXT("[PlayEarthQuakeEffect] Rock effect triggered after delay."));
+			}
+		});
+
+	FTimerHandle DelayHandle;
+	WorldContext->GetTimerManager().SetTimer(
+		DelayHandle,
+		DelayedRockDelegate,
+		0.5f, // ← 0.5초 딜레이
+		false
 	);
-	DrawDebugLine(
-		WorldContext,
-		RockPos + FVector(0, 0, 500.f),
-		RockPos,
-		LineColor,
-		false,
-		3.0f,
-		0,
-		1.0f
-	);
+
 }
 
 void UGPObjectManager::PlayFlameBreathEffect(const FVector& Origin, const FVector& Dir, float Range, float Angle)

@@ -7,6 +7,7 @@
 // #include "Engine/SkeletalMeshSocket.h"
 #include "Character/Modules/GPPlayerAppearanceHandler.h"
 #include "Character/Modules/GPPlayerEffectHandler.h"
+#include "Boss/GPEarthQuakeRockActor.h"
 #include "Character/Modules/GPCharacterUIHandler.h"
 #include "GPCharacterPlayer.h"
 
@@ -68,7 +69,7 @@ void AGPCharacterPlayer::PostInitializeComponents()
         if (EffectHandler)
         {
             EffectHandler->Init(this);
-         
+            EffectHandler->EarthQuakeRockActorClass = AGPEarthQuakeRockActor::StaticClass();
         }
     }
 

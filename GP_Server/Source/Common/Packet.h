@@ -621,6 +621,7 @@ namespace Tino
 			Header.PacketSize = sizeof(EarthQuakePacket);
 		}
 	};
+
 	struct FlameBreathPacket : public Packet
 	{
 		FVector Origin;     // 시작 위치 (몬스터 위치)
