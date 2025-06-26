@@ -449,7 +449,7 @@ void GameWorld::HandleEarthQuakeImpact(const FVector& rockPos)
 
 			auto pkt = Tino::EarthQuakePacket(rockPos, true);
 			SessionManager::GetInst().SendPacket(player->GetInfo().ID, &pkt);
-			//player->OnDamaged(damage);
+			player->OnDamaged(damage);
 		}
 	}
 }

@@ -453,7 +453,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_FLAME_BREATH:
 			{
 				Tino::FlameBreathPacket* Pkt = reinterpret_cast<Tino::FlameBreathPacket*>(RemainingData.GetData());
-				ObjectMgr->PlayFlameBreathEffect(Pkt->Origin, Pkt->Direction, Pkt->Range, Pkt->AngleDeg);
+				ObjectMgr->PlayFlameBreathEffect(Pkt->Origin, Pkt->Direction, Pkt->Range, Pkt->AngleDeg, Pkt->bDebug);
 				break;
 			}
 #pragma endregion
