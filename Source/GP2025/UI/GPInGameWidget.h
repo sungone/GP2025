@@ -50,6 +50,9 @@ public :
     UPROPERTY(meta = (BindWidget))
     class UGPChatBoxWidget* ChatBoxWidget;
 
+    UPROPERTY(meta = (BindWidget))
+    class UTextBlock* GameMessage;
+
 public :
     void UpdateHealthBar(float Ratio);
     void UpdateExpBar(float Ratio);
