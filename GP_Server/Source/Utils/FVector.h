@@ -73,3 +73,13 @@ struct FVector
 };
 
 inline const FVector FVector::ZeroVector = FVector(0.0, 0.0, 0.0);
+
+inline double DegreesToRadians(double degrees)
+{
+	return degrees * (3.14159265358979323846 / 180.0);
+}
+
+inline double RadiansToDegrees(double radians)
+{
+	return radians * (180.0 / 3.14159265358979323846);
+}
