@@ -4,6 +4,7 @@
 #include "UI/GPInGameWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/ProgressBar.h"
+#include "Components/Border.h"
 #include "Components/TextBlock.h"
 #include "Styling/SlateColor.h"
 #include "GPInGameWidget.h"
@@ -66,3 +67,33 @@ FSlateColor UGPInGameWidget::GetRSkillTextColor()
 
     return FSlateColor(FLinearColor::White);
 }
+
+void UGPInGameWidget::ShowGameMessage(const FString& Message, float Duration)
+{
+    if (!GameMessage) return;
+
+    GameMessage->SetText(FText::FromString(Message));
+    GameMessageBox->SetVisibility(ESlateVisibility::Visible);
+    // GameMessage->SetVisibility(ESlateVisibility::Visible);
+
+    PlayGameMessageFadeIn();
+
+    FTimerHandle TimerHandle;
+    GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+        {
+            PlayGameMessageFadeOut();
+            FTimerHandle HideHandle;
+            GetWorld()->GetTimerManager().SetTimer(HideHandle, [this]()
+                {
+                    GameMessageBox->SetVisibility(ESlateVisibility::Collapsed);
+                }, 1.0f, false); 
+
+        }, Duration, false);
+}
+
+//void UGPInGameWidget::HideGameMessage()
+//{
+//    PlayGameMessageFadeOut();
+//}
+
+

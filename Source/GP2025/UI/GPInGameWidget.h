@@ -50,8 +50,7 @@ public :
     UPROPERTY(meta = (BindWidget))
     class UGPChatBoxWidget* ChatBoxWidget;
 
-    UPROPERTY(meta = (BindWidget))
-    class UTextBlock* GameMessage;
+
 
 public :
     void UpdateHealthBar(float Ratio);
@@ -61,4 +60,22 @@ public :
     struct FSlateColor GetQSkillTextColor();
     struct FSlateColor GetESkillTextColor();
     struct FSlateColor GetRSkillTextColor();
+
+public:
+    UPROPERTY(meta = (BindWidget))
+    class UBorder* GameMessageBox;
+
+    UPROPERTY(meta = (BindWidget))
+    class UTextBlock* GameMessage;
+
+    void ShowGameMessage(const FString& Message, float Duration = 3.0f);
+
+    UFUNCTION(BlueprintImplementableEvent, Category = "Game Message")
+    void PlayGameMessageFadeIn();
+
+    UFUNCTION(BlueprintImplementableEvent, Category = "Game Message")
+    void PlayGameMessageFadeOut();
+
+    //FTimerHandle GameMessageTimerHandle;
+    //void HideGameMessage();
 };
