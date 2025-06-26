@@ -178,7 +178,7 @@ void Monster::PerformEarthQuake()
 
 	for (int i = 0; i < rockCount; ++i)
 	{
-		FVector rockPos = _target->GetInfo().Pos + RandomUtils::GetRandomOffset(100, 300, 0);
+		FVector rockPos = _target->GetInfo().Pos + RandomUtils::GetRandomOffset(0, 300, 0);
 
 		std::unordered_set<int32> viewListCopy;
 		{
@@ -188,7 +188,7 @@ void Monster::PerformEarthQuake()
 		auto pkt = Tino::EarthQuakePacket(rockPos);
 		SessionManager::GetInst().BroadcastToViewList(&pkt, viewListCopy);
 
-		TimerQueue::AddTimer([rockPos] { GameWorld::GetInst().HandleEarthQuakeImpact(rockPos);}, 1500, false);
+		TimerQueue::AddTimer([rockPos] { GameWorld::GetInst().HandleEarthQuakeImpact(rockPos);}, 500, false);
 	}
 }
 

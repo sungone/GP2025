@@ -420,7 +420,7 @@ void UGPObjectManager::PlayEarthQuakeEffect(const FVector& RockPos, bool bDebug)
 		RockPos,
 		100.f,
 		24,
-		FColor::Red,
+		SphereColor,
 		false,
 		2.0f
 	);
@@ -428,7 +428,7 @@ void UGPObjectManager::PlayEarthQuakeEffect(const FVector& RockPos, bool bDebug)
 		WorldContext,
 		RockPos + FVector(0, 0, 500.f),
 		RockPos,
-		FColor::Red,
+		LineColor,
 		false,
 		3.0f,
 		0,

@@ -447,7 +447,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_EARTH_QUAKE:
 			{
 				Tino::EarthQuakePacket* Pkt = reinterpret_cast<Tino::EarthQuakePacket*>(RemainingData.GetData());
-				ObjectMgr->PlayEarthQuakeEffect(Pkt->RockPos);
+				ObjectMgr->PlayEarthQuakeEffect(Pkt->RockPos, Pkt->bDebug);
 				break;
 			}
 			case EPacketType::S_FLAME_BREATH:
