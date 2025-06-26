@@ -24,7 +24,7 @@ void UAnimNotify_TinoAttackEffect::Notify(USkeletalMeshComponent* MeshComp, UAni
 
 	if (EffectComp)
 	{
-		EffectComp->SetRelativeScale3D(FVector(3.f)); 
+		EffectComp->SetRelativeScale3D(FVector(10.f)); 
 	}
 }
 
