@@ -10,7 +10,7 @@ public:
 	virtual void Update() {};
 	virtual bool IsDead();
 
-	void OnDamaged(float damage);
+	virtual void OnDamaged(float damage);
 	virtual float GetAttackDamage() = 0;
 
 	bool IsCollision(const FVector& pos, const float dist);

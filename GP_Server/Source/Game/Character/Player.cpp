@@ -81,6 +81,22 @@ void Player::OnEnterGame()
 	}
 }
 
+void Player::OnDamaged(float damage)
+{
+	Character::OnDamaged(damage);
+	auto pkt = InfoPacket(EPacketType::S_DAMAGED_PLAYER, GetInfo());
+	SessionManager::GetInst().SendPacket(_id, &pkt);
+	if (IsDead())
+	{
+		_info.AddState(ECharacterStateType::STATE_DIE);
+		//temp
+		//todo: 잡큐로 분리하자..
+		auto playerID = _id;
+		TimerQueue::AddTimer([playerID] { GameWorld::GetInst().PlayerDead(playerID);}, 10, false);
+		TimerQueue::AddTimer([playerID] { GameWorld::GetInst().RespawnPlayer(playerID, ZoneType::TUK);}, 3000, false);
+	}
+}
+
 void Player::UpdateViewList(std::shared_ptr<Character> other)
 {
 	if (!other)

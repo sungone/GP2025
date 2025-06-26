@@ -13,6 +13,7 @@ public:
 	void SetCharacterType(Type::EPlayer type);
 	void OnEnterGame();
 
+	void OnDamaged(float damage) override;
 	void UpdateViewList(std::shared_ptr<Character> other) override;
 	void AddMonsterToViewList(std::shared_ptr<Character> monster);
 	void AddPlayerToViewList(std::shared_ptr<Character> player);
