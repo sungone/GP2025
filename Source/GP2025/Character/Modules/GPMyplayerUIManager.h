@@ -31,6 +31,9 @@ public:
 
 	void CloseInventory();
 
+	UPROPERTY()
+	bool bIsInventoryOpen = false;
+
 	// Setting
 	void OpenSettingWidget();
 

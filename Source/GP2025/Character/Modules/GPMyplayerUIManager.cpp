@@ -148,6 +148,7 @@ void UGPMyplayerUIManager::OpenInventory()
 		}
 
 		InventoryWidget->AddToViewport();
+		bIsInventoryOpen = true;
 
 		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
 		if (PC)
@@ -170,6 +171,7 @@ void UGPMyplayerUIManager::CloseInventory()
 	if (InventoryWidget->IsInViewport())
 	{
 		InventoryWidget->RemoveFromParent();
+		bIsInventoryOpen = false;
 
 		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
 		if (PC)

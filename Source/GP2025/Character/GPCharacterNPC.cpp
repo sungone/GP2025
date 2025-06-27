@@ -106,6 +106,8 @@ void AGPCharacterNPC::OpenShopUI(APlayerController* PlayerController)
 		{
 			AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(PlayerController->GetPawn());
 
+			if (MyPlayer->UIManager->bIsInventoryOpen) return;
+
 			if (UGPShop* LocalShopWidget = Cast<UGPShop>(ShopWidget))
 			{
 				LocalShopWidget->SetOwningNPC(this);  // Owning NPC 설정
