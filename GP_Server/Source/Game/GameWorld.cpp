@@ -217,6 +217,7 @@ void GameWorld::PlayerAttack(int32 playerId)
 		std::lock_guard lock(player->_vlLock);
 		viewList = player->GetViewList();
 	}
+	auto zone = player->GetZone();
 	for (int32 targetId : viewList)
 	{
 		if (!IsMonster(targetId)) continue;
@@ -240,14 +241,13 @@ void GameWorld::PlayerAttack(int32 playerId)
 					{
 						FVector itemPos = basePos + RandomUtils::GetRandomOffset();
 						auto dropedItem = WorldItem(dropId, itemPos);
-						SpawnWorldItem(dropedItem);
+						SpawnWorldItem(dropedItem, zone);
 					}
 
 					player->GiveQuestReward(mquest);
 				}
 				else if (mquest == QuestType::CH2_CLEAR_E_BUILDING || mquest == QuestType::CH3_CLEAR_SERVER_ROOM)
 				{
-					auto zone = monster->GetZone();
 					_monsterCnt[zone]--;
 					if (_monsterCnt[zone] == 1)
 					{
@@ -259,9 +259,9 @@ void GameWorld::PlayerAttack(int32 playerId)
 			//todo: 아이템 드랍테이블로 스폰하자
 			{
 				FVector itemPos = basePos + RandomUtils::GetRandomOffset();
-				SpawnWorldItem(itemPos, monlv, playertype);
+				SpawnWorldItem(itemPos, monlv, playertype, zone);
 				FVector goldPos = basePos + RandomUtils::GetRandomOffset();
-				SpawnGoldItem(goldPos);
+				SpawnGoldItem(goldPos, zone);
 			}
 
 			RemoveMonster(targetId);
@@ -455,77 +455,80 @@ void GameWorld::HandleEarthQuakeImpact(const FVector& rockPos)
 }
 
 
-bool GameWorld::RemoveWorldItem(std::shared_ptr<WorldItem> item)
+bool GameWorld::RemoveWorldItem(uint32 itemId, ZoneType zone)
 {
-	if (!item) return false;
-
-	auto it = std::remove_if(_worldItems.begin(), _worldItems.end(),
-		[&item](const std::shared_ptr<WorldItem>& worldItem) {
-			return worldItem == item;
+	std::lock_guard<std::mutex> lock(_mtItemZMap);
+	auto& items = _worldItemsByZone[zone];
+	auto it = std::remove_if(items.begin(), items.end(),
+		[itemId](const std::shared_ptr<WorldItem>& item) {
+			return item->GetItemID() == itemId;
 		});
-
-	if (it != _worldItems.end())
+	if (it != items.end())
 	{
-		_worldItems.erase(it, _worldItems.end());
+		items.erase(it, items.end());
 		return true;
 	}
 	return false;
 }
 
-std::shared_ptr<WorldItem> GameWorld::FindWorldItemById(uint32 itemId)
+std::shared_ptr<WorldItem> GameWorld::FindWorldItemById(uint32 itemId, ZoneType zone)
 {
-	auto it = std::find_if(_worldItems.begin(), _worldItems.end(),
+	std::lock_guard<std::mutex> lock(_mtItemZMap);
+
+	auto zoneIt = _worldItemsByZone.find(zone);
+	if (zoneIt == _worldItemsByZone.end()) return nullptr;
+
+	auto& itemList = zoneIt->second;
+	auto it = std::find_if(itemList.begin(), itemList.end(),
 		[itemId](const std::shared_ptr<WorldItem>& item) {
 			return item->GetItemID() == itemId;
 		});
 
-	if (it != _worldItems.end())
-	{
+	if (it != itemList.end())
 		return *it;
-	}
+
 	return nullptr;
 }
 
-void GameWorld::SpawnGoldItem(FVector position)
+void GameWorld::SpawnGoldItem(FVector position, ZoneType zone)
 {
-	std::lock_guard<std::mutex> lock(_mtItem);
+	std::lock_guard<std::mutex> lock(_mtItemZMap);
 	auto newItem = std::make_shared<WorldItem>(position);
-
+	_worldItemsByZone[zone].emplace_back(newItem);
 	ItemPkt::SpawnPacket packet(newItem->GetItemID(), newItem->GetItemTypeID(), position);
-	_worldItems.emplace_back(newItem);
-	SessionManager::GetInst().BroadcastToAll(&packet);
+	BroadcastToZone(zone, &packet);
+
 }
 
-void GameWorld::SpawnWorldItem(FVector position, uint32 monlv, Type::EPlayer playertype)
+void GameWorld::SpawnWorldItem(FVector position, uint32 monlv, Type::EPlayer playertype, ZoneType zone)
 {
-	std::lock_guard<std::mutex> lock(_mtItem);
+	std::lock_guard<std::mutex> lock(_mtItemZMap);
 	auto newItem = std::make_shared<WorldItem>(position, monlv, playertype);
-
+	_worldItemsByZone[zone].emplace_back(newItem);
 	ItemPkt::SpawnPacket packet(newItem->GetItemID(), newItem->GetItemTypeID(), position);
-	_worldItems.emplace_back(newItem);
-	SessionManager::GetInst().BroadcastToAll(&packet);
+	BroadcastToZone(zone, &packet);
 }
 
-void GameWorld::SpawnWorldItem(WorldItem dropedItem)
+void GameWorld::SpawnWorldItem(WorldItem dropedItem, ZoneType zone)
 {
-	std::lock_guard<std::mutex> lock(_mtItem);
+	std::lock_guard<std::mutex> lock(_mtItemZMap);
 	auto newItem = std::make_shared<WorldItem>(dropedItem);
-	_worldItems.emplace_back(newItem);
+	_worldItemsByZone[zone].emplace_back(newItem);
 	ItemPkt::DropPacket packet(newItem->GetItemID(), newItem->GetItemTypeID(), newItem->GetPos());
-	SessionManager::GetInst().BroadcastToAll(&packet);
+	BroadcastToZone(zone, &packet);
 }
 
 void GameWorld::PickUpWorldItem(int32 playerId, uint32 itemId)
 {
-	std::lock_guard<std::mutex> lock(_mtItem);
+	std::lock_guard<std::mutex> lock(_mtItemZMap);
 	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
 		LOG(Warning, "Invalid player in PickUpWorldItem");
 		return;
 	}
-
-	auto targetItem = FindWorldItemById(itemId);
+	auto zone = player->GetZone();
+	auto targetItem = FindWorldItemById(itemId, zone);
 	if (!targetItem)
 	{
 		LOG(Warning, "Invalid");
@@ -534,11 +537,11 @@ void GameWorld::PickUpWorldItem(int32 playerId, uint32 itemId)
 
 	if (player->TakeWorldItem(targetItem))
 	{
-		RemoveWorldItem(targetItem);
+		RemoveWorldItem(itemId, zone);
 		auto pkt = ItemPkt::AddInventoryPacket(targetItem->GetItemID(), targetItem->GetItemTypeID());
 		SessionManager::GetInst().SendPacket(playerId, &pkt);
 		auto pkt1 = ItemPkt::PickUpPacket(itemId);
-		SessionManager::GetInst().BroadcastToAll(&pkt1);
+		BroadcastToZone(zone, &pkt1);
 	}
 	else
 	{
@@ -855,5 +858,22 @@ void GameWorld::SellItem(int32 playerId, uint32 itemId)
 		return;
 	}
 	player->SellItem(itemId);
+}
+
+void GameWorld::BroadcastToZone(ZoneType zone, Packet* packet)
+{
+	std::lock_guard<std::mutex> lock(_mtPlayerZMap);
+
+	auto it = _playersByZone.find(zone);
+	if (it == _playersByZone.end())
+		return;
+
+	for (auto& [playerId, player] : it->second)
+	{
+		if (player)
+		{
+			SessionManager::GetInst().SendPacket(playerId, packet);
+		}
+	}
 }
 

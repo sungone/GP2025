@@ -42,12 +42,12 @@ public:
 	void UnequipInventoryItem(int32 playerId, uint32 itemId);
 
 	// World Item
-	bool RemoveWorldItem(std::shared_ptr<WorldItem> item);
-	std::shared_ptr<WorldItem> FindWorldItemById(uint32 itemId);
-	void SpawnGoldItem(FVector position);
+	bool RemoveWorldItem(uint32 itemId, ZoneType zone);
+	std::shared_ptr<WorldItem> FindWorldItemById(uint32 itemId, ZoneType zone);
+	void SpawnGoldItem(FVector position, ZoneType zone);
 
-	void SpawnWorldItem(FVector position, uint32 monlv, Type::EPlayer playertype);
-	void SpawnWorldItem(WorldItem newItem);
+	void SpawnWorldItem(FVector position, uint32 monlv, Type::EPlayer playertype, ZoneType zone);
+	void SpawnWorldItem(WorldItem newItem, ZoneType zone);
 
 	// Etc
 	FVector TransferToZone(int32 playerId, ZoneType targetZone);
@@ -62,6 +62,7 @@ public:
 	void BuyItem(int32 playerId, uint8 itemType, uint16 quantity);
 	void SellItem(int32 playerId, uint32 itemId);
 
+	void BroadcastToZone(ZoneType zone, Packet* packet);
 
 	std::shared_ptr<Player> GetPlayerByID(int32 id);
 	std::shared_ptr<Monster> GetMonsterByID(int32 id);
@@ -73,12 +74,12 @@ private:
 	std::array<std::shared_ptr<Player>, MAX_PLAYER> _players;
 	std::unordered_map<ZoneType, std::unordered_map<int32, std::shared_ptr<Player>>> _playersByZone;
 	std::unordered_map<ZoneType, std::unordered_map<int32, std::shared_ptr<Monster>>> _monstersByZone;
-	std::vector<std::shared_ptr<WorldItem>> _worldItems;
+	std::unordered_map<ZoneType, std::vector<std::shared_ptr<WorldItem>>> _worldItemsByZone;
 
 	std::mutex _mtPlayers;
 	std::mutex _mtPlayerZMap;
 	std::mutex _mtMonZMap;
-	std::mutex _mtItem;
+	std::mutex _mtItemZMap;
 	int32 _nextMonsterId = MAX_PLAYER;
 	std::unordered_map<ZoneType, int32> _monsterCnt;
 };
