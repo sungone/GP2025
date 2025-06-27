@@ -48,6 +48,7 @@ public:
 
 	void SpawnWorldItem(FVector position, uint32 monlv, Type::EPlayer playertype, ZoneType zone);
 	void SpawnWorldItem(WorldItem newItem, ZoneType zone);
+	void DespawnWorldItem(uint32 itemId, ZoneType zone);
 
 	// Etc
 	FVector TransferToZone(int32 playerId, ZoneType targetZone);

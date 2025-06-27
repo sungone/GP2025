@@ -495,9 +495,14 @@ void GameWorld::SpawnGoldItem(FVector position, ZoneType zone)
 	std::lock_guard<std::mutex> lock(_mtItemZMap);
 	auto newItem = std::make_shared<WorldItem>(position);
 	_worldItemsByZone[zone].emplace_back(newItem);
-	ItemPkt::SpawnPacket packet(newItem->GetItemID(), newItem->GetItemTypeID(), position);
+	
+	auto itemId = newItem->GetItemID();
+	ItemPkt::SpawnPacket packet(itemId, newItem->GetItemTypeID(), position);
 	BroadcastToZone(zone, &packet);
 
+	TimerQueue::AddTimer([itemId, zone]() {
+		GameWorld::GetInst().DespawnWorldItem(itemId, zone);
+		}, ITEM_DISAPPEAR_TIME_MS, false);
 }
 
 void GameWorld::SpawnWorldItem(FVector position, uint32 monlv, Type::EPlayer playertype, ZoneType zone)
@@ -505,8 +510,14 @@ void GameWorld::SpawnWorldItem(FVector position, uint32 monlv, Type::EPlayer pla
 	std::lock_guard<std::mutex> lock(_mtItemZMap);
 	auto newItem = std::make_shared<WorldItem>(position, monlv, playertype);
 	_worldItemsByZone[zone].emplace_back(newItem);
-	ItemPkt::SpawnPacket packet(newItem->GetItemID(), newItem->GetItemTypeID(), position);
+
+	auto itemId = newItem->GetItemID();
+	ItemPkt::SpawnPacket packet(itemId, newItem->GetItemTypeID(), position);
 	BroadcastToZone(zone, &packet);
+
+	TimerQueue::AddTimer([itemId, zone]() {
+		GameWorld::GetInst().DespawnWorldItem(itemId, zone);
+		}, ITEM_DISAPPEAR_TIME_MS, false);
 }
 
 void GameWorld::SpawnWorldItem(WorldItem dropedItem, ZoneType zone)
@@ -514,8 +525,36 @@ void GameWorld::SpawnWorldItem(WorldItem dropedItem, ZoneType zone)
 	std::lock_guard<std::mutex> lock(_mtItemZMap);
 	auto newItem = std::make_shared<WorldItem>(dropedItem);
 	_worldItemsByZone[zone].emplace_back(newItem);
-	ItemPkt::DropPacket packet(newItem->GetItemID(), newItem->GetItemTypeID(), newItem->GetPos());
+
+	int32 itemId = newItem->GetItemID();  
+	ItemPkt::DropPacket packet(itemId, newItem->GetItemTypeID(), newItem->GetPos());
 	BroadcastToZone(zone, &packet);
+
+	TimerQueue::AddTimer([itemId, zone]() {
+		GameWorld::GetInst().DespawnWorldItem(itemId, zone);
+		}, ITEM_DISAPPEAR_TIME_MS, false);
+}
+
+void GameWorld::DespawnWorldItem(uint32 itemId, ZoneType zone)
+{
+	std::lock_guard<std::mutex> lock(_mtItemZMap);
+
+	auto& itemList = _worldItemsByZone[zone];
+	auto item = std::find_if(itemList.begin(), itemList.end(),
+		[itemId](const std::shared_ptr<WorldItem>& item) {
+			return item->GetItemID() == itemId;
+		});
+
+	if (item == itemList.end())
+		return;
+
+	auto pos = (*item)->GetPos();
+	itemList.erase(item);
+
+	auto pkt = ItemPkt::DespawnPacket(itemId);
+	BroadcastToZone(zone, &pkt);
+
+	LOG(std::format("Item [{}] auto-despawned", itemId));
 }
 
 void GameWorld::PickUpWorldItem(int32 playerId, uint32 itemId)
