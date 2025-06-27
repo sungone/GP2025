@@ -14,6 +14,8 @@
 #include "Inventory/GPItemSlot.h"
 #include "Components/TextBlock.h"
 #include "UI/GPNPCInteractionText.h"
+#include "UI/GPInGameWidget.h"
+#include "Character/Modules/GPMyplayerSoundManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Character/Modules/GPMyplayerUIManager.h"
 #include "Character/GPCharacterMyplayer.h"
@@ -201,14 +203,12 @@ void AGPCharacterNPC::OpenQuestUI(APlayerController* PlayerController)
 			if (UGPQuestWidget* LocalQuestWidget = Cast<UGPQuestWidget>(QuestWidget))
 			{
 				LocalQuestWidget->OwningNPC = this;
-
 				switch (NPCType)
 				{
 				case ENPCType::PROFESSOR:
 					LocalQuestWidget->SetQuestTitle(TEXT("교수님"));
 					LocalQuestWidget->SetQuestDescription(TEXT("어서오게나"));
 					break;
-
 				case ENPCType::STUDENT:
 					LocalQuestWidget->SetQuestTitle(TEXT("학생 A"));
 					LocalQuestWidget->SetQuestDescription(TEXT("안녕하세요! 도와주실 수 있나요?"));
@@ -262,6 +262,19 @@ void AGPCharacterNPC::CloseQuestUI()
 	bIsInteracting = false;
 }
 
+void AGPCharacterNPC::ShowQuestNotAvailableMessage(AGPCharacterMyplayer* MyPlayer, const FString& Message)
+{
+	if (MyPlayer && MyPlayer->UIManager && MyPlayer->UIManager->GetInGameWidget())
+	{
+		MyPlayer->UIManager->GetInGameWidget()->ShowGameMessage(Message, 3.0f);
+	}
+
+	if (MyPlayer && MyPlayer->SoundManager && MyPlayer->SoundManager->WarningSound)
+	{
+		MyPlayer->SoundManager->PlaySFX(MyPlayer->SoundManager->WarningSound);
+	}
+}
+
 void AGPCharacterNPC::OnInteractionStart(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(OtherActor);
@@ -308,7 +321,6 @@ void AGPCharacterNPC::OnInteractionExit(UPrimitiveComponent* OverlappedComp, AAc
 void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 {
 	if (!MyPlayer || !MyPlayer->InputHandler) return;
-
 	APlayerController* PC = Cast<APlayerController>(MyPlayer->GetController());
 	if (!PC) return;
 	if (bIsInteracting)
@@ -331,8 +343,44 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 		bIsInteracting = true;
 		break;
 	case ENPCType::PROFESSOR:
+		if (MyPlayer->CharacterInfo.CurrentQuest.QuestType != QuestType::CH3_RETURN_TO_TIP_WITH_DOC)
+		{
+			ShowQuestNotAvailableMessage(MyPlayer, TEXT("퀘스트를 진행하세요"));
+			return;
+		}
+
+		MyPlayer->CameraHandler->StartDialogueCamera(GetActorLocation());
+		GetWorld()->GetTimerManager().SetTimer(
+			QuestOpenUITimerHandle,
+			this,
+			&AGPCharacterNPC::OpenQuestUIDelayed,
+			1.f,
+			false
+		);
+		break;
 	case ENPCType::STUDENT:
+		if (MyPlayer->CharacterInfo.CurrentQuest.QuestType != QuestType::CH1_TALK_TO_STUDENT_A)
+		{
+			ShowQuestNotAvailableMessage(MyPlayer, TEXT("퀘스트를 진행하세요"));
+			return;
+		}
+
+		MyPlayer->CameraHandler->StartDialogueCamera(GetActorLocation());
+		GetWorld()->GetTimerManager().SetTimer(
+			QuestOpenUITimerHandle,
+			this,
+			&AGPCharacterNPC::OpenQuestUIDelayed,
+			1.f,
+			false
+		);
+		break;
 	case ENPCType::SECURITY:
+		if (MyPlayer->CharacterInfo.CurrentQuest.QuestType != QuestType::CH1_FIND_JANITOR)
+		{
+			ShowQuestNotAvailableMessage(MyPlayer, TEXT("퀘스트를 진행하세요"));
+			return;
+		}
+
 		MyPlayer->CameraHandler->StartDialogueCamera(GetActorLocation());
 		GetWorld()->GetTimerManager().SetTimer(
 			QuestOpenUITimerHandle,

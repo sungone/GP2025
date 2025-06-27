@@ -90,4 +90,6 @@ public :
 
 	void OpenQuestUI(APlayerController* PlayerController);
 	void CloseQuestUI();
+
+	void ShowQuestNotAvailableMessage(AGPCharacterMyplayer* MyPlayer, const FString& Message);
 };
