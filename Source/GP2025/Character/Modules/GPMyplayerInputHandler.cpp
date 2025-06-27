@@ -336,6 +336,12 @@ void UGPMyplayerInputHandler::StartAiming()
 {
 	if (!Owner || !Owner->bIsGunnerCharacter()) return;
 
+	if (!Owner->HasWeaponEquipped())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Aiming] Gunner has no weapon equipped. Zoom disabled."));
+		return;
+	}
+
 	if (Owner->SoundManager)
 	{
 		Owner->SoundManager->PlaySFX(Owner->SoundManager->GunnerPlayerZoomSound);
