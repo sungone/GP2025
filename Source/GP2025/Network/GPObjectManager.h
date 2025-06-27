@@ -41,6 +41,7 @@ public:
 	void PlayFlameBreathEffect(const FVector& Origin, const FVector& Dir, float Range, float Angle, bool bDebug);
 
 	void ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos);
+	void ItemPickUp(uint32 ItemID);
 	void ItemDespawn(uint32 ItemID);
 	void DropItem(uint32 ItemID, uint8 ItemType, FVector Pos);
 	void AddInventoryItem(uint32 ItemID, uint8 ItemType);

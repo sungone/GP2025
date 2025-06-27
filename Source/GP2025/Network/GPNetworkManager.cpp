@@ -473,8 +473,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_ITEM_PICKUP:
 			{
 				ItemPkt::PickUpPacket* Pkt = reinterpret_cast<ItemPkt::PickUpPacket*>(RemainingData.GetData());
-				//Todo: 추후 pick up이랑 despawn 구분하기
-				ObjectMgr->ItemDespawn(Pkt->ItemID);
+				ObjectMgr->ItemPickUp(Pkt->ItemID);
 				break;
 			}
 			case EPacketType::S_ITEM_DROP:

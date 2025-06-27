@@ -547,8 +547,7 @@ void UGPObjectManager::ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos)
 	Items.Add(ItemID, SpawnedItem);
 	UE_LOG(LogTemp, Log, TEXT("[ItemSpawn] Item [%d] successfully added to Items map"), ItemID);
 }
-
-void UGPObjectManager::ItemDespawn(uint32 ItemID)
+void UGPObjectManager::ItemPickUp(uint32 ItemID)
 {
 	if (!World || !IsValid(World))
 	{
@@ -585,6 +584,50 @@ void UGPObjectManager::ItemDespawn(uint32 ItemID)
 					UE_LOG(LogTemp, Warning, TEXT("[ItemDespawn] Item [%d] was not found in Items map during removal"), ItemID);
 				}
 			}, 0.1f, false);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[ItemDespawn] Item [%d] is invalid, removing directly"), ItemID);
+		Items.Remove(ItemID);
+	}
+}
+void UGPObjectManager::ItemDespawn(uint32 ItemID)
+{
+	if (!World || !IsValid(World))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[ItemDespawn] World is invalid"));
+		return;
+	}
+	UE_LOG(LogTemp, Log, TEXT("[ItemDespawn] World is valid"));
+
+	TWeakObjectPtr<AGPItem>* ItemPtr = Items.Find(ItemID);
+	if (!ItemPtr || !ItemPtr->IsValid())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[ItemDespawn] Item [%d] not found or already destroyed"), ItemID);
+		Items.Remove(ItemID);
+		return;
+	}
+	UE_LOG(LogTemp, Log, TEXT("[ItemDespawn] Item found in Items map for ItemID [%d]"), ItemID);
+
+
+	AGPItem* Item = ItemPtr->Get();
+	if (IsValid(Item))
+	{
+		UE_LOG(LogTemp, Log, TEXT("[ItemDespawn] Destroying Item [%d]"), ItemID);
+		Item->Destroy();
+
+		FTimerHandle TimerHandle;
+		World->GetTimerManager().SetTimer(TimerHandle, [this, ItemID]()
+			{
+				if (Items.Remove(ItemID) > 0)
+				{
+					UE_LOG(LogTemp, Log, TEXT("[ItemDespawn] Item [%d] successfully removed from Items map"), ItemID);
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("[ItemDespawn] Item [%d] was not found in Items map during removal"), ItemID);
+				}
+			}, 3.0f, false);
 	}
 	else
 	{

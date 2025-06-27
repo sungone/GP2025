@@ -457,7 +457,6 @@ void GameWorld::HandleEarthQuakeImpact(const FVector& rockPos)
 
 bool GameWorld::RemoveWorldItem(uint32 itemId, ZoneType zone)
 {
-	std::lock_guard<std::mutex> lock(_mtItemZMap);
 	auto& items = _worldItemsByZone[zone];
 	auto it = std::remove_if(items.begin(), items.end(),
 		[itemId](const std::shared_ptr<WorldItem>& item) {
@@ -473,8 +472,6 @@ bool GameWorld::RemoveWorldItem(uint32 itemId, ZoneType zone)
 
 std::shared_ptr<WorldItem> GameWorld::FindWorldItemById(uint32 itemId, ZoneType zone)
 {
-	std::lock_guard<std::mutex> lock(_mtItemZMap);
-
 	auto zoneIt = _worldItemsByZone.find(zone);
 	if (zoneIt == _worldItemsByZone.end()) return nullptr;
 

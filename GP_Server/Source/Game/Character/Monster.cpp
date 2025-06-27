@@ -148,9 +148,6 @@ void Monster::Attack()
 
 void Monster::BossAttack()
 {
-	//PerformFlameBreath();
-
-
 	switch (_currentPattern)
 	{
 	case EAttackPattern::MeleeAttack:
