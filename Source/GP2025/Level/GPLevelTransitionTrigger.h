@@ -55,4 +55,6 @@ public :
 	void OnLevelAdded(ULevel* Level, UWorld* World);
 
 	void ShowZoneChangeMessage(ZoneType NewZone);
+
+	FRotator GetRotationOffsetForLevel(const FString& LevelName) const;
 };

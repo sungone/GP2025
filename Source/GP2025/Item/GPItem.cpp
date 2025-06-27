@@ -115,6 +115,13 @@ void AGPItem::HideInteractionWidget()
 
 void AGPItem::TryTakeItem()
 {
+	if (!OverlappingPlayer) return;
+	if (!OverlappingPlayer->InputHandler || !OverlappingPlayer->InputHandler->bGetTakeItem)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Item] TakeItem attempted without valid TakeInteraction flag."));
+		return;
+	}
+
 	auto NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
 	if (NetworkMgr)
 	{

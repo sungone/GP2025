@@ -172,6 +172,21 @@ void AGPLevelTransitionTrigger::OnLevelAdded(ULevel* Level, UWorld* World)
 			CachedPlayer->SoundManager->StopBGM();
 			CachedPlayer->SoundManager->PlayBGMByLevelName(FName(*RawLevelName));
 		}
+
+		if (CachedPlayer)
+		{
+			FRotator RotationOffset = GetRotationOffsetForLevel(RawLevelName);
+			FRotator NewRotation = CachedPlayer->GetActorRotation() + RotationOffset;
+			CachedPlayer->SetActorRotation(NewRotation);
+
+			if (AController* Controller = CachedPlayer->GetController())
+			{
+				Controller->SetControlRotation(NewRotation);
+			}
+
+			UE_LOG(LogTemp, Log, TEXT("[LevelTransitionTrigger] Player rotation adjusted by %s for level %s."),
+				*RotationOffset.ToCompactString(), *RawLevelName);
+		}
 	}
 }
 
@@ -211,5 +226,33 @@ void AGPLevelTransitionTrigger::ShowZoneChangeMessage(ZoneType NewZone)
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[LevelTransitionTrigger] ShowZoneChangeMessage - CachedPlayer or UIManager is NULL"));
+	}
+}
+
+FRotator AGPLevelTransitionTrigger::GetRotationOffsetForLevel(const FString& LevelName) const
+{
+	if (LevelName == "tip")
+	{
+		return FRotator(0.f, 270.f, 0.f); 
+	}
+	else if (LevelName == "E")
+	{
+		return FRotator(0.f, 90.f, 0.f); 
+	}
+	else if (LevelName == "gym")
+	{
+		return FRotator(0.f, 150.f, 0.f); 
+	}
+	else if (LevelName == "TUK")
+	{
+		return FRotator(0.f, 120.f, 0.f); 
+	}
+	else if (LevelName == "industry")
+	{
+		return FRotator(0.f, 0.f, 0.f);
+	}
+	else
+	{
+		return FRotator::ZeroRotator;
 	}
 }
