@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "UI/GPInGameWidget.h"
@@ -12,6 +12,10 @@
 void UGPInGameWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+    if (CurrentMapNameText)
+    {
+        CurrentMapNameText->SetText(FText::FromString(TEXT("í•œêµ­ê³µí•™ëŒ€í•™êµ")));
+    }
 }
 
 void UGPInGameWidget::UpdateHealthBar(float Ratio)
@@ -42,10 +46,10 @@ FSlateColor UGPInGameWidget::GetQSkillTextColor()
 {
     if (QSkillBar && QSkillBar->GetPercent() >= 1.0f - KINDA_SMALL_NUMBER)
     {
-        return FSlateColor(FLinearColor::Blue); // ÄðÅ¸ÀÓ ¿Ï·á: ÆÄ¶õ»ö
+        return FSlateColor(FLinearColor::Blue); // ì¿¨íƒ€ìž„ ì™„ë£Œ: íŒŒëž€ìƒ‰
     }
 
-    return FSlateColor(FLinearColor::White); // ±âº» ÅØ½ºÆ® »ö
+    return FSlateColor(FLinearColor::White); // ê¸°ë³¸ í…ìŠ¤íŠ¸ ìƒ‰
 }
 
 FSlateColor UGPInGameWidget::GetESkillTextColor()
@@ -66,6 +70,15 @@ FSlateColor UGPInGameWidget::GetRSkillTextColor()
     }
 
     return FSlateColor(FLinearColor::White);
+}
+
+void UGPInGameWidget::SetCurrentMapName(const FString& MapName)
+{
+    if (CurrentMapNameText)
+    {
+        CurrentMapNameText->SetText(FText::FromString(MapName));
+        UE_LOG(LogTemp, Log, TEXT("[InGameWidget] Updated current map name to: %s"), *MapName);
+    }
 }
 
 void UGPInGameWidget::ShowGameMessage(const FString& Message, float Duration)

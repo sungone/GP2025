@@ -68,6 +68,11 @@ public:
     UPROPERTY(meta = (BindWidget))
     class UTextBlock* GameMessage;
 
+    UPROPERTY(meta = (BindWidget))
+    UTextBlock* CurrentMapNameText;
+
+    void SetCurrentMapName(const FString& MapName);
+
     void ShowGameMessage(const FString& Message, float Duration = 3.0f);
 
     UFUNCTION(BlueprintImplementableEvent, Category = "Game Message")

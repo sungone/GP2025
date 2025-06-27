@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Level/GPLevelTransitionTrigger.h"
@@ -29,7 +29,7 @@ AGPLevelTransitionTrigger::AGPLevelTransitionTrigger()
 	TriggerBox->SetCollisionProfileName(CPROFILE_GPTRIGGER);
 	TriggerBox->SetGenerateOverlapEvents(true);
 
-	// ÀÌÆåÆ® »ı¼º
+	// ì´í™íŠ¸ ìƒì„±
 	PortalEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("PortalEffect"));
 	PortalEffect->SetupAttachment(RootComponent);
 	PortalEffect->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
@@ -62,7 +62,7 @@ void AGPLevelTransitionTrigger::EndPlay(const EEndPlayReason::Type EndPlayReason
 {
 	Super::EndPlay(EndPlayReason);
 
-	// Äİ¹é ÇØÁ¦
+	// ì½œë°± í•´ì œ
 	FWorldDelegates::LevelRemovedFromWorld.RemoveAll(this);
 	FWorldDelegates::LevelAddedToWorld.RemoveAll(this);
 }
@@ -98,23 +98,23 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 		else if (LevelToLoad == "TUK")  NewZone = ZoneType::TUK;
 		else if (LevelToLoad == "industry")  NewZone = ZoneType::INDUSTY;
 
-		// ÀÌ ºÎºĞÀÌ ÇÙ½É:
+		// ì´ ë¶€ë¶„ì´ í•µì‹¬:
 		if (NewZone == ZoneType::E)
 		{
-			// 1. ÀÎº¥Åä¸® Á¢±Ù
+			// 1. ì¸ë²¤í† ë¦¬ ì ‘ê·¼
 			if (CachedPlayer->UIManager && CachedPlayer->UIManager->GetInventoryWidget())
 			{
 				UGPInventory* Inventory = CachedPlayer->UIManager->GetInventoryWidget();
 
-				// 2. RowName 25¹ø ¾ÆÀÌÅÛ º¸À¯ È®ÀÎ
-				if (Inventory->HasItemByType(50)) // ¿­¼è ¾ÆÀÌÅÛÀÌ ÀÖÀ» ¶§¿¡¸¸ Æ÷Å» ÀÌµ¿ °¡´É
+				// 2. RowName 25ë²ˆ ì•„ì´í…œ ë³´ìœ  í™•ì¸
+				if (Inventory->HasItemByType(50)) // ì—´ì‡  ì•„ì´í…œì´ ìˆì„ ë•Œì—ë§Œ í¬íƒˆ ì´ë™ ê°€ëŠ¥
 				{
 					if (CachedPlayer->SoundManager && CachedPlayer->SoundManager->TeleportationSound)
 					{
 						CachedPlayer->SoundManager->PlaySFX(CachedPlayer->SoundManager->TeleportationSound);
 					}
 
-					// ¾ÆÀÌÅÛ ÀÖÀ½ ¡æ Á¤»ó ÀÔÀå Ã³¸®
+					// ì•„ì´í…œ ìˆìŒ â†’ ì •ìƒ ì…ì¥ ì²˜ë¦¬
 					NetworkMgr->SendMyZoneChangePacket(NewZone);
 					ShowZoneChangeMessage(NewZone);
 					NetworkMgr->SendMyCompleteQuest(QuestType::CH2_ENTER_E_BUILDING);
@@ -137,7 +137,7 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 		}
 		else
 		{
-			// E°¡ ¾Æ´Ñ ÀÏ¹İÀûÀÎ Á¸ ÀÌµ¿
+			// Eê°€ ì•„ë‹Œ ì¼ë°˜ì ì¸ ì¡´ ì´ë™
 
 			if (CachedPlayer->SoundManager && CachedPlayer->SoundManager->TeleportationSound)
 			{
@@ -164,7 +164,7 @@ void AGPLevelTransitionTrigger::OnLevelAdded(ULevel* Level, UWorld* World)
 {
 	if (Level && World)
 	{
-		const FString RawLevelName = Level->GetOuter()->GetName();  // Á¤È®ÇÑ ·¹º§ ÀÌ¸§
+		const FString RawLevelName = Level->GetOuter()->GetName();  // ì •í™•í•œ ë ˆë²¨ ì´ë¦„
 		UE_LOG(LogTemp, Warning, TEXT("Level %s added to world %s"), *RawLevelName, *World->GetName());
 
 		if (CachedPlayer && CachedPlayer->SoundManager)
@@ -187,16 +187,16 @@ void AGPLevelTransitionTrigger::ShowZoneChangeMessage(ZoneType NewZone)
 			ZoneNameString = TEXT("TIP");
 			break;
 		case ZoneType::E:
-			ZoneNameString = TEXT("Building E");
+			ZoneNameString = TEXT("Eë™ ê±´ë¬¼");
 			break;
 		case ZoneType::GYM:
-			ZoneNameString = TEXT("GYM");
+			ZoneNameString = TEXT("ì²´ìœ¡ê´€");
 			break;
 		case ZoneType::TUK:
-			ZoneNameString = TEXT("TUK");
+			ZoneNameString = TEXT("í•œêµ­ê³µí•™ëŒ€í•™êµ");
 			break;
 		case ZoneType::INDUSTY:
-			ZoneNameString = TEXT("Building Industry");
+			ZoneNameString = TEXT("ì‚°ìœµ ê±´ë¬¼");
 			break;
 		default:
 			ZoneNameString = TEXT("");
@@ -204,6 +204,7 @@ void AGPLevelTransitionTrigger::ShowZoneChangeMessage(ZoneType NewZone)
 		}
 
 		CachedPlayer->UIManager->GetInGameWidget()->ShowGameMessage(ZoneNameString, 3.0f);
+		CachedPlayer->UIManager->GetInGameWidget()->SetCurrentMapName(ZoneNameString);
 
 		UE_LOG(LogTemp, Log, TEXT("[LevelTransitionTrigger] ZoneChange Message: %s"), *ZoneNameString);
 	}
