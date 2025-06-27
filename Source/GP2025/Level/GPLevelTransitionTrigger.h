@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "../../GP_Server/Source/Common/Common.h"
 #include "GPLevelTransitionTrigger.generated.h"
 
 UCLASS()
@@ -52,4 +53,6 @@ public :
 
 	UFUNCTION()
 	void OnLevelAdded(ULevel* Level, UWorld* World);
+
+	void ShowZoneChangeMessage(ZoneType NewZone);
 };

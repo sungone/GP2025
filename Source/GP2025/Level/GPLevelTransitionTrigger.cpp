@@ -14,6 +14,7 @@
 #include "Character/Modules/GPMyplayerSoundManager.h"
 #include "Character/Modules/GPMyplayerUIManager.h"
 #include "NiagaraFunctionLibrary.h"
+#include "UI/GPInGameWidget.h"
 #include "Engine/World.h"
 #include "Engine/LevelStreaming.h"
 #include "Engine/Engine.h"
@@ -115,6 +116,7 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 
 					// 아이템 있음 → 정상 입장 처리
 					NetworkMgr->SendMyZoneChangePacket(NewZone);
+					ShowZoneChangeMessage(NewZone);
 					NetworkMgr->SendMyCompleteQuest(QuestType::CH2_ENTER_E_BUILDING);
 					UE_LOG(LogTemp, Log, TEXT("[LevelTransitionTrigger] ZoneChange + QuestComplete Success"));
 				}
@@ -143,6 +145,7 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 			}
 
 			NetworkMgr->SendMyZoneChangePacket(NewZone);
+			ShowZoneChangeMessage(NewZone);
 			UE_LOG(LogTemp, Log, TEXT("[LevelTransitionTrigger] SendMyZoneChangePacket Send Success"));
 		}
 	}
@@ -169,5 +172,43 @@ void AGPLevelTransitionTrigger::OnLevelAdded(ULevel* Level, UWorld* World)
 			CachedPlayer->SoundManager->StopBGM();
 			CachedPlayer->SoundManager->PlayBGMByLevelName(FName(*RawLevelName));
 		}
+	}
+}
+
+void AGPLevelTransitionTrigger::ShowZoneChangeMessage(ZoneType NewZone)
+{
+	if (CachedPlayer && CachedPlayer->UIManager && CachedPlayer->UIManager->GetInGameWidget())
+	{
+		FString ZoneNameString;
+
+		switch (NewZone)
+		{
+		case ZoneType::TIP:
+			ZoneNameString = TEXT("TIP");
+			break;
+		case ZoneType::E:
+			ZoneNameString = TEXT("Building E");
+			break;
+		case ZoneType::GYM:
+			ZoneNameString = TEXT("GYM");
+			break;
+		case ZoneType::TUK:
+			ZoneNameString = TEXT("TUK");
+			break;
+		case ZoneType::INDUSTY:
+			ZoneNameString = TEXT("Building Industry");
+			break;
+		default:
+			ZoneNameString = TEXT("");
+			break;
+		}
+
+		CachedPlayer->UIManager->GetInGameWidget()->ShowGameMessage(ZoneNameString, 3.0f);
+
+		UE_LOG(LogTemp, Log, TEXT("[LevelTransitionTrigger] ZoneChange Message: %s"), *ZoneNameString);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[LevelTransitionTrigger] ShowZoneChangeMessage - CachedPlayer or UIManager is NULL"));
 	}
 }
