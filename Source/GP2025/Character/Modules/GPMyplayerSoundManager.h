@@ -29,7 +29,7 @@ public:
 	// È¿°úÀ½
 	void PlaySFX(class USoundBase* Sound, float Pitch = 1.f, float Volume = 1.f);
 
-private:
+public:
 	UPROPERTY()
 	AGPCharacterMyplayer* Owner;
 

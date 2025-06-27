@@ -845,6 +845,24 @@ void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
 
 		MyPlayer->GetMesh()->SetVisibility(true, true);
 		MyPlayer->GetMesh()->SetHiddenInGame(false);
+
+		if (MyPlayer->SoundManager)
+		{
+			USoundBase** FoundSound = MyPlayer->SoundManager->LevelBGMSounds.Find(TEXT("TUK"));
+			if (FoundSound && *FoundSound)
+			{
+				MyPlayer->SoundManager->PlayBGM(*FoundSound);
+				UE_LOG(LogTemp, Log, TEXT("[Respawn] TUK BGM played on respawn."));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[Respawn] TUK BGM not found in LevelBGMSounds."));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[Respawn] OutsideSound is NULL or SoundManager is NULL."));
+		}
 	}
 }
 
