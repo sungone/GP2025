@@ -421,20 +421,32 @@ void UGPCharacterCombatHandler::PlaySkillMontage(UAnimMontage* SkillMontage)
 				UE_LOG(LogTemp, Error, TEXT("[Combat] Failsafe: Skill Montage did not end. Cleaning up manually."));
 				bIsUsingSkill = false;
 
-				// 상태 제거 (Q/E/R 중 어떤 것인지 확인 후 제거)
+				if (!Owner || !Owner->IsValidLowLevel())
+				{
+					UE_LOG(LogTemp, Error, TEXT("[Combat] Failsafe: Owner is nullptr or invalid. Skipping cleanup."));
+					return;
+				}
+
 				if (CurrentSkillMontage == QSkillMontage)
+				{
 					Owner->CharacterInfo.RemoveState(STATE_SKILL_Q);
+				}
 				else if (CurrentSkillMontage == ESkillMontage)
 				{
 					Owner->CharacterInfo.RemoveState(STATE_SKILL_E);
 					if (Owner->CharacterInfo.CharacterType == static_cast<uint8>(Type::EPlayer::WARRIOR))
 					{
 						bIsDashing = false;
-						Owner->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+						if (Owner->GetCharacterMovement())
+						{
+							Owner->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+						}
 					}
 				}
 				else if (CurrentSkillMontage == RSkillMontage)
+				{
 					Owner->CharacterInfo.RemoveState(STATE_SKILL_R);
+				}
 			}
 		},
 		AdjustedDuration + 0.2f,
