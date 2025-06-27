@@ -219,13 +219,16 @@ void UGPShop::HideResultMessage()
 
 void UGPShop::OnSellItemClicked()
 {
-	if (ClickSound)
+	if (!MyPlayer)
 	{
-		UGameplayStatics::PlaySound2D(GetWorld(), SellAndBuySound);
+		UE_LOG(LogTemp, Warning, TEXT("OnSellItemClicked - MyPlayer is null"));
+		return;
 	}
 
-	if (!MyPlayer || !CurrentSlot)
+	if (!CurrentSlot)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("OnSellItemClicked - CurrentSlot is null, please select a slot again."));
+		ShowResultMessage(TEXT("아이템을 선택해주세요."), 2.0f);
 		return;
 	}
 
@@ -237,6 +240,39 @@ void UGPShop::OnSellItemClicked()
 	if (CurrentSlot->SlotData.ItemUniqueIDs.Num() == 0)
 	{
 		return;
+	}
+
+	UGPInventory* Inventory = MyPlayer->UIManager->GetInventoryWidget();
+	if (Inventory)
+	{
+		FName RowName = CurrentSlot->SlotData.ItemID.RowName;
+		UGPItemSlot* InventorySlot = Inventory->FindSlotByRowName(RowName);
+		if (InventorySlot)
+		{
+			if (Inventory->IsEquippedItem(InventorySlot, MyPlayer))
+			{
+				if (ResultMessage)
+				{
+					ShowResultMessage(TEXT("장착을 해제하고 판매해주세요"), 3.0f);
+				}
+
+				if (ClickSound)
+				{
+					UGameplayStatics::PlaySound2D(GetWorld(), ErrorSound);
+				}
+
+				return;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("OnSellItemClicked - No matching InventorySlot found."));
+		}
+	}
+
+	if (ClickSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), SellAndBuySound);
 	}
 
 	// 첫 번째 고유 ID만 사용

@@ -80,4 +80,10 @@ public :
 	// 아이템이 있는 지 확인
 	UFUNCTION(BlueprintCallable)
 	bool HasItemByType(uint8 ItemType) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	bool IsEquippedItem(UGPItemSlot* SlotForSale, AGPCharacterPlayer* Player) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	UGPItemSlot* FindSlotByRowName(FName RowName) const;
 };

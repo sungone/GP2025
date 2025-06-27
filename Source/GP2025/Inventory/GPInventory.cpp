@@ -296,3 +296,73 @@ bool UGPInventory::HasItemByType(uint8 ItemType) const
     return false;
 }
 
+bool UGPInventory::IsEquippedItem(UGPItemSlot* SlotForSale, AGPCharacterPlayer* Player) const
+{
+    if (!SlotForSale || !Player)
+    {
+        return false;
+    }
+
+    ECategory ItemCategory = SlotForSale->CurrentItem.Category;
+
+    if (ItemCategory == ECategory::consumable ||
+        ItemCategory == ECategory::Gold ||
+        ItemCategory == ECategory::Quest ||
+        ItemCategory == ECategory::None)
+    {
+        return false;
+    }
+
+    int32* EquippedIDPtr = Player->EquippedItemIDs.Find(ItemCategory);
+    if (!EquippedIDPtr || *EquippedIDPtr == -1)
+    {
+        return false;
+    }
+
+    int32 EquippedID = *EquippedIDPtr;
+
+    if (SlotForSale->SlotData.ItemUniqueIDs.Contains(EquippedID))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Inventory] Item %d (category %d) is currently equipped. Cannot sell."),
+            EquippedID, static_cast<int32>(ItemCategory));
+        return true;
+    }
+
+    return false;
+}
+
+UGPItemSlot* UGPInventory::FindSlotByRowName(FName RowName) const
+{
+    for (UGPItemSlot* SlotForFind : WeaponSlots)
+    {
+        if (!SlotForFind) continue;
+        if (SlotForFind->SlotData.ItemID.RowName == RowName)
+        {
+            UE_LOG(LogTemp, Log, TEXT("[Inventory] Found slot in WeaponSlots for RowName: %s"), *RowName.ToString());
+            return SlotForFind;
+        }
+    }
+
+    for (UGPItemSlot* SlotForFind : ArmorSlots)
+    {
+        if (!SlotForFind) continue;
+        if (SlotForFind->SlotData.ItemID.RowName == RowName)
+        {
+            UE_LOG(LogTemp, Log, TEXT("[Inventory] Found slot in ArmorSlots for RowName: %s"), *RowName.ToString());
+            return SlotForFind;
+        }
+    }
+
+    for (UGPItemSlot* SlotForFind : EatableSlots)
+    {
+        if (!SlotForFind) continue;
+        if (SlotForFind->SlotData.ItemID.RowName == RowName)
+        {
+            UE_LOG(LogTemp, Log, TEXT("[Inventory] Found slot in EatableSlots for RowName: %s"), *RowName.ToString());
+            return SlotForFind;
+        }
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("[Inventory] No slot found for RowName: %s"), *RowName.ToString());
+    return nullptr;
+}

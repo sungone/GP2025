@@ -69,7 +69,18 @@ void UGPEquippedItemSlot::ClickEquippedItemSlot()
         MyPlayer->AppearanceHandler->UnequipItemFromCharacter(CurrentItem.Category);
     }
 
-    // 3. 데이터 및 UI 초기화
+    // 3. EquippedItemIDs 업데이트
+    if (MyPlayer->EquippedItemIDs.Contains(CurrentItem.Category))
+    {
+        MyPlayer->EquippedItemIDs[CurrentItem.Category] = -1;
+        UE_LOG(LogTemp, Log, TEXT("[EquippedSlot] Unequipped item. Category %d now set to -1"), (int32)CurrentItem.Category);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[EquippedSlot] Category %d not found in EquippedItemIDs"), (int32)CurrentItem.Category);
+    }
+
+    // 4. 데이터 및 UI 초기화
     SlotData = FSlotStruct();
     CurrentItem = FGPItemStruct();
     SetImage();
