@@ -102,7 +102,22 @@ void UGPItemSlot::ClickItem()
                 NetworkManager->SendMyEquipItem(UniqueIDToSend);
             }
 
-            Player->EquippedItemIDs[CurrentItem.Category] = UniqueIDToSend;
+            if (CurrentItem.Category == ECategory::sword || CurrentItem.Category == ECategory::bow)
+            {
+                Player->EquippedItemIDs[ECategory::sword] = -1;
+                Player->EquippedItemIDs[ECategory::bow] = -1;
+
+                Player->EquippedItemIDs[CurrentItem.Category] = UniqueIDToSend;
+
+                UE_LOG(LogTemp, Warning, TEXT("[Equip] Weapon category switched. Equipped %s with ID %d."),
+                    *UEnum::GetValueAsString(CurrentItem.Category),
+                    UniqueIDToSend);
+            }
+            else
+            {
+                Player->EquippedItemIDs[CurrentItem.Category] = UniqueIDToSend;
+            }
+
             UpdatePlayerEquippedItemSlot(Player);
         }
         else if (CurrentItem.Category == ECategory::consumable)
