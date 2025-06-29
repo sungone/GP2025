@@ -83,4 +83,10 @@ public:
 
     //FTimerHandle GameMessageTimerHandle;
     //void HideGameMessage();
+
+    UPROPERTY(meta = (BindWidgetAnim), Transient)
+    UWidgetAnimation* LevelUpAnim;
+
+    void LevelUpAnimation();
+    int32 LastLevel = 1;
 };
