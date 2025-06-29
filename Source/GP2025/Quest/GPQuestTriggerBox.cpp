@@ -40,12 +40,17 @@ void AGPQuestTriggerBox::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherAc
 			{
 				MyPlayer->NetMgr->SendMyCompleteQuest(QuestType::CH1_GO_TO_E_FIRST);
 				QuestMessage = TEXT("E동이 잠겨있다. 경비아저씨를 찾아가서 여쭤봐야 할것 같다.");
+				InGameUI->ShowGameMessage(QuestMessage, 3.f);
 			}
 			break;
 
 		case 4: // CH1_GO_TO_BUNKER
-			MyPlayer->NetMgr->SendMyCompleteQuest(QuestType::CH1_GO_TO_BUNKER);
-			QuestMessage = TEXT("벙커에 도착했다. 벙커에 있는 몬스터를 잡고 열쇠를 찾아보자.");
+			if (MyPlayer->CharacterInfo.GetCurrentQuest().QuestType == QuestType::CH1_GO_TO_BUNKER)
+			{
+				QuestMessage = TEXT("벙커에 도착했다. 벙커에 있는 몬스터를 잡고 열쇠를 찾아보자.");
+				InGameUI->ShowGameMessage(QuestMessage, 3.f);
+				MyPlayer->NetMgr->SendMyCompleteQuest(QuestType::CH1_GO_TO_BUNKER);
+			}
 			break;
 
 			// 추후 확장 가능
@@ -54,7 +59,5 @@ void AGPQuestTriggerBox::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherAc
 			UE_LOG(LogTemp, Warning, TEXT("QuestTriggerBox: AssignedQuest not handled."));
 			break;
 		}
-		
-		InGameUI->ShowGameMessage(QuestMessage , 3.f);
 	}
 }
