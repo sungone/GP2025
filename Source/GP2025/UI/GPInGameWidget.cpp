@@ -39,6 +39,12 @@ void UGPInGameWidget::UpdatePlayerLevel(int32_t NewLevel)
     if (LevelText)
     {
         LevelText->SetText(FText::AsNumber(NewLevel));
+
+        if (LastLevel + 1 == NewLevel)
+        {
+            LevelUpAnimation();
+            LastLevel = NewLevel;
+        }
     }
 }
 
@@ -103,6 +109,18 @@ void UGPInGameWidget::ShowGameMessage(const FString& Message, float Duration)
 
         }, Duration, false);
 }
+
+void UGPInGameWidget::LevelUpAnimation()
+{
+    PlayAnimation(LevelUpAnim, 0.f, 1, EUMGSequencePlayMode::Forward, 1.f);
+}
+
+void UGPInGameWidget::HitByMonsterAnimation()
+{
+    PlayAnimation(HitByMonsterAnim, 0.f, 1, EUMGSequencePlayMode::Forward, 1.f);
+}
+
+
 
 //void UGPInGameWidget::HideGameMessage()
 //{

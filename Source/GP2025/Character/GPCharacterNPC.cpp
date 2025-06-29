@@ -184,7 +184,7 @@ void AGPCharacterNPC::CloseShopUI()
 		APlayerController* PC = GetWorld()->GetFirstPlayerController();
 		if (PC)
 		{
-			PC->SetInputMode(FInputModeGameOnly());
+			PC->SetInputMode(FInputModeGameOnly()); 
 			PC->bShowMouseCursor = false;
 		}
 	}

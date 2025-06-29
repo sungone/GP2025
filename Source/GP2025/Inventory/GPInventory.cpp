@@ -366,3 +366,13 @@ UGPItemSlot* UGPInventory::FindSlotByRowName(FName RowName) const
     UE_LOG(LogTemp, Warning, TEXT("[Inventory] No slot found for RowName: %s"), *RowName.ToString());
     return nullptr;
 }
+
+void UGPInventory::OpenInventory()
+{
+    PlayAnimation(OpenAnim, 0.f, 1, EUMGSequencePlayMode::Forward, 1.f);
+}
+
+void UGPInventory::CloseInventory()
+{
+    PlayAnimation(CloseAnim, 0.f, 1, EUMGSequencePlayMode::Forward, 1.f);
+}

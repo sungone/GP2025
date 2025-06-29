@@ -1,5 +1,5 @@
 ﻿#include "Network/GPObjectManager.h"
-#include "Character/GPCharacterPlayer.h"
+#include "Character/GPCharacterMyPlayer.h"
 #include "Character/GPCharacterMonster.h"
 #include "Item/GPItemStruct.h"
 #include "Item/GPItem.h"
@@ -266,6 +266,12 @@ void UGPObjectManager::DamagedPlayer(const FInfoData& PlayerInfo)
 		if (WeakPlayerPtr->IsValid())
 		{
 			WeakPlayerPtr->Get()->SetCharacterInfo(PlayerInfo);
+		}
+
+		AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(WeakPlayerPtr->Get());
+		if ((LocalMyPlayer == MyPlayer) && MyPlayer->UIManager)
+		{
+			MyPlayer->UIManager->GetInGameWidget()->HitByMonsterAnimation();
 		}
 	}
 }
