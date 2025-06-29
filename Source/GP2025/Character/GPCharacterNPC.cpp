@@ -160,9 +160,10 @@ void AGPCharacterNPC::OpenShopUI(APlayerController* PlayerController)
 
 				LocalShopWidget->PopulateShopItems();
 				LocalShopWidget->PopulateSellItems();
-			}
 
-			ShopWidget->AddToViewport();
+				ShopWidget->AddToViewport();
+				LocalShopWidget->OpenShopAnimation();
+			}
 		}
 	}
 
@@ -178,18 +179,56 @@ void AGPCharacterNPC::CloseShopUI()
 {
 	if (ShopWidget)
 	{
-		ShopWidget->RemoveFromParent();   
-		ShopWidget = nullptr;
+		UE_LOG(LogTemp, Warning, TEXT("[CloseShopUI] CloseShopUI called. ShopWidget is valid."));
 
-		APlayerController* PC = GetWorld()->GetFirstPlayerController();
-		if (PC)
+		UWidgetAnimation* CloseAnim = nullptr;
+
+		UGPShop* ShopUI = Cast<UGPShop>(ShopWidget);
+
+		if (ShopUI)
 		{
-			PC->SetInputMode(FInputModeGameOnly()); 
-			PC->bShowMouseCursor = false;
+			UE_LOG(LogTemp, Warning, TEXT("[CloseShopUI] Calling ShopUI->CloseShopAnimation()."));
+			ShopUI->CloseShopAnimation();
+
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(
+				TimerHandle,
+				FTimerDelegate::CreateLambda([this]()
+					{
+						UE_LOG(LogTemp, Warning, TEXT("[CloseShopUI] Timer triggered → Removing ShopWidget from Parent."));
+
+						if (ShopWidget)
+						{
+							ShopWidget->RemoveFromParent();
+							ShopWidget = nullptr;
+							UE_LOG(LogTemp, Warning, TEXT("[CloseShopUI] ShopWidget removed from parent and nulled."));
+						}
+						else
+						{
+							UE_LOG(LogTemp, Error, TEXT("[CloseShopUI] ShopWidget already NULL when timer fired!"));
+						}
+
+						APlayerController* PC = GetWorld()->GetFirstPlayerController();
+						if (PC)
+						{
+							PC->SetInputMode(FInputModeGameOnly());
+							PC->bShowMouseCursor = false;
+							UE_LOG(LogTemp, Warning, TEXT("[CloseShopUI] SetInputMode(GameOnly) and Hide Mouse Cursor."));
+						}
+						else
+						{
+							UE_LOG(LogTemp, Error, TEXT("[CloseShopUI] PlayerController is NULL."));
+						}
+
+						bIsInteracting = false;
+						UE_LOG(LogTemp, Warning, TEXT("[CloseShopUI] bIsInteracting set to false."));
+
+					}),
+				0.5f,
+				false
+			);
 		}
 	}
-
-	bIsInteracting = false;
 }
 
 void AGPCharacterNPC::OpenQuestUI(APlayerController* PlayerController)

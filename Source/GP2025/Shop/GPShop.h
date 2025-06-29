@@ -119,4 +119,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	USoundBase* ErrorSound;
 
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	UWidgetAnimation* OpenAnim;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	UWidgetAnimation* CloseAnim;
+
+	void OpenShopAnimation();
+	void CloseShopAnimation();
+
 };

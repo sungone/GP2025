@@ -77,7 +77,7 @@ void UGPShop::OnShopExit()
 	if (OwningNPC)
 	{
 		OwningNPC->ExitInteraction();
-		RemoveFromParent();
+		// RemoveFromParent();
 	}
 }
 
@@ -432,4 +432,14 @@ void UGPShop::SetShopType(EShopType NewShopType)
 {
 	CurrentShopType = NewShopType;
 	UE_LOG(LogTemp, Log, TEXT("SetShopType - CurrentShopType: %d"), static_cast<int32>(CurrentShopType));
+}
+
+void UGPShop::OpenShopAnimation()
+{
+	PlayAnimation(OpenAnim, 0.f, 1, EUMGSequencePlayMode::Forward, 1.f);
+}
+
+void UGPShop::CloseShopAnimation()
+{
+	PlayAnimation(CloseAnim, 0.f, 1, EUMGSequencePlayMode::Forward, 1.f);
 }
