@@ -86,4 +86,13 @@ public :
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	UGPItemSlot* FindSlotByRowName(FName RowName) const;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	UWidgetAnimation* OpenAnim;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	UWidgetAnimation* CloseAnim;
+
+	void OpenInventory();
+	void CloseInventory();
 };

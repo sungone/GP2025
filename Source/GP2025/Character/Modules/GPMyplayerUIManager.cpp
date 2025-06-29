@@ -148,6 +148,7 @@ void UGPMyplayerUIManager::OpenInventory()
 		}
 
 		InventoryWidget->AddToViewport();
+		Inventory->OpenInventory();
 		bIsInventoryOpen = true;
 
 		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
@@ -166,19 +167,40 @@ void UGPMyplayerUIManager::OpenInventory()
 
 void UGPMyplayerUIManager::CloseInventory()
 {
-	if (!Owner || !IsValid(InventoryWidget)) return;
+	if (!Owner || !IsValid(InventoryWidget))
+		return;
 
+	UGPInventory* Inventory = Cast<UGPInventory>(InventoryWidget);
 	if (InventoryWidget->IsInViewport())
 	{
-		InventoryWidget->RemoveFromParent();
-		bIsInventoryOpen = false;
-
-		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
-		if (PC)
+		// 애니메이션 먼저 실행
+		if (Inventory)
 		{
-			PC->SetShowMouseCursor(false);
-			PC->SetInputMode(FInputModeGameOnly());
+			Inventory->CloseInventory();
 		}
+
+		FTimerHandle TimerHandle;
+		Owner->GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle,
+			FTimerDelegate::CreateLambda([this]()
+				{
+					if (IsValid(InventoryWidget))
+					{
+						InventoryWidget->RemoveFromParent();
+					}
+
+					bIsInventoryOpen = false;
+
+					APlayerController* PC = Cast<APlayerController>(Owner->GetController());
+					if (PC)
+					{
+						PC->SetShowMouseCursor(false);
+						PC->SetInputMode(FInputModeGameOnly());
+					}
+				}),
+			0.3f,    
+			false
+		);
 	}
 }
 
