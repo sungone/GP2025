@@ -115,6 +115,13 @@ void UGPInGameWidget::LevelUpAnimation()
     PlayAnimation(LevelUpAnim, 0.f, 1, EUMGSequencePlayMode::Forward, 1.f);
 }
 
+void UGPInGameWidget::HitByMonsterAnimation()
+{
+    PlayAnimation(HitByMonsterAnim, 0.f, 1, EUMGSequencePlayMode::Forward, 1.f);
+}
+
+
+
 //void UGPInGameWidget::HideGameMessage()
 //{
 //    PlayGameMessageFadeOut();

@@ -89,4 +89,10 @@ public:
 
     void LevelUpAnimation();
     int32 LastLevel = 1;
+
+
+    UPROPERTY(meta = (BindWidgetAnim), Transient)
+    UWidgetAnimation* HitByMonsterAnim;
+
+    void HitByMonsterAnimation();
 };
