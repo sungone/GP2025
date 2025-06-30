@@ -669,7 +669,7 @@ FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
 		}
 	}
 	ZoneType oldZone = player->GetZone();
-	FVector newPos = Map::GetInst().GetRandomSpawnPosition(oldZone, targetZone);
+	FVector newPos = Map::GetInst().GetRandomEntryPos(oldZone, targetZone);
 
 	if (newPos == FVector::ZeroVector)
 		return FVector::ZeroVector;

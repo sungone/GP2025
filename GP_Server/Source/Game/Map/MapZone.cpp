@@ -4,20 +4,37 @@
 
 bool Map::Init()
 {
+	_navMeshes[ZoneType::PLAYGROUND] = NavMesh(MapDataPath + "NavMeshData_Playground.json");
+	_navMeshes[ZoneType::TUK] = NavMesh(MapDataPath + "NavMeshData_TUK.json");
+	_navMeshes[ZoneType::TIP] = NavMesh(MapDataPath + "NavMeshData_TIP.json");
+	_navMeshes[ZoneType::E] = NavMesh(MapDataPath + "NavMeshData_E.json");
+	_navMeshes[ZoneType::GYM] = NavMesh(MapDataPath + "NavMeshData_GYM.json");
+	_navMeshes[ZoneType::INDUSTY] = NavMesh(MapDataPath + "NavMeshData_Industry.json");
+	_navMeshes[ZoneType::BUNKER] = NavMesh(MapDataPath + "NavMeshData_Bunker.json");
 
-	_navMeshs[ZoneType::PLAYGROUND] = NavMesh(MapDataPath + "NavMeshData_Playground.json");
-	_navMeshs[ZoneType::TUK] = NavMesh(MapDataPath + "NavMeshData_TUK.json");
-	_navMeshs[ZoneType::E] = NavMesh(MapDataPath + "NavMeshData_E.json");
-	_navMeshs[ZoneType::INDUSTY] = NavMesh(MapDataPath + "NavMeshData_Industry.json");
-	_navMeshs[ZoneType::GYM] = NavMesh(MapDataPath + "NavMeshData_Gym.json");
-	_navMeshs[ZoneType::TIP] = NavMesh(MapDataPath + "NavMeshData_TIP.json");
-	_navMeshs[ZoneType::BUNKER] = NavMesh(MapDataPath + "NavMeshData_Bunker.json");
+	_entryMeshes[EntryType::TIP_IN] = NavMesh(MapDataPath + "NavMeshData_TIP_In.json");
+	_entryMeshes[EntryType::TIP_OUT] = NavMesh(MapDataPath + "NavMeshData_TIP_Out.json");
+	_entryMeshes[EntryType::E_IN] = NavMesh(MapDataPath + "NavMeshData_E_In.json");
+	_entryMeshes[EntryType::E_OUT] = NavMesh(MapDataPath + "NavMeshData_E_Out.json");
+	_entryMeshes[EntryType::GYM_IN] = NavMesh(MapDataPath + "NavMeshData_GYM_In.json");
+	_entryMeshes[EntryType::GYM_OUT] = NavMesh(MapDataPath + "NavMeshData_GYM_Out.json");
+	_entryMeshes[EntryType::INDUSTY_IN] = NavMesh(MapDataPath + "NavMeshData_Industry_In.json");
+	_entryMeshes[EntryType::INDUSTY_OUT] = NavMesh(MapDataPath + "NavMeshData_Industry_Out.json");
 
-	for (auto& [zone, navMesh] : _navMeshs)
+	for (auto& [zone, mesh] : _navMeshes)
 	{
-		if (!navMesh.IsLoaded())
+		if (!mesh.IsLoaded())
 		{
-			LOG(Warning, std::format("NavMesh for zone [{}] failed to load.", static_cast<int>(zone)));
+			LOG(Warning, std::format("Failed to load zone mesh [{}]", static_cast<int>(zone)));
+			return false;
+		}
+	}
+
+	for (auto& [entry, mesh] : _entryMeshes)
+	{
+		if (!mesh.IsLoaded())
+		{
+			LOG(Warning, std::format("Failed to load entry mesh [{}]", static_cast<int>(entry)));
 			return false;
 		}
 	}
@@ -25,56 +42,6 @@ bool Map::Init()
 	return true;
 }
 
-FVector Map::GetRandomPos(ZoneType type, float collisionRadius) const
-{
-	auto it = _navMeshs.find(type);
-	if (it != _navMeshs.end())
-		return it->second.GetRandomPositionWithRadius(collisionRadius);
-
-	return FVector::ZeroVector;
-}
-
-NavMesh& Map::GetNavMesh(ZoneType type)
-{
-	auto it = _navMeshs.find(type);
-	if (it == _navMeshs.end())
-		LOG(Warning, "type Invaild");
-
-	return it->second;
-}
-
-FVector Map::GetRandomSpawnPosition(ZoneType from, ZoneType to) const
-{
-	auto RandomOffset = [](float radius) {
-		float offsetX = RandomUtils::GetRandomFloat(-radius, radius);
-		float offsetY = RandomUtils::GetRandomFloat(-radius, radius);
-		return FVector(offsetX, offsetY, 0.0f);
-		};
-
-	FVector center;
-
-	if (to == ZoneType::TUK && from == ZoneType::TIP)
-		center = FVector(-5270.0, 15050.0, 147);
-	else if (to == ZoneType::TUK && from == ZoneType::E)
-		center = FVector(-4420.0, -12730.0, 837);
-	else if (to == ZoneType::TUK && from == ZoneType::GYM)
-		center = FVector(-4180.0, 5220.0, 147);
-	else if (to == ZoneType::TUK && from == ZoneType::INDUSTY)
-		center = FVector(8721.06, -19229.73, 146.28);
-	else if (to == ZoneType::TIP)
-		center = FVector(-100, 100, 147);
-	else if (to == ZoneType::E)
-		center = FVector(-150, 1500, 147);
-	else if (to == ZoneType::GYM)
-		center = FVector(-2000, 0, 147);
-	else if (to == ZoneType::INDUSTY)
-		center = FVector(0, -10640.0, 147);
-	else
-		return FVector::ZeroVector;
-
-	const float radius = 100.0f; //범위 내에서
-	return center + RandomOffset(radius);
-}
 bool Map::IsZoneAccessible(ZoneType zone, uint32 playerLevel) const
 {
 	switch (zone)
@@ -86,6 +53,77 @@ bool Map::IsZoneAccessible(ZoneType zone, uint32 playerLevel) const
 	case ZoneType::GYM:       return playerLevel > 0;
 	default:                  return false;
 	}
+}
+
+FVector Map::GetRandomPos(ZoneType type, float collisionRadius) const
+{
+	auto it = _navMeshes.find(type);
+	if (it != _navMeshes.end())
+		return it->second.GetRandomPositionWithRadius(collisionRadius);
+
+	return FVector::ZeroVector;
+}
+
+NavMesh& Map::GetNavMesh(ZoneType type)
+{
+	auto it = _navMeshes.find(type);
+	if (it == _navMeshes.end())
+		LOG(Warning, "type Invaild");
+
+	return it->second;
+}
+
+FVector Map::GetRandomEntryPos(ZoneType oldZone, ZoneType targetZone) const
+{
+	EntryType entryType;
+
+	switch (targetZone)
+	{
+	case ZoneType::TIP:
+		entryType = EntryType::TIP_IN;
+		break;
+	case ZoneType::E:
+		entryType = EntryType::E_IN;
+		break;
+	case ZoneType::GYM:
+		entryType = EntryType::GYM_IN;
+		break;
+	case ZoneType::INDUSTY:
+		entryType = EntryType::INDUSTY_IN;
+		break;
+	case ZoneType::TUK:
+	{
+		if (oldZone == ZoneType::TIP)
+			entryType = EntryType::TIP_OUT;
+		else if (oldZone == ZoneType::E)
+			entryType = EntryType::E_OUT;
+		else if (oldZone == ZoneType::GYM)
+			entryType = EntryType::GYM_OUT;
+		else if (oldZone == ZoneType::INDUSTY)
+			entryType = EntryType::INDUSTY_OUT;
+		else
+			return FVector::ZeroVector;
+		break;
+	}
+	default:
+		return FVector::ZeroVector;
+	}
+	
+	return GetRandomEntryPos(entryType, playerCollision);
+}
+
+FVector Map::GetRandomEntryPos(EntryType entryType, float collisionRadius) const
+{
+	auto it = _entryMeshes.find(entryType);
+	if (it != _entryMeshes.end())
+		return it->second.GetRandomPositionWithRadius(collisionRadius);
+
+	return FVector::ZeroVector;
+}
+
+NavMesh& Map::GetEntryNavMesh(EntryType entryType)
+{
+	return _entryMeshes.at(entryType);
 }
 
 FVector Map::GetStartPos(ZoneType startZone)

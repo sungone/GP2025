@@ -244,8 +244,22 @@ enum class ZoneType : uint8
 	GYM,
 	INDUSTY,
 	BUNKER,
-	PLAYGROUND,//test¿ë
+	PLAYGROUND,
 };
+
+enum class EntryType : uint8
+{
+	TIP_OUT,
+	TIP_IN,
+	E_OUT,
+	E_IN,
+	GYM_OUT,
+	GYM_IN,
+	INDUSTY_OUT,
+	INDUSTY_IN,
+};
+
+
 #else
 UENUM(BlueprintType)
 enum class ZoneType : uint8
