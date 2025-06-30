@@ -83,6 +83,7 @@ GP_StressTest/x64
 
 *.vcxproj.user
 GP_Server/gp_server_log.txt
+GP_Server/NavMeshData.json
 
 * text=auto
 *.cpp text eol=lf
