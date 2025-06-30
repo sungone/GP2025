@@ -128,10 +128,6 @@ void UGPMyplayerSoundManager::PlayBGMForCurrentLevel()
 	{
 		if (*FoundSound)
 		{
-			UE_LOG(LogTemp, Log, TEXT("[SoundManager] Playing BGM for level: %s ¡æ %s"),
-				*ShortMapName,
-				*(*FoundSound)->GetName());
-
 			PlayBGM(*FoundSound);
 		}
 	}

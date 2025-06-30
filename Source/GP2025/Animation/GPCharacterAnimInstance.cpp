@@ -26,29 +26,44 @@ void UGPCharacterAnimInstance::NativeInitializeAnimation()
 
 void UGPCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	Super::NativeUpdateAnimation(DeltaSeconds);
+    Super::NativeUpdateAnimation(DeltaSeconds);
 
-	if (Movement)
-	{
-		Velocity = Movement->Velocity;
-		GroundSpeed = Velocity.Size2D();
-		bIsIdle = GroundSpeed < MovingThreshould;
-		bIsFalling = Movement->IsFalling();
-		bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);
-	}
+    if (!Owner)
+    {
+        Owner = Cast<ACharacter>(GetOwningActor());
+        if (Owner)
+        {
+            Movement = Owner->GetCharacterMovement();
+        }
+    }
 
-	if (Owner)
-	{
-		AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(Owner);
-		if (MyPlayer)
-		{
-			bIsZooming = MyPlayer->CameraHandler->IsZooming();
-		}
-		else
-		{
-			AGPCharacterPlayer* Player = Cast<AGPCharacterPlayer>(Owner);
-			if (Player)
-				bIsZooming = Player->CharacterInfo.HasState(STATE_AIMING);
-		}
-	}
+    Velocity = FVector::ZeroVector;
+    GroundSpeed = 0.f;
+    bIsIdle = true;
+    bIsFalling = false;
+    bIsJumping = false;
+    bIsZooming = false;
+
+    if (Owner && Movement)
+    {
+        Velocity = Movement->Velocity;
+        GroundSpeed = Velocity.Size2D();
+        bIsIdle = GroundSpeed < MovingThreshould;
+        bIsFalling = Movement->IsFalling();
+        bIsJumping = bIsFalling && (Velocity.Z > JumpingThreshould);
+
+        AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(Owner);
+        if (MyPlayer && MyPlayer->CameraHandler)
+        {
+            bIsZooming = MyPlayer->CameraHandler->IsZooming();
+        }
+        else
+        {
+            AGPCharacterPlayer* Player = Cast<AGPCharacterPlayer>(Owner);
+            if (Player)
+            {
+                bIsZooming = Player->CharacterInfo.HasState(STATE_AIMING);
+            }
+        }
+    }
 }
