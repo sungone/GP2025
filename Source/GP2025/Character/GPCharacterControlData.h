@@ -39,6 +39,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<class UInputMappingContext> InputMappingContext;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<class UInputMappingContext> MobileMappingContext;
+
 	UPROPERTY(EditAnywhere, Category = "SpringArm")
 	FRotator RelativeRotation;
 

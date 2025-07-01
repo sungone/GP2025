@@ -141,6 +141,12 @@ void AGPCharacterMyplayer::OnPlayerEnterGame()
 		UIManager->OnSetUpInGameWidgets();
 	}
 
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (PC)
+	{
+		PC->SetVirtualJoystickVisibility(true);
+	}
+
 	// LoginSound 중지 -> 현재 레벨에 맞는 Background Sound 재생
 	if (SoundManager)
 	{
@@ -190,13 +196,25 @@ void AGPCharacterMyplayer::SetCharacterType(ECharacterType NewCharacterType)
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
 		Subsystem->ClearAllMappings();
+#if PLATFORM_ANDROID
+		UInputMappingContext* NewMappingContext = NewCharacterData->MobileMappingContext;
+#else
 		UInputMappingContext* NewMappingContext = NewCharacterData->InputMappingContext;
+#endif
+
 		if (NewMappingContext)
 		{
 			Subsystem->AddMappingContext(NewMappingContext, 0);
 		}
+		else
+		{
+#if PLATFORM_ANDROID
+			UE_LOG(LogTemp, Error, TEXT("[SetCharacterType] MobileInputMappingContext is NULL"));
+#else
+			UE_LOG(LogTemp, Error, TEXT("[SetCharacterType] InputMappingContext is NULL"));
+#endif
+		}
 	}
-
 	CurrentCharacterType = NewCharacterType;
 }
 

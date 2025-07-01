@@ -28,12 +28,6 @@
 
 UGPMyplayerInputHandler::UGPMyplayerInputHandler()
 {
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/PlayerInput/IMC_PlayerIMC.IMC_PlayerIMC'"));
-	if (InputMappingContextRef.Object)
-	{
-		DefaultMappingContext = InputMappingContextRef.Object;
-	}
-
 	auto LoadAction = [](const FString& Path, TObjectPtr<UInputAction>& Target)
 		{
 			ConstructorHelpers::FObjectFinder<UInputAction> ActionFinder(*Path);
@@ -101,7 +95,6 @@ void UGPMyplayerInputHandler::SetupInputBindings(UEnhancedInputComponent* Enhanc
 	EnhancedInput->BindAction(RefuseAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::Refuse);
 	EnhancedInput->BindAction(InteractionAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::Interact);
 	EnhancedInput->BindAction(EnterKeyAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::EnterChatting);
-
 }
 
 

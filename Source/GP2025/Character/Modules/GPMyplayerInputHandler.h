@@ -31,9 +31,6 @@ public :
 	TObjectPtr<AGPCharacterMyplayer> Owner;
 
 	UPROPERTY()
-	TObjectPtr<UInputMappingContext> DefaultMappingContext;
-
-	UPROPERTY()
 	TObjectPtr<UInputAction> MoveAction;
 
 	UPROPERTY()
