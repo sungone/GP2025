@@ -105,7 +105,7 @@ void UGPMyplayerUIManager::OnSetUpInGameWidgets()
 			APlayerController* PC = Cast<APlayerController>(Owner->GetController());
 			if (PC)
 			{
-				PC->SetShowMouseCursor(true);
+				PC->SetShowMouseCursor(false);
 				PC->SetInputMode(FInputModeGameOnly());
 				InGameWidget->SetVisibility(ESlateVisibility::Visible);
 			}
