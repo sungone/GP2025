@@ -141,12 +141,6 @@ void AGPCharacterMyplayer::OnPlayerEnterGame()
 		UIManager->OnSetUpInGameWidgets();
 	}
 
-	APlayerController* PC = Cast<APlayerController>(GetController());
-	if (PC)
-	{
-		PC->SetVirtualJoystickVisibility(true);
-	}
-
 	// LoginSound 중지 -> 현재 레벨에 맞는 Background Sound 재생
 	if (SoundManager)
 	{
