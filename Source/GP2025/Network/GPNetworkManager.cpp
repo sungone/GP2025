@@ -571,6 +571,18 @@ void UGPNetworkManager::ProcessPacket()
 				break;
 			}
 #pragma endregion
+#pragma region Test
+			case EPacketType::S_DEBUG_TRIANGLE:
+			{
+				DebugTrianglePacket* Packet = reinterpret_cast<DebugTrianglePacket*>(RemainingData.GetData());
+				const FColor DefaultColor = FColor::Red;
+
+				DrawDebugLine(GetWorld(), Packet->A, Packet->B, DefaultColor, false, Packet->Duration, 0, 2.0f);
+				DrawDebugLine(GetWorld(), Packet->B, Packet->C, DefaultColor, false, Packet->Duration, 0, 2.0f);
+				DrawDebugLine(GetWorld(), Packet->C, Packet->A, DefaultColor, false, Packet->Duration, 0, 2.0f);
+				break;
+			}
+#pragma endregion
 
 			default:
 				UE_LOG(LogTemp, Warning, TEXT("Unknown Packet Type received: type [%d] - size %d"),

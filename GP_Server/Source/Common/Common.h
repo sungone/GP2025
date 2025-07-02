@@ -26,7 +26,7 @@ using uint64 = unsigned __int64;
 
 #define SAFE_STRCPY(dest, src, size) \
         do { \
-            strncpy(dest, src, size); \
+            strncpy_s(dest, src, size); \
             dest[size] = '\0'; \
         } while (0)
 #endif

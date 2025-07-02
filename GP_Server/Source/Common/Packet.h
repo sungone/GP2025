@@ -154,7 +154,7 @@ struct MovePacket : public Packet
 
 	MovePacket(int32 PlayerID_, const FVector& PlayerPos_, uint32 State_,
 		uint64 SendTime_ = 0, EPacketType Type_ = EPacketType::C_MOVE)
-		: Packet(Type_), PlayerID(PlayerID_), State(State_), PlayerPos(PlayerPos_), MoveTime(SendTime_)
+		: Packet(Type_), PlayerID(PlayerID_), PlayerPos(PlayerPos_), State(State_), MoveTime(SendTime_)
 	{
 		Header.PacketSize = sizeof(MovePacket);
 	}
@@ -639,3 +639,20 @@ namespace Tino
 	};
 
 }
+
+//for test
+
+struct DebugTrianglePacket : public Packet
+{
+	FVector A;
+	FVector B;
+	FVector C;
+	float  Duration;
+
+	DebugTrianglePacket(const FVector& InA, const FVector& InB, const FVector& InC, float InDuration = 10.0f)
+		: Packet(EPacketType::S_DEBUG_TRIANGLE)
+		, A(InA), B(InB), C(InC), Duration(InDuration)
+	{
+		Header.PacketSize = sizeof(DebugTrianglePacket);
+	}
+};

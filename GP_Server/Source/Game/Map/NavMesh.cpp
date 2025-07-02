@@ -1,6 +1,15 @@
 #include "pch.h"
 #include "NavMesh.h"
 
+NavMesh::NavMesh(const std::string& filePath)
+{
+	bLoaded = LoadFromJson(filePath);
+	if (!bLoaded)
+	{
+		LOG(Error, "NavMesh");
+	}
+}
+
 void NavMesh::BuildPolygonGraph()
 {
 	PolygonGraph.clear();
