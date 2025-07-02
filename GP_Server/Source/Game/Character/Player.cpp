@@ -88,7 +88,7 @@ void Player::OnDamaged(float damage)
 	SessionManager::GetInst().SendPacket(_id, &pkt);
 	if (IsDead())
 	{
-		_info.AddState(ECharacterStateType::STATE_DIE);
+		ChangeState(ECharacterStateType::STATE_DIE);
 		//temp
 		//todo: 잡큐로 분리하자..
 		auto playerID = _id;
