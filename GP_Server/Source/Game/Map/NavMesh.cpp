@@ -1,6 +1,15 @@
 #include "pch.h"
 #include "NavMesh.h"
 
+NavMesh::NavMesh(const std::string& filePath)
+{
+	bLoaded = LoadFromJson(filePath);
+	if (!bLoaded)
+	{
+		LOG(Error, "NavMesh");
+	}
+}
+
 void NavMesh::BuildPolygonGraph()
 {
 	PolygonGraph.clear();
@@ -157,66 +166,31 @@ bool NavMesh::LoadFromJson(const std::string& filePath)
 	return true;
 }
 
-FVector NavMesh::GetRandomPositionWithRadius(float radius) const
+FVector NavMesh::GetRandomPosition() const
 {
 	if (Triangles.empty() || Vertices.empty())
 		return FVector(0, 0, 0);
 
-	for (int attempt = 0; attempt < 30; ++attempt)
+	int RandomTriangleIndex = RandomUtils::GetRandomInt(0, Triangles.size() - 1);
+	const Triangle& tri = Triangles[RandomTriangleIndex];
+
+	const FVector& A = Vertices[tri.IndexA];
+	const FVector& B = Vertices[tri.IndexB];
+	const FVector& C = Vertices[tri.IndexC];
+
+	float r1 = RandomUtils::GetRandomFloat(0.0f, 1.0f);
+	float r2 = RandomUtils::GetRandomFloat(0.0f, 1.0f);
+	if (r1 + r2 > 1.0f)
 	{
-		int RandomTriangleIndex = RandomUtils::GetRandomInt(0, Triangles.size() - 1);
-		const Triangle& tri = Triangles[RandomTriangleIndex];
-
-		const FVector& A = Vertices[tri.IndexA];
-		const FVector& B = Vertices[tri.IndexB];
-		const FVector& C = Vertices[tri.IndexC];
-
-		float r1 = RandomUtils::GetRandomFloat(0.0f, 1.0f);
-		float r2 = RandomUtils::GetRandomFloat(0.0f, 1.0f);
-		if (r1 + r2 > 1.0f)
-		{
-			r1 = 1.0f - r1;
-			r2 = 1.0f - r2;
-		}
-
-		FVector P = A + (B - A) * r1 + (C - A) * r2;
-		P.Z += 90.0f;
-
-		auto DistanceToEdge2D = [](const FVector& p, const FVector& a, const FVector& b) -> float {
-			double dx = b.X - a.X;
-			double dy = b.Y - a.Y;
-			double lengthSq = dx * dx + dy * dy;
-
-			if (lengthSq == 0.0)
-				return std::sqrt((p.X - a.X) * (p.X - a.X) + (p.Y - a.Y) * (p.Y - a.Y));
-
-			double t = ((p.X - a.X) * dx + (p.Y - a.Y) * dy) / lengthSq;
-			t = std::clamp(t, 0.0, 1.0);
-			double projX = a.X + t * dx;
-			double projY = a.Y + t * dy;
-
-			double distX = p.X - projX;
-			double distY = p.Y - projY;
-			return std::sqrt(distX * distX + distY * distY);
-			};
-
-		if (DistanceToEdge2D(P, A, B) >= radius &&
-			DistanceToEdge2D(P, B, C) >= radius &&
-			DistanceToEdge2D(P, C, A) >= radius)
-		{
-			return P;
-		}
+		r1 = 1.0f - r1;
+		r2 = 1.0f - r2;
 	}
 
-	{
-		const Triangle& tri = Triangles[RandomUtils::GetRandomInt(0, Triangles.size() - 1)];
-		const FVector& A = Vertices[tri.IndexA];
-		const FVector& B = Vertices[tri.IndexB];
-		const FVector& C = Vertices[tri.IndexC];
-		FVector centroid = (A + B + C) / 3.0f;
-		centroid.Z += 100.0f;
-		return centroid;
-	}
+	FVector P = A + (B - A) * r1 + (C - A) * r2;
+
+	P.Z += 90.0f;
+
+	return P;
 }
 
 

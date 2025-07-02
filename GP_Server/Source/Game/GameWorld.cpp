@@ -193,6 +193,22 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 	player->GetInfo().SetLocationAndYaw(pos);
 	player->GetInfo().State = static_cast<ECharacterStateType>(state);
 	UpdateViewList(player);
+
+	{
+		ZoneType zone = player->GetZone();
+		auto& navMesh = Map::GetInst().GetNavMesh(zone); 
+		int triIdx = navMesh.FindIdxFromPos(pos);
+		if (triIdx != -1)
+		{
+			const Triangle& tri = navMesh.Triangles[triIdx];
+			const FVector& A = navMesh.Vertices[tri.IndexA];
+			const FVector& B = navMesh.Vertices[tri.IndexB];
+			const FVector& C = navMesh.Vertices[tri.IndexC];
+			DebugTrianglePacket dbg(A, B, C, 1.f);
+			SessionManager::GetInst().SendPacket(playerId, &dbg);
+		}
+	}
+
 	auto pkt = MovePacket(playerId, pos, state, time, EPacketType::S_PLAYER_MOVE);
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
 	auto upkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
@@ -337,7 +353,7 @@ void GameWorld::CreateMonster()
 				{
 					do
 					{
-						pos = Map::GetInst().GetRandomPos(z, radius);
+						pos = Map::GetInst().GetRandomPos(z);
 					} while (IsCollisionDetected(zone, pos, radius));
 				}
 				monster->SetPos(pos);
@@ -710,7 +726,7 @@ void GameWorld::RespawnPlayer(int32 playerId, ZoneType targetZone)
 	auto player = GetPlayerByID(playerId);
 	if (!player) return;
 	ZoneType oldZone = player->GetZone();
-	FVector newPos = Map::GetInst().GetRandomPos(targetZone, playerCollision);
+	FVector newPos = Map::GetInst().GetRandomPos(targetZone);
 
 	player->SetPos(newPos);
 	player->GetInfo().SetZone(targetZone);

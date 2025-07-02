@@ -13,11 +13,11 @@ public:
 	bool Init();
 	bool IsZoneAccessible(ZoneType zone, uint32 playerLevel) const;
 
-	FVector GetRandomPos(ZoneType type, float collisionRadius) const;
+	FVector GetRandomPos(ZoneType type) const;
 	NavMesh& GetNavMesh(ZoneType type);
 	
 	FVector GetRandomEntryPos(ZoneType oldZone, ZoneType targetZone) const;
-	FVector GetRandomEntryPos(EntryType entryType, float collisionRadius) const;
+	FVector GetRandomEntryPos(EntryType entryType) const;
 	NavMesh& GetEntryNavMesh(EntryType entryType);
 
 	FVector GetStartPos(ZoneType startZone);

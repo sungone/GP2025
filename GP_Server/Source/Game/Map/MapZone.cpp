@@ -55,11 +55,11 @@ bool Map::IsZoneAccessible(ZoneType zone, uint32 playerLevel) const
 	}
 }
 
-FVector Map::GetRandomPos(ZoneType type, float collisionRadius) const
+FVector Map::GetRandomPos(ZoneType type) const
 {
 	auto it = _navMeshes.find(type);
 	if (it != _navMeshes.end())
-		return it->second.GetRandomPositionWithRadius(collisionRadius);
+		return it->second.GetRandomPosition();
 
 	return FVector::ZeroVector;
 }
@@ -109,14 +109,14 @@ FVector Map::GetRandomEntryPos(ZoneType oldZone, ZoneType targetZone) const
 		return FVector::ZeroVector;
 	}
 	
-	return GetRandomEntryPos(entryType, playerCollision);
+	return GetRandomEntryPos(entryType);
 }
 
-FVector Map::GetRandomEntryPos(EntryType entryType, float collisionRadius) const
+FVector Map::GetRandomEntryPos(EntryType entryType) const
 {
 	auto it = _entryMeshes.find(entryType);
 	if (it != _entryMeshes.end())
-		return it->second.GetRandomPositionWithRadius(collisionRadius);
+		return it->second.GetRandomPosition();
 
 	return FVector::ZeroVector;
 }
@@ -135,7 +135,7 @@ FVector Map::GetStartPos(ZoneType startZone)
 		FVector newPos;
 		float radius = playerCollision;
 		do {
-			newPos = Map::GetInst().GetRandomPos(startZone, radius);
+			newPos = Map::GetInst().GetRandomPos(startZone);
 		} while (GameWorld::GetInst().IsCollisionDetected(startZone, newPos, radius));
 		return newPos;
 	}

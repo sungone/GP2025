@@ -87,6 +87,9 @@ enum EPacketType : uint8
 	C_CHAT_SEND,
 	S_CHAT_BROADCAST,
 
+
+	//for test
+	S_DEBUG_TRIANGLE
 };
 
 

@@ -58,27 +58,19 @@ class NavMesh
 {
 public:
 	NavMesh() {}
-	NavMesh(const std::string& filePath)
-	{
-		isLoaded = LoadFromJson(filePath);
-		if (!isLoaded)
-		{
-			LOG(Error,"NavMesh");
-		}
-	}
+	NavMesh(const std::string& filePath);
 
 	void BuildPolygonGraph();
 	int FindIdxFromPos(const FVector _pos);
 
 	std::vector<int> FindPath(int StartPolygon, int GoalPolygon);
 	bool LoadFromJson(const std::string& filePath);
-	FVector GetRandomPositionWithRadius(float radius) const;
-
+	FVector GetRandomPosition() const;
 	FVector GetTriangleCenter(int triIndex) const;
 	const std::unordered_set<int>& GetNeighbors(int triIdx) const;
-	bool IsLoaded() { return isLoaded; }
+	bool IsLoaded() { return bLoaded; }
 public:
-	bool isLoaded = false;
+	bool bLoaded = false;
 	std::vector<FVector> Vertices;
 	std::vector<Triangle> Triangles;
 	std::unordered_map<int, PolygonNode> PolygonGraph;
