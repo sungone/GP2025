@@ -39,7 +39,8 @@ public:
 
 	// <Input>
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	UPROPERTY()
+
+	UPROPERTY(BlueprintReadOnly, Category = "MyPlayer")
 	class UGPMyplayerInputHandler* InputHandler;
 
 	// <UI>

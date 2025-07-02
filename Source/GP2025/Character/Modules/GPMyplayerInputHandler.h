@@ -79,31 +79,52 @@ public :
 	TObjectPtr<UInputAction> EnterKeyAction;
 
 public :
+	UFUNCTION(BlueprintCallable)
     void Move(const FInputActionValue& Value);
+
     void Look(const FInputActionValue& Value);
 
-    void Jump();
-    void StopJumping();
+	UFUNCTION(BlueprintCallable)
+	void Jump();
 
-    void StartSprinting();
-    void StopSprinting();
+	UFUNCTION(BlueprintCallable)
+	void StopJumping();
 
+	UFUNCTION(BlueprintCallable)
+	void StartSprinting();
+
+	UFUNCTION(BlueprintCallable)
+	void StopSprinting();
+
+	UFUNCTION(BlueprintCallable)
     void AutoAttack();
 
+
+	UFUNCTION(BlueprintCallable)
     void ToggleInventory();
+
+	UFUNCTION(BlueprintCallable)
     void ResetInventoryToggle();
+
 	void OpenInventory();
 	void CloseInventory();
 
+
     void OpenSettingWidget();
+
 
 	void Accept();
 	void Refuse();
+
+	UFUNCTION(BlueprintCallable)
 	void Interact();
+
 	void EnterChatting();
 	
-
+	UFUNCTION(BlueprintCallable)
 	void TakeInteraction();
+
+
 	UPROPERTY()
 	AActor* CurrentInteractionTarget = nullptr;
 
@@ -111,8 +132,11 @@ public :
     void StopAiming();
 
 	// <Skill>
+	UFUNCTION(BlueprintCallable)
     void UseSkillQ();
+	UFUNCTION(BlueprintCallable)
     void UseSkillE();
+	UFUNCTION(BlueprintCallable)
     void UseSkillR();
 
 public :
