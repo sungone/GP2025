@@ -65,8 +65,7 @@ public:
 
 	std::vector<int> FindPath(int StartPolygon, int GoalPolygon);
 	bool LoadFromJson(const std::string& filePath);
-	FVector GetRandomPositionWithRadius(float radius) const;
-
+	FVector GetRandomPosition() const;
 	FVector GetTriangleCenter(int triIndex) const;
 	const std::unordered_set<int>& GetNeighbors(int triIdx) const;
 	bool IsLoaded() { return bLoaded; }

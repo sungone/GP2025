@@ -196,7 +196,7 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 
 	{
 		ZoneType zone = player->GetZone();
-		auto& navMesh = Map::GetInst().GetNavMesh(zone);
+		auto& navMesh = Map::GetInst().GetNavMesh(zone); 
 		int triIdx = navMesh.FindIdxFromPos(pos);
 		if (triIdx != -1)
 		{
@@ -353,7 +353,7 @@ void GameWorld::CreateMonster()
 				{
 					do
 					{
-						pos = Map::GetInst().GetRandomPos(z, radius);
+						pos = Map::GetInst().GetRandomPos(z);
 					} while (IsCollisionDetected(zone, pos, radius));
 				}
 				monster->SetPos(pos);
@@ -726,7 +726,7 @@ void GameWorld::RespawnPlayer(int32 playerId, ZoneType targetZone)
 	auto player = GetPlayerByID(playerId);
 	if (!player) return;
 	ZoneType oldZone = player->GetZone();
-	FVector newPos = Map::GetInst().GetRandomPos(targetZone, playerCollision);
+	FVector newPos = Map::GetInst().GetRandomPos(targetZone);
 
 	player->SetPos(newPos);
 	player->GetInfo().SetZone(targetZone);
