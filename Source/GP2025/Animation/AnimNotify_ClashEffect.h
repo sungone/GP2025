@@ -26,7 +26,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	FVector EffectLocationOffset = FVector::ZeroVector;
 
-	// 회전 오프셋 (필요 시)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	FRotator EffectRotationOffset = FRotator::ZeroRotator;
 

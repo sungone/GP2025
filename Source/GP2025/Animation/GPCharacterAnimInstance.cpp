@@ -28,7 +28,7 @@ void UGPCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
     Super::NativeUpdateAnimation(DeltaSeconds);
 
-    if (!Owner)
+    if (!IsValid(Owner))
     {
         Owner = Cast<ACharacter>(GetOwningActor());
         if (Owner)
@@ -36,13 +36,6 @@ void UGPCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
             Movement = Owner->GetCharacterMovement();
         }
     }
-
-    Velocity = FVector::ZeroVector;
-    GroundSpeed = 0.f;
-    bIsIdle = true;
-    bIsFalling = false;
-    bIsJumping = false;
-    bIsZooming = false;
 
     if (Owner && Movement)
     {
@@ -52,6 +45,7 @@ void UGPCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
         bIsFalling = Movement->IsFalling();
         bIsJumping = bIsFalling && (Velocity.Z > JumpingThreshould);
 
+        // Gunner Player Zooming ÆÇ´Ü
         AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(Owner);
         if (MyPlayer && MyPlayer->CameraHandler)
         {
@@ -65,5 +59,14 @@ void UGPCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
                 bIsZooming = Player->CharacterInfo.HasState(STATE_AIMING);
             }
         }
+    }
+    else
+    {
+        Velocity = FVector::ZeroVector;
+        GroundSpeed = 0.f;
+        bIsIdle = true;
+        bIsFalling = false;
+        bIsJumping = false;
+        bIsZooming = false;
     }
 }

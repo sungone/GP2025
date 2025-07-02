@@ -15,11 +15,9 @@ class GP2025_API UAnimNotify_FThrowingEffect : public UAnimNotify
 	GENERATED_BODY()
 
 public:
-	// 애니메이션 재생 시 호출되는 Notify
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
 protected:
-	// 발사할 이펙트 액터 (예: 투사체)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	TSubclassOf<AActor> ProjectileEffectClass;
 

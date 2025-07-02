@@ -17,7 +17,6 @@ void UAnimNotify_GunnerAttackEffect::Notify(USkeletalMeshComponent* MeshComp, UA
 	AActor* OwnerActor = MeshComp->GetOwner();
 	if (!OwnerActor) return;
 
-	// 소켓 위치 + 오프셋 적용
 	FVector MuzzleLocation = MeshComp->GetSocketLocation(FName("WeaponSocket")) + MuzzleOffset;
 
 	APlayerController* PC = Cast<APlayerController>(OwnerActor->GetInstigatorController());

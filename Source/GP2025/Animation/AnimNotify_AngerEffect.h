@@ -20,10 +20,10 @@ public:
 	class UNiagaraSystem* AngerEffect;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
-	float Duration = 10.f;
+	FName SocketName = FName("WeaponSocket");
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
-	FName SocketName = FName("WeaponSocket");
+	float Duration = 10.f;
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 };

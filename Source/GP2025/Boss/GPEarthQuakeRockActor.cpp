@@ -7,7 +7,7 @@
 
 AGPEarthQuakeRockActor::AGPEarthQuakeRockActor()
 {
-	PrimaryActorTick.bCanEverTick = false; // Tick 사용 안 함
+	PrimaryActorTick.bCanEverTick = false; 
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(Mesh);
@@ -37,7 +37,7 @@ void AGPEarthQuakeRockActor::BeginPlay()
 		FallTimerHandle,
 		this,
 		&AGPEarthQuakeRockActor::UpdateFall,
-		FallDuration / NumSteps, // 예: 0.5초 / 20 = 0.025초 간격
+		FallDuration / NumSteps, 
 		true
 	);
 }
@@ -58,10 +58,6 @@ void AGPEarthQuakeRockActor::UpdateFall()
 	if (Alpha >= 1.f)
 	{
 		GetWorldTimerManager().ClearTimer(FallTimerHandle);
-
-		// 충돌 시 이펙트 / 사운드
-		//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactFX, TargetPos);
-		//UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSound, TargetPos);
 
 		GetWorldTimerManager().SetTimer(
 			DestroyTimerHandle,

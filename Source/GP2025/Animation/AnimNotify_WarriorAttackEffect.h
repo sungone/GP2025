@@ -15,19 +15,15 @@ class GP2025_API UAnimNotify_WarriorAttackEffect : public UAnimNotify
 	GENERATED_BODY()
 
 public:
-	// 부착할 이펙트
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	class UNiagaraSystem* AutoAttackEffect;
 
-	// 부착할 소켓 이름
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	FName SocketName = FName("WeaponSocket");
 
-	// 오프셋 위치 (필요 시)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	FVector EffectLocationOffset = FVector::ZeroVector;
 
-	// 회전 오프셋 (필요 시)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	FRotator EffectRotationOffset = FRotator::ZeroRotator;
 

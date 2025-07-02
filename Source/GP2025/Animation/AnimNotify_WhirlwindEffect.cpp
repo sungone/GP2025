@@ -27,7 +27,6 @@ void UAnimNotify_WhirlwindEffect::Notify(USkeletalMeshComponent* MeshComp, UAnim
 
 	if (Effect)
 	{
-		// 여기서 Duration 설정!
-		Effect->SetFloatParameter(TEXT("Lifetime"), 2.f); // 원하는 재생 시간
+		Effect->SetFloatParameter(TEXT("Lifetime"), 2.f); 
 	}
 }

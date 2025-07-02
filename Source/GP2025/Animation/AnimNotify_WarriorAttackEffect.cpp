@@ -26,7 +26,6 @@ void UAnimNotify_WarriorAttackEffect::Notify(USkeletalMeshComponent* MeshComp, U
 
 	if (Effect)
 	{
-		// 여기서 Duration 설정!
-		Effect->SetFloatParameter(TEXT("Lifetime"), 0.3f); // 원하는 재생 시간
+		Effect->SetFloatParameter(TEXT("Lifetime"), 0.3f); 
 	}
 }

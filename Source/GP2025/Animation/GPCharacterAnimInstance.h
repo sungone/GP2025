@@ -28,37 +28,31 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	TObjectPtr<class UCharacterMovementComponent> Movement;
 
-	// 플레이어의 속도
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	FVector Velocity;
 
-	// 땅에서의 속력
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	float GroundSpeed;
 
-	// Idle 판별
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	uint8 bIsIdle : 1;
 
-	// 움직이고 있는지 쉬고 있는지
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character")
-	float MovingThreshould;
-
-	// 떨어지는 지 판별
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	uint8 bIsFalling : 1;
 
-	// 점프하는 지 판별
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	uint8 bIsJumping : 1;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
+	float MovingThreshould;
 
-	// 점프 중인지 판별
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character")
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	float JumpingThreshould;
 
+	// Gunner Player 줌인 판단
 public :
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	uint8 bIsZooming : 1;
 
 	UPROPERTY()
