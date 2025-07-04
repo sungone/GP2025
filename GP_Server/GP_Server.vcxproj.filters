@@ -251,12 +251,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Source\Game\Map\MapJsonData\NavMeshData.json">
-      <Filter>Source Files\Game\GameWorld\Map</Filter>
-    </None>
-    <None Include="Source\Game\Map\MapJsonData\PlaygroundNavData.json">
-      <Filter>Source Files\Game\GameWorld\Map</Filter>
-    </None>
     <None Include="Tools\backup_mysql.bat">
       <Filter>Source Files\DB\BatchFile</Filter>
     </None>

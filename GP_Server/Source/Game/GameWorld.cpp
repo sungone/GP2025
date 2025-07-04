@@ -195,18 +195,9 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 	UpdateViewList(player);
 
 	{
+		//for test
 		ZoneType zone = player->GetZone();
-		auto& navMesh = Map::GetInst().GetNavMesh(zone); 
-		int triIdx = navMesh.FindIdxFromPos(pos);
-		if (triIdx != -1)
-		{
-			const Triangle& tri = navMesh.Triangles[triIdx];
-			const FVector& A = navMesh.Vertices[tri.IndexA];
-			const FVector& B = navMesh.Vertices[tri.IndexB];
-			const FVector& C = navMesh.Vertices[tri.IndexC];
-			DebugTrianglePacket dbg(A, B, C, 1.f);
-			SessionManager::GetInst().SendPacket(playerId, &dbg);
-		}
+		auto& navMesh = Map::GetInst().GetNavMesh(zone);
 	}
 
 	auto pkt = MovePacket(playerId, pos, state, time, EPacketType::S_PLAYER_MOVE);
@@ -508,7 +499,7 @@ void GameWorld::SpawnGoldItem(FVector position, ZoneType zone)
 	std::lock_guard<std::mutex> lock(_mtItemZMap);
 	auto newItem = std::make_shared<WorldItem>(position);
 	_worldItemsByZone[zone].emplace_back(newItem);
-	
+
 	auto itemId = newItem->GetItemID();
 	ItemPkt::SpawnPacket packet(itemId, newItem->GetItemTypeID(), position);
 	BroadcastToZone(zone, &packet);
@@ -539,7 +530,7 @@ void GameWorld::SpawnWorldItem(WorldItem dropedItem, ZoneType zone)
 	auto newItem = std::make_shared<WorldItem>(dropedItem);
 	_worldItemsByZone[zone].emplace_back(newItem);
 
-	int32 itemId = newItem->GetItemID();  
+	int32 itemId = newItem->GetItemID();
 	ItemPkt::DropPacket packet(itemId, newItem->GetItemTypeID(), newItem->GetPos());
 	BroadcastToZone(zone, &packet);
 
