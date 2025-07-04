@@ -21,6 +21,7 @@ public:
 	void BroadcastToViewList(Packet* packet, const std::unordered_set<int32>& viewList);
 	std::array<std::shared_ptr<PlayerSession>, MAX_CLIENT>& GetSessions() { return _sessions; }
 	std::shared_ptr<PlayerSession> GetSession(int32 sessionId);
+
 private:
 	int32 GenerateId();
 private:

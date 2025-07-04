@@ -195,9 +195,37 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 	UpdateViewList(player);
 
 	{
-		//for test
 		ZoneType zone = player->GetZone();
 		auto& navMesh = Map::GetInst().GetNavMesh(zone);
+
+		FVector start = player->GetInfo().Pos;
+		FVector goal = FVector(-2931, 6060, 0); // 테스트용 목적지
+
+		int startTri = navMesh.FindIdxFromPos(start);
+		int goalTri = navMesh.FindIdxFromPos(goal);
+		if(startTri != -1)
+		{
+			const auto& tri = navMesh.triangles[startTri];
+			const FVector& A = navMesh.vertices[tri.a];
+			const FVector& B = navMesh.vertices[tri.b];
+			const FVector& C = navMesh.vertices[tri.c];
+
+			DebugTrianglePacket dbg(A, B, C, 5.f);
+			SessionManager::GetInst().SendPacket(playerId, &dbg);
+		}
+		if (startTri != -1 && goalTri != -1) {
+			auto path = navMesh.FindPath(startTri, goalTri);
+			for (int triIdx : path) {
+				const auto& tri = navMesh.triangles[triIdx];
+				const FVector& A = navMesh.vertices[tri.a];
+				const FVector& B = navMesh.vertices[tri.b];
+				const FVector& C = navMesh.vertices[tri.c];
+
+				DebugTrianglePacket dbg(A, B, C, 5.f);
+				SessionManager::GetInst().SendPacket(playerId, &dbg);
+			}
+		}
+
 	}
 
 	auto pkt = MovePacket(playerId, pos, state, time, EPacketType::S_PLAYER_MOVE);

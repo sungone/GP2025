@@ -4,6 +4,18 @@
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 
+namespace std {
+    template <>
+    struct hash<FVector> {
+        std::size_t operator()(const FVector& v) const {
+            std::size_t h1 = std::hash<float>()(v.X);
+            std::size_t h2 = std::hash<float>()(v.Y);
+            std::size_t h3 = std::hash<float>()(v.Z);
+            return h1 ^ (h2 << 1) ^ (h3 << 2);
+        }
+    };
+}
+
 std::optional<NavMesh> NavMesh::LoadFromJson(const std::string& filePath)
 {
     std::ifstream file(filePath);
@@ -14,13 +26,21 @@ std::optional<NavMesh> NavMesh::LoadFromJson(const std::string& filePath)
 
     rapidjson::Document doc;
     doc.Parse(json.c_str());
-    if (doc.HasParseError())
-        return std::nullopt;
-
-    if (!doc.HasMember("Triangles") || !doc["Triangles"].IsArray())
+    if (doc.HasParseError() || !doc.HasMember("Triangles") || !doc["Triangles"].IsArray())
         return std::nullopt;
 
     NavMesh mesh;
+    std::unordered_map<FVector, int> vertexMap;
+
+    auto GetOrAddVertex = [&](const FVector& v) -> int {
+        auto it = vertexMap.find(v);
+        if (it != vertexMap.end()) return it->second;
+
+        int index = static_cast<int>(mesh.vertices.size());
+        mesh.vertices.push_back(v);
+        vertexMap[v] = index;
+        return index;
+        };
 
     const auto& tris = doc["Triangles"].GetArray();
     for (const auto& tri : tris)
@@ -32,18 +52,17 @@ std::optional<NavMesh> NavMesh::LoadFromJson(const std::string& filePath)
         FVector v1(tri[1][0].GetFloat(), tri[1][1].GetFloat(), tri[1][2].GetFloat());
         FVector v2(tri[2][0].GetFloat(), tri[2][1].GetFloat(), tri[2][2].GetFloat());
 
-        int i0 = static_cast<int>(mesh.vertices.size());
-        mesh.vertices.push_back(v0);
-        mesh.vertices.push_back(v1);
-        mesh.vertices.push_back(v2);
+        int i0 = GetOrAddVertex(v0);
+        int i1 = GetOrAddVertex(v1);
+        int i2 = GetOrAddVertex(v2);
 
-        mesh.triangles.emplace_back(i0, i0 + 1, i0 + 2);
+        mesh.triangles.emplace_back(i0, i1, i2);
     }
 
     mesh.BuildAdjacencyCSR();
-
     return mesh;
 }
+
 
 void NavMesh::BuildAdjacencyCSR()
 {
@@ -79,8 +98,8 @@ void NavMesh::BuildAdjacencyCSR()
     }
 
     nbrOffsets.clear();
-    nbrOffsets.reserve(triCount + 1);
     nbrIndices.clear();
+    nbrOffsets.reserve(triCount + 1);
 
     nbrOffsets.push_back(0);
     for (int i = 0; i < triCount; ++i) {
@@ -88,6 +107,7 @@ void NavMesh::BuildAdjacencyCSR()
         nbrOffsets.push_back(static_cast<int>(nbrIndices.size()));
     }
 }
+
 
 int NavMesh::FindIdxFromPos(const FVector& pos) const
 {

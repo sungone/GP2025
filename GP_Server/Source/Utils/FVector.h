@@ -26,6 +26,12 @@ struct FVector
 		float Len = Length();
 		return (Len > 0) ? (*this) / Len : FVector(0, 0, 0);
 	}
+	static float DistanceSquared(const FVector& a, const FVector& b)
+	{
+		return (a.X - b.X) * (a.X - b.X) +
+			(a.Y - b.Y) * (a.Y - b.Y) +
+			(a.Z - b.Z) * (a.Z - b.Z);
+	}
 
 	float DistanceSquared(const FVector& Other) const
 	{
