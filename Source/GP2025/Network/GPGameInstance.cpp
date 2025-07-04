@@ -2,6 +2,7 @@
 #include "Network/GPNetworkManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "GPUtils.h"
+#include "Network/GPNavMeshExporter.h"
 
 #if PLATFORM_ANDROID
 #include "AndroidPermissionFunctionLibrary.h"
@@ -29,7 +30,8 @@ bool UGPGameInstance::SaveNavData(bool IsSave)
 {
 #if !PLATFORM_ANDROID
 	if (IsSave)
-		return ExtractNavMeshData(GetWorld(), TEXT("GP_Server/NavMeshData.json"));
+		return GPNavMeshExporter::ExportNavMesh(GetWorld(), TEXT("NavMeshData.json"));
+		//return ExtractNavMeshData(GetWorld(), TEXT("GP_Server/NavMeshData.json"));
 #endif
     return false;
 }
