@@ -140,9 +140,9 @@ void UGPMyplayerCameraHandler::PlayHitCameraShake()
 
 	// 如甸 Offset 积己
 	FVector ShakeOffset = FVector(
-		FMath::RandRange(-10.f, 10.f),   // 谅快 如甸覆
-		FMath::RandRange(-10.f, 10.f),   // 惑窍 如甸覆
-		FMath::RandRange(-2.f, 2.f)    // 菊第 如甸覆
+		FMath::RandRange(-30.f, 30.f),
+		FMath::RandRange(-30.f, 30.f),
+		FMath::RandRange(-4.f, 4.f)
 	);
 
 	// 如甸扁
