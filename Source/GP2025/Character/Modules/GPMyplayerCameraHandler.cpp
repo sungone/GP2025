@@ -8,7 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
-
+#include "TimerManager.h"
 
 void UGPMyplayerCameraHandler::Initialize(AGPCharacterMyplayer* InOwner)
 {
@@ -129,4 +129,38 @@ void UGPMyplayerCameraHandler::StopDialogueCamera()
 {
 	bIsLookingAtTarget = false;
 	bIsZoomingForDialogue = false;
+}
+
+void UGPMyplayerCameraHandler::PlayHitCameraShake()
+{
+	if (!Owner || !Owner->CameraBoom) return;
+
+	// ¿ø·¡ SocketOffset ÀúÀå
+	OriginalSocketOffset = Owner->CameraBoom->SocketOffset;
+
+	// Èçµé Offset »ý¼º
+	FVector ShakeOffset = FVector(
+		FMath::RandRange(-10.f, 10.f),   // ÁÂ¿ì Èçµé¸²
+		FMath::RandRange(-10.f, 10.f),   // »óÇÏ Èçµé¸²
+		FMath::RandRange(-2.f, 2.f)    // ¾ÕµÚ Èçµé¸²
+	);
+
+	// Èçµé±â
+	Owner->CameraBoom->SocketOffset = OriginalSocketOffset + ShakeOffset;
+
+	// Àá±ñ µÚ ¿øº¹
+	Owner->GetWorldTimerManager().SetTimer(
+		CameraShakeResetTimer,
+		this,
+		&UGPMyplayerCameraHandler::ResetCameraShake,
+		0.05f,
+		false
+	);
+}
+
+void UGPMyplayerCameraHandler::ResetCameraShake()
+{
+	if (!Owner || !Owner->CameraBoom) return;
+
+	Owner->CameraBoom->SocketOffset = OriginalSocketOffset;
 }

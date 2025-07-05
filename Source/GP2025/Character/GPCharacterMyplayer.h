@@ -89,6 +89,13 @@ public :
 
 public :
 	// Camera Shake
-	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
+	UFUNCTION(BlueprintImplementableEvent, Category = "CameraShake")
 	void GunnerAttackCameraShake();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "CameraShake")
+	void WarriorAttackCameraShake();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "CameraShake")
+	void PlayerHittedCameraShake();
+
 };

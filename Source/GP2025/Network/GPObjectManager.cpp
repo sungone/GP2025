@@ -272,6 +272,8 @@ void UGPObjectManager::DamagedPlayer(const FInfoData& PlayerInfo)
 		if ((LocalMyPlayer == MyPlayer) && MyPlayer->UIManager)
 		{
 			MyPlayer->UIManager->GetInGameWidget()->HitByMonsterAnimation();
+			// Hit Camera Shake
+			MyPlayer->PlayerHittedCameraShake();
 		}
 	}
 }

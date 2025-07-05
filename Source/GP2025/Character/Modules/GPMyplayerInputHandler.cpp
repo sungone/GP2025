@@ -217,11 +217,6 @@ void UGPMyplayerInputHandler::AutoAttack()
 			Owner->CombatHandler->PlayAutoAttackMontage();
 			Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
 		}
-
-		if (Owner->bIsGunnerCharacter())
-		{
-			Owner->GunnerAttackCameraShake();
-		}
 	}
 }
 
