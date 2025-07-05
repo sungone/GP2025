@@ -67,4 +67,6 @@ public:
 	bool bIsZoomingForDialogue = false;
 	float DialogueZoomTargetLength = 200.f; 
 	float DefaultZoomLength = 600.f;
+
+public:
 };

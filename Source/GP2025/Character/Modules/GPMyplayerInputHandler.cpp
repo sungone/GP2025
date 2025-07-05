@@ -203,6 +203,11 @@ void UGPMyplayerInputHandler::AutoAttack()
 			Owner->CombatHandler->PlayAutoAttackMontage();
 			Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
 		}
+
+		if (Owner->bIsGunnerCharacter())
+		{
+			Owner->GunnerAttackCameraShake();
+		}
 	}
 	else
 	{
@@ -211,6 +216,11 @@ void UGPMyplayerInputHandler::AutoAttack()
 			Owner->CharacterInfo.AddState(STATE_AUTOATTACK);
 			Owner->CombatHandler->PlayAutoAttackMontage();
 			Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
+		}
+
+		if (Owner->bIsGunnerCharacter())
+		{
+			Owner->GunnerAttackCameraShake();
 		}
 	}
 }
@@ -388,6 +398,7 @@ void UGPMyplayerInputHandler::UseSkillQ()
 		Owner->CharacterInfo.AddState(STATE_SKILL_Q);
 		Owner->CombatHandler->PlayQSkillMontage();
 		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Throwing, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
+		Owner->GunnerAttackCameraShake();
 	}
 	else
 	{
@@ -396,7 +407,6 @@ void UGPMyplayerInputHandler::UseSkillQ()
 		Owner->CombatHandler->PlayQSkillMontage();
 		Owner->NetMgr->SendMyUseSkill(ESkillGroup::HitHard, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
 	}
-
 }
 
 void UGPMyplayerInputHandler::UseSkillE()
@@ -419,11 +429,11 @@ void UGPMyplayerInputHandler::UseSkillE()
 	{
 		if (!Owner->CameraHandler->IsZooming()) return;
 
-
 		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_E);
 		Owner->CombatHandler->PlayESkillMontage();
 		Owner->NetMgr->SendMyUseSkill(ESkillGroup::FThrowing, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
+		Owner->GunnerAttackCameraShake();
 	}
 	else
 	{

@@ -48,7 +48,7 @@ public:
 	class UGPMyplayerUIManager* UIManager;
 	
 	// <Camera>
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, Category = "MyPlayer")
 	class UGPMyplayerCameraHandler* CameraHandler;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", Meta = (AllowPrivateAccess = "true"))
@@ -86,4 +86,9 @@ public :
 	virtual void SetCharacterInfo(const FInfoData& CharacterInfo_) override;
 	int32 PrevLevel = 1;
 
+
+public :
+	// Camera Shake
+	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
+	void GunnerAttackCameraShake();
 };
