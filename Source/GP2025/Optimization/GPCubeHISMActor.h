@@ -45,4 +45,10 @@ public:
 
     UPROPERTY(EditAnywhere, Category = "HISM Placement")
     FVector InstanceScale;
+
+    UPROPERTY(EditAnywhere, Category = "HISM Placement")
+    FRotator StartRotation;
+
+    UPROPERTY(EditAnywhere, Category = "HISM Placement")
+    FRotator NextRotation;
 };

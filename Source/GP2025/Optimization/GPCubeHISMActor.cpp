@@ -17,6 +17,8 @@ AGPCubeHISMActor::AGPCubeHISMActor()
     InstanceCount = 10;
     InstanceScale = FVector(1.f, 1.f, 1.f);
 
+    StartRotation = FRotator::ZeroRotator;
+    NextRotation = FRotator::ZeroRotator;
 }
 
 // Called when the game starts or when spawned
@@ -45,14 +47,16 @@ void AGPCubeHISMActor::OnConstruction(const FTransform& Transform)
     HISMComponent->SetStaticMesh(MeshToUse);
 
     FVector Offset = NextLocation - StartLocation;
+    FRotator OffsetRotator = NextRotation - StartRotation;
 
     for (int32 i = 0; i < InstanceCount; i++)
     {
         FVector Location = StartLocation + Offset * i;
+        FRotator Rotation = StartRotation + OffsetRotator * i;
 
         FTransform InstanceTransform;
         InstanceTransform.SetLocation(Location);
-        InstanceTransform.SetRotation(FQuat::Identity);
+        InstanceTransform.SetRotation(Rotation.Quaternion());
         InstanceTransform.SetScale3D(InstanceScale);
 
         HISMComponent->AddInstance(InstanceTransform);
