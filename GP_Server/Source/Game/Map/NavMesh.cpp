@@ -123,6 +123,68 @@ std::vector<int> NavMesh::FindPath(int startPoly, int goalPoly) const
     return path;
 }
 
+std::vector<int> NavMesh::FindPathAStar(const FVector& startPos, const FVector& goalPos) const
+{
+    int startPoly = FindIdxFromPos(startPos);
+    int goalPoly = FindIdxFromPos(goalPos);
+    if (startPoly < 0 || goalPoly < 0)
+        return {};
+
+    int N = static_cast<int>(polygons.size());
+    // Precompute polygon centers
+    std::vector<FVector> centers(N);
+    for (int i = 0; i < N; ++i) {
+        FVector sum(0, 0, 0);
+        for (int vid : polygons[i])
+            sum = sum + vertices[vid];
+        centers[i] = sum / static_cast<float>(polygons[i].size());
+    }
+
+    auto Heuristic = [&](int p) {
+        return (centers[p] - goalPos).Length();
+        };
+
+    struct Node { int poly; float g, f; int parent; };
+    struct Compare { bool operator()(const Node& a, const Node& b) const { return a.f > b.f; } };
+
+    std::priority_queue<Node, std::vector<Node>, Compare> openPQ;
+    std::vector<float>       gScore(N, std::numeric_limits<float>::infinity());
+    std::vector<int>         parent(N, -1);
+    std::vector<bool>        closed(N, false);
+
+    // Initialize start
+    gScore[startPoly] = (startPos - centers[startPoly]).Length();
+    openPQ.push({ startPoly, gScore[startPoly], gScore[startPoly] + Heuristic(startPoly), -1 });
+
+    while (!openPQ.empty()) {
+        Node cur = openPQ.top();
+        openPQ.pop();
+        if (closed[cur.poly]) continue;
+        closed[cur.poly] = true;
+        parent[cur.poly] = cur.parent;
+        if (cur.poly == goalPoly) break;
+
+        for (int nb : neighbors[cur.poly]) {
+            if (closed[nb]) continue;
+            float cost = (centers[cur.poly] - centers[nb]).Length();
+            float tentativeG = gScore[cur.poly] + cost;
+            if (tentativeG < gScore[nb]) {
+                gScore[nb] = tentativeG;
+                openPQ.push({ nb, tentativeG, tentativeG + Heuristic(nb), cur.poly });
+            }
+        }
+    }
+
+    if (parent[goalPoly] < 0)
+        return {};
+
+    std::vector<int> path;
+    for (int at = goalPoly; at != -1; at = parent[at])
+        path.push_back(at);
+    std::reverse(path.begin(), path.end());
+    return path;
+}
+
 FVector NavMesh::GetRandomPosition() const
 {
     if (polygons.empty() || vertices.empty())

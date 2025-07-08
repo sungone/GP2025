@@ -224,7 +224,7 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 		// 경로 탐색 및 디버그 그리기
 		if (startPoly != -1 && goalPoly != -1)
 		{
-			auto path = navMesh.FindPath(startPoly, goalPoly);
+			auto path = navMesh.FindPathAStar(start, goal);
 			for (int polyIdx : path)
 			{
 				const auto& poly = navMesh.polygons[polyIdx];
