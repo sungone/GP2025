@@ -15,11 +15,9 @@ bool GPNavMeshExporter::ExportNavMesh(UWorld* World, const FString& FilePath)
     ARecastNavMesh* NavData = Cast<ARecastNavMesh>(NavSys->GetDefaultNavDataInstance());
     if (!NavData) return false;
 
-    // 1) 준비: 폴리곤 참조와 인덱스 매핑
     TArray<uint64>   AllPolyRefs;
     TMap<uint64, int32> PolyRefToIndex;
 
-    // 2) 전역 정점 풀 및 폴리곤, 삼각형 JSON 준비
     TMap<FVector, int32> VertexToIndex;
     TArray<FVector>      VertexList;
     auto GetOrAddVertexIndex = [&](const FVector& V) -> int32 {
@@ -31,10 +29,9 @@ bool GPNavMeshExporter::ExportNavMesh(UWorld* World, const FString& FilePath)
         return NewIdx;
         };
 
-    TArray<TArray<int32>>       Polygons;      // 폴리곤별 정점 인덱스
-    TArray<TSharedPtr<FJsonValue>> TrianglesJson; // 삼각형 좌표 JSON
+    TArray<TArray<int32>>       Polygons;
+    TArray<TSharedPtr<FJsonValue>> TrianglesJson;
 
-    // 3) 타일 순회: 폴리곤·정점·삼각형 수집
     const int32 NumTiles = NavData->GetNavMeshTilesCount();
     for (int32 TileIdx = 0; TileIdx < NumTiles; ++TileIdx)
     {
@@ -44,18 +41,15 @@ bool GPNavMeshExporter::ExportNavMesh(UWorld* World, const FString& FilePath)
 
         for (const FNavPoly& Poly : Polys)
         {
-            // (a) PolyRef 기록
             uint64 Ref = Poly.Ref;
             int32 PolyIdx = AllPolyRefs.Num();
             AllPolyRefs.Add(Ref);
             PolyRefToIndex.Add(Ref, PolyIdx);
 
-            // (b) 폴리곤 정점 가져오기
             TArray<FVector> Verts;
             if (!NavData->GetPolyVerts(Ref, Verts) || Verts.Num() < 3)
                 continue;
 
-            // (c) 폴리곤 인덱스 리스트 생성
             TArray<int32> PolyIndices;
             PolyIndices.Reserve(Verts.Num());
             for (const FVector& V : Verts)
@@ -64,7 +58,6 @@ bool GPNavMeshExporter::ExportNavMesh(UWorld* World, const FString& FilePath)
             }
             Polygons.Add(MoveTemp(PolyIndices));
 
-            // (d) 볼록 폴리곤 삼각 분할하여 JSON에 저장
             for (int32 i = 1; i + 1 < Verts.Num(); ++i)
             {
                 TArray<TSharedPtr<FJsonValue>> TriVerts;
@@ -83,7 +76,6 @@ bool GPNavMeshExporter::ExportNavMesh(UWorld* World, const FString& FilePath)
         }
     }
 
-    // 4) 폴리곤별 이웃 정보 추출 (타일 내부 + 외부)
     TArray<TSharedPtr<FJsonValue>> NeighborsJson;
     NeighborsJson.Reserve(AllPolyRefs.Num());
     for (int32 idx = 0; idx < AllPolyRefs.Num(); ++idx)
@@ -104,10 +96,8 @@ bool GPNavMeshExporter::ExportNavMesh(UWorld* World, const FString& FilePath)
         NeighborsJson.Add(MakeShareable(new FJsonValueArray(Arr)));
     }
 
-    // 5) JSON 배열로 변환: Vertices, Polygons, Triangles, Neighbors
     TSharedPtr<FJsonObject> Root = MakeShareable(new FJsonObject());
 
-    // Vertices
     TArray<TSharedPtr<FJsonValue>> VertexJson;
     VertexJson.Reserve(VertexList.Num());
     for (const FVector& V : VertexList)
@@ -120,7 +110,6 @@ bool GPNavMeshExporter::ExportNavMesh(UWorld* World, const FString& FilePath)
     }
     Root->SetArrayField(TEXT("Vertices"), VertexJson);
 
-    // Polygons
     TArray<TSharedPtr<FJsonValue>> PolygonsJson;
     PolygonsJson.Reserve(Polygons.Num());
     for (const TArray<int32>& PolyVerts : Polygons)
@@ -134,14 +123,9 @@ bool GPNavMeshExporter::ExportNavMesh(UWorld* World, const FString& FilePath)
         PolygonsJson.Add(MakeShareable(new FJsonValueArray(PolyJson)));
     }
     Root->SetArrayField(TEXT("Polygons"), PolygonsJson);
-
-    // Triangles (기존 삼각형 분할)
     Root->SetArrayField(TEXT("Triangles"), TrianglesJson);
-
-    // Neighbors (폴리곤 이웃 인덱스)
     Root->SetArrayField(TEXT("Neighbors"), NeighborsJson);
 
-    // 6) 직렬화 & 파일 저장
     FString Output;
     TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Output);
     if (!FJsonSerializer::Serialize(Root.ToSharedRef(), Writer))

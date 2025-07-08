@@ -61,29 +61,27 @@ std::optional<NavMesh> NavMesh::LoadFromJson(const std::string& filePath)
     return mesh;
 }
 
-static bool PointInConvexPoly(const FVector& P, const std::vector<int>& poly,
+static bool PointInPoly(const FVector& P, const std::vector<int>& poly,
     const std::vector<FVector>& verts)
 {
-    const FVector& A0 = verts[poly[0]];
-    int n = (int)poly.size();
-    auto Sign = [&](const FVector& p1, const FVector& p2, const FVector& p3) {
-        return (p1.X - p3.X) * (p2.Y - p3.Y) - (p2.X - p3.X) * (p1.Y - p3.Y);
-        };
-    float base = Sign(P, verts[poly[1]], A0);
-    for (int i = 2; i < n; ++i)
+    bool inside = false;
+    int n = poly.size();
+    for (int i = 0, j = n - 1; i < n; j = i++)
     {
-        float s = Sign(P, verts[poly[i]], A0);
-        if ((base >= 0 && s < 0) || (base <= 0 && s > 0))
-            return false;
+        const FVector& vi = verts[poly[i]];
+        const FVector& vj = verts[poly[j]];
+        bool intersect = ((vi.Y > P.Y) != (vj.Y > P.Y)) &&
+            (P.X < (vj.X - vi.X) * (P.Y - vi.Y) / (vj.Y - vi.Y) + vi.X);
+        if (intersect) inside = !inside;
     }
-    return true;
+    return inside;
 }
 
 int NavMesh::FindIdxFromPos(const FVector& pos) const
 {
     for (int i = 0; i < (int)polygons.size(); ++i)
     {
-        if (PointInConvexPoly(pos, polygons[i], vertices))
+        if (PointInPoly(pos, polygons[i], vertices))
             return i;
     }
     return -1;
