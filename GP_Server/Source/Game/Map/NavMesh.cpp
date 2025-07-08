@@ -4,148 +4,145 @@
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 
-namespace std {
-    template <>
-    struct hash<FVector> {
-        std::size_t operator()(const FVector& v) const {
-            std::size_t h1 = std::hash<float>()(v.X);
-            std::size_t h2 = std::hash<float>()(v.Y);
-            std::size_t h3 = std::hash<float>()(v.Z);
-            return h1 ^ (h2 << 1) ^ (h3 << 2);
-        }
-    };
-}
-
 std::optional<NavMesh> NavMesh::LoadFromJson(const std::string& filePath)
 {
-    std::ifstream file(filePath);
-    if (!file.is_open())
-        return std::nullopt;
-
-    std::string json((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    std::ifstream ifs(filePath);
+    if (!ifs.is_open()) return std::nullopt;
+    std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
 
     rapidjson::Document doc;
-    doc.Parse(json.c_str());
-    if (doc.HasParseError() || !doc.HasMember("Triangles") || !doc["Triangles"].IsArray())
-        return std::nullopt;
-
-    NavMesh mesh;
-    std::unordered_map<FVector, int> vertexMap;
-
-    auto GetOrAddVertex = [&](const FVector& v) -> int {
-        auto it = vertexMap.find(v);
-        if (it != vertexMap.end()) return it->second;
-
-        int index = static_cast<int>(mesh.vertices.size());
-        mesh.vertices.push_back(v);
-        vertexMap[v] = index;
-        return index;
-        };
-
-    const auto& tris = doc["Triangles"].GetArray();
-    for (const auto& tri : tris)
+    doc.Parse(str.c_str());
+    if (doc.HasParseError()
+        || !doc.HasMember("Vertices") || !doc["Vertices"].IsArray()
+        || !doc.HasMember("Polygons") || !doc["Polygons"].IsArray()
+        || !doc.HasMember("Neighbors") || !doc["Neighbors"].IsArray())
     {
-        if (!tri.IsArray() || tri.Size() != 3)
-            continue;
-
-        FVector v0(tri[0][0].GetFloat(), tri[0][1].GetFloat(), tri[0][2].GetFloat());
-        FVector v1(tri[1][0].GetFloat(), tri[1][1].GetFloat(), tri[1][2].GetFloat());
-        FVector v2(tri[2][0].GetFloat(), tri[2][1].GetFloat(), tri[2][2].GetFloat());
-
-        int i0 = GetOrAddVertex(v0);
-        int i1 = GetOrAddVertex(v1);
-        int i2 = GetOrAddVertex(v2);
-
-        mesh.triangles.emplace_back(i0, i1, i2);
+        return std::nullopt;
     }
 
-    mesh.BuildAdjacencyCSR();
+    NavMesh mesh;
+
+    const auto& vArr = doc["Vertices"].GetArray();
+    mesh.vertices.reserve(vArr.Size());
+    for (const auto& vj : vArr)
+    {
+        const auto& a = vj.GetArray();
+        mesh.vertices.emplace_back(
+            a[0].GetFloat(),
+            a[1].GetFloat(),
+            a[2].GetFloat()
+        );
+    }
+
+    const auto& pArr = doc["Polygons"].GetArray();
+    mesh.polygons.reserve(pArr.Size());
+    for (const auto& pj : pArr)
+    {
+        const auto& idxs = pj.GetArray();
+        std::vector<int> poly;
+        poly.reserve(idxs.Size());
+        for (const auto& xi : idxs)
+            poly.push_back(xi.GetInt());
+        mesh.polygons.push_back(std::move(poly));
+    }
+
+    const auto& nArr = doc["Neighbors"].GetArray();
+    mesh.neighbors.reserve(nArr.Size());
+    for (const auto& nj : nArr)
+    {
+        const auto& ni = nj.GetArray();
+        std::vector<int> row;
+        row.reserve(ni.Size());
+        for (const auto& xi : ni)
+            row.push_back(xi.GetInt());
+        mesh.neighbors.push_back(std::move(row));
+    }
+
     return mesh;
 }
 
-
-void NavMesh::BuildAdjacencyCSR()
+static bool PointInConvexPoly(const FVector& P, const std::vector<int>& poly,
+    const std::vector<FVector>& verts)
 {
-    int triCount = static_cast<int>(triangles.size());
-
-    using Edge = std::pair<int, int>;
-    auto MakeEdge = [](int a, int b) {
-        return std::make_pair(std::min(a, b), std::max(a, b));
+    const FVector& A0 = verts[poly[0]];
+    int n = (int)poly.size();
+    auto Sign = [&](const FVector& p1, const FVector& p2, const FVector& p3) {
+        return (p1.X - p3.X) * (p2.Y - p3.Y) - (p2.X - p3.X) * (p1.Y - p3.Y);
         };
-    struct EdgeHash {
-        size_t operator()(const Edge& e) const {
-            return std::hash<int>()(e.first) ^ (std::hash<int>()(e.second) << 1);
-        }
-    };
-
-    std::unordered_map<Edge, std::vector<int>, EdgeHash> edgeMap;
-
-    for (int i = 0; i < triCount; ++i) {
-        const auto& tri = triangles[i];
-        edgeMap[MakeEdge(tri.a, tri.b)].push_back(i);
-        edgeMap[MakeEdge(tri.b, tri.c)].push_back(i);
-        edgeMap[MakeEdge(tri.c, tri.a)].push_back(i);
+    float base = Sign(P, verts[poly[1]], A0);
+    for (int i = 2; i < n; ++i)
+    {
+        float s = Sign(P, verts[poly[i]], A0);
+        if ((base >= 0 && s < 0) || (base <= 0 && s > 0))
+            return false;
     }
-
-    std::vector<std::vector<int>> neighbors(triCount);
-    for (const auto& [edge, triList] : edgeMap) {
-        if (triList.size() == 2) {
-            int t1 = triList[0];
-            int t2 = triList[1];
-            neighbors[t1].push_back(t2);
-            neighbors[t2].push_back(t1);
-        }
-    }
-
-    nbrOffsets.clear();
-    nbrIndices.clear();
-    nbrOffsets.reserve(triCount + 1);
-
-    nbrOffsets.push_back(0);
-    for (int i = 0; i < triCount; ++i) {
-        nbrIndices.insert(nbrIndices.end(), neighbors[i].begin(), neighbors[i].end());
-        nbrOffsets.push_back(static_cast<int>(nbrIndices.size()));
-    }
+    return true;
 }
-
 
 int NavMesh::FindIdxFromPos(const FVector& pos) const
 {
-    auto Sign = [](const FVector& p1, const FVector& p2, const FVector& p3)
-        {
-            return (p1.X - p3.X) * (p2.Y - p3.Y) - (p2.X - p3.X) * (p1.Y - p3.Y);
-        };
-
-    for (int i = 0; i < triangles.size(); ++i) {
-        const auto& tri = triangles[i];
-        const FVector& A = vertices[tri.a];
-        const FVector& B = vertices[tri.b];
-        const FVector& C = vertices[tri.c];
-
-        float d1 = Sign(pos, A, B);
-        float d2 = Sign(pos, B, C);
-        float d3 = Sign(pos, C, A);
-
-        bool hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
-        bool hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
-
-        if (!(hasNeg && hasPos))
+    for (int i = 0; i < (int)polygons.size(); ++i)
+    {
+        if (PointInConvexPoly(pos, polygons[i], vertices))
             return i;
     }
-
     return -1;
+}
+
+std::vector<int> NavMesh::FindPath(int startPoly, int goalPoly) const
+{
+    int N = (int)polygons.size();
+    if (startPoly < 0 || goalPoly < 0 || startPoly >= N || goalPoly >= N)
+        return {};
+
+    std::vector<int> prev(N, -1);
+    std::deque<int> queue;
+    queue.push_back(startPoly);
+    prev[startPoly] = startPoly;
+
+    while (!queue.empty())
+    {
+        int cur = queue.front(); queue.pop_front();
+        if (cur == goalPoly) break;
+
+        for (int nb : neighbors[cur])
+        {
+            if (prev[nb] == -1)
+            {
+                prev[nb] = cur;
+                queue.push_back(nb);
+            }
+        }
+    }
+
+    if (prev[goalPoly] == -1) return {};
+
+    std::vector<int> path;
+    for (int at = goalPoly; at != startPoly; at = prev[at])
+        path.push_back(at);
+    path.push_back(startPoly);
+    std::reverse(path.begin(), path.end());
+    return path;
 }
 
 FVector NavMesh::GetRandomPosition() const
 {
-    if (triangles.empty()) return FVector::ZeroVector;
+    if (polygons.empty() || vertices.empty())
+        return FVector::ZeroVector;
 
-    int idx = RandomUtils::GetRandomInt(0, static_cast<int>(triangles.size()) - 1);
-    const auto& tri = triangles[idx];
+    int polyCount = static_cast<int>(polygons.size());
+    int polyIdx = RandomUtils::GetRandomInt(0, polyCount - 1);
+    const auto& poly = polygons[polyIdx];
+    int vcount = static_cast<int>(poly.size());
+    if (vcount < 3)
+        return FVector::ZeroVector;
 
-    const FVector& A = vertices[tri.a];
-    const FVector& B = vertices[tri.b];
-    const FVector& C = vertices[tri.c];
+    int triCount = vcount - 2;
+    int ti = RandomUtils::GetRandomInt(0, triCount - 1);
+
+    const FVector& A = vertices[poly[0]];
+    const FVector& B = vertices[poly[ti + 1]];
+    const FVector& C = vertices[poly[ti + 2]];
 
     float u = RandomUtils::GetRandomFloat(0.f, 1.f);
     float v = RandomUtils::GetRandomFloat(0.f, 1.f);
@@ -155,39 +152,6 @@ FVector NavMesh::GetRandomPosition() const
     }
 
     FVector P = A + (B - A) * u + (C - A) * v;
-    P.Z += 90.f;
+    P.Z += 90;
     return P;
-}
-
-std::vector<int> NavMesh::FindPath(int startTri, int goalTri) const
-{
-    if (startTri < 0 || goalTri < 0 || startTri >= triangles.size() || goalTri >= triangles.size())
-        return {};
-
-    std::vector<int> prev(triangles.size(), -1);
-    std::vector<int> q;
-    q.reserve(triangles.size());
-    int qh = 0;
-    q.push_back(startTri);
-    prev[startTri] = startTri;
-
-    while (qh < q.size()) {
-        int cur = q[qh++];
-        if (cur == goalTri) break;
-        for (int k = nbrOffsets[cur]; k < nbrOffsets[cur + 1]; ++k) {
-            int nb = nbrIndices[k];
-            if (prev[nb] == -1) {
-                prev[nb] = cur;
-                q.push_back(nb);
-            }
-        }
-    }
-
-    if (prev[goalTri] == -1) return {};
-    std::vector<int> path;
-    for (int at = goalTri; at != startTri; at = prev[at])
-        path.push_back(at);
-    path.push_back(startTri);
-    std::reverse(path.begin(), path.end());
-    return path;
 }

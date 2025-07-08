@@ -198,33 +198,6 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 		ZoneType zone = player->GetZone();
 		auto& navMesh = Map::GetInst().GetNavMesh(zone);
 
-		FVector start = player->GetInfo().Pos;
-		FVector goal = FVector(-2931, 6060, 0); // 테스트용 목적지
-
-		int startTri = navMesh.FindIdxFromPos(start);
-		int goalTri = navMesh.FindIdxFromPos(goal);
-		if(startTri != -1)
-		{
-			const auto& tri = navMesh.triangles[startTri];
-			const FVector& A = navMesh.vertices[tri.a];
-			const FVector& B = navMesh.vertices[tri.b];
-			const FVector& C = navMesh.vertices[tri.c];
-
-			DebugTrianglePacket dbg(A, B, C, 5.f);
-			SessionManager::GetInst().SendPacket(playerId, &dbg);
-		}
-		if (startTri != -1 && goalTri != -1) {
-			auto path = navMesh.FindPath(startTri, goalTri);
-			for (int triIdx : path) {
-				const auto& tri = navMesh.triangles[triIdx];
-				const FVector& A = navMesh.vertices[tri.a];
-				const FVector& B = navMesh.vertices[tri.b];
-				const FVector& C = navMesh.vertices[tri.c];
-
-				DebugTrianglePacket dbg(A, B, C, 5.f);
-				SessionManager::GetInst().SendPacket(playerId, &dbg);
-			}
-		}
 
 	}
 
@@ -350,7 +323,7 @@ void GameWorld::PlayerDead(int32 playerID)
 void GameWorld::CreateMonster()
 {
 	auto table = SpawnTable::GetInst();
-	for (ZoneType z : { ZoneType::GYM, ZoneType::TUK, ZoneType::E, ZoneType::INDUSTY, ZoneType::BUNKER })
+	for (ZoneType z : { ZoneType::TUK})
 	{
 		const auto& spawns = table.GetSpawnsByZone(z);
 		ZoneType zone = (z == ZoneType::BUNKER) ? ZoneType::TUK : z;
@@ -364,11 +337,11 @@ void GameWorld::CreateMonster()
 				auto monster = std::make_shared<Monster>(id, zone, info.MonsterType);
 				FVector pos;
 				float radius = monster->GetInfo().CollisionRadius;
-				if (!info.bRandomSpawn)
-				{
-					pos = info.SpawnPos;
-				}
-				else
+				//if (!info.bRandomSpawn)
+				//{
+				//	pos = info.SpawnPos;
+				//}
+				//else
 				{
 					do
 					{

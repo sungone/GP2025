@@ -7,23 +7,23 @@
 bool Map::Init()
 {
 	const std::vector<std::pair<ZoneType, std::string>> ZoneMeshFiles = {
-	{ ZoneType::PLAYGROUND, "NavMeshData_Playground.json" },
+	//{ ZoneType::PLAYGROUND, "NavMeshData_Playground.json" },
 	{ ZoneType::TUK,        "NavMeshData_TUK.json" },
-	{ ZoneType::TIP,        "NavMeshData_TIP.json" },
-	{ ZoneType::E,          "NavMeshData_E.json" },
-	{ ZoneType::GYM,        "NavMeshData_GYM.json" },
-	{ ZoneType::INDUSTY,    "NavMeshData_Industry.json" },
-	{ ZoneType::BUNKER,     "NavMeshData_Bunker.json" }
+	//{ ZoneType::TIP,        "NavMeshData_TIP.json" },
+	//{ ZoneType::E,          "NavMeshData_E.json" },
+	//{ ZoneType::GYM,        "NavMeshData_GYM.json" },
+	//{ ZoneType::INDUSTY,    "NavMeshData_Industry.json" },
+	//{ ZoneType::BUNKER,     "NavMeshData_Bunker.json" }
 	};
 	const std::vector<std::pair<EntryType, std::string>> EntryMeshFiles = {
-	{ EntryType::TIP_IN,       "NavMeshData_TIP_In.json" },
-	{ EntryType::TIP_OUT,      "NavMeshData_TIP_Out.json" },
-	{ EntryType::E_IN,         "NavMeshData_E_In.json" },
-	{ EntryType::E_OUT,        "NavMeshData_E_Out.json" },
-	{ EntryType::GYM_IN,       "NavMeshData_GYM_In.json" },
-	{ EntryType::GYM_OUT,      "NavMeshData_GYM_Out.json" },
-	{ EntryType::INDUSTY_IN,   "NavMeshData_Industry_In.json" },
-	{ EntryType::INDUSTY_OUT,  "NavMeshData_Industry_Out.json" }
+	//{ EntryType::TIP_IN,       "NavMeshData_TIP_In.json" },
+	//{ EntryType::TIP_OUT,      "NavMeshData_TIP_Out.json" },
+	//{ EntryType::E_IN,         "NavMeshData_E_In.json" },
+	//{ EntryType::E_OUT,        "NavMeshData_E_Out.json" },
+	//{ EntryType::GYM_IN,       "NavMeshData_GYM_In.json" },
+	//{ EntryType::GYM_OUT,      "NavMeshData_GYM_Out.json" },
+	//{ EntryType::INDUSTY_IN,   "NavMeshData_Industry_In.json" },
+	//{ EntryType::INDUSTY_OUT,  "NavMeshData_Industry_Out.json" }
 	};
 
 	for (const auto& [zone, file] : ZoneMeshFiles)
