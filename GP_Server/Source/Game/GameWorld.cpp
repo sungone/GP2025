@@ -323,7 +323,7 @@ void GameWorld::PlayerDead(int32 playerID)
 void GameWorld::CreateMonster()
 {
 	auto table = SpawnTable::GetInst();
-	for (ZoneType z : { ZoneType::TUK})
+	for (ZoneType z : { ZoneType::TUK, ZoneType::E, ZoneType::INDUSTY, ZoneType::BUNKER })
 	{
 		const auto& spawns = table.GetSpawnsByZone(z);
 		ZoneType zone = (z == ZoneType::BUNKER) ? ZoneType::TUK : z;

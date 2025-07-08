@@ -53,7 +53,6 @@ ZoneType SpawnTable::ParseZoneType(const std::string& str)
     if (str == "GYM") return ZoneType::GYM;
     if (str == "INDUSTY") return ZoneType::INDUSTY;
     if (str == "BUNKER") return ZoneType::BUNKER;
-    if (str == "PLAYGROUND") return ZoneType::PLAYGROUND;
     return ZoneType::NONE;
 }
 

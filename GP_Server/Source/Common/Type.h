@@ -247,7 +247,6 @@ enum class ZoneType : uint8
 	GYM,
 	INDUSTY,
 	BUNKER,
-	PLAYGROUND,
 };
 
 enum class EntryType : uint8
