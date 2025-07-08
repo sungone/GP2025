@@ -67,4 +67,15 @@ public:
 	bool bIsZoomingForDialogue = false;
 	float DialogueZoomTargetLength = 200.f; 
 	float DefaultZoomLength = 600.f;
+
+	// Camera Shake
+public :
+
+	UFUNCTION(BlueprintCallable, Category = "Camera")
+	void PlayHitCameraShake();
+	FVector OriginalSocketOffset;
+	FTimerHandle CameraShakeResetTimer;
+
+	UFUNCTION()
+	void ResetCameraShake();
 };

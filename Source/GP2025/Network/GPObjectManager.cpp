@@ -272,6 +272,8 @@ void UGPObjectManager::DamagedPlayer(const FInfoData& PlayerInfo)
 		if ((LocalMyPlayer == MyPlayer) && MyPlayer->UIManager)
 		{
 			MyPlayer->UIManager->GetInGameWidget()->HitByMonsterAnimation();
+			// Hit Camera Shake
+			MyPlayer->PlayerHittedCameraShake();
 		}
 	}
 }
@@ -353,7 +355,7 @@ void UGPObjectManager::RemoveMonster(int32 MonsterID)
 		if (WeakMonsterPtr->IsValid())
 		{
 			AGPCharacterMonster* Monster = WeakMonsterPtr->Get();
-			Monster->CombatHandler->HandleDeath();
+			Monster->Destroy();
 		}
 		Monsters.Remove(MonsterID);
 	}
@@ -366,11 +368,6 @@ void UGPObjectManager::UpdateMonster(const FInfoData& MonsterInfo)
 		if (WeakMonsterPtr->IsValid())
 		{
 			AGPCharacterMonster* Monster = WeakMonsterPtr->Get();
-
-			if (MonsterInfo.HasState(ECharacterStateType::STATE_DIE))
-			{
-				return;
-			}
 
 			Monster->SetCharacterInfo(MonsterInfo);
 			FRotator CurrentRot = Monster->GetActorRotation();

@@ -246,7 +246,7 @@ void AGPCharacterNPC::OpenQuestUI(APlayerController* PlayerController)
 				{
 				case ENPCType::PROFESSOR:
 					LocalQuestWidget->SetQuestTitle(TEXT("교수님"));
-					LocalQuestWidget->SetQuestDescription(TEXT("어서오게나"));
+					LocalQuestWidget->SetQuestDescription(TEXT("문서를 가져왔나? 서버를 꺼야해"));
 					break;
 				case ENPCType::STUDENT:
 					LocalQuestWidget->SetQuestTitle(TEXT("학생 A"));
@@ -254,7 +254,7 @@ void AGPCharacterNPC::OpenQuestUI(APlayerController* PlayerController)
 					break;
 				case ENPCType::SECURITY:
 					LocalQuestWidget->SetQuestTitle(TEXT("경비 아저씨"));
-					LocalQuestWidget->SetQuestDescription(TEXT("안녕하세요! 도와주실 수 있나요?"));
+					LocalQuestWidget->SetQuestDescription(TEXT("벙커에 있는 몬스터가 열쇠를 가져갔어..."));
 					break;
 				default:
 					LocalQuestWidget->SetQuestTitle(TEXT("대화"));
