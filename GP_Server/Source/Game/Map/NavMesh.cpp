@@ -87,6 +87,29 @@ int NavMesh::FindIdxFromPos(const FVector& pos) const
     return -1;
 }
 
+int NavMesh::FindClosestPoly(const FVector& pos) const
+{
+    int bestIdx = -1;
+    float bestDist = std::numeric_limits<float>::infinity();
+
+    for (int i = 0; i < static_cast<int>(polygons.size()); ++i)
+    {
+        FVector center(0, 0, 0);
+        for (int vid : polygons[i])
+            center = center + vertices[vid];
+        center = center / static_cast<float>(polygons[i].size());
+
+        float distSq = center.DistanceSquared2D(pos);
+        if (distSq < bestDist)
+        {
+            bestDist = distSq;
+            bestIdx = i;
+        }
+    }
+
+    return bestIdx;
+}
+
 FVector NavMesh::GetRandomPosition() const
 {
     if (polygons.empty() || vertices.empty())
@@ -118,48 +141,19 @@ FVector NavMesh::GetRandomPosition() const
     return P;
 }
 
-std::vector<int> NavMesh::FindPath(int startPoly, int goalPoly) const
-{
-    int N = (int)polygons.size();
-    if (startPoly < 0 || goalPoly < 0 || startPoly >= N || goalPoly >= N)
-        return {};
-
-    std::vector<int> prev(N, -1);
-    std::deque<int> queue;
-    queue.push_back(startPoly);
-    prev[startPoly] = startPoly;
-
-    while (!queue.empty())
-    {
-        int cur = queue.front(); queue.pop_front();
-        if (cur == goalPoly) break;
-
-        for (int nb : neighbors[cur])
-        {
-            if (prev[nb] == -1)
-            {
-                prev[nb] = cur;
-                queue.push_back(nb);
-            }
-        }
-    }
-
-    if (prev[goalPoly] == -1) return {};
-
-    std::vector<int> path;
-    for (int at = goalPoly; at != startPoly; at = prev[at])
-        path.push_back(at);
-    path.push_back(startPoly);
-    std::reverse(path.begin(), path.end());
-    return path;
-}
-
 std::vector<int> NavMesh::FindPathAStar(const FVector& startPos, const FVector& goalPos) const
 {
     int startPoly = FindIdxFromPos(startPos);
     int goalPoly = FindIdxFromPos(goalPos);
+
+    if (startPoly < 0)
+        startPoly = FindClosestPoly(startPos);
+    if (goalPoly < 0)
+        goalPoly = FindClosestPoly(goalPos);
+
     if (startPoly < 0 || goalPoly < 0)
         return {};
+
 
     int N = static_cast<int>(polygons.size());
     // Precompute polygon centers

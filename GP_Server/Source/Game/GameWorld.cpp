@@ -17,8 +17,8 @@ bool GameWorld::Init()
 		return false;
 	}
 
-	//CreateMonster();
-	//TimerQueue::AddTimer([] { GameWorld::GetInst().UpdateAllMonsters(); }, 1500, true);
+	CreateMonster();
+	TimerQueue::AddTimer([] { GameWorld::GetInst().UpdateAllMonsters(); }, 1500, true);
 
 	return true;
 }
@@ -213,41 +213,7 @@ void GameWorld::PlayerAttack(int32 playerId)
 		LOG(Warning, "Invaild!");
 		return;
 	}
-	{
-		ZoneType zone = player->GetZone();
-		auto& navMesh = Map::GetInst().GetNavMesh(zone);
 
-		FVector start = player->GetInfo().Pos;
-		FVector goal = FVector(-2931, 6060, 0);
-
-		std::vector<int> polyPath = navMesh.FindPathAStar(start, goal);
-
-		std::vector<FVector> straightPath = navMesh.GetStraightPath(start, goal, polyPath);
-
-		for (int polyIdx : polyPath)
-		{
-			if (polyIdx < 0 || polyIdx >= navMesh.polygons.size())
-				continue;
-
-			const auto& poly = navMesh.polygons[polyIdx];
-			if (poly.size() < 3) continue;
-
-			for (size_t i = 1; i + 1 < poly.size(); ++i)
-			{
-				const FVector& A = navMesh.vertices[poly[0]];
-				const FVector& B = navMesh.vertices[poly[i]];
-				const FVector& C = navMesh.vertices[poly[i + 1]];
-				DebugTrianglePacket dbg(A, B, C, 2.f);
-				SessionManager::GetInst().SendPacket(playerId, &dbg);
-			}
-		}
-
-		for (size_t i = 1; i < straightPath.size(); ++i)
-		{
-			DebugLinePacket dbgLine(straightPath[i - 1], straightPath[i], 5.f);
-			SessionManager::GetInst().SendPacket(playerId, &dbgLine);
-		}
-	}
 	std::unordered_set<int32> viewList;
 	{
 		std::lock_guard lock(player->_vlLock);

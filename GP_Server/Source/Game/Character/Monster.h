@@ -55,6 +55,7 @@ private:
 	void PerformMeleeAttack();
 	void SetNextPattern();
 
+	void UpdateChaseMovement();
 	void Chase();
 	void Patrol();
 
@@ -72,7 +73,7 @@ private:
 	bool _isBoss;
 	EAttackPattern _currentPattern;
 	NavMesh* _navMesh = nullptr;
-	std::vector<FVector>           _movePath;
-	int                             _pathIdx = 0;
+	std::vector<FVector> _movePath;
+	int _pathIdx = 0;
 };
 
