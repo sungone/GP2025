@@ -310,6 +310,33 @@ void UGPObjectManager::LevelUp(const FInfoData& PlayerInfo)
 {
 	if (MyPlayer->EffectHandler)
 		MyPlayer->EffectHandler->PlayLevelUpEffect();
+
+	UGPInGameWidget* LocalInGameWidget = MyPlayer->UIManager->GetInGameWidget();
+	if (LocalInGameWidget)
+	{
+		int32 PlayerLevel = PlayerInfo.GetLevel();
+		FTimerHandle TimerHandle;
+		MyPlayer->GetWorldTimerManager().SetTimer(
+			TimerHandle,
+			[LocalInGameWidget, PlayerLevel]()
+			{
+				if (PlayerLevel == 2 || PlayerLevel == 5 || PlayerLevel == 8)
+				{
+					LocalInGameWidget->ShowLevelUpArrowTemporarily(LocalInGameWidget->LevelUpArrowQ);
+				}
+				else if (PlayerLevel == 3 || PlayerLevel == 6 || PlayerLevel == 9)
+				{
+					LocalInGameWidget->ShowLevelUpArrowTemporarily(LocalInGameWidget->LevelUpArrowE);
+				}
+				else if (PlayerLevel == 4 || PlayerLevel == 7 || PlayerLevel == 10)
+				{
+					LocalInGameWidget->ShowLevelUpArrowTemporarily(LocalInGameWidget->LevelUpArrowR);
+				}
+			},
+			2.0f,
+			false
+		);
+	}
 }
 
 void UGPObjectManager::AddMonster(const FInfoData& MonsterInfo)

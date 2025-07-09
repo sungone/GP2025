@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/ProgressBar.h"
 #include "Components/Border.h"
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Styling/SlateColor.h"
 #include "GPInGameWidget.h"
@@ -118,6 +119,35 @@ void UGPInGameWidget::LevelUpAnimation()
 void UGPInGameWidget::HitByMonsterAnimation()
 {
     PlayAnimation(HitByMonsterAnim, 0.f, 1, EUMGSequencePlayMode::Forward, 1.f);
+}
+
+void UGPInGameWidget::ShowLevelUpArrowTemporarily(UImage* ArrowImage, float Duration)
+{
+    if (!ArrowImage)
+        return;
+
+    // Visible 처리
+    ArrowImage->SetVisibility(ESlateVisibility::Visible);
+
+    if (LevelUpArrow)
+    {
+        PlayAnimation(LevelUpArrow);
+    }
+
+    // 일정 시간 뒤 Hidden 처리
+    FTimerHandle TimerHandle;
+    GetWorld()->GetTimerManager().SetTimer(
+        TimerHandle,
+        [ArrowImage]()
+        {
+            if (ArrowImage)
+            {
+                ArrowImage->SetVisibility(ESlateVisibility::Hidden);
+            }
+        },
+        Duration,
+        false
+    );
 }
 
 

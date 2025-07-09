@@ -95,4 +95,18 @@ public:
     UWidgetAnimation* HitByMonsterAnim;
 
     void HitByMonsterAnimation();
+
+    UPROPERTY(meta = (BindWidget))
+    class UImage* LevelUpArrowQ;
+
+    UPROPERTY(meta = (BindWidget))
+    class UImage* LevelUpArrowE;
+
+    UPROPERTY(meta = (BindWidget))
+    class UImage* LevelUpArrowR;
+
+    UPROPERTY(meta = (BindWidgetAnim), Transient)
+    class UWidgetAnimation* LevelUpArrow;
+
+    void ShowLevelUpArrowTemporarily(UImage* ArrowImage, float Duration = 1.0f);
 };
