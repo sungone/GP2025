@@ -122,5 +122,9 @@ public :
 	// Chat System
 	void FocusChatInput();     // 입력창 열기 + 포커스 + 마우스 표시
 	// void CloseChatInput();     // 입력 종료 + 마우스 숨김 + 인게임 복귀
+
+
+// Skill Info Update From Inventory
+	void UpdateSkillInfosFromPlayer();
 };
 

@@ -12,7 +12,7 @@ AGPEarthQuakeRockActor::AGPEarthQuakeRockActor()
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(Mesh);
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> RockMeshAsset(TEXT("/Game/Skill/Rock_shopk_Raw.Rock_shopk_Raw"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> RockMeshAsset(TEXT("/Game/Skill/Rock_earthquake.Rock_earthquake"));
 	if (RockMeshAsset.Succeeded())
 	{
 		Mesh->SetStaticMesh(RockMeshAsset.Object);

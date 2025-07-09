@@ -14,6 +14,8 @@
 #include "UI/GPQuestListWidget.h"
 #include "Character/Modules/GPMyplayerSoundManager.h"
 #include "UI/GPSkillLevelUpText.h"
+#include "Skill/GPSkillStruct.h"
+#include "Inventory/GPSkillInfo.h"
 
 UGPMyplayerUIManager::UGPMyplayerUIManager()
 {
@@ -145,6 +147,7 @@ void UGPMyplayerUIManager::OpenInventory()
 		if (Inventory && IsValid(Owner))
 		{
 			Inventory->SetGold(Owner->CharacterInfo.Gold);
+			UpdateSkillInfosFromPlayer();
 		}
 
 		InventoryWidget->AddToViewport();
@@ -444,6 +447,142 @@ void UGPMyplayerUIManager::FocusChatInput()
 			InputMode.SetWidgetToFocus(Chat->TakeWidget());
 			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 			PC->SetInputMode(InputMode);
+		}
+	}
+}
+
+void UGPMyplayerUIManager::UpdateSkillInfosFromPlayer()
+{
+	if (!Owner)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[UIManager] UpdateSkillInfosFromPlayer: Owner is null"));
+		return;
+	}
+
+	UGPInventory* Inven = GetInventoryWidget();
+	if (!Inven)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[UIManager] UpdateSkillInfosFromPlayer: Inventory is null"));
+		return;
+	}
+
+	if (!Inven->SkillDataTable)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[UIManager] UpdateSkillInfosFromPlayer: SkillDataTable is null"));
+		return;
+	}
+
+	bool bIsGunner = Owner->bIsGunnerCharacter();
+	FString RequiredWeapon = bIsGunner ? TEXT("Gun") : TEXT("Sword");
+
+	int32 PlayerLevel = Owner->CharacterInfo.GetLevel();
+
+	TArray<FString> SkillNames;
+	TArray<FString> SkillKeys;
+
+	if (bIsGunner)
+	{
+		SkillNames = { TEXT("Throwing"), TEXT("FThrowing"), TEXT("Anger") };
+		SkillKeys = { TEXT("Q"), TEXT("E"), TEXT("R") };
+	}
+	else
+	{
+		SkillNames = { TEXT("HitHard"), TEXT("Clash"), TEXT("Whirlwind") };
+		SkillKeys = { TEXT("Q"), TEXT("E"), TEXT("R") };
+	}
+
+	TArray<UGPSkillInfo*> SkillWidgets = {
+	Inven->QSkillInfo,
+	Inven->ESkillInfo,
+	Inven->RSkillInfo
+	};
+
+	TArray<bool> bSkillVisible = { false, false, false };
+
+	if (PlayerLevel >= 4)
+	{
+		bSkillVisible[0] = true;
+		bSkillVisible[1] = true;
+		bSkillVisible[2] = true;
+	}
+	else if (PlayerLevel == 3)
+	{
+		bSkillVisible[0] = true;
+		bSkillVisible[1] = true;
+	}
+	else if (PlayerLevel == 2)
+	{
+		bSkillVisible[0] = true;
+	}
+
+
+
+	for (int32 i = 0; i < SkillNames.Num() && i < SkillWidgets.Num(); ++i)
+	{
+		if (!SkillWidgets[i])
+			continue;
+
+		// 먼저 Visibility 설정
+		if (bSkillVisible[i])
+		{
+			SkillWidgets[i]->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			SkillWidgets[i]->SetVisibility(ESlateVisibility::Hidden);
+			continue;
+		}
+
+		const FString& SkillName = SkillNames[i];
+		const FString& InputKey = SkillKeys[i];
+
+		const FGPSkillStruct* BestRow = nullptr;
+		int32 BestSkillLv = -1;
+		int32 BestAppliedLevel = -1;
+
+		for (const auto& RowPair : Inven->SkillDataTable->GetRowMap())
+		{
+			const FGPSkillStruct* Row = reinterpret_cast<const FGPSkillStruct*>(RowPair.Value);
+			if (!Row)
+				continue;
+
+			if (Row->weapon != RequiredWeapon)
+				continue;
+
+			if (Row->name != SkillName)
+				continue;
+
+			if (Row->applied_Level > PlayerLevel)
+				continue;
+
+			// Applied Level 가 더 높거나 같으면 교체
+			if (Row->applied_Level > BestAppliedLevel ||
+				(Row->applied_Level == BestAppliedLevel && Row->skill_lv > BestSkillLv))
+			{
+				BestAppliedLevel = Row->applied_Level;
+				BestSkillLv = Row->skill_lv;
+				BestRow = Row;
+			}
+		}
+
+		if (BestRow && SkillWidgets[i])
+		{
+			SkillWidgets[i]->SetSkillInfo(
+				FName(*BestRow->name),
+				BestRow->cooltime,
+				BestRow->skill_value_00,
+				InputKey
+			);
+		}
+		else if (SkillWidgets[i])
+		{
+			// 값 없으면 초기화
+			SkillWidgets[i]->SetSkillInfo(
+				FName(TEXT("-")),
+				0.0f,
+				0,
+				InputKey
+			);
 		}
 	}
 }

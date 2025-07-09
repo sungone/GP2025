@@ -55,4 +55,7 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int32 skill_value_01;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 applied_Level;
 };

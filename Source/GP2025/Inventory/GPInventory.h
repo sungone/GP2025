@@ -40,6 +40,9 @@ public :
 	UPROPERTY(EditDefaultsOnly, Category = "Data")
 	UDataTable* ItemDataTable;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Data")
+	UDataTable* SkillDataTable;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UGPItemSlot> SlotClass;
 
@@ -60,6 +63,15 @@ public :
 	// Stat Info Ã³¸®
 	UPROPERTY(meta = (BindWidget))
 	class UGPStatInfo* StatInfo;
+
+	UPROPERTY(meta = (BindWidget))
+	class UGPSkillInfo* QSkillInfo;
+
+	UPROPERTY(meta = (BindWidget))
+	class UGPSkillInfo* ESkillInfo;
+
+	UPROPERTY(meta = (BindWidget))
+	class UGPSkillInfo* RSkillInfo;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UGPEquippedItemSlot> WeaponViewerSlot;
