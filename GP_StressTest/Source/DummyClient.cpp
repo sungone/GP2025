@@ -190,7 +190,9 @@ bool DummyClient::SendMovePacket()
 bool DummyClient::Move()
 {
 	static auto& nav = Map::GetInst().GetNavMesh(ZoneType::TUK);
-
+	FVector currentPos = _info.Pos;
+	FVector newPos = nav.GetNearbyRandomPosition(currentPos);
+	_info.SetLocationAndYaw(newPos);
 
 	return true;
 }

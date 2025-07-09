@@ -262,38 +262,45 @@ std::vector<FVector> NavMesh::GetStraightPath(
     return path;
 }
 
-FVector NavMesh::GetNearbyRandomPosition(const FVector& origin, float radius) const
+FVector NavMesh::GetNearbyRandomPosition(const FVector& origin) const
 {
+    static float maxDist = 200.f;
     int currIdx = FindIdxFromPos(origin);
     if (currIdx < 0 || currIdx >= static_cast<int>(neighbors.size()))
         return origin;
 
-    const std::vector<int>& neighborPolys = neighbors[currIdx];
-    if (neighborPolys.empty())
-        return origin;
+    std::vector<int> neighborPolys = neighbors[currIdx];
+    neighborPolys.push_back(currIdx);
 
-    int randIdx = RandomUtils::GetRandomInt(0, static_cast<int>(neighborPolys.size()) - 1);
-    int targetPolyIdx = neighborPolys[randIdx];
-    if (targetPolyIdx < 0 || targetPolyIdx >= static_cast<int>(polygons.size()))
-        return origin;
+    for (int attempt = 0; attempt < 5; ++attempt)
+    {
+        int randIdx = RandomUtils::GetRandomInt(0, static_cast<int>(neighborPolys.size()) - 1);
+        int targetPolyIdx = neighborPolys[randIdx];
+        if (targetPolyIdx < 0 || targetPolyIdx >= static_cast<int>(polygons.size()))
+            continue;
 
-    const auto& poly = polygons[targetPolyIdx];
-    if (poly.size() < 3)
-        return origin;
+        const auto& poly = polygons[targetPolyIdx];
+        if (poly.size() < 3)
+            continue;
 
-    const FVector& A = vertices[poly[0]];
-    const FVector& B = vertices[poly[1]];
-    const FVector& C = vertices[poly[2]];
+        const FVector& A = vertices[poly[0]];
+        const FVector& B = vertices[poly[1]];
+        const FVector& C = vertices[poly[2]];
 
-    float u = RandomUtils::GetRandomFloat(0.f, 1.f);
-    float v = RandomUtils::GetRandomFloat(0.f, 1.f);
-    if (u + v > 1.f) {
-        u = 1.f - u;
-        v = 1.f - v;
+        float u = RandomUtils::GetRandomFloat(0.f, 1.f);
+        float v = RandomUtils::GetRandomFloat(0.f, 1.f);
+        if (u + v > 1.f) {
+            u = 1.f - u;
+            v = 1.f - v;
+        }
+
+        FVector P = A + (B - A) * u + (C - A) * v;
+        if ((P - origin).LengthSquared() <= maxDist * maxDist)
+        {
+            P.Z += 90.f;
+            return P;
+        }
     }
 
-    FVector P = A + (B - A) * u + (C - A) * v;
-    P.Z += 90.f;
-
-    return P;
+    return origin;
 }

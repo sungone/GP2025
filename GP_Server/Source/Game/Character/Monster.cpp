@@ -410,8 +410,7 @@ void Monster::Patrol()
 {
 	ChangeState(ECharacterStateType::STATE_WALK);
 	FVector currentPos = GetPos();
-	float redius = _info.CollisionRadius;
-	FVector newPos = _navMesh->GetNearbyRandomPosition(currentPos, redius);
+	FVector newPos = _navMesh->GetNearbyRandomPosition(currentPos);
 	_info.SetLocationAndYaw(newPos);
 	if (RandomUtils::GetRandomBool())
 	{
@@ -427,29 +426,41 @@ bool Monster::SetTarget()
 		viewListCopy.assign(_viewList.begin(), _viewList.end());
 	}
 
-	for (auto& playerId : viewListCopy)
+	float minDistSq = std::numeric_limits<float>::max();
+	std::shared_ptr<Player> nearestPlayer = nullptr;
+
+	for (int32 playerId : viewListCopy)
 	{
 		if (playerId >= MAX_PLAYER)
 		{
-			LOG(Warning, "Invaild");
-			ChangeState(ECharacterStateType::STATE_IDLE);
 			continue;
 		}
+
 		auto player = GameWorld::GetInst().GetPlayerByID(playerId);
-		if (!player)
+		if (!player || player->IsDead())
 		{
 			RemoveFromViewList(playerId);
 			continue;
 		}
-		if (IsInViewDistance(player->GetInfo().Pos, detectDist))
+
+		const FVector& pos = player->GetInfo().Pos;
+		if (!IsInViewDistance(pos, detectDist))
+			continue;
+
+		float distSq = (pos - GetInfo().Pos).LengthSquared();
+		if (distSq < minDistSq)
 		{
-			LOG("SetTarget!");
-			//Todo: 제일 가까운 플레이어를 쫓아야함...
-			ChangeState(ECharacterStateType::STATE_WALK);
-			_target = std::dynamic_pointer_cast<Player>(player);
-			return true;
+			minDistSq = distSq;
+			nearestPlayer = player;
 		}
 	}
+
+	if (nearestPlayer)
+	{
+		_target = nearestPlayer;
+		return true;
+	}
+
 	return false;
 }
 

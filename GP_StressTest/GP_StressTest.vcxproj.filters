@@ -75,10 +75,10 @@
     <ClInclude Include="..\GP_Server\Source\Common\Type.h">
       <Filter>소스 파일\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\GP_Server\Source\Game\Map\Map.h">
+    <ClInclude Include="..\GP_Server\Source\Game\Map\NavMesh.h">
       <Filter>소스 파일\Map</Filter>
     </ClInclude>
-    <ClInclude Include="..\GP_Server\Source\Game\Map\NavMesh.h">
+    <ClInclude Include="..\GP_Server\Source\Game\Map\Map.h">
       <Filter>소스 파일\Map</Filter>
     </ClInclude>
   </ItemGroup>
