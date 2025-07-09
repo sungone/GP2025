@@ -71,5 +71,8 @@ private:
 	bool _active = false;
 	bool _isBoss;
 	EAttackPattern _currentPattern;
+	NavMesh* _navMesh = nullptr;
+	std::vector<FVector>           _movePath;
+	int                             _pathIdx = 0;
 };
 

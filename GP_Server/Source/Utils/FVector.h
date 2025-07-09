@@ -76,6 +76,9 @@ struct FVector
 			<< std::format("{:.2f}", Z) << ")";
 		return oss.str();
 	}
+
+	FVector GetSafeNormal2D() const;
+	static FVector CrossProduct(const FVector& A, const FVector& B);
 };
 
 inline const FVector FVector::ZeroVector = FVector(0.0, 0.0, 0.0);
@@ -88,4 +91,22 @@ inline double DegreesToRadians(double degrees)
 inline double RadiansToDegrees(double radians)
 {
 	return radians * (180.0 / 3.14159265358979323846);
+}
+
+inline FVector FVector::GetSafeNormal2D() const
+{
+	float sizeSq2D = X * X + Y * Y;
+	if (sizeSq2D == 0.f)
+		return FVector(0, 0, 0);
+	float scale = 1.f / std::sqrt(sizeSq2D);
+	return FVector(X * scale, Y * scale, 0.f);
+}
+
+inline FVector FVector::CrossProduct(const FVector& A, const FVector& B)
+{
+	return FVector(
+		A.Y * B.Z - A.Z * B.Y,
+		A.Z * B.X - A.X * B.Z,
+		A.X * B.Y - A.Y * B.X
+	);
 }

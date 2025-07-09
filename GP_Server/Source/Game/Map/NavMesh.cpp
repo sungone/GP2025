@@ -87,6 +87,37 @@ int NavMesh::FindIdxFromPos(const FVector& pos) const
     return -1;
 }
 
+FVector NavMesh::GetRandomPosition() const
+{
+    if (polygons.empty() || vertices.empty())
+        return FVector::ZeroVector;
+
+    int polyCount = static_cast<int>(polygons.size());
+    int polyIdx = RandomUtils::GetRandomInt(0, polyCount - 1);
+    const auto& poly = polygons[polyIdx];
+    int vcount = static_cast<int>(poly.size());
+    if (vcount < 3)
+        return FVector::ZeroVector;
+
+    int triCount = vcount - 2;
+    int ti = RandomUtils::GetRandomInt(0, triCount - 1);
+
+    const FVector& A = vertices[poly[0]];
+    const FVector& B = vertices[poly[ti + 1]];
+    const FVector& C = vertices[poly[ti + 2]];
+
+    float u = RandomUtils::GetRandomFloat(0.f, 1.f);
+    float v = RandomUtils::GetRandomFloat(0.f, 1.f);
+    if (u + v > 1.f) {
+        u = 1.f - u;
+        v = 1.f - v;
+    }
+
+    FVector P = A + (B - A) * u + (C - A) * v;
+    P.Z += 90;
+    return P;
+}
+
 std::vector<int> NavMesh::FindPath(int startPoly, int goalPoly) const
 {
     int N = (int)polygons.size();
@@ -185,33 +216,55 @@ std::vector<int> NavMesh::FindPathAStar(const FVector& startPos, const FVector& 
     return path;
 }
 
-FVector NavMesh::GetRandomPosition() const
+std::vector<FVector> NavMesh::GetStraightPath(
+    const FVector& startPos,
+    const FVector& goalPos,
+    const std::vector<int>& polyPath) const
 {
-    if (polygons.empty() || vertices.empty())
-        return FVector::ZeroVector;
-
-    int polyCount = static_cast<int>(polygons.size());
-    int polyIdx = RandomUtils::GetRandomInt(0, polyCount - 1);
-    const auto& poly = polygons[polyIdx];
-    int vcount = static_cast<int>(poly.size());
-    if (vcount < 3)
-        return FVector::ZeroVector;
-
-    int triCount = vcount - 2;
-    int ti = RandomUtils::GetRandomInt(0, triCount - 1);
-
-    const FVector& A = vertices[poly[0]];
-    const FVector& B = vertices[poly[ti + 1]];
-    const FVector& C = vertices[poly[ti + 2]];
-
-    float u = RandomUtils::GetRandomFloat(0.f, 1.f);
-    float v = RandomUtils::GetRandomFloat(0.f, 1.f);
-    if (u + v > 1.f) {
-        u = 1.f - u;
-        v = 1.f - v;
+    std::vector<FVector> path;
+    if (polyPath.size() < 2)
+    {
+        path.push_back(startPos);
+        path.push_back(goalPos);
+        return path;
     }
 
-    FVector P = A + (B - A) * u + (C - A) * v;
-    P.Z += 90;
-    return P;
+    std::vector<std::pair<FVector, FVector>> portals;
+    portals.emplace_back(startPos, startPos);
+    for (size_t i = 0; i + 1 < polyPath.size(); ++i)
+    {
+        const auto& A = polygons[polyPath[i]];
+        const auto& B = polygons[polyPath[i + 1]];
+        std::unordered_set<int> setA(A.begin(), A.end());
+        std::vector<FVector> shared;
+        shared.reserve(2);
+        for (int vid : B)
+            if (setA.count(vid))
+                shared.push_back(vertices[vid]);
+
+        if (shared.size() == 2)
+        {
+            FVector L = shared[0], R = shared[1];
+            auto cross2D = [](const FVector& a, const FVector& b) {
+                return a.X * b.Y - a.Y * b.X;
+                };
+            if (cross2D(R - L, goalPos - L) < 0)
+                std::swap(L, R);
+
+            portals.emplace_back(L, R);
+        }
+    }
+    portals.emplace_back(goalPos, goalPos);
+
+    path.reserve(portals.size());
+    path.push_back(startPos);
+    for (size_t i = 1; i + 1 < portals.size(); ++i)
+    {
+        const auto& [L, R] = portals[i];
+        FVector mid = (L + R) * 0.5;
+        path.push_back(mid);
+    }
+    path.push_back(goalPos);
+
+    return path;
 }

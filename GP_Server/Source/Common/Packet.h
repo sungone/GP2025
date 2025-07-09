@@ -656,3 +656,17 @@ struct DebugTrianglePacket : public Packet
 		Header.PacketSize = sizeof(DebugTrianglePacket);
 	}
 };
+
+struct DebugLinePacket : public Packet
+{
+	FVector A;
+	FVector B;
+	float  Duration;
+
+	DebugLinePacket(const FVector& InA, const FVector& InB, float InDuration = 10.0f)
+		: Packet(EPacketType::S_DEBUG_LINE)
+		, A(InA), B(InB), Duration(InDuration)
+	{
+		Header.PacketSize = sizeof(DebugLinePacket);
+	}
+};

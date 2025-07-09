@@ -575,11 +575,19 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_DEBUG_TRIANGLE:
 			{
 				DebugTrianglePacket* Packet = reinterpret_cast<DebugTrianglePacket*>(RemainingData.GetData());
-				const FColor DefaultColor = FColor::Red;
+				const FColor DefaultColor = FColor::White;
 
 				DrawDebugLine(GetWorld(), Packet->A, Packet->B, DefaultColor, false, Packet->Duration, 0, 2.0f);
 				DrawDebugLine(GetWorld(), Packet->B, Packet->C, DefaultColor, false, Packet->Duration, 0, 2.0f);
 				DrawDebugLine(GetWorld(), Packet->C, Packet->A, DefaultColor, false, Packet->Duration, 0, 2.0f);
+				break;
+			}
+			case EPacketType::S_DEBUG_LINE:
+			{
+				DebugLinePacket* Packet = reinterpret_cast<DebugLinePacket*>(RemainingData.GetData());
+				const FColor DefaultColor = FColor::Green;
+
+				DrawDebugLine(GetWorld(), Packet->A, Packet->B, DefaultColor, false, Packet->Duration, 0, 5.0f);
 				break;
 			}
 #pragma endregion

@@ -29,6 +29,7 @@ public:
 
 	virtual void ChangeState(ECharacterStateType newState) = 0;
 	FInfoData& GetInfo() { return _info; }
+	FVector GetPos() const { return _info.Pos; }
 	ZoneType GetZone() { return _info.GetZone(); }
 	void SetInfo(const FInfoData& info) { _info = info; }
 	void SetPos(const FVector& pos) { _info.Pos = pos; }

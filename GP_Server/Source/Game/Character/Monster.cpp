@@ -28,7 +28,7 @@ void Monster::Init()
 	_info.CollisionRadius = data->CollisionRadius;
 	_info.AttackRadius = data->AtkRadius;
 	_info.State = ECharacterStateType::STATE_IDLE;
-
+	_navMesh = &Map::GetInst().GetNavMesh(_zone);
 }
 
 void Monster::UpdateViewList(std::shared_ptr<Character> other)

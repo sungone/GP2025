@@ -89,7 +89,8 @@ enum EPacketType : uint8
 
 
 	//for test
-	S_DEBUG_TRIANGLE
+	S_DEBUG_TRIANGLE,
+	S_DEBUG_LINE
 };
 
 

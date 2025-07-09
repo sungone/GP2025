@@ -17,8 +17,8 @@ bool GameWorld::Init()
 		return false;
 	}
 
-	CreateMonster();
-	TimerQueue::AddTimer([] { GameWorld::GetInst().UpdateAllMonsters(); }, 1500, true);
+	//CreateMonster();
+	//TimerQueue::AddTimer([] { GameWorld::GetInst().UpdateAllMonsters(); }, 1500, true);
 
 	return true;
 }
@@ -194,52 +194,6 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 	player->GetInfo().State = static_cast<ECharacterStateType>(state);
 	UpdateViewList(player);
 
-	{
-		ZoneType zone = player->GetZone();
-		auto& navMesh = Map::GetInst().GetNavMesh(zone);
-
-		// 플레이어 시작/목표 위치
-		FVector start = player->GetInfo().Pos;
-		FVector goal = FVector(-2931, 6060, 0);
-
-		// 폴리곤 인덱스 검색
-		int startPoly = navMesh.FindIdxFromPos(start);
-		int goalPoly = navMesh.FindIdxFromPos(goal);
-
-		// 시작 폴리곤 디버그 그리기
-		if (startPoly != -1)
-		{
-			const auto& poly = navMesh.polygons[startPoly];
-			// fan triangulation: poly[0] 기준으로 (n-2)개의 삼각형
-			for (int i = 1; i + 1 < poly.size(); ++i)
-			{
-				const FVector& A = navMesh.vertices[poly[0]];
-				const FVector& B = navMesh.vertices[poly[i]];
-				const FVector& C = navMesh.vertices[poly[i + 1]];
-				DebugTrianglePacket dbg(A, B, C, 5.f);
-				SessionManager::GetInst().SendPacket(playerId, &dbg);
-			}
-		}
-
-		// 경로 탐색 및 디버그 그리기
-		if (startPoly != -1 && goalPoly != -1)
-		{
-			auto path = navMesh.FindPathAStar(start, goal);
-			for (int polyIdx : path)
-			{
-				const auto& poly = navMesh.polygons[polyIdx];
-				for (int i = 1; i + 1 < poly.size(); ++i)
-				{
-					const FVector& A = navMesh.vertices[poly[0]];
-					const FVector& B = navMesh.vertices[poly[i]];
-					const FVector& C = navMesh.vertices[poly[i + 1]];
-					DebugTrianglePacket dbg(A, B, C, 5.f);
-					SessionManager::GetInst().SendPacket(playerId, &dbg);
-				}
-			}
-		}
-	}
-
 	auto pkt = MovePacket(playerId, pos, state, time, EPacketType::S_PLAYER_MOVE);
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
 	auto upkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
@@ -258,6 +212,41 @@ void GameWorld::PlayerAttack(int32 playerId)
 	{
 		LOG(Warning, "Invaild!");
 		return;
+	}
+	{
+		ZoneType zone = player->GetZone();
+		auto& navMesh = Map::GetInst().GetNavMesh(zone);
+
+		FVector start = player->GetInfo().Pos;
+		FVector goal = FVector(-2931, 6060, 0);
+
+		std::vector<int> polyPath = navMesh.FindPathAStar(start, goal);
+
+		std::vector<FVector> straightPath = navMesh.GetStraightPath(start, goal, polyPath);
+
+		for (int polyIdx : polyPath)
+		{
+			if (polyIdx < 0 || polyIdx >= navMesh.polygons.size())
+				continue;
+
+			const auto& poly = navMesh.polygons[polyIdx];
+			if (poly.size() < 3) continue;
+
+			for (size_t i = 1; i + 1 < poly.size(); ++i)
+			{
+				const FVector& A = navMesh.vertices[poly[0]];
+				const FVector& B = navMesh.vertices[poly[i]];
+				const FVector& C = navMesh.vertices[poly[i + 1]];
+				DebugTrianglePacket dbg(A, B, C, 2.f);
+				SessionManager::GetInst().SendPacket(playerId, &dbg);
+			}
+		}
+
+		for (size_t i = 1; i < straightPath.size(); ++i)
+		{
+			DebugLinePacket dbgLine(straightPath[i - 1], straightPath[i], 5.f);
+			SessionManager::GetInst().SendPacket(playerId, &dbgLine);
+		}
 	}
 	std::unordered_set<int32> viewList;
 	{
