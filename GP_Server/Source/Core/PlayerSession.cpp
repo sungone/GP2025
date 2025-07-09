@@ -12,6 +12,7 @@ void PlayerSession::DoRecv()
 void PlayerSession::DoSend(const Packet* packet)
 {
 	auto name = std::string(magic_enum::enum_name(static_cast<EPacketType>(packet->Header.PacketType)));
+	if (name.empty()) name = "Unknown";
 	LOG(LogType::SendLog, std::format("{} PKT to [{}]", name, _id));
 
 	_sSocket->DoSend(packet);

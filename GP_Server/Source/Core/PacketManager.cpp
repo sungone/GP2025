@@ -1,110 +1,92 @@
 ﻿#include "pch.h"
 #include "PacketManager.h"
+#include "magic_enum/magic_enum.hpp"
 
 void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 {
 	EPacketType packetType = static_cast<EPacketType>(packet->Header.PacketType);
+	auto name = std::string(magic_enum::enum_name(packetType));
+	if (name.empty()) name = "Unknown";
 
+	LOG(LogType::RecvLog, std::format("{} from [{}]", name, sessionId));
+	
 	switch (packetType)
 	{
 	case EPacketType::C_SIGNUP:
-		LOG(LogType::RecvLog, std::format("SignUpPacket from [{}]", sessionId));
 		HandleSignUpPacket(sessionId, packet);
 		break;
 	case EPacketType::C_LOGIN:
-		LOG(LogType::RecvLog, std::format("LoginPacket from [{}]", sessionId));
 		HandleLoginPacket(sessionId, packet);
 		break;
 	case EPacketType::C_LOGOUT:
-		LOG(LogType::RecvLog, std::format("LogoutPacket from [{}]", sessionId));
 		HandleLogoutPacket(sessionId);
 		break;
 	case EPacketType::C_SELECT_CHARACTER:
-		LOG(LogType::RecvLog, std::format("SelectCharacter from [{}]", sessionId));
 		HandleSelectCharacterPacket(sessionId, packet);
 		break;
 	case EPacketType::C_ENTER_GAME:
-		LOG(LogType::RecvLog, std::format("EnterGamePacket from [{}]", sessionId));
 		HandleEnterGamePacket(sessionId, packet);
 		break;
 
 	case EPacketType::C_MOVE:
-		LOG(LogType::RecvLog, std::format("MovePacket from [{}]", sessionId));
 		HandleMovePacket(sessionId, packet);
 		break;
 	case EPacketType::C_ATTACK:
-		LOG(LogType::RecvLog, std::format("AttackPacket from [{}]", sessionId));
 		HandleAttackPacket(sessionId, packet);
 		break;
 	case EPacketType::C_START_AIMING:
-		LOG(LogType::RecvLog, std::format("StartAimingPacket from [{}]", sessionId));
 		HandleStartAimingPacket(sessionId, packet);
 		break;
 	case EPacketType::C_STOP_AIMING:
-		LOG(LogType::RecvLog, std::format("StopAimingPacket from [{}]", sessionId));
 		HandleStopAimingPacket(sessionId, packet);
 		break;
 
 	case EPacketType::C_USE_SKILL:
-		LOG(LogType::RecvLog, std::format("UseSkillPacket from [{}]", sessionId));
 		HandleUseSkillPacket(sessionId, packet);
 		break;
 	case EPacketType::C_REMOVE_STATE:
-		LOG(LogType::RecvLog, std::format("ChatSendPacket from [{}]", sessionId));
 		HandleRemoveStatePacket(sessionId, packet);
 		break;
 
 
 	case EPacketType::C_TAKE_ITEM:
-		LOG(LogType::RecvLog, std::format("PickUpItemPacket from [{}]", sessionId));
 		HandlePickUpItemPacket(sessionId, packet);
 		break;
 	case EPacketType::C_DROP_ITEM:
-		LOG(LogType::RecvLog, std::format("DropItemPacket from [{}]", sessionId));
 		HandleDropItemPacket(sessionId, packet);
 		break;
 	case EPacketType::C_USE_ITEM:
-		LOG(LogType::RecvLog, std::format("UseItemPacket from [{}]", sessionId));
 		HandleUseItemPacket(sessionId, packet);
 		break;
 	case EPacketType::C_EQUIP_ITEM:
-		LOG(LogType::RecvLog, std::format("EquipItemPacket from [{}]", sessionId));
 		HandleEquipItemPacket(sessionId, packet);
 		break;
 	case EPacketType::C_UNEQUIP_ITEM:
-		LOG(LogType::RecvLog, std::format("UnequipItemPacket from [{}]", sessionId));
 		HandleUnequipItemPacket(sessionId, packet);
 		break;
 
 	case EPacketType::C_CHANGE_ZONE:
-		LOG(LogType::RecvLog, std::format("RequestZoneChange from [{}]", sessionId));
 		HandleZoneChangeRequestPacket(sessionId, packet);
 		break;
 	case EPacketType::C_RESPAWN:
-		LOG(LogType::RecvLog, std::format("RespawnRequest from [{}]", sessionId));
 		HandleRespawnRequestPacket(sessionId, packet);
 		break;
 
 	case EPacketType::C_SHOP_BUY_ITEM:
-		LOG(LogType::RecvLog, std::format("ShopBuyItemPacket from [{}]", sessionId));
 		HandleShopBuyItemPacket(sessionId, packet);
 		break;
 	case EPacketType::C_SHOP_SELL_ITEM:
-		LOG(LogType::RecvLog, std::format("ShopSellItemPacket from [{}]", sessionId));
 		HandleShopSellItemPacket(sessionId, packet);
 		break;
 
 	case EPacketType::C_REQUEST_QUEST:
-		LOG(LogType::RecvLog, std::format("RequestQuestPacket from [{}]", sessionId));
 		HandleRequestQuestPacket(sessionId, packet);
 		break;
 	case EPacketType::C_COMPLETE_QUEST:
-		LOG(LogType::RecvLog, std::format("CompleteQuestPacket from [{}]", sessionId));
 		HandleCompleteQuestPacket(sessionId, packet);
 		break;
 
 	case EPacketType::C_CHAT_SEND:
-		LOG(LogType::RecvLog, std::format("ChatSendPacket from [{}]", sessionId));
 		HandleChatSendPacket(sessionId, packet);
 		break;
 
