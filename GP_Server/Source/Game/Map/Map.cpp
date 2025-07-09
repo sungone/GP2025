@@ -1,6 +1,5 @@
 #include "pch.h"
-#include "MapZone.h"
-#include "GameWorld.h"
+#include "Map.h"
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 
@@ -116,7 +115,7 @@ FVector Map::GetRandomEntryPos(ZoneType oldZone, ZoneType targetZone) const
 	default:
 		return FVector::ZeroVector;
 	}
-	
+
 	return GetRandomEntryPos(entryType);
 }
 
@@ -142,14 +141,15 @@ FVector Map::GetStartPos(ZoneType startZone)
 	{
 		FVector newPos;
 		float radius = playerCollision;
-		do {
-			newPos = Map::GetInst().GetRandomPos(startZone);
-		} while (GameWorld::GetInst().IsCollisionDetected(startZone, newPos, radius));
+		newPos = Map::GetInst().GetRandomPos(startZone);
 		return newPos;
 	}
 	case ZoneType::TUK:
 	{
-		return FVector(-5270.0, 15050.0, 147);
+		FVector newPos;
+		float radius = playerCollision;
+		newPos = Map::GetInst().GetRandomPos(startZone);
+		return newPos;
 	}
 	}
 

@@ -186,8 +186,7 @@
     <ClInclude Include="Source\Game\Item\Inventory.h" />
     <ClInclude Include="Source\Game\Item\Item.h" />
     <ClInclude Include="Source\Game\Item\WorldItem.h" />
-    <ClInclude Include="Source\Game\Map\BoundingBox.h" />
-    <ClInclude Include="Source\Game\Map\MapZone.h" />
+    <ClInclude Include="Source\Game\Map\Map.h" />
     <ClInclude Include="Source\Game\Map\NavMesh.h" />
     <ClInclude Include="Source\ServerDefine.h" />
     <ClInclude Include="Source\Utils\FVector.h" />
@@ -218,8 +217,7 @@
     <ClCompile Include="Source\Game\Item\Inventory.cpp" />
     <ClCompile Include="Source\Game\Item\Item.cpp" />
     <ClCompile Include="Source\Game\Item\WorldItem.cpp" />
-    <ClCompile Include="Source\Game\Map\BoundingBox.cpp" />
-    <ClCompile Include="Source\Game\Map\MapZone.cpp" />
+    <ClCompile Include="Source\Game\Map\Map.cpp" />
     <ClCompile Include="Source\Game\Map\NavMesh.cpp" />
     <ClCompile Include="Source\ServerMain.cpp" />
     <ClCompile Include="Source\Utils\pch.cpp">

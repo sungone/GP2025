@@ -5,23 +5,11 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="소스 파일\Network">
-      <UniqueIdentifier>{ed68e76c-1850-4d7c-a5e9-875606c5c28b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\PCH">
       <UniqueIdentifier>{0198502e-1345-4340-ab7e-bead8a2df816}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\ServerSource">
-      <UniqueIdentifier>{0b276779-f9e9-45a7-9f86-30e48612d8f3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\ServerSource\Common">
-      <UniqueIdentifier>{1c1598d2-38f3-4362-9d04-8597d59a3464}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\ServerSource\IOCP">
-      <UniqueIdentifier>{217e5454-a697-4a74-b0ce-354000ed604e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\ServerSource\Map">
-      <UniqueIdentifier>{3e0f9cf1-ec7e-48bc-a417-d69974eee2b1}</UniqueIdentifier>
+    <Filter Include="소스 파일\DummyClient">
+      <UniqueIdentifier>{ed68e76c-1850-4d7c-a5e9-875606c5c28b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -29,60 +17,24 @@
       <Filter>소스 파일\PCH</Filter>
     </ClCompile>
     <ClCompile Include="Source\DummyClient.cpp">
-      <Filter>소스 파일\Network</Filter>
+      <Filter>소스 파일\DummyClient</Filter>
     </ClCompile>
     <ClCompile Include="Source\DummyClinetManager.cpp">
-      <Filter>소스 파일\Network</Filter>
+      <Filter>소스 파일\DummyClient</Filter>
     </ClCompile>
     <ClCompile Include="Source\TestMain.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="..\GP_Server\Source\Core\IOCP\ExpOver.cpp">
-      <Filter>소스 파일\ServerSource\IOCP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\GP_Server\Source\Core\IOCP\IOCP.cpp">
-      <Filter>소스 파일\ServerSource\IOCP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\GP_Server\Source\Game\Map\NavMesh.cpp">
-      <Filter>소스 파일\ServerSource\Map</Filter>
-    </ClCompile>
-    <ClCompile Include="..\GP_Server\Source\Game\Map\MapZone.cpp">
-      <Filter>소스 파일\ServerSource\Map</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\GP_Server\Source\Common\Common.h">
-      <Filter>소스 파일\ServerSource\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\GP_Server\Source\Common\DataStruct.h">
-      <Filter>소스 파일\ServerSource\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\GP_Server\Source\Common\Packet.h">
-      <Filter>소스 파일\ServerSource\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\GP_Server\Source\Common\Type.h">
-      <Filter>소스 파일\ServerSource\Common</Filter>
-    </ClInclude>
     <ClInclude Include="Source\pch.h">
       <Filter>소스 파일\PCH</Filter>
     </ClInclude>
     <ClInclude Include="Source\DummyClient.h">
-      <Filter>소스 파일\Network</Filter>
+      <Filter>소스 파일\DummyClient</Filter>
     </ClInclude>
     <ClInclude Include="Source\DummyClinetManager.h">
-      <Filter>소스 파일\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\GP_Server\Source\Core\IOCP\ExpOver.h">
-      <Filter>소스 파일\ServerSource\IOCP</Filter>
-    </ClInclude>
-    <ClInclude Include="..\GP_Server\Source\Core\IOCP\IOCP.h">
-      <Filter>소스 파일\ServerSource\IOCP</Filter>
-    </ClInclude>
-    <ClInclude Include="..\GP_Server\Source\Game\Map\NavMesh.h">
-      <Filter>소스 파일\ServerSource\Map</Filter>
-    </ClInclude>
-    <ClInclude Include="..\GP_Server\Source\Game\Map\MapZone.h">
-      <Filter>소스 파일\ServerSource\Map</Filter>
+      <Filter>소스 파일\DummyClient</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
