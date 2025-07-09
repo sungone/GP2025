@@ -16,13 +16,13 @@ UGPPlayerEffectHandler::UGPPlayerEffectHandler()
         SkillUnlockEffect = SkillUnlockEffectFinder.Object;
     }
 
-    static ConstructorHelpers::FObjectFinder<UNiagaraSystem> LevelUpEffectFinder(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Loot_05_Legendary.NS_ARPGEssentials_Loot_05_Legendary"));
+    static ConstructorHelpers::FObjectFinder<UNiagaraSystem> LevelUpEffectFinder(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Loot_02_Uncommon.NS_ARPGEssentials_Loot_02_Uncommon"));
     if (LevelUpEffectFinder.Succeeded())
     {
         LevelUpEffect = LevelUpEffectFinder.Object;
-    }
+    } 
 
-    static ConstructorHelpers::FObjectFinder<UNiagaraSystem> QuestEffectFinder(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Loot_02_Uncommon.NS_ARPGEssentials_Loot_02_Uncommon"));
+    static ConstructorHelpers::FObjectFinder<UNiagaraSystem> QuestEffectFinder(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Loot_05_Legendary.NS_ARPGEssentials_Loot_05_Legendary"));
     if (QuestEffectFinder.Succeeded())
     {
         QuestClearEffect = QuestEffectFinder.Object;
