@@ -28,13 +28,12 @@ public:
 	}
 	uint8 GetItemTypeID() const { return _itemTypeID; }
 	uint32 GetItemID() const { return _itemID; }
-	const ItemStats& GetStats() const { return _stats; }
-	EAbilityType GetAbilityType() const { return _abilityType; }
-	float GetAbilityValue() const { return _abilityValue; }
+	const ItemStats& GetStats() const;
+	EAbilityType GetAbilityType() const;
+	float GetAbilityValue() const;
+	EItemCategory GetItemCategory() const;
 protected:
 	uint32 _itemID;
 	uint8 _itemTypeID;
-	ItemStats _stats;
-	EAbilityType _abilityType;
-	float _abilityValue;
+	const FItemData* _itemInfo;
 };

@@ -506,7 +506,7 @@ void GameWorld::SpawnWorldItem(FVector position, uint32 monlv, Type::EPlayer pla
 	auto itemId = newItem->GetItemID();
 	ItemPkt::SpawnPacket packet(itemId, newItem->GetItemTypeID(), position);
 	BroadcastToZone(zone, &packet);
-
+	
 	TimerQueue::AddTimer([itemId, zone]() {
 		GameWorld::GetInst().DespawnWorldItem(itemId, zone);
 		}, ITEM_DISAPPEAR_TIME_MS, false);
@@ -521,10 +521,12 @@ void GameWorld::SpawnWorldItem(WorldItem dropedItem, ZoneType zone)
 	int32 itemId = newItem->GetItemID();
 	ItemPkt::DropPacket packet(itemId, newItem->GetItemTypeID(), newItem->GetPos());
 	BroadcastToZone(zone, &packet);
-
-	TimerQueue::AddTimer([itemId, zone]() {
-		GameWorld::GetInst().DespawnWorldItem(itemId, zone);
-		}, ITEM_DISAPPEAR_TIME_MS, false);
+	if(newItem->GetItemCategory() != EItemCategory::Quest)
+	{
+		TimerQueue::AddTimer([itemId, zone]() {
+			GameWorld::GetInst().DespawnWorldItem(itemId, zone);
+			}, ITEM_DISAPPEAR_TIME_MS, false);
+	}
 }
 
 void GameWorld::DespawnWorldItem(uint32 itemId, ZoneType zone)

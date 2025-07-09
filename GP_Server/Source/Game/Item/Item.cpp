@@ -16,23 +16,35 @@ Item::Item(uint32 itemID, uint8 itemTypeID)
 void Item::Init(uint8 itemTypeID)
 {
 	_itemTypeID = itemTypeID;
-	auto data = ItemTable::GetInst().GetItemByTypeId(itemTypeID);
-	if (!data) {
+	_itemInfo = ItemTable::GetInst().GetItemByTypeId(itemTypeID);
+	if (!_itemInfo) {
 		LOG(Warning, "Invalid ItemType");
-		_stats = ItemStats{};
-		_abilityType = EAbilityType::None;
-		_abilityValue = 0.0f;
 		return;
 	}
+}
 
-	_stats = ItemStats(
-		static_cast<int>(data->Damage),
-		static_cast<int>(data->Hp),
-		data->CrtRate,
-		data->DodgeRate,
-		data->MoveSpeed
+const ItemStats& Item::GetStats() const
+{
+	return ItemStats(
+		_itemInfo->Damage,
+		_itemInfo->Hp,
+		_itemInfo->CrtRate,
+		_itemInfo->DodgeRate,
+		_itemInfo->MoveSpeed
 	);
+}
 
-	_abilityType = data->AbilityType;
-	_abilityValue = data->AbilityValue;
+EAbilityType Item::GetAbilityType() const
+{
+	return _itemInfo->AbilityType;
+}
+
+float Item::GetAbilityValue() const
+{
+	return _itemInfo->AbilityValue;
+}
+
+EItemCategory Item::GetItemCategory() const
+{
+	return _itemInfo->Category;
 }
