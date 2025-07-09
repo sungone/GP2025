@@ -190,19 +190,7 @@ bool DummyClient::SendMovePacket()
 bool DummyClient::Move()
 {
 	static auto& nav = Map::GetInst().GetNavMesh(ZoneType::TUK);
-	int currentTriIdx = nav.FindIdxFromPos(_info.Pos);
-	if (currentTriIdx == -1) return false;
 
-	const auto& neighbors = nav.GetNeighbors(currentTriIdx);
-	if (neighbors.empty()) return false;
-
-	int randIdx = RandomUtils::GetRandomInt(0, static_cast<int>(neighbors.size()) - 1);
-	auto it = neighbors.begin();
-	std::advance(it, randIdx);
-	int nextTriIdx = *it;
-	FVector nextPos = nav.GetTriangleCenter(nextTriIdx);
-	nextPos.Z = _info.Pos.Z;
-	_info.SetLocation(nextPos);
 
 	return true;
 }

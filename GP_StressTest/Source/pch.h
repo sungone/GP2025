@@ -26,18 +26,11 @@
 #include "Common.h"
 #include "Logger.h"
 #include "RandomUtils.h"
-#include "MapZone.h"
+#include "Map.h"
+#include "ExpOver.h"
+#include "TimerQueue.h"
+
 using namespace std::chrono;
-
-enum class CompType
-{
-	RECV,
-	SEND,
-	ACCEPT,
-
-	MOVE,
-	ATTACK,
-};
 
 inline long long NowMs()
 {
@@ -55,4 +48,31 @@ inline void UpdateDelay(int rtt_ms) {
 }
 
 inline std::atomic_int _active_clients;
-const std::string MapDataPath = "../GP_Server/MapJsonData/";
+inline constexpr size_t MAX_CLIENT = 10000;
+inline constexpr size_t MAX_PLAYER = MAX_CLIENT;
+inline constexpr float VIEW_DIST = 5000.f;
+inline constexpr float playerCollision = 50.f;
+
+const std::string BasePath = "../GP_Server";
+
+const std::string MapDataPath = BasePath + "/MapJsonData/";
+const std::string DataTablePath = BasePath + "/DataTable/";
+
+enum class CompType
+{
+	RECV,
+	SEND,
+	ACCEPT,
+};
+
+static std::wstring ConvertToWString(const std::string& str)
+{
+	int size = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, nullptr, 0);
+	if (size <= 0) return L"";
+
+	std::wstring wstr(size, 0);
+	MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, &wstr[0], size);
+
+	wstr.pop_back();
+	return wstr;
+}

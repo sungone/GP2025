@@ -59,9 +59,6 @@
     <Filter Include="Source Files\Game\GameWorld\Map">
       <UniqueIdentifier>{8c3f90d3-fa86-4a55-8ae0-ca4c78604b0d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Game\GameWorld\Quest">
-      <UniqueIdentifier>{5508843b-2a1c-4f0c-966d-87dc41cb08ab}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Utils\Logger.h">
@@ -118,10 +115,7 @@
     <ClInclude Include="Source\Game\Item\Item.h">
       <Filter>Source Files\Game\GameObjects\Item</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Game\Map\BoundingBox.h">
-      <Filter>Source Files\Game\GameWorld\Map</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Game\Map\MapZone.h">
+    <ClInclude Include="Source\Game\Map\Map.h">
       <Filter>Source Files\Game\GameWorld\Map</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\Map\NavMesh.h">
@@ -204,10 +198,7 @@
     <ClCompile Include="Source\Game\Item\Item.cpp">
       <Filter>Source Files\Game\GameObjects\Item</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Game\Map\BoundingBox.cpp">
-      <Filter>Source Files\Game\GameWorld\Map</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Game\Map\MapZone.cpp">
+    <ClCompile Include="Source\Game\Map\Map.cpp">
       <Filter>Source Files\Game\GameWorld\Map</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Map\NavMesh.cpp">

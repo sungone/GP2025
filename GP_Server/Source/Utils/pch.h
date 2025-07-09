@@ -31,7 +31,7 @@
 #include "TimerQueue.h"
 #include "DBManager.h"
 
-#include "MapZone.h"
+#include "Map.h"
 #include "ItemTable.h"
 #include "PlayerSkillTable.h"
 #include "PlayerLevelTable.h"

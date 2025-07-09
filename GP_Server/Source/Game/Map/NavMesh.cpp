@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "NavMesh.h"
-#include "SessionManager.h"
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 

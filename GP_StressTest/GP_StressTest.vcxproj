@@ -19,10 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\GP_Server\Source\Core\IOCP\ExpOver.cpp" />
-    <ClCompile Include="..\GP_Server\Source\Core\IOCP\IOCP.cpp" />
-    <ClCompile Include="..\GP_Server\Source\Game\Map\MapZone.cpp" />
-    <ClCompile Include="..\GP_Server\Source\Game\Map\NavMesh.cpp" />
     <ClCompile Include="Source\DummyClient.cpp" />
     <ClCompile Include="Source\DummyClinetManager.cpp" />
     <ClCompile Include="Source\pch.cpp">
@@ -32,14 +28,6 @@
     <ClCompile Include="Source\TestMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\GP_Server\Source\Common\Common.h" />
-    <ClInclude Include="..\GP_Server\Source\Common\DataStruct.h" />
-    <ClInclude Include="..\GP_Server\Source\Common\Packet.h" />
-    <ClInclude Include="..\GP_Server\Source\Common\Type.h" />
-    <ClInclude Include="..\GP_Server\Source\Core\IOCP\ExpOver.h" />
-    <ClInclude Include="..\GP_Server\Source\Core\IOCP\IOCP.h" />
-    <ClInclude Include="..\GP_Server\Source\Game\Map\MapZone.h" />
-    <ClInclude Include="..\GP_Server\Source\Game\Map\NavMesh.h" />
     <ClInclude Include="Source\DummyClient.h" />
     <ClInclude Include="Source\DummyClinetManager.h" />
     <ClInclude Include="Source\pch.h" />
