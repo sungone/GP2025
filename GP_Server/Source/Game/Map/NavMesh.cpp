@@ -261,3 +261,39 @@ std::vector<FVector> NavMesh::GetStraightPath(
 
     return path;
 }
+
+FVector NavMesh::GetNearbyRandomPosition(const FVector& origin, float radius) const
+{
+    int currIdx = FindIdxFromPos(origin);
+    if (currIdx < 0 || currIdx >= static_cast<int>(neighbors.size()))
+        return origin;
+
+    const std::vector<int>& neighborPolys = neighbors[currIdx];
+    if (neighborPolys.empty())
+        return origin;
+
+    int randIdx = RandomUtils::GetRandomInt(0, static_cast<int>(neighborPolys.size()) - 1);
+    int targetPolyIdx = neighborPolys[randIdx];
+    if (targetPolyIdx < 0 || targetPolyIdx >= static_cast<int>(polygons.size()))
+        return origin;
+
+    const auto& poly = polygons[targetPolyIdx];
+    if (poly.size() < 3)
+        return origin;
+
+    const FVector& A = vertices[poly[0]];
+    const FVector& B = vertices[poly[1]];
+    const FVector& C = vertices[poly[2]];
+
+    float u = RandomUtils::GetRandomFloat(0.f, 1.f);
+    float v = RandomUtils::GetRandomFloat(0.f, 1.f);
+    if (u + v > 1.f) {
+        u = 1.f - u;
+        v = 1.f - v;
+    }
+
+    FVector P = A + (B - A) * u + (C - A) * v;
+    P.Z += 90.f;
+
+    return P;
+}

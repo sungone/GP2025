@@ -103,8 +103,6 @@ void Monster::BehaviorTree()
 			Chase();
 		else
 			Patrol();
-
-		UpdateChaseMovement();
 		return;
 	}
 	else if (_info.HasState(ECharacterStateType::STATE_IDLE))
@@ -405,13 +403,20 @@ void Monster::Chase()
 		DebugLinePacket dbgLine(_movePath[i - 1], _movePath[i], 3.f);
 		SessionManager::GetInst().SendPacket(PlayerId, &dbgLine);
 	}
-
-	ChangeState(ECharacterStateType::STATE_WALK);
+	UpdateChaseMovement();
 }
 
 void Monster::Patrol()
 {
 	ChangeState(ECharacterStateType::STATE_WALK);
+	FVector currentPos = GetPos();
+	float redius = _info.CollisionRadius;
+	FVector newPos = _navMesh->GetNearbyRandomPosition(currentPos, redius);
+	_info.SetLocationAndYaw(newPos);
+	if (RandomUtils::GetRandomBool())
+	{
+		ChangeState(ECharacterStateType::STATE_IDLE);
+	}
 }
 
 bool Monster::SetTarget()
