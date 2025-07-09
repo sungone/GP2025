@@ -87,7 +87,6 @@ void Monster::BehaviorTree()
 		}
 		else if (!IsTargetInAttackRange())
 		{
-			ChangeState(ECharacterStateType::STATE_WALK);
 			Chase();
 		}
 		else
@@ -96,29 +95,27 @@ void Monster::BehaviorTree()
 		}
 		return;
 	}
-
-	if (_info.HasState(ECharacterStateType::STATE_WALK))
+	else if (_info.HasState(ECharacterStateType::STATE_WALK))
 	{
-		UpdateChaseMovement();
 		if (_target)
 			Chase();
 		else if (SetTarget())
 			Chase();
 		else
 			Patrol();
+
+		UpdateChaseMovement();
 		return;
 	}
-
-	if (_info.HasState(ECharacterStateType::STATE_IDLE))
+	else if (_info.HasState(ECharacterStateType::STATE_IDLE))
 	{
 		if (SetTarget())
 		{
 			Chase();
-			ChangeState(ECharacterStateType::STATE_WALK);
 		}
 		else if (RandomUtils::GetRandomBool())
 		{
-			ChangeState(ECharacterStateType::STATE_WALK);
+			Patrol();
 		}
 		return;
 	}
@@ -137,7 +134,11 @@ void Monster::Attack()
 {
 	ChangeState(ECharacterStateType::STATE_AUTOATTACK);
 
-	if (!_target || _target->IsDead()) return;
+	if (!_target || _target->IsDead())
+	{
+		ChangeState(ECharacterStateType::STATE_IDLE);
+		return;
+	}
 	if (IsBoss())
 	{
 		BossAttack();
@@ -339,6 +340,7 @@ void Monster::UpdateChaseMovement()
 	if (_movePath.empty() || _pathIdx >= _movePath.size()) {
 		return;
 	}
+
 	Look();
 
 	FVector current = GetInfo().Pos;
@@ -363,11 +365,20 @@ void Monster::UpdateChaseMovement()
 		_info.SetLocation(newPos);
 		break;
 	}
+	if (IsTargetInAttackRange())
+	{
+		Attack();
+	}
+	else
+	{
+		ChangeState(ECharacterStateType::STATE_IDLE);
+	}
 }
 
 void Monster::Chase()
 {
 	if (!_target || !_navMesh) return;
+	ChangeState(ECharacterStateType::STATE_WALK);
 
 	if (!IsTargetInChaseRange())
 	{
@@ -400,7 +411,7 @@ void Monster::Chase()
 
 void Monster::Patrol()
 {
-
+	ChangeState(ECharacterStateType::STATE_WALK);
 }
 
 bool Monster::SetTarget()

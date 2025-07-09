@@ -317,7 +317,7 @@ void GameWorld::PlayerDead(int32 playerID)
 void GameWorld::CreateMonster()
 {
 	auto table = SpawnTable::GetInst();
-	for (ZoneType z : { ZoneType::TUK, ZoneType::E, ZoneType::INDUSTY, ZoneType::BUNKER })
+	for (ZoneType z : { ZoneType::TUK, ZoneType::E, ZoneType::INDUSTY, ZoneType::BUNKER, ZoneType::GYM })
 	{
 		const auto& spawns = table.GetSpawnsByZone(z);
 		ZoneType zone = (z == ZoneType::BUNKER) ? ZoneType::TUK : z;
@@ -331,17 +331,10 @@ void GameWorld::CreateMonster()
 				auto monster = std::make_shared<Monster>(id, zone, info.MonsterType);
 				FVector pos;
 				float radius = monster->GetInfo().CollisionRadius;
-				//if (!info.bRandomSpawn)
-				//{
-				//	pos = info.SpawnPos;
-				//}
-				//else
+				do
 				{
-					do
-					{
-						pos = Map::GetInst().GetRandomPos(z);
-					} while (IsCollisionDetected(zone, pos, radius));
-				}
+					pos = Map::GetInst().GetRandomPos(z);
+				} while (IsCollisionDetected(zone, pos, radius));
 				monster->SetPos(pos);
 				monster->Init();
 				monster->SetQuestID(static_cast<QuestType>(info.QuestID));
@@ -648,28 +641,7 @@ FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
 		LOG(std::format("Player [{}] cannot access due to level {}", playerId, playerLevel));
 		return FVector::ZeroVector;
 	}
-	auto questData = player->GetCurrentQuestData();
-	if (questData->Catagory == EQuestCategory::MOVE)
-	{
-		auto quest = questData->QuestID;
-		switch (quest)
-		{
-		case QuestType::CH1_GO_TO_BUNKER:
-			break;
-		case QuestType::CH1_GO_TO_E_FIRST:
-			break;
-		case QuestType::CH2_ENTER_E_BUILDING:
-			break;
-		case QuestType::CH3_RETURN_TO_TIP_WITH_DOC:
-			break;
-		case QuestType::CH4_ENTER_GYM:
-			if (targetZone == ZoneType::GYM)
-			{
-				CompleteQuest(playerId, quest);
-			}
-			break;
-		}
-	}
+
 	ZoneType oldZone = player->GetZone();
 	FVector newPos = Map::GetInst().GetRandomEntryPos(oldZone, targetZone);
 
