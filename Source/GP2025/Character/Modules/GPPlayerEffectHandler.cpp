@@ -21,6 +21,12 @@ UGPPlayerEffectHandler::UGPPlayerEffectHandler()
     {
         LevelUpEffect = LevelUpEffectFinder.Object;
     }
+
+    static ConstructorHelpers::FObjectFinder<UNiagaraSystem> QuestEffectFinder(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Loot_02_Uncommon.NS_ARPGEssentials_Loot_02_Uncommon"));
+    if (QuestEffectFinder.Succeeded())
+    {
+        QuestClearEffect = QuestEffectFinder.Object;
+    }
 }
 
 void UGPPlayerEffectHandler::Init(AGPCharacterPlayer* InOwner)
@@ -50,6 +56,22 @@ void UGPPlayerEffectHandler::PlayLevelUpEffect()
     {
         UNiagaraFunctionLibrary::SpawnSystemAttached(
             LevelUpEffect,
+            Owner->GetRootComponent(),
+            TEXT("Hips"),
+            FVector::ZeroVector,
+            FRotator::ZeroRotator,
+            EAttachLocation::SnapToTargetIncludingScale,
+            true
+        );
+    }
+}
+
+void UGPPlayerEffectHandler::PlayQuestClearEffect()
+{
+    if (Owner && QuestClearEffect)
+    {
+        UNiagaraFunctionLibrary::SpawnSystemAttached(
+            QuestClearEffect,
             Owner->GetRootComponent(),
             TEXT("Hips"),
             FVector::ZeroVector,

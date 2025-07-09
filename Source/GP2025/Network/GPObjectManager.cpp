@@ -906,6 +906,11 @@ void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpR
 			MyPlayer->SoundManager->PlaySFX(MyPlayer->SoundManager->QuestClearSound);
 		}
 
+		if (MyPlayer->EffectHandler)
+		{
+			MyPlayer->EffectHandler->PlayQuestClearEffect();
+		}
+
 		uint8 QuestID = static_cast<uint8>(Quest);
 		MyPlayer->UIManager->UpdateQuestState(QuestID, true);
 	}

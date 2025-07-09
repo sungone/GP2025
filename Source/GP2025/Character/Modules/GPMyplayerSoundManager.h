@@ -104,4 +104,7 @@ public :
 
 	UPROPERTY()
 	USoundBase* PickUpItemSound;
+
+	UPROPERTY()
+	USoundBase* PlayerHitSound;
 };

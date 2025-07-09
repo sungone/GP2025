@@ -24,6 +24,9 @@ public:
     UFUNCTION()
     void PlayLevelUpEffect();
 
+    UFUNCTION()
+    void PlayQuestClearEffect();
+
 public:
     UPROPERTY()
     AGPCharacterPlayer* Owner;
@@ -33,6 +36,9 @@ public:
 
     UPROPERTY(EditDefaultsOnly, Category = "Effects")
     class UNiagaraSystem* LevelUpEffect;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Effects")
+    class UNiagaraSystem* QuestClearEffect;
 
     void PlayEarthQuakeRock(const FVector& RockPos);
 
