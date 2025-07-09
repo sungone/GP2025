@@ -11,6 +11,15 @@
     <Filter Include="소스 파일\DummyClient">
       <UniqueIdentifier>{ed68e76c-1850-4d7c-a5e9-875606c5c28b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\IOCP">
+      <UniqueIdentifier>{95b45c6d-c86e-413b-9fbe-35ec939ba7ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Common">
+      <UniqueIdentifier>{cabd73e3-d842-419d-b69f-8502406206f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Map">
+      <UniqueIdentifier>{e018b892-1f63-4d63-9613-1a8cc785899d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\pch.cpp">
@@ -25,6 +34,18 @@
     <ClCompile Include="Source\TestMain.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="..\GP_Server\Source\Core\IOCP\ExpOver.cpp">
+      <Filter>소스 파일\IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GP_Server\Source\Core\IOCP\IOCP.cpp">
+      <Filter>소스 파일\IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GP_Server\Source\Game\Map\Map.cpp">
+      <Filter>소스 파일\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GP_Server\Source\Game\Map\NavMesh.cpp">
+      <Filter>소스 파일\Map</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\pch.h">
@@ -35,6 +56,30 @@
     </ClInclude>
     <ClInclude Include="Source\DummyClinetManager.h">
       <Filter>소스 파일\DummyClient</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\Core\IOCP\ExpOver.h">
+      <Filter>소스 파일\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\Core\IOCP\IOCP.h">
+      <Filter>소스 파일\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\Common\Common.h">
+      <Filter>소스 파일\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\Common\DataStruct.h">
+      <Filter>소스 파일\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\Common\Packet.h">
+      <Filter>소스 파일\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\Common\Type.h">
+      <Filter>소스 파일\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\Game\Map\Map.h">
+      <Filter>소스 파일\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\Game\Map\NavMesh.h">
+      <Filter>소스 파일\Map</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
