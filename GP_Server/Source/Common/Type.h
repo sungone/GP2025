@@ -89,7 +89,8 @@ enum EPacketType : uint8
 
 
 	//for test
-	S_DEBUG_TRIANGLE
+	S_DEBUG_TRIANGLE,
+	S_DEBUG_LINE
 };
 
 
@@ -247,7 +248,6 @@ enum class ZoneType : uint8
 	GYM,
 	INDUSTY,
 	BUNKER,
-	PLAYGROUND,
 };
 
 enum class EntryType : uint8

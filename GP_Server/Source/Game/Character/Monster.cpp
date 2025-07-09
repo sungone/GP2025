@@ -28,7 +28,7 @@ void Monster::Init()
 	_info.CollisionRadius = data->CollisionRadius;
 	_info.AttackRadius = data->AtkRadius;
 	_info.State = ECharacterStateType::STATE_IDLE;
-
+	_navMesh = &Map::GetInst().GetNavMesh(_zone);
 }
 
 void Monster::UpdateViewList(std::shared_ptr<Character> other)
@@ -99,6 +99,7 @@ void Monster::BehaviorTree()
 
 	if (_info.HasState(ECharacterStateType::STATE_WALK))
 	{
+		UpdateChaseMovement();
 		if (_target)
 			Chase();
 		else if (SetTarget())
@@ -124,7 +125,6 @@ void Monster::BehaviorTree()
 
 	LOG(Warning, std::format("Invalid state bits: {}", static_cast<uint32>(_info.State)));
 }
-
 
 void Monster::Look()
 {
@@ -249,8 +249,6 @@ void Monster::PerformFlameBreath()
 		}, delayMs, false);
 }
 
-
-
 void Monster::PerformFlameBreathRotate()
 {
 	LOG("Rotating FlameBreath!");
@@ -321,7 +319,6 @@ void Monster::PerformFlameBreathRotate()
 		}, tickCount * tickIntervalMs, false);
 }
 
-
 void Monster::PerformMeleeAttack()
 {
 	if (IsTargetInAttackRange())
@@ -337,30 +334,74 @@ void Monster::SetNextPattern()
 	_currentPattern = static_cast<EAttackPattern>(randomIndex);
 }
 
+void Monster::UpdateChaseMovement()
+{
+	if (_movePath.empty() || _pathIdx >= _movePath.size()) {
+		return;
+	}
+	Look();
+
+	FVector current = GetInfo().Pos;
+	current.Z -= 90;
+
+	const float step = _info.Stats.Speed;
+	const float reachThreshold = 50.f;
+	while (_pathIdx < _movePath.size())
+	{
+		FVector target = _movePath[_pathIdx];
+		FVector toTarget = target - current;
+
+		if (toTarget.Length() < reachThreshold)
+		{
+			++_pathIdx;
+			continue;
+		}
+
+		FVector dir = toTarget.Normalize();
+		FVector newPos = current + dir * std::min(step, toTarget.Length());
+		newPos.Z += 90;
+		_info.SetLocation(newPos);
+		break;
+	}
+}
 
 void Monster::Chase()
 {
-	if (!_target) return;
+	if (!_target || !_navMesh) return;
 
 	if (!IsTargetInChaseRange())
 	{
-		LOG("Is Not In ChaseRange!");
 		_target.reset();
 		ChangeState(ECharacterStateType::STATE_IDLE);
 		return;
 	}
 
-	LOG("Chase!");
-	//todo: 길찾기로 처리 하자
-	Look();
-	ChangeState(ECharacterStateType::STATE_AUTOATTACK);
+	FVector start = GetInfo().Pos;
+	FVector goal = _target->GetInfo().Pos;
+	start.Z -= 90.f;
+	goal.Z -= 90.f;
+
+	auto polyPath = _navMesh->FindPathAStar(start, goal);
+	auto pathPoints = _navMesh->GetStraightPath(start, goal, polyPath);
+
+	_movePath = std::move(pathPoints);
+	_pathIdx = 1;
+	auto PlayerId = _target->GetInfo().ID;
+
+	// for test
+	for (size_t i = 1; i < _movePath.size(); ++i)
+	{
+		DebugLinePacket dbgLine(_movePath[i - 1], _movePath[i], 3.f);
+		SessionManager::GetInst().SendPacket(PlayerId, &dbgLine);
+	}
+
+	ChangeState(ECharacterStateType::STATE_WALK);
 }
 
 void Monster::Patrol()
 {
 
 }
-
 
 bool Monster::SetTarget()
 {

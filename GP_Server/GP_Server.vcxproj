@@ -229,8 +229,6 @@
     <ClCompile Include="Source\Utils\TimerQueue.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Source\Game\Map\MapJsonData\NavMeshData.json" />
-    <None Include="Source\Game\Map\MapJsonData\PlaygroundNavData.json" />
     <None Include="Tools\backup_mysql.bat" />
     <None Include="Tools\restore_mysql.bat" />
   </ItemGroup>

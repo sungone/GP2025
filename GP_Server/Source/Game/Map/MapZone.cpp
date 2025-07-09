@@ -1,42 +1,50 @@
 #include "pch.h"
 #include "MapZone.h"
 #include "GameWorld.h"
+#include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
 
 bool Map::Init()
 {
-	_navMeshes[ZoneType::PLAYGROUND] = NavMesh(MapDataPath + "NavMeshData_Playground.json");
-	_navMeshes[ZoneType::TUK] = NavMesh(MapDataPath + "NavMeshData_TUK.json");
-	_navMeshes[ZoneType::TIP] = NavMesh(MapDataPath + "NavMeshData_TIP.json");
-	_navMeshes[ZoneType::E] = NavMesh(MapDataPath + "NavMeshData_E.json");
-	_navMeshes[ZoneType::GYM] = NavMesh(MapDataPath + "NavMeshData_GYM.json");
-	_navMeshes[ZoneType::INDUSTY] = NavMesh(MapDataPath + "NavMeshData_Industry.json");
-	_navMeshes[ZoneType::BUNKER] = NavMesh(MapDataPath + "NavMeshData_Bunker.json");
+	const std::vector<std::pair<ZoneType, std::string>> ZoneMeshFiles = {
+	{ ZoneType::TUK,        "NavMeshData_TUK.json" },
+	{ ZoneType::TIP,        "NavMeshData_TIP.json" },
+	{ ZoneType::E,          "NavMeshData_E.json" },
+	{ ZoneType::GYM,        "NavMeshData_GYM.json" },
+	{ ZoneType::INDUSTY,    "NavMeshData_Industry.json" },
+	{ ZoneType::BUNKER,     "NavMeshData_Bunker.json" }
+	};
+	const std::vector<std::pair<EntryType, std::string>> EntryMeshFiles = {
+	{ EntryType::TIP_IN,       "NavMeshData_TIP_In.json" },
+	{ EntryType::TIP_OUT,      "NavMeshData_TIP_Out.json" },
+	{ EntryType::E_IN,         "NavMeshData_E_In.json" },
+	{ EntryType::E_OUT,        "NavMeshData_E_Out.json" },
+	{ EntryType::GYM_IN,       "NavMeshData_Gym_In.json" },
+	{ EntryType::GYM_OUT,      "NavMeshData_Gym_Out.json" },
+	{ EntryType::INDUSTY_IN,   "NavMeshData_Industry_In.json" },
+	{ EntryType::INDUSTY_OUT,  "NavMeshData_Industry_Out.json" }
+	};
 
-	_entryMeshes[EntryType::TIP_IN] = NavMesh(MapDataPath + "NavMeshData_TIP_In.json");
-	_entryMeshes[EntryType::TIP_OUT] = NavMesh(MapDataPath + "NavMeshData_TIP_Out.json");
-	_entryMeshes[EntryType::E_IN] = NavMesh(MapDataPath + "NavMeshData_E_In.json");
-	_entryMeshes[EntryType::E_OUT] = NavMesh(MapDataPath + "NavMeshData_E_Out.json");
-	_entryMeshes[EntryType::GYM_IN] = NavMesh(MapDataPath + "NavMeshData_GYM_In.json");
-	_entryMeshes[EntryType::GYM_OUT] = NavMesh(MapDataPath + "NavMeshData_GYM_Out.json");
-	_entryMeshes[EntryType::INDUSTY_IN] = NavMesh(MapDataPath + "NavMeshData_Industry_In.json");
-	_entryMeshes[EntryType::INDUSTY_OUT] = NavMesh(MapDataPath + "NavMeshData_Industry_Out.json");
-
-	for (auto& [zone, mesh] : _navMeshes)
+	for (const auto& [zone, file] : ZoneMeshFiles)
 	{
-		if (!mesh.IsLoaded())
+		auto meshOpt = NavMesh::LoadFromJson(MapDataPath + file);
+		if (!meshOpt)
 		{
 			LOG(Warning, std::format("Failed to load zone mesh [{}]", static_cast<int>(zone)));
 			return false;
 		}
+		_navMeshes[zone] = std::move(*meshOpt);
 	}
 
-	for (auto& [entry, mesh] : _entryMeshes)
+	for (const auto& [entry, file] : EntryMeshFiles)
 	{
-		if (!mesh.IsLoaded())
+		auto meshOpt = NavMesh::LoadFromJson(MapDataPath + file);
+		if (!meshOpt)
 		{
 			LOG(Warning, std::format("Failed to load entry mesh [{}]", static_cast<int>(entry)));
 			return false;
 		}
+		_entryMeshes[entry] = std::move(*meshOpt);
 	}
 
 	return true;

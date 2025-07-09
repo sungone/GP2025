@@ -194,21 +194,6 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 	player->GetInfo().State = static_cast<ECharacterStateType>(state);
 	UpdateViewList(player);
 
-	{
-		ZoneType zone = player->GetZone();
-		auto& navMesh = Map::GetInst().GetNavMesh(zone); 
-		int triIdx = navMesh.FindIdxFromPos(pos);
-		if (triIdx != -1)
-		{
-			const Triangle& tri = navMesh.Triangles[triIdx];
-			const FVector& A = navMesh.Vertices[tri.IndexA];
-			const FVector& B = navMesh.Vertices[tri.IndexB];
-			const FVector& C = navMesh.Vertices[tri.IndexC];
-			DebugTrianglePacket dbg(A, B, C, 1.f);
-			SessionManager::GetInst().SendPacket(playerId, &dbg);
-		}
-	}
-
 	auto pkt = MovePacket(playerId, pos, state, time, EPacketType::S_PLAYER_MOVE);
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
 	auto upkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
@@ -228,6 +213,7 @@ void GameWorld::PlayerAttack(int32 playerId)
 		LOG(Warning, "Invaild!");
 		return;
 	}
+
 	std::unordered_set<int32> viewList;
 	{
 		std::lock_guard lock(player->_vlLock);
@@ -331,7 +317,7 @@ void GameWorld::PlayerDead(int32 playerID)
 void GameWorld::CreateMonster()
 {
 	auto table = SpawnTable::GetInst();
-	for (ZoneType z : { ZoneType::GYM, ZoneType::TUK, ZoneType::E, ZoneType::INDUSTY, ZoneType::BUNKER })
+	for (ZoneType z : { ZoneType::TUK, ZoneType::E, ZoneType::INDUSTY, ZoneType::BUNKER })
 	{
 		const auto& spawns = table.GetSpawnsByZone(z);
 		ZoneType zone = (z == ZoneType::BUNKER) ? ZoneType::TUK : z;
@@ -345,11 +331,11 @@ void GameWorld::CreateMonster()
 				auto monster = std::make_shared<Monster>(id, zone, info.MonsterType);
 				FVector pos;
 				float radius = monster->GetInfo().CollisionRadius;
-				if (!info.bRandomSpawn)
-				{
-					pos = info.SpawnPos;
-				}
-				else
+				//if (!info.bRandomSpawn)
+				//{
+				//	pos = info.SpawnPos;
+				//}
+				//else
 				{
 					do
 					{
@@ -508,7 +494,7 @@ void GameWorld::SpawnGoldItem(FVector position, ZoneType zone)
 	std::lock_guard<std::mutex> lock(_mtItemZMap);
 	auto newItem = std::make_shared<WorldItem>(position);
 	_worldItemsByZone[zone].emplace_back(newItem);
-	
+
 	auto itemId = newItem->GetItemID();
 	ItemPkt::SpawnPacket packet(itemId, newItem->GetItemTypeID(), position);
 	BroadcastToZone(zone, &packet);
@@ -539,7 +525,7 @@ void GameWorld::SpawnWorldItem(WorldItem dropedItem, ZoneType zone)
 	auto newItem = std::make_shared<WorldItem>(dropedItem);
 	_worldItemsByZone[zone].emplace_back(newItem);
 
-	int32 itemId = newItem->GetItemID();  
+	int32 itemId = newItem->GetItemID();
 	ItemPkt::DropPacket packet(itemId, newItem->GetItemTypeID(), newItem->GetPos());
 	BroadcastToZone(zone, &packet);
 

@@ -1,0 +1,39 @@
+{
+	"NumTiles": 8,
+	"Vertices": [
+		[ -0, -7980, 10 ],
+		[ -0, -8208, 10 ],
+		[ -304, -8208, 10 ],
+		[ -304, -7980, 10 ],
+		[ 323, -7980, 10 ],
+		[ 323, -8208, 10 ],
+		[ -0, -8208, 10 ],
+		[ -0, -7980, 10 ]
+	],
+	"Triangles": [
+		{
+			"IndexA": 2,
+			"IndexB": 3,
+			"IndexC": 1,
+			"AreaID": 63
+		},
+		{
+			"IndexA": 3,
+			"IndexB": 0,
+			"IndexC": 1,
+			"AreaID": 63
+		},
+		{
+			"IndexA": 6,
+			"IndexB": 7,
+			"IndexC": 5,
+			"AreaID": 63
+		},
+		{
+			"IndexA": 7,
+			"IndexB": 4,
+			"IndexC": 5,
+			"AreaID": 63
+		}
+	]
+}

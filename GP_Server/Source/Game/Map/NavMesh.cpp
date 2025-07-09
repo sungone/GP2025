@@ -1,222 +1,264 @@
 #include "pch.h"
 #include "NavMesh.h"
+#include "SessionManager.h"
+#include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
 
-NavMesh::NavMesh(const std::string& filePath)
+std::optional<NavMesh> NavMesh::LoadFromJson(const std::string& filePath)
 {
-	bLoaded = LoadFromJson(filePath);
-	if (!bLoaded)
-	{
-		LOG(Error, "NavMesh");
-	}
+    std::ifstream ifs(filePath);
+    if (!ifs.is_open()) return std::nullopt;
+    std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+
+    rapidjson::Document doc;
+    doc.Parse(str.c_str());
+    if (doc.HasParseError()
+        || !doc.HasMember("Vertices") || !doc["Vertices"].IsArray()
+        || !doc.HasMember("Polygons") || !doc["Polygons"].IsArray()
+        || !doc.HasMember("Neighbors") || !doc["Neighbors"].IsArray())
+    {
+        return std::nullopt;
+    }
+
+    NavMesh mesh;
+
+    const auto& vArr = doc["Vertices"].GetArray();
+    mesh.vertices.reserve(vArr.Size());
+    for (const auto& vj : vArr)
+    {
+        const auto& a = vj.GetArray();
+        mesh.vertices.emplace_back(
+            a[0].GetFloat(),
+            a[1].GetFloat(),
+            a[2].GetFloat()
+        );
+    }
+
+    const auto& pArr = doc["Polygons"].GetArray();
+    mesh.polygons.reserve(pArr.Size());
+    for (const auto& pj : pArr)
+    {
+        const auto& idxs = pj.GetArray();
+        std::vector<int> poly;
+        poly.reserve(idxs.Size());
+        for (const auto& xi : idxs)
+            poly.push_back(xi.GetInt());
+        mesh.polygons.push_back(std::move(poly));
+    }
+
+    const auto& nArr = doc["Neighbors"].GetArray();
+    mesh.neighbors.reserve(nArr.Size());
+    for (const auto& nj : nArr)
+    {
+        const auto& ni = nj.GetArray();
+        std::vector<int> row;
+        row.reserve(ni.Size());
+        for (const auto& xi : ni)
+            row.push_back(xi.GetInt());
+        mesh.neighbors.push_back(std::move(row));
+    }
+
+    return mesh;
 }
 
-void NavMesh::BuildPolygonGraph()
+static bool PointInPoly(const FVector& P, const std::vector<int>& poly,
+    const std::vector<FVector>& verts)
 {
-	PolygonGraph.clear();
-
-	std::unordered_map<Edge, std::vector<int>, EdgeHash> edgeMap;
-	PolygonGraph.reserve(Triangles.size());
-
-	for (int i = 0; i < Triangles.size(); i++) {
-		const Triangle& tri = Triangles[i];
-		edgeMap[Edge(tri.IndexA, tri.IndexB)].push_back(i);
-		edgeMap[Edge(tri.IndexB, tri.IndexC)].push_back(i);
-		edgeMap[Edge(tri.IndexC, tri.IndexA)].push_back(i);
-		PolygonGraph[i] = { i, {} };
-	}
-
-	for (const auto& [edge, triIndices] : edgeMap) {
-		if (triIndices.size() >= 2) {
-			for (size_t i = 0; i < triIndices.size(); i++) {
-				for (size_t j = i + 1; j < triIndices.size(); j++) {
-					int t1 = triIndices[i];
-					int t2 = triIndices[j];
-					PolygonGraph[t1].Neighbors.insert(t2);
-					PolygonGraph[t2].Neighbors.insert(t1);
-				}
-			}
-		}
-	}
+    bool inside = false;
+    int n = poly.size();
+    for (int i = 0, j = n - 1; i < n; j = i++)
+    {
+        const FVector& vi = verts[poly[i]];
+        const FVector& vj = verts[poly[j]];
+        bool intersect = ((vi.Y > P.Y) != (vj.Y > P.Y)) &&
+            (P.X < (vj.X - vi.X) * (P.Y - vi.Y) / (vj.Y - vi.Y) + vi.X);
+        if (intersect) inside = !inside;
+    }
+    return inside;
 }
 
-int NavMesh::FindIdxFromPos(const FVector _pos)
+int NavMesh::FindIdxFromPos(const FVector& pos) const
 {
-	int BestTriangleIndex = -1;
-	float MinDistance = FLT_MAX;
-
-	for (int i = 0; i < Triangles.size(); i++) {
-		const Triangle& Tri = Triangles[i];
-
-		const FVector& A = Vertices[Tri.IndexA];
-		const FVector& B = Vertices[Tri.IndexB];
-		const FVector& C = Vertices[Tri.IndexC];
-
-		FVector TriangleCenter = FVector(
-			(A.X + B.X + C.X) / 3.0f,
-			(A.Y + B.Y + C.Y) / 3.0f,
-			(A.Z + B.Z + C.Z) / 3.0f
-		);
-
-		float Distance = _pos.DistanceTo(TriangleCenter);
-		if (Distance < MinDistance) {
-			MinDistance = Distance;
-			BestTriangleIndex = i;
-		}
-	}
-
-	return BestTriangleIndex;
+    for (int i = 0; i < (int)polygons.size(); ++i)
+    {
+        if (PointInPoly(pos, polygons[i], vertices))
+            return i;
+    }
+    return -1;
 }
 
-std::vector<int> NavMesh::FindPath(int StartPolyIdx, int GoalPolyIdx)
+int NavMesh::FindClosestPoly(const FVector& pos) const
 {
-	if (StartPolyIdx == GoalPolyIdx)
-		return { StartPolyIdx };
+    int bestIdx = -1;
+    float bestDist = std::numeric_limits<float>::infinity();
 
-	std::unordered_map<int, int> cameFrom;
-	std::unordered_map<int, float> gScore;
-	std::unordered_map<int, float> fScore;
-	std::unordered_set<int> closedSet;
+    for (int i = 0; i < static_cast<int>(polygons.size()); ++i)
+    {
+        FVector center(0, 0, 0);
+        for (int vid : polygons[i])
+            center = center + vertices[vid];
+        center = center / static_cast<float>(polygons[i].size());
 
-	auto heuristic = [&](int from, int to) -> float {
-		FVector fromCenter = GetTriangleCenter(from);
-		FVector toCenter = GetTriangleCenter(to);
-		return fromCenter.DistanceTo(toCenter);
-		};
+        float distSq = center.DistanceSquared2D(pos);
+        if (distSq < bestDist)
+        {
+            bestDist = distSq;
+            bestIdx = i;
+        }
+    }
 
-	auto cmp = [&](int left, int right) {
-		return fScore[left] > fScore[right];
-		};
-
-	std::priority_queue<int, std::vector<int>, decltype(cmp)> openSet(cmp);
-	openSet.push(StartPolyIdx);
-	gScore[StartPolyIdx] = 0;
-	fScore[StartPolyIdx] = heuristic(StartPolyIdx, GoalPolyIdx);
-
-	while (!openSet.empty())
-	{
-		int current = openSet.top();
-		openSet.pop();
-
-		if (current == GoalPolyIdx)
-		{
-			std::vector<int> path;
-			for (int node = current; node != StartPolyIdx; node = cameFrom[node])
-				path.push_back(node);
-			path.push_back(StartPolyIdx);
-			std::reverse(path.begin(), path.end());
-			return path;
-		}
-
-		closedSet.insert(current);
-
-		for (int neighbor : PolygonGraph[current].Neighbors)
-		{
-			if (closedSet.contains(neighbor))
-				continue;
-
-			float tentative_g = gScore[current] + GetTriangleCenter(current).DistanceTo(GetTriangleCenter(neighbor));
-
-			if (!gScore.contains(neighbor) || tentative_g < gScore[neighbor])
-			{
-				cameFrom[neighbor] = current;
-				gScore[neighbor] = tentative_g;
-				fScore[neighbor] = tentative_g + heuristic(neighbor, GoalPolyIdx);
-				openSet.push(neighbor);
-			}
-		}
-	}
-	return {};
-}
-
-bool NavMesh::LoadFromJson(const std::string& filePath)
-{
-	std::ifstream file(filePath);
-	if (!file.is_open())
-	{
-		LOG(LogType::Warning, std::format("Failed to open file: {}", filePath));
-		return false;
-	}
-
-	std::string jsonStr((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-	rapidjson::Document doc;
-	doc.Parse(jsonStr.c_str());
-
-	if (doc.HasParseError()) {
-		std::cerr << "JSON parse error: " << GetParseError_En(doc.GetParseError()) << " at offset " << doc.GetErrorOffset() << std::endl;
-		return false;
-	}
-
-	if (doc.HasMember("Vertices") && doc["Vertices"].IsArray()) {
-		const auto& verts = doc["Vertices"];
-		Vertices.reserve(verts.Size());
-		for (const auto& vertVal : verts.GetArray()) {
-			Vertices.emplace_back(vertVal[0].GetFloat(), vertVal[1].GetFloat(), vertVal[2].GetFloat());
-		}
-	}
-
-	if (doc.HasMember("Triangles") && doc["Triangles"].IsArray()) {
-		const auto& tris = doc["Triangles"];
-		Triangles.reserve(tris.Size());
-		for (const auto& triVal : tris.GetArray()) {
-			Triangles.emplace_back(triVal["IndexA"].GetInt(), triVal["IndexB"].GetInt(), triVal["IndexC"].GetInt());
-		}
-	}
-
-	BuildPolygonGraph();
-	return true;
+    return bestIdx;
 }
 
 FVector NavMesh::GetRandomPosition() const
 {
-	if (Triangles.empty() || Vertices.empty())
-		return FVector(0, 0, 0);
+    if (polygons.empty() || vertices.empty())
+        return FVector::ZeroVector;
 
-	int RandomTriangleIndex = RandomUtils::GetRandomInt(0, Triangles.size() - 1);
-	const Triangle& tri = Triangles[RandomTriangleIndex];
+    int polyCount = static_cast<int>(polygons.size());
+    int polyIdx = RandomUtils::GetRandomInt(0, polyCount - 1);
+    const auto& poly = polygons[polyIdx];
+    int vcount = static_cast<int>(poly.size());
+    if (vcount < 3)
+        return FVector::ZeroVector;
 
-	const FVector& A = Vertices[tri.IndexA];
-	const FVector& B = Vertices[tri.IndexB];
-	const FVector& C = Vertices[tri.IndexC];
+    int triCount = vcount - 2;
+    int ti = RandomUtils::GetRandomInt(0, triCount - 1);
 
-	float r1 = RandomUtils::GetRandomFloat(0.0f, 1.0f);
-	float r2 = RandomUtils::GetRandomFloat(0.0f, 1.0f);
-	if (r1 + r2 > 1.0f)
-	{
-		r1 = 1.0f - r1;
-		r2 = 1.0f - r2;
-	}
+    const FVector& A = vertices[poly[0]];
+    const FVector& B = vertices[poly[ti + 1]];
+    const FVector& C = vertices[poly[ti + 2]];
 
-	FVector P = A + (B - A) * r1 + (C - A) * r2;
+    float u = RandomUtils::GetRandomFloat(0.f, 1.f);
+    float v = RandomUtils::GetRandomFloat(0.f, 1.f);
+    if (u + v > 1.f) {
+        u = 1.f - u;
+        v = 1.f - v;
+    }
 
-	P.Z += 90.0f;
-
-	return P;
+    FVector P = A + (B - A) * u + (C - A) * v;
+    P.Z += 90;
+    return P;
 }
 
-
-FVector NavMesh::GetTriangleCenter(int triIndex) const
+std::vector<int> NavMesh::FindPathAStar(const FVector& startPos, const FVector& goalPos) const
 {
-	const Triangle& tri = Triangles[triIndex];
-	const FVector& A = Vertices[tri.IndexA];
-	const FVector& B = Vertices[tri.IndexB];
-	const FVector& C = Vertices[tri.IndexC];
+    int startPoly = FindIdxFromPos(startPos);
+    int goalPoly = FindIdxFromPos(goalPos);
 
-	float a = (B - C).Length();
-	float b = (C - A).Length();
-	float c = (A - B).Length();
+    if (startPoly < 0)
+        startPoly = FindClosestPoly(startPos);
+    if (goalPoly < 0)
+        goalPoly = FindClosestPoly(goalPos);
 
-	float sum = a + b + c;
+    if (startPoly < 0 || goalPoly < 0)
+        return {};
 
-	if (sum == 0) return A;
 
-	return (A * a + B * b + C * c) / sum;
+    int N = static_cast<int>(polygons.size());
+    // Precompute polygon centers
+    std::vector<FVector> centers(N);
+    for (int i = 0; i < N; ++i) {
+        FVector sum(0, 0, 0);
+        for (int vid : polygons[i])
+            sum = sum + vertices[vid];
+        centers[i] = sum / static_cast<float>(polygons[i].size());
+    }
+
+    auto Heuristic = [&](int p) {
+        return (centers[p] - goalPos).Length();
+        };
+
+    struct Node { int poly; float g, f; int parent; };
+    struct Compare { bool operator()(const Node& a, const Node& b) const { return a.f > b.f; } };
+
+    std::priority_queue<Node, std::vector<Node>, Compare> openPQ;
+    std::vector<float>       gScore(N, std::numeric_limits<float>::infinity());
+    std::vector<int>         parent(N, -1);
+    std::vector<bool>        closed(N, false);
+
+    // Initialize start
+    gScore[startPoly] = (startPos - centers[startPoly]).Length();
+    openPQ.push({ startPoly, gScore[startPoly], gScore[startPoly] + Heuristic(startPoly), -1 });
+
+    while (!openPQ.empty()) {
+        Node cur = openPQ.top();
+        openPQ.pop();
+        if (closed[cur.poly]) continue;
+        closed[cur.poly] = true;
+        parent[cur.poly] = cur.parent;
+        if (cur.poly == goalPoly) break;
+
+        for (int nb : neighbors[cur.poly]) {
+            if (closed[nb]) continue;
+            float cost = (centers[cur.poly] - centers[nb]).Length();
+            float tentativeG = gScore[cur.poly] + cost;
+            if (tentativeG < gScore[nb]) {
+                gScore[nb] = tentativeG;
+                openPQ.push({ nb, tentativeG, tentativeG + Heuristic(nb), cur.poly });
+            }
+        }
+    }
+
+    if (parent[goalPoly] < 0)
+        return {};
+
+    std::vector<int> path;
+    for (int at = goalPoly; at != -1; at = parent[at])
+        path.push_back(at);
+    std::reverse(path.begin(), path.end());
+    return path;
 }
 
-const std::unordered_set<int>& NavMesh::GetNeighbors(int triIdx) const
+std::vector<FVector> NavMesh::GetStraightPath(
+    const FVector& startPos,
+    const FVector& goalPos,
+    const std::vector<int>& polyPath) const
 {
-	auto it = PolygonGraph.find(triIdx);
-	if (it != PolygonGraph.end())
-		return it->second.Neighbors;
-	static const std::unordered_set<int> Empty;
-	return Empty;
+    std::vector<FVector> path;
+    if (polyPath.size() < 2)
+    {
+        path.push_back(startPos);
+        path.push_back(goalPos);
+        return path;
+    }
+
+    std::vector<std::pair<FVector, FVector>> portals;
+    portals.emplace_back(startPos, startPos);
+    for (size_t i = 0; i + 1 < polyPath.size(); ++i)
+    {
+        const auto& A = polygons[polyPath[i]];
+        const auto& B = polygons[polyPath[i + 1]];
+        std::unordered_set<int> setA(A.begin(), A.end());
+        std::vector<FVector> shared;
+        shared.reserve(2);
+        for (int vid : B)
+            if (setA.count(vid))
+                shared.push_back(vertices[vid]);
+
+        if (shared.size() == 2)
+        {
+            FVector L = shared[0], R = shared[1];
+            auto cross2D = [](const FVector& a, const FVector& b) {
+                return a.X * b.Y - a.Y * b.X;
+                };
+            if (cross2D(R - L, goalPos - L) < 0)
+                std::swap(L, R);
+
+            portals.emplace_back(L, R);
+        }
+    }
+    portals.emplace_back(goalPos, goalPos);
+
+    path.reserve(portals.size());
+    path.push_back(startPos);
+    for (size_t i = 1; i + 1 < portals.size(); ++i)
+    {
+        const auto& [L, R] = portals[i];
+        FVector mid = (L + R) * 0.5;
+        path.push_back(mid);
+    }
+    path.push_back(goalPos);
+
+    return path;
 }
