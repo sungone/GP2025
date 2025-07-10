@@ -18,9 +18,14 @@ void PlayerSession::DoSend(const Packet* packet)
 	_sSocket->DoSend(packet);
 }
 
-void PlayerSession::HandleRecvBuffer(int32 recvByte, ExpOver* expOver)
+void PlayerSession::OnRecv(int32 recvByte, ExpOver* expOver)
 {
-	_sSocket->HandleRecvBuffer(_id, recvByte, expOver);
+	_sSocket->OnRecv(_id, recvByte, expOver);
+}
+
+void PlayerSession::OnSendCompleted(ExpOver* over)
+{
+	_sSocket->OnSendCompleted(over);
 }
 
 void PlayerSession::Connect(SOCKET socket, int32 id)

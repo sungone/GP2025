@@ -203,8 +203,13 @@ void Server::HandleAccept()
 	DoAccept();
 }
 
-void Server::HandleRecv(int32 _id, int32 recvByte, ExpOver* expOver)
+void Server::HandleRecv(int32 id, int32 recvByte, ExpOver* over)
 {
-	SessionManager::GetInst().HandleRecvBuffer(_id, recvByte, expOver);
-	SessionManager::GetInst().DoRecv(_id);
+	SessionManager::GetInst().OnRecv(id, recvByte, over);
+	SessionManager::GetInst().DoRecv(id);
+}
+
+void Server::HandSend(int32 id, ExpOver* over)
+{
+	SessionManager::GetInst().OnSendCompleted(id, over);
 }

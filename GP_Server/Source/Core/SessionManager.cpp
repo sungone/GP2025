@@ -46,9 +46,9 @@ void SessionManager::DoRecv(int32 id)
 	_sessions[id]->DoRecv();
 }
 
-void SessionManager::HandleRecvBuffer(int32 id, int32 recvByte, ExpOver* expOver)
+void SessionManager::OnRecv(int32 id, int32 recvByte, ExpOver* expOver)
 {
-	_sessions[id]->HandleRecvBuffer(recvByte, expOver);
+	_sessions[id]->OnRecv(recvByte, expOver);
 }
 
 void SessionManager::HandleLogin(int32 sessionId, const DBLoginResult& dbRes)
@@ -69,6 +69,11 @@ void SessionManager::SendPacket(int32 sessionId, const Packet* packet)
 		return; 
 	}
 	session->DoSend(packet);
+}
+
+void SessionManager::OnSendCompleted(int32 sessionId, ExpOver* over)
+{
+	_sessions[sessionId]->OnSendCompleted(over);
 }
 
 void SessionManager::BroadcastToAll(Packet* packet)

@@ -16,9 +16,10 @@ public:
 	void Schedule(int32 sessionId, std::function<void()> job);
 
 	void DoRecv(int32 sessionId);
-	void HandleRecvBuffer(int32 sessionId, int32 recvByte, ExpOver* expOver);
+	void OnRecv(int32 sessionId, int32 recvByte, ExpOver* expOver);
 	void HandleLogin(int32 sessionId, const DBLoginResult& dbRes = DBLoginResult());
 	void SendPacket(int32 sessionId, const Packet* packet);
+	void OnSendCompleted(int32 sessionId, ExpOver* over);
 	void BroadcastToAll(Packet* packet);
 	void BroadcastToViewList(Packet* packet, const std::unordered_set<int32>& viewList);
 	std::array<std::shared_ptr<PlayerSession>, MAX_CLIENT>& GetSessions() { return _sessions; }
