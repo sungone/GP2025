@@ -3,6 +3,7 @@
 #include "IOCP.h"
 #include "SessionManager.h"
 #include "GameWorld.h"
+#include "DBJobQueue.h"
 
 bool Server::Init()
 {
@@ -80,9 +81,11 @@ void Server::Run()
 		threads.emplace_back([this]() {WorkerThreadLoop(); });
 	}
 	threads.emplace_back(TimerQueue::TimerThread);
-	const int32 jobThreads =1;
+	const int32 jobThreads = std::max(2, coreNum / 4);
 	for (int32 i = 0; i < jobThreads; ++i)
-		threads.emplace_back([]() { SessionManager::GetInst().JobQueueWorkerLoop(); });
+		threads.emplace_back([]() { SessionManager::GetInst().GameJobWorkerLoop(); });
+	threads.emplace_back([]() { DBJobQueue::GetInst().WorkerLoop(); });
+
 	for (auto& thread : threads)
 	{
 		thread.join();

@@ -1,40 +1,25 @@
 #include "pch.h"
 #include "JobQueue.h"
-#include "PlayerSession.h"
-#include "JobManager.h"
 
-void JobQueue::Push(Job&& job, PlayerSession* owner)
+void JobQueue::Push(std::function<void()> job)
 {
-    {
-        std::lock_guard<std::mutex> lock(_mutex);
-        _jobs.emplace(std::move(job));
-    }
-
-    bool expected = false;
-    if (_running.compare_exchange_strong(expected, true))
-    {
-        RunNext();
-    }
+	std::lock_guard<std::mutex> lock(_mutex);
+	_jobs.push(std::move(job));
 }
 
-void JobQueue::RunNext()
+
+void JobQueue::Run()
 {
-    while (true)
-    {
-        Job job;
-
-        {
-            std::lock_guard<std::mutex> lock(_mutex);
-            if (_jobs.empty())
-            {
-                _running.store(false);
-                return;
-            }
-
-            job = std::move(_jobs.front());
-            _jobs.pop();
-        }
-
-        job();
-    }
+	while (true)
+	{
+		std::function<void()> job;
+		{
+			std::lock_guard<std::mutex> lock(_mutex);
+			if (_jobs.empty())
+				break;
+			job = std::move(_jobs.front());
+			_jobs.pop();
+		}
+		job();
+	}
 }

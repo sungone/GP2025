@@ -182,11 +182,12 @@
     <ClInclude Include="Source\Game\DataTable\PlayerSkillTable.h" />
     <ClInclude Include="Source\Game\DataTable\QuestTable.h" />
     <ClInclude Include="Source\Game\DataTable\SpawnTable.h" />
+    <ClInclude Include="Source\Game\DBJobQueue.h" />
     <ClInclude Include="Source\Game\GameWorld.h" />
     <ClInclude Include="Source\Game\Item\Inventory.h" />
     <ClInclude Include="Source\Game\Item\Item.h" />
     <ClInclude Include="Source\Game\Item\WorldItem.h" />
-    <ClInclude Include="Source\Game\JobManager.h" />
+    <ClInclude Include="Source\Game\GameJobScheduler.h" />
     <ClInclude Include="Source\Game\JobQueue.h" />
     <ClInclude Include="Source\Game\Map\Map.h" />
     <ClInclude Include="Source\Game\Map\NavMesh.h" />
@@ -215,11 +216,12 @@
     <ClCompile Include="Source\Game\DataTable\PlayerSkillTable.cpp" />
     <ClCompile Include="Source\Game\DataTable\QuestTable.cpp" />
     <ClCompile Include="Source\Game\DataTable\SpawnTable.cpp" />
+    <ClCompile Include="Source\Game\DBJobQueue.cpp" />
     <ClCompile Include="Source\Game\GameWorld.cpp" />
     <ClCompile Include="Source\Game\Item\Inventory.cpp" />
     <ClCompile Include="Source\Game\Item\Item.cpp" />
     <ClCompile Include="Source\Game\Item\WorldItem.cpp" />
-    <ClCompile Include="Source\Game\JobManager.cpp" />
+    <ClCompile Include="Source\Game\GameJobScheduler.cpp" />
     <ClCompile Include="Source\Game\JobQueue.cpp" />
     <ClCompile Include="Source\Game\Map\Map.cpp" />
     <ClCompile Include="Source\Game\Map\NavMesh.cpp" />

@@ -21,25 +21,21 @@ void SessionManager::Disconnect(int32 id)
 	_sessions[id] = nullptr;
 }
 
-void SessionManager::JobQueueWorkerLoop()
+void SessionManager::Schedule(int32 sessionId, std::function<void()> job)
 {
-	while (true)
+	auto session = GetSession(sessionId);
+	if (session)
 	{
-		std::vector<std::shared_ptr<PlayerSession>> sessionsCopy;
+		session->PushJob(job);
+		GameJobScheduler::GetInst().Schedule(session);
+	}
+}
 
-		{
-			std::lock_guard<std::mutex> lock(_smgrMutex);
-			for (auto session : _sessions)
-			{
-				if (session)
-					sessionsCopy.push_back(session);
-			}
-		}
-
-		for (auto& session : sessionsCopy)
-			session->RunJobs();
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+void SessionManager::GameJobWorkerLoop()
+{
+	while (true) {
+		auto session = GameJobScheduler::GetInst().Pop();
+		session->RunGameJobs();
 	}
 }
 

@@ -43,16 +43,17 @@ public:
 	}
 	std::shared_ptr<Player> GetPlayer();
 
-	void PushJob(Job&& job) {
-		_jobQueue.Push(std::move(job), this);
+	void PushJob(std::function<void()> job)
+	{
+		_gameJobQueue.Push(std::move(job));
 	}
 
-	void RunJobs() {
-		_jobQueue.RunNext();
+	void RunGameJobs() {
+		_gameJobQueue.Run();
 	}
 
 private:
-	JobQueue _jobQueue;
+	JobQueue _gameJobQueue;
 	int32 _id = -1;
 	uint32 _dbId;
 	std::shared_ptr<Player> _player;

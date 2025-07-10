@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "PacketManager.h"
 #include "magic_enum/magic_enum.hpp"
+#include "DBJobQueue.h"
 
 void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 {
@@ -100,16 +101,23 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 	auto pkt = static_cast<SignUpPacket*>(packet);
 #ifdef DB_LOCAL
 	std::wstring name = ConvertToWString(pkt->NickName);
-	auto res = _dbMgr.SignUpUser(sessionId, pkt->AccountID, pkt->AccountPW, name);
-	if (res.code != DBResultCode::SUCCESS)
-	{
-		LOG(std::format("SignUp Failed [{}]", sessionId));
-		SignUpFailPacket failpkt(res.code);
-		_sessionMgr.SendPacket(sessionId, &failpkt);
-		return;
-	}
-	_sessionMgr.HandleLogin(sessionId, res);
-	LOG(std::format("SignUp Success [{}] userId: {}", sessionId, res.dbId));
+
+	DBJobQueue::GetInst().Push([sessionId, id = pkt->AccountID, pw = pkt->AccountPW, name]() {
+		auto res = DBManager::GetInst().SignUpUser(sessionId, id, pw, name);
+
+		SessionManager::GetInst().Schedule(sessionId, [sessionId, res]() {
+			if (res.code != DBResultCode::SUCCESS)
+			{
+				LOG(std::format("SignUp Failed [{}]", sessionId));
+				SignUpFailPacket failpkt(res.code);
+				SessionManager::GetInst().SendPacket(sessionId, &failpkt);
+				return;
+			}
+
+			SessionManager::GetInst().HandleLogin(sessionId, res);
+			LOG(std::format("SignUp Success [{}] userId: {}", sessionId, res.dbId));
+			});
+		});
 	return;
 #else
 	LOG(std::format("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW));
@@ -123,19 +131,24 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 {
 	auto pkt = static_cast<LoginPacket*>(packet);
 #ifdef DB_LOCAL
-	auto res = _dbMgr.CheckLogin(sessionId, pkt->AccountID, pkt->AccountPW);
+	DBJobQueue::GetInst().Push([sessionId, accountID = pkt->AccountID, accountPW = pkt->AccountPW]() {
+		auto res = DBManager::GetInst().CheckLogin(sessionId, accountID, accountPW);
 
-	if (res.code != DBResultCode::SUCCESS)
-	{
-		LoginFailPacket failpkt(res.code);
-		_sessionMgr.SendPacket(sessionId, &failpkt);
-		return;
-	}
-	LoginSuccessPacket loginpkt;
-	_sessionMgr.SendPacket(sessionId, &loginpkt);
-	_sessionMgr.HandleLogin(sessionId, res);
+		SessionManager::GetInst().Schedule(sessionId, [sessionId, res]() {
+			if (res.code != DBResultCode::SUCCESS)
+			{
+				LoginFailPacket failpkt(res.code);
+				SessionManager::GetInst().SendPacket(sessionId, &failpkt);
+				return;
+			}
 
-	LOG(LogType::Log, std::format("Login Success [{}] userId: {}", sessionId, res.dbId));
+			LoginSuccessPacket loginpkt;
+			SessionManager::GetInst().SendPacket(sessionId, &loginpkt);
+			SessionManager::GetInst().HandleLogin(sessionId, res);
+
+			LOG(LogType::Log, std::format("Login Success [{}] userId: {}", sessionId, res.dbId));
+			});
+		});
 	return;
 
 #else
