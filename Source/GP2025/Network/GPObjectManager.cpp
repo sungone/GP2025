@@ -332,15 +332,15 @@ void UGPObjectManager::LevelUp(const FInfoData& PlayerInfo)
 			TimerHandle,
 			[LocalInGameWidget, PlayerLevel]()
 			{
-				if (PlayerLevel == 2 || PlayerLevel == 5 || PlayerLevel == 8)
+				if (PlayerLevel == 5 || PlayerLevel == 8)
 				{
 					LocalInGameWidget->ShowLevelUpArrowTemporarily(LocalInGameWidget->LevelUpArrowQ);
 				}
-				else if (PlayerLevel == 3 || PlayerLevel == 6 || PlayerLevel == 9)
+				else if (PlayerLevel == 6 || PlayerLevel == 9)
 				{
 					LocalInGameWidget->ShowLevelUpArrowTemporarily(LocalInGameWidget->LevelUpArrowE);
 				}
-				else if (PlayerLevel == 4 || PlayerLevel == 7 || PlayerLevel == 10)
+				else if (PlayerLevel == 7 || PlayerLevel == 10)
 				{
 					LocalInGameWidget->ShowLevelUpArrowTemporarily(LocalInGameWidget->LevelUpArrowR);
 				}

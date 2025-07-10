@@ -483,12 +483,12 @@ void UGPMyplayerUIManager::UpdateSkillInfosFromPlayer()
 	if (bIsGunner)
 	{
 		SkillNames = { TEXT("던지기"), TEXT("빨리던지기"), TEXT("분노") };
-		SkillKeys = { TEXT("Q"), TEXT("E"), TEXT("R") };
+		SkillKeys = { TEXT(" Q "), TEXT(" E "), TEXT(" R ") };
 	}
 	else
 	{
-		SkillNames = { TEXT("강타"), TEXT("돌진"), TEXT("회오리") };
-		SkillKeys = { TEXT("Q"), TEXT("E"), TEXT("R") };
+		SkillNames = { TEXT("강타"), TEXT("돌진"), TEXT("회오리베기") };
+		SkillKeys = { TEXT(" Q "), TEXT(" E "), TEXT(" R ") };
 	}
 
 	TArray<UGPSkillInfo*> SkillWidgets = {
