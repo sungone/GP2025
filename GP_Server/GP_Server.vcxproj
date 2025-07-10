@@ -186,6 +186,8 @@
     <ClInclude Include="Source\Game\Item\Inventory.h" />
     <ClInclude Include="Source\Game\Item\Item.h" />
     <ClInclude Include="Source\Game\Item\WorldItem.h" />
+    <ClInclude Include="Source\Game\JobManager.h" />
+    <ClInclude Include="Source\Game\JobQueue.h" />
     <ClInclude Include="Source\Game\Map\Map.h" />
     <ClInclude Include="Source\Game\Map\NavMesh.h" />
     <ClInclude Include="Source\ServerDefine.h" />
@@ -217,6 +219,8 @@
     <ClCompile Include="Source\Game\Item\Inventory.cpp" />
     <ClCompile Include="Source\Game\Item\Item.cpp" />
     <ClCompile Include="Source\Game\Item\WorldItem.cpp" />
+    <ClCompile Include="Source\Game\JobManager.cpp" />
+    <ClCompile Include="Source\Game\JobQueue.cpp" />
     <ClCompile Include="Source\Game\Map\Map.cpp" />
     <ClCompile Include="Source\Game\Map\NavMesh.cpp" />
     <ClCompile Include="Source\ServerMain.cpp" />

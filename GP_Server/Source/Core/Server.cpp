@@ -74,12 +74,15 @@ void Server::Run()
 	DoAccept();
 
 	static std::vector<std::thread> threads;
-	int32 numThreads = std::thread::hardware_concurrency();
+	int32 coreNum = std::thread::hardware_concurrency();
+	int32 numThreads = coreNum;
 	for (int32 i = 0; i < numThreads; ++i) {
 		threads.emplace_back([this]() {WorkerThreadLoop(); });
 	}
 	threads.emplace_back(TimerQueue::TimerThread);
-
+	const int32 jobThreads =1;
+	for (int32 i = 0; i < jobThreads; ++i)
+		threads.emplace_back([]() { SessionManager::GetInst().JobQueueWorkerLoop(); });
 	for (auto& thread : threads)
 	{
 		thread.join();

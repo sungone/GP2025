@@ -67,6 +67,7 @@ void Player::OnEnterGame()
 			SessionManager::GetInst().SendPacket(_id, &pkt);
 		}
 	}
+	if(_curQuest.QuestType !=QuestType::NONE)
 	{
 		const QuestData* questData = QuestTable::GetInst().GetQuest(_curQuest.QuestType);
 		if (!questData)

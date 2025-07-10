@@ -1,7 +1,7 @@
 #pragma once
 #include "PlayerSession.h"
 #include "IOCP.h"
-
+#include "JobManager.h"
 class SessionManager
 {
 public:
@@ -12,6 +12,7 @@ public:
 	}
 	void Connect(SOCKET& socket);
 	void Disconnect(int32 sessionId);
+	void JobQueueWorkerLoop();
 
 	void DoRecv(int32 sessionId);
 	void HandleRecvBuffer(int32 sessionId, int32 recvByte, ExpOver* expOver);
@@ -27,6 +28,7 @@ private:
 private:
 	std::array<std::shared_ptr<PlayerSession>, MAX_CLIENT> _sessions;
 	IOCP& _iocp = IOCP::GetInst();
+	JobManager& _jobManager = JobManager::GetInst();
 
 	std::mutex _smgrMutex;
 };

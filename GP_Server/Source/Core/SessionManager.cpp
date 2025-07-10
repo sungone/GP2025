@@ -21,6 +21,28 @@ void SessionManager::Disconnect(int32 id)
 	_sessions[id] = nullptr;
 }
 
+void SessionManager::JobQueueWorkerLoop()
+{
+	while (true)
+	{
+		std::vector<std::shared_ptr<PlayerSession>> sessionsCopy;
+
+		{
+			std::lock_guard<std::mutex> lock(_smgrMutex);
+			for (auto session : _sessions)
+			{
+				if (session)
+					sessionsCopy.push_back(session);
+			}
+		}
+
+		for (auto& session : sessionsCopy)
+			session->RunJobs();
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	}
+}
+
 void SessionManager::DoRecv(int32 id)
 {
 	std::lock_guard<std::mutex> lock(_smgrMutex);

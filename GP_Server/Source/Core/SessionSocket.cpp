@@ -48,7 +48,18 @@ void SessionSocket::HandleRecvBuffer(int32 id, int32 recvByte, ExpOver* expOver)
 			uint32 packetSize = packet->Header.PacketSize;
 			if (packetSize <= 0 || packetSize > dataSize)
 				break;
+			if (_owner)
+			{
+				auto sharedPacket = std::shared_ptr<Packet>(
+					reinterpret_cast<Packet*>(new uint8[packet->Header.PacketSize]),
+					[](Packet* p) { delete[] reinterpret_cast<uint8_t*>(p); }
+				);
+				memcpy(sharedPacket.get(), packet, packet->Header.PacketSize);
 
+				_owner->PushJob([sharedPacket, id]() {
+					PacketManager::GetInst().ProcessPacket(id, sharedPacket.get());
+					});
+			}
 			PacketManager::GetInst().ProcessPacket(id, packet);
 			buffer += packetSize;
 			dataSize -= packetSize;

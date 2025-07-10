@@ -59,6 +59,9 @@
     <Filter Include="Source Files\Game\GameWorld\Map">
       <UniqueIdentifier>{8c3f90d3-fa86-4a55-8ae0-ca4c78604b0d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Game\Job">
+      <UniqueIdentifier>{0e2cae6d-8808-472f-bbc3-d43313b17b01}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Utils\Logger.h">
@@ -160,6 +163,12 @@
     <ClInclude Include="Source\Game\DataTable\SpawnTable.h">
       <Filter>Source Files\Game\DataTable</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Game\JobQueue.h">
+      <Filter>Source Files\Game\Job</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\JobManager.h">
+      <Filter>Source Files\Game\Job</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Core\PlayerSession.cpp">
@@ -239,6 +248,12 @@
     </ClCompile>
     <ClCompile Include="Source\Game\DataTable\SpawnTable.cpp">
       <Filter>Source Files\Game\DataTable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\JobQueue.cpp">
+      <Filter>Source Files\Game\Job</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\JobManager.cpp">
+      <Filter>Source Files\Game\Job</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,7 @@
 #pragma once
 #include "Player.h"
 #include "SessionSocket.h"
+#include "JobQueue.h"
 
 enum class SessionState { None, LoggedIn, InGame };
 
@@ -41,7 +42,17 @@ public:
 		_state = newState;
 	}
 	std::shared_ptr<Player> GetPlayer();
+
+	void PushJob(Job&& job) {
+		_jobQueue.Push(std::move(job), this);
+	}
+
+	void RunJobs() {
+		_jobQueue.RunNext();
+	}
+
 private:
+	JobQueue _jobQueue;
 	int32 _id = -1;
 	uint32 _dbId;
 	std::shared_ptr<Player> _player;
