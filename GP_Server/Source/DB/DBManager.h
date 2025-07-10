@@ -22,11 +22,4 @@ public:
 	bool UpdatePlayerInfo(uint32 dbId, const FInfoData& info);
 	bool AddUserItem(uint32 dbId, uint32 itemID, uint8 itemTypeID);
 	bool RemoveUserItem(uint32 dbId, uint32 itemID);
-
-private:
-	std::shared_ptr<mysqlx::Session> _dbsess;
-	std::shared_ptr<mysqlx::Schema> _db;
-
-	const std::string USERS_TABLE = "users";
-	mysqlx::Table GetUsersTable();
 };

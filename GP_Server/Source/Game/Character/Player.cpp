@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "SessionManager.h"
 #include "GameWorld.h"
+#include "DBJobQueue.h"
 
 void Player::Init()
 {
@@ -30,7 +31,9 @@ void Player::LoadFromDB(const DBLoginResult& dbRes)
 
 void Player::SaveToDB(uint32 dbId)
 {
-	DBManager::GetInst().UpdatePlayerInfo(dbId, _info);
+	DBJobQueue::GetInst().Push([dbId, info = _info]() {
+		DBManager::GetInst().UpdatePlayerInfo(dbId, info);
+		});
 	_inventory.SaveToDB(dbId);
 }
 

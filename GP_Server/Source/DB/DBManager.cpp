@@ -1,29 +1,18 @@
 #include "pch.h"
 #include "DBManager.h"
 #include "GameWorld.h"
+#include "ScopedDBSession.h"
 
-bool DBManager::Connect(const std::string& host, const std::string& user, const std::string& pwd, const  std::string& db)
+bool DBManager::Connect(const std::string& host, const std::string& user, const std::string& pwd, const std::string& db)
 {
-	try {
-		_dbsess = std::make_shared<mysqlx::Session>(mysqlx::SessionSettings(host, user, pwd, db));
-		_db = std::make_shared<mysqlx::Schema>(_dbsess->getSchema(db));
-		return true;
-	}
-	catch (const mysqlx::Error& e)
-	{
-		LOG(LogType::Error, std::format("MySQL Error: {}", e.what()));
-		return false;
-	}
+	return DBConnectionPool::GetInst().Init(host, user, pwd, db, 10);
 }
 
 void DBManager::Close()
 {
-	_db.reset();
-	if (_dbsess) {
-		_dbsess->close();
-		_dbsess.reset();
-	}
+	DBConnectionPool::GetInst().Close();
 }
+
 
 DBLoginResult DBManager::SignUpUser(int32 sessionId, const std::string& login_id, const std::string& password, const std::wstring& nickname)
 {
@@ -67,14 +56,17 @@ DBLoginResult DBManager::SignUpUser(int32 sessionId, const std::string& login_id
 	newinfo.EquipState = {};
 
 	try {
-		auto result = GetUsersTable()
+		ScopedDBSession scoped;
+		auto& sess = scoped.Get();
+		auto schema = sess.getSchema("gp2025");
+		auto result = schema.getTable("users")
 			.insert("login_id", "password", "nickname")
 			.values(login_id, password, nickname)
 			.execute();
 
 		uint32 dbId = static_cast<uint32>(result.getAutoIncrementValue());
 
-		_db->getTable("player_info")
+		schema.getTable("player_info")
 			.insert("id", "character_type", "pos_x", "pos_y", "pos_z", "yaw",
 				"collision_radius", "attack_radius", "fov_angle",
 				"level", "exp", "max_exp", "hp", "max_hp", "damage",
@@ -117,7 +109,10 @@ DBLoginResult DBManager::SignUpUser(int32 sessionId, const std::string& login_id
 DBLoginResult DBManager::CheckLogin(int32 sessionId, const std::string& login_id, const std::string& password)
 {
 	try {
-		auto result = _dbsess->sql(
+		ScopedDBSession scoped;
+		auto& sess = scoped.Get();
+		auto schema = sess.getSchema("gp2025");
+		auto result = sess.sql(
 			"SELECT "
 			"u.id, u.password, u.nickname, "
 			"p.character_type, p.pos_x, p.pos_y, p.pos_z, p.yaw, "
@@ -178,7 +173,7 @@ DBLoginResult DBManager::CheckLogin(int32 sessionId, const std::string& login_id
 
 		std::vector<std::pair<uint32, uint8>> itemList;
 
-		auto itemResult = _db->getTable("user_items")
+		auto itemResult = schema.getTable("user_items")
 			.select("item_uid", "item_type_id")
 			.where("user_id = :uid")
 			.bind("uid", dbId)
@@ -201,7 +196,11 @@ DBLoginResult DBManager::CheckLogin(int32 sessionId, const std::string& login_id
 bool DBManager::UpdatePlayerInfo(uint32 dbId, const FInfoData& info)
 {
 	try {
-		auto table = _db->getTable("player_info");
+		ScopedDBSession scoped;
+		auto& sess = scoped.Get();
+		auto schema = sess.getSchema("gp2025");
+
+		auto table = schema.getTable("player_info");
 		table.update()
 			.set("character_type", info.CharacterType)
 			.set("pos_x", info.Pos.X)
@@ -250,7 +249,10 @@ bool DBManager::UpdatePlayerInfo(uint32 dbId, const FInfoData& info)
 bool DBManager::AddUserItem(uint32 dbId, uint32 itemID, uint8 itemTypeID)
 {
 	try {
-		_db->getTable("user_items")
+		ScopedDBSession scoped;
+		auto& sess = scoped.Get();
+		auto schema = sess.getSchema("gp2025");
+		schema.getTable("user_items")
 			.insert("item_uid", "user_id", "item_type_id")
 			.values(itemID, dbId, itemTypeID)
 			.execute();
@@ -268,7 +270,10 @@ bool DBManager::AddUserItem(uint32 dbId, uint32 itemID, uint8 itemTypeID)
 bool DBManager::RemoveUserItem(uint32 dbId, uint32 itemID)
 {
 	try {
-		_db->getTable("user_items")
+		ScopedDBSession scoped;
+		auto& sess = scoped.Get();
+		auto schema = sess.getSchema("gp2025");
+		schema.getTable("user_items")
 			.remove()
 			.where("item_uid = :uid AND user_id = :userid")
 			.bind("uid", itemID)
@@ -283,9 +288,4 @@ bool DBManager::RemoveUserItem(uint32 dbId, uint32 itemID)
 		LOG(LogType::Error, std::format("MySQL Error (RemoveUserItem): {}", e.what()));
 		return false;
 	}
-}
-
-mysqlx::Table DBManager::GetUsersTable()
-{
-	return _db->getTable(USERS_TABLE);
 }
