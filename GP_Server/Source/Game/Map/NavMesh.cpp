@@ -56,8 +56,19 @@ std::optional<NavMesh> NavMesh::LoadFromJson(const std::string& filePath)
             row.push_back(xi.GetInt());
         mesh.neighbors.push_back(std::move(row));
     }
-
+    mesh.ComputePolygonCenters();
     return mesh;
+}
+
+void NavMesh::ComputePolygonCenters()
+{
+    polyCenters.resize(polygons.size());
+    for (int i = 0; i < (int)polygons.size(); ++i) {
+        FVector sum(0, 0, 0);
+        for (int vid : polygons[i])
+            sum = sum + vertices[vid];
+        polyCenters[i] = sum / static_cast<float>(polygons[i].size());
+    }
 }
 
 static bool PointInPoly(const FVector& P, const std::vector<int>& poly,
@@ -93,12 +104,7 @@ int NavMesh::FindClosestPoly(const FVector& pos) const
 
     for (int i = 0; i < static_cast<int>(polygons.size()); ++i)
     {
-        FVector center(0, 0, 0);
-        for (int vid : polygons[i])
-            center = center + vertices[vid];
-        center = center / static_cast<float>(polygons[i].size());
-
-        float distSq = center.DistanceSquared2D(pos);
+        float distSq = polyCenters[i].DistanceSquared2D(pos);
         if (distSq < bestDist)
         {
             bestDist = distSq;
@@ -114,20 +120,57 @@ FVector NavMesh::GetRandomPosition() const
     if (polygons.empty() || vertices.empty())
         return FVector::ZeroVector;
 
-    int polyCount = static_cast<int>(polygons.size());
-    int polyIdx = RandomUtils::GetRandomInt(0, polyCount - 1);
-    const auto& poly = polygons[polyIdx];
-    int vcount = static_cast<int>(poly.size());
-    if (vcount < 3)
+    struct TriangleInfo {
+        int polyIdx;
+        int triOffset;
+        float cumulativeArea;
+    };
+
+    std::vector<TriangleInfo> triangles;
+    float totalArea = 0.f;
+
+    // 1. 각 삼각형 면적 계산
+    for (int polyIdx = 0; polyIdx < static_cast<int>(polygons.size()); ++polyIdx) {
+        const auto& poly = polygons[polyIdx];
+        int vcount = static_cast<int>(poly.size());
+        if (vcount < 3) continue;
+
+        for (int i = 0; i < vcount - 2; ++i) {
+            const FVector& A = vertices[poly[0]];
+            const FVector& B = vertices[poly[i + 1]];
+            const FVector& C = vertices[poly[i + 2]];
+
+            float area = FVector::CrossProduct(B - A, C - A).Length() * 0.5f;
+            totalArea += area;
+
+            triangles.push_back({ polyIdx, i, totalArea });  // 누적 합 저장
+        }
+    }
+
+    if (triangles.empty())
         return FVector::ZeroVector;
 
-    int triCount = vcount - 2;
-    int ti = RandomUtils::GetRandomInt(0, triCount - 1);
+    // 2. 랜덤 면적값 선택
+    float r = RandomUtils::GetRandomFloat(0.f, totalArea);
 
+    // 3. 어떤 삼각형을 선택할지 이분 탐색
+    const TriangleInfo* selected = nullptr;
+    for (const auto& tri : triangles) {
+        if (r <= tri.cumulativeArea) {
+            selected = &tri;
+            break;
+        }
+    }
+
+    if (!selected)
+        selected = &triangles.back();
+
+    const auto& poly = polygons[selected->polyIdx];
     const FVector& A = vertices[poly[0]];
-    const FVector& B = vertices[poly[ti + 1]];
-    const FVector& C = vertices[poly[ti + 2]];
+    const FVector& B = vertices[poly[selected->triOffset + 1]];
+    const FVector& C = vertices[poly[selected->triOffset + 2]];
 
+    // 4. 삼각형 내부 샘플링 (barycentric 방식)
     float u = RandomUtils::GetRandomFloat(0.f, 1.f);
     float v = RandomUtils::GetRandomFloat(0.f, 1.f);
     if (u + v > 1.f) {
@@ -136,9 +179,10 @@ FVector NavMesh::GetRandomPosition() const
     }
 
     FVector P = A + (B - A) * u + (C - A) * v;
-    P.Z += 90;
+    P.Z += 90.f;
     return P;
 }
+
 
 std::vector<int> NavMesh::FindPathAStar(const FVector& startPos, const FVector& goalPos) const
 {
@@ -155,17 +199,9 @@ std::vector<int> NavMesh::FindPathAStar(const FVector& startPos, const FVector& 
 
 
     int N = static_cast<int>(polygons.size());
-    // Precompute polygon centers
-    std::vector<FVector> centers(N);
-    for (int i = 0; i < N; ++i) {
-        FVector sum(0, 0, 0);
-        for (int vid : polygons[i])
-            sum = sum + vertices[vid];
-        centers[i] = sum / static_cast<float>(polygons[i].size());
-    }
 
     auto Heuristic = [&](int p) {
-        return (centers[p] - goalPos).Length();
+        return (polyCenters[p] - polyCenters[goalPoly]).Length();
         };
 
     struct Node { int poly; float g, f; int parent; };
@@ -177,7 +213,7 @@ std::vector<int> NavMesh::FindPathAStar(const FVector& startPos, const FVector& 
     std::vector<bool>        closed(N, false);
 
     // Initialize start
-    gScore[startPoly] = (startPos - centers[startPoly]).Length();
+    gScore[startPoly] = (startPos - polyCenters[startPoly]).Length();
     openPQ.push({ startPoly, gScore[startPoly], gScore[startPoly] + Heuristic(startPoly), -1 });
 
     while (!openPQ.empty()) {
@@ -190,7 +226,7 @@ std::vector<int> NavMesh::FindPathAStar(const FVector& startPos, const FVector& 
 
         for (int nb : neighbors[cur.poly]) {
             if (closed[nb]) continue;
-            float cost = (centers[cur.poly] - centers[nb]).Length();
+            float cost = (polyCenters[cur.poly] - polyCenters[nb]).Length();
             float tentativeG = gScore[cur.poly] + cost;
             if (tentativeG < gScore[nb]) {
                 gScore[nb] = tentativeG;
