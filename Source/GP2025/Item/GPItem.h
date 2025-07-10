@@ -16,6 +16,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void SetupItem(int32 NewItemID, uint8 NewItemtype, int32 NewAmount);
+	virtual void Reset() override;
+
+	void ReturnToPool();
+	void SetPool(class UGPItemPool* InPool);
 
 private:
 	void UpdateFloatingEffect();
@@ -44,4 +48,8 @@ public:
 
 	UPROPERTY()
 	int32 Amount;
+
+private:
+	UPROPERTY()
+	class UGPItemPool* Pool;
 };

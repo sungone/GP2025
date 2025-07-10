@@ -11,6 +11,7 @@
 #include "Character/Modules/GPMyplayerInputHandler.h"
 #include "Character/Modules/GPMyplayerSoundManager.h"
 #include "GameFramework/PlayerController.h"
+#include "ObjectPool/GPItemPool.h"
 
 // Sets default values
 AGPItem::AGPItem()
@@ -170,4 +171,41 @@ UDataTable* AGPItem::GetItemDataTable()
 	}
 
 	return DataTable;
+}
+
+void AGPItem::Reset()
+{
+	Super::Reset();
+	SetActorLocation(FVector::ZeroVector);
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+	SetActorTickEnabled(false);
+
+	if (ItemStaticMesh)
+	{
+		ItemStaticMesh->SetStaticMesh(nullptr);
+		ItemStaticMesh->SetVisibility(false);
+	}
+
+	HideInteractionWidget();
+
+	ItemID = -1;
+	Amount = 0;
+}
+
+void AGPItem::ReturnToPool()
+{
+	if (Pool)
+	{
+		Pool->Release(this);
+	}
+	else
+	{
+		Destroy();
+	}
+}
+
+void AGPItem::SetPool(UGPItemPool* InPool)
+{
+	Pool = InPool;
 }

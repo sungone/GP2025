@@ -84,4 +84,12 @@ private:
 
 	ZoneType PendingZone;
 	FVector PendingLocation;
+
+// Object Pool
+public :
+	UPROPERTY()
+	class UGPFloatingDamageTextPool* FloatingDamageTextPool;
+
+	UPROPERTY()
+	class UGPItemPool* ItemPool;
 };

@@ -5,6 +5,7 @@
 #include "Components/WidgetComponent.h"
 #include "Components/TextBlock.h"
 #include "Blueprint/UserWidget.h"
+#include "ObjectPool/GPFloatingDamageTextPool.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -34,8 +35,6 @@ void AGPFloatingDamageText::BeginPlay()
 		DamageText = Cast<UTextBlock>(Widget->GetWidgetFromName(TEXT("DamageText")));
 		DamageText->SetColorAndOpacity(FSlateColor(FLinearColor::White));
 	}
-
-	GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &AGPFloatingDamageText::DestroySelf, 1.0f, false);
 }
 
 // Called every frame
@@ -73,10 +72,47 @@ void AGPFloatingDamageText::SetDamageText(float DamageAmount, bool bIsCrt)
 			}
 		}
 	}
+
+	GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
+	GetWorldTimerManager().SetTimer(
+		DestroyTimerHandle,
+		this,
+		&AGPFloatingDamageText::ReturnToPool,
+		1.0f,
+		false
+	);
 }
 
-void AGPFloatingDamageText::DestroySelf()
+void AGPFloatingDamageText::ReturnToPool()
 {
-	Destroy();
+	if (Pool)
+	{
+		Pool->Release(this);
+	}
+	else
+	{
+		Destroy();
+	}
 }
 
+void AGPFloatingDamageText::Reset()
+{
+	Super::Reset();
+
+	SetActorLocation(FVector::ZeroVector);
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+	SetActorTickEnabled(false);
+
+	if (DamageText)
+	{
+		DamageText->SetText(FText::FromString(TEXT("")));
+		DamageText->SetRenderScale(FVector2D(1.f, 1.f));
+		DamageText->SetColorAndOpacity(FSlateColor(FLinearColor::White));
+	}
+}
+
+void AGPFloatingDamageText::SetPool(UGPFloatingDamageTextPool* InPool)
+{
+	Pool = InPool;
+}

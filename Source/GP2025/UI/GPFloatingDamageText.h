@@ -24,6 +24,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void SetDamageText(float DamageAmount , bool bIsCrt);
+	virtual void Reset() override;
 
 	UPROPERTY(VisibleAnywhere)
 	class UWidgetComponent* DamageWidgetComponent;
@@ -31,9 +32,12 @@ public:
 	UPROPERTY()
 	class UTextBlock* DamageText;
 
-
-	FTimerHandle DestroyTimerHandle;
 	
-	void DestroySelf();
+	void ReturnToPool();
+	void SetPool(class UGPFloatingDamageTextPool* InPool);
 
+private:
+	UPROPERTY()
+	class UGPFloatingDamageTextPool* Pool;
+	FTimerHandle DestroyTimerHandle;
 };

@@ -16,7 +16,10 @@
 #include "UI/GPQuestListEntryWidget.h"
 #include "UI/GPQuestListWidget.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Character/GPCharacterControlData.h"
 #include "Character/Modules/GPMyplayerSoundManager.h"
+#include "ObjectPool/GPFloatingDamageTextPool.h"
+#include "ObjectPool/GPItemPool.h"
 #include "Network/GPNetworkManager.h"
 #include "Inventory/GPEquippedItemSlot.h"
 #include "Kismet/GameplayStatics.h"
@@ -30,8 +33,17 @@ void UGPObjectManager::Initialize(FSubsystemCollectionBase& Collection)
 	OtherPlayerClass = AGPCharacterPlayer::StaticClass();
 	MonsterClass = AGPCharacterMonster::StaticClass();
 
+	// Pool Manager 생성
+	FloatingDamageTextPool = NewObject<UGPFloatingDamageTextPool>(this);
+	FloatingDamageTextPool->Initialize(World, 20);
+
+	ItemPool = NewObject<UGPItemPool>(this);
+	ItemPool->Initialize(World, 50); // 풀 초기 크기 50, 네 상황에 맞춰 조절 가능
+
 	static const FString DataTablePath = TEXT("/Game/Item/GPItemTable.GPItemTable");
 	ItemDataTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath));
+
+
 }
 
 void UGPObjectManager::Deinitialize()
@@ -354,13 +366,8 @@ void UGPObjectManager::AddMonster(const FInfoData& MonsterInfo)
 
 	if (Monster == nullptr)
 	{
-		// UE_LOG(LogTemp, Error, TEXT("Failed to spawn monster [%d] at location (%f, %f, %f)."),
-			//MonsterInfo.ID, SpawnLocation.X, SpawnLocation.Y, SpawnLocation.Z);
 		return;
 	}
-
-	// UE_LOG(LogTemp, Warning, TEXT("Spawned Monster [%d] at (%f, %f, %f) with rotation (%f)."),
-		//MonsterInfo.ID, SpawnLocation.X, SpawnLocation.Y, SpawnLocation.Z, SpawnRotation.Yaw);
 
 	Monster->SetCharacterInfo(MonsterInfo);
 	Monster->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
@@ -370,6 +377,7 @@ void UGPObjectManager::AddMonster(const FInfoData& MonsterInfo)
 	{
 		Monster->SetNameByCharacterInfo();
 	}
+
 	Monsters.Add(MonsterInfo.ID, Monster);
 }
 
@@ -419,17 +427,12 @@ void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage
 			FVector SpawnLocation = Monster->GetActorLocation() + FVector(0, 0, 100);
 			FActorSpawnParameters SpawnParams;
 
-			AGPFloatingDamageText* DamageText = World->SpawnActor<AGPFloatingDamageText>(
-				AGPFloatingDamageText::StaticClass(),
-				SpawnLocation,
-				FRotator::ZeroRotator,
-				SpawnParams
-			);
-
 			bool isCrt = (MyPlayer && MyPlayer->CharacterInfo.GetDamage() * 10 < Damage);
 
+			AGPFloatingDamageText* DamageText = FloatingDamageTextPool->Acquire();
 			if (DamageText)
 			{
+				DamageText->SetActorLocation(SpawnLocation);
 				DamageText->SetDamageText(Damage, isCrt);
 			}
 
@@ -560,9 +563,7 @@ void UGPObjectManager::ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos)
 	}
 	UE_LOG(LogTemp, Log, TEXT("[ItemSpawn] Item data found for ItemType [%d]: %s"), ItemType, *ItemData->ItemName.ToString());
 
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-	AGPItem* SpawnedItem = World->SpawnActor<AGPItem>(AGPItem::StaticClass(), Pos, FRotator::ZeroRotator, SpawnParams);
+	AGPItem* SpawnedItem = ItemPool->Acquire();
 
 	if (!SpawnedItem)
 	{
@@ -571,6 +572,7 @@ void UGPObjectManager::ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos)
 	}
 	UE_LOG(LogTemp, Log, TEXT("[ItemSpawn] Item actor spawned successfully for ItemID [%d]"), ItemID);
 
+	SpawnedItem->SetActorLocation(Pos);
 	SpawnedItem->SetupItem(ItemID, ItemType, 0);
 	UE_LOG(LogTemp, Log, TEXT("[ItemSpawn] Item setup completed for ItemID [%d]"), ItemID);
 
@@ -600,7 +602,7 @@ void UGPObjectManager::ItemPickUp(uint32 ItemID)
 	if (IsValid(Item))
 	{
 		UE_LOG(LogTemp, Log, TEXT("[ItemDespawn] Destroying Item [%d]"), ItemID);
-		Item->Destroy();
+		Item->ReturnToPool();
 
 		FTimerHandle TimerHandle;
 		World->GetTimerManager().SetTimer(TimerHandle, [this, ItemID]()
@@ -644,7 +646,7 @@ void UGPObjectManager::ItemDespawn(uint32 ItemID)
 	if (IsValid(Item))
 	{
 		UE_LOG(LogTemp, Log, TEXT("[ItemDespawn] Destroying Item [%d]"), ItemID);
-		Item->Destroy();
+		Item->ReturnToPool();
 
 		FTimerHandle TimerHandle;
 		World->GetTimerManager().SetTimer(TimerHandle, [this, ItemID]()
@@ -665,6 +667,7 @@ void UGPObjectManager::ItemDespawn(uint32 ItemID)
 		Items.Remove(ItemID);
 	}
 }
+
 void UGPObjectManager::DropItem(uint32 ItemID, uint8 ItemType, FVector Pos)
 {
 	//Todo : ItemSpawn()과 비슷하지만 둥둥 뜨지 않고 땅바닥에 스폰하도록 
