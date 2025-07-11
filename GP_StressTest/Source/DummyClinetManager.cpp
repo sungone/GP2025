@@ -59,7 +59,7 @@ void DummyClientManager::SendMovePacket(int i)
 }
 void DummyClientManager::WorkerThread()
 {
-	LOG_I("Run Stress Test");
+	LOG_I("Run Stress Test WorkerThread");
 	DWORD rbyte;
 	ULONG_PTR id;
 	LPWSAOVERLAPPED over;

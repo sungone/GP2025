@@ -24,6 +24,8 @@ void SessionSocket::Disconnect()
 
 void SessionSocket::DoRecv()
 {
+	if (_socket == INVALID_SOCKET)
+		return;
 	ZeroMemory(&_recvOver._wsaover, sizeof(_recvOver._wsaover));
 	DWORD recv_flag = 0;
 	_recvOver._wsabuf.len = BUFSIZE - _remain;

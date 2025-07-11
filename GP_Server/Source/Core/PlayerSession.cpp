@@ -33,6 +33,7 @@ void PlayerSession::Disconnect()
 {
 	Logout();
 	_sSocket->Disconnect();
+	_sSocket.reset();
 }
 
 void PlayerSession::Login(const DBLoginResult& dbRes)
@@ -56,6 +57,7 @@ void PlayerSession::Logout()
 {
 	if(IsLogin())
 	{
+		//todo: 뷰리스트 제거
 		_state = SessionState::None;
 #ifdef DB_MODE
 		_player->SaveToDB(_dbId);

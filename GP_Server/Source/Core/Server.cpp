@@ -176,7 +176,6 @@ void Server::HandleCompletionError(ExpOver* over, int32 id)
 		LOG_W("CompType : RECV[{}] Code={}", id, over->errorCode);
 		GameWorld::GetInst().PlayerLeaveGame(id);
 		SessionManager::GetInst().Disconnect(id);
-		delete over;
 		break;
 	}
 	case CompType::SEND:
