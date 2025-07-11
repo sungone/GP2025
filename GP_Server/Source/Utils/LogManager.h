@@ -24,7 +24,7 @@ public:
     {
         if (_initialized) return;
 
-        constexpr std::size_t queueSize = 8192;
+        constexpr std::size_t queueSize = 1024;
         constexpr std::size_t threadCount = 1;
         spdlog::init_thread_pool(queueSize, threadCount);
 

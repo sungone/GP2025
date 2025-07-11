@@ -139,13 +139,14 @@ void SessionManager::BroadcastToAll(Packet* packet)
 
 void SessionManager::BroadcastToViewList(Packet* packet, const std::unordered_set<int32>& viewList)
 {
-	std::lock_guard<std::mutex> lock(_sMutex);
-	for (auto& session : _sessions)
+	for (auto sessionId : viewList)
 	{
-		if (!session || !session->IsLogin()) continue;
-		int sid = session->GetId();
-		if (viewList.count(sid))
-			session->DoSend(packet);
+		auto session = GetSession(sessionId);
+		if (!session)
+		{
+			return;
+		}
+		session->DoSend(packet);
 	}
 }
 

@@ -104,7 +104,7 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 	SessionManager::GetInst().Schedule(sessionId, [sessionId, res]() {
 		if (res.code != DBResultCode::SUCCESS)
 		{
-			LOG_W("SignUp Failed [{}]", sessionId);
+			LOG_D("SignUp Failed [{}]", sessionId);
 			SignUpFailPacket failpkt(res.code);
 			SessionManager::GetInst().SendPacket(sessionId, &failpkt);
 			return;

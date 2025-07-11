@@ -27,11 +27,17 @@ void DummyClientManager::Run()
 {
 	std::thread worker, timer;
 	try {
-		std::thread worker([this]() { WorkerThread(); });
-		std::thread test([this]() { TestThread(); });
+		static std::vector<std::thread> threads;
 
-		worker.join();
-		timer.join();
+		int32 n = std::thread::hardware_concurrency();
+		for (int32 i = 0; i < n; ++i)
+			threads.emplace_back([this]() { WorkerThread(); });
+		threads.emplace_back([this]() { TestThread(); });
+
+		for (auto& thread : threads)
+		{
+			thread.join();
+		}
 	}
 	catch (const std::exception& e) {
 		LOG_E("Thread error: {}", e.what());
@@ -101,7 +107,7 @@ void DummyClientManager::TestThread()
 		for (int i = 0;i < CLIENT_NUM;i++)
 		{
 			if (!_clients[i].IsConnected()) continue;
-			if(_clients[i].IsLogin()&&_clients[i].Move())
+			if (_clients[i].IsLogin() && _clients[i].Move())
 				_clients[i].SendMovePacket();
 		}
 	}

@@ -46,15 +46,15 @@ enum EPacketType : uint8
 
 	// --- Item ---
 	C_TAKE_ITEM,
-	C_DROP_ITEM,// -> іЄБЯїЎ
+	C_DROP_ITEM,// -> л‚м¤‘м—ђ
 	C_USE_ITEM,
 	C_EQUIP_ITEM,
 	C_UNEQUIP_ITEM,
 
 	S_ITEM_SPAWN,
-	S_ITEM_DESPAWN, // -> іЄБЯїЎ
+	S_ITEM_DESPAWN, // -> л‚м¤‘м—ђ
 	S_ITEM_PICKUP,
-	S_ITEM_DROP, // -> іЄБЯїЎ
+	S_ITEM_DROP, // -> л‚м¤‘м—ђ
 	S_ADD_INVENTORY_ITEM,
 	S_REMOVE_INVENTORY_ITEM,
 	S_USE_INVENTORY_ITEM,
@@ -72,7 +72,7 @@ enum EPacketType : uint8
 	C_SHOP_BUY_ITEM,
 	C_SHOP_SELL_ITEM,
 
-	S_SHOP_ITEM_LIST,// -> іЄБЯїЎ
+	S_SHOP_ITEM_LIST,// -> л‚м¤‘м—ђ
 	S_SHOP_BUY_RESULT,
 	S_SHOP_SELL_RESULT,
 

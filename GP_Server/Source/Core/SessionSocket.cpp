@@ -33,19 +33,11 @@ void SessionSocket::DoRecv()
 
 void SessionSocket::DoSend(const Packet* packet)
 {
-	if (!_socket)
+	if (_socket == INVALID_SOCKET)
 		return;
 
 	auto over = new ExpOver{ packet };
-	auto ret = WSASend(_socket, &over->_wsabuf, 1, nullptr, 0, &over->_wsaover, nullptr);
-	if (ret == SOCKET_ERROR)
-	{
-		int err = WSAGetLastError();
-		if (err!= WSA_IO_PENDING)
-		{
-			LOG_W("WSASend: failed! WSAGetLastError = {}", err);
-		}
-	}
+	WSASend(_socket, &over->_wsabuf, 1, nullptr, 0, &over->_wsaover, nullptr);
 }
 
 void SessionSocket::OnRecv(int32 id, int32 recvByte, ExpOver* expOver)
