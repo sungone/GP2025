@@ -172,9 +172,6 @@
     <ClInclude Include="Source\DB\DBConnectionPool.h">
       <Filter>Source Files\DB</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Game\DBJobQueue.h">
-      <Filter>Source Files\Game\Job</Filter>
-    </ClInclude>
     <ClInclude Include="Source\DB\ScopedDBSession.h">
       <Filter>Source Files\DB</Filter>
     </ClInclude>
@@ -266,9 +263,6 @@
     </ClCompile>
     <ClCompile Include="Source\DB\DBConnectionPool.cpp">
       <Filter>Source Files\DB</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Game\DBJobQueue.cpp">
-      <Filter>Source Files\Game\Job</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

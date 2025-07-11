@@ -1,7 +1,6 @@
 ﻿#include "pch.h"
 #include "PacketManager.h"
 #include "magic_enum/magic_enum.hpp"
-#include "DBJobQueue.h"
 
 void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 {
@@ -10,7 +9,7 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 	if (name.empty()) name = "Unknown";
 
 	LOG_D("{} from [{}]", name, sessionId);
-	
+
 	switch (packetType)
 	{
 	case EPacketType::C_SIGNUP:
@@ -98,22 +97,21 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 	auto pkt = static_cast<SignUpPacket*>(packet);
 #ifdef DB_MODE
 	std::wstring name = ConvertToWString(pkt->NickName);
+	auto id = pkt->AccountID;
+	auto pw = pkt->AccountPW;
+	auto res = DBManager::GetInst().SignUpUser(sessionId, id, pw, name);
 
-	DBJobQueue::GetInst().Push([sessionId, id = pkt->AccountID, pw = pkt->AccountPW, name]() {
-		auto res = DBManager::GetInst().SignUpUser(sessionId, id, pw, name);
+	SessionManager::GetInst().Schedule(sessionId, [sessionId, res]() {
+		if (res.code != DBResultCode::SUCCESS)
+		{
+			LOG_W("SignUp Failed [{}]", sessionId);
+			SignUpFailPacket failpkt(res.code);
+			SessionManager::GetInst().SendPacket(sessionId, &failpkt);
+			return;
+		}
 
-		SessionManager::GetInst().Schedule(sessionId, [sessionId, res]() {
-			if (res.code != DBResultCode::SUCCESS)
-			{
-				LOG_W("SignUp Failed [{}]", sessionId);
-				SignUpFailPacket failpkt(res.code);
-				SessionManager::GetInst().SendPacket(sessionId, &failpkt);
-				return;
-			}
-
-			SessionManager::GetInst().HandleLogin(sessionId, res);
-			LOG_D("SignUp Success [{}] userId: {}", sessionId, res.dbId);
-			});
+		SessionManager::GetInst().HandleLogin(sessionId, res);
+		LOG_D("SignUp Success [{}] userId: {}", sessionId, res.dbId);
 		});
 	return;
 #else
@@ -128,7 +126,9 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 {
 	auto pkt = static_cast<LoginPacket*>(packet);
 #ifdef DB_MODE
-	DBJobQueue::GetInst().Push([sessionId, accountID = pkt->AccountID, accountPW = pkt->AccountPW]() {
+	auto accountID = pkt->AccountID;
+	auto accountPW = pkt->AccountPW;
+	{
 		auto res = DBManager::GetInst().CheckLogin(sessionId, accountID, accountPW);
 
 		SessionManager::GetInst().Schedule(sessionId, [sessionId, res]() {
@@ -145,7 +145,7 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 
 			LOG_D("Login Success [{}] userId: {}", sessionId, res.dbId);
 			});
-		});
+	}
 	return;
 
 #else

@@ -52,7 +52,7 @@ void Monster::ScheduleUpdate()
 			self->BroadcastStatus();
 			self->ClearDirty();
 		}
-
+		int32 delayMs = self->GetUpdateDelay();
 		self->ScheduleUpdate();
 		}, delayMs, false);
 }
@@ -98,7 +98,7 @@ void Monster::UpdateViewList(std::shared_ptr<Character> other)
 void Monster::Update()
 {
 	if (!IsActive()) return;
-
+	if (GetViewList().empty()) return;
 	if (IsDead())
 	{
 		ChangeState(ECharacterStateType::STATE_DIE);

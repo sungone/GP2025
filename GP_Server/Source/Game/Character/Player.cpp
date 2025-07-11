@@ -2,7 +2,6 @@
 #include "Player.h"
 #include "SessionManager.h"
 #include "GameWorld.h"
-#include "DBJobQueue.h"
 
 void Player::Init()
 {
@@ -31,9 +30,8 @@ void Player::LoadFromDB(const DBLoginResult& dbRes)
 
 void Player::SaveToDB(uint32 dbId)
 {
-	DBJobQueue::GetInst().Push([dbId, info = _info]() {
-		DBManager::GetInst().UpdatePlayerInfo(dbId, info);
-		});
+
+	DBManager::GetInst().UpdatePlayerInfo(dbId, _info);
 	_inventory.SaveToDB(dbId);
 }
 
@@ -70,7 +68,7 @@ void Player::OnEnterGame()
 			SessionManager::GetInst().SendPacket(_id, &pkt);
 		}
 	}
-	if(_curQuest.QuestType !=QuestType::NONE)
+	if (_curQuest.QuestType != QuestType::NONE)
 	{
 		const QuestData* questData = QuestTable::GetInst().GetQuest(_curQuest.QuestType);
 		if (!questData)
@@ -500,7 +498,7 @@ bool Player::GiveQuestReward(QuestType quest)
 {
 	if (!IsQuestInProgress(quest))
 		return false;
-	
+
 	const QuestData* questData = _curQuestData;
 	if (!_curQuestData)
 	{
