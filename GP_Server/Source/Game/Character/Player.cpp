@@ -39,7 +39,7 @@ void Player::SaveToDB(uint32 dbId)
 
 void Player::SetCharacterType(Type::EPlayer type)
 {
-	LOG(std::format("Set type {}", (type == Type::EPlayer::WARRIOR) ? "warrior" : "gunner"));
+	LOG_D(std::format("Set type {}", (type == Type::EPlayer::WARRIOR) ? "warrior" : "gunner"));
 	_playerType = type;
 	_info.CharacterType = static_cast<uint8>(_playerType);
 	if (_playerType == Type::EPlayer::WARRIOR)
@@ -75,7 +75,7 @@ void Player::OnEnterGame()
 		const QuestData* questData = QuestTable::GetInst().GetQuest(_curQuest.QuestType);
 		if (!questData)
 		{
-			LOG(Warning, "Invalid quest datatable");
+			LOG_W("Invalid quest datatable");
 			return;
 		}
 		SetCurrentQuest(questData->NextQuestID);
@@ -105,7 +105,7 @@ void Player::UpdateViewList(std::shared_ptr<Character> other)
 {
 	if (!other)
 	{
-		LOG(Warning, "Invalid character!");
+		LOG_W("Invalid character!");
 		return;
 	}
 
@@ -195,7 +195,7 @@ bool Player::BuyItem(std::shared_ptr<Item> item, uint32 price, uint16 quantity)
 
 	if (!SpendGold(totalPrice))
 	{
-		LOG("Not enough gold");
+		LOG_D("Not enough gold");
 		return false;
 	}
 	return AddInventoryItem(item);
@@ -210,7 +210,7 @@ bool Player::SellItem(uint32 itemId)
 	auto item = _inventory.FindItem(itemId);
 	if (!item)
 	{
-		LOG(Warning, "Invalid item");
+		LOG_W("Invalid item");
 		resultCode = DBResultCode::ITEM_NOT_FOUND;
 	}
 	else
@@ -220,12 +220,12 @@ bool Player::SellItem(uint32 itemId)
 
 		if (!itemData)
 		{
-			LOG(Warning, "Invalid item data");
+			LOG_W("Invalid item data");
 			resultCode = DBResultCode::ITEM_NOT_FOUND;
 		}
 		else if (!_inventory.RemoveItem(itemId))
 		{
-			LOG(Warning, "Failed remove item");
+			LOG_W("Failed remove item");
 			resultCode = DBResultCode::ITEM_NOT_FOUND;
 		}
 		else
@@ -274,7 +274,7 @@ void Player::UseSkill(ESkillGroup groupId)
 	auto curSkill = _info.GetSkillData(groupId);
 	if (curSkill == nullptr || !curSkill->IsValid())
 	{
-		LOG(Warning, "Invaild!");
+		LOG_W("Invaild!");
 		return;
 	}
 
@@ -282,10 +282,10 @@ void Player::UseSkill(ESkillGroup groupId)
 	const FSkillTableData* skilltable = PlayerSkillTable::GetInst().GetSkill(static_cast<uint32>(groupId), level);
 	if (!skilltable)
 	{
-		LOG(Warning, "Invaild!");
+		LOG_W("Invaild!");
 		return;
 	}
-	LOG(std::format("Use Skill - {}", static_cast<uint8>(groupId)));
+	LOG_D(std::format("Use Skill - {}", static_cast<uint8>(groupId)));
 	if (groupId == ESkillGroup::HitHard || groupId == ESkillGroup::Throwing)
 		_info.AddState(STATE_SKILL_Q);
 	else if (groupId == ESkillGroup::Clash || groupId == ESkillGroup::FThrowing)
@@ -380,7 +380,7 @@ void Player::UpgradeSkill(ESkillGroup groupId)
 	auto* skill = _info.GetSkillData(groupId);
 	if (!skill)
 	{
-		LOG(Warning, "Trying to upgrade unlearned skill");
+		LOG_W("Trying to upgrade unlearned skill");
 		return;
 	}
 
@@ -404,7 +404,7 @@ void Player::UnlockSkillsOnLevelUp()
 		baseGroup = (int32)ESkillGroup::Throwing;
 		break;
 	default:
-		LOG(Warning, "Unknown Player Type");
+		LOG_W("Unknown Player Type");
 		return;
 	}
 
@@ -414,7 +414,7 @@ void Player::UnlockSkillsOnLevelUp()
 	const FSkillTableData* skill = PlayerSkillTable::GetInst().GetSkill(skillGroup, skillLevel);
 	if (skill == nullptr)
 	{
-		LOG(Warning, "Invaild!");
+		LOG_W("Invaild!");
 		return;
 	}
 	ESkillGroup groupId = static_cast<ESkillGroup>(skill->SkillGroup);
@@ -425,14 +425,14 @@ void Player::UnlockSkillsOnLevelUp()
 		LearnSkill(groupId);
 		auto pkt = SkillUnlockPacket(groupId);
 		SessionManager::GetInst().SendPacket(_id, &pkt);
-		LOG(Log, std::format("Learned New Skill [{}] Level [{}]", static_cast<uint32>(groupId), skillLevel));
+		LOG_D(std::format("Learned New Skill [{}] Level [{}]", static_cast<uint32>(groupId), skillLevel));
 	}
 	else
 	{
 		UpgradeSkill(groupId);
 		auto pkt = UpgradeSkillPacket(groupId);
 		SessionManager::GetInst().SendPacket(_id, &pkt);
-		LOG(Log, std::format("Upgraded Skill [{}] to Level [{}]", static_cast<uint32>(groupId), curSkill->SkillLevel));
+		LOG_D(std::format("Upgraded Skill [{}] to Level [{}]", static_cast<uint32>(groupId), curSkill->SkillLevel));
 	}
 }
 
@@ -504,7 +504,7 @@ bool Player::GiveQuestReward(QuestType quest)
 	const QuestData* questData = _curQuestData;
 	if (!_curQuestData)
 	{
-		LOG(Warning, "Invalid quest datatable");
+		LOG_W("Invalid quest datatable");
 		return false;
 	}
 
@@ -533,7 +533,7 @@ bool Player::SetCurrentQuest(QuestType quest)
 	const QuestData* questData = QuestTable::GetInst().GetQuest(quest);
 	if (!questData)
 	{
-		LOG(Warning, "Invalid quest ID");
+		LOG_W("Invalid quest ID");
 		return false;
 	}
 	_curQuestData = questData;
@@ -623,7 +623,7 @@ void Player::ApplyLevelStats(uint32 level)
 	const FStatData* newStats = PlayerLevelTable::GetInst().GetStatByLevel(level);
 	if (!newStats)
 	{
-		LOG(Warning, "Invaild");
+		LOG_W("Invaild");
 		return;
 	}
 

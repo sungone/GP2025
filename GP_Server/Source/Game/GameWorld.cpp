@@ -13,7 +13,7 @@ bool GameWorld::Init()
 
 	if (!res)
 	{
-		LOG(LogType::Warning, "LoadFromCSV");
+		LOG_E("LoadFromCSV");
 		return false;
 	}
 
@@ -136,7 +136,7 @@ void GameWorld::PlayerSetLocation(int32 playerId, float yaw, FVector pos)
 	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
-		LOG(Warning, "Invaild!");
+		LOG_W("Invaild!");
 		return;
 	}
 	player->GetInfo().SetYaw(yaw);
@@ -148,7 +148,7 @@ void GameWorld::PlayerAddState(int32 playerId, ECharacterStateType newState)
 	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
-		LOG(Warning, "Invaild!");
+		LOG_W("Invaild!");
 		return;
 	}
 	player->ChangeState(newState);
@@ -166,7 +166,7 @@ void GameWorld::PlayerRemoveState(int32 playerId, ECharacterStateType oldState)
 	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
-		LOG(Warning, "Invaild!");
+		LOG_W("Invaild!");
 		return;
 	}
 	if (player->RemoveState(oldState))
@@ -186,10 +186,11 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
-		LOG(Warning, "Invaild");
+		LOG_W("Invaild!");
+		
 		return;
 	}
-	LOG(std::format("Player [{}] Move {}", playerId, pos.ToString()));
+	LOG_D(std::format("Player [{}] Move {}", playerId, pos.ToString()));
 	player->GetInfo().SetLocationAndYaw(pos);
 	player->GetInfo().State = static_cast<ECharacterStateType>(state);
 	UpdateViewList(player);
@@ -210,7 +211,7 @@ void GameWorld::PlayerAttack(int32 playerId)
 	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
-		LOG(Warning, "Invaild!");
+		LOG_W("Invaild!");
 		return;
 	}
 
@@ -281,7 +282,7 @@ void GameWorld::PlayerUseSkill(int32 playerId, ESkillGroup groupId)
 	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
-		LOG(Warning, "Invaild!");
+		LOG_W("Invaild!");
 		return;
 	}
 	player->UseSkill(groupId);
@@ -300,7 +301,7 @@ void GameWorld::PlayerDead(int32 playerID)
 	auto player = GetPlayerByID(playerID);
 	if (!player)
 	{
-		LOG(Warning, "Invaild!");
+		LOG_W("Invaild!");
 		return;
 	}
 
@@ -548,7 +549,7 @@ void GameWorld::DespawnWorldItem(uint32 itemId, ZoneType zone)
 	auto pkt = ItemPkt::DespawnPacket(itemId);
 	BroadcastToZone(zone, &pkt);
 
-	LOG(std::format("Item [{}] auto-despawned", itemId));
+	LOG_D(std::format("Item [{}] auto-despawned", itemId));
 }
 
 void GameWorld::PickUpWorldItem(int32 playerId, uint32 itemId)
@@ -557,14 +558,14 @@ void GameWorld::PickUpWorldItem(int32 playerId, uint32 itemId)
 	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
-		LOG(Warning, "Invalid player in PickUpWorldItem");
+		LOG_W("Invalid player in PickUpWorldItem");
 		return;
 	}
 	auto zone = player->GetZone();
 	auto targetItem = FindWorldItemById(itemId, zone);
 	if (!targetItem)
 	{
-		LOG(Warning, "Invalid");
+		LOG_W("Invalid");
 		return;
 	}
 
@@ -578,7 +579,7 @@ void GameWorld::PickUpWorldItem(int32 playerId, uint32 itemId)
 	}
 	else
 	{
-		LOG(Warning, "Failed TakeItem");
+		LOG_D("Failed TakeItem");
 	}
 }
 
@@ -587,7 +588,7 @@ void GameWorld::UseInventoryItem(int32 playerId, uint32 itemId)
 	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
-		LOG(Warning, "Invalid");
+		LOG_W("Invalid");
 		return;
 	}
 	player->UseItem(itemId);
@@ -598,7 +599,7 @@ void GameWorld::EquipInventoryItem(int32 playerId, uint32 itemId)
 	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
-		LOG(Warning, "Invalid");
+		LOG_W("Invalid");
 		return;
 	}
 	uint8 itemTypeID = player->EquipItem(itemId);
@@ -618,7 +619,7 @@ void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
 	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
-		LOG(Warning, "Invalid");
+		LOG_W("Invalid");
 		return;
 	}
 	uint8 itemTypeID = player->UnequipItem(itemId);
@@ -640,7 +641,7 @@ FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
 	uint32 playerLevel = player->GetInfo().GetLevel();
 	if (!Map::GetInst().IsZoneAccessible(targetZone, playerLevel))
 	{
-		LOG(std::format("Player [{}] cannot access due to level {}", playerId, playerLevel));
+		LOG_D(std::format("Player [{}] cannot access due to level {}", playerId, playerLevel));
 		return FVector::ZeroVector;
 	}
 
@@ -785,7 +786,7 @@ void GameWorld::RequestQuest(int32 playerId, QuestType quest)
 	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
-		LOG(Warning, "Invalid player");
+		LOG_W("Invalid");
 		return;
 	}
 
@@ -797,7 +798,7 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
-		LOG(Warning, "Invalid player");
+		LOG_W("Invalid");
 		return;
 	}
 	if (player->IsQuestInProgress(quest))
@@ -825,7 +826,7 @@ void GameWorld::BuyItem(int32 playerId, uint8 itemType, uint16 quantity)
 	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
-		LOG(Warning, "Invalid player");
+		LOG_W("Invalid");
 		return;
 	}
 
@@ -835,7 +836,7 @@ void GameWorld::BuyItem(int32 playerId, uint8 itemType, uint16 quantity)
 	auto itemData = ItemTable::GetInst().GetItemByTypeId(itemType);
 	if (!itemData)
 	{
-		LOG(Warning, "Invalid item data");
+		LOG_W("Invalid");
 		ResultCode = DBResultCode::ITEM_NOT_FOUND;
 		auto respkt = BuyItemResultPacket(bSuccess, ResultCode, 0);
 		SessionManager::GetInst().SendPacket(playerId, &respkt);
@@ -866,7 +867,7 @@ void GameWorld::SellItem(int32 playerId, uint32 itemId)
 	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
-		LOG(Warning, "Invalid player");
+		LOG_W("Invalid");
 		return;
 	}
 	player->SellItem(itemId);

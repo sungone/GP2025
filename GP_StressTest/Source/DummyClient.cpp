@@ -12,14 +12,14 @@ bool DummyClient::Connect(IOCP& hIocp)
 {
 	if (_connected)
 	{
-		LOG(Warning, std::format("Already connected - ID{}", _playerId));
+		LOG_W(std::format("Already connected - ID{}", _playerId));
 		return false;
 	}
 
 	_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
 	if (_socket == INVALID_SOCKET)
 	{
-		LOG(Error, std::format("WSASocket failed. WSAGetLastError: {}", WSAGetLastError()));
+		LOG_W(std::format("WSASocket failed. WSAGetLastError: {}", WSAGetLastError()));
 		return false;
 	}
 
@@ -31,7 +31,7 @@ bool DummyClient::Connect(IOCP& hIocp)
 	if (connect(_socket, (struct sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR)
 	{
 		int errCode = WSAGetLastError();
-		LOG(Error, std::format("connect failed. WSAGetLastError: {}", errCode));
+		LOG_W(std::format("connect failed. WSAGetLastError: {}", errCode));
 		closesocket(_socket);
 		_socket = INVALID_SOCKET;
 		return false;
@@ -40,7 +40,7 @@ bool DummyClient::Connect(IOCP& hIocp)
 	hIocp.RegisterSocket(_socket, _dummyNum);
 	DoRecv();
 	SendSignUpPacket();
-	LOG(std::format("Connect success: [{}] sock={}", _name, _socket));
+	LOG_I(std::format("Connect success: [{}] ", _name, _socket));
 	_connected = true;
 
 	return true;
@@ -61,7 +61,7 @@ void DummyClient::DoRecv()
 {
 	if (_socket == INVALID_SOCKET)
 	{
-		LOG(Warning, "DoRecv called with invalid socket");
+		LOG_W("DoRecv called with invalid socket");
 		return;
 	}
 	ZeroMemory(&_recvOver._wsaover, sizeof(_recvOver._wsaover));
@@ -71,7 +71,7 @@ void DummyClient::DoRecv()
 	int res = WSARecv(_socket, &_recvOver._wsabuf, 1, 0, &recv_flag, &_recvOver._wsaover, 0);
 	if (res == SOCKET_ERROR && WSAGetLastError() != WSA_IO_PENDING)
 	{
-		LOG(Error, std::format("WSARecv failed. Error: {}", WSAGetLastError()));
+		LOG_E(std::format("WSARecv failed. Error: {}", WSAGetLastError()));
 	}
 }
 
@@ -79,7 +79,7 @@ void DummyClient::DoSend(Packet* packet)
 {
 	if (_socket == INVALID_SOCKET)
 	{
-		LOG(Warning, "DoSend called with invalid socket");
+		LOG_W("DoSend called with invalid socket");
 		return;
 	}
 	auto send_data = new ExpOver{ packet };

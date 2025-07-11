@@ -6,7 +6,6 @@ bool SpawnTable::LoadFromCSV(const std::string& filePath)
     std::ifstream file(filePath);
     if (!file.is_open())
     {
-        std::cerr << "Failed to open spawn CSV: " << filePath << std::endl;
         return false;
     }
 

@@ -13,7 +13,7 @@ bool DBConnectionPool::Init(const std::string& host, const std::string& user, co
         return true;
     }
     catch (const mysqlx::Error& e) {
-        LOG(LogType::Error, std::format("DB pool init failed: {}", e.what()));
+        LOG_E(std::format("DB pool init failed: {}", e.what()));
         return false;
     }
 }

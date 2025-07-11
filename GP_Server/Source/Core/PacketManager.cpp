@@ -9,7 +9,7 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 	auto name = std::string(magic_enum::enum_name(packetType));
 	if (name.empty()) name = "Unknown";
 
-	LOG(LogType::RecvLog, std::format("{} from [{}]", name, sessionId));
+	LOG_D(std::format("{} from [{}]", name, sessionId));
 	
 	switch (packetType)
 	{
@@ -90,9 +90,6 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 	case EPacketType::C_CHAT_SEND:
 		HandleChatSendPacket(sessionId, packet);
 		break;
-
-	default:
-		LOG(LogType::RecvLog, "Unknown Packet Type");
 	}
 }
 
@@ -108,19 +105,19 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 		SessionManager::GetInst().Schedule(sessionId, [sessionId, res]() {
 			if (res.code != DBResultCode::SUCCESS)
 			{
-				LOG(std::format("SignUp Failed [{}]", sessionId));
+				LOG_W(std::format("SignUp Failed [{}]", sessionId));
 				SignUpFailPacket failpkt(res.code);
 				SessionManager::GetInst().SendPacket(sessionId, &failpkt);
 				return;
 			}
 
 			SessionManager::GetInst().HandleLogin(sessionId, res);
-			LOG(std::format("SignUp Success [{}] userId: {}", sessionId, res.dbId));
+			LOG_D(std::format("SignUp Success [{}] userId: {}", sessionId, res.dbId));
 			});
 		});
 	return;
 #else
-	LOG(std::format("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW));
+	LOG_D(std::format("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW));
 	_sessionMgr.HandleLogin(sessionId);
 	LoginSuccessPacket loginpkt;
 	_sessionMgr.SendPacket(sessionId, &loginpkt);
@@ -146,13 +143,13 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 			SessionManager::GetInst().SendPacket(sessionId, &loginpkt);
 			SessionManager::GetInst().HandleLogin(sessionId, res);
 
-			LOG(LogType::Log, std::format("Login Success [{}] userId: {}", sessionId, res.dbId));
+			LOG_D(std::format("Login Success [{}] userId: {}", sessionId, res.dbId));
 			});
 		});
 	return;
 
 #else
-	LOG(std::format("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW));
+	LOG_D(std::format("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW));
 	_sessionMgr.HandleLogin(sessionId);
 	LoginSuccessPacket loginpkt;
 	_sessionMgr.SendPacket(sessionId, &loginpkt);

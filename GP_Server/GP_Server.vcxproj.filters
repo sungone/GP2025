@@ -64,7 +64,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Utils\Logger.h">
+    <ClInclude Include="Source\Utils\LogManager.h">
       <Filter>Source Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="Source\Core\PlayerSession.h">

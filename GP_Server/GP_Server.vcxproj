@@ -43,14 +43,12 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -115,6 +113,7 @@
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,6 +142,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)Includes;$(SolutionDir)Includes\mysqlx\include;$(SolutionDir)Source;$(SolutionDir)Source\Common;$(SolutionDir)Source\Core\IOCP;$(SolutionDir)Source\Core;$(SolutionDir)Source\Game;$(SolutionDir)Source\Game\Character;$(SolutionDir)Source\Game\Map;$(SolutionDir)Source\Game\Item;$(SolutionDir)Source\Game\DataTable;$(SolutionDir)Source\DB;$(SolutionDir)Source\AI;$(SolutionDir)Source\Utils</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -195,7 +195,7 @@
     <ClInclude Include="Source\Game\Map\NavMesh.h" />
     <ClInclude Include="Source\ServerDefine.h" />
     <ClInclude Include="Source\Utils\FVector.h" />
-    <ClInclude Include="Source\Utils\Logger.h" />
+    <ClInclude Include="Source\Utils\LogManager.h" />
     <ClInclude Include="Source\Utils\pch.h" />
     <ClInclude Include="Source\Utils\RandomUtils.h" />
     <ClInclude Include="Source\Utils\TimerQueue.h" />

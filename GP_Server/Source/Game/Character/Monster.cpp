@@ -10,7 +10,7 @@ void Monster::Init()
 	auto data = MonsterTable::GetInst().GetMonsterByTypeId(static_cast<uint8>(_monType));
 	if (!data)
 	{
-		LOG(Warning, "Invaild");
+		LOG_W("Invaild");
 		return;
 	}
 	FVector newPos{};
@@ -33,7 +33,7 @@ void Monster::Init()
 
 void Monster::UpdateViewList(std::shared_ptr<Character> other)
 {
-	if (!other) { LOG(Warning, "Invaild!"); return; }
+	if (!other) { LOG_W("Invaild!"); return; }
 
 	auto player = std::dynamic_pointer_cast<Player>(other);
 	if (!player) return;
@@ -118,7 +118,7 @@ void Monster::BehaviorTree()
 		return;
 	}
 
-	LOG(Warning, std::format("Invalid state bits: {}", static_cast<uint32>(_info.State)));
+	LOG_W(std::format("Invalid state bits: {}", static_cast<uint32>(_info.State)));
 }
 
 void Monster::Look()
@@ -167,7 +167,7 @@ void Monster::BossAttack()
 
 void Monster::PerformEarthQuake()
 {
-	LOG("EarthQuake!");
+	LOG_D("EarthQuake!");
 
 	int rockCount = 5;
 	if (_info.GetHp() / _info.GetMaxHp() < 0.3f)
@@ -194,7 +194,7 @@ void Monster::PerformEarthQuake()
 
 void Monster::PerformFlameBreath()
 {
-	LOG("FlameBreath Start!");
+	LOG_D("FlameBreath Start!");
 
 	const float range = _info.AttackRadius;
 	const float halfAngleDeg = 15.f;
@@ -238,7 +238,7 @@ void Monster::PerformFlameBreath()
 			float ratio = 1.0f - (dist / range);
 			float damage = maxDamage * ratio;
 
-			LOG(std::format("FlameBreath HIT [{}] dmg: {:.1f}", pid, damage));
+			LOG_D(std::format("FlameBreath HIT [{}] dmg: {:.1f}", pid, damage));
 			player->OnDamaged(damage);
 			auto hitDebugPkt = Tino::FlameBreathPacket(origin, forward, range, halfAngleDeg * 2, true);
 			SessionManager::GetInst().BroadcastToViewList(&hitDebugPkt, viewListCopy);
@@ -250,7 +250,7 @@ void Monster::PerformFlameBreath()
 
 void Monster::PerformFlameBreathRotate()
 {
-	LOG("Rotating FlameBreath!");
+	LOG_D("Rotating FlameBreath!");
 	const float range = _info.AttackRadius;
 	const float halfAngleDeg = 15.f;
 	const float maxDamage = 40.f;
@@ -303,7 +303,7 @@ void Monster::PerformFlameBreathRotate()
 				float ratio = 1.0f - (dist / range);
 				float damage = maxDamage * ratio;
 
-				LOG(std::format("[Tick {}] FlameBreath hit [{}] - dist: {:.1f}, dmg: {:.1f}", i, pid, dist, damage));
+				LOG_D(std::format("[Tick {}] FlameBreath hit [{}] - dist: {:.1f}, dmg: {:.1f}", i, pid, dist, damage));
 				player->OnDamaged(damage);
 			}
 

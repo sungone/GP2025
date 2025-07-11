@@ -6,7 +6,6 @@ bool ItemTable::LoadFromCSV(const std::string& FilePath)
     std::ifstream file(FilePath);
     if (!file.is_open())
     {
-        std::cerr << "Failed to open file: " << FilePath << std::endl;
         return false;
     }
 

@@ -65,7 +65,7 @@ void SessionManager::SendPacket(int32 sessionId, const Packet* packet)
 	auto session = _sessions[sessionId];
 	if (!session) 
 	{
-		LOG(Warning, "Invalid!"); 
+		LOG_W("Invalid!"); 
 		return; 
 	}
 	session->DoSend(packet);
