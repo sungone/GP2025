@@ -129,13 +129,15 @@ void Server::WorkerThreadLoop()
 		switch (expOver->_compType)
 		{
 		case CompType::ACCEPT:
-			HandleAccept();
+			SessionManager::GetInst().Connect(_acceptSocket);
+			DoAccept();
 			break;
 		case CompType::RECV:
-			HandleRecv(static_cast<int32>(sessionId), recvByte, expOver);
+			SessionManager::GetInst().OnRecv(static_cast<int32>(sessionId), recvByte, expOver);
+			SessionManager::GetInst().DoRecv(static_cast<int32>(sessionId));
 			break;
 		case CompType::SEND:
-			delete expOver;
+			SessionManager::GetInst().OnSendCompleted(static_cast<int32>(sessionId), expOver);
 			break;
 		}
 	}
@@ -188,23 +190,10 @@ void Server::DoAccept()
 	InitSocket(_acceptSocket, WSA_FLAG_OVERLAPPED);
 	ZeroMemory(&_acceptOver._wsaover, sizeof(_acceptOver._wsaover));
 	_acceptOver._compType = CompType::ACCEPT;
-	AcceptEx(_listenSocket, _acceptSocket, _acceptOver._buf, 0,
+	bool ret = AcceptEx(_listenSocket, _acceptSocket, _acceptOver._buf, 0,
 		sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, 0, &_acceptOver._wsaover);
-}
-
-void Server::HandleAccept()
-{
-	SessionManager::GetInst().Connect(_acceptSocket);
-	DoAccept();
-}
-
-void Server::HandleRecv(int32 id, int32 recvByte, ExpOver* over)
-{
-	SessionManager::GetInst().OnRecv(id, recvByte, over);
-	SessionManager::GetInst().DoRecv(id);
-}
-
-void Server::HandSend(int32 id, ExpOver* over)
-{
-	SessionManager::GetInst().OnSendCompleted(id, over);
+	if (ret == FALSE && WSAGetLastError() != ERROR_IO_PENDING)
+	{
+		LOG_E("AcceptEx failed: {}", WSAGetLastError());
+	}
 }

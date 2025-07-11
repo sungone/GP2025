@@ -7,7 +7,7 @@ public:
 	~SessionSocket();
 
 	void Init(SOCKET& socket);
-	void Shutdown();
+	void Disconnect();
 
 	void DoRecv();
 	void DoSend(const Packet* packet);

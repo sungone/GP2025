@@ -20,9 +20,6 @@ protected:
 	void WorkerThreadLoop();
 	void HandleCompletionError(ExpOver* ex_over, int32 _id);
 	void DoAccept();
-	void HandleAccept();
-	void HandleRecv(int32 id, int32 recvByte, ExpOver* over);
-	void HandSend(int32 id, ExpOver* over);
 
 protected:
 	bool _bRunning = true;

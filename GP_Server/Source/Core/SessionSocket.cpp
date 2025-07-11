@@ -8,7 +8,7 @@ SessionSocket::SessionSocket(SOCKET socket)
 
 SessionSocket::~SessionSocket()
 {
-	Shutdown();
+	Disconnect();
 }
 
 void SessionSocket::Init(SOCKET& socket)
@@ -16,9 +16,10 @@ void SessionSocket::Init(SOCKET& socket)
 	this->_socket = socket;
 }
 
-void SessionSocket::Shutdown()
+void SessionSocket::Disconnect()
 {
 	closesocket(_socket);
+	_socket = INVALID_SOCKET;
 }
 
 void SessionSocket::DoRecv()
@@ -32,8 +33,10 @@ void SessionSocket::DoRecv()
 
 void SessionSocket::DoSend(const Packet* packet)
 {
+	if (!_socket)
+		return;
+
 	auto over = new ExpOver{ packet };
-	if (!_socket) return;
 	auto ret = WSASend(_socket, &over->_wsabuf, 1, nullptr, 0, &over->_wsaover, nullptr);
 	if (ret == SOCKET_ERROR)
 	{

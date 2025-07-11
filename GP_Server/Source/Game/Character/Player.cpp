@@ -91,8 +91,6 @@ void Player::OnDamaged(float damage)
 	if (IsDead())
 	{
 		ChangeState(ECharacterStateType::STATE_DIE);
-		//temp
-		//todo: 잡큐로 분리하자..
 		auto playerID = _id;
 		TimerQueue::AddTimer([playerID] { GameWorld::GetInst().PlayerDead(playerID);}, 10, false);
 		TimerQueue::AddTimer([playerID] { GameWorld::GetInst().RespawnPlayer(playerID, ZoneType::TUK);}, 3000, false);
