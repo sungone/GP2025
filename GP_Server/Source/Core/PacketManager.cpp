@@ -9,7 +9,7 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 	auto name = std::string(magic_enum::enum_name(packetType));
 	if (name.empty()) name = "Unknown";
 
-	LOG_D(std::format("{} from [{}]", name, sessionId));
+	LOG_D("{} from [{}]", name, sessionId);
 	
 	switch (packetType)
 	{
@@ -96,7 +96,7 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 {
 	auto pkt = static_cast<SignUpPacket*>(packet);
-#ifdef DB_LOCAL
+#ifdef DB_MODE
 	std::wstring name = ConvertToWString(pkt->NickName);
 
 	DBJobQueue::GetInst().Push([sessionId, id = pkt->AccountID, pw = pkt->AccountPW, name]() {
@@ -105,19 +105,19 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 		SessionManager::GetInst().Schedule(sessionId, [sessionId, res]() {
 			if (res.code != DBResultCode::SUCCESS)
 			{
-				LOG_W(std::format("SignUp Failed [{}]", sessionId));
+				LOG_W("SignUp Failed [{}]", sessionId);
 				SignUpFailPacket failpkt(res.code);
 				SessionManager::GetInst().SendPacket(sessionId, &failpkt);
 				return;
 			}
 
 			SessionManager::GetInst().HandleLogin(sessionId, res);
-			LOG_D(std::format("SignUp Success [{}] userId: {}", sessionId, res.dbId));
+			LOG_D("SignUp Success [{}] userId: {}", sessionId, res.dbId);
 			});
 		});
 	return;
 #else
-	LOG_D(std::format("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW));
+	LOG_D("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW);
 	_sessionMgr.HandleLogin(sessionId);
 	LoginSuccessPacket loginpkt;
 	_sessionMgr.SendPacket(sessionId, &loginpkt);
@@ -127,7 +127,7 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 {
 	auto pkt = static_cast<LoginPacket*>(packet);
-#ifdef DB_LOCAL
+#ifdef DB_MODE
 	DBJobQueue::GetInst().Push([sessionId, accountID = pkt->AccountID, accountPW = pkt->AccountPW]() {
 		auto res = DBManager::GetInst().CheckLogin(sessionId, accountID, accountPW);
 
@@ -143,13 +143,13 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 			SessionManager::GetInst().SendPacket(sessionId, &loginpkt);
 			SessionManager::GetInst().HandleLogin(sessionId, res);
 
-			LOG_D(std::format("Login Success [{}] userId: {}", sessionId, res.dbId));
+			LOG_D("Login Success [{}] userId: {}", sessionId, res.dbId);
 			});
 		});
 	return;
 
 #else
-	LOG_D(std::format("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW));
+	LOG_D("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW);
 	_sessionMgr.HandleLogin(sessionId);
 	LoginSuccessPacket loginpkt;
 	_sessionMgr.SendPacket(sessionId, &loginpkt);

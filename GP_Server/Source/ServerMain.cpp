@@ -16,16 +16,12 @@ int main()
             return EXIT_FAILURE;
         }
 
-        LOG_I("Server initialized successfully.");
         server.Run();
-        LOG_I("Server stopped.");
-
         server.Shutdown();
-        LOG_I("Server shutdown completed.");
     }
     catch (const std::exception& ex)
     {
-        LOG_E(std::format("Unhandled std::exception: {}", ex.what()));
+        LOG_E("Unhandled std::exception: {}", ex.what());
         return EXIT_FAILURE;
     }
     catch (...)

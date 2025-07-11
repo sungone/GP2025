@@ -9,7 +9,7 @@ bool Inventory::LoadItem(const std::shared_ptr<Item>& item)
 
 	if (_items.contains(itemId))
 	{
-		LOG_W(std::format("LoadItem failed - duplicate itemID: {}", itemId));
+		LOG_W("LoadItem failed - duplicate itemID: {}", itemId);
 		return false;
 	}
 
@@ -29,7 +29,7 @@ bool Inventory::AddItem(const std::shared_ptr<Item>& item)
 
 	if (_items.contains(itemId))
 	{
-		LOG_W(std::format("AddItem failed - duplicate itemID: {}", itemId));
+		LOG_W("AddItem failed - duplicate itemID: {}", itemId);
 		return false;
 	}
 
@@ -46,7 +46,7 @@ bool Inventory::RemoveItem(uint32 itemId)
 	auto it = _items.find(itemId);
 	if (it == _items.end())
 	{
-		LOG_W(std::format("RemoveItem failed - itemId {} not found", itemId));
+		LOG_W("RemoveItem failed - itemId {} not found", itemId);
 		return false;
 	}
 

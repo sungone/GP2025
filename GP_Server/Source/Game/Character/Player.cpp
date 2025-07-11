@@ -8,7 +8,7 @@ void Player::Init()
 {
 	Character::Init();
 	SetCharacterType(Type::EPlayer::WARRIOR);
-#ifndef DB_LOCAL
+#ifndef DB_MODE
 	_info.SetName(L"플레이어");
 	SetCharacterType(Type::EPlayer::WARRIOR);
 	_info.Stats.Level = 1;
@@ -39,7 +39,7 @@ void Player::SaveToDB(uint32 dbId)
 
 void Player::SetCharacterType(Type::EPlayer type)
 {
-	LOG_D(std::format("Set type {}", (type == Type::EPlayer::WARRIOR) ? "warrior" : "gunner"));
+	LOG_D("Set type {}", (type == Type::EPlayer::WARRIOR) ? "warrior" : "gunner");
 	_playerType = type;
 	_info.CharacterType = static_cast<uint8>(_playerType);
 	if (_playerType == Type::EPlayer::WARRIOR)
@@ -285,7 +285,7 @@ void Player::UseSkill(ESkillGroup groupId)
 		LOG_W("Invaild!");
 		return;
 	}
-	LOG_D(std::format("Use Skill - {}", static_cast<uint8>(groupId)));
+	LOG_D("Use Skill - {}", static_cast<uint8>(groupId));
 	if (groupId == ESkillGroup::HitHard || groupId == ESkillGroup::Throwing)
 		_info.AddState(STATE_SKILL_Q);
 	else if (groupId == ESkillGroup::Clash || groupId == ESkillGroup::FThrowing)
@@ -425,14 +425,14 @@ void Player::UnlockSkillsOnLevelUp()
 		LearnSkill(groupId);
 		auto pkt = SkillUnlockPacket(groupId);
 		SessionManager::GetInst().SendPacket(_id, &pkt);
-		LOG_D(std::format("Learned New Skill [{}] Level [{}]", static_cast<uint32>(groupId), skillLevel));
+		LOG_D("Learned New Skill [{}] Level [{}]", static_cast<uint32>(groupId), skillLevel);
 	}
 	else
 	{
 		UpgradeSkill(groupId);
 		auto pkt = UpgradeSkillPacket(groupId);
 		SessionManager::GetInst().SendPacket(_id, &pkt);
-		LOG_D(std::format("Upgraded Skill [{}] to Level [{}]", static_cast<uint32>(groupId), curSkill->SkillLevel));
+		LOG_D("Upgraded Skill [{}] to Level [{}]", static_cast<uint32>(groupId), curSkill->SkillLevel);
 	}
 }
 

@@ -13,7 +13,7 @@ void PlayerSession::DoSend(const Packet* packet)
 {
 	auto name = std::string(magic_enum::enum_name(static_cast<EPacketType>(packet->Header.PacketType)));
 	if (name.empty()) name = "Unknown";
-	LOG_D(std::format("{} PKT to [{}]", name, _id));
+	LOG_D("{} PKT to [{}]", name, _id);
 
 	_sSocket->DoSend(packet);
 }
@@ -44,7 +44,7 @@ void PlayerSession::Login(const DBLoginResult& dbRes)
 {
 	_state = SessionState::LoggedIn;
 	_player = std::make_shared<Player>(_id);
-#ifdef DB_LOCAL
+#ifdef DB_MODE
 	{
 		_dbId = dbRes.dbId;
 		_player->LoadFromDB(dbRes);
@@ -62,7 +62,7 @@ void PlayerSession::Logout()
 	if(IsLogin())
 	{
 		_state = SessionState::None;
-#ifdef DB_LOCAL
+#ifdef DB_MODE
 		_player->SaveToDB(_dbId);
 #endif
 	}

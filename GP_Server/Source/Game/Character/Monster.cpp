@@ -118,7 +118,7 @@ void Monster::BehaviorTree()
 		return;
 	}
 
-	LOG_W(std::format("Invalid state bits: {}", static_cast<uint32>(_info.State)));
+	LOG_W("Invalid state bits: {}", static_cast<uint32>(_info.State));
 }
 
 void Monster::Look()
@@ -238,7 +238,7 @@ void Monster::PerformFlameBreath()
 			float ratio = 1.0f - (dist / range);
 			float damage = maxDamage * ratio;
 
-			LOG_D(std::format("FlameBreath HIT [{}] dmg: {:.1f}", pid, damage));
+			LOG_D("FlameBreath HIT [{}] dmg: {:.1f}", pid, damage);
 			player->OnDamaged(damage);
 			auto hitDebugPkt = Tino::FlameBreathPacket(origin, forward, range, halfAngleDeg * 2, true);
 			SessionManager::GetInst().BroadcastToViewList(&hitDebugPkt, viewListCopy);
@@ -303,7 +303,7 @@ void Monster::PerformFlameBreathRotate()
 				float ratio = 1.0f - (dist / range);
 				float damage = maxDamage * ratio;
 
-				LOG_D(std::format("[Tick {}] FlameBreath hit [{}] - dist: {:.1f}, dmg: {:.1f}", i, pid, dist, damage));
+				LOG_D("[Tick {}] FlameBreath hit [{}] - dist: {:.1f}, dmg: {:.1f}", i, pid, dist, damage);
 				player->OnDamaged(damage);
 			}
 

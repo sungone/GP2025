@@ -40,7 +40,7 @@ void SessionSocket::DoSend(const Packet* packet)
 		int err = WSAGetLastError();
 		if (err!= WSA_IO_PENDING)
 		{
-			LOG_W(std::format("WSASend: failed! WSAGetLastError = {}", err));
+			LOG_W("WSASend: failed! WSAGetLastError = {}", err);
 		}
 	}
 }

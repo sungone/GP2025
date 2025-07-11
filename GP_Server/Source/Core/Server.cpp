@@ -8,7 +8,7 @@
 bool Server::Init()
 {
 	SetConsoleOutputCP(CP_UTF8);
-#ifndef DB_LOCAL
+#ifdef DB_MODE
 	if (!DBManager::GetInst().Connect("localhost", "serverdev", "pass123!", "gp2025"))
 	{
 		LOG_E("DBManager");
@@ -84,7 +84,7 @@ void Server::Run()
 	const int32 jobThreads = std::max(2, coreNum / 4);
 	for (int32 i = 0; i < jobThreads; ++i)
 		threads.emplace_back([]() { SessionManager::GetInst().GameJobWorkerLoop(); });
-#ifndef DB_LOCAL
+#ifdef DB_MODE
 	threads.emplace_back([]() { DBJobQueue::GetInst().WorkerLoop(); });
 #endif
 	for (auto& thread : threads)
@@ -165,22 +165,19 @@ void Server::HandleCompletionError(ExpOver* ex_over, int32 id)
 	{
 	case CompType::ACCEPT:
 	{
-		LOG_W(std::format("CompType : ACCEPT[{}] Code={} Msg={}",
-			id, ex_over->errorCode, errMsg));
+		LOG_W("CompType : ACCEPT[{}] Code={} Msg={}", id, ex_over->errorCode, errMsg);
 		break;
 	}
 	case CompType::RECV:
 	{
-		LOG_W(std::format("CompType : RECV[{}] Code={} Msg={}",
-			id, ex_over->errorCode, errMsg));
+		LOG_W("CompType : RECV[{}] Code={} Msg={}", id, ex_over->errorCode, errMsg);
 		GameWorld::GetInst().PlayerLeaveGame(id);
 		SessionManager::GetInst().Disconnect(id);
 		break;
 	}
 	case CompType::SEND:
 	{
-		LOG_W(std::format("CompType : SEND[{}] Code={} Msg={}",
-			id, ex_over->errorCode, errMsg));
+		LOG_W("CompType : SEND[{}] Code={} Msg={}", id, ex_over->errorCode, errMsg);
 		GameWorld::GetInst().PlayerLeaveGame(id);
 		SessionManager::GetInst().Disconnect(id);
 		delete ex_over;

@@ -190,7 +190,7 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 		
 		return;
 	}
-	LOG_D(std::format("Player [{}] Move {}", playerId, pos.ToString()));
+	LOG_D("Player [{}] Move {}", playerId, pos.ToString());
 	player->GetInfo().SetLocationAndYaw(pos);
 	player->GetInfo().State = static_cast<ECharacterStateType>(state);
 	UpdateViewList(player);
@@ -549,7 +549,7 @@ void GameWorld::DespawnWorldItem(uint32 itemId, ZoneType zone)
 	auto pkt = ItemPkt::DespawnPacket(itemId);
 	BroadcastToZone(zone, &pkt);
 
-	LOG_D(std::format("Item [{}] auto-despawned", itemId));
+	LOG_D("Item [{}] auto-despawned", itemId);
 }
 
 void GameWorld::PickUpWorldItem(int32 playerId, uint32 itemId)
@@ -641,7 +641,7 @@ FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
 	uint32 playerLevel = player->GetInfo().GetLevel();
 	if (!Map::GetInst().IsZoneAccessible(targetZone, playerLevel))
 	{
-		LOG_D(std::format("Player [{}] cannot access due to level {}", playerId, playerLevel));
+		LOG_D("Player [{}] cannot access due to level {}", playerId, playerLevel);
 		return FVector::ZeroVector;
 	}
 

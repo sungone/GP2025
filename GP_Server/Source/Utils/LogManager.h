@@ -6,14 +6,16 @@
 #include <memory>
 #include <vector>
 
-#define LOG_I(...)  spdlog::get("CoreLogger")->info(__VA_ARGS__)
-#define LOG_W(...)  spdlog::get("CoreLogger")->warn(__VA_ARGS__)
-#define LOG_E(...) spdlog::get("CoreLogger")->error(__VA_ARGS__)
+#define LOG_I(fmt, ...)  spdlog::get("CoreLogger")->info("[{}] " fmt, __FUNCTION__, ##__VA_ARGS__)
+#define LOG_W(fmt, ...)  spdlog::get("CoreLogger")->warn("[{}] " fmt, __FUNCTION__, ##__VA_ARGS__)
+#define LOG_E(fmt, ...)  spdlog::get("CoreLogger")->error("[{}] " fmt, __FUNCTION__, ##__VA_ARGS__)
+
 #ifdef _DEBUG
-#define LOG_D(...) spdlog::get("CoreLogger")->debug(__VA_ARGS__)
+#define LOG_D(fmt, ...)  spdlog::get("CoreLogger")->debug("[{}] " fmt, __FUNCTION__, ##__VA_ARGS__)
 #else
-#define LOG_D(...) ((void)0)
+#define LOG_D(fmt, ...)  ((void)0)
 #endif
+
 
 class LogManager
 {
