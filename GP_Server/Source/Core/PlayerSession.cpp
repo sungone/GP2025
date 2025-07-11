@@ -37,7 +37,7 @@ void PlayerSession::Connect(SOCKET socket, int32 id)
 void PlayerSession::Disconnect()
 {
 	Logout();
-	_sSocket->Close();
+	_sSocket->Shutdown();
 }
 
 void PlayerSession::Login(const DBLoginResult& dbRes)

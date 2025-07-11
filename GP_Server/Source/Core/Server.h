@@ -8,11 +8,11 @@ public:
 		static Server inst;
 		return inst;
 	}
-	~Server() { Close(); }
+	~Server() {}
 
 	bool Init();
 	void Run();
-	void Close();
+	void Shutdown();
 
 protected:
 	void InitSocket(SOCKET& socket, DWORD dwFlags);

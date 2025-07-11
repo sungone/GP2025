@@ -27,7 +27,7 @@ public:
         spdlog::init_thread_pool(queueSize, threadCount);
 
         auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-        consoleSink->set_pattern("[%H:%M:%S.%e] [%^%l%$] %v");
+        consoleSink->set_pattern("[%H:%M:%S] [%^%l%$] %v");
 
         std::vector<spdlog::sink_ptr> sinks{ consoleSink };
 

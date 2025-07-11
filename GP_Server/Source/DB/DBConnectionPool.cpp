@@ -33,7 +33,7 @@ void DBConnectionPool::Release(std::shared_ptr<mysqlx::Session> session) {
     _cv.notify_one();
 }
 
-void DBConnectionPool::Close() {
+void DBConnectionPool::Shutdown() {
     std::lock_guard<std::mutex> lock(_mutex);
     while (!_pool.empty()) {
         _pool.front()->close();

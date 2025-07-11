@@ -8,7 +8,7 @@ SessionSocket::SessionSocket(SOCKET socket)
 
 SessionSocket::~SessionSocket()
 {
-	Close();
+	Shutdown();
 }
 
 void SessionSocket::Init(SOCKET& socket)
@@ -16,7 +16,7 @@ void SessionSocket::Init(SOCKET& socket)
 	this->_socket = socket;
 }
 
-void SessionSocket::Close()
+void SessionSocket::Shutdown()
 {
 	closesocket(_socket);
 }

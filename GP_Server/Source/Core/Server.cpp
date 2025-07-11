@@ -8,7 +8,7 @@
 bool Server::Init()
 {
 	SetConsoleOutputCP(CP_UTF8);
-#ifdef DB_LOCAL
+#ifndef DB_LOCAL
 	if (!DBManager::GetInst().Connect("localhost", "serverdev", "pass123!", "gp2025"))
 	{
 		LOG_E("DBManager");
@@ -84,16 +84,18 @@ void Server::Run()
 	const int32 jobThreads = std::max(2, coreNum / 4);
 	for (int32 i = 0; i < jobThreads; ++i)
 		threads.emplace_back([]() { SessionManager::GetInst().GameJobWorkerLoop(); });
+#ifndef DB_LOCAL
 	threads.emplace_back([]() { DBJobQueue::GetInst().WorkerLoop(); });
-
+#endif
 	for (auto& thread : threads)
 	{
 		thread.join();
 	}
 }
 
-void Server::Close()
+void Server::Shutdown()
 {
+	LOG_I("Shutdown Server");
 	_bRunning = false;
 
 	if (_listenSocket != INVALID_SOCKET) {
@@ -102,7 +104,6 @@ void Server::Close()
 	}
 
 	WSACleanup();
-	LOG_I("Shutdown Server");
 }
 
 void Server::InitSocket(SOCKET& socket, DWORD dwFlags)

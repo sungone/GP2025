@@ -8,9 +8,9 @@ bool DBManager::Connect(const std::string& host, const std::string& user, const 
 	return DBConnectionPool::GetInst().Init(host, user, pwd, db, 10);
 }
 
-void DBManager::Close()
+void DBManager::Shutdown()
 {
-	DBConnectionPool::GetInst().Close();
+	DBConnectionPool::GetInst().Shutdown();
 }
 
 
