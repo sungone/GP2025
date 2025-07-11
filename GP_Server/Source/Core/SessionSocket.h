@@ -13,7 +13,6 @@ public:
 	void DoSend(const Packet* packet);
 
 	void OnRecv(int32 id, int32 recvByte, ExpOver* expOver);
-	void OnSendCompleted(ExpOver* over);
 private:
 	SOCKET _socket = INVALID_SOCKET;
 	ExpOver _recvOver;

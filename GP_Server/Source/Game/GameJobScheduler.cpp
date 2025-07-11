@@ -2,19 +2,19 @@
 #include "GameJobScheduler.h"
 #include "PlayerSession.h"
 
-void GameJobScheduler::Schedule(std::shared_ptr<PlayerSession> session) {
+void GameJobScheduler::Schedule(int32 sessionId) {
     {
         std::lock_guard<std::mutex> lock(_mutex);
-        _readySessions.push(session);
+        _readySessionIds.push(sessionId);
     }
     _cv.notify_one();
 }
 
-std::shared_ptr<PlayerSession> GameJobScheduler::Pop() {
+int32 GameJobScheduler::Pop() {
     std::unique_lock<std::mutex> lock(_mutex);
-    _cv.wait(lock, [&]() { return !_readySessions.empty(); });
+    _cv.wait(lock, [&]() { return !_readySessionIds.empty(); });
 
-    auto session = _readySessions.front();
-    _readySessions.pop();
-    return session;
+    int32 sessionId = _readySessionIds.front();
+    _readySessionIds.pop();
+    return sessionId;
 }

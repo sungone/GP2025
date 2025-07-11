@@ -72,8 +72,3 @@ void SessionSocket::OnRecv(int32 id, int32 recvByte, ExpOver* expOver)
 
 	_remain = dataSize;
 }
-
-void SessionSocket::OnSendCompleted(ExpOver* over)
-{
-	delete over;
-}

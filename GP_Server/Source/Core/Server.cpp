@@ -142,19 +142,19 @@ void Server::WorkerThreadLoop()
 			SessionManager::GetInst().DoRecv(static_cast<int32>(sessionId));
 			break;
 		case CompType::SEND:
-			SessionManager::GetInst().OnSendCompleted(static_cast<int32>(sessionId), expOver);
+			delete over;
 			break;
 		}
 	}
 }
 
-void Server::HandleCompletionError(ExpOver* ex_over, int32 id)
+void Server::HandleCompletionError(ExpOver* over, int32 id)
 {
 	LPVOID msgBuf = nullptr;
 	FormatMessageA(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 		nullptr,
-		ex_over->errorCode,
+		over->errorCode,
 		MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
 		(LPSTR)&msgBuf,
 		0,
@@ -164,26 +164,27 @@ void Server::HandleCompletionError(ExpOver* ex_over, int32 id)
 	std::string errMsg = msgBuf ? (char*)msgBuf : "Unknown error";
 	if (msgBuf) LocalFree(msgBuf);
 
-	switch (ex_over->_compType)
+	switch (over->_compType)
 	{
 	case CompType::ACCEPT:
 	{
-		LOG_W("CompType : ACCEPT[{}] Code={}", id, ex_over->errorCode);
+		LOG_W("CompType : ACCEPT[{}] Code={}", id, over->errorCode);
 		break;
 	}
 	case CompType::RECV:
 	{
-		LOG_W("CompType : RECV[{}] Code={}", id, ex_over->errorCode);
+		LOG_W("CompType : RECV[{}] Code={}", id, over->errorCode);
 		GameWorld::GetInst().PlayerLeaveGame(id);
 		SessionManager::GetInst().Disconnect(id);
+		delete over;
 		break;
 	}
 	case CompType::SEND:
 	{
-		LOG_W("CompType : SEND[{}] Code={}", id, ex_over->errorCode);
+		LOG_W("CompType : SEND[{}] Code={}", id, over->errorCode);
 		GameWorld::GetInst().PlayerLeaveGame(id);
 		SessionManager::GetInst().Disconnect(id);
-		delete ex_over;
+		delete over;
 		break;
 	}
 	}

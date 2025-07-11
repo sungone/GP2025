@@ -23,11 +23,6 @@ void PlayerSession::OnRecv(int32 recvByte, ExpOver* expOver)
 	_sSocket->OnRecv(_id, recvByte, expOver);
 }
 
-void PlayerSession::OnSendCompleted(ExpOver* over)
-{
-	_sSocket->OnSendCompleted(over);
-}
-
 void PlayerSession::Connect(SOCKET socket, int32 id)
 {
 	this->_id = id;
@@ -64,6 +59,7 @@ void PlayerSession::Logout()
 		_state = SessionState::None;
 #ifdef DB_MODE
 		_player->SaveToDB(_dbId);
+		_player.reset();
 #endif
 	}
 }

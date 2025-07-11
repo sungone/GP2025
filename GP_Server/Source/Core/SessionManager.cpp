@@ -14,7 +14,7 @@ void SessionManager::Connect(SOCKET& socket)
 	std::lock_guard<std::mutex> lock(_sMutex);
 	int32 _id = GenerateId();
 	if (_id != -1) {
-		_sessions[_id] = std::make_shared<PlayerSession>();
+		_sessions[_id] = std::make_unique<PlayerSession>();
 		_sessions[_id]->Connect(socket, _id);
 		_iocp.RegisterSocket(socket, _id);
 		_sessions[_id]->DoRecv();
@@ -23,20 +23,25 @@ void SessionManager::Connect(SOCKET& socket)
 
 void SessionManager::Disconnect(int32 sessionId)
 {
-	auto session = GetSession(sessionId);
-	if (!session)
 	{
-		LOG_W("Invalid");
-		return;
+		std::lock_guard<std::mutex> lock(_sMutex);
+
+		if (sessionId < 0 || sessionId >= MAX_CLIENT || !_sessions[sessionId])
+		{
+			LOG_W("Invalid session id: {}", sessionId);
+			return;
+		}
+
+		_sessions[sessionId]->Disconnect();
+		_sessions[sessionId].reset();
 	}
 
-	session->Disconnect();
-	session = nullptr;
 	{
 		std::lock_guard<std::mutex> idLock(_idMutex);
 		_freeIds.push(sessionId);
 	}
 }
+
 
 void SessionManager::Schedule(int32 sessionId, std::function<void()> job)
 {
@@ -47,13 +52,14 @@ void SessionManager::Schedule(int32 sessionId, std::function<void()> job)
 		return;
 	}
 	session->PushJob(job);
-	GameJobScheduler::GetInst().Schedule(session);
+	GameJobScheduler::GetInst().Schedule(sessionId);
 }
 
 void SessionManager::GameJobWorkerLoop()
 {
 	while (true) {
-		auto session = GameJobScheduler::GetInst().Pop();
+		int32 sessionId = GameJobScheduler::GetInst().Pop();
+		auto session = GetSession(sessionId);
 		if (!session)
 		{
 			LOG_W("Invalid");
@@ -110,30 +116,11 @@ void SessionManager::SendPacket(int32 sessionId, const Packet* packet)
 	session->DoSend(packet);
 }
 
-void SessionManager::OnSendCompleted(int32 sessionId, ExpOver* over)
-{
-	auto session = GetSession(sessionId);
-	if (!session)
-	{
-		LOG_W("Invalid");
-		return;
-	}
-	session->OnSendCompleted(over);
-}
-
 void SessionManager::BroadcastToAll(Packet* packet)
 {
-	std::vector<std::shared_ptr<PlayerSession>> snapshot;
-	{
-		std::lock_guard<std::mutex> lock(_sMutex);
-		for (auto& session : _sessions)
-		{
-			if (session && session->IsLogin())
-				snapshot.push_back(session);
-		}
-	}
-	for (auto& session : snapshot)
-		session->DoSend(packet);
+	for (auto& session : _sessions)
+		if (session && session->IsLogin())
+			session->DoSend(packet);
 }
 
 
@@ -150,14 +137,14 @@ void SessionManager::BroadcastToViewList(Packet* packet, const std::unordered_se
 	}
 }
 
-std::shared_ptr<PlayerSession> SessionManager::GetSession(int32 sessionId)
+PlayerSession* SessionManager::GetSession(int32 sessionId)
 {
 	std::lock_guard<std::mutex> lock(_sMutex);
 
 	if (sessionId < 0 || sessionId >= MAX_CLIENT)
 		return nullptr;
 
-	return _sessions[sessionId];
+	return _sessions[sessionId].get();
 }
 
 int SessionManager::GenerateId()
