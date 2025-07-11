@@ -10,6 +10,7 @@ public:
 		static SessionManager inst;
 		return inst;
 	}
+	bool Init();
 	void Connect(SOCKET& socket);
 	void Disconnect(int32 sessionId);
 	void GameJobWorkerLoop();
@@ -31,7 +32,8 @@ private:
 	std::array<std::shared_ptr<PlayerSession>, MAX_CLIENT> _sessions;
 	IOCP& _iocp = IOCP::GetInst();
 	GameJobScheduler& _jobManager = GameJobScheduler::GetInst();
-
-	std::mutex _smgrMutex;
+	std::queue<int32> _freeIds;
+	std::mutex _sMutex;
+	std::mutex _idMutex;
 };
 

@@ -2,9 +2,16 @@
 #include "SessionManager.h"
 #include "PacketManager.h"
 
+bool SessionManager::Init()
+{
+	for (int i = 1; i < MAX_CLIENT; ++i)
+		_freeIds.push(i);
+	return true;
+}
+
 void SessionManager::Connect(SOCKET& socket)
 {
-	std::lock_guard<std::mutex> lock(_smgrMutex);
+	std::lock_guard<std::mutex> lock(_sMutex);
 	int32 _id = GenerateId();
 	if (_id != -1) {
 		_sessions[_id] = std::make_shared<PlayerSession>();
@@ -14,81 +21,125 @@ void SessionManager::Connect(SOCKET& socket)
 	}
 }
 
-void SessionManager::Disconnect(int32 id)
+void SessionManager::Disconnect(int32 sessionId)
 {
-	std::lock_guard<std::mutex> lock(_smgrMutex);
-	_sessions[id]->Disconnect();
-	_sessions[id] = nullptr;
+	auto session = GetSession(sessionId);
+	if (!session)
+	{
+		LOG_W("Invalid");
+		return;
+	}
+
+	session->Disconnect();
+	session = nullptr;
+	{
+		std::lock_guard<std::mutex> idLock(_idMutex);
+		_freeIds.push(sessionId);
+	}
 }
 
 void SessionManager::Schedule(int32 sessionId, std::function<void()> job)
 {
 	auto session = GetSession(sessionId);
-	if (session)
+	if (!session)
 	{
-		session->PushJob(job);
-		GameJobScheduler::GetInst().Schedule(session);
+		LOG_W("Invalid");
+		return;
 	}
+	session->PushJob(job);
+	GameJobScheduler::GetInst().Schedule(session);
 }
 
 void SessionManager::GameJobWorkerLoop()
 {
 	while (true) {
 		auto session = GameJobScheduler::GetInst().Pop();
+		if (!session)
+		{
+			LOG_W("Invalid");
+			return;
+		}
 		session->RunGameJobs();
 	}
 }
 
-void SessionManager::DoRecv(int32 id)
+void SessionManager::DoRecv(int32 sessionId)
 {
-	std::lock_guard<std::mutex> lock(_smgrMutex);
-	if (_sessions[id] == nullptr) return;
-	_sessions[id]->DoRecv();
+	auto session = GetSession(sessionId);
+	if (!session)
+	{
+		LOG_W("Invalid");
+		return;
+	}
+	session->DoRecv();
 }
 
-void SessionManager::OnRecv(int32 id, int32 recvByte, ExpOver* expOver)
+void SessionManager::OnRecv(int32 sessionId, int32 recvByte, ExpOver* expOver)
 {
-	_sessions[id]->OnRecv(recvByte, expOver);
+	auto session = GetSession(sessionId);
+	if (!session)
+	{
+		LOG_W("Invalid");
+		return;
+	}
+	session->OnRecv(recvByte, expOver);
 }
 
 void SessionManager::HandleLogin(int32 sessionId, const DBLoginResult& dbRes)
 {
-	_sessions[sessionId]->Login(dbRes);
-	auto& playerInfo = _sessions[sessionId]->GetPlayerInfo();
+	auto session = GetSession(sessionId);
+	if (!session)
+	{
+		LOG_W("Invalid");
+		return;
+	}
+	session->Login(dbRes);
+	auto& playerInfo = session->GetPlayerInfo();
 	SignUpSuccessPacket spkt;
 	SendPacket(sessionId, &spkt);
 }
 
 void SessionManager::SendPacket(int32 sessionId, const Packet* packet)
 {
-	std::lock_guard<std::mutex> lock(_smgrMutex);
-	auto session = _sessions[sessionId];
-	if (!session) 
+	auto session = GetSession(sessionId);
+	if (!session)
 	{
-		LOG_W("Invalid!"); 
-		return; 
+		LOG_W("Invalid");
+		return;
 	}
 	session->DoSend(packet);
 }
 
 void SessionManager::OnSendCompleted(int32 sessionId, ExpOver* over)
 {
-	_sessions[sessionId]->OnSendCompleted(over);
+	auto session = GetSession(sessionId);
+	if (!session)
+	{
+		LOG_W("Invalid");
+		return;
+	}
+	session->OnSendCompleted(over);
 }
 
 void SessionManager::BroadcastToAll(Packet* packet)
 {
-	std::lock_guard<std::mutex> lock(_smgrMutex);
-	for (auto& session : _sessions)
+	std::vector<std::shared_ptr<PlayerSession>> snapshot;
 	{
-		if (!session || !session->IsLogin()) continue;
-		session->DoSend(packet);
+		std::lock_guard<std::mutex> lock(_sMutex);
+		for (auto& session : _sessions)
+		{
+			if (session && session->IsLogin())
+				snapshot.push_back(session);
+		}
 	}
+	for (auto& session : snapshot)
+		session->DoSend(packet);
 }
+
 
 void SessionManager::BroadcastToViewList(Packet* packet, const std::unordered_set<int32>& viewList)
 {
-	std::lock_guard<std::mutex> lock(_smgrMutex);
+	std::lock_guard<std::mutex> lock(_sMutex);
 	for (auto& session : _sessions)
 	{
 		if (!session || !session->IsLogin()) continue;
@@ -100,7 +151,7 @@ void SessionManager::BroadcastToViewList(Packet* packet, const std::unordered_se
 
 std::shared_ptr<PlayerSession> SessionManager::GetSession(int32 sessionId)
 {
-	std::lock_guard<std::mutex> lock(_smgrMutex);
+	std::lock_guard<std::mutex> lock(_sMutex);
 
 	if (sessionId < 0 || sessionId >= MAX_CLIENT)
 		return nullptr;
@@ -108,13 +159,13 @@ std::shared_ptr<PlayerSession> SessionManager::GetSession(int32 sessionId)
 	return _sessions[sessionId];
 }
 
-
 int SessionManager::GenerateId()
 {
-	for (int32 i = 1; i < MAX_CLIENT; ++i)
-	{
-		if (_sessions[i] != nullptr) continue;
-		return i;
-	}
-	return -1;
+	std::lock_guard<std::mutex> lock(_idMutex);
+	if (_freeIds.empty())
+		return -1;
+
+	int id = _freeIds.front();
+	_freeIds.pop();
+	return id;
 }

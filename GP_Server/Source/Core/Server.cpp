@@ -51,6 +51,11 @@ bool Server::Init()
 		return false;
 	}
 	IOCP::GetInst().RegisterSocket(_listenSocket);
+	if (!SessionManager::GetInst().Init())
+	{
+		LOG_E("SessionManager");
+		return false;
+	}
 
 	if (!Map::GetInst().Init())
 	{
