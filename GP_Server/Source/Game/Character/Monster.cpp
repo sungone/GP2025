@@ -29,8 +29,46 @@ void Monster::Init()
 	_info.AttackRadius = data->AtkRadius;
 	_info.State = ECharacterStateType::STATE_IDLE;
 	_navMesh = &Map::GetInst().GetNavMesh(_zone);
+	ScheduleUpdate();
 }
 
+int32 Monster::GetUpdateDelay()
+{
+	return 1000;
+}
+
+void Monster::ScheduleUpdate()
+{
+	auto self = shared_from_this();
+	int32 delayMs = GetUpdateDelay();
+
+	TimerQueue::AddTimer([self]() {
+		if (!self->IsActive()) return;
+
+		self->Update();
+
+		if (self->IsDirty())
+		{
+			self->BroadcastStatus();
+			self->ClearDirty();
+		}
+
+		self->ScheduleUpdate();
+		}, delayMs, false);
+}
+
+void Monster::BroadcastStatus()
+{
+	InfoPacket pkt(EPacketType::S_MONSTER_STATUS_UPDATE, GetInfo());
+
+	std::unordered_set<int32> viewList;
+	{
+		std::lock_guard lock(_vlLock);
+		viewList = GetViewList();
+	}
+
+	SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
+}
 void Monster::UpdateViewList(std::shared_ptr<Character> other)
 {
 	if (!other) { LOG_W("Invaild!"); return; }
@@ -69,6 +107,7 @@ void Monster::Update()
 	}
 
 	BehaviorTree();
+	_dirty = true;
 }
 
 void Monster::BehaviorTree()
@@ -333,7 +372,7 @@ void Monster::SetNextPattern()
 	_currentPattern = static_cast<EAttackPattern>(randomIndex);
 }
 
-void Monster::UpdateChaseMovement()
+void Monster::Move()
 {
 	if (_movePath.empty() || _pathIdx >= _movePath.size()) {
 		return;
@@ -344,7 +383,8 @@ void Monster::UpdateChaseMovement()
 	FVector current = GetInfo().Pos;
 	current.Z -= 90;
 
-	const float step = _info.Stats.Speed;
+	const float tickIntervalSec = GetUpdateDelay() / 1000.f;
+	const float step = _info.Stats.Speed * tickIntervalSec;
 	const float reachThreshold = 50.f;
 	while (_pathIdx < _movePath.size())
 	{
@@ -377,6 +417,7 @@ void Monster::Chase()
 {
 	if (!_target || !_navMesh) return;
 	ChangeState(ECharacterStateType::STATE_WALK);
+	_info.AddState(ECharacterStateType::STATE_CHASE);
 
 	if (!IsTargetInChaseRange())
 	{
@@ -403,7 +444,7 @@ void Monster::Chase()
 		DebugLinePacket dbgLine(_movePath[i - 1], _movePath[i], 3.f);
 		SessionManager::GetInst().SendPacket(PlayerId, &dbgLine);
 	}
-	UpdateChaseMovement();
+	Move();
 }
 
 void Monster::Patrol()

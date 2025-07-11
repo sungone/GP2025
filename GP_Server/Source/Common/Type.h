@@ -236,6 +236,7 @@ enum ECharacterStateType : uint32
 	STATE_SKILL_E = 1 << 7,
 	STATE_SKILL_R = 1 << 8,
 	STATE_AIMING = 1 << 9,
+	STATE_CHASE = 1 << 10,
 };
 
 #ifdef SERVER_BUILD

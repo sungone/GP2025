@@ -34,7 +34,7 @@ void DummyClientManager::Run()
 		timer.join();
 	}
 	catch (const std::exception& e) {
-		LOG_E(std::format("Thread error: {}", e.what()));
+		LOG_E("Thread error: {}", e.what());
 		throw;
 	}
 
@@ -48,7 +48,7 @@ void DummyClientManager::SendMovePacket(int i)
 	}
 	else
 	{
-		LOG_E(std::format("client[{}] is not connected", i));
+		LOG_E("client[{}] is not connected", i);
 	}
 }
 void DummyClientManager::WorkerThread()
@@ -85,7 +85,7 @@ void DummyClientManager::WorkerThread()
 	}
 	catch (const std::exception& e)
 	{
-		LOG_E(std::format("Exception in WorkerThread: {}", e.what()));
+		LOG_E("Exception in WorkerThread: {}", e.what());
 	}
 	catch (...)
 	{
@@ -165,7 +165,7 @@ void DummyClientManager::HandleCompletionError(ExpOver* ex_over, int32 id)
 
 	if (!_clients[id].IsConnected())
 	{
-		LOG_W(std::format("Skip error handling for already disconnected client [{}]", id));
+		LOG_W("Skip error handling for already disconnected client [{}]", id);
 		if (ex_over->_compType == CompType::SEND)
 			delete ex_over;
 		return;
@@ -178,8 +178,7 @@ void DummyClientManager::HandleCompletionError(ExpOver* ex_over, int32 id)
 	case CompType::SEND: cmptype = "SEND"; break;
 	}
 
-	LOG_W(std::format("CompType : {}[{}] Code={} Msg={}",
-		cmptype, id, ex_over->errorCode, errMsg));
+	LOG_W("CompType : {}[{}] Code={} Msg={}", cmptype, id, ex_over->errorCode, errMsg);
 
 	Disconnect(id);
 

@@ -18,8 +18,6 @@ bool GameWorld::Init()
 	}
 
 	CreateMonster();
-	TimerQueue::AddTimer([] { GameWorld::GetInst().UpdateAllMonsters(); }, 1500, true);
-
 	return true;
 }
 
@@ -379,38 +377,6 @@ void GameWorld::RemoveMonster(int32 id)
 		std::lock_guard plock(_mtPlayers);
 		for (auto& p : _players)
 			if (p) { p->RemoveFromViewList(id); }
-	}
-}
-
-void GameWorld::UpdateAllMonsters()
-{
-	std::vector<std::pair<int32, FInfoData>> snaps;
-	{
-		std::lock_guard lock(_mtMonZMap);
-		for (auto& [zone, zoneMap] : _monstersByZone)
-		{
-			for (auto& [id, monster] : zoneMap)
-			{
-				if (!monster || !monster->IsActive()) continue;
-				monster->Update();
-				snaps.emplace_back(id, monster->GetInfo());
-			}
-		}
-	}
-
-	for (auto& [id, info] : snaps)
-	{
-		InfoPacket pkt(EPacketType::S_MONSTER_STATUS_UPDATE, info);
-
-		auto monster = GetMonsterByID(id);
-		if (!monster) continue;
-		std::unordered_set<int32> viewList;
-		{
-			std::lock_guard lock(monster->_vlLock);
-			viewList = monster->GetViewList();
-		}
-
-		SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
 	}
 }
 

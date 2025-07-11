@@ -165,19 +165,19 @@ void Server::HandleCompletionError(ExpOver* ex_over, int32 id)
 	{
 	case CompType::ACCEPT:
 	{
-		LOG_W("CompType : ACCEPT[{}] Code={} Msg={}", id, ex_over->errorCode, errMsg);
+		LOG_W("CompType : ACCEPT[{}] Code={}", id, ex_over->errorCode);
 		break;
 	}
 	case CompType::RECV:
 	{
-		LOG_W("CompType : RECV[{}] Code={} Msg={}", id, ex_over->errorCode, errMsg);
+		LOG_W("CompType : RECV[{}] Code={}", id, ex_over->errorCode);
 		GameWorld::GetInst().PlayerLeaveGame(id);
 		SessionManager::GetInst().Disconnect(id);
 		break;
 	}
 	case CompType::SEND:
 	{
-		LOG_W("CompType : SEND[{}] Code={} Msg={}", id, ex_over->errorCode, errMsg);
+		LOG_W("CompType : SEND[{}] Code={}", id, ex_over->errorCode);
 		GameWorld::GetInst().PlayerLeaveGame(id);
 		SessionManager::GetInst().Disconnect(id);
 		delete ex_over;
