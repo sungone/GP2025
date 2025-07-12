@@ -104,7 +104,11 @@ void Player::UpdateViewList(std::shared_ptr<Character> other)
 		LOG_W("Invalid character!");
 		return;
 	}
-
+	if (GetZone() != other->GetZone())
+	{
+		LOG_W("Not Same Zone");
+		return;
+	}
 	if (IsInViewDistance(other->GetInfo().Pos, VIEW_DIST))
 	{
 		if (other->IsMonster())

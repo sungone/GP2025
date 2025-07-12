@@ -70,7 +70,8 @@ public:
 	FVector TransferToZone(int32 playerId, ZoneType targetZone);
 	void RespawnPlayer(int32 playerId, ZoneType targetZone);
 	void UpdateViewList(std::shared_ptr<Player> player);
-	void InitViewList(std::shared_ptr<Player> player);
+	void ClearViewList(std::shared_ptr<Player> player);
+	void InitViewList(std::shared_ptr<Player> player, ZoneType zone);
 	void AddAllToViewList(std::shared_ptr<Player> player, ZoneType zone);
 	bool IsCollisionDetected(ZoneType zone, const FVector& pos, float dist);
 

@@ -21,7 +21,8 @@ void Character::UpdatePos(const FVector& newPos)
 {
 	auto old = GetPos();
 	GetInfo().SetLocationAndYaw(newPos);
-	GameWorld::GetInst().MoveGrid(_id, old, newPos);
+	if (GetZone() == ZoneType::TUK)
+		GameWorld::GetInst().MoveGrid(_id, old, newPos);
 }
 
 bool Character::IsCollision(const FVector& pos, float dist)
