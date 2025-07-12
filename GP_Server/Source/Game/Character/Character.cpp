@@ -5,7 +5,6 @@
 void Character::Init()
 {
 	_info.SetYaw(RandomUtils::GetRandomFloat(-180, 180));
-	GameWorld::GetInst().EnterGrid(_id, GetPos());
 }
 
 bool Character::IsDead()

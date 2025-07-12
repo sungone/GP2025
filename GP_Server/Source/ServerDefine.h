@@ -12,8 +12,8 @@ inline constexpr size_t MAX_PLAYER = MAX_CLIENT;
 inline constexpr size_t MAX_MONSTER = 500;
 inline constexpr size_t MAX_CHARACTER = MAX_PLAYER + MAX_MONSTER;
 
-inline constexpr float VIEW_DIST = 5000.f;
-constexpr float GRID_CELL_SIZE = 2000.f;
+inline constexpr float VIEW_DIST = 2000.f;
+inline constexpr float GRID_CELL_SIZE = 1000.f;
 inline constexpr float playerCollision = 50.f;
 
 constexpr int ITEM_DISAPPEAR_TIME_MS = 60 * 1000;

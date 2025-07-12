@@ -185,7 +185,7 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 	if (!player)
 	{
 		LOG_W("Invaild!");
-		
+
 		return;
 	}
 	LOG_D("Player [{}] Move {}", playerId, pos.ToString());
@@ -346,6 +346,8 @@ void GameWorld::CreateMonster()
 					monster->SetActive(true);
 				monster->SetBoss(info.bIsBoss);
 				zoneMap[id] = monster;
+				if (zone == ZoneType::TUK)
+					GameWorld::GetInst().EnterGrid(id, pos);
 			}
 		}
 		_monsterCnt[zone] = zoneMap.size();
@@ -473,7 +475,7 @@ void GameWorld::SpawnWorldItem(FVector position, uint32 monlv, Type::EPlayer pla
 	auto itemId = newItem->GetItemID();
 	ItemPkt::SpawnPacket packet(itemId, newItem->GetItemTypeID(), position);
 	BroadcastToZone(zone, &packet);
-	
+
 	TimerQueue::AddTimer([itemId, zone]() {
 		GameWorld::GetInst().DespawnWorldItem(itemId, zone);
 		}, ITEM_DISAPPEAR_TIME_MS, false);
@@ -488,7 +490,7 @@ void GameWorld::SpawnWorldItem(WorldItem dropedItem, ZoneType zone)
 	int32 itemId = newItem->GetItemID();
 	ItemPkt::DropPacket packet(itemId, newItem->GetItemTypeID(), newItem->GetPos());
 	BroadcastToZone(zone, &packet);
-	if(newItem->GetItemCategory() != EItemCategory::Quest)
+	if (newItem->GetItemCategory() != EItemCategory::Quest)
 	{
 		TimerQueue::AddTimer([itemId, zone]() {
 			GameWorld::GetInst().DespawnWorldItem(itemId, zone);
@@ -643,7 +645,7 @@ FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
 		_playersByZone[targetZone][playerId] = player;
 	}
 
-	UpdateViewList(player);
+	InitViewList(player);
 	ChangeZonePacket response(targetZone, newPos);
 	SessionManager::GetInst().SendPacket(playerId, &response);
 }
@@ -687,40 +689,72 @@ void GameWorld::RespawnPlayer(int32 playerId, ZoneType targetZone)
 	RespawnPacket pkt(info);
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
 
-	UpdateViewList(player);
+	InitViewList(player);
 	ChangeZonePacket response(targetZone, newPos);
 	SessionManager::GetInst().SendPacket(playerId, &response);
 }
 
-void GameWorld::UpdateViewList(std::shared_ptr<Character> listOwner)
+void GameWorld::UpdateViewList(std::shared_ptr<Player> player)
 {
-	int32 ownerId = listOwner->GetInfo().ID;
-	ZoneType ownerZone = listOwner->GetZone();
-	if (IsMonster(ownerId))
+	ZoneType ownerZone = player->GetZone();
+	int32 ownerId = player->GetInfo().ID;
+	if (IsMonster(ownerId)) return;
+
+	if (ownerZone != ZoneType::TUK)
+		return;
+
+	auto idList = QueryNearbyCharacters(player->GetPos());
+	for (int32 id : idList)
+	{
+		if (id == ownerId) continue;
+		auto target = GetCharacterByID(id);
+		if (!target) continue;
+		player->UpdateViewList(target);
+	}
+}
+
+void GameWorld::InitViewList(std::shared_ptr<Player> player)
+{
+	ZoneType ownerZone = player->GetZone();
+	int32 ownerId = player->GetInfo().ID;
+	if (IsMonster(ownerId)) return;
+
+	if (ownerZone != ZoneType::TUK)
+	{
+		AddAllToViewList(player, ownerZone);
+		return;
+	}
+	auto idList = QueryNearbyCharacters(player->GetPos());
+	for (int32 id : idList)
+	{
+		if (id == ownerId) continue;
+		auto target = GetCharacterByID(id);
+		if (!target) continue;
+		player->UpdateViewList(target);
+	}
+}
+
+void GameWorld::AddAllToViewList(std::shared_ptr<Player> player, ZoneType zone)
+{
+	int32 ownerId = player->GetInfo().ID;
 	{
 		std::lock_guard lock(_mtPlayerZMap);
-		for (auto& [pid, player] : _playersByZone[ownerZone])
+		for (auto& [pid, otherPlayer] : _playersByZone[zone])
 		{
-			if (player)
-				listOwner->UpdateViewList(player);
-		}
-	}
-	else
-	{
-		{
-			std::lock_guard lock(_mtPlayerZMap);
-			for (auto& [pid, player] : _playersByZone[ownerZone])
+			if (otherPlayer && pid != ownerId)
 			{
-				if (player && pid != ownerId)
-					listOwner->UpdateViewList(player);
+				player->AddPlayerToViewList(otherPlayer);
 			}
 		}
+	}
+
+	{
+		std::lock_guard lock(_mtMonZMap);
+		for (auto& [mid, monster] : _monstersByZone[zone])
 		{
-			std::lock_guard lock(_mtMonZMap);
-			for (auto& [mid, monster] : _monstersByZone[ownerZone])
+			if (monster && monster->IsActive())
 			{
-				if (monster && monster->IsActive())
-					listOwner->UpdateViewList(monster);
+				player->AddMonsterToViewList(monster);
 			}
 		}
 	}

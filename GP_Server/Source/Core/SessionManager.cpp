@@ -128,6 +128,8 @@ void SessionManager::BroadcastToViewList(Packet* packet, const std::unordered_se
 {
 	for (auto sessionId : viewList)
 	{
+		if (sessionId > MAX_PLAYER) continue;
+
 		auto session = GetSession(sessionId);
 		if (!session)
 		{
