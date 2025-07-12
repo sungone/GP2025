@@ -23,6 +23,8 @@
 #include "Network/GPNetworkManager.h"
 #include "Inventory/GPEquippedItemSlot.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 #include "GPObjectManager.h"
 #include "TimerManager.h"
 
@@ -437,6 +439,26 @@ void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage
 			}
 
 			UE_LOG(LogTemp, Warning, TEXT("Damaged monster [%d]"), MonsterInfo.ID);
+
+			if (Monster->HitEffect)
+			{
+				USkeletalMeshComponent* Mesh = Monster->GetMesh();
+				if (Mesh)
+				{
+					UNiagaraFunctionLibrary::SpawnSystemAttached(
+						Monster->HitEffect,
+						Mesh,
+						FName(TEXT("HitSocket")),  
+						FVector(0.f , 0.f , 70.f),
+						FRotator::ZeroRotator,          
+						EAttachLocation::SnapToTarget,  
+						true,                          
+						true,                        
+						ENCPoolMethod::None,
+						true
+					);
+				}
+			}
 		}
 	}
 }

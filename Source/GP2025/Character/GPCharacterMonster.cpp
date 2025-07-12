@@ -11,11 +11,20 @@
 #include "Components/CapsuleComponent.h"
 #include "UI/GPWidgetComponent.h"
 #include "Components/SceneComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
+#include "UObject/ConstructorHelpers.h"
 
 AGPCharacterMonster::AGPCharacterMonster()
 {
     GetMesh()->SetCollisionProfileName(TEXT("PhysicsActor"));
     GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> HitEffectAsset(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Impact_Stab_01.NS_ARPGEssentials_Impact_Stab_01"));
+	if (HitEffectAsset.Succeeded())
+	{
+		HitEffect = HitEffectAsset.Object;
+	}
 }
 
 void AGPCharacterMonster::BeginPlay()
@@ -30,6 +39,7 @@ void AGPCharacterMonster::BeginPlay()
 	MyMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	MyMesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	MyMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
 }
 
 void AGPCharacterMonster::Tick(float DeltaTime)

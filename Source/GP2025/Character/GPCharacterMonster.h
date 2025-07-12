@@ -24,4 +24,9 @@ public:
 
 	// Ä¸½¶¿¡ ¸ÂÃç¼­ ¸Þ½Ã Å©±â Á¶Á¤
 	void ApplyCapsuleAndMeshScaling(float CapsuleRadius, float CapsuleHalfHeight);
+
+// Effect
+public :
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	class UNiagaraSystem* HitEffect;
 };

@@ -34,6 +34,8 @@ void UGPPlayerEffectHandler::Init(AGPCharacterPlayer* InOwner)
 	Owner = InOwner;
 }
 
+
+
 void UGPPlayerEffectHandler::PlaySkillUnlockEffect()
 {
     if (Owner && SkillUnlockEffect)
