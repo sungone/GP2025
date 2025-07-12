@@ -51,7 +51,6 @@ public:
 	void SetQuestID(QuestType quest) { _questID = quest; }
 	QuestType GetQuestID() { return _questID; }
 private:
-	void Look();
 	void Attack();
 
 	void BossAttack();

@@ -5,6 +5,23 @@
 #include "Item.h"
 #include "WorldItem.h"
 
+struct GridPos {
+	int32 X, Y;
+
+	bool operator==(const GridPos& other) const {
+		return X == other.X && Y == other.Y;
+	}
+};
+
+namespace std {
+	template <>
+	struct hash<GridPos> {
+		size_t operator()(const GridPos& pos) const {
+			return std::hash<int32>()(pos.X) ^ (std::hash<int32>()(pos.Y) << 1);
+		}
+	};
+}
+
 class GameWorld
 {
 public:
@@ -29,7 +46,6 @@ public:
 	// Monster
 	void CreateMonster();
 	void RemoveMonster(int32 id);
-	void UpdateAllMonsters();
 	void UpdateMonsterState(int32 id, ECharacterStateType newState);
 
 	//Tino
@@ -65,6 +81,13 @@ public:
 
 	void BroadcastToZone(ZoneType zone, Packet* packet);
 
+	void EnterGrid(int32 id, const FVector& pos);
+	void LeaveGrid(int32 id, const FVector& pos);
+	void MoveGrid(int32 id, const FVector& oldPos, const FVector& newPos);
+
+	std::vector<int32> QueryNearbyCharacters(const FVector& pos);
+	GridPos GetGridPos(const FVector& pos);
+
 	std::shared_ptr<Player> GetPlayerByID(int32 id);
 	std::shared_ptr<Monster> GetMonsterByID(int32 id);
 	std::shared_ptr<Character> GetCharacterByID(int32 id);
@@ -83,5 +106,10 @@ private:
 	std::mutex _mtItemZMap;
 	int32 _nextMonsterId = MAX_PLAYER;
 	std::unordered_map<ZoneType, int32> _monsterCnt;
+
+private:
+
+	std::unordered_map<GridPos, std::unordered_set<int32>> _gridMap;
+	std::mutex _gridMutex;
 };
 

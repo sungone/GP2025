@@ -5,6 +5,7 @@
 void Character::Init()
 {
 	_info.SetYaw(RandomUtils::GetRandomFloat(-180, 180));
+	GameWorld::GetInst().EnterGrid(_id, GetPos());
 }
 
 bool Character::IsDead()
@@ -15,6 +16,13 @@ bool Character::IsDead()
 void Character::OnDamaged(float damage)
 {
 	_info.TakeDamage(damage);
+}
+
+void Character::UpdatePos(const FVector& newPos)
+{
+	auto old = GetPos();
+	GetInfo().SetLocationAndYaw(newPos);
+	GameWorld::GetInst().MoveGrid(_id, old, newPos);
 }
 
 bool Character::IsCollision(const FVector& pos, float dist)

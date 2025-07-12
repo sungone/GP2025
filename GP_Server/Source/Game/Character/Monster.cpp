@@ -160,13 +160,6 @@ void Monster::BehaviorTree()
 	LOG_W("Invalid state bits: {}", static_cast<uint32>(_info.State));
 }
 
-void Monster::Look()
-{
-	if (!_target) return;
-	float yaw = _info.CalculateYaw(_target->GetInfo().Pos);
-	_info.SetYaw(yaw);
-}
-
 void Monster::Attack()
 {
 	ChangeState(ECharacterStateType::STATE_AUTOATTACK);
@@ -378,8 +371,6 @@ void Monster::Move()
 		return;
 	}
 
-	Look();
-
 	FVector current = GetInfo().Pos;
 	current.Z -= 90;
 
@@ -400,7 +391,7 @@ void Monster::Move()
 		FVector dir = toTarget.Normalize();
 		FVector newPos = current + dir * std::min(step, toTarget.Length());
 		newPos.Z += 90;
-		_info.SetLocation(newPos);
+		UpdatePos(newPos);
 		break;
 	}
 	if (IsTargetInAttackRange())

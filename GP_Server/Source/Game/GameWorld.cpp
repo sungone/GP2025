@@ -189,7 +189,7 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 		return;
 	}
 	LOG_D("Player [{}] Move {}", playerId, pos.ToString());
-	player->GetInfo().SetLocationAndYaw(pos);
+	player->UpdatePos(pos);
 	player->GetInfo().State = static_cast<ECharacterStateType>(state);
 	UpdateViewList(player);
 
@@ -856,3 +856,63 @@ void GameWorld::BroadcastToZone(ZoneType zone, Packet* packet)
 	}
 }
 
+GridPos GameWorld::GetGridPos(const FVector& pos)
+{
+	int32 x = static_cast<int32>(std::floor(pos.X / GRID_CELL_SIZE));
+	int32 y = static_cast<int32>(std::floor(pos.Y / GRID_CELL_SIZE));
+	return GridPos{ x, y };
+}
+
+void GameWorld::EnterGrid(int32 id, const FVector& pos)
+{
+	std::lock_guard<std::mutex> lock(_gridMutex);
+	_gridMap[GetGridPos(pos)].insert(id);
+}
+
+void GameWorld::LeaveGrid(int32 id, const FVector& pos)
+{
+	std::lock_guard<std::mutex> lock(_gridMutex);
+	GridPos gp = GetGridPos(pos);
+	auto it = _gridMap.find(gp);
+	if (it != _gridMap.end())
+	{
+		it->second.erase(id);
+		if (it->second.empty())
+			_gridMap.erase(gp);
+	}
+}
+
+void GameWorld::MoveGrid(int32 id, const FVector& oldPos, const FVector& newPos)
+{
+	GridPos oldGrid = GetGridPos(oldPos);
+	GridPos newGrid = GetGridPos(newPos);
+
+	if (oldGrid.X != newGrid.X || oldGrid.Y != newGrid.Y)
+	{
+		LeaveGrid(id, oldPos);
+		EnterGrid(id, newPos);
+	}
+}
+
+std::vector<int32> GameWorld::QueryNearbyCharacters(const FVector& pos)
+{
+	std::vector<int32> result;
+	GridPos center = GetGridPos(pos);
+	int32 range = static_cast<int32>(std::ceil(VIEW_DIST / GRID_CELL_SIZE));
+
+	std::lock_guard<std::mutex> lock(_gridMutex);
+
+	for (int32 dx = -range; dx <= range; ++dx)
+	{
+		for (int32 dy = -range; dy <= range; ++dy)
+		{
+			GridPos neighbor{ center.X + dx, center.Y + dy };
+			auto it = _gridMap.find(neighbor);
+			if (it != _gridMap.end())
+			{
+				result.insert(result.end(), it->second.begin(), it->second.end());
+			}
+		}
+	}
+	return result;
+}
