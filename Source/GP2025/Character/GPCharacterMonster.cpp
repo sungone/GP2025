@@ -25,6 +25,12 @@ AGPCharacterMonster::AGPCharacterMonster()
 	{
 		HitEffect = HitEffectAsset.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> CriEffectAsset(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Impact_Strike_01.NS_ARPGEssentials_Impact_Strike_01"));
+	if (CriEffectAsset.Succeeded())
+	{
+		CriticalEffect = CriEffectAsset.Object;
+	}
 }
 
 void AGPCharacterMonster::BeginPlay()

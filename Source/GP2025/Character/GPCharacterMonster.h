@@ -29,4 +29,7 @@ public:
 public :
 	UPROPERTY(EditAnywhere, Category = "Effect")
 	class UNiagaraSystem* HitEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	class UNiagaraSystem* CriticalEffect;
 };

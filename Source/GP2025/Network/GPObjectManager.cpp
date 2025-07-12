@@ -439,24 +439,50 @@ void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage
 			}
 
 			UE_LOG(LogTemp, Warning, TEXT("Damaged monster [%d]"), MonsterInfo.ID);
+			
 
-			if (Monster->HitEffect)
+			if (isCrt)
 			{
-				USkeletalMeshComponent* Mesh = Monster->GetMesh();
-				if (Mesh)
+				if (Monster->CriticalEffect)
 				{
-					UNiagaraFunctionLibrary::SpawnSystemAttached(
-						Monster->HitEffect,
-						Mesh,
-						FName(TEXT("HitSocket")),  
-						FVector(0.f , 0.f , 70.f),
-						FRotator::ZeroRotator,          
-						EAttachLocation::SnapToTarget,  
-						true,                          
-						true,                        
-						ENCPoolMethod::None,
-						true
-					);
+					USkeletalMeshComponent* Mesh = Monster->GetMesh();
+					if (Mesh)
+					{
+						UNiagaraFunctionLibrary::SpawnSystemAttached(
+							Monster->CriticalEffect,
+							Mesh,
+							FName(TEXT("HitSocket")),
+							FVector(0.f, 0.f, 0.f),
+							FRotator::ZeroRotator,
+							EAttachLocation::SnapToTarget,
+							true,
+							true,
+							ENCPoolMethod::None,
+							true
+						);
+					}
+				}
+			}
+			else
+			{
+				if (Monster->HitEffect)
+				{
+					USkeletalMeshComponent* Mesh = Monster->GetMesh();
+					if (Mesh)
+					{
+						UNiagaraFunctionLibrary::SpawnSystemAttached(
+							Monster->HitEffect,
+							Mesh,
+							FName(TEXT("HitSocket")),
+							FVector(0.f, 0.f, 0.f),
+							FRotator::ZeroRotator,
+							EAttachLocation::SnapToTarget,
+							true,
+							true,
+							ENCPoolMethod::None,
+							true
+						);
+					}
 				}
 			}
 		}
