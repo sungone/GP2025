@@ -35,6 +35,7 @@ public:
 
 	void AddMonster(const FInfoData& MonsterInfo);
 	void RemoveMonster(int32 MonsterID);
+	void HandleMonsterDeath(int32 MonsterID);
 	void UpdateMonster(const FInfoData& MonsterInfo);
 	void DamagedMonster(const FInfoData& MonsterInfo, float Damage);
 	void PlayEarthQuakeEffect(const FVector& RockPos, bool bDebug);

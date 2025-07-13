@@ -265,7 +265,7 @@ void GameWorld::PlayerAttack(int32 playerId)
 				SpawnGoldItem(goldPos, zone);
 			}
 
-			RemoveMonster(targetId);
+			OnMonsterDead(targetId);
 		}
 	}
 
@@ -354,16 +354,16 @@ void GameWorld::CreateMonster()
 	}
 }
 
-void GameWorld::RemoveMonster(int32 id)
+void GameWorld::OnMonsterDead(int32 monsterId)
 {
 	std::lock_guard<std::mutex> lock(_mtMonZMap);
 	for (auto& [zone, zoneMap] : _monstersByZone)
 	{
-		auto it = zoneMap.find(id);
+		auto it = zoneMap.find(monsterId);
 		if (it == zoneMap.end()) continue;
 
 		auto monster = it->second;
-		InfoPacket pkt(EPacketType::S_REMOVE_MONSTER, monster->GetInfo());
+		auto pkt = MonsterDeadPacket(monsterId);
 		std::unordered_set<int32> viewList;
 		{
 			std::lock_guard lock(monster->_vlLock);
@@ -371,14 +371,15 @@ void GameWorld::RemoveMonster(int32 id)
 		}
 		SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
 
-		//zoneMap.erase(it);
+		for (auto& pid : viewList)
+		{
+			auto player = GetPlayerByID(pid);
+			if (!player) continue;
+			player->RemoveFromViewList(monsterId);
+		}
+
 		monster->SetActive(false);
 		break;
-	}
-	{
-		std::lock_guard plock(_mtPlayers);
-		for (auto& p : _players)
-			if (p) { p->RemoveFromViewList(id); }
 	}
 }
 

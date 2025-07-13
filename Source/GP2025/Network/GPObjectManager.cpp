@@ -398,6 +398,19 @@ void UGPObjectManager::RemoveMonster(int32 MonsterID)
 	}
 }
 
+void UGPObjectManager::HandleMonsterDeath(int32 MonsterID)
+{
+	if (TWeakObjectPtr<AGPCharacterMonster>* WeakMonsterPtr = Monsters.Find(MonsterID))
+	{
+		if (WeakMonsterPtr->IsValid())
+		{
+			AGPCharacterMonster* Monster = WeakMonsterPtr->Get();
+			Monster->CombatHandler->HandleDeath();
+		}
+		Monsters.Remove(MonsterID);
+	}
+}
+
 void UGPObjectManager::UpdateMonster(const FInfoData& MonsterInfo)
 {
 	if (TWeakObjectPtr<AGPCharacterMonster>* WeakMonsterPtr = Monsters.Find(MonsterInfo.ID))
@@ -439,7 +452,7 @@ void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage
 			}
 
 			UE_LOG(LogTemp, Warning, TEXT("Damaged monster [%d]"), MonsterInfo.ID);
-			
+
 
 			if (isCrt)
 			{

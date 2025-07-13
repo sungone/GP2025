@@ -101,7 +101,6 @@ void Monster::Update()
 	if (GetViewList().empty()) return;
 	if (IsDead())
 	{
-		ChangeState(ECharacterStateType::STATE_DIE);
 		GameWorld::GetInst().LeaveGrid(_id, GetPos());
 		SetActive(false);
 		return;

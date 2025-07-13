@@ -177,7 +177,6 @@ void UGPCharacterCombatHandler::OnAutoAttackMontageEnded(UAnimMontage* Montage, 
 void UGPCharacterCombatHandler::HandleDeath()
 {
 	if (!Owner) return;
-	if (!Owner->CharacterInfo.HasState(STATE_DIE)) return;
 
 	Owner->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	Owner->SetActorEnableCollision(false);

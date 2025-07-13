@@ -456,6 +456,12 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->PlayFlameBreathEffect(Pkt->Origin, Pkt->Direction, Pkt->Range, Pkt->AngleDeg, Pkt->bDebug);
 				break;
 			}
+			case EPacketType::S_MONSTER_DEAD:
+			{
+				MonsterDeadPacket* Pkt = reinterpret_cast<MonsterDeadPacket*>(RemainingData.GetData());
+				ObjectMgr->HandleMonsterDeath(Pkt->MonsterID);
+				break;
+			}
 #pragma endregion
 #pragma region Item
 			case EPacketType::S_ITEM_SPAWN:

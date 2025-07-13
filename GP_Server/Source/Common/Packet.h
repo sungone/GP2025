@@ -219,6 +219,16 @@ struct PlayerDamagePacket : public Packet
 		Header.PacketSize = sizeof(PlayerDamagePacket);
 	}
 };
+struct MonsterDeadPacket : public Packet
+{
+	int32 MonsterID;
+
+	MonsterDeadPacket(int32 MonsterID_)
+		: Packet(EPacketType::S_MONSTER_DEAD), MonsterID(MonsterID_)
+	{
+		Header.PacketSize = sizeof(MonsterDeadPacket);
+	}
+};
 #pragma endregion
 
 #pragma region Skill

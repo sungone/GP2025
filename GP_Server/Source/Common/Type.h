@@ -29,6 +29,7 @@ enum EPacketType : uint8
 	S_SKILL_UNLOCK,
 	S_SKILL_UPGRADE,
 	S_LEVEL_UP,
+	S_PLAYER_DEAD,
 	// --- Player Join/Leave ---
 	S_ADD_PLAYER,
 	S_REMOVE_PLAYER,
@@ -36,9 +37,9 @@ enum EPacketType : uint8
 	// --- Monster Events ---
 	S_ADD_MONSTER,
 	S_REMOVE_MONSTER,
+	S_MONSTER_DEAD,
 	S_MONSTER_STATUS_UPDATE,
 	S_DAMAGED_MONSTER,
-	S_PLAYER_DEAD,
 
 	//--- Tino ---
 	S_EARTH_QUAKE,
