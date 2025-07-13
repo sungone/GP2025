@@ -73,10 +73,6 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 
 	//for test
 	player->AddGold(10000);
-	//for test
-	BuyItem(id, (uint8)Type::EWeapon::POSITRON, 1);
-	BuyItem(id, (uint8)Type::EWeapon::ENERGY_SWORD, 1);
-
 
 	auto& playerInfo = player->GetInfo();
 	UpdateViewList(player);
@@ -667,7 +663,7 @@ void GameWorld::RespawnPlayer(int32 playerId, ZoneType targetZone)
 	auto& info = player->GetInfo();
 	info.Stats.Hp = info.Stats.MaxHp;
 	info.State = ECharacterStateType::STATE_IDLE;
-
+	
 	RespawnPacket pkt(info);
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
 

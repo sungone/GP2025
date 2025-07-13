@@ -1,7 +1,7 @@
 #pragma once
 #include "DummyClient.h"
 
-constexpr int32 CLIENT_NUM = 1000;
+constexpr int32 CLIENT_NUM = 10000;
 class DummyClientManager
 {
 public:
@@ -26,6 +26,7 @@ public:
 	}
 	void Disconnect(int32 id)
 	{
+		LOG_I("Disconnect [{}]", id);
 		if(_clients[id].Disconnect())
 			_active_clients--;
 	}
@@ -36,5 +37,6 @@ private:
 
 	std::atomic_int _num_connections;
 	std::atomic_int _client_to_close;
+	std::vector<std::thread> _threads;
 };
 

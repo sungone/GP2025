@@ -58,6 +58,10 @@ void UGPNetworkManager::SetMyPlayer(AGPCharacterPlayer* InMyPlayer)
 
 void UGPNetworkManager::SendPacket(uint8* Buf, int32 Size)
 {
+	UGPObjectManager* ObjectMgr = GetWorld()->GetSubsystem<UGPObjectManager>();
+	if (ObjectMgr && ObjectMgr->IsChangingZone())
+		return;
+
 	int32 BytesSent = 0;
 	Socket->Send(Buf, Size, BytesSent);
 }
@@ -182,10 +186,6 @@ void UGPNetworkManager::SendMyEnterGamePacket(Type::EPlayer PlayerType)
 
 void UGPNetworkManager::SendMyMovePacket()
 {
-	UGPObjectManager* ObjectMgr = GetWorld()->GetSubsystem<UGPObjectManager>();
-	if (ObjectMgr && ObjectMgr->IsChangingZone())
-		return;
-
 	auto info = MyPlayer->CharacterInfo;
 	MovePacket Packet(info.ID, info.Pos, info.State, 0);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
