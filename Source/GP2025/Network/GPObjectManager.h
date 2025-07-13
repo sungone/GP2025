@@ -51,6 +51,10 @@ public:
 	void UnequipItem(int32 PlayerID, uint8 ItemType);
 
 	void ChangeZone(ZoneType zone, const FVector& pos);
+	bool IsChangingZone() const { return bChangingZone; }
+
+	UFUNCTION()
+	void OnZoneLevelUnLoaded();
 	UFUNCTION()
 	void OnZoneLevelLoaded();
 	void RespawnMyPlayer(const FInfoData& info);
@@ -85,7 +89,9 @@ private:
 
 	ZoneType PendingZone;
 	FVector PendingLocation;
+	FName PendingLevelName;
 
+	bool bChangingZone = false;
 // Object Pool
 public :
 	UPROPERTY()

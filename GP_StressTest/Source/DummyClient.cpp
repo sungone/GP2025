@@ -182,7 +182,9 @@ bool DummyClient::SendMovePacket()
 
 	auto now = NowMs();
 	_info.AddState(ECharacterStateType::STATE_WALK);
-	MovePacket pkt(_playerId, _info.Pos, _info.State, now);
+	auto sendPos = _info.Pos;
+	sendPos.Z += 90.f;
+	MovePacket pkt(_playerId, sendPos, _info.State, now);
 	DoSend(&pkt);
 	return true;
 }

@@ -622,6 +622,8 @@ FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
 	{
 		LOG_W("EntryPos");
 	}
+	newPos.Z += 90.f;
+	LOG_D("({}, {}, {})", newPos.X, newPos.Y, newPos.Z);
 
 	player->GetInfo().SetZone(targetZone);
 	player->UpdatePos(newPos);
@@ -636,9 +638,9 @@ FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
 		_playersByZone[targetZone][playerId] = player;
 	}
 
-	InitViewList(player, targetZone);
 	ChangeZonePacket response(targetZone, newPos);
 	SessionManager::GetInst().SendPacket(playerId, &response);
+	InitViewList(player, targetZone);
 }
 
 void GameWorld::RespawnPlayer(int32 playerId, ZoneType targetZone)
@@ -649,6 +651,7 @@ void GameWorld::RespawnPlayer(int32 playerId, ZoneType targetZone)
 	if (oldZone == ZoneType::TUK)
 		LeaveGrid(playerId, player->GetPos());
 	FVector newPos = Map::GetInst().GetRandomPos(targetZone);
+	newPos.Z += 90.f;
 
 	player->GetInfo().SetZone(targetZone);
 	player->UpdatePos(newPos);
@@ -668,9 +671,9 @@ void GameWorld::RespawnPlayer(int32 playerId, ZoneType targetZone)
 	RespawnPacket pkt(info);
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
 
-	InitViewList(player, targetZone);
 	ChangeZonePacket response(targetZone, newPos);
 	SessionManager::GetInst().SendPacket(playerId, &response);
+	InitViewList(player, targetZone);
 }
 
 void GameWorld::UpdateViewList(std::shared_ptr<Player> player)
@@ -687,7 +690,7 @@ void GameWorld::UpdateViewList(std::shared_ptr<Player> player)
 	{
 		if (id == ownerId) continue;
 		auto target = GetCharacterByID(id);
-		if (!target||!target->IsValid()) continue;
+		if (!target || !target->IsValid()) continue;
 		player->UpdateViewList(target);
 	}
 }
@@ -717,7 +720,6 @@ void GameWorld::InitViewList(std::shared_ptr<Player> player, ZoneType zone)
 
 	if (zone != ZoneType::TUK)
 	{
-		ClearViewList(player);
 		AddAllToViewList(player, zone);
 		return;
 	}

@@ -190,7 +190,7 @@ void UGPObjectManager::AddPlayer(const FInfoData& PlayerInfo)
 	{
 		Player->SetNameByCharacterInfo();
 	}
-	Player->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
+	//Player->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
 
 	Players.Add(PlayerInfo.ID, Player);
 
@@ -868,7 +868,6 @@ void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType)
 void UGPObjectManager::ChangeZone(ZoneType newZone, const FVector& RandomPos)
 {
 	if (!MyPlayer) return;
-
 	auto oldZone = MyPlayer->CharacterInfo.CurrentZone;
 	auto GetLevelName = [](ZoneType zone) -> FName {
 		switch (zone) {
@@ -880,22 +879,37 @@ void UGPObjectManager::ChangeZone(ZoneType newZone, const FVector& RandomPos)
 		default: return NAME_None;
 		}
 		};
+
 	FName NewLevel = GetLevelName(newZone);
 	FName OldLevel = GetLevelName(oldZone);
+
 	if (!OldLevel.IsNone() && !NewLevel.IsNone())
 	{
-		UGameplayStatics::UnloadStreamLevel(this, OldLevel, FLatentActionInfo(), false);
-		FLatentActionInfo LatentInfo;
-		LatentInfo.CallbackTarget = this;
-		LatentInfo.ExecutionFunction = FName("OnZoneLevelLoaded");
-		LatentInfo.Linkage = 0;
-		LatentInfo.UUID = __LINE__;
-
-		UGameplayStatics::LoadStreamLevel(this, NewLevel, true, true, LatentInfo);
+		bChangingZone = true;
 
 		PendingZone = newZone;
 		PendingLocation = RandomPos;
+		PendingLevelName = NewLevel;
+
+		FLatentActionInfo LatentInfo;
+		LatentInfo.CallbackTarget = this;
+		LatentInfo.ExecutionFunction = FName("OnZoneLevelUnloaded");
+		LatentInfo.Linkage = 0;
+		LatentInfo.UUID = __LINE__;
+
+		UGameplayStatics::UnloadStreamLevel(this, OldLevel, LatentInfo, false);
 	}
+}
+
+void UGPObjectManager::OnZoneLevelUnLoaded()
+{
+	FLatentActionInfo LatentInfo;
+	LatentInfo.CallbackTarget = this;
+	LatentInfo.ExecutionFunction = FName("OnZoneLevelLoaded");
+	LatentInfo.Linkage = 0;
+	LatentInfo.UUID = __LINE__;
+
+	UGameplayStatics::LoadStreamLevel(this, PendingLevelName, true, true, LatentInfo);
 }
 
 void UGPObjectManager::OnZoneLevelLoaded()
@@ -907,6 +921,7 @@ void UGPObjectManager::OnZoneLevelLoaded()
 	{
 		MyPlayer->AppearanceHandler->SetupLeaderPose();
 	}
+	bChangingZone = false;
 }
 
 void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
