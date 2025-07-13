@@ -284,6 +284,7 @@ void UGPCharacterCombatHandler::FinishDash()
 		float Yaw = LocalMyPlayer->GetControlRotation().Yaw;
 
 		LocalMyPlayer->NetMgr->SendMyUseSkill(ESkillGroup::Clash, Yaw, Location);
+
 	}
 }
 
@@ -295,8 +296,8 @@ void UGPCharacterCombatHandler::UpdateDash()
 
 	float Alpha = FMath::Clamp(DashElapsedTime / DashDuration, 0.0f, 1.0f);
 
-	FVector NewLocation = FMath::Lerp(DashStartLocation, DashEndLocation, Alpha);
-	Owner->SetActorLocation(NewLocation);
+	//FVector NewLocation = FMath::Lerp(DashStartLocation, DashEndLocation, Alpha);
+	//Owner->SetActorLocation(NewLocation);
 
 	if (Alpha >= 1.0f)
 	{

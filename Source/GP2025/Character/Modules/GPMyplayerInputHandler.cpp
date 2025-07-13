@@ -437,6 +437,9 @@ void UGPMyplayerInputHandler::UseSkillE()
 		Owner->CharacterInfo.AddState(STATE_SKILL_E);
 		Owner->CombatHandler->StartDash(); // 여기서 공격 처리 중
 		// Owner->NetMgr->SendMyUseSkill(ESkillGroup::Clash, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
+		float BoostPlayRate = 4.0f; // 공격속도 몽타지 증가 시간
+		float BoostDuration = 10.f; // 공격속도 증가 지속 시간
+		Owner->CombatHandler->ApplyAttackSpeedBoost(BoostPlayRate, BoostDuration);
 	}
 
 }
