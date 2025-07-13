@@ -12,7 +12,7 @@ public:
 
 	virtual void OnDamaged(float damage);
 	virtual float GetAttackDamage() = 0;
-
+	void UpdatePos(const FVector& newPos);
 	bool IsCollision(const FVector& pos, const float dist);
 	bool IsCollision(const FVector& pos);
 	bool IsCollision(const FInfoData& target);

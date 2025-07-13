@@ -10,14 +10,14 @@ bool DummyClientManager::Init()
 	WSADATA wsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
 	{
-		LOG(Error, "WSAStartup");
+		LOG_E("WSAStartup");
 		return false;
 	}
 	for (uint32 i = 0;i < CLIENT_NUM;++i)
 		_clients[i].Init(i);
 	if (!Map::GetInst().Init())
 	{
-		LOG(LogType::Error, "MapZone");
+		LOG_E("MapZone");
 		return false;
 	}
 	return true;
@@ -27,14 +27,20 @@ void DummyClientManager::Run()
 {
 	std::thread worker, timer;
 	try {
-		std::thread worker([this]() { WorkerThread(); });
-		std::thread test([this]() { TestThread(); });
+		static std::vector<std::thread> threads;
 
-		worker.join();
-		timer.join();
+		int32 n = std::thread::hardware_concurrency();
+		for (int32 i = 0; i < n; ++i)
+			threads.emplace_back([this]() { WorkerThread(); });
+		threads.emplace_back([this]() { TestThread(); });
+
+		for (auto& thread : threads)
+		{
+			thread.join();
+		}
 	}
 	catch (const std::exception& e) {
-		LOG(Error, std::format("Thread error: {}", e.what()));
+		LOG_E("Thread error: {}", e.what());
 		throw;
 	}
 
@@ -48,12 +54,12 @@ void DummyClientManager::SendMovePacket(int i)
 	}
 	else
 	{
-		LOG(Warning, std::format("client[{}] is not connected", i));
+		LOG_E("client[{}] is not connected", i);
 	}
 }
 void DummyClientManager::WorkerThread()
 {
-	LOG("Run Stress Test");
+	LOG_I("Run Stress Test WorkerThread");
 	DWORD rbyte;
 	ULONG_PTR id;
 	LPWSAOVERLAPPED over;
@@ -85,11 +91,11 @@ void DummyClientManager::WorkerThread()
 	}
 	catch (const std::exception& e)
 	{
-		LOG(Error, std::format("Exception in WorkerThread: {}", e.what()));
+		LOG_E("Exception in WorkerThread: {}", e.what());
 	}
 	catch (...)
 	{
-		LOG(Error, "Unknown exception in WorkerThread!");
+		LOG_E("Unknown exception in WorkerThread!");
 	}
 }
 
@@ -101,7 +107,7 @@ void DummyClientManager::TestThread()
 		for (int i = 0;i < CLIENT_NUM;i++)
 		{
 			if (!_clients[i].IsConnected()) continue;
-			if(_clients[i].IsLogin()&&_clients[i].Move())
+			if (_clients[i].IsLogin() && _clients[i].Move())
 				_clients[i].SendMovePacket();
 		}
 	}
@@ -165,7 +171,7 @@ void DummyClientManager::HandleCompletionError(ExpOver* ex_over, int32 id)
 
 	if (!_clients[id].IsConnected())
 	{
-		LOG(std::format("Skip error handling for already disconnected client [{}]", id));
+		LOG_W("Skip error handling for already disconnected client [{}]", id);
 		if (ex_over->_compType == CompType::SEND)
 			delete ex_over;
 		return;
@@ -178,8 +184,7 @@ void DummyClientManager::HandleCompletionError(ExpOver* ex_over, int32 id)
 	case CompType::SEND: cmptype = "SEND"; break;
 	}
 
-	LOG(Warning, std::format("CompType : {}[{}] Code={} Msg={}",
-		cmptype, id, ex_over->errorCode, errMsg));
+	LOG_W("CompType : {}[{}] Code={} Msg={}", cmptype, id, ex_over->errorCode, errMsg);
 
 	Disconnect(id);
 

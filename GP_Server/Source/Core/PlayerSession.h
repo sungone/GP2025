@@ -17,8 +17,7 @@ public:
 public:
 	void DoRecv();
 	void DoSend(const Packet* packet);
-	void HandleRecvBuffer(int32 recvByte, ExpOver* expOver);
-
+	void OnRecv(int32 recvByte, ExpOver* expOver);
 	void Connect(SOCKET socket, int32 id);
 	void Disconnect();
 

@@ -8,9 +8,9 @@ bool DBManager::Connect(const std::string& host, const std::string& user, const 
 	return DBConnectionPool::GetInst().Init(host, user, pwd, db, 10);
 }
 
-void DBManager::Close()
+void DBManager::Shutdown()
 {
-	DBConnectionPool::GetInst().Close();
+	DBConnectionPool::GetInst().Shutdown();
 }
 
 
@@ -36,7 +36,7 @@ DBLoginResult DBManager::SignUpUser(int32 sessionId, const std::string& login_id
 
 	const FStatData* newStats = PlayerLevelTable::GetInst().GetStatByLevel(level);
 	if (!newStats) {
-		LOG(Warning, "Invalid level stat");
+		LOG_W("Invalid level stat");
 		return { DBResultCode::DB_ERROR };
 	}
 
@@ -101,7 +101,7 @@ DBLoginResult DBManager::SignUpUser(int32 sessionId, const std::string& login_id
 		if (msg.find("Duplicate entry") != std::string::npos) {
 			return { DBResultCode::DUPLICATE_ID };
 		}
-		LOG(LogType::Error, std::format("MySQL Error: {}", msg));
+		LOG_E("MySQL Error: {}", msg);
 		return { DBResultCode::DB_ERROR };
 	}
 }
@@ -188,7 +188,7 @@ DBLoginResult DBManager::CheckLogin(int32 sessionId, const std::string& login_id
 		return { DBResultCode::SUCCESS, dbId, info, itemList };
 	}
 	catch (const mysqlx::Error& e) {
-		LOG(LogType::Error, std::format("MySQL Error (CheckLogin - login_id: {}): {}", login_id, e.what()));
+		LOG_E("MySQL Error (CheckLogin - login_id: {}): {}", login_id, e.what());
 		return { DBResultCode::DB_ERROR };
 	}
 }
@@ -236,12 +236,12 @@ bool DBManager::UpdatePlayerInfo(uint32 dbId, const FInfoData& info)
 			.bind("id", dbId)
 			.execute();
 
-		LOG(std::format("Update DB - dbid: {}", dbId));
+		LOG_D("Update DB - dbid: {}", dbId);
 		return true;
 	}
 	catch (const mysqlx::Error& e)
 	{
-		LOG(LogType::Error, std::format("MySQL Error (UpdatePlayerInfo): {}", e.what()));
+		LOG_E("MySQL Error (UpdatePlayerInfo): {}", e.what());
 		return false;
 	}
 }
@@ -261,7 +261,7 @@ bool DBManager::AddUserItem(uint32 dbId, uint32 itemID, uint8 itemTypeID)
 	}
 	catch (const mysqlx::Error& e)
 	{
-		LOG(LogType::Error, std::format("MySQL Error (AddUserItem): {}", e.what()));
+		LOG_E("MySQL Error (AddUserItem): {}", e.what());
 		return false;
 	}
 }
@@ -280,12 +280,12 @@ bool DBManager::RemoveUserItem(uint32 dbId, uint32 itemID)
 			.bind("userid", dbId)
 			.execute();
 
-		LOG(std::format("Remove Item - userId: {}, itemUID: {}", dbId, itemID));
+		LOG_D("Remove Item - userId: {}, itemUID: {}", dbId, itemID);
 		return true;
 	}
 	catch (const mysqlx::Error& e)
 	{
-		LOG(LogType::Error, std::format("MySQL Error (RemoveUserItem): {}", e.what()));
+		LOG_E("MySQL Error (RemoveUserItem): {}", e.what());
 		return false;
 	}
 }

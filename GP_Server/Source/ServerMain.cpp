@@ -3,9 +3,33 @@
 
 int main()
 {
-	Server& server = Server::GetInst();
-	if (server.Init())
-		server.Run(); 
+    try
+    {
+        LogManager::Init();
+        LOG_I("LogManager initialized.");
 
-	return 0;
+        Server& server = Server::GetInst();
+
+        if (!server.Init())
+        {
+            LOG_E("Server initialization failed.");
+            return EXIT_FAILURE;
+        }
+
+        server.Run();
+        server.Shutdown();
+    }
+    catch (const std::exception& ex)
+    {
+        LOG_E("Unhandled std::exception: {}", ex.what());
+        return EXIT_FAILURE;
+    }
+    catch (...)
+    {
+        LOG_E("Unhandled unknown exception.");
+        return EXIT_FAILURE;
+    }
+
+    LogManager::Shutdown();
+    return EXIT_SUCCESS;
 }

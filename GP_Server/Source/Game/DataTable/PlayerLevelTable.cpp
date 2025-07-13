@@ -6,7 +6,6 @@ bool PlayerLevelTable::LoadFromCSV(const std::string& filePath)
     std::ifstream file(filePath);
     if (!file.is_open())
     {
-        std::cerr << "Failed to open level stat CSV: " << filePath << std::endl;
         return false;
     }
 

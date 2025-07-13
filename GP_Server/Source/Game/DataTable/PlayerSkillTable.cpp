@@ -6,7 +6,6 @@ bool PlayerSkillTable::LoadFromCSV(const std::string& filePath)
     std::ifstream file(filePath);
     if (!file.is_open())
     {
-        std::cerr << "Failed to open skill CSV: " << filePath << std::endl;
         return false;
     }
 
@@ -77,5 +76,5 @@ Type::EPlayer PlayerSkillTable::StringToWeaponType(const std::string& str)
     if (str == "Sword") return Type::EPlayer::WARRIOR;
     if (str == "Gun") return Type::EPlayer::GUNNER;
     
-    LOG(Warning, "error type");
+    LOG_W("error type");
 }

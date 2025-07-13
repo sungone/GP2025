@@ -13,7 +13,7 @@ bool DBConnectionPool::Init(const std::string& host, const std::string& user, co
         return true;
     }
     catch (const mysqlx::Error& e) {
-        LOG(LogType::Error, std::format("DB pool init failed: {}", e.what()));
+        LOG_E("DB pool init failed: {}", e.what());
         return false;
     }
 }
@@ -33,7 +33,7 @@ void DBConnectionPool::Release(std::shared_ptr<mysqlx::Session> session) {
     _cv.notify_one();
 }
 
-void DBConnectionPool::Close() {
+void DBConnectionPool::Shutdown() {
     std::lock_guard<std::mutex> lock(_mutex);
     while (!_pool.empty()) {
         _pool.front()->close();

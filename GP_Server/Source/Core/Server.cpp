@@ -3,30 +3,28 @@
 #include "IOCP.h"
 #include "SessionManager.h"
 #include "GameWorld.h"
-#include "DBJobQueue.h"
 
 bool Server::Init()
 {
 	SetConsoleOutputCP(CP_UTF8);
-	Logger::GetInst().OpenLogFile("gp_server_log.txt");
-#ifdef DB_LOCAL
+#ifdef DB_MODE
 	if (!DBManager::GetInst().Connect("localhost", "serverdev", "pass123!", "gp2025"))
 	{
-		LOG(LogType::Error, "DBManager");
+		LOG_E("DBManager");
 		return false;
 	}
 #endif
 	WSADATA wsa_data;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
 	{
-		LOG(LogType::Error, "WSAStartup");
+		LOG_E("WSAStartup");
 		return false;
 	}
 
 	InitSocket(_listenSocket, WSA_FLAG_OVERLAPPED);
 	if (_listenSocket == INVALID_SOCKET)
 	{
-		LOG(LogType::Error, "WSASocket");
+		LOG_E("WSASocket");
 		return false;
 	}
 
@@ -37,41 +35,47 @@ bool Server::Init()
 
 	if (bind(_listenSocket, reinterpret_cast<sockaddr*>(&addr_s), sizeof(addr_s)) == SOCKET_ERROR)
 	{
-		LOG(LogType::Error, "bind");
+		LOG_E("bind");
 		return false;
 	}
 
 	if (listen(_listenSocket, SOMAXCONN) == SOCKET_ERROR)
 	{
-		LOG(LogType::Error, "listen");
+		LOG_E("listen");
 		return false;
 	}
 
 	if (!IOCP::GetInst().Init())
 	{
-		LOG(LogType::Error, "IOCP");
+		LOG_E("IOCP");
 		return false;
 	}
 	IOCP::GetInst().RegisterSocket(_listenSocket);
+	if (!SessionManager::GetInst().Init())
+	{
+		LOG_E("SessionManager");
+		return false;
+	}
 
 	if (!Map::GetInst().Init())
 	{
-		LOG(LogType::Error, "MapZone");
+		LOG_E("MapZone");
 		return false;
 	}
 
 	if (!GameWorld::GetInst().Init())
 	{
-		LOG(LogType::Error, "GameMgr");
+		LOG_E("GameMgr");
 		return false;
 	}
 
-	LOG(LogType::Log, "Successfully Init");
+	LOG_I("Successfully Init");
 	return true;
 }
 
 void Server::Run()
 {
+	LOG_I("Run Server");
 	DoAccept();
 
 	static std::vector<std::thread> threads;
@@ -84,16 +88,15 @@ void Server::Run()
 	const int32 jobThreads = std::max(2, coreNum / 4);
 	for (int32 i = 0; i < jobThreads; ++i)
 		threads.emplace_back([]() { SessionManager::GetInst().GameJobWorkerLoop(); });
-	threads.emplace_back([]() { DBJobQueue::GetInst().WorkerLoop(); });
-
 	for (auto& thread : threads)
 	{
 		thread.join();
 	}
 }
 
-void Server::Close()
+void Server::Shutdown()
 {
+	LOG_I("Shutdown Server");
 	_bRunning = false;
 
 	if (_listenSocket != INVALID_SOCKET) {
@@ -131,25 +134,27 @@ void Server::WorkerThreadLoop()
 		switch (expOver->_compType)
 		{
 		case CompType::ACCEPT:
-			HandleAccept();
+			SessionManager::GetInst().Connect(_acceptSocket);
+			DoAccept();
 			break;
 		case CompType::RECV:
-			HandleRecv(static_cast<int32>(sessionId), recvByte, expOver);
+			SessionManager::GetInst().OnRecv(static_cast<int32>(sessionId), recvByte, expOver);
+			SessionManager::GetInst().DoRecv(static_cast<int32>(sessionId));
 			break;
 		case CompType::SEND:
-			delete expOver;
+			delete over;
 			break;
 		}
 	}
 }
 
-void Server::HandleCompletionError(ExpOver* ex_over, int32 id)
+void Server::HandleCompletionError(ExpOver* over, int32 id)
 {
 	LPVOID msgBuf = nullptr;
 	FormatMessageA(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 		nullptr,
-		ex_over->errorCode,
+		over->errorCode,
 		MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
 		(LPSTR)&msgBuf,
 		0,
@@ -159,29 +164,26 @@ void Server::HandleCompletionError(ExpOver* ex_over, int32 id)
 	std::string errMsg = msgBuf ? (char*)msgBuf : "Unknown error";
 	if (msgBuf) LocalFree(msgBuf);
 
-	switch (ex_over->_compType)
+	switch (over->_compType)
 	{
 	case CompType::ACCEPT:
 	{
-		LOG(Warning, std::format("CompType : ACCEPT[{}] Code={} Msg={}",
-			id, ex_over->errorCode, errMsg));
+		LOG_W("CompType : ACCEPT[{}] Code={}", id, over->errorCode);
 		break;
 	}
 	case CompType::RECV:
 	{
-		LOG(Warning, std::format("CompType : RECV[{}] Code={} Msg={}",
-			id, ex_over->errorCode, errMsg));
+		LOG_W("CompType : RECV[{}] Code={}", id, over->errorCode);
 		GameWorld::GetInst().PlayerLeaveGame(id);
 		SessionManager::GetInst().Disconnect(id);
 		break;
 	}
 	case CompType::SEND:
 	{
-		LOG(Warning, std::format("CompType : SEND[{}] Code={} Msg={}",
-			id, ex_over->errorCode, errMsg));
+		LOG_W("CompType : SEND[{}] Code={}", id, over->errorCode);
 		GameWorld::GetInst().PlayerLeaveGame(id);
 		SessionManager::GetInst().Disconnect(id);
-		delete ex_over;
+		delete over;
 		break;
 	}
 	}
@@ -193,18 +195,10 @@ void Server::DoAccept()
 	InitSocket(_acceptSocket, WSA_FLAG_OVERLAPPED);
 	ZeroMemory(&_acceptOver._wsaover, sizeof(_acceptOver._wsaover));
 	_acceptOver._compType = CompType::ACCEPT;
-	AcceptEx(_listenSocket, _acceptSocket, _acceptOver._buf, 0,
+	bool ret = AcceptEx(_listenSocket, _acceptSocket, _acceptOver._buf, 0,
 		sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, 0, &_acceptOver._wsaover);
-}
-
-void Server::HandleAccept()
-{
-	SessionManager::GetInst().Connect(_acceptSocket);
-	DoAccept();
-}
-
-void Server::HandleRecv(int32 _id, int32 recvByte, ExpOver* expOver)
-{
-	SessionManager::GetInst().HandleRecvBuffer(_id, recvByte, expOver);
-	SessionManager::GetInst().DoRecv(_id);
+	if (ret == FALSE && WSAGetLastError() != ERROR_IO_PENDING)
+	{
+		LOG_E("AcceptEx failed: {}", WSAGetLastError());
+	}
 }

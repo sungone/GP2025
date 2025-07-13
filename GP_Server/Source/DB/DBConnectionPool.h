@@ -8,7 +8,7 @@ public:
     }
 
     bool Init(const std::string& host, const std::string& user, const std::string& pwd, const std::string& db, int32 poolSize);
-    void Close();
+    void Shutdown();
 
     std::shared_ptr<mysqlx::Session> Acquire();
     void Release(std::shared_ptr<mysqlx::Session> session);

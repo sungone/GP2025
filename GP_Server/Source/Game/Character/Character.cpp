@@ -17,6 +17,14 @@ void Character::OnDamaged(float damage)
 	_info.TakeDamage(damage);
 }
 
+void Character::UpdatePos(const FVector& newPos)
+{
+	auto old = GetPos();
+	GetInfo().SetLocationAndYaw(newPos);
+	if (GetZone() == ZoneType::TUK)
+		GameWorld::GetInst().MoveGrid(_id, old, newPos);
+}
+
 bool Character::IsCollision(const FVector& pos, float dist)
 {
 	return _info.Pos.IsInRange(pos, dist);
@@ -52,13 +60,14 @@ bool Character::IsInViewDistance(const FVector& targetPos, const float viewDist)
 
 bool Character::IsInFieldOfView(const FInfoData& target)
 {
-	float RadianYaw = _info.Yaw * (3.14159265f / 180.0f);
-	FVector ForwardVector(std::cos(RadianYaw), std::sin(RadianYaw), 0.0f);
-	FVector ToTarget = (target.Pos - _info.Pos).Normalize();
-	float Dot = ForwardVector.DotProduct(ToTarget);
-	float CosFOV = std::cos(_info.fovAngle * 0.5f * (3.14159265f / 180.0f));
+	static constexpr float DegToRad = 3.14f / 180.0f;
+	const float radYaw = _info.Yaw * DegToRad;
+	const FVector forward(std::cos(radYaw), std::sin(radYaw), 0.0f);
+	const FVector toTarget = (target.Pos - _info.Pos).Normalize();
+	const float dot = forward.DotProduct(toTarget);
+	const float cosFOV = std::cos(_info.fovAngle * 0.5f * DegToRad);
 
-	return Dot >= CosFOV;
+	return dot >= cosFOV;
 }
 
 bool Character::HasLineOfSight(const FVector& targetPos, const std::vector<FVector>& obstacles)

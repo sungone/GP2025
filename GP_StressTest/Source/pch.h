@@ -24,7 +24,7 @@
 #include "IOCP.h"
 #include "FVector.h"
 #include "Common.h"
-#include "Logger.h"
+#include "LogManager.h"
 #include "RandomUtils.h"
 #include "Map.h"
 #include "ExpOver.h"

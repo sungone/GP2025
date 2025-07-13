@@ -29,7 +29,7 @@ bool Map::Init()
 		auto meshOpt = NavMesh::LoadFromJson(MapDataPath + file);
 		if (!meshOpt)
 		{
-			LOG(Warning, std::format("Failed to load zone mesh [{}]", static_cast<int>(zone)));
+			LOG_E("Failed to load zone mesh [{}]", static_cast<int>(zone));
 			return false;
 		}
 		_navMeshes[zone] = std::move(*meshOpt);
@@ -40,7 +40,7 @@ bool Map::Init()
 		auto meshOpt = NavMesh::LoadFromJson(MapDataPath + file);
 		if (!meshOpt)
 		{
-			LOG(Warning, std::format("Failed to load entry mesh [{}]", static_cast<int>(entry)));
+			LOG_E("Failed to load entry mesh [{}]", static_cast<int>(entry));
 			return false;
 		}
 		_entryMeshes[entry] = std::move(*meshOpt);
@@ -75,7 +75,7 @@ NavMesh& Map::GetNavMesh(ZoneType type)
 {
 	auto it = _navMeshes.find(type);
 	if (it == _navMeshes.end())
-		LOG(Warning, "type Invaild");
+		LOG_W("Invalid");
 
 	return it->second;
 }

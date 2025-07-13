@@ -46,15 +46,15 @@ enum EPacketType : uint8
 
 	// --- Item ---
 	C_TAKE_ITEM,
-	C_DROP_ITEM,// -> ³ªÁß¿¡
+	C_DROP_ITEM,// -> ë‚˜ì¤‘ì—
 	C_USE_ITEM,
 	C_EQUIP_ITEM,
 	C_UNEQUIP_ITEM,
 
 	S_ITEM_SPAWN,
-	S_ITEM_DESPAWN, // -> ³ªÁß¿¡
+	S_ITEM_DESPAWN, // -> ë‚˜ì¤‘ì—
 	S_ITEM_PICKUP,
-	S_ITEM_DROP, // -> ³ªÁß¿¡
+	S_ITEM_DROP, // -> ë‚˜ì¤‘ì—
 	S_ADD_INVENTORY_ITEM,
 	S_REMOVE_INVENTORY_ITEM,
 	S_USE_INVENTORY_ITEM,
@@ -72,7 +72,7 @@ enum EPacketType : uint8
 	C_SHOP_BUY_ITEM,
 	C_SHOP_SELL_ITEM,
 
-	S_SHOP_ITEM_LIST,// -> ³ªÁß¿¡
+	S_SHOP_ITEM_LIST,// -> ë‚˜ì¤‘ì—
 	S_SHOP_BUY_RESULT,
 	S_SHOP_SELL_RESULT,
 
@@ -236,6 +236,7 @@ enum ECharacterStateType : uint32
 	STATE_SKILL_E = 1 << 7,
 	STATE_SKILL_R = 1 << 8,
 	STATE_AIMING = 1 << 9,
+	STATE_CHASE = 1 << 10,
 };
 
 #ifdef SERVER_BUILD

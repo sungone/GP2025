@@ -8,11 +8,24 @@ SessionSocket::SessionSocket(SOCKET socket)
 
 SessionSocket::~SessionSocket()
 {
-	Close();
+	Disconnect();
+}
+
+void SessionSocket::Init(SOCKET& socket)
+{
+	this->_socket = socket;
+}
+
+void SessionSocket::Disconnect()
+{
+	closesocket(_socket);
+	_socket = INVALID_SOCKET;
 }
 
 void SessionSocket::DoRecv()
 {
+	if (_socket == INVALID_SOCKET)
+		return;
 	ZeroMemory(&_recvOver._wsaover, sizeof(_recvOver._wsaover));
 	DWORD recv_flag = 0;
 	_recvOver._wsabuf.len = BUFSIZE - _remain;
@@ -22,21 +35,14 @@ void SessionSocket::DoRecv()
 
 void SessionSocket::DoSend(const Packet* packet)
 {
-	auto send_data = new ExpOver{ (packet) };
-	WSASend(_socket, &send_data->_wsabuf, 1, nullptr, 0, &send_data->_wsaover, nullptr);
+	if (_socket == INVALID_SOCKET)
+		return;
+
+	auto over = new ExpOver{ packet };
+	WSASend(_socket, &over->_wsabuf, 1, nullptr, 0, &over->_wsaover, nullptr);
 }
 
-void SessionSocket::Init(SOCKET& socket)
-{
-	this->_socket = socket;
-}
-
-void SessionSocket::Close()
-{
-	closesocket(_socket);
-}
-
-void SessionSocket::HandleRecvBuffer(int32 id, int32 recvByte, ExpOver* expOver)
+void SessionSocket::OnRecv(int32 id, int32 recvByte, ExpOver* expOver)
 {
 	uint32 dataSize = recvByte + _remain;
 	if (dataSize >= sizeof(FPacketHeader))

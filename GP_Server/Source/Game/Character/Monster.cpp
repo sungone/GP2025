@@ -10,7 +10,7 @@ void Monster::Init()
 	auto data = MonsterTable::GetInst().GetMonsterByTypeId(static_cast<uint8>(_monType));
 	if (!data)
 	{
-		LOG(Warning, "Invaild");
+		LOG_W("Invaild");
 		return;
 	}
 	FVector newPos{};
@@ -29,11 +29,49 @@ void Monster::Init()
 	_info.AttackRadius = data->AtkRadius;
 	_info.State = ECharacterStateType::STATE_IDLE;
 	_navMesh = &Map::GetInst().GetNavMesh(_zone);
+	ScheduleUpdate();
 }
 
+int32 Monster::GetUpdateDelay()
+{
+	return 1000;
+}
+
+void Monster::ScheduleUpdate()
+{
+	auto self = shared_from_this();
+	int32 delayMs = GetUpdateDelay();
+
+	TimerQueue::AddTimer([self]() {
+		if (!self->IsActive()) return;
+
+		self->Update();
+
+		if (self->IsDirty())
+		{
+			self->BroadcastStatus();
+			self->ClearDirty();
+		}
+		int32 delayMs = self->GetUpdateDelay();
+		self->ScheduleUpdate();
+		}, delayMs, false);
+}
+
+void Monster::BroadcastStatus()
+{
+	InfoPacket pkt(EPacketType::S_MONSTER_STATUS_UPDATE, GetInfo());
+
+	std::unordered_set<int32> viewList;
+	{
+		std::lock_guard lock(_vlLock);
+		viewList = GetViewList();
+	}
+
+	SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
+}
 void Monster::UpdateViewList(std::shared_ptr<Character> other)
 {
-	if (!other) { LOG(Warning, "Invaild!"); return; }
+	if (!other) { LOG_W("Invaild!"); return; }
 
 	auto player = std::dynamic_pointer_cast<Player>(other);
 	if (!player) return;
@@ -60,7 +98,7 @@ void Monster::UpdateViewList(std::shared_ptr<Character> other)
 void Monster::Update()
 {
 	if (!IsActive()) return;
-
+	if (GetViewList().empty()) return;
 	if (IsDead())
 	{
 		ChangeState(ECharacterStateType::STATE_DIE);
@@ -69,6 +107,7 @@ void Monster::Update()
 	}
 
 	BehaviorTree();
+	_dirty = true;
 }
 
 void Monster::BehaviorTree()
@@ -118,14 +157,7 @@ void Monster::BehaviorTree()
 		return;
 	}
 
-	LOG(Warning, std::format("Invalid state bits: {}", static_cast<uint32>(_info.State)));
-}
-
-void Monster::Look()
-{
-	if (!_target) return;
-	float yaw = _info.CalculateYaw(_target->GetInfo().Pos);
-	_info.SetYaw(yaw);
+	LOG_W("Invalid state bits: {}", static_cast<uint32>(_info.State));
 }
 
 void Monster::Attack()
@@ -167,7 +199,7 @@ void Monster::BossAttack()
 
 void Monster::PerformEarthQuake()
 {
-	LOG("EarthQuake!");
+	LOG_D("EarthQuake!");
 
 	int rockCount = 5;
 	if (_info.GetHp() / _info.GetMaxHp() < 0.3f)
@@ -194,7 +226,7 @@ void Monster::PerformEarthQuake()
 
 void Monster::PerformFlameBreath()
 {
-	LOG("FlameBreath Start!");
+	LOG_D("FlameBreath Start!");
 
 	const float range = _info.AttackRadius;
 	const float halfAngleDeg = 15.f;
@@ -238,7 +270,7 @@ void Monster::PerformFlameBreath()
 			float ratio = 1.0f - (dist / range);
 			float damage = maxDamage * ratio;
 
-			LOG(std::format("FlameBreath HIT [{}] dmg: {:.1f}", pid, damage));
+			LOG_D("FlameBreath HIT [{}] dmg: {:.1f}", pid, damage);
 			player->OnDamaged(damage);
 			auto hitDebugPkt = Tino::FlameBreathPacket(origin, forward, range, halfAngleDeg * 2, true);
 			SessionManager::GetInst().BroadcastToViewList(&hitDebugPkt, viewListCopy);
@@ -250,7 +282,7 @@ void Monster::PerformFlameBreath()
 
 void Monster::PerformFlameBreathRotate()
 {
-	LOG("Rotating FlameBreath!");
+	LOG_D("Rotating FlameBreath!");
 	const float range = _info.AttackRadius;
 	const float halfAngleDeg = 15.f;
 	const float maxDamage = 40.f;
@@ -303,7 +335,7 @@ void Monster::PerformFlameBreathRotate()
 				float ratio = 1.0f - (dist / range);
 				float damage = maxDamage * ratio;
 
-				LOG(std::format("[Tick {}] FlameBreath hit [{}] - dist: {:.1f}, dmg: {:.1f}", i, pid, dist, damage));
+				LOG_D("[Tick {}] FlameBreath hit [{}] - dist: {:.1f}, dmg: {:.1f}", i, pid, dist, damage);
 				player->OnDamaged(damage);
 			}
 
@@ -333,18 +365,17 @@ void Monster::SetNextPattern()
 	_currentPattern = static_cast<EAttackPattern>(randomIndex);
 }
 
-void Monster::UpdateChaseMovement()
+void Monster::Move()
 {
 	if (_movePath.empty() || _pathIdx >= _movePath.size()) {
 		return;
 	}
 
-	Look();
-
 	FVector current = GetInfo().Pos;
 	current.Z -= 90;
 
-	const float step = _info.Stats.Speed;
+	const float tickIntervalSec = GetUpdateDelay() / 1000.f;
+	const float step = _info.Stats.Speed * tickIntervalSec;
 	const float reachThreshold = 50.f;
 	while (_pathIdx < _movePath.size())
 	{
@@ -360,7 +391,7 @@ void Monster::UpdateChaseMovement()
 		FVector dir = toTarget.Normalize();
 		FVector newPos = current + dir * std::min(step, toTarget.Length());
 		newPos.Z += 90;
-		_info.SetLocation(newPos);
+		UpdatePos(newPos);
 		break;
 	}
 	if (IsTargetInAttackRange())
@@ -377,6 +408,7 @@ void Monster::Chase()
 {
 	if (!_target || !_navMesh) return;
 	ChangeState(ECharacterStateType::STATE_WALK);
+	_info.AddState(ECharacterStateType::STATE_CHASE);
 
 	if (!IsTargetInChaseRange())
 	{
@@ -403,7 +435,7 @@ void Monster::Chase()
 		DebugLinePacket dbgLine(_movePath[i - 1], _movePath[i], 3.f);
 		SessionManager::GetInst().SendPacket(PlayerId, &dbgLine);
 	}
-	UpdateChaseMovement();
+	Move();
 }
 
 void Monster::Patrol()

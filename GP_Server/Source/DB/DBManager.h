@@ -16,7 +16,7 @@ public:
 		return inst;
 	}
 	bool Connect(const std::string& host, const std::string& user, const std::string& pass, const std::string& schema);
-	void Close();
+	void Shutdown();
 	DBLoginResult SignUpUser(int32 sessionId, const std::string& login_id, const std::string& password, const std::wstring& nickname);
 	DBLoginResult CheckLogin(int32 sessionId, const std::string& login_id, const std::string& password);
 	bool UpdatePlayerInfo(uint32 dbId, const FInfoData& info);

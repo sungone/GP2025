@@ -8,11 +8,11 @@ public:
 		static Server inst;
 		return inst;
 	}
-	~Server() { Close(); }
+	~Server() {}
 
 	bool Init();
 	void Run();
-	void Close();
+	void Shutdown();
 
 protected:
 	void InitSocket(SOCKET& socket, DWORD dwFlags);
@@ -20,8 +20,6 @@ protected:
 	void WorkerThreadLoop();
 	void HandleCompletionError(ExpOver* ex_over, int32 _id);
 	void DoAccept();
-	void HandleAccept();
-	void HandleRecv(int32 _id, int32 recvByte, ExpOver* expOver);
 
 protected:
 	bool _bRunning = true;

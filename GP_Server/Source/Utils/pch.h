@@ -25,7 +25,7 @@
 #include "ServerDefine.h"
 #include "FVector.h"
 #include "Common.h"
-#include "Logger.h"
+#include "LogManager.h"
 #include "ExpOver.h"
 #include "RandomUtils.h"
 #include "TimerQueue.h"

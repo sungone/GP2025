@@ -22,6 +22,12 @@ public:
 		_zone = zone;
 	}
 	void Init() override;
+	bool IsDirty() const { return _dirty; }
+	void ClearDirty() { _dirty = false; }
+	void ScheduleUpdate();
+	int32 GetUpdateDelay();
+	void BroadcastStatus();
+
 	void UpdateViewList(std::shared_ptr<Character> other) override;
 	void Update();
 	void BehaviorTree();
@@ -45,7 +51,6 @@ public:
 	void SetQuestID(QuestType quest) { _questID = quest; }
 	QuestType GetQuestID() { return _questID; }
 private:
-	void Look();
 	void Attack();
 
 	void BossAttack();
@@ -55,7 +60,7 @@ private:
 	void PerformMeleeAttack();
 	void SetNextPattern();
 
-	void UpdateChaseMovement();
+	void Move();
 	void Chase();
 	void Patrol();
 
@@ -72,8 +77,13 @@ private:
 	bool _active = false;
 	bool _isBoss;
 	EAttackPattern _currentPattern;
+
+private:
 	NavMesh* _navMesh = nullptr;
 	std::vector<FVector> _movePath;
 	int _pathIdx = 0;
+
+private:
+	bool _dirty = false;
 };
 

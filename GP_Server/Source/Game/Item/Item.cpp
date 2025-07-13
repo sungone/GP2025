@@ -18,7 +18,7 @@ void Item::Init(uint8 itemTypeID)
 	_itemTypeID = itemTypeID;
 	_itemInfo = ItemTable::GetInst().GetItemByTypeId(itemTypeID);
 	if (!_itemInfo) {
-		LOG(Warning, "Invalid ItemType");
+		LOG_W("Invalid ItemType");
 		return;
 	}
 }
