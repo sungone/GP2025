@@ -35,6 +35,7 @@ public:
 
 	void AddMonster(const FInfoData& MonsterInfo);
 	void RemoveMonster(int32 MonsterID);
+	void HandleMonsterDeath(int32 MonsterID);
 	void UpdateMonster(const FInfoData& MonsterInfo);
 	void DamagedMonster(const FInfoData& MonsterInfo, float Damage);
 	void PlayEarthQuakeEffect(const FVector& RockPos, bool bDebug);
@@ -50,6 +51,10 @@ public:
 	void UnequipItem(int32 PlayerID, uint8 ItemType);
 
 	void ChangeZone(ZoneType zone, const FVector& pos);
+	bool IsChangingZone() const { return bChangingZone; }
+
+	UFUNCTION()
+	void OnZoneLevelUnLoaded();
 	UFUNCTION()
 	void OnZoneLevelLoaded();
 	void RespawnMyPlayer(const FInfoData& info);
@@ -84,7 +89,9 @@ private:
 
 	ZoneType PendingZone;
 	FVector PendingLocation;
+	FName PendingLevelName;
 
+	bool bChangingZone = false;
 // Object Pool
 public :
 	UPROPERTY()

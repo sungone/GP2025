@@ -29,9 +29,7 @@ void DummyClientManager::Run()
 	try {
 		static std::vector<std::thread> threads;
 
-		int32 n = std::thread::hardware_concurrency();
-		for (int32 i = 0; i < n; ++i)
-			threads.emplace_back([this]() { WorkerThread(); });
+		threads.emplace_back([this]() { WorkerThread(); });
 		threads.emplace_back([this]() { TestThread(); });
 
 		for (auto& thread : threads)
@@ -136,7 +134,7 @@ void DummyClientManager::AdjustClientCount()
 			increasing = false;
 		}
 		if (100 > _active_clients) return;
-		if (ACCEPT_DELY * 10 > duration_cast<milliseconds>(duration).count()) return;
+		if (ACCEPT_DELY * 20 > duration_cast<milliseconds>(duration).count()) return;
 		last_connect_time = high_resolution_clock::now();
 		Disconnect(_client_to_close);
 		_client_to_close++;
@@ -171,7 +169,6 @@ void DummyClientManager::HandleCompletionError(ExpOver* ex_over, int32 id)
 
 	if (!_clients[id].IsConnected())
 	{
-		LOG_W("Skip error handling for already disconnected client [{}]", id);
 		if (ex_over->_compType == CompType::SEND)
 			delete ex_over;
 		return;

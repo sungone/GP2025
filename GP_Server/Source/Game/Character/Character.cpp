@@ -108,3 +108,11 @@ bool Character::RemoveFromViewList(int32 CharacterId)
 	std::lock_guard<std::mutex> lock(_vlLock);
 	return _viewList.erase(CharacterId) > 0;
 }
+
+bool Character::IsValid()
+{
+	if (_info.GetHp() <= 0)
+		return false;
+
+	return true;
+}

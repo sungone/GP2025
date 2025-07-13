@@ -17,8 +17,8 @@
 
 AGPCharacterMonster::AGPCharacterMonster()
 {
-    GetMesh()->SetCollisionProfileName(TEXT("PhysicsActor"));
-    GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetMesh()->SetCollisionProfileName(TEXT("PhysicsActor"));
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> HitEffectAsset(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Impact_Stab_01.NS_ARPGEssentials_Impact_Stab_01"));
 	if (HitEffectAsset.Succeeded())
@@ -31,6 +31,11 @@ AGPCharacterMonster::AGPCharacterMonster()
 	{
 		CriticalEffect = CriEffectAsset.Object;
 	}
+	SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
+	SetRootComponent(SceneRoot);
+
+	GetCapsuleComponent()->SetupAttachment(SceneRoot);
+	GetMesh()->SetupAttachment(GetCapsuleComponent());
 }
 
 void AGPCharacterMonster::BeginPlay()
@@ -45,7 +50,6 @@ void AGPCharacterMonster::BeginPlay()
 	MyMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	MyMesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	MyMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
-
 }
 
 void AGPCharacterMonster::Tick(float DeltaTime)
@@ -64,8 +68,10 @@ void AGPCharacterMonster::SetCharacterData(const UGPCharacterControlData* Charac
 	GetCapsuleComponent()->SetCapsuleHalfHeight(CharacterControlData->CapsuleHalfHeight);
 	GetCapsuleComponent()->SetCapsuleRadius(CharacterControlData->CapsuleRadius);
 
-	if (CharacterControlData->bIsBoos)
-		ApplyCapsuleAndMeshScaling(CharacterControlData->CapsuleRadius, CharacterControlData->CapsuleHalfHeight);
+	//if (CharacterControlData->bIsBoos)
+	//ApplyCapsuleAndMeshScaling(CharacterControlData->CapsuleRadius, CharacterControlData->CapsuleHalfHeight);
+
+	AdjustMeshToCapsule();
 }
 
 void AGPCharacterMonster::SetCharacterType(ECharacterType NewCharacterControlType)
@@ -77,7 +83,7 @@ void AGPCharacterMonster::ApplyCapsuleAndMeshScaling(float CapsuleRadius, float 
 {
 	const float BaseRadius = 42.f;
 	const float BaseHalfHeight = 99.f;
-		
+
 	const float RadiusScaleRatio = CapsuleRadius / BaseRadius;
 	const float HeightScaleRatio = CapsuleHalfHeight / BaseHalfHeight;
 
@@ -85,4 +91,26 @@ void AGPCharacterMonster::ApplyCapsuleAndMeshScaling(float CapsuleRadius, float 
 
 	GetMesh()->SetWorldScale3D(FVector(FinalScale));
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -CapsuleHalfHeight));
+}
+
+void AGPCharacterMonster::AdjustMeshToCapsule()
+{
+	UCapsuleComponent* Capsule = GetCapsuleComponent();
+	USkeletalMeshComponent* MyMesh = GetMesh();
+
+	if (!Capsule || !MyMesh) return;
+
+	const float CapsuleHalfHeight = Capsule->GetUnscaledCapsuleHalfHeight();
+	const float CapsuleFullHeight = CapsuleHalfHeight * 2.f;
+
+	const FBoxSphereBounds Bounds = MyMesh->GetLocalBounds();
+	const float MeshTotalHeight = Bounds.BoxExtent.Z * 2.f;
+
+	const float ScaleRatio = CapsuleFullHeight / MeshTotalHeight;
+	MyMesh->SetWorldScale3D(FVector(ScaleRatio));
+
+	MyMesh->SetRelativeLocation(FVector(0.f, 0.f, -CapsuleHalfHeight));
+
+	Capsule->SetRelativeLocation(FVector(0.f, 0.f, CapsuleHalfHeight));
+	Capsule->SetCapsuleRadius(CharacterInfo.CollisionRadius);
 }

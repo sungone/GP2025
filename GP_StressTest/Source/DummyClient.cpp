@@ -19,7 +19,7 @@ bool DummyClient::Connect(IOCP& hIocp)
 	_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
 	if (_socket == INVALID_SOCKET)
 	{
-		LOG_W("WSASocket failed. WSAGetLastError: {}", WSAGetLastError());
+		LOG_W("WSASocket failed. Code={}", WSAGetLastError());
 		return false;
 	}
 
@@ -31,7 +31,7 @@ bool DummyClient::Connect(IOCP& hIocp)
 	if (connect(_socket, (struct sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR)
 	{
 		int errCode = WSAGetLastError();
-		LOG_W("connect failed. WSAGetLastError: {}", errCode);
+		LOG_W("Connect failed. Code={}", errCode);
 		closesocket(_socket);
 		_socket = INVALID_SOCKET;
 		return false;
@@ -40,7 +40,7 @@ bool DummyClient::Connect(IOCP& hIocp)
 	hIocp.RegisterSocket(_socket, _dummyNum);
 	DoRecv();
 	SendSignUpPacket();
-	LOG_I("Connect success: [{}] ", _name, _socket);
+	LOG_I("Connect [{}] ", _name, _socket);
 	_connected = true;
 
 	return true;
@@ -182,7 +182,9 @@ bool DummyClient::SendMovePacket()
 
 	auto now = NowMs();
 	_info.AddState(ECharacterStateType::STATE_WALK);
-	MovePacket pkt(_playerId, _info.Pos, _info.State, now);
+	auto sendPos = _info.Pos;
+	sendPos.Z += 90.f;
+	MovePacket pkt(_playerId, sendPos, _info.State, now);
 	DoSend(&pkt);
 	return true;
 }

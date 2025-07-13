@@ -262,7 +262,10 @@ bool Player::Attack(std::shared_ptr<Character> target)
 	{
 		monster->OnDamaged(atkDamage);
 	}
-
+	if (monster->IsDead())
+	{
+		ChangeState(ECharacterStateType::STATE_DIE);
+	}
 	auto pkt = MonsterDamagePacket(monster->GetInfo(), atkDamage);
 	SessionManager::GetInst().SendPacket(_id, &pkt);
 	SessionManager::GetInst().BroadcastToViewList(&pkt, _viewList);

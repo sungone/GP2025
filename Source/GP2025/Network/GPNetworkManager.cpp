@@ -58,6 +58,10 @@ void UGPNetworkManager::SetMyPlayer(AGPCharacterPlayer* InMyPlayer)
 
 void UGPNetworkManager::SendPacket(uint8* Buf, int32 Size)
 {
+	UGPObjectManager* ObjectMgr = GetWorld()->GetSubsystem<UGPObjectManager>();
+	if (ObjectMgr && ObjectMgr->IsChangingZone())
+		return;
+
 	int32 BytesSent = 0;
 	Socket->Send(Buf, Size, BytesSent);
 }
@@ -310,9 +314,15 @@ void UGPNetworkManager::ReceiveData()
 
 void UGPNetworkManager::ProcessPacket()
 {
+	UGPObjectManager* ObjectMgr = GetWorld()->GetSubsystem<UGPObjectManager>();
+	if (!ObjectMgr || ObjectMgr->IsChangingZone())
+	{
+		return;
+	}
+
 	ReceiveData();
 	TArray<uint8> PacketData;
-	UGPObjectManager* ObjectMgr = GetWorld()->GetSubsystem<UGPObjectManager>();
+
 	while (RecvQueue.Dequeue(PacketData))
 	{
 		RemainingData.Append(PacketData);
@@ -320,7 +330,7 @@ void UGPNetworkManager::ProcessPacket()
 		while (RemainingData.Num() > sizeof(FPacketHeader))
 		{
 			FPacketHeader* PacketHeader = reinterpret_cast<FPacketHeader*>(RemainingData.GetData());
-
+			if (ObjectMgr->IsChangingZone()) break;
 			if (RemainingData.Num() < PacketHeader->PacketSize) break;
 
 			switch (PacketHeader->PacketType)
@@ -454,6 +464,12 @@ void UGPNetworkManager::ProcessPacket()
 			{
 				Tino::FlameBreathPacket* Pkt = reinterpret_cast<Tino::FlameBreathPacket*>(RemainingData.GetData());
 				ObjectMgr->PlayFlameBreathEffect(Pkt->Origin, Pkt->Direction, Pkt->Range, Pkt->AngleDeg, Pkt->bDebug);
+				break;
+			}
+			case EPacketType::S_MONSTER_DEAD:
+			{
+				MonsterDeadPacket* Pkt = reinterpret_cast<MonsterDeadPacket*>(RemainingData.GetData());
+				ObjectMgr->HandleMonsterDeath(Pkt->MonsterID);
 				break;
 			}
 #pragma endregion

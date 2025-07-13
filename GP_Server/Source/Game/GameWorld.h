@@ -45,7 +45,7 @@ public:
 
 	// Monster
 	void CreateMonster();
-	void RemoveMonster(int32 id);
+	void OnMonsterDead(int32 monsterId);
 	void UpdateMonsterState(int32 id, ECharacterStateType newState);
 
 	//Tino
