@@ -102,6 +102,7 @@ void Monster::Update()
 	if (IsDead())
 	{
 		ChangeState(ECharacterStateType::STATE_DIE);
+		GameWorld::GetInst().LeaveGrid(_id, GetPos());
 		SetActive(false);
 		return;
 	}
@@ -372,7 +373,6 @@ void Monster::Move()
 	}
 
 	FVector current = GetInfo().Pos;
-	current.Z -= 90;
 
 	const float tickIntervalSec = GetUpdateDelay() / 1000.f;
 	const float step = _info.Stats.Speed * tickIntervalSec;
@@ -390,7 +390,6 @@ void Monster::Move()
 
 		FVector dir = toTarget.Normalize();
 		FVector newPos = current + dir * std::min(step, toTarget.Length());
-		newPos.Z += 90;
 		UpdatePos(newPos);
 		break;
 	}
@@ -419,7 +418,6 @@ void Monster::Chase()
 
 	FVector start = GetInfo().Pos;
 	FVector goal = _target->GetInfo().Pos;
-	start.Z -= 90.f;
 	goal.Z -= 90.f;
 
 	auto polyPath = _navMesh->FindPathAStar(start, goal);

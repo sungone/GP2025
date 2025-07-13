@@ -36,6 +36,7 @@ public:
 	bool IsMonster() const {
 		return _info.ID >= MAX_PLAYER;
 	}
+	virtual bool IsValid();
 public:
 	std::mutex _cLock;
 	std::mutex _vlLock;

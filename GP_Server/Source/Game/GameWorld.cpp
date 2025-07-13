@@ -686,7 +686,7 @@ void GameWorld::UpdateViewList(std::shared_ptr<Player> player)
 	{
 		if (id == ownerId) continue;
 		auto target = GetCharacterByID(id);
-		if (!target) continue;
+		if (!target||!target->IsValid()) continue;
 		player->UpdateViewList(target);
 	}
 }

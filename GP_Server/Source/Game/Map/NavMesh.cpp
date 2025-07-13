@@ -208,7 +208,6 @@ FVector NavMesh::GetRandomPosition() const
 	}
 
 	FVector P = A + (B - A) * u + (C - A) * v;
-	P.Z += 90.f;
 	return P;
 }
 
@@ -364,7 +363,6 @@ FVector NavMesh::GetNearbyRandomPosition(const FVector& origin) const
 		FVector P = A + (B - A) * u + (C - A) * v;
 		if ((P - origin).LengthSquared() <= maxDist * maxDist)
 		{
-			P.Z += 90.f;
 			return P;
 		}
 	}
