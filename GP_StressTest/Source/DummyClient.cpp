@@ -178,9 +178,9 @@ void DummyClient::SendRequestEnterGamePacket()
 bool DummyClient::SendMovePacket()
 {
 	if (last_move_time + 1s > high_resolution_clock::now()) return false;
+	if (!Move()) return false;
 	auto now = NowMs();
 	_info.AddState(ECharacterStateType::STATE_WALK);
-	Move();
 	auto sendPos = _info.Pos;
 	MovePacket pkt(_playerId, sendPos, _info.State, now);
 	DoSend(&pkt);
@@ -195,6 +195,8 @@ bool DummyClient::Move()
 	currentPos.Z -= 90.f;
 	FVector newPos = nav.GetNearbyRandomPosition(currentPos);
 	newPos.Z += 90.f;
+	if (newPos == _info.Pos)
+		return false;
 	_info.SetLocationAndYaw(newPos);
 	return true;
 }
