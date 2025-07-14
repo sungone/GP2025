@@ -60,7 +60,10 @@ void UGPNetworkManager::SendPacket(uint8* Buf, int32 Size)
 {
 	UGPObjectManager* ObjectMgr = GetWorld()->GetSubsystem<UGPObjectManager>();
 	if (ObjectMgr && ObjectMgr->IsChangingZone())
+	{
+		UE_LOG(LogTemp, Log, TEXT("Changing Zone..."));
 		return;
+	}
 
 	int32 BytesSent = 0;
 	Socket->Send(Buf, Size, BytesSent);
@@ -315,10 +318,8 @@ void UGPNetworkManager::ReceiveData()
 void UGPNetworkManager::ProcessPacket()
 {
 	UGPObjectManager* ObjectMgr = GetWorld()->GetSubsystem<UGPObjectManager>();
-	if (!ObjectMgr || ObjectMgr->IsChangingZone())
-	{
+	if (!ObjectMgr)
 		return;
-	}
 
 	ReceiveData();
 	TArray<uint8> PacketData;
@@ -330,8 +331,12 @@ void UGPNetworkManager::ProcessPacket()
 		while (RemainingData.Num() > sizeof(FPacketHeader))
 		{
 			FPacketHeader* PacketHeader = reinterpret_cast<FPacketHeader*>(RemainingData.GetData());
-			if (ObjectMgr->IsChangingZone()) break;
 			if (RemainingData.Num() < PacketHeader->PacketSize) break;
+			if (ObjectMgr->IsChangingZone())
+			{
+				UE_LOG(LogTemp, Log, TEXT("Changing Zone..."));
+				break;
+			}
 
 			switch (PacketHeader->PacketType)
 			{
@@ -529,6 +534,7 @@ void UGPNetworkManager::ProcessPacket()
 #pragma region Map
 			case EPacketType::S_CHANGE_ZONE:
 			{
+				ObjectMgr->SetChangeingZone(true);
 				ChangeZonePacket* Pkt = reinterpret_cast<ChangeZonePacket*>(RemainingData.GetData());
 				ObjectMgr->ChangeZone(Pkt->TargetZone, Pkt->RandomPos);
 				break;

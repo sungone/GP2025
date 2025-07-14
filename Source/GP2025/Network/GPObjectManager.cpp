@@ -867,7 +867,13 @@ void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType)
 
 void UGPObjectManager::ChangeZone(ZoneType newZone, const FVector& RandomPos)
 {
-	if (!MyPlayer) return;
+	if (!MyPlayer)
+	{ 
+		SetChangeingZone(false);
+		return;
+	}
+	UE_LOG(LogTemp, Log, TEXT("Start Changing Zone [%d]"), MyPlayer->CharacterInfo.ID);
+
 	auto oldZone = MyPlayer->CharacterInfo.CurrentZone;
 	auto GetLevelName = [](ZoneType zone) -> FName {
 		switch (zone) {
@@ -885,8 +891,6 @@ void UGPObjectManager::ChangeZone(ZoneType newZone, const FVector& RandomPos)
 
 	if (!OldLevel.IsNone() && !NewLevel.IsNone())
 	{
-		bChangingZone = true;
-
 		PendingZone = newZone;
 		PendingLocation = RandomPos;
 		PendingLevelName = NewLevel;
@@ -898,6 +902,11 @@ void UGPObjectManager::ChangeZone(ZoneType newZone, const FVector& RandomPos)
 		LatentInfo.UUID = __LINE__;
 
 		UGameplayStatics::UnloadStreamLevel(this, OldLevel, LatentInfo, false);
+	}
+	else
+	{
+		SetChangeingZone(false);
+		UE_LOG(LogTemp, Log, TEXT("Failed Changing Zone [%d]"), MyPlayer->CharacterInfo.ID);
 	}
 }
 
@@ -921,7 +930,8 @@ void UGPObjectManager::OnZoneLevelLoaded()
 	{
 		MyPlayer->AppearanceHandler->SetupLeaderPose();
 	}
-	bChangingZone = false;
+	SetChangeingZone(false);
+	UE_LOG(LogTemp, Log, TEXT("End Changing Zone [%d]"), MyPlayer->CharacterInfo.ID);
 }
 
 void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)

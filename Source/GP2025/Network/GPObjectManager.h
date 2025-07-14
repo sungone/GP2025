@@ -52,6 +52,7 @@ public:
 
 	void ChangeZone(ZoneType zone, const FVector& pos);
 	bool IsChangingZone() const { return bChangingZone; }
+	void SetChangeingZone(bool value) { bChangingZone = value; }
 
 	UFUNCTION()
 	void OnZoneLevelUnLoaded();
