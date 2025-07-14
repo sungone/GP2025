@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Engine/TriggerBox.h"
+#include "Engine/DataTable.h"
+#include "GPQuestMessageStruct.h"
 #include "GPQuestTriggerBox.generated.h"
 
 /**
@@ -27,4 +29,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
 	uint8 TriggerQuestType;
 	
+public :
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Quest")
+	UDataTable* QuestMessageTable;
 };

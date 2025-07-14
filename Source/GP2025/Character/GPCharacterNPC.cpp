@@ -301,7 +301,7 @@ void AGPCharacterNPC::CloseQuestUI()
 	bIsInteracting = false;
 }
 
-void AGPCharacterNPC::ShowQuestNotAvailableMessage(AGPCharacterMyplayer* MyPlayer, const FString& Message)
+void AGPCharacterNPC::ShowQuestNotAvailableMessage(AGPCharacterMyplayer* MyPlayer, const FText& Message)
 {
 	if (MyPlayer && MyPlayer->UIManager && MyPlayer->UIManager->GetInGameWidget())
 	{
@@ -384,7 +384,7 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 	case ENPCType::PROFESSOR:
 		if (MyPlayer->CharacterInfo.CurrentQuest.QuestType != QuestType::CH3_RETURN_TO_TIP_WITH_DOC)
 		{
-			ShowQuestNotAvailableMessage(MyPlayer, TEXT("퀘스트를 진행하세요"));
+			ShowQuestNotAvailableMessage(MyPlayer, FText::FromString(TEXT("퀘스트를 진행하세요")));
 			return;
 		}
 
@@ -400,7 +400,7 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 	case ENPCType::STUDENT:
 		if (MyPlayer->CharacterInfo.CurrentQuest.QuestType != QuestType::CH1_TALK_TO_STUDENT_A)
 		{
-			ShowQuestNotAvailableMessage(MyPlayer, TEXT("퀘스트를 진행하세요"));
+			ShowQuestNotAvailableMessage(MyPlayer, FText::FromString(TEXT("퀘스트를 진행하세요")));
 			return;
 		}
 
@@ -416,7 +416,7 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 	case ENPCType::SECURITY:
 		if (MyPlayer->CharacterInfo.CurrentQuest.QuestType != QuestType::CH1_FIND_JANITOR)
 		{
-			ShowQuestNotAvailableMessage(MyPlayer, TEXT("퀘스트를 진행하세요"));
+			ShowQuestNotAvailableMessage(MyPlayer, FText::FromString(TEXT("퀘스트를 진행하세요")));
 			return;
 		}
 

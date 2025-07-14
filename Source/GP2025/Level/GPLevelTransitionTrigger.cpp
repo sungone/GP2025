@@ -189,46 +189,44 @@ void AGPLevelTransitionTrigger::OnLevelAdded(ULevel* Level, UWorld* World)
 		}
 	}
 }
-
 void AGPLevelTransitionTrigger::ShowZoneChangeMessage(ZoneType NewZone)
 {
 	if (CachedPlayer && CachedPlayer->UIManager && CachedPlayer->UIManager->GetInGameWidget())
 	{
-		FString ZoneNameString;
+		FText ZoneNameText;
 
 		switch (NewZone)
 		{
 		case ZoneType::TIP:
-			ZoneNameString = TEXT("TIP");
+			ZoneNameText = FText::FromString(TEXT("TIP"));
 			break;
 		case ZoneType::E:
-			ZoneNameString = TEXT("E동 건물");
+			ZoneNameText = FText::FromString(TEXT("E동 건물"));
 			break;
 		case ZoneType::GYM:
-			ZoneNameString = TEXT("체육관");
+			ZoneNameText = FText::FromString(TEXT("체육관"));
 			break;
 		case ZoneType::TUK:
-			ZoneNameString = TEXT("한국공학대학교");
+			ZoneNameText = FText::FromString(TEXT("한국공학대학교"));
 			break;
 		case ZoneType::INDUSTY:
-			ZoneNameString = TEXT("산융 건물");
+			ZoneNameText = FText::FromString(TEXT("산융 건물"));
 			break;
 		default:
-			ZoneNameString = TEXT("");
+			ZoneNameText = FText::GetEmpty();
 			break;
 		}
 
-		CachedPlayer->UIManager->GetInGameWidget()->ShowGameMessage(ZoneNameString, 3.0f);
-		CachedPlayer->UIManager->GetInGameWidget()->SetCurrentMapName(ZoneNameString);
+		CachedPlayer->UIManager->GetInGameWidget()->ShowGameMessage(ZoneNameText, 3.0f);
+		CachedPlayer->UIManager->GetInGameWidget()->SetCurrentMapName(ZoneNameText.ToString());
 
-		UE_LOG(LogTemp, Log, TEXT("[LevelTransitionTrigger] ZoneChange Message: %s"), *ZoneNameString);
+		UE_LOG(LogTemp, Log, TEXT("[LevelTransitionTrigger] ZoneChange Message: %s"), *ZoneNameText.ToString());
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[LevelTransitionTrigger] ShowZoneChangeMessage - CachedPlayer or UIManager is NULL"));
 	}
 }
-
 FRotator AGPLevelTransitionTrigger::GetRotationOffsetForLevel(const FString& LevelName) const
 {
 	if (LevelName == "tip")

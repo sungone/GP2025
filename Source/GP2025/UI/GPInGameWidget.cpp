@@ -88,13 +88,12 @@ void UGPInGameWidget::SetCurrentMapName(const FString& MapName)
     }
 }
 
-void UGPInGameWidget::ShowGameMessage(const FString& Message, float Duration)
+void UGPInGameWidget::ShowGameMessage(const FText& Message, float Duration)
 {
     if (!GameMessage) return;
 
-    GameMessage->SetText(FText::FromString(Message));
+    GameMessage->SetText(Message);
     GameMessageBox->SetVisibility(ESlateVisibility::Visible);
-    // GameMessage->SetVisibility(ESlateVisibility::Visible);
 
     PlayGameMessageFadeIn();
 
@@ -106,7 +105,7 @@ void UGPInGameWidget::ShowGameMessage(const FString& Message, float Duration)
             GetWorld()->GetTimerManager().SetTimer(HideHandle, [this]()
                 {
                     GameMessageBox->SetVisibility(ESlateVisibility::Collapsed);
-                }, 1.0f, false); 
+                }, 1.0f, false);
 
         }, Duration, false);
 }

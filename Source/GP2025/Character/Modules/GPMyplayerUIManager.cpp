@@ -252,7 +252,7 @@ void UGPMyplayerUIManager::ShowDeadScreen()
 	{
 		if (UGPInGameWidget* LocalInGameWidget = Cast<UGPInGameWidget>(InGameWidget))
 		{
-			LocalInGameWidget->ShowGameMessage(TEXT("몬스터에게 사망하셨습니다"), 2.f);
+			LocalInGameWidget->ShowGameMessage(FText::FromString(TEXT("몬스터에게 사망하셨습니다")), 2.f);
 		}
 
 		TypedWidget->AddToViewport();

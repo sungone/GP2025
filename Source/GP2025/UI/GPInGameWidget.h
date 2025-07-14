@@ -73,7 +73,7 @@ public:
 
     void SetCurrentMapName(const FString& MapName);
 
-    void ShowGameMessage(const FString& Message, float Duration = 3.0f);
+    void ShowGameMessage(const FText& Message, float Duration = 3.0f);
 
     UFUNCTION(BlueprintImplementableEvent, Category = "Game Message")
     void PlayGameMessageFadeIn();
