@@ -74,6 +74,8 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 
 	//for test
 	player->AddGold(10000);
+	BuyItem(playerId, (uint8)Type::EWeapon::ENERGY_SWORD, 1);
+	BuyItem(playerId, (uint8)Type::EQuestItem::KEY, 1);
 
 	auto& playerInfo = player->GetInfo();
 
@@ -84,6 +86,9 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 	AddItems(playerId, startZone);
 
 	LOG_D("Enter Game [{}] - Zone <{}>", playerId, ENUM_NAME(startZone));
+	auto questData = player->GetCurrentQuestData();
+	if (questData->Catagory == EQuestCategory::KILL)
+		QuestSpawn(playerId, questData->QuestID);
 }
 
 void GameWorld::PlayerLeaveGame(int32 id)
@@ -356,31 +361,26 @@ void GameWorld::CreateMonster()
 
 void GameWorld::OnMonsterDead(int32 monsterId)
 {
-	std::lock_guard<std::mutex> lock(_mtMonZMap);
-	for (auto& [zone, zoneMap] : _monstersByZone)
+	auto monster = GetMonsterByID(monsterId);
+	auto pkt = MonsterDeadPacket(monsterId);
+	std::unordered_set<int32> viewList;
 	{
-		auto it = zoneMap.find(monsterId);
-		if (it == zoneMap.end()) continue;
-
-		auto monster = it->second;
-		auto pkt = MonsterDeadPacket(monsterId);
-		std::unordered_set<int32> viewList;
-		{
-			std::lock_guard lock(monster->_vlLock);
-			viewList = monster->GetViewList();
-		}
-		SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
-
-		for (auto& pid : viewList)
-		{
-			auto player = GetPlayerByID(pid);
-			if (!player) continue;
-			player->RemoveFromViewList(monsterId);
-		}
-
-		monster->SetActive(false);
-		break;
+		std::lock_guard lock(monster->_vlLock);
+		viewList = monster->GetViewList();
 	}
+	SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
+
+	for (auto& pid : viewList)
+	{
+		auto player = GetPlayerByID(pid);
+		if (!player) continue;
+		player->RemoveFromViewList(monsterId);
+	}
+
+	monster->SetActive(false);
+	TimerQueue::AddTimer([monsterId]() {
+		GameWorld::GetInst().MonsterRespawn(monsterId);
+		}, MONSTER_RESPAWN_TIME_MS, false);
 }
 
 void GameWorld::UpdateMonsterState(int32 id, ECharacterStateType newState)
@@ -388,6 +388,17 @@ void GameWorld::UpdateMonsterState(int32 id, ECharacterStateType newState)
 	auto monster = GetMonsterByID(id);
 	if (!monster) return;
 	monster->ChangeState(newState);
+}
+
+void GameWorld::MonsterRespawn(int32 monsterId)
+{
+	auto monster = GetMonsterByID(monsterId);
+	if (!monster)
+	{
+		LOG_W("Invalid monster");
+		return;
+	}
+	monster->Respawn();
 }
 
 void GameWorld::HandleEarthQuakeImpact(const FVector& rockPos)
@@ -698,7 +709,11 @@ bool GameWorld::TransferToZone(int32 playerId, ZoneType newZone)
 void GameWorld::RespawnPlayer(int32 playerId, ZoneType newZone)
 {
 	auto player = GetPlayerByID(playerId);
-	if (!player) return;
+	if (!player)
+	{
+		LOG_W("Invalid player");
+		return;
+	}
 	ZoneType oldZone = player->GetZone();
 	if (oldZone == ZoneType::TUK)
 		LeaveGrid(playerId, player->GetPos());
@@ -710,6 +725,7 @@ void GameWorld::RespawnPlayer(int32 playerId, ZoneType newZone)
 	auto oldName = ENUM_NAME(oldZone);
 	auto newName = ENUM_NAME(newZone);
 	LOG_D("Respawn <{}> To <{}>", oldName, newName);
+	player->Restore();
 
 	ClearViewList(playerId);
 	ClearItems(playerId, oldZone);
@@ -720,13 +736,10 @@ void GameWorld::RespawnPlayer(int32 playerId, ZoneType newZone)
 		if (oldMap.empty()) _playersByZone.erase(oldZone);
 		_playersByZone[newZone][playerId] = player;
 	}
-	player->Restore();
 
 	RespawnPacket pkt(info);
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
 
-	ChangeZonePacket response(newZone, newPos);
-	SessionManager::GetInst().SendPacket(playerId, &response);
 	InitViewList(playerId, newZone);
 	AddItems(playerId, newZone);
 }
@@ -772,7 +785,7 @@ void GameWorld::ClearViewList(int32 playerId)
 	for (int32 mid : oldvlist)
 	{
 		auto other = GetCharacterByID(mid);
-		if (!other||!other->IsValid()) continue;
+		if (!other || !other->IsValid()) continue;
 		if (other->IsMonster())
 			player->RemoveMonsterFromViewList(other);
 		else
@@ -880,22 +893,31 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 
 void GameWorld::QuestSpawn(int32 playerId, QuestType quest)
 {
-	std::lock_guard lock(_mtMonZMap);
-	for (auto& [zone, monMap] : _monstersByZone)
+	auto player = GetPlayerByID(playerId);
+	if (!player)
 	{
-		for (auto& [id, mon] : monMap)
+		LOG_W("Invalid");
+		return;
+	}
+	{
+		std::lock_guard lock(_mtMonZMap);
+		for (auto& [zone, monMap] : _monstersByZone)
 		{
-			if (!mon) continue;
-			if (!mon->IsActive() && mon->GetQuestID() == quest)
+			for (auto& [id, mon] : monMap)
 			{
-				mon->Respawn();
-				auto type = static_cast<Type::EMonster>(mon->GetMonsterType());
-				auto name = ENUM_NAME(type);
-				if (name.empty()) name = "Unknown";
-				LOG_D("Spawn Monster = {}", name);
+				if (!mon) continue;
+				if (!mon->IsActive() && mon->GetQuestID() == quest)
+				{
+					mon->Respawn();
+					auto type = static_cast<Type::EMonster>(mon->GetMonsterType());
+					auto name = ENUM_NAME(type);
+					if (name.empty()) name = "Unknown";
+					LOG_D("Spawn Monster = {}", name);
+				}
 			}
 		}
 	}
+	AddAllToViewList(player, player->GetZone());
 }
 
 void GameWorld::BuyItem(int32 playerId, uint8 itemType, uint16 quantity)

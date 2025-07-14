@@ -47,7 +47,7 @@ public:
 	void CreateMonster();
 	void OnMonsterDead(int32 monsterId);
 	void UpdateMonsterState(int32 id, ECharacterStateType newState);
-
+	void MonsterRespawn(int32 monsterId);
 	//Tino
 	void HandleEarthQuakeImpact(const FVector& rockPos);
 

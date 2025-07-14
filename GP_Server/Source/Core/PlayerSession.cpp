@@ -12,7 +12,7 @@ void PlayerSession::DoRecv()
 void PlayerSession::DoSend(const Packet* packet)
 {
 	auto name = ENUM_NAME(static_cast<EPacketType>(packet->Header.PacketType));
-	LOG_D("{} PKT to [{}]", name, _id);
+	LOG_D(">>> {} PKT to [{}]", name, _id);
 
 	_sSocket->DoSend(packet);
 }

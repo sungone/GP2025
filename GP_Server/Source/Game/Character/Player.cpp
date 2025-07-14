@@ -15,12 +15,14 @@ void Player::Init()
 	_info.CollisionRadius = playerCollision;
 	_info.State = ECharacterStateType::STATE_IDLE;
 	ApplyLevelStats(_info.Stats.Level);
+	SetCurrentQuest(QuestType::CH2_CLEAR_E_BUILDING);
 #endif
 }
 
 void Player::LoadFromDB(const DBLoginResult& dbRes)
 {
 	SetInfo(dbRes.info);
+	SetCurrentQuest(GetInfo().CurrentQuest.QuestType);
 	for (auto& [itemID, itemTypeID] : dbRes.items)
 	{
 		LoadInventoryItem(std::make_shared<Item>(itemID, itemTypeID));
@@ -76,9 +78,8 @@ void Player::OnEnterGame()
 			LOG_W("Invalid quest datatable");
 			return;
 		}
-		SetCurrentQuest(questData->NextQuestID);
 
-		auto questpkt = QuestStartPacket(questData->NextQuestID);
+		auto questpkt = QuestStartPacket(questData->QuestID);
 		SessionManager::GetInst().SendPacket(_id, &questpkt);
 	}
 }
@@ -99,7 +100,7 @@ void Player::OnDamaged(float damage)
 
 void Player::UpdateViewList(std::shared_ptr<Character> other)
 {
-	if (!other||!other->IsValid())
+	if (!other || !other->IsValid())
 	{
 		LOG_D("Invalid character!");
 		return;
@@ -539,10 +540,21 @@ bool Player::SetCurrentQuest(QuestType quest)
 		LOG_W("Invalid quest ID");
 		return false;
 	}
-	_curQuestData = questData;
+
+	if (_curQuestData != nullptr)
+	{
+		if (_curQuestData->NextQuestID != quest)
+		{
+			LOG_D("is not next quest");
+			return false;
+		}
+	}
 
 	if (!StartQuest(quest))
 		return false;
+	LOG_D("Start Quest [{}] = '{} ", static_cast<uint8>(questData->QuestID), ENUM_NAME(quest));
+
+	_curQuestData = questData;
 	auto qpkt = QuestStartPacket(questData->QuestID);
 
 	SessionManager::GetInst().SendPacket(_id, &qpkt);
