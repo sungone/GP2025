@@ -50,7 +50,7 @@ public:
 	void EquipItem(int32 PlayerID, uint8 ItemType);
 	void UnequipItem(int32 PlayerID, uint8 ItemType);
 
-	void ChangeZone(ZoneType zone, const FVector& pos);
+	void ChangeZone(ZoneType OldZone, ZoneType NewZone, const FVector& RandomPos);
 	bool IsChangingZone() const { return bChangingZone; }
 	void SetChangeingZone(bool value) { bChangingZone = value; }
 

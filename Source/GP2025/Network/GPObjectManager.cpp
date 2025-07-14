@@ -865,16 +865,21 @@ void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType)
 	UE_LOG(LogTemp, Log, TEXT("[UnequipItem] Player [%d] successfully unequipped item: %s"), PlayerID, *ItemData->ItemName.ToString());
 }
 
-void UGPObjectManager::ChangeZone(ZoneType newZone, const FVector& RandomPos)
+void UGPObjectManager::ChangeZone(ZoneType oldZone, ZoneType newZone, const FVector& RandomPos)
 {
 	if (!MyPlayer)
 	{ 
 		SetChangeingZone(false);
 		return;
 	}
-	UE_LOG(LogTemp, Log, TEXT("Start Changing Zone [%d]"), MyPlayer->CharacterInfo.ID);
 
-	auto oldZone = MyPlayer->CharacterInfo.CurrentZone;
+	if (oldZone == newZone)
+	{
+		SetChangeingZone(false);
+		return;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Start Changing Zone [%d]"), MyPlayer->CharacterInfo.ID);
 	auto GetLevelName = [](ZoneType zone) -> FName {
 		switch (zone) {
 		case ZoneType::TIP: return "tip";

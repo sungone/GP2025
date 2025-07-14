@@ -372,6 +372,9 @@ void UGPNetworkManager::ProcessPacket()
 			{
 				EnterGamePacket* Pkt = reinterpret_cast<EnterGamePacket*>(RemainingData.GetData());
 				OnEnterGame.Broadcast();
+				FInfoData Data =  Pkt->PlayerInfo;
+				ObjectMgr->SetChangeingZone(true);
+				ObjectMgr->ChangeZone(ZoneType::TUK, Data.GetZone(), Data.Pos);
 				ObjectMgr->AddMyPlayer(Pkt->PlayerInfo);
 				break;
 			}
@@ -536,7 +539,8 @@ void UGPNetworkManager::ProcessPacket()
 			{
 				ObjectMgr->SetChangeingZone(true);
 				ChangeZonePacket* Pkt = reinterpret_cast<ChangeZonePacket*>(RemainingData.GetData());
-				ObjectMgr->ChangeZone(Pkt->TargetZone, Pkt->RandomPos);
+				ZoneType OldZone = MyPlayer->CharacterInfo.CurrentZone;
+				ObjectMgr->ChangeZone(OldZone, Pkt->TargetZone, Pkt->RandomPos);
 				break;
 			}
 			case EPacketType::S_RESPAWN:
