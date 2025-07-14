@@ -178,14 +178,13 @@ void DummyClient::SendRequestEnterGamePacket()
 bool DummyClient::SendMovePacket()
 {
 	if (last_move_time + 1s > high_resolution_clock::now()) return false;
-	last_move_time = high_resolution_clock::now();
-
 	auto now = NowMs();
 	_info.AddState(ECharacterStateType::STATE_WALK);
+	Move();
 	auto sendPos = _info.Pos;
-	sendPos.Z += 90.f;
 	MovePacket pkt(_playerId, sendPos, _info.State, now);
 	DoSend(&pkt);
+	last_move_time = high_resolution_clock::now();
 	return true;
 }
 
@@ -193,8 +192,9 @@ bool DummyClient::Move()
 {
 	static auto& nav = Map::GetInst().GetNavMesh(ZoneType::TUK);
 	FVector currentPos = _info.Pos;
+	currentPos.Z -= 90.f;
 	FVector newPos = nav.GetNearbyRandomPosition(currentPos);
+	newPos.Z += 90.f;
 	_info.SetLocationAndYaw(newPos);
-
 	return true;
 }

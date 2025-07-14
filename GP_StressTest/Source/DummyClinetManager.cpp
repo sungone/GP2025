@@ -105,7 +105,7 @@ void DummyClientManager::TestThread()
 		for (int i = 0;i < CLIENT_NUM;i++)
 		{
 			if (!_clients[i].IsConnected()) continue;
-			if (_clients[i].IsLogin() && _clients[i].Move())
+			if (_clients[i].IsLogin())
 				_clients[i].SendMovePacket();
 		}
 	}
@@ -134,7 +134,7 @@ void DummyClientManager::AdjustClientCount()
 			increasing = false;
 		}
 		if (100 > _active_clients) return;
-		if (ACCEPT_DELY * 20 > duration_cast<milliseconds>(duration).count()) return;
+		if (ACCEPT_DELY * 10 > duration_cast<milliseconds>(duration).count()) return;
 		last_connect_time = high_resolution_clock::now();
 		Disconnect(_client_to_close);
 		_client_to_close++;

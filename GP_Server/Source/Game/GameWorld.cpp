@@ -57,6 +57,8 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 	ZoneType startZone = ZoneType::TUK;
 
 	newPos = Map::GetInst().GetStartPos(startZone);
+	newPos.Z += 90.f;
+
 	player->UpdatePos(newPos);
 	int32 id = player->GetInfo().ID;
 	player->GetInfo().SetZone(startZone);

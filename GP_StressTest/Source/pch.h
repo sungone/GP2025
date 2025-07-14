@@ -40,7 +40,7 @@ inline long long NowMs()
 inline int delayTime;
 constexpr int DELAY_LIMIT = 100;
 constexpr int DELAY_LIMIT2 = 150;
-constexpr int ACCEPT_DELY = 50;
+constexpr int ACCEPT_DELY = 40;
 
 inline void UpdateDelay(int rtt_ms) {
 	if (delayTime < rtt_ms) delayTime++;
