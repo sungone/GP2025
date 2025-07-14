@@ -188,9 +188,9 @@ void UGPCharacterCombatHandler::HandleDeath()
 
 	float DeathAnimDuration = DeadMontage ? DeadMontage->GetPlayLength() : 2.0f;
 
-
 	if (AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(LocalOwner))
 	{
+
 	}
 	else
 	{
