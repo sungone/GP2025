@@ -114,7 +114,7 @@ struct ShopItemInfo
 	uint32 ItemID;
 	uint32 Price;
 };
-
+#define START_ZONE ZoneType::TUK
 struct FInfoData
 {
 	int32 ID{};
@@ -131,7 +131,7 @@ struct FInfoData
 	uint32 Gold;
 	FSkillState Skills;
 	FEquitState EquipState;
-	ZoneType CurrentZone{ ZoneType::TUK };
+	ZoneType CurrentZone{ START_ZONE };
 
 	QuestStatus CurrentQuest;
 
@@ -265,7 +265,7 @@ struct FInfoData
 	Type::EArmor  GetEquippedHelmet() const { return EquipState.Helmet; }
 	Type::EArmor  GetEquippedChest() const { return EquipState.Chest; }
 
-	
+
 	const QuestStatus& GetCurrentQuest() const { return CurrentQuest; }
 
 #ifdef SERVER_BUILD

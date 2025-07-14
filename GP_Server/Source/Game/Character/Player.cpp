@@ -99,9 +99,9 @@ void Player::OnDamaged(float damage)
 
 void Player::UpdateViewList(std::shared_ptr<Character> other)
 {
-	if (!other)
+	if (!other||!other->IsValid())
 	{
-		LOG_W("Invalid character!");
+		LOG_D("Invalid character!");
 		return;
 	}
 	if (GetZone() != other->GetZone())
@@ -549,7 +549,7 @@ bool Player::SetCurrentQuest(QuestType quest)
 	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, GetInfo());
 	SessionManager::GetInst().SendPacket(_id, &infopkt);
 	if (questData->Catagory == EQuestCategory::KILL)
-		GameWorld::GetInst().QuestSpawn(quest);
+		GameWorld::GetInst().QuestSpawn(_id, quest);
 	return true;
 }
 

@@ -21,6 +21,7 @@
 #include <fstream>
 #include <filesystem>
 #include <sstream>
+#include <magic_enum/magic_enum.hpp>
 
 #include "ServerDefine.h"
 #include "FVector.h"

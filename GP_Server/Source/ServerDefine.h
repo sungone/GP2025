@@ -23,6 +23,8 @@ const std::string BasePath = std::filesystem::current_path().string();
 const std::string MapDataPath = BasePath + "/MapJsonData/";
 const std::string DataTablePath = BasePath + "/DataTable/";
 
+#define ENUM_NAME(x) (magic_enum::enum_name(x).empty() ? "UnknownEnum" : std::string(magic_enum::enum_name(x)))
+
 enum class CompType
 {
 	RECV,

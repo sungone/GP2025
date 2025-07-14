@@ -66,19 +66,22 @@ public:
 	void SpawnWorldItem(WorldItem newItem, ZoneType zone);
 	void DespawnWorldItem(uint32 itemId, ZoneType zone);
 
+	void ClearItems(int32 playerId, ZoneType oldZone);
+	void AddItems(int32 playerId, ZoneType oldZone);
+	
 	// Etc
-	FVector TransferToZone(int32 playerId, ZoneType targetZone);
-	void RespawnPlayer(int32 playerId, ZoneType targetZone);
-	void UpdateViewList(std::shared_ptr<Player> player);
-	void ClearViewList(std::shared_ptr<Player> player);
-	void InitViewList(std::shared_ptr<Player> player, ZoneType zone);
+	bool TransferToZone(int32 playerId, ZoneType newZone);
+	void RespawnPlayer(int32 playerId, ZoneType newZone);
+	void UpdateViewList(int32 playerId);
+	void ClearViewList(int32 playerId);
+	void InitViewList(int32 playerId, ZoneType zone);
 	void AddAllToViewList(std::shared_ptr<Player> player, ZoneType zone);
 	bool IsCollisionDetected(ZoneType zone, const FVector& pos, float dist);
 
 	//Quest
 	void RequestQuest(int32 playerId, QuestType quest);
 	void CompleteQuest(int32 playerId, QuestType quest);
-	void QuestSpawn(QuestType quest);
+	void QuestSpawn(int32 playerId, QuestType quest);
 	void BuyItem(int32 playerId, uint8 itemType, uint16 quantity);
 	void SellItem(int32 playerId, uint32 itemId);
 
