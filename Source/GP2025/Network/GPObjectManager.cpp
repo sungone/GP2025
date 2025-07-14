@@ -867,19 +867,25 @@ void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType)
 
 void UGPObjectManager::ChangeZone(ZoneType oldZone, ZoneType newZone, const FVector& RandomPos)
 {
+	if (IsChangingZone())
+		return;
+
+	SetChangeingZone(true);
+
 	if (!MyPlayer)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed Changing Zone... Player is nullptr"));
 		SetChangeingZone(false);
 		return;
 	}
 
 	if (oldZone == newZone && oldZone == ZoneType::TUK)
 	{
+		MyPlayer->SetActorLocation(RandomPos);
 		SetChangeingZone(false);
 		return;
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Start Changing Zone [%d]"), MyPlayer->CharacterInfo.ID);
 	auto GetLevelName = [](ZoneType zone) -> FName {
 		switch (zone) {
 		case ZoneType::TIP: return "tip";
@@ -891,42 +897,49 @@ void UGPObjectManager::ChangeZone(ZoneType oldZone, ZoneType newZone, const FVec
 		}
 		};
 
-	FName NewLevel = GetLevelName(newZone);
 	FName OldLevel = GetLevelName(oldZone);
+	PendingLevelName = GetLevelName(newZone);
+	PendingZone = newZone;
+	PendingLocation = RandomPos;
 
-	if (!OldLevel.IsNone() && !NewLevel.IsNone())
+	UE_LOG(LogTemp, Log, TEXT("Start Changing Zone [%d] From %s to %s"),
+		MyPlayer->CharacterInfo.ID,
+		*OldLevel.ToString(), *PendingLevelName.ToString());
+
+	ULevelStreaming* StreamLevel = UGameplayStatics::GetStreamingLevel(this, OldLevel);
+	if (StreamLevel)
 	{
-		PendingZone = newZone;
-		PendingLocation = RandomPos;
-		PendingLevelName = NewLevel;
-
-		FLatentActionInfo LatentInfo;
-		LatentInfo.CallbackTarget = this;
-		LatentInfo.ExecutionFunction = FName("OnZoneLevelUnloaded");
-		LatentInfo.Linkage = 0;
-		LatentInfo.UUID = __LINE__;
-
-		UGameplayStatics::UnloadStreamLevel(this, OldLevel, LatentInfo, false);
+		StreamLevel->OnLevelUnloaded.RemoveAll(this);
+		StreamLevel->OnLevelUnloaded.AddDynamic(this, &UGPObjectManager::HandleLevelUnloaded);
+		StreamLevel->SetShouldBeLoaded(false);
+		StreamLevel->SetShouldBeVisible(false);
 	}
 	else
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Old level not found."));
 		SetChangeingZone(false);
-		UE_LOG(LogTemp, Log, TEXT("Failed Changing Zone [%d]"), MyPlayer->CharacterInfo.ID);
 	}
 }
 
-void UGPObjectManager::OnZoneLevelUnLoaded()
+void UGPObjectManager::HandleLevelUnloaded()
 {
-	FLatentActionInfo LatentInfo;
-	LatentInfo.CallbackTarget = this;
-	LatentInfo.ExecutionFunction = FName("OnZoneLevelLoaded");
-	LatentInfo.Linkage = 0;
-	LatentInfo.UUID = __LINE__;
+	ULevelStreaming* StreamLevel = UGameplayStatics::GetStreamingLevel(this, PendingLevelName);
+	if (StreamLevel)
+	{
+		StreamLevel->OnLevelLoaded.RemoveAll(this);
+		StreamLevel->OnLevelLoaded.AddDynamic(this, &UGPObjectManager::HandleLevelLoaded);
 
-	UGameplayStatics::LoadStreamLevel(this, PendingLevelName, true, true, LatentInfo);
+		StreamLevel->SetShouldBeLoaded(true);
+		StreamLevel->SetShouldBeVisible(true);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Pending level not found."));
+		SetChangeingZone(false);
+	}
 }
 
-void UGPObjectManager::OnZoneLevelLoaded()
+void UGPObjectManager::HandleLevelLoaded()
 {
 	MyPlayer->CharacterInfo.SetZone(PendingZone);
 	MyPlayer->SetActorLocation(PendingLocation);
@@ -935,38 +948,23 @@ void UGPObjectManager::OnZoneLevelLoaded()
 	{
 		MyPlayer->AppearanceHandler->SetupLeaderPose();
 	}
-	SetChangeingZone(false);
+
 	UE_LOG(LogTemp, Log, TEXT("End Changing Zone [%d]"), MyPlayer->CharacterInfo.ID);
+
+	SetChangeingZone(false);
 }
+
 
 void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
 {
-	// 리스폰 시 player 정보 갱신
-	UpdatePlayer(info);
-
+	ZoneType oldZone = MyPlayer->CharacterInfo.GetZone();
+	ZoneType newZone = info.GetZone();
+	const FVector& RandomPos = info.Pos;
 	if (MyPlayer)
 	{
 		MyPlayer->SetActorHiddenInGame(false);
-
 		MyPlayer->SetActorEnableCollision(true);
-
 		MyPlayer->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-
-		// 캐릭터 외형 정보 적용
-		//UGPCharacterControlData** FoundData = MyPlayer->CharacterTypeManager.Find(MyPlayer->CurrentCharacterType);
-		//if (FoundData)
-		//{
-		//	if (*FoundData)
-		//	{
-		//		UE_LOG(LogTemp, Log, TEXT("[Respawn] Found UGPCharacterControlData for type: %d"), (int32)MyPlayer->CurrentCharacterType);
-		//		if (MyPlayer->AppearanceHandler)
-		//		{
-		//			MyPlayer->AppearanceHandler->ApplyCharacterPartsFromData(*FoundData);
-		//			UE_LOG(LogTemp, Log, TEXT("[Respawn] ApplyCharacterPartsFromData() called"));
-		//		}
-		//	}
-		//}
-
 		MyPlayer->GetMesh()->SetVisibility(true, true);
 		MyPlayer->GetMesh()->SetHiddenInGame(false);
 
@@ -988,6 +986,8 @@ void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
 			UE_LOG(LogTemp, Warning, TEXT("[Respawn] OutsideSound is NULL or SoundManager is NULL."));
 		}
 	}
+	UpdatePlayer(info);
+	ChangeZone(oldZone, newZone, RandomPos);
 }
 
 void UGPObjectManager::OnQuestStart(QuestType Quest)

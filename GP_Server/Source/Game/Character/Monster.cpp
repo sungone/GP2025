@@ -441,13 +441,13 @@ void Monster::Chase()
 	_pathIdx = 1;
 	auto PlayerId = _target->GetInfo().ID;
 
-	// for test
+#ifdef _DEBUG
 	for (size_t i = 1; i < _movePath.size(); ++i)
 	{
 		DebugLinePacket dbgLine(_movePath[i - 1], _movePath[i], 3.f);
 		SessionManager::GetInst().SendPacket(PlayerId, &dbgLine);
 	}
-
+#endif
 	float distToTargetSq = (goal - start).LengthSquared();
 	float attackThresholdDistance = _info.AttackRadius * 0.9f;
 

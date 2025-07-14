@@ -55,9 +55,9 @@ public:
 	void SetChangeingZone(bool value) { bChangingZone = value; }
 
 	UFUNCTION()
-	void OnZoneLevelUnLoaded();
+	void HandleLevelUnloaded();
 	UFUNCTION()
-	void OnZoneLevelLoaded();
+	void HandleLevelLoaded();
 	void RespawnMyPlayer(const FInfoData& info);
 	
 	void OnQuestStart(QuestType Quest);

@@ -56,7 +56,7 @@ void SessionSocket::OnRecv(int32 id, int32 recvByte, ExpOver* expOver)
 				break;
 
 			auto name = ENUM_NAME(static_cast<EPacketType>(packet->Header.PacketType));
-			LOG_D("{} PKT from [{}]", name, id);
+			LOG_D("<<< {} PKT from [{}]", name, id);
 			auto sharedPacket = std::shared_ptr<Packet>(
 				reinterpret_cast<Packet*>(new uint8[packet->Header.PacketSize]),
 				[](Packet* p) { delete[] reinterpret_cast<uint8_t*>(p); }
