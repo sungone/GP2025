@@ -66,9 +66,12 @@ public:
 	void SpawnWorldItem(WorldItem newItem, ZoneType zone);
 	void DespawnWorldItem(uint32 itemId, ZoneType zone);
 
+	void ClearItems(int32 playerId, ZoneType oldZone);
+	void AddItems(int32 playerId, ZoneType oldZone);
+	
 	// Etc
-	FVector TransferToZone(int32 playerId, ZoneType targetZone);
-	void RespawnPlayer(int32 playerId, ZoneType targetZone);
+	FVector TransferToZone(int32 playerId, ZoneType newZone);
+	void RespawnPlayer(int32 playerId, ZoneType newZone);
 	void UpdateViewList(int32 playerId);
 	void ClearViewList(int32 playerId);
 	void InitViewList(int32 playerId, ZoneType zone);

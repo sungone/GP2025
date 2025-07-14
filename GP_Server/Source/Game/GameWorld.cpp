@@ -77,11 +77,12 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 	player->AddGold(10000);
 
 	auto& playerInfo = player->GetInfo();
-	UpdateViewList(playerId);
 
 	EnterGamePacket enterpkt(playerInfo);
 	SessionManager::GetInst().SendPacket(playerId, &enterpkt);
 	player->OnEnterGame();
+	InitViewList(playerId, startZone);
+	AddItems(playerId, startZone);
 }
 
 void GameWorld::PlayerLeaveGame(int32 id)
@@ -519,15 +520,57 @@ void GameWorld::DespawnWorldItem(uint32 itemId, ZoneType zone)
 	LOG_D("Item [{}] auto-despawned", itemId);
 }
 
+void GameWorld::ClearItems(int32 playerId, ZoneType oldZone)
+{
+	auto player = GetPlayerByID(playerId);
+	if (!player)
+	{
+		LOG_W("Invalid");
+		return;
+	}
+	std::lock_guard<std::mutex> lock(_mtItemZMap);
+	{
+		auto& itemList = _worldItemsByZone[oldZone];
+		for (auto item : itemList)
+		{
+			auto i = item->GetItemID();
+			auto pkt = ItemPkt::DespawnPacket(i);
+			SessionManager::GetInst().SendPacket(playerId, &pkt);
+		}
+	}
+}
+
+void GameWorld::AddItems(int32 playerId, ZoneType newZone)
+{
+	auto player = GetPlayerByID(playerId);
+	if (!player)
+	{
+		LOG_W("Invalid");
+		return;
+	}
+	std::lock_guard<std::mutex> lock(_mtItemZMap);
+	{
+		auto& itemList = _worldItemsByZone[newZone];
+		for (auto item : itemList)
+		{
+			auto i = item->GetItemID();
+			auto type = item->GetItemTypeID();
+			auto pos = item->GetPos();
+			auto pkt = ItemPkt::SpawnPacket(i, type, pos);
+			SessionManager::GetInst().SendPacket(playerId, &pkt);
+		}
+	}
+}
+
 void GameWorld::PickUpWorldItem(int32 playerId, uint32 itemId)
 {
-	std::lock_guard<std::mutex> lock(_mtItemZMap);
 	auto player = GetPlayerByID(playerId);
 	if (!player)
 	{
 		LOG_W("Invalid player in PickUpWorldItem");
 		return;
 	}
+	std::lock_guard<std::mutex> lock(_mtItemZMap);
 	auto zone = player->GetZone();
 	auto targetItem = FindWorldItemById(itemId, zone);
 	if (!targetItem)
@@ -600,13 +643,13 @@ void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
 	SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
 }
 
-FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
+FVector GameWorld::TransferToZone(int32 playerId, ZoneType newZone)
 {
 	auto player = GetPlayerByID(playerId);
 	if (!player) return FVector::ZeroVector;
 
 	uint32 playerLevel = player->GetInfo().GetLevel();
-	if (!Map::GetInst().IsZoneAccessible(targetZone, playerLevel))
+	if (!Map::GetInst().IsZoneAccessible(newZone, playerLevel))
 	{
 		LOG_D("Player [{}] cannot access due to level {}", playerId, playerLevel);
 		return FVector::ZeroVector;
@@ -615,7 +658,7 @@ FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
 	if (oldZone == ZoneType::TUK)
 		LeaveGrid(playerId, player->GetPos());
 
-	FVector newPos = Map::GetInst().GetRandomEntryPos(oldZone, targetZone);
+	FVector newPos = Map::GetInst().GetRandomEntryPos(oldZone, newZone);
 	if (newPos == FVector::ZeroVector)
 	{
 		LOG_W("EntryPos");
@@ -623,56 +666,60 @@ FVector GameWorld::TransferToZone(int32 playerId, ZoneType targetZone)
 	newPos.Z += 90.f;
 	LOG_D("({}, {}, {})", newPos.X, newPos.Y, newPos.Z);
 
-	player->GetInfo().SetZone(targetZone);
+	player->GetInfo().SetZone(newZone);
 	player->UpdatePos(newPos);
 
 	ClearViewList(playerId);
+	ClearItems(playerId, oldZone);
 
 	{
 		std::lock_guard lock(_mtPlayerZMap);
 		auto& oldMap = _playersByZone[oldZone];
 		oldMap.erase(playerId);
 		if (oldMap.empty()) _playersByZone.erase(oldZone);
-		_playersByZone[targetZone][playerId] = player;
+		_playersByZone[newZone][playerId] = player;
 	}
 
-	ChangeZonePacket response(targetZone, newPos);
+	ChangeZonePacket response(newZone, newPos);
 	SessionManager::GetInst().SendPacket(playerId, &response);
-	
-	InitViewList(playerId, targetZone);
+
+	InitViewList(playerId, newZone);
+	AddItems(playerId, newZone);
 }
 
-void GameWorld::RespawnPlayer(int32 playerId, ZoneType targetZone)
+void GameWorld::RespawnPlayer(int32 playerId, ZoneType newZone)
 {
 	auto player = GetPlayerByID(playerId);
 	if (!player) return;
 	ZoneType oldZone = player->GetZone();
 	if (oldZone == ZoneType::TUK)
 		LeaveGrid(playerId, player->GetPos());
-	FVector newPos = Map::GetInst().GetRandomPos(targetZone);
+	FVector newPos = Map::GetInst().GetRandomPos(newZone);
 	newPos.Z += 90.f;
 
-	player->GetInfo().SetZone(targetZone);
+	player->GetInfo().SetZone(newZone);
 	player->UpdatePos(newPos);
 
 	ClearViewList(playerId);
+	ClearItems(playerId, oldZone);
 	{
 		std::lock_guard lock(_mtPlayerZMap);
 		auto& oldMap = _playersByZone[oldZone];
 		oldMap.erase(playerId);
 		if (oldMap.empty()) _playersByZone.erase(oldZone);
-		_playersByZone[targetZone][playerId] = player;
+		_playersByZone[newZone][playerId] = player;
 	}
 	auto& info = player->GetInfo();
 	info.Stats.Hp = info.Stats.MaxHp;
 	info.State = ECharacterStateType::STATE_IDLE;
-	
+
 	RespawnPacket pkt(info);
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
 
-	ChangeZonePacket response(targetZone, newPos);
+	ChangeZonePacket response(newZone, newPos);
 	SessionManager::GetInst().SendPacket(playerId, &response);
-	InitViewList(playerId, targetZone);
+	InitViewList(playerId, newZone);
+	AddItems(playerId, newZone);
 }
 
 void GameWorld::UpdateViewList(int32 playerId)
