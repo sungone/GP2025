@@ -114,7 +114,7 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 						CachedPlayer->SoundManager->PlaySFX(CachedPlayer->SoundManager->TeleportationSound);
 					}
 
-					CachedPlayer->UIManager->GetInGameWidget()->PlayFadeOut(2.f);
+					CachedPlayer->UIManager->GetInGameWidget()->PlayFadeOut(1.f);
 					FTimerHandle TimerHandle;
 					GetWorld()->GetTimerManager().SetTimer(
 						TimerHandle,
@@ -127,7 +127,7 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 								ShowZoneChangeMessage(NewZone);
 							}
 						},
-						0.5f, false
+						0.25f, false
 					);
 
 					NetworkMgr->SendMyCompleteQuest(QuestType::CH2_ENTER_E_BUILDING);
@@ -157,7 +157,7 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 				CachedPlayer->SoundManager->PlaySFX(CachedPlayer->SoundManager->TeleportationSound);
 			}
 
-			CachedPlayer->UIManager->GetInGameWidget()->PlayFadeOut(1.5f);
+			CachedPlayer->UIManager->GetInGameWidget()->PlayFadeOut(1.f);
 			FTimerHandle TimerHandle;
 			GetWorld()->GetTimerManager().SetTimer(
 				TimerHandle,
@@ -170,7 +170,7 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 						ShowZoneChangeMessage(NewZone);
 					}
 				},
-				0.5f, false
+				0.25f, false
 			);
 		
 			UE_LOG(LogTemp, Log, TEXT("[LevelTransitionTrigger] SendMyZoneChangePacket Send Success"));
@@ -216,6 +216,7 @@ void AGPLevelTransitionTrigger::OnLevelAdded(ULevel* Level, UWorld* World)
 		}
 	}
 }
+
 void AGPLevelTransitionTrigger::ShowZoneChangeMessage(ZoneType NewZone)
 {
 	if (CachedPlayer && CachedPlayer->UIManager && CachedPlayer->UIManager->GetInGameWidget())
