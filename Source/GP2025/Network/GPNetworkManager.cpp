@@ -373,7 +373,6 @@ void UGPNetworkManager::ProcessPacket()
 				EnterGamePacket* Pkt = reinterpret_cast<EnterGamePacket*>(RemainingData.GetData());
 				OnEnterGame.Broadcast();
 				FInfoData Data =  Pkt->PlayerInfo;
-				ObjectMgr->SetChangeingZone(true);
 				ObjectMgr->ChangeZone(ZoneType::TUK, Data.GetZone(), Data.Pos);
 				ObjectMgr->AddMyPlayer(Pkt->PlayerInfo);
 				break;
@@ -537,7 +536,6 @@ void UGPNetworkManager::ProcessPacket()
 #pragma region Map
 			case EPacketType::S_CHANGE_ZONE:
 			{
-				ObjectMgr->SetChangeingZone(true);
 				ChangeZonePacket* Pkt = reinterpret_cast<ChangeZonePacket*>(RemainingData.GetData());
 				ZoneType OldZone = MyPlayer->CharacterInfo.CurrentZone;
 				ObjectMgr->ChangeZone(OldZone, Pkt->TargetZone, Pkt->RandomPos);
