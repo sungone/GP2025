@@ -490,7 +490,7 @@ void AGPCharacterNPC::ExitInteraction()
 	case ENPCType::JUICESHOP:
 		CloseShopUI();
 		break;
-
+		 
 	case ENPCType::PROFESSOR:
 	case ENPCType::STUDENT:
 	case ENPCType::SECURITY:

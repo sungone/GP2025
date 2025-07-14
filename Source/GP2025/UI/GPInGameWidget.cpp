@@ -149,7 +149,16 @@ void UGPInGameWidget::ShowLevelUpArrowTemporarily(UImage* ArrowImage, float Dura
     );
 }
 
+void UGPInGameWidget::PlayFadeOut(float Duration)
+{
+    if (!FadeOverlay || !FadeOutAnim) return;
 
+    // FadeOverlay 활성화
+    FadeOverlay->SetVisibility(ESlateVisibility::Visible);
+
+    // Duration 조절 (기본 애니메이션 길이가 1초라고 가정)
+    PlayAnimation(FadeOutAnim, 0.0f, 1, EUMGSequencePlayMode::Forward, 1.0f / Duration);
+}
 
 //void UGPInGameWidget::HideGameMessage()
 //{

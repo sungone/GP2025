@@ -114,9 +114,22 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 						CachedPlayer->SoundManager->PlaySFX(CachedPlayer->SoundManager->TeleportationSound);
 					}
 
-					// 아이템 있음 → 정상 입장 처리
-					NetworkMgr->SendMyZoneChangePacket(NewZone);
-					ShowZoneChangeMessage(NewZone);
+					CachedPlayer->UIManager->GetInGameWidget()->PlayFadeOut(2.f);
+					FTimerHandle TimerHandle;
+					GetWorld()->GetTimerManager().SetTimer(
+						TimerHandle,
+						[this, NewZone]()
+						{
+							UGPNetworkManager* NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+							if (NetworkMgr)
+							{
+								NetworkMgr->SendMyZoneChangePacket(NewZone);
+								ShowZoneChangeMessage(NewZone);
+							}
+						},
+						0.5f, false
+					);
+
 					NetworkMgr->SendMyCompleteQuest(QuestType::CH2_ENTER_E_BUILDING);
 					UE_LOG(LogTemp, Log, TEXT("[LevelTransitionTrigger] ZoneChange + QuestComplete Success"));
 				}
@@ -144,8 +157,22 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 				CachedPlayer->SoundManager->PlaySFX(CachedPlayer->SoundManager->TeleportationSound);
 			}
 
-			NetworkMgr->SendMyZoneChangePacket(NewZone);
-			ShowZoneChangeMessage(NewZone);
+			CachedPlayer->UIManager->GetInGameWidget()->PlayFadeOut(1.5f);
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(
+				TimerHandle,
+				[this, NewZone]()
+				{
+					UGPNetworkManager* NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+					if (NetworkMgr)
+					{
+						NetworkMgr->SendMyZoneChangePacket(NewZone);
+						ShowZoneChangeMessage(NewZone);
+					}
+				},
+				0.5f, false
+			);
+		
 			UE_LOG(LogTemp, Log, TEXT("[LevelTransitionTrigger] SendMyZoneChangePacket Send Success"));
 		}
 	}
@@ -227,6 +254,7 @@ void AGPLevelTransitionTrigger::ShowZoneChangeMessage(ZoneType NewZone)
 		UE_LOG(LogTemp, Warning, TEXT("[LevelTransitionTrigger] ShowZoneChangeMessage - CachedPlayer or UIManager is NULL"));
 	}
 }
+
 FRotator AGPLevelTransitionTrigger::GetRotationOffsetForLevel(const FString& LevelName) const
 {
 	if (LevelName == "tip")

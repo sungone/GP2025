@@ -109,4 +109,16 @@ public:
     class UWidgetAnimation* LevelUpArrow;
 
     void ShowLevelUpArrowTemporarily(UImage* ArrowImage, float Duration = 1.0f);
+
+
+// Fade Out / Fade In
+public :
+    UPROPERTY(meta = (BindWidget))
+    class UImage* FadeOverlay;
+
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
+    UWidgetAnimation* FadeOutAnim;
+
+
+    void PlayFadeOut(float Duration);
 };
