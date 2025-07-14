@@ -3,7 +3,7 @@
 #include "SessionManager.h"
 #include "GameWorld.h"
 #include "PacketManager.h"
-#include "magic_enum/magic_enum.hpp"
+
 void PlayerSession::DoRecv()
 {
 	_sSocket->DoRecv();

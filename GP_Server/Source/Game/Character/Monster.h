@@ -27,6 +27,7 @@ public:
 	void ScheduleUpdate();
 	int32 GetUpdateDelay();
 	void BroadcastStatus();
+	void Respawn();
 
 	void UpdateViewList(std::shared_ptr<Character> other) override;
 	void Update();
@@ -46,6 +47,8 @@ public:
 	bool IsBoss() { return _isBoss; }
 	void SetBoss(bool value) { _isBoss = value; }
 	bool IsActive() { return _active; }
+	virtual bool IsValid() override;
+
 	void SetActive(bool value) { _active = value; }
 
 	void SetQuestID(QuestType quest) { _questID = quest; }

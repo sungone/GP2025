@@ -69,6 +69,14 @@ void Monster::BroadcastStatus()
 
 	SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
 }
+
+void Monster::Respawn()
+{
+	SetActive(true);
+	Restore();
+	ScheduleUpdate();
+}
+
 void Monster::UpdateViewList(std::shared_ptr<Character> other)
 {
 	if (!other) { LOG_W("Invaild!"); return; }
@@ -97,14 +105,8 @@ void Monster::UpdateViewList(std::shared_ptr<Character> other)
 
 void Monster::Update()
 {
-	if (!IsActive()) return;
+	if (!IsValid()) return;
 	if (GetViewList().empty()) return;
-	if (IsDead())
-	{
-		GameWorld::GetInst().LeaveGrid(_id, GetPos());
-		SetActive(false);
-		return;
-	}
 
 	BehaviorTree();
 	_dirty = true;
@@ -158,6 +160,11 @@ void Monster::BehaviorTree()
 	}
 
 	LOG_W("Invalid state bits: {}", static_cast<uint32>(_info.State));
+}
+
+bool Monster::IsValid()
+{
+	return(Character::IsValid()) && _active;
 }
 
 void Monster::Attack()

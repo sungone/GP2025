@@ -116,3 +116,10 @@ bool Character::IsValid()
 
 	return true;
 }
+
+void Character::Restore()
+{
+	auto& info = GetInfo();
+	info.Stats.Hp = info.Stats.MaxHp;
+	info.State = ECharacterStateType::STATE_IDLE;
+}

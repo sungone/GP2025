@@ -696,8 +696,9 @@ void GameWorld::RespawnPlayer(int32 playerId, ZoneType newZone)
 		LeaveGrid(playerId, player->GetPos());
 	FVector newPos = Map::GetInst().GetRandomPos(newZone);
 	newPos.Z += 90.f;
+	auto info = player->GetInfo();
+	info.SetZone(newZone);
 
-	player->GetInfo().SetZone(newZone);
 	player->UpdatePos(newPos);
 
 	ClearViewList(playerId);
@@ -709,9 +710,7 @@ void GameWorld::RespawnPlayer(int32 playerId, ZoneType newZone)
 		if (oldMap.empty()) _playersByZone.erase(oldZone);
 		_playersByZone[newZone][playerId] = player;
 	}
-	auto& info = player->GetInfo();
-	info.Stats.Hp = info.Stats.MaxHp;
-	info.State = ECharacterStateType::STATE_IDLE;
+	player->Restore();
 
 	RespawnPacket pkt(info);
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
@@ -763,7 +762,7 @@ void GameWorld::ClearViewList(int32 playerId)
 	for (int32 mid : oldvlist)
 	{
 		auto other = GetCharacterByID(mid);
-		if (!other) continue;
+		if (!other||!other->IsValid()) continue;
 		if (other->IsMonster())
 			player->RemoveMonsterFromViewList(other);
 		else
@@ -793,7 +792,7 @@ void GameWorld::InitViewList(int32 playerId, ZoneType zone)
 	{
 		if (id == ownerId) continue;
 		auto target = GetCharacterByID(id);
-		if (!target) continue;
+		if (!target || !target->IsValid()) continue;
 		player->UpdateViewList(target);
 	}
 }
@@ -869,7 +868,7 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 		player->GiveQuestReward(quest);
 }
 
-void GameWorld::QuestSpawn(QuestType quest)
+void GameWorld::QuestSpawn(int32 playerId, QuestType quest)
 {
 	std::lock_guard lock(_mtMonZMap);
 	for (auto& [zone, monMap] : _monstersByZone)
@@ -879,7 +878,11 @@ void GameWorld::QuestSpawn(QuestType quest)
 			if (!mon) continue;
 			if (!mon->IsActive() && mon->GetQuestID() == quest)
 			{
-				mon->SetActive(true);
+				mon->Respawn();
+				auto type = static_cast<Type::EMonster>(mon->GetMonsterType());
+				auto name = std::string(magic_enum::enum_name(type));
+				if (name.empty()) name = "Unknown";
+				LOG_D("Spawn Monster = {}", name);
 			}
 		}
 	}

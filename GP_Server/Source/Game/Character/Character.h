@@ -37,6 +37,8 @@ public:
 		return _info.ID >= MAX_PLAYER;
 	}
 	virtual bool IsValid();
+	void Restore();
+
 public:
 	std::mutex _cLock;
 	std::mutex _vlLock;
