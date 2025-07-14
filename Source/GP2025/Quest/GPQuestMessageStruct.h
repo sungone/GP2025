@@ -15,4 +15,7 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
     FText QuestMessage;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
+    FText QuestTitle;
 };

@@ -24,19 +24,19 @@ void UGPQuestWidget::NativeConstruct()
 	}
 }
 
-void UGPQuestWidget::SetQuestDescription(const FString& Description)
+void UGPQuestWidget::SetQuestDescription(const FText& Description)
 {
 	if (QuestDescriptionText)
 	{
-		QuestDescriptionText->SetText(FText::FromString(Description));
+		QuestDescriptionText->SetText(Description);
 	}
 }
 
-void UGPQuestWidget::SetQuestTitle(const FString& Title)
+void UGPQuestWidget::SetQuestTitle(const FText& Title)
 {
 	if (QuestTypeText)
 	{
-		QuestTypeText->SetText(FText::FromString(Title));
+		QuestTypeText->SetText(Title);
 	}
 }
 

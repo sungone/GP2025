@@ -92,4 +92,7 @@ public :
 	void CloseQuestUI();
 
 	void ShowQuestNotAvailableMessage(AGPCharacterMyplayer* MyPlayer, const FText& Message);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Quest")
+	UDataTable* QuestMessageTable;
 };

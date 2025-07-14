@@ -17,8 +17,8 @@ public:
 	virtual void NativeConstruct() override;
 
 	// Setter Ãß°¡
-	void SetQuestDescription(const FString& Description);
-	void SetQuestTitle(const FString& Title);
+	void SetQuestDescription(const FText& Description);
+	void SetQuestTitle(const FText& Title);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	USoundBase* ClickSound;

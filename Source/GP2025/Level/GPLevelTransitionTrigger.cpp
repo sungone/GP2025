@@ -201,7 +201,7 @@ void AGPLevelTransitionTrigger::ShowZoneChangeMessage(ZoneType NewZone)
 			ZoneNameText = FText::FromString(TEXT("TIP"));
 			break;
 		case ZoneType::E:
-			ZoneNameText = FText::FromString(TEXT("E동 건물"));
+			ZoneNameText = FText::FromString(TEXT("E동 2층"));
 			break;
 		case ZoneType::GYM:
 			ZoneNameText = FText::FromString(TEXT("체육관"));
@@ -210,7 +210,7 @@ void AGPLevelTransitionTrigger::ShowZoneChangeMessage(ZoneType NewZone)
 			ZoneNameText = FText::FromString(TEXT("한국공학대학교"));
 			break;
 		case ZoneType::INDUSTY:
-			ZoneNameText = FText::FromString(TEXT("산융 건물"));
+			ZoneNameText = FText::FromString(TEXT("산융 지하실"));
 			break;
 		default:
 			ZoneNameText = FText::GetEmpty();

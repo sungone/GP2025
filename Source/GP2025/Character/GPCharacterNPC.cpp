@@ -10,6 +10,7 @@
 #include "Components/SphereComponent.h"
 #include "Character/Modules/GPMyplayerInputHandler.h"
 #include "Character/Modules/GPMyplayerCameraHandler.h"
+#include "Quest/GPQuestMessageStruct.h"
 #include "UI/GPQuestWidget.h"
 #include "Inventory/GPItemSlot.h"
 #include "Components/TextBlock.h"
@@ -39,6 +40,15 @@ AGPCharacterNPC::AGPCharacterNPC()
 	if (WidgetBP.Succeeded())
 	{
 		WBPClass_NPCInteraction = WidgetBP.Class;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UDataTable> QuestMessageTableObj(
+		TEXT("/Game/Quest/GPQuestMessageTable.GPQuestMessageTable")
+	);
+
+	if (QuestMessageTableObj.Succeeded())
+	{
+		QuestMessageTable = QuestMessageTableObj.Object;
 	}
 
 	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionSphere"));
@@ -242,25 +252,39 @@ void AGPCharacterNPC::OpenQuestUI(APlayerController* PlayerController)
 			if (UGPQuestWidget* LocalQuestWidget = Cast<UGPQuestWidget>(QuestWidget))
 			{
 				LocalQuestWidget->OwningNPC = this;
+
+				uint8 RowID = 40;
 				switch (NPCType)
 				{
 				case ENPCType::PROFESSOR:
-					LocalQuestWidget->SetQuestTitle(TEXT("교수님"));
-					LocalQuestWidget->SetQuestDescription(TEXT("문서를 가져왔나? 서버를 꺼야해"));
+					RowID = 41;
 					break;
 				case ENPCType::STUDENT:
-					LocalQuestWidget->SetQuestTitle(TEXT("학생 A"));
-					LocalQuestWidget->SetQuestDescription(TEXT("안녕하세요! 도와주실 수 있나요?"));
+					RowID = 42;
 					break;
 				case ENPCType::SECURITY:
-					LocalQuestWidget->SetQuestTitle(TEXT("경비 아저씨"));
-					LocalQuestWidget->SetQuestDescription(TEXT("벙커에 있는 몬스터가 열쇠를 가져갔어..."));
-					break;
-				default:
-					LocalQuestWidget->SetQuestTitle(TEXT("대화"));
-					LocalQuestWidget->SetQuestDescription(TEXT("이 NPC는 특별한 대화가 없습니다."));
+					RowID = 43;
 					break;
 				}
+
+				FText QuestTitle = FText::FromString(TEXT("대화"));
+				FText QuestDescription = FText::FromString(TEXT("이 NPC는 특별한 대화가 없습니다."));
+
+				if (QuestMessageTable)
+				{
+					const FName RowName = FName(*FString::FromInt(RowID));
+					FGPQuestMessageStruct* Row = QuestMessageTable->FindRow<FGPQuestMessageStruct>(RowName, TEXT("QuestWidgetLookup"));
+
+					if (Row)
+					{
+						QuestTitle = Row->QuestTitle;
+						QuestDescription = Row->QuestMessage;
+					}
+				}
+
+				LocalQuestWidget->SetQuestTitle(QuestTitle);
+				LocalQuestWidget->SetQuestDescription(QuestDescription);
+
 
 				// MyPlayer 바인딩 유지
 				if (AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0)))
@@ -367,6 +391,26 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 		return;
 	}
 
+	auto GetQuestNotAvailableMessage = [this]() -> FText
+		{
+			FText Message = FText::FromString(TEXT("퀘스트를 진행할 수 없습니다."));
+
+			if (QuestMessageTable)
+			{
+				FGPQuestMessageStruct* Row = QuestMessageTable->FindRow<FGPQuestMessageStruct>(
+					FName(TEXT("40")),
+					TEXT("QuestNotAvailableLookup")
+				);
+
+				if (Row)
+				{
+					Message = Row->QuestMessage;
+				}
+			}
+
+			return Message;
+		};
+
 	switch (NPCType)
 	{
 	case ENPCType::GSSHOP:
@@ -384,7 +428,7 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 	case ENPCType::PROFESSOR:
 		if (MyPlayer->CharacterInfo.CurrentQuest.QuestType != QuestType::CH3_RETURN_TO_TIP_WITH_DOC)
 		{
-			ShowQuestNotAvailableMessage(MyPlayer, FText::FromString(TEXT("퀘스트를 진행하세요")));
+			ShowQuestNotAvailableMessage(MyPlayer, GetQuestNotAvailableMessage());
 			return;
 		}
 
@@ -400,7 +444,7 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 	case ENPCType::STUDENT:
 		if (MyPlayer->CharacterInfo.CurrentQuest.QuestType != QuestType::CH1_TALK_TO_STUDENT_A)
 		{
-			ShowQuestNotAvailableMessage(MyPlayer, FText::FromString(TEXT("퀘스트를 진행하세요")));
+			ShowQuestNotAvailableMessage(MyPlayer, GetQuestNotAvailableMessage());
 			return;
 		}
 
@@ -416,7 +460,7 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 	case ENPCType::SECURITY:
 		if (MyPlayer->CharacterInfo.CurrentQuest.QuestType != QuestType::CH1_FIND_JANITOR)
 		{
-			ShowQuestNotAvailableMessage(MyPlayer, FText::FromString(TEXT("퀘스트를 진행하세요")));
+			ShowQuestNotAvailableMessage(MyPlayer, GetQuestNotAvailableMessage());
 			return;
 		}
 
