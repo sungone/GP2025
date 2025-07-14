@@ -238,21 +238,21 @@ void GameWorld::PlayerAttack(int32 playerId)
 
 			FVector basePos = monster->GetInfo().Pos;
 			auto mquest = monster->GetQuestID();
+			uint32 dropId = monster->GetDropItemId();
+			if (monster->IsBoss())
+			{
+				if (monster->HasDropItem())
+				{
+					FVector itemPos = basePos + RandomUtils::GetRandomOffset();
+					auto dropedItem = WorldItem(dropId, itemPos);
+					SpawnWorldItem(dropedItem, zone);
+				}
+
+				player->GiveQuestReward(mquest);
+			}
 			if (mquest != QuestType::NONE)
 			{
-				uint32 dropId = monster->GetDropItemId();
-				if (monster->IsBoss())
-				{
-					if (monster->HasDropItem())
-					{
-						FVector itemPos = basePos + RandomUtils::GetRandomOffset();
-						auto dropedItem = WorldItem(dropId, itemPos);
-						SpawnWorldItem(dropedItem, zone);
-					}
-
-					player->GiveQuestReward(mquest);
-				}
-				else if (mquest == QuestType::CH2_CLEAR_E_BUILDING || mquest == QuestType::CH3_CLEAR_SERVER_ROOM)
+				if (mquest == QuestType::CH2_CLEAR_E_BUILDING || mquest == QuestType::CH3_CLEAR_SERVER_ROOM)
 				{
 					_monsterCnt[zone]--;
 					if (_monsterCnt[zone] == 1)
@@ -378,9 +378,12 @@ void GameWorld::OnMonsterDead(int32 monsterId)
 	}
 
 	monster->SetActive(false);
-	TimerQueue::AddTimer([monsterId]() {
-		GameWorld::GetInst().MonsterRespawn(monsterId);
-		}, MONSTER_RESPAWN_TIME_MS, false);
+	if(monster->GetQuestID() == QuestType::NONE)
+	{
+		TimerQueue::AddTimer([monsterId]() {
+			GameWorld::GetInst().MonsterRespawn(monsterId);
+			}, MONSTER_RESPAWN_TIME_MS, false);
+	}
 }
 
 void GameWorld::UpdateMonsterState(int32 id, ECharacterStateType newState)

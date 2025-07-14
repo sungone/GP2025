@@ -444,7 +444,7 @@ void Monster::Chase()
 #ifdef _DEBUG
 	for (size_t i = 1; i < _movePath.size(); ++i)
 	{
-		DebugLinePacket dbgLine(_movePath[i - 1], _movePath[i], 3.f);
+		DebugLinePacket dbgLine(_movePath[i - 1], _movePath[i], 1.f);
 		SessionManager::GetInst().SendPacket(PlayerId, &dbgLine);
 	}
 #endif
