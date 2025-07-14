@@ -11,8 +11,7 @@ void PlayerSession::DoRecv()
 
 void PlayerSession::DoSend(const Packet* packet)
 {
-	auto name = std::string(magic_enum::enum_name(static_cast<EPacketType>(packet->Header.PacketType)));
-	if (name.empty()) name = "Unknown";
+	auto name = ENUM_NAME(static_cast<EPacketType>(packet->Header.PacketType));
 	LOG_D("{} PKT to [{}]", name, _id);
 
 	_sSocket->DoSend(packet);
@@ -55,7 +54,7 @@ void PlayerSession::EnterGame()
 
 void PlayerSession::Logout()
 {
-	if(IsLogin())
+	if (IsLogin())
 	{
 		//todo: 뷰리스트 제거
 		_state = SessionState::None;

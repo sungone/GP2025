@@ -868,12 +868,12 @@ void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType)
 void UGPObjectManager::ChangeZone(ZoneType oldZone, ZoneType newZone, const FVector& RandomPos)
 {
 	if (!MyPlayer)
-	{ 
+	{
 		SetChangeingZone(false);
 		return;
 	}
 
-	if (oldZone == newZone)
+	if (oldZone == newZone && oldZone == ZoneType::TUK)
 	{
 		SetChangeingZone(false);
 		return;

@@ -54,8 +54,7 @@ bool GameWorld::IsMonster(int32 id)
 void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 {
 	FVector newPos;
-	ZoneType startZone = ZoneType::TUK;
-
+	ZoneType startZone = START_ZONE;
 	newPos = Map::GetInst().GetStartPos(startZone);
 	newPos.Z += 90.f;
 
@@ -83,6 +82,8 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 	player->OnEnterGame();
 	InitViewList(playerId, startZone);
 	AddItems(playerId, startZone);
+
+	LOG_D("Enter Game [{}] - Zone <{}>", playerId, ENUM_NAME(startZone));
 }
 
 void GameWorld::PlayerLeaveGame(int32 id)
@@ -643,18 +644,23 @@ void GameWorld::UnequipInventoryItem(int32 playerId, uint32 itemId)
 	SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
 }
 
-FVector GameWorld::TransferToZone(int32 playerId, ZoneType newZone)
+bool GameWorld::TransferToZone(int32 playerId, ZoneType newZone)
 {
+	LOG_D("Try Transfer");
 	auto player = GetPlayerByID(playerId);
-	if (!player) return FVector::ZeroVector;
-
-	uint32 playerLevel = player->GetInfo().GetLevel();
+	if (!player) return false;
+	auto& info = player->GetInfo();
+	uint32 playerLevel = info.GetLevel();
 	if (!Map::GetInst().IsZoneAccessible(newZone, playerLevel))
 	{
 		LOG_D("Player [{}] cannot access due to level {}", playerId, playerLevel);
-		return FVector::ZeroVector;
+		return false;
 	}
 	ZoneType oldZone = player->GetZone();
+	auto oldName = ENUM_NAME(oldZone);
+	auto newName = ENUM_NAME(newZone);
+	LOG_D("Transfer <{}> To <{}>", oldName, newName);
+
 	if (oldZone == ZoneType::TUK)
 		LeaveGrid(playerId, player->GetPos());
 
@@ -662,11 +668,12 @@ FVector GameWorld::TransferToZone(int32 playerId, ZoneType newZone)
 	if (newPos == FVector::ZeroVector)
 	{
 		LOG_W("EntryPos");
+		return false;
 	}
 	newPos.Z += 90.f;
 	LOG_D("({}, {}, {})", newPos.X, newPos.Y, newPos.Z);
 
-	player->GetInfo().SetZone(newZone);
+	info.SetZone(newZone);
 	player->UpdatePos(newPos);
 
 	ClearViewList(playerId);
@@ -685,6 +692,7 @@ FVector GameWorld::TransferToZone(int32 playerId, ZoneType newZone)
 
 	InitViewList(playerId, newZone);
 	AddItems(playerId, newZone);
+	return true;
 }
 
 void GameWorld::RespawnPlayer(int32 playerId, ZoneType newZone)
@@ -696,10 +704,12 @@ void GameWorld::RespawnPlayer(int32 playerId, ZoneType newZone)
 		LeaveGrid(playerId, player->GetPos());
 	FVector newPos = Map::GetInst().GetRandomPos(newZone);
 	newPos.Z += 90.f;
-	auto info = player->GetInfo();
+	auto& info = player->GetInfo();
 	info.SetZone(newZone);
-
 	player->UpdatePos(newPos);
+	auto oldName = ENUM_NAME(oldZone);
+	auto newName = ENUM_NAME(newZone);
+	LOG_D("Respawn <{}> To <{}>", oldName, newName);
 
 	ClearViewList(playerId);
 	ClearItems(playerId, oldZone);
@@ -880,7 +890,7 @@ void GameWorld::QuestSpawn(int32 playerId, QuestType quest)
 			{
 				mon->Respawn();
 				auto type = static_cast<Type::EMonster>(mon->GetMonsterType());
-				auto name = std::string(magic_enum::enum_name(type));
+				auto name = ENUM_NAME(type);
 				if (name.empty()) name = "Unknown";
 				LOG_D("Spawn Monster = {}", name);
 			}

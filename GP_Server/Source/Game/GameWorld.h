@@ -70,7 +70,7 @@ public:
 	void AddItems(int32 playerId, ZoneType oldZone);
 	
 	// Etc
-	FVector TransferToZone(int32 playerId, ZoneType newZone);
+	bool TransferToZone(int32 playerId, ZoneType newZone);
 	void RespawnPlayer(int32 playerId, ZoneType newZone);
 	void UpdateViewList(int32 playerId);
 	void ClearViewList(int32 playerId);
