@@ -17,6 +17,7 @@ inline constexpr float GRID_CELL_SIZE = 2000.f;
 inline constexpr float playerCollision = 50.f;
 
 constexpr int ITEM_DISAPPEAR_TIME_MS = 60 * 1000;
+constexpr int MONSTER_RESPAWN_TIME_MS = 10 * 1000;
 
 const std::string BasePath = std::filesystem::current_path().string();
 

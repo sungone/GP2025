@@ -87,8 +87,8 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 
 	LOG_D("Enter Game [{}] - Zone <{}>", playerId, ENUM_NAME(startZone));
 	auto questData = player->GetCurrentQuestData();
-	if(questData->Catagory == EQuestCategory::KILL)
-	QuestSpawn(playerId, questData->QuestID);
+	if (questData->Catagory == EQuestCategory::KILL)
+		QuestSpawn(playerId, questData->QuestID);
 }
 
 void GameWorld::PlayerLeaveGame(int32 id)
@@ -361,31 +361,26 @@ void GameWorld::CreateMonster()
 
 void GameWorld::OnMonsterDead(int32 monsterId)
 {
-	std::lock_guard<std::mutex> lock(_mtMonZMap);
-	for (auto& [zone, zoneMap] : _monstersByZone)
+	auto monster = GetMonsterByID(monsterId);
+	auto pkt = MonsterDeadPacket(monsterId);
+	std::unordered_set<int32> viewList;
 	{
-		auto it = zoneMap.find(monsterId);
-		if (it == zoneMap.end()) continue;
-
-		auto monster = it->second;
-		auto pkt = MonsterDeadPacket(monsterId);
-		std::unordered_set<int32> viewList;
-		{
-			std::lock_guard lock(monster->_vlLock);
-			viewList = monster->GetViewList();
-		}
-		SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
-
-		for (auto& pid : viewList)
-		{
-			auto player = GetPlayerByID(pid);
-			if (!player) continue;
-			player->RemoveFromViewList(monsterId);
-		}
-
-		monster->SetActive(false);
-		break;
+		std::lock_guard lock(monster->_vlLock);
+		viewList = monster->GetViewList();
 	}
+	SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
+
+	for (auto& pid : viewList)
+	{
+		auto player = GetPlayerByID(pid);
+		if (!player) continue;
+		player->RemoveFromViewList(monsterId);
+	}
+
+	monster->SetActive(false);
+	TimerQueue::AddTimer([monsterId]() {
+		GameWorld::GetInst().MonsterRespawn(monsterId);
+		}, MONSTER_RESPAWN_TIME_MS, false);
 }
 
 void GameWorld::UpdateMonsterState(int32 id, ECharacterStateType newState)
@@ -393,6 +388,17 @@ void GameWorld::UpdateMonsterState(int32 id, ECharacterStateType newState)
 	auto monster = GetMonsterByID(id);
 	if (!monster) return;
 	monster->ChangeState(newState);
+}
+
+void GameWorld::MonsterRespawn(int32 monsterId)
+{
+	auto monster = GetMonsterByID(monsterId);
+	if (!monster)
+	{
+		LOG_W("Invalid monster");
+		return;
+	}
+	monster->Respawn();
 }
 
 void GameWorld::HandleEarthQuakeImpact(const FVector& rockPos)
