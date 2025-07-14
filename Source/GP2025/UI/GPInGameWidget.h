@@ -90,7 +90,6 @@ public:
     void LevelUpAnimation();
     int32 LastLevel = 1;
 
-
     UPROPERTY(meta = (BindWidgetAnim), Transient)
     UWidgetAnimation* HitByMonsterAnim;
 
@@ -109,7 +108,6 @@ public:
     class UWidgetAnimation* LevelUpArrow;
 
     void ShowLevelUpArrowTemporarily(UImage* ArrowImage, float Duration = 1.0f);
-
 
 // Fade Out / Fade In
 public :

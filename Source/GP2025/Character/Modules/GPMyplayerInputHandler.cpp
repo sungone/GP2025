@@ -296,17 +296,6 @@ void UGPMyplayerInputHandler::Refuse()
 void UGPMyplayerInputHandler::Interact()
 {
 	if (!Owner) return;
-
-	// NPC
-	if (AGPCharacterNPC* NPC = Cast<AGPCharacterNPC>(CurrentInteractionTarget))
-	{
-		NPC->CheckAndHandleInteraction(Cast<AGPCharacterMyplayer>(Owner));
-	}
-
-	if (Owner->SoundManager)
-	{
-		Owner->SoundManager->PlaySFX(Owner->SoundManager->ClickSound);
-	}
 }
 
 void UGPMyplayerInputHandler::EnterChatting()
@@ -327,7 +316,17 @@ void UGPMyplayerInputHandler::TakeInteraction()
 		1.f,
 		false
 	);
-	
+
+	// NPC
+	if (AGPCharacterNPC* NPC = Cast<AGPCharacterNPC>(CurrentInteractionTarget))
+	{
+		NPC->CheckAndHandleInteraction(Cast<AGPCharacterMyplayer>(Owner));
+
+		if (Owner->SoundManager)
+		{
+			Owner->SoundManager->PlaySFX(Owner->SoundManager->ClickSound);
+		}
+	}
 }
 
 void UGPMyplayerInputHandler::StartAiming()
