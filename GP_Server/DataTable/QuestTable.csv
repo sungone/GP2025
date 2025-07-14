@@ -1,5 +1,5 @@
 ﻿QuestID,Chapter,QuestName,Description,Category,ExpReward,GoldReward,RewarditemTypeID,NextQuestID
-1,1,CH1_TALK_TO_STUDENT_A,TIP에서 학생 A를 만난다,INTERACT,10,5,0,2
+1,1,CH1_TALK_TO_STUDENT_A,TIP에서 학생 A를 만난다,INTERACT,10,5,0,4
 2,1,CH1_GO_TO_E_FIRST,E동으로 이동한다,MOVE,10,5,0,3
 3,1,CH1_FIND_JANITOR,문이 잠겨있어 경비아저씨를 찾는다,INTERACT,10,5,0,4
 4,1,CH1_GO_TO_BUNKER,종합관 앞 벙커로 간다,MOVE,10,5,0,5
