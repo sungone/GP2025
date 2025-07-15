@@ -39,13 +39,17 @@ public:
 	uint8 EquipItem(uint32 itemId);
 	uint8 UnequipItem(uint32 itemId);
 
+	void CheckAndUpdateQuestProgress();
+
 	bool GiveQuestReward(QuestType quest);
 	bool SetCurrentQuest(QuestType quest);
 	bool IsQuestInProgress(QuestType quest) const;
 	bool StartQuest(QuestType newQuest);
 	bool CompleteCurrentQuest();
+
 	QuestType GetCurrentQuest() { return _curQuest.QuestType; }
 	const QuestData* GetCurrentQuestData() { return _curQuestData; }
+
 	void AddItemStats(const ItemStats& stats);
 	void RemoveItemStats(const ItemStats& stats);
 
@@ -82,6 +86,7 @@ public:
 		return false;
 	}
 	FStatData& GetStats() const { return _stats; }
+	bool IsInTutorialQuest() { return _bTutQuest; }
 private:
 	Type::EPlayer _playerType;
 	Inventory _inventory;
@@ -90,4 +95,5 @@ private:
 	uint32& _gold = _info.Gold;
 	QuestStatus& _curQuest = _info.CurrentQuest;
 	const QuestData* _curQuestData = nullptr;
+	bool _bTutQuest = false;
 };

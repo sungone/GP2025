@@ -100,8 +100,6 @@ struct FEquitState
 	Type::EArmor Chest = Type::EArmor::NONE;
 };
 
-//constexpr uint8 MAX_PLAYER_QUESTS = static_cast<uint8>(QuestType::MAX);
-constexpr uint8 MAX_PLAYER_QUESTS = 15;
 struct QuestStatus
 {
 	QuestType QuestType = QuestType::NONE;

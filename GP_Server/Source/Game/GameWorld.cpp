@@ -247,21 +247,19 @@ void GameWorld::PlayerAttack(int32 playerId)
 					auto dropedItem = WorldItem(dropId, itemPos);
 					SpawnWorldItem(dropedItem, zone);
 				}
-
-				player->GiveQuestReward(mquest);
+				player->CheckAndUpdateQuestProgress();
 			}
 			if (mquest != QuestType::NONE)
 			{
 				if (mquest == QuestType::CH2_CLEAR_E_BUILDING || mquest == QuestType::CH3_CLEAR_SERVER_ROOM)
 				{
+					//todo: 
+					// 다른플레이어가 죽은 몬스터 활성화 못하도록
+					// 몬스터에 퀘스트 진행중 체크 넣야할듯
 					_monsterCnt[zone]--;
-					if (_monsterCnt[zone] == 1)
-					{
-						player->GiveQuestReward(mquest);
-					}
 				}
+				player->CheckAndUpdateQuestProgress();
 			}
-
 			//todo: 아이템 드랍테이블로 스폰하자
 			{
 				FVector itemPos = basePos + RandomUtils::GetRandomOffset();
@@ -378,7 +376,7 @@ void GameWorld::OnMonsterDead(int32 monsterId)
 	}
 
 	monster->SetActive(false);
-	if(monster->GetQuestID() == QuestType::NONE)
+	if (monster->GetQuestID() == QuestType::NONE)
 	{
 		TimerQueue::AddTimer([monsterId]() {
 			GameWorld::GetInst().MonsterRespawn(monsterId);
@@ -890,8 +888,8 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 		LOG_W("Invalid");
 		return;
 	}
-	if (player->IsQuestInProgress(quest))
-		player->GiveQuestReward(quest);
+	if(player->IsQuestInProgress(quest))
+		player->CheckAndUpdateQuestProgress();
 }
 
 void GameWorld::QuestSpawn(int32 playerId, QuestType quest)
@@ -912,14 +910,11 @@ void GameWorld::QuestSpawn(int32 playerId, QuestType quest)
 				if (!mon->IsActive() && mon->GetQuestID() == quest)
 				{
 					mon->Respawn();
-					auto type = static_cast<Type::EMonster>(mon->GetMonsterType());
-					auto name = ENUM_NAME(type);
-					if (name.empty()) name = "Unknown";
-					LOG_D("Spawn Monster = {}", name);
 				}
 			}
 		}
 	}
+
 	AddAllToViewList(player, player->GetZone());
 }
 

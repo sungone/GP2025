@@ -199,6 +199,12 @@ bool Player::BuyItem(std::shared_ptr<Item> item, uint32 price, uint16 quantity)
 		LOG_D("Not enough gold");
 		return false;
 	}
+	auto type = item->GetItemCategory();
+	if (IsInTutorialQuest() && type == EItemCategory::Weapon)
+	{
+		CheckAndUpdateQuestProgress();
+	}
+
 	return AddInventoryItem(item);
 }
 
@@ -447,10 +453,10 @@ void Player::UseItem(uint32 itemId)
 	if (!targetItem) return;
 
 	const ItemStats& stats = targetItem->GetStats();
-	const EAbilityType ability = targetItem->GetAbilityType();
+	const EAbilityType type = targetItem->GetAbilityType();
 	const float value = targetItem->GetAbilityValue();
 
-	switch (ability)
+	switch (type)
 	{
 	case EAbilityType::Recove:
 		_stats.Hp = std::min(_stats.Hp + value, _stats.MaxHp);
@@ -470,6 +476,12 @@ void Player::UseItem(uint32 itemId)
 	auto pkt = ItemPkt::ItemUsedPacket(itemId, _info);
 	SessionManager::GetInst().SendPacket(_id, &pkt);
 	_inventory.RemoveItem(itemId);
+
+	if (IsInTutorialQuest() && type == EAbilityType::Recove)
+	{
+		CheckAndUpdateQuestProgress();
+	}
+
 }
 
 uint8 Player::EquipItem(uint32 itemId)
@@ -482,6 +494,12 @@ uint8 Player::EquipItem(uint32 itemId)
 
 	uint8 itemType = targetItem->GetItemTypeID();
 	_info.EquipItemByType(itemType);
+
+	auto type = targetItem->GetItemCategory();
+	if (IsInTutorialQuest()&& type == EItemCategory::Weapon)
+	{
+		CheckAndUpdateQuestProgress();
+	}
 
 	return itemType;
 }
@@ -499,6 +517,58 @@ uint8 Player::UnequipItem(uint32 itemId)
 
 	return itemType;
 }
+
+void Player::CheckAndUpdateQuestProgress()
+{
+	auto questData = GetCurrentQuestData();
+	QuestType quest = GetCurrentQuest();
+	if (!IsQuestInProgress(quest))
+		return;
+
+	bool res = false;
+	switch (questData->Catagory)
+	{
+	case EQuestCategory::INTERACT:
+		res = true;
+		if (quest == QuestType::TUT_COMPLETE)
+		{
+			_bTutQuest = false;
+		}
+		break;
+	case EQuestCategory::MOVE:
+	{
+		if (quest == QuestType::TUT_MOVE)
+		{
+			//클라에서 트리거로 처리
+			res = true;
+		}
+		break;
+	}
+	case EQuestCategory::KILL:
+	{
+		if (quest == QuestType::CH2_CLEAR_E_BUILDING || quest == QuestType::CH3_CLEAR_SERVER_ROOM)
+		{
+			int32 mcnt = GameWorld::GetInst().GetMonsterCnt(GetZone());
+			if (mcnt == 1)
+			{
+				res = true;
+			}
+		}
+		else if (quest == QuestType::TUT_KILL_ONE_MON)
+		{
+			res = true;
+		}
+		break;
+	}
+	case EQuestCategory::ITEM:
+		res = true;
+		break;
+	}
+
+	if (res)
+		GiveQuestReward(quest);
+}
+
 
 bool Player::GiveQuestReward(QuestType quest)
 {
@@ -529,6 +599,7 @@ bool Player::GiveQuestReward(QuestType quest)
 
 	auto pkt = QuestRewardPacket(quest, res, exp, gold);
 	SessionManager::GetInst().SendPacket(_id, &pkt);
+	questData->RewarditemType();
 	return true;
 }
 
@@ -561,7 +632,9 @@ bool Player::SetCurrentQuest(QuestType quest)
 	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, GetInfo());
 	SessionManager::GetInst().SendPacket(_id, &infopkt);
 	if (questData->Catagory == EQuestCategory::KILL)
+	{
 		GameWorld::GetInst().QuestSpawn(_id, quest);
+	}
 	return true;
 }
 

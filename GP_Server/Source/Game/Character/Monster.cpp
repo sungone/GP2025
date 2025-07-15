@@ -72,6 +72,11 @@ void Monster::BroadcastStatus()
 
 void Monster::Respawn()
 {
+	auto type = GetMonsterType();
+	auto name = ENUM_NAME(type);
+	if (name.empty()) name = "Unknown";
+	LOG_D("Respawn Monster = {}", name);
+
 	SetActive(true);
 	Restore();
 	ScheduleUpdate();
