@@ -88,12 +88,28 @@ enum EPacketType : uint8
 	C_CHAT_SEND,
 	S_CHAT_BROADCAST,
 
+	//--- Friend ---
+	C_FRIEND_REQUEST,
+	C_FRIEND_ACCEPT,
+	C_FRIEND_REJECT,
+	C_FRIEND_REMOVE,
+	S_FRIEND_OPERATION_RESULT,
+	S_FRIEND_LIST,
+	S_ADD_FRIEND,
+	S_REMOVE_FRIEND,
 
 	//for test
 	S_DEBUG_TRIANGLE,
 	S_DEBUG_LINE
 };
 
+enum class EFriendOpType : uint8
+{
+	Request,
+	Accept,
+	Reject,
+	Remove
+};
 
 using ECharacterType = uint8;
 

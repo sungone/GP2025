@@ -82,6 +82,24 @@ void Player::OnEnterGame()
 		auto questpkt = QuestStartPacket(questData->QuestID);
 		SessionManager::GetInst().SendPacket(_id, &questpkt);
 	}
+#ifndef DEBUG
+	auto session = SessionManager::GetInst().GetSession(_id);
+	if (!session)
+	{
+		LOG_W("Invalid");
+		return;
+	}
+	auto dbId = session->GetUserDBID();
+	auto ret = DBManager::GetInst().GetFriendList(dbId);
+	DBResultCode code = ret.first;
+	if (code == DBResultCode::SUCCESS)
+	{
+		auto friends = ret.second;
+		FriendListPacket pkt(static_cast<uint8>(friends.size()), friends.data());
+		SessionManager::GetInst().SendPacket(_id, &pkt);
+	}
+#endif // DEBUG
+
 }
 
 void Player::OnDamaged(float damage)

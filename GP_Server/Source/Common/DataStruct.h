@@ -12,9 +12,13 @@ enum class DBResultCode : int32
 	NOT_ENOUGH_GOLD = -10,
 	ITEM_NOT_FOUND = -11,
 
+	// Friend
+	FRIEND_ALREADY_REQUESTED = -20,
+	FRIEND_ALREADY_ADDED = -21,
+	FRIEND_SELF_REQUEST = -22,
+	FRIEND_USER_NOT_FOUND = -23,
 
 	DB_ERROR = -99
-
 };
 
 #pragma pack(push,1)
@@ -111,6 +115,39 @@ struct ShopItemInfo
 	uint8  ItemType;
 	uint32 ItemID;
 	uint32 Price;
+};
+
+struct FFriendInfo
+{
+	uint32 Id;
+	char NickName[NICKNAME_LEN];
+	uint32 Level;
+	bool bAccepted;
+
+	const char* GetName() const { return NickName; }
+#ifdef SERVER_BUILD
+	void SetName(std::wstring InNick)
+	{
+		if (InNick.empty()) {
+			SAFE_STRCPY(NickName, "None", NICKNAME_LEN - 1);
+			NickName[NICKNAME_LEN - 1] = '\0';
+			return;
+		}
+
+		int utf8Length = WideCharToMultiByte(CP_UTF8, 0, InNick.c_str(), -1, nullptr, 0, nullptr, nullptr);
+		if (utf8Length <= 0) {
+			SAFE_STRCPY(NickName, "Invalid", NICKNAME_LEN - 1);
+			NickName[NICKNAME_LEN - 1] = '\0';
+			return;
+		}
+
+		std::string utf8Str(utf8Length, 0);
+		WideCharToMultiByte(CP_UTF8, 0, InNick.c_str(), -1, &utf8Str[0], utf8Length, nullptr, nullptr);
+
+		SAFE_STRCPY(NickName, utf8Str.c_str(), NICKNAME_LEN - 1);
+		NickName[NICKNAME_LEN - 1] = '\0';
+	}
+#endif
 };
 #define START_ZONE ZoneType::TUK
 struct FInfoData
