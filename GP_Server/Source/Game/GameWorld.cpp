@@ -86,6 +86,7 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 
 	LOG_D("Enter Game [{}] - Zone <{}>", playerId, ENUM_NAME(startZone));
 	auto questData = player->GetCurrentQuestData();
+	if (!questData) return;
 	if (questData->Catagory == EQuestCategory::KILL)
 		QuestSpawn(playerId, questData->QuestID);
 }
@@ -886,7 +887,7 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 		LOG_W("Invalid");
 		return;
 	}
-	if(player->IsQuestInProgress(quest))
+	if (player->IsQuestInProgress(quest))
 	{
 		const QuestData* questData = QuestTable::GetInst().GetQuest(quest);
 		if (!questData)

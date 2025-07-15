@@ -6,6 +6,7 @@ struct DBLoginResult
 	uint32 dbId = 0;
 	FInfoData info;
 	std::vector<std::pair<uint32, uint8>> items;
+	std::vector<FFriendInfo> friends;
 };
 
 
