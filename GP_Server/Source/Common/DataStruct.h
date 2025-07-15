@@ -123,7 +123,7 @@ struct FFriendInfo
 	char NickName[NICKNAME_LEN];
 	uint32 Level;
 	bool bAccepted;
-
+	bool isOnline = false;
 	const char* GetName() const { return NickName; }
 #ifdef SERVER_BUILD
 	void SetName(std::wstring InNick)

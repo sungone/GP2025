@@ -31,7 +31,7 @@ void Player::LoadFromDB(const DBLoginResult& dbRes)
 	{
 		LoadInventoryItem(std::make_shared<Item>(itemID, itemTypeID));
 	}
-
+	_friends = dbRes.friends;
 }
 
 void Player::SaveToDB(uint32 dbId)
