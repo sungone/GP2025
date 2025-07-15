@@ -135,7 +135,30 @@ void UGPFriendBox::OnAcceptButtonClicked()
 
 void UGPFriendBox::OnRejectButtonClicked()
 {
-	// TODO: NetMgr ¡æ SendFriendRejectPacket
+	if (SelectedFriendUserID < 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[FriendBox] No friend selected for rejection."));
+		return;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("[FriendBox] Rejecting friend request from UserID: %d"), SelectedFriendUserID);
+
+	AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (MyPlayer && MyPlayer->NetMgr)
+	{
+		MyPlayer->NetMgr->SendMyFriendReject(SelectedFriendUserID);
+	}
+
+	if (RequestedFriendWidget)
+	{
+		UGPFriendList* RequestList = Cast<UGPFriendList>(RequestedFriendWidget);
+		if (RequestList)
+		{
+			RequestList->RemoveFriendEntry(SelectedFriendUserID);
+		}
+	}
+
+	SelectedFriendUserID = -1;
 	UE_LOG(LogTemp, Log, TEXT("[FriendBox] RejectButton clicked ¡æ Send FriendRejectPacket to server."));
 }
 
