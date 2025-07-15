@@ -645,8 +645,6 @@ void UGPNetworkManager::ProcessPacket()
 					FFriendInfo& Info = Pkt->Friends[i];
 					FString Name = Info.GetName();
 					FString Status = Info.bAccepted ? TEXT("친구") : TEXT("요청중");
-
-
 					UE_LOG(LogTemp, Log, TEXT("- %s (Lv.%d) [%s]"), *Name, Info.Level, *Status);
 				}
 				break;
@@ -654,7 +652,8 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_ADD_FRIEND:
 			{
 				AddFriendPacket* Pkt = reinterpret_cast<AddFriendPacket*>(RemainingData.GetData());
-				UE_LOG(LogTemp, Log, TEXT("친구 추가: %s"), *Pkt->NewFriend.GetName());
+				FString Name = Pkt->NewFriend.GetName();
+				UE_LOG(LogTemp, Log, TEXT("친구 추가: %s"), *Name);
 				break;
 			}
 			case EPacketType::S_REMOVE_FRIEND:
