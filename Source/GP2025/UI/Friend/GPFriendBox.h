@@ -97,7 +97,7 @@ public:
 
 
 	UPROPERTY()
-	uint32 SelectedFriendUserID = -1;
+	uint32 SelectedFriendUserID = MAX_uint32;
 
 
 	void OnFriendAccepted(

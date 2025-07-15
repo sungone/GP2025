@@ -165,12 +165,12 @@ int SessionManager::GenerateId()
 	return id;
 }
 
-bool SessionManager::IsOnline(uint32 userId)
+int32 SessionManager::GetOnlineSessionId(uint32 dbid)
 {
 	for (auto& session : _sessions)
 	{
-		if (session && session->IsLogin() && session->GetUserDBID() == userId)
-			return true;
+		if (session && session->IsLogin() && session->GetUserDBID() == dbid)
+			return session->GetId();
 	}
-	return false;
+	return -1;
 }
