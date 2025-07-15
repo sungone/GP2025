@@ -247,7 +247,6 @@ void GameWorld::PlayerAttack(int32 playerId)
 					auto dropedItem = WorldItem(dropId, itemPos);
 					SpawnWorldItem(dropedItem, zone);
 				}
-				player->CheckAndUpdateQuestProgress();
 			}
 			if (mquest != QuestType::NONE)
 			{
@@ -258,7 +257,7 @@ void GameWorld::PlayerAttack(int32 playerId)
 					// 몬스터에 퀘스트 진행중 체크 넣야할듯
 					_monsterCnt[zone]--;
 				}
-				player->CheckAndUpdateQuestProgress();
+				player->CheckAndUpdateQuestProgress(EQuestCategory::KILL);
 			}
 			//todo: 아이템 드랍테이블로 스폰하자
 			{
@@ -889,7 +888,16 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 		return;
 	}
 	if(player->IsQuestInProgress(quest))
-		player->CheckAndUpdateQuestProgress();
+	{
+		const QuestData* questData = QuestTable::GetInst().GetQuest(quest);
+		if (!questData)
+		{
+			LOG_W("Invalid quest ID");
+			return;
+		}
+		auto type = questData->Catagory;
+		player->CheckAndUpdateQuestProgress(type);
+	}
 }
 
 void GameWorld::QuestSpawn(int32 playerId, QuestType quest)

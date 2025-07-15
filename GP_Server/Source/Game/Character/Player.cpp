@@ -202,7 +202,7 @@ bool Player::BuyItem(std::shared_ptr<Item> item, uint32 price, uint16 quantity)
 	auto type = item->GetItemCategory();
 	if (IsInTutorialQuest() && type == EItemCategory::Weapon)
 	{
-		CheckAndUpdateQuestProgress();
+		CheckAndUpdateQuestProgress(EQuestCategory::ITEM);
 	}
 
 	return AddInventoryItem(item);
@@ -479,7 +479,7 @@ void Player::UseItem(uint32 itemId)
 
 	if (IsInTutorialQuest() && type == EAbilityType::Recove)
 	{
-		CheckAndUpdateQuestProgress();
+		CheckAndUpdateQuestProgress(EQuestCategory::ITEM);
 	}
 
 }
@@ -498,7 +498,7 @@ uint8 Player::EquipItem(uint32 itemId)
 	auto type = targetItem->GetItemCategory();
 	if (IsInTutorialQuest() && type == EItemCategory::Weapon)
 	{
-		CheckAndUpdateQuestProgress();
+		CheckAndUpdateQuestProgress(EQuestCategory::ITEM);
 	}
 
 	return itemType;
@@ -518,15 +518,19 @@ uint8 Player::UnequipItem(uint32 itemId)
 	return itemType;
 }
 
-void Player::CheckAndUpdateQuestProgress()
+void Player::CheckAndUpdateQuestProgress(EQuestCategory type)
 {
 	auto questData = GetCurrentQuestData();
 	QuestType quest = GetCurrentQuest();
 	if (!IsQuestInProgress(quest))
 		return;
+	if (type != questData->Catagory)
+	{
+		return;
+	}
 
 	bool res = false;
-	switch (questData->Catagory)
+	switch (type)
 	{
 	case EQuestCategory::INTERACT:
 		res = true;
