@@ -50,7 +50,7 @@ public:
 	void RunGameJobs() {
 		_gameJobQueue.Run();
 	}
-
+	uint32 GetUserDBID() { return _dbId; };
 private:
 	JobQueue _gameJobQueue;
 	int32 _id = -1;

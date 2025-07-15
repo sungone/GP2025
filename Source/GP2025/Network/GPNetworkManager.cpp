@@ -297,6 +297,31 @@ void UGPNetworkManager::SendMyRemoveStatePacket(uint32 State)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
+void UGPNetworkManager::SendFriendRequest(const FString& TargetNickName)
+{
+	FTCHARToUTF8 NameUtf8(*TargetNickName);
+	FriendRequestPacket Packet(NameUtf8.Get());
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendFriendAccept(int32 RequesterUserID)
+{
+	FriendAcceptPacket Packet(RequesterUserID);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendFriendReject(int32 RequesterUserID)
+{
+	FriendRejectPacket Packet(RequesterUserID);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendFriendRemove(int32 TargetUserID)
+{
+	FriendRemovePacket Packet(TargetUserID);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
 void UGPNetworkManager::ReceiveData()
 {
 	uint32 DataSize;
@@ -595,6 +620,33 @@ void UGPNetworkManager::ProcessPacket()
 				break;
 			}
 #pragma endregion
+#pragma region Friend
+			case EPacketType::S_FRIEND_OPERATION_RESULT:
+			{
+				FriendOperationResultPacket* Pkt = reinterpret_cast<FriendOperationResultPacket*>(RemainingData.GetData());
+				DBResultCode Code = Pkt->ResultCode;
+				EFriendOpType OpType =  Pkt->OperationType;
+
+				break;
+			}
+			case EPacketType::S_FRIEND_LIST:
+			{
+				FriendListPacket* Pkt = reinterpret_cast<FriendListPacket*>(RemainingData.GetData());
+				uint8 Count = Pkt->FriendCount;
+
+				UE_LOG(LogTemp, Log, TEXT("== Friend List =="));
+				for (int i = 0; i < Count; ++i)
+				{
+					FFriendInfo& Info = Pkt->Friends[i];
+					FString Name = Info.GetName();
+					FString Status = Info.bAccepted ? TEXT("친구") : TEXT("요청중");
+
+
+					UE_LOG(LogTemp, Log, TEXT("- %s (Lv.%d) [%s]"), *Name, Info.Level, *Status);
+				}
+				break;
+			}
+#pragma endregion
 #pragma region Test
 			case EPacketType::S_DEBUG_TRIANGLE:
 			{
@@ -627,3 +679,26 @@ void UGPNetworkManager::ProcessPacket()
 	}
 }
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReceiveChat, const FString&, Sender, const FString&, Message)
+{
+}
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnBuyItemResult, bool, bSuccess, uint32, CurrentGold, const FString&, Message)
+{
+}
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnSellItemResult, bool, bSuccess, uint32, CurrentGold, const FString&, Message)
+{
+}
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUserAuthFailed, FString, Message)
+{
+}
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterLobby)
+{
+}
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterGame)
+{
+}

@@ -93,7 +93,7 @@ enum EPacketType : uint8
 	C_FRIEND_ACCEPT,
 	C_FRIEND_REJECT,
 	C_FRIEND_REMOVE,
-	S_FRIEND_REQUEST_RESULT,
+	S_FRIEND_OPERATION_RESULT,
 	S_FRIEND_LIST,
 
 	//for test
@@ -101,6 +101,13 @@ enum EPacketType : uint8
 	S_DEBUG_LINE
 };
 
+enum class EFriendOpType : uint8
+{
+	Request,
+	Accept,
+	Reject,
+	Remove
+};
 
 using ECharacterType = uint8;
 

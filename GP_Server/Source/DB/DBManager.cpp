@@ -383,7 +383,9 @@ std::pair<DBResultCode, std::optional<FFriendInfo>> DBManager::AcceptFriendReque
 
 		FFriendInfo info;
 		info.Id = static_cast<uint32>(row[0].get<int>());
-		info.Nickname = row[1].get<std::string>();
+
+		std::string nickname = row[1].get<std::string>();
+		info.SetName(ConvertToWString(nickname));
 		info.Level = static_cast<uint32>(row[2].get<int>());
 		info.bAccepted = true;
 
@@ -470,7 +472,8 @@ std::pair<DBResultCode, std::vector<FFriendInfo>> DBManager::GetFriendList(uint3
 		{
 			FFriendInfo info;
 			info.Id = static_cast<uint32>(row[0].get<int>());
-			info.Nickname = row[1].get<std::string>();
+			std::string nickname = row[1].get<std::string>();
+			info.SetName(ConvertToWString(nickname));
 			info.Level = static_cast<uint32>(row[2].get<int>());
 			info.bAccepted = row[3].get<int>() == 1;
 
@@ -484,5 +487,32 @@ std::pair<DBResultCode, std::vector<FFriendInfo>> DBManager::GetFriendList(uint3
 	{
 		LOG_E("MySQL Error (GetFriendList): {}", e.what());
 		return { DBResultCode::DB_ERROR, {} };
+	}
+}
+
+int32 DBManager::FindUserDBId(const std::string& nickname)
+{
+	try
+	{
+		ScopedDBSession scoped;
+		auto& session = scoped.Get();
+		auto schema = session.getSchema("gp2025");
+		auto table = schema.getTable("users");
+
+		auto result = table.select("id")
+			.where("nickname = :nickname")
+			.bind("nickname", nickname)
+			.execute();
+
+		auto row = result.fetchOne();
+		if (!row)
+			return -1;
+
+		return static_cast<int32>(row[0].get<int>());
+	}
+	catch (const std::exception& e)
+	{
+		LOG_E("FindUserId() Exception: {}", e.what());
+		return -1;
 	}
 }

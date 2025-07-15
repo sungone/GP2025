@@ -684,37 +684,36 @@ struct DebugLinePacket : public Packet
 
 struct FriendRequestPacket : public Packet
 {
-	int32 TargetUserID;
-	char RequesterNickName[NICKNAME_LEN];
+	char TargetNickName[NICKNAME_LEN];
 
-	FriendRequestPacket(int32 targetUserId, const char* requesterNick)
-		: Packet(EPacketType::C_FRIEND_REQUEST), TargetUserID(targetUserId)
+	FriendRequestPacket(const char* friendNick)
+		: Packet(EPacketType::C_FRIEND_REQUEST)
 	{
-		SAFE_STRCPY(RequesterNickName, requesterNick, NICKNAME_LEN - 1);
-		RequesterNickName[NICKNAME_LEN - 1] = '\0';
+		SAFE_STRCPY(TargetNickName, friendNick, NICKNAME_LEN - 1);
+		TargetNickName[NICKNAME_LEN - 1] = '\0';
 
 		Header.PacketSize = sizeof(FriendRequestPacket);
 	}
 };
 
-
-struct FriendRequestResultPacket : public Packet
+struct FriendOperationResultPacket : public Packet
 {
+	EFriendOpType OperationType;
 	DBResultCode ResultCode;
 
-	FriendRequestResultPacket(DBResultCode code)
-		: Packet(EPacketType::S_FRIEND_REQUEST_RESULT), ResultCode(code)
+	FriendOperationResultPacket(EFriendOpType type, DBResultCode result)
+		: Packet(EPacketType::S_FRIEND_OPERATION_RESULT), OperationType(type), ResultCode(result)
 	{
-		Header.PacketSize = sizeof(FriendRequestResultPacket);
+		Header.PacketSize = sizeof(FriendOperationResultPacket);
 	}
 };
 
 struct FriendAcceptPacket : public Packet
 {
-	int32 TargetUserID;
+	int32 RequesterUserID;
 
-	FriendAcceptPacket(int32 targetUserId)
-		: Packet(EPacketType::C_FRIEND_ACCEPT), TargetUserID(targetUserId)
+	FriendAcceptPacket(int32 requesterUserID)
+		: Packet(EPacketType::C_FRIEND_ACCEPT), RequesterUserID(requesterUserID)
 	{
 		Header.PacketSize = sizeof(FriendAcceptPacket);
 	}
@@ -722,10 +721,10 @@ struct FriendAcceptPacket : public Packet
 
 struct FriendRejectPacket : public Packet
 {
-	int32 TargetUserID;
+	int32 RequesterUserID;
 
-	FriendRejectPacket(int32 targetUserId)
-		: Packet(EPacketType::C_FRIEND_REJECT), TargetUserID(targetUserId)
+	FriendRejectPacket(int32 requesterUserID)
+		: Packet(EPacketType::C_FRIEND_REJECT), RequesterUserID(requesterUserID)
 	{
 		Header.PacketSize = sizeof(FriendRejectPacket);
 	}
