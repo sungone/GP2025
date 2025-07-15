@@ -39,7 +39,7 @@ public:
 	};
 
 	UPROPERTY(meta = (BindWidget))
-	class UUserWidget* FriendListWidget;
+	class UGPFriendList* FriendListWidget;
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* AddButton;
@@ -49,7 +49,7 @@ public:
 
 	// RequestList
 	UPROPERTY(meta = (BindWidget))
-	class UUserWidget* RequestedFriendWidget;
+	class UGPFriendList* RequestedFriendWidget;
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* AcceptButton;
@@ -82,11 +82,11 @@ public:
 	
 public:
 	// Getter (Optional)
-	FORCEINLINE UUserWidget* GetFriendListWidget() const { return FriendListWidget; }
-	FORCEINLINE UUserWidget* GetRequestedFriendWidget() const { return RequestedFriendWidget; }
+	FORCEINLINE UGPFriendList* GetFriendListWidget() const { return FriendListWidget; }
+	FORCEINLINE UGPFriendList* GetRequestedFriendWidget() const { return RequestedFriendWidget; }
 
-	void UpdateFriendList(const TArray<FFriendInfo>& FriendList);
-	void UpdateRequestList(const TArray<FFriendInfo>& RequestList);
+	//void UpdateFriendList(const TArray<FFriendInfo>& FriendList);
+	//void UpdateRequestList(const TArray<FFriendInfo>& RequestList);
 
 public:
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
@@ -94,4 +94,16 @@ public:
 
 	/** 애니메이션 재생 함수 */
 	void PlayOpenAnimation(bool bReverse);
+
+
+	UPROPERTY()
+	uint32 SelectedFriendUserID = -1;
+
+
+	void OnFriendAccepted(
+		uint32 FriendUserID,
+		const FString& Nickname,
+		int32 Level,
+		bool bAccepted,
+		bool bOnline);
 };

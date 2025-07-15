@@ -15,6 +15,8 @@
 #include "Character/Modules/GPMyplayerSoundManager.h"
 #include "UI/GPSkillLevelUpText.h"
 #include "Skill/GPSkillStruct.h"
+#include "Components/Button.h"
+#include "UI/Friend/GPFriendBox.h"
 #include "Quest/GPQuestMessageStruct.h"
 #include "UI/GPQuestWidget.h"
 #include "UI/Friend/GPFriendBox.h"
@@ -644,7 +646,7 @@ void UGPMyplayerUIManager::PlayMainQuestStartWidget()
 		{
 			if (QuestWidget->QuestExitButton)
 			{
-				QuestWidget->QuestExitButton->SetVisibility(ESlateVisibility::Hidden);
+				// QuestWidget->QuestExitButton->SetVisibility(ESlateVisibility::Hidden);
 				UE_LOG(LogTemp, Log, TEXT("[UIManager] QuestExitButton hidden in MainQuestStartWidget."));
 			}
 			else
@@ -732,4 +734,9 @@ void UGPMyplayerUIManager::CloseFriendBox()
 
 		UE_LOG(LogTemp, Log, TEXT("[UIManager] FriendBoxWidget closed."));
 	}
+}
+
+UGPFriendBox* UGPMyplayerUIManager::GetFriendBoxWidget()
+{
+	return Cast<UGPFriendBox>(FriendBoxWidget);
 }

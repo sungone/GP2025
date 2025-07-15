@@ -647,8 +647,15 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_ADD_FRIEND:
 			{
 				AddFriendPacket* Pkt = reinterpret_cast<AddFriendPacket*>(RemainingData.GetData());
-				FString Name = Pkt->NewFriend.GetName();
+				FFriendInfo& FriendInfo = Pkt->NewFriend;
+				FString Name = FriendInfo.GetName();
 				UE_LOG(LogTemp, Log, TEXT("친구 추가: %s"), *Name);
+
+				ObjectMgr->AddFriend(FriendInfo.Id,
+					FString(FriendInfo.GetName()),
+					FriendInfo.Level,
+					FriendInfo.bAccepted,
+					FriendInfo.isOnline);
 				break;
 			}
 			case EPacketType::S_REMOVE_FRIEND:
@@ -660,7 +667,17 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_REQUEST_FRIEND:
 			{
 				FriendRequestPacket* Pkt = reinterpret_cast<FriendRequestPacket*>(RemainingData.GetData());
-				
+				const FFriendInfo& Info = Pkt->RequesterInfo;
+
+				uint32 UserID = Info.Id;
+				FString Name = Info.GetName();
+				int32 Level = Info.Level;
+				bool bOnline = Info.isOnline;
+
+				UE_LOG(LogTemp, Log, TEXT("[FriendRequest] New friend request from %s (Lv.%d) %s"),
+					*Name, Level, bOnline ? TEXT("[Online]") : TEXT("[Offline]"));
+
+				ObjectMgr->AddRequestFriend(UserID, Name, Level, bOnline);
 				break;
 			}
 #pragma endregion

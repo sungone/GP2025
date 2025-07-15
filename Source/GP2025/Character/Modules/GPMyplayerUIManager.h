@@ -155,5 +155,7 @@ public :
 
 		UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Friend")
 		TSubclassOf<UUserWidget> FriendBoxWidgetClass;
+
+		class UGPFriendBox* GetFriendBoxWidget();
 };
 

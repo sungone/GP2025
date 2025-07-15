@@ -21,7 +21,8 @@ public:
     virtual void NativeConstruct() override;
 
     void ClearFriendEntries();
-    void AddFriendEntry(const FString& NickName, int32 Level);
+    void AddFriendEntry(uint32 Id , const FString& NickName, int32 Level, bool bOnline = false);
+    void RemoveFriendEntry(uint32 Id);
 
 protected:
     UPROPERTY(meta = (BindWidget))
@@ -29,4 +30,8 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, Category = "Friend UI")
     TSubclassOf<UGPFriendEntry> FriendEntryClass;
+
+public :
+    UPROPERTY()
+    class UGPFriendBox* OwnerBox;
 };

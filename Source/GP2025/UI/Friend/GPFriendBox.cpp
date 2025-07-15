@@ -3,6 +3,11 @@
 
 #include "UI/Friend/GPFriendBox.h"
 #include "Components/Button.h"
+#include "UI/Friend/GPFriendList.h"
+#include "UI/Friend/GPFriendEntry.h"
+#include "Character/GPCharacterMyplayer.h"
+#include "Network/GPNetworkManager.h"
+#include "kismet/GameplayStatics.h"
 #include "Components/WidgetSwitcher.h"
 
 void UGPFriendBox::NativeConstruct()
@@ -48,6 +53,16 @@ void UGPFriendBox::NativeConstruct()
 		FriendWidgetSwitcher->SetActiveWidgetIndex(WidgetIndex::FriendList);
 		UE_LOG(LogTemp, Log, TEXT("[FriendBox] Initial tab set to FriendList."));
 	}
+
+	if (FriendListWidget)
+	{
+		FriendListWidget->OwnerBox = this;
+	}
+
+	if (RequestedFriendWidget)
+	{
+		RequestedFriendWidget->OwnerBox = this;
+	}
 }
 
 void UGPFriendBox::OnFriendListButtonClicked()
@@ -70,7 +85,26 @@ void UGPFriendBox::OnRequestListButtonClicked()
 
 void UGPFriendBox::OnAddButtonClicked()
 {
-	// TODO: NetMgr → SendFriendAddPacket
+	if (!SendNicknameText) return;
+
+	FText InputText = SendNicknameText->GetText();
+	FString TargetNickname = InputText.ToString();
+
+	if (TargetNickname.IsEmpty())
+	{
+		return;
+	}
+
+
+	// 서버로 전송
+	if (AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0)))
+	{
+		if (MyPlayer->NetMgr)
+		{
+			MyPlayer->NetMgr->SendMyFriendRequest(TargetNickname);
+		}
+	}
+
 	UE_LOG(LogTemp, Log, TEXT("[FriendBox] AddButton clicked → Send FriendAddPacket to server."));
 }
 
@@ -82,7 +116,20 @@ void UGPFriendBox::OnRemoveButtonClicked()
 
 void UGPFriendBox::OnAcceptButtonClicked()
 {
-	// TODO: NetMgr → SendFriendAcceptPacket
+	if (SelectedFriendUserID < 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[FriendBox] No friend selected."));
+		return;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("[FriendBox] Accepting friend with UserID: %d"), SelectedFriendUserID);
+
+	AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (MyPlayer && MyPlayer->NetMgr)
+	{
+		MyPlayer->NetMgr->SendMyFriendAccept(SelectedFriendUserID);
+	}
+
 	UE_LOG(LogTemp, Log, TEXT("[FriendBox] AcceptButton clicked → Send FriendAcceptPacket to server."));
 }
 
@@ -92,15 +139,29 @@ void UGPFriendBox::OnRejectButtonClicked()
 	UE_LOG(LogTemp, Log, TEXT("[FriendBox] RejectButton clicked → Send FriendRejectPacket to server."));
 }
 
-void UGPFriendBox::UpdateFriendList(const TArray<FFriendInfo>& FriendList)
-{
-
-}
-
-void UGPFriendBox::UpdateRequestList(const TArray<FFriendInfo>& RequestList)
-{
-
-}
+//void UGPFriendBox::UpdateFriendList(const TArray<FFriendInfo>& FriendList)
+//{
+//	if (FriendListWidget)
+//	{
+//		FriendListWidget->ClearFriendEntries();
+//		for (const auto& Info : FriendList)
+//		{
+//			FriendListWidget->AddFriendEntry(Info.NickName, Info.Level);
+//		}
+//	}
+//}
+//
+//void UGPFriendBox::UpdateRequestList(const TArray<FFriendInfo>& RequestList)
+//{
+//	if (RequestedFriendWidget)
+//	{
+//		RequestedFriendWidget->ClearFriendEntries();
+//		for (const auto& Info : RequestList)
+//		{
+//			RequestedFriendWidget->AddFriendEntry(Info.NickName, Info.Level);
+//		}
+//	}
+//}
 
 void UGPFriendBox::PlayOpenAnimation(bool bReverse)
 {
@@ -113,4 +174,26 @@ void UGPFriendBox::PlayOpenAnimation(bool bReverse)
 		bReverse ? EUMGSequencePlayMode::Reverse : EUMGSequencePlayMode::Forward,
 		1.f
 	);
+}
+
+void UGPFriendBox::OnFriendAccepted(
+	uint32 FriendUserID,
+	const FString& Nickname,
+	int32 Level,
+	bool bAccepted,
+	bool bOnline)
+{
+	UE_LOG(LogTemp, Log, TEXT("[FriendBox] OnFriendAccepted → UserID: %d (%s)"), FriendUserID, *Nickname);
+
+	// (1) 요청 목록에서 제거
+	if (RequestedFriendWidget)
+	{
+		RequestedFriendWidget->RemoveFriendEntry(FriendUserID);
+	}
+
+	// (2) 친구 목록에 추가
+	if (FriendListWidget)
+	{
+		FriendListWidget->AddFriendEntry(FriendUserID, Nickname, Level, bOnline);
+	}
 }

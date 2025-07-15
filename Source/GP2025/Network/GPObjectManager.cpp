@@ -20,6 +20,9 @@
 #include "Character/Modules/GPMyplayerSoundManager.h"
 #include "ObjectPool/GPFloatingDamageTextPool.h"
 #include "ObjectPool/GPItemPool.h"
+#include "UI/Friend/GPFriendBox.h"
+#include "UI/Friend/GPFriendList.h"
+#include "UI/Friend/GPFriendEntry.h"
 #include "Network/GPNetworkManager.h"
 #include "Inventory/GPEquippedItemSlot.h"
 #include "Kismet/GameplayStatics.h"
@@ -1056,4 +1059,28 @@ void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpR
 		uint8 QuestID = static_cast<uint8>(Quest);
 		MyPlayer->UIManager->UpdateQuestState(QuestID, true);
 	}
+}
+
+void UGPObjectManager::AddRequestFriend(uint32 ID ,const FString& Name, int32 Level , bool bIsOnline)
+{
+	if (MyPlayer && MyPlayer->UIManager)
+	{
+		// FriendBox 가져오기
+		UGPFriendBox* FriendBox = MyPlayer->UIManager->GetFriendBoxWidget();
+		if (FriendBox)
+		{
+			UGPFriendList* RequestListWidget = FriendBox->GetRequestedFriendWidget();
+			if (RequestListWidget)
+			{
+				// 요청 리스트에 Entry 추가
+				RequestListWidget->AddFriendEntry(ID , Name, Level , bIsOnline);
+			}
+		}
+	}
+}
+
+void UGPObjectManager::AddFriend(uint32 Id, const FString& Name, uint32 Level, bool bAccepted, bool bIsOnline)
+{
+	MyPlayer->UIManager->GetFriendBoxWidget()->OnFriendAccepted(Id , Name , 
+		Level , bAccepted , bIsOnline);
 }

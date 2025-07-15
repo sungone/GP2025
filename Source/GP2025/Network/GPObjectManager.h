@@ -62,6 +62,12 @@ public:
 	
 	void OnQuestStart(QuestType Quest);
 	void OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpReward, uint32 GoldReward);
+
+
+	// Friend
+	void AddRequestFriend(uint32 ID , const FString& Name , int32 Level , bool bIsOnline);
+	void AddFriend(uint32 Id, const FString& Name, uint32 Level, bool bAccepted, bool bIsOnline);
+
 private:
 	UPROPERTY()
 	TSubclassOf<AGPCharacterPlayer> OtherPlayerClass;
