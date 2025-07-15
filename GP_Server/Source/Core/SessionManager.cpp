@@ -103,6 +103,11 @@ void SessionManager::HandleLogin(int32 sessionId, const DBLoginResult& dbRes)
 	auto& playerInfo = session->GetPlayerInfo();
 	SignUpSuccessPacket spkt;
 	SendPacket(sessionId, &spkt);
+	if (!dbRes.friends.empty())
+	{
+		FriendListPacket pkt(static_cast<uint8>(dbRes.friends.size()), dbRes.friends.data());
+		SessionManager::GetInst().SendPacket(sessionId, &pkt);
+	}
 }
 
 void SessionManager::SendPacket(int32 sessionId, const Packet* packet)
