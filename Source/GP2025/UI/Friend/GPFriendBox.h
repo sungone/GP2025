@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/EditableText.h"
 #include "GPFriendBox.generated.h"
 
 /**
@@ -55,6 +56,10 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* RejectButton;
 
+	// 닉네임 입력창
+	UPROPERTY(meta = (BindWidget))
+	UEditableText* SendNicknameText;
+
 	// 콜백
 	UFUNCTION()
 	void OnFriendListButtonClicked();
@@ -81,7 +86,6 @@ public:
 
 
 public:
-	/** Friend창 열/닫기 애니메이션 */
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	UWidgetAnimation* OpenAnim;
 
