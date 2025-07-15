@@ -87,6 +87,8 @@ public:
 	}
 	FStatData& GetStats() const { return _stats; }
 	bool IsInTutorialQuest() { return _bTutQuest; }
+	const std::vector<FFriendInfo>& GetFriends() const { return _friends; }
+
 private:
 	Type::EPlayer _playerType;
 	Inventory _inventory;
@@ -96,4 +98,5 @@ private:
 	QuestStatus& _curQuest = _info.CurrentQuest;
 	const QuestData* _curQuestData = nullptr;
 	bool _bTutQuest = false;
+	std::vector<FFriendInfo> _friends;
 };

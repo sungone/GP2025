@@ -322,11 +322,6 @@ void UGPNetworkManager::SendMyFriendRemove(int32 TargetUserID)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-//void UGPNetworkManager::SendFriendListRequest(int32 PlayerID)
-//{
-//	//Todo: 로드 실패시 요청해야함.
-//}
-
 void UGPNetworkManager::ReceiveData()
 {
 	uint32 DataSize;
@@ -660,6 +655,12 @@ void UGPNetworkManager::ProcessPacket()
 			{
 				RemoveFriendPacket* Pkt = reinterpret_cast<RemoveFriendPacket*>(RemainingData.GetData());
 				UE_LOG(LogTemp, Log, TEXT("친구 제거됨: UserID=%d"), Pkt->FriendUserID);
+				break;
+			}
+			case EPacketType::S_REQUEST_FRIEND:
+			{
+				FriendRequestPacket* Pkt = reinterpret_cast<FriendRequestPacket*>(RemainingData.GetData());
+				
 				break;
 			}
 #pragma endregion
