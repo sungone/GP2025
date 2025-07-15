@@ -92,6 +92,16 @@ void UGPFriendBox::OnRejectButtonClicked()
 	UE_LOG(LogTemp, Log, TEXT("[FriendBox] RejectButton clicked ¡æ Send FriendRejectPacket to server."));
 }
 
+void UGPFriendBox::UpdateFriendList(const TArray<FFriendInfo>& FriendList)
+{
+
+}
+
+void UGPFriendBox::UpdateRequestList(const TArray<FFriendInfo>& RequestList)
+{
+
+}
+
 void UGPFriendBox::PlayOpenAnimation(bool bReverse)
 {
 	if (!OpenAnim) return;

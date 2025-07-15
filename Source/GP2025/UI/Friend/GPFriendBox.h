@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "../../GP_Server/Source/Common/DataStruct.h"
 #include "Components/EditableText.h"
 #include "GPFriendBox.generated.h"
 
@@ -84,6 +85,8 @@ public:
 	FORCEINLINE UUserWidget* GetFriendListWidget() const { return FriendListWidget; }
 	FORCEINLINE UUserWidget* GetRequestedFriendWidget() const { return RequestedFriendWidget; }
 
+	void UpdateFriendList(const TArray<FFriendInfo>& FriendList);
+	void UpdateRequestList(const TArray<FFriendInfo>& RequestList);
 
 public:
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
