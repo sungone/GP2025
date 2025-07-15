@@ -322,6 +322,11 @@ void UGPNetworkManager::SendFriendRemove(int32 TargetUserID)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
+//void UGPNetworkManager::SendFriendListRequest(int32 PlayerID)
+//{
+//	//Todo: 로드 실패시 요청해야함.
+//}
+
 void UGPNetworkManager::ReceiveData()
 {
 	uint32 DataSize;
@@ -679,26 +684,3 @@ void UGPNetworkManager::ProcessPacket()
 	}
 }
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReceiveChat, const FString&, Sender, const FString&, Message)
-{
-}
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnBuyItemResult, bool, bSuccess, uint32, CurrentGold, const FString&, Message)
-{
-}
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnSellItemResult, bool, bSuccess, uint32, CurrentGold, const FString&, Message)
-{
-}
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUserAuthFailed, FString, Message)
-{
-}
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterLobby)
-{
-}
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterGame)
-{
-}

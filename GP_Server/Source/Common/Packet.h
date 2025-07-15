@@ -681,7 +681,6 @@ struct DebugLinePacket : public Packet
 	}
 };
 #pragma region Friend
-
 struct FriendRequestPacket : public Packet
 {
 	char TargetNickName[NICKNAME_LEN];

@@ -87,7 +87,7 @@ public:
 	void SendFriendAccept(int32 RequesterUserID);
 	void SendFriendReject(int32 RequesterUserID);
 	void SendFriendRemove(int32 TargetUserID);
-	void SendFriendRemove(int32 PlayerID);
+	//void SendFriendListRequest(int32 PlayerID); ³ªÁß¿¡
 
 private:
 	void SendPacket(uint8* Buf, int32 Size);
