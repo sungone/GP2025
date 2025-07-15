@@ -95,8 +95,6 @@ void UGPFriendBox::OnAddButtonClicked()
 		return;
 	}
 
-
-	// 서버로 전송
 	if (AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0)))
 	{
 		if (MyPlayer->NetMgr)
@@ -110,8 +108,31 @@ void UGPFriendBox::OnAddButtonClicked()
 
 void UGPFriendBox::OnRemoveButtonClicked()
 {
-	// TODO: NetMgr → SendFriendRemovePacket
 	UE_LOG(LogTemp, Log, TEXT("[FriendBox] RemoveButton clicked → Send FriendRemovePacket to server."));
+
+	if (SelectedFriendUserID < 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[FriendBox] No friend selected for removal."));
+		return;
+	}
+
+	AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (MyPlayer && MyPlayer->NetMgr)
+	{
+		MyPlayer->NetMgr->SendMyFriendRemove(SelectedFriendUserID);
+	}
+
+	if (FriendListWidget)
+	{
+		UGPFriendList* FriendList = Cast<UGPFriendList>(FriendListWidget);
+		if (FriendList)
+		{
+			FriendList->RemoveFriendEntry(SelectedFriendUserID);
+		}
+	}
+
+	// 선택 초기화
+	SelectedFriendUserID = -1;
 }
 
 void UGPFriendBox::OnAcceptButtonClicked()
@@ -135,7 +156,30 @@ void UGPFriendBox::OnAcceptButtonClicked()
 
 void UGPFriendBox::OnRejectButtonClicked()
 {
-	// TODO: NetMgr → SendFriendRejectPacket
+	if (SelectedFriendUserID < 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[FriendBox] No friend selected for rejection."));
+		return;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("[FriendBox] Rejecting friend request from UserID: %d"), SelectedFriendUserID);
+
+	AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (MyPlayer && MyPlayer->NetMgr)
+	{
+		MyPlayer->NetMgr->SendMyFriendReject(SelectedFriendUserID);
+	}
+
+	if (RequestedFriendWidget)
+	{
+		UGPFriendList* RequestList = Cast<UGPFriendList>(RequestedFriendWidget);
+		if (RequestList)
+		{
+			RequestList->RemoveFriendEntry(SelectedFriendUserID);
+		}
+	}
+
+	SelectedFriendUserID = -1;
 	UE_LOG(LogTemp, Log, TEXT("[FriendBox] RejectButton clicked → Send FriendRejectPacket to server."));
 }
 
@@ -197,3 +241,4 @@ void UGPFriendBox::OnFriendAccepted(
 		FriendListWidget->AddFriendEntry(FriendUserID, Nickname, Level, bOnline);
 	}
 }
+
