@@ -483,7 +483,7 @@ std::pair<DBResultCode, std::vector<FFriendInfo>> DBManager::GetFriendList(uint3
 			info.SetName(ConvertToWString(nickname));
 			info.Level = static_cast<uint32>(row[2].get<int>());
 			info.bAccepted = row[3].get<int>() == 1;
-
+			info.isOnline = SessionManager::GetInst().IsOnline(info.Id);
 			friendList.emplace_back(info);
 		}
 

@@ -740,7 +740,7 @@ struct FriendRejectRequestPacket : public Packet
 	}
 };
 
-constexpr uint8 MAX_FRIENDS = 100;
+constexpr uint8 MAX_FRIENDS = 50;
 struct FriendListPacket : public Packet
 {
 	uint8 FriendCount;

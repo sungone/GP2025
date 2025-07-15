@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "../../GP_Server/Source/Common/DataStruct.h"
 #include "Components/EditableText.h"
 #include "GPFriendBox.generated.h"
 
 /**
  * 
  */
+struct FFriendInfo;
 UCLASS()
 class GP2025_API UGPFriendBox : public UUserWidget
 {

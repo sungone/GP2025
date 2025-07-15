@@ -119,7 +119,7 @@ struct ShopItemInfo
 
 struct FFriendInfo
 {
-	uint32 Id;
+	uint32 Id;//dbId
 	char NickName[NICKNAME_LEN];
 	uint32 Level;
 	bool bAccepted;

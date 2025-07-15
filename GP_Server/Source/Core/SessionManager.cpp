@@ -164,3 +164,4 @@ int SessionManager::GenerateId()
 	_freeIds.pop();
 	return id;
 }
+

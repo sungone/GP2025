@@ -24,7 +24,7 @@ public:
 	void BroadcastToViewList(Packet* packet, const std::unordered_set<int32>& viewList);
 	std::array<std::unique_ptr<PlayerSession>, MAX_CLIENT>& GetSessions() { return _sessions; }
 	PlayerSession* GetSession(int32 sessionId);
-
+	bool IsOnline(uint32 dbId);
 private:
 	int32 GenerateId();
 private:
