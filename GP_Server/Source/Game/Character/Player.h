@@ -39,7 +39,7 @@ public:
 	uint8 EquipItem(uint32 itemId);
 	uint8 UnequipItem(uint32 itemId);
 
-	void CheckAndUpdateQuestProgress();
+	void CheckAndUpdateQuestProgress(EQuestCategory type);
 
 	bool GiveQuestReward(QuestType quest);
 	bool SetCurrentQuest(QuestType quest);
