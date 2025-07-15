@@ -95,8 +95,6 @@ void UGPFriendBox::OnAddButtonClicked()
 		return;
 	}
 
-
-	// 서버로 전송
 	if (AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0)))
 	{
 		if (MyPlayer->NetMgr)
@@ -110,8 +108,31 @@ void UGPFriendBox::OnAddButtonClicked()
 
 void UGPFriendBox::OnRemoveButtonClicked()
 {
-	// TODO: NetMgr → SendFriendRemovePacket
 	UE_LOG(LogTemp, Log, TEXT("[FriendBox] RemoveButton clicked → Send FriendRemovePacket to server."));
+
+	if (SelectedFriendUserID < 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[FriendBox] No friend selected for removal."));
+		return;
+	}
+
+	AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (MyPlayer && MyPlayer->NetMgr)
+	{
+		MyPlayer->NetMgr->SendMyFriendRemove(SelectedFriendUserID);
+	}
+
+	if (FriendListWidget)
+	{
+		UGPFriendList* FriendList = Cast<UGPFriendList>(FriendListWidget);
+		if (FriendList)
+		{
+			FriendList->RemoveFriendEntry(SelectedFriendUserID);
+		}
+	}
+
+	// 선택 초기화
+	SelectedFriendUserID = -1;
 }
 
 void UGPFriendBox::OnAcceptButtonClicked()
@@ -220,3 +241,4 @@ void UGPFriendBox::OnFriendAccepted(
 		FriendListWidget->AddFriendEntry(FriendUserID, Nickname, Level, bOnline);
 	}
 }
+
