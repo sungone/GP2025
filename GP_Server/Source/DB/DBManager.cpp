@@ -2,6 +2,7 @@
 #include "DBManager.h"
 #include "GameWorld.h"
 #include "ScopedDBSession.h"
+#include "SessionManager.h"
 
 bool DBManager::Connect(const std::string& host, const std::string& user, const std::string& pwd, const std::string& db)
 {
