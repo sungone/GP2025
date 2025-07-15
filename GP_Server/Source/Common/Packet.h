@@ -680,3 +680,82 @@ struct DebugLinePacket : public Packet
 		Header.PacketSize = sizeof(DebugLinePacket);
 	}
 };
+#pragma region Friend
+
+struct FriendRequestPacket : public Packet
+{
+	int32 TargetUserID;
+	char RequesterNickName[NICKNAME_LEN];
+
+	FriendRequestPacket(int32 targetUserId, const char* requesterNick)
+		: Packet(EPacketType::C_FRIEND_REQUEST), TargetUserID(targetUserId)
+	{
+		SAFE_STRCPY(RequesterNickName, requesterNick, NICKNAME_LEN - 1);
+		RequesterNickName[NICKNAME_LEN - 1] = '\0';
+
+		Header.PacketSize = sizeof(FriendRequestPacket);
+	}
+};
+
+
+struct FriendRequestResultPacket : public Packet
+{
+	DBResultCode ResultCode;
+
+	FriendRequestResultPacket(DBResultCode code)
+		: Packet(EPacketType::S_FRIEND_REQUEST_RESULT), ResultCode(code)
+	{
+		Header.PacketSize = sizeof(FriendRequestResultPacket);
+	}
+};
+
+struct FriendAcceptPacket : public Packet
+{
+	int32 TargetUserID;
+
+	FriendAcceptPacket(int32 targetUserId)
+		: Packet(EPacketType::C_FRIEND_ACCEPT), TargetUserID(targetUserId)
+	{
+		Header.PacketSize = sizeof(FriendAcceptPacket);
+	}
+};
+
+struct FriendRejectPacket : public Packet
+{
+	int32 TargetUserID;
+
+	FriendRejectPacket(int32 targetUserId)
+		: Packet(EPacketType::C_FRIEND_REJECT), TargetUserID(targetUserId)
+	{
+		Header.PacketSize = sizeof(FriendRejectPacket);
+	}
+};
+
+constexpr uint8 MAX_FRIENDS = 100;
+struct FriendListPacket : public Packet
+{
+	uint8 FriendCount;
+	FFriendInfo Friends[MAX_FRIENDS];
+
+	FriendListPacket(uint8 count, const FFriendInfo* friendList)
+		: Packet(EPacketType::S_FRIEND_LIST), FriendCount(count)
+	{
+		for (int i = 0; i < count && i < MAX_FRIENDS; ++i)
+			Friends[i] = friendList[i];
+
+		Header.PacketSize = sizeof(FriendListPacket);
+	}
+};
+
+struct FriendRemovePacket : public Packet
+{
+	int32 TargetUserID;
+
+	FriendRemovePacket(int32 targetUserId)
+		: Packet(EPacketType::C_FRIEND_REMOVE), TargetUserID(targetUserId)
+	{
+		Header.PacketSize = sizeof(FriendRemovePacket);
+	}
+};
+
+#pragma endregion

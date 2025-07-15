@@ -290,39 +290,31 @@ bool DBManager::RemoveUserItem(uint32 dbId, uint32 itemID)
 	}
 }
 
-bool DBManager::SendFriendRequest(uint32 fromId, uint32 toId)
+DBResultCode DBManager::SendFriendRequest(uint32 fromId, uint32 toId)
 {
+	if (fromId == toId)
+		return DBResultCode::FRIEND_SELF_REQUEST;
+
+	if (IsFriendOrPending(fromId, toId))
+		return DBResultCode::FRIEND_ALREADY_REQUESTED;
+
 	try {
-		// 같은 사람에게 보내는 요청은 허용 X
-		if (fromId == toId)
-		{
-			LOG_W("Cannot send friend request to self: {}", fromId);
-			return false;
-		}
-
-		// 이미 친구이거나 요청 중인지 검사
-		if (DBManager::GetInst().IsFriendOrPending(fromId, toId))
-		{
-			LOG_W("Friend request already exists or already friends: {} -> {}", fromId, toId);
-			return false;
-		}
-
 		ScopedDBSession scoped;
 		auto& sess = scoped.Get();
 		auto schema = sess.getSchema("gp2025");
 
 		schema.getTable("user_friends")
 			.insert("user_id", "friend_id", "status")
-			.values(fromId, toId, 0) // 0 = pending
+			.values(fromId, toId, 0)
 			.execute();
 
 		LOG_D("Friend request sent: {} -> {}", fromId, toId);
-		return true;
+		return DBResultCode::SUCCESS;
 	}
 	catch (const mysqlx::Error& e)
 	{
 		LOG_E("MySQL Error (SendFriendRequest): {}", e.what());
-		return false;
+		return DBResultCode::DB_ERROR;
 	}
 }
 
@@ -349,7 +341,7 @@ bool DBManager::IsFriendOrPending(uint32 userId, uint32 targetId)
 	}
 }
 
-std::optional<FFriendInfo> DBManager::AcceptFriendRequest(uint32 fromId, uint32 toId)
+std::pair<DBResultCode, std::optional<FFriendInfo>> DBManager::AcceptFriendRequest(uint32 fromId, uint32 toId)
 {
 	try {
 		ScopedDBSession scoped;
@@ -366,10 +358,7 @@ std::optional<FFriendInfo> DBManager::AcceptFriendRequest(uint32 fromId, uint32 
 			.execute();
 
 		if (updateRes.getAffectedItemsCount() == 0)
-		{
-			LOG_W("No pending request found from {} to {}", fromId, toId);
-			return std::nullopt;
-		}
+			return { DBResultCode::FRIEND_USER_NOT_FOUND, std::nullopt };
 
 		// 2. 역방향 accepted 관계 삽입 (중복이면 무시)
 		try {
@@ -379,10 +368,10 @@ std::optional<FFriendInfo> DBManager::AcceptFriendRequest(uint32 fromId, uint32 
 				.execute();
 		}
 		catch (...) {
-			// 이미 있다면 무시
+			// 이미 있는 경우 무시
 		}
 
-		// 3. 친구 정보 반환 (fromId 기준)
+		// 3. 친구 정보 조회
 		auto result = sess.sql(
 			"SELECT u.id, u.nickname, p.level "
 			"FROM users u JOIN player_info p ON u.id = p.id "
@@ -390,7 +379,7 @@ std::optional<FFriendInfo> DBManager::AcceptFriendRequest(uint32 fromId, uint32 
 		).bind(fromId).execute();
 
 		auto row = result.fetchOne();
-		if (!row) return std::nullopt;
+		if (!row) return { DBResultCode::FRIEND_USER_NOT_FOUND, std::nullopt };
 
 		FFriendInfo info;
 		info.Id = static_cast<uint32>(row[0].get<int>());
@@ -398,17 +387,16 @@ std::optional<FFriendInfo> DBManager::AcceptFriendRequest(uint32 fromId, uint32 
 		info.Level = static_cast<uint32>(row[2].get<int>());
 		info.bAccepted = true;
 
-		LOG_D("Friend accepted: {} <-> {}", fromId, toId);
-		return info;
+		return { DBResultCode::SUCCESS, info };
 	}
 	catch (const mysqlx::Error& e)
 	{
 		LOG_E("MySQL Error (AcceptFriendRequest): {}", e.what());
-		return std::nullopt;
+		return { DBResultCode::DB_ERROR, std::nullopt };
 	}
 }
 
-bool DBManager::RemoveFriendRequest(uint32 fromId, uint32 toId)
+DBResultCode DBManager::RemoveFriendRequest(uint32 fromId, uint32 toId)
 {
 	try {
 		ScopedDBSession scoped;
@@ -423,22 +411,19 @@ bool DBManager::RemoveFriendRequest(uint32 fromId, uint32 toId)
 			.execute();
 
 		if (result.getAffectedItemsCount() == 0)
-		{
-			LOG_W("No pending friend request found from {} to {}", fromId, toId);
-			return false;
-		}
+			return DBResultCode::FRIEND_USER_NOT_FOUND;
 
 		LOG_D("Friend request removed: {} -> {}", fromId, toId);
-		return true;
+		return DBResultCode::SUCCESS;
 	}
 	catch (const mysqlx::Error& e)
 	{
 		LOG_E("MySQL Error (RemoveFriendRequest): {}", e.what());
-		return false;
+		return DBResultCode::DB_ERROR;
 	}
 }
 
-bool DBManager::RemoveFriend(uint32 userId, uint32 friendId)
+DBResultCode DBManager::RemoveFriend(uint32 userId, uint32 friendId)
 {
 	try {
 		ScopedDBSession scoped;
@@ -453,22 +438,19 @@ bool DBManager::RemoveFriend(uint32 userId, uint32 friendId)
 			.execute();
 
 		if (result.getAffectedItemsCount() == 0)
-		{
-			LOG_W("No accepted friendship found between {} and {}", userId, friendId);
-			return false;
-		}
+			return DBResultCode::FRIEND_USER_NOT_FOUND;
 
 		LOG_D("Friendship removed: {} <-> {}", userId, friendId);
-		return true;
+		return DBResultCode::SUCCESS;
 	}
 	catch (const mysqlx::Error& e)
 	{
 		LOG_E("MySQL Error (RemoveFriend): {}", e.what());
-		return false;
+		return DBResultCode::DB_ERROR;
 	}
 }
 
-std::vector<FFriendInfo> DBManager::GetFriendList(uint32 userId)
+std::pair<DBResultCode, std::vector<FFriendInfo>> DBManager::GetFriendList(uint32 userId)
 {
 	std::vector<FFriendInfo> friendList;
 
@@ -476,7 +458,6 @@ std::vector<FFriendInfo> DBManager::GetFriendList(uint32 userId)
 		ScopedDBSession scoped;
 		auto& sess = scoped.Get();
 
-		// JOIN: user_friends → users → player_info
 		auto result = sess.sql(
 			"SELECT f.friend_id, u.nickname, p.level, f.status "
 			"FROM user_friends f "
@@ -497,11 +478,11 @@ std::vector<FFriendInfo> DBManager::GetFriendList(uint32 userId)
 		}
 
 		LOG_D("Loaded {} friend(s) for user {}", friendList.size(), userId);
+		return { DBResultCode::SUCCESS, friendList };
 	}
 	catch (const mysqlx::Error& e)
 	{
 		LOG_E("MySQL Error (GetFriendList): {}", e.what());
+		return { DBResultCode::DB_ERROR, {} };
 	}
-
-	return friendList;
 }

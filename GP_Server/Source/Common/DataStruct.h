@@ -12,9 +12,13 @@ enum class DBResultCode : int32
 	NOT_ENOUGH_GOLD = -10,
 	ITEM_NOT_FOUND = -11,
 
+	// Friend
+	FRIEND_ALREADY_REQUESTED = -20,
+	FRIEND_ALREADY_ADDED = -21,
+	FRIEND_SELF_REQUEST = -22,
+	FRIEND_USER_NOT_FOUND = -23,
 
 	DB_ERROR = -99
-
 };
 
 #pragma pack(push,1)
