@@ -110,7 +110,7 @@ void UGPFriendBox::OnRemoveButtonClicked()
 {
 	UE_LOG(LogTemp, Log, TEXT("[FriendBox] RemoveButton clicked → Send FriendRemovePacket to server."));
 
-	if (SelectedFriendUserID < 0)
+	if (SelectedFriendUserID == MAX_uint32)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[FriendBox] No friend selected for removal."));
 		return;
@@ -137,7 +137,7 @@ void UGPFriendBox::OnRemoveButtonClicked()
 
 void UGPFriendBox::OnAcceptButtonClicked()
 {
-	if (SelectedFriendUserID < 0)
+	if (SelectedFriendUserID == MAX_uint32)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[FriendBox] No friend selected."));
 		return;
@@ -156,7 +156,7 @@ void UGPFriendBox::OnAcceptButtonClicked()
 
 void UGPFriendBox::OnRejectButtonClicked()
 {
-	if (SelectedFriendUserID < 0)
+	if (SelectedFriendUserID == MAX_uint32)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[FriendBox] No friend selected for rejection."));
 		return;
@@ -238,6 +238,7 @@ void UGPFriendBox::OnFriendAccepted(
 	// (2) 친구 목록에 추가
 	if (FriendListWidget)
 	{
+		FriendListWidget->RemoveFriendEntry(FriendUserID);
 		FriendListWidget->AddFriendEntry(FriendUserID, Nickname, Level, bOnline);
 	}
 }

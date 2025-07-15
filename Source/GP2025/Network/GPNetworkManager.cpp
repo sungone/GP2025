@@ -638,7 +638,7 @@ void UGPNetworkManager::ProcessPacket()
 				for (int i = 0; i < Count; ++i)
 				{
 					FFriendInfo& Info = Pkt->Friends[i];
-					FString Name = Info.GetName();
+					FString Name = UTF8_TO_TCHAR(Info.GetName());
 					FString Status = Info.bAccepted ? TEXT("친구") : TEXT("요청중");
 					UE_LOG(LogTemp, Log, TEXT("- %s (Lv.%d) [%s]"), *Name, Info.Level, *Status);
 				}
@@ -670,7 +670,7 @@ void UGPNetworkManager::ProcessPacket()
 				const FFriendInfo& Info = Pkt->RequesterInfo;
 
 				uint32 UserID = Info.Id;
-				FString Name = Info.GetName();
+				FString Name = UTF8_TO_TCHAR(Info.GetName());
 				int32 Level = Info.Level;
 				bool bOnline = Info.isOnline;
 
