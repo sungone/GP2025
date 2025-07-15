@@ -48,10 +48,37 @@ void UGPCharacterCombatHandler::PlayAutoAttackMontage()
 
 	bool bHasWeapon = Owner->HasWeaponEquipped();
 
+
+
 	if (bHasWeapon)
 	{
-		MontageToPlay = AttackMontage;
-		UE_LOG(LogTemp, Log, TEXT("[Combat] Selected AttackMontage (with weapon)."));
+		TArray<UAnimMontage*> MontageCandidates;
+
+		if (AttackMontage)
+		{
+			MontageCandidates.Add(AttackMontage);
+		}
+		if (WarriorAttackMontage_1)
+		{
+			MontageCandidates.Add(WarriorAttackMontage_1);
+		}
+		if (WarriorAttackMontage_2)
+		{
+			MontageCandidates.Add(WarriorAttackMontage_2);
+		}
+
+		if (MontageCandidates.Num() > 0)
+		{
+			int32 RandomIndex = FMath::RandRange(0, MontageCandidates.Num() - 1);
+			MontageToPlay = MontageCandidates[RandomIndex];
+
+			UE_LOG(LogTemp, Log, TEXT("[Combat] Randomly selected montage: %s"), *MontageToPlay->GetName());
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[Combat] No valid montages found for random selection."));
+			return;
+		}
 	}
 	else
 	{
@@ -494,6 +521,13 @@ void UGPCharacterCombatHandler::SetAttackWithoutWeaponMontage(UAnimMontage* Mont
 void UGPCharacterCombatHandler::SetAttackMontage(UAnimMontage* Montage)
 {
 	AttackMontage = Montage;
+}
+
+void UGPCharacterCombatHandler::SetAttackMontageForWarrior(UAnimMontage* Montage1, UAnimMontage* Montage2, UAnimMontage* Montage3)
+{
+	AttackMontage = Montage1;
+	WarriorAttackMontage_1 = Montage2;
+	WarriorAttackMontage_2 = Montage3;
 }
 
 void UGPCharacterCombatHandler::SetQSkillMontage(UAnimMontage* Montage)
