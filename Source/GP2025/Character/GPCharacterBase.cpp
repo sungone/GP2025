@@ -329,7 +329,13 @@ void AGPCharacterBase::SetCharacterData(const UGPCharacterControlData* Character
 		CombatHandler->SetDeadMontage(CharacterData->DeadAnimMontage);
 		CombatHandler->SetQSkillMontage(CharacterData->QSkillAnimMontage);  
 		CombatHandler->SetESkillMontage(CharacterData->ESkillAnimMontage);  
-		CombatHandler->SetRSkillMontage(CharacterData->RSkillAnimMontage);  
+		CombatHandler->SetRSkillMontage(CharacterData->RSkillAnimMontage); 
+
+		if (CharacterData->AttackAnimMontage_2 && CharacterData->AttackAnimMontage_3)
+		{
+			CombatHandler->SetAttackMontageForWarrior(CharacterData->AttackAnimMontage , 
+				CharacterData->AttackAnimMontage_2 , CharacterData->AttackAnimMontage_3);
+		}
 	}
 }
 

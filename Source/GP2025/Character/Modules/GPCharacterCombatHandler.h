@@ -46,6 +46,7 @@ public:
 	// 애니메이션 세팅
 	void SetAttackWithoutWeaponMontage(UAnimMontage* Montage);
 	void SetAttackMontage(UAnimMontage* Montage);
+	void SetAttackMontageForWarrior(UAnimMontage* Montage1, UAnimMontage* Montage2, UAnimMontage* Montage3);
 	void SetQSkillMontage(UAnimMontage* Montage);
 	void SetESkillMontage(UAnimMontage* Montage);
 	void SetRSkillMontage(UAnimMontage* Montage);
@@ -94,6 +95,12 @@ public:
 
 	UPROPERTY()
 	UAnimMontage* AttackMontage;
+
+	UPROPERTY()
+	UAnimMontage* WarriorAttackMontage_1;
+
+	UPROPERTY()
+	UAnimMontage* WarriorAttackMontage_2;
 
 	UPROPERTY()
 	UAnimMontage* QSkillMontage;

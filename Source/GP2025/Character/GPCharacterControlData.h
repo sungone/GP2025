@@ -74,6 +74,12 @@ public:
 	UAnimMontage* AttackAnimMontage;
 
 	UPROPERTY(EditAnywhere, Category = "Animation")
+	UAnimMontage* AttackAnimMontage_2;
+
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	UAnimMontage* AttackAnimMontage_3;
+
+	UPROPERTY(EditAnywhere, Category = "Animation")
 	UAnimMontage* QSkillAnimMontage;
 
 	UPROPERTY(EditAnywhere, Category = "Animation")
