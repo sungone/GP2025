@@ -95,16 +95,16 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 
 
 	case EPacketType::C_FRIEND_REQUEST:
-		HandleFriendRequestPacket(sessionId, packet);
+		HandleFriendAddRequestPacket(sessionId, packet);
 		break;
 	case EPacketType::C_FRIEND_ACCEPT:
-		HandleFriendAcceptPacket(sessionId, packet);
+		HandleFriendAcceptRequestPacket(sessionId, packet);
 		break;
 	case EPacketType::C_FRIEND_REMOVE:
-		HandleFriendRemovePacket(sessionId, packet);
+		HandleFriendRemoveRequestPacket(sessionId, packet);
 		break;
 	case EPacketType::C_FRIEND_REJECT:
-		HandleFriendRejectPacket(sessionId, packet);
+		HandleFriendRejectRequestPacket(sessionId, packet);
 		break;
 	}
 }
@@ -347,9 +347,9 @@ void PacketManager::HandleChatSendPacket(int32 sessionId, Packet* packet)
 	_sessionMgr.BroadcastToAll(&broadcastPkt);
 }
 
-void PacketManager::HandleFriendRequestPacket(int32 sessionId, Packet* packet)
+void PacketManager::HandleFriendAddRequestPacket(int32 sessionId, Packet* packet)
 {
-	auto* p = static_cast<FriendRequestPacket*>(packet);
+	auto* p = static_cast<FriendAddRequestPacket*>(packet);
 	auto session = SessionManager::GetInst().GetSession(sessionId);
 	if (!session || !session->IsLogin()) return;
 
@@ -362,9 +362,32 @@ void PacketManager::HandleFriendRequestPacket(int32 sessionId, Packet* packet)
 	SessionManager::GetInst().SendPacket(sessionId, &resPkt);
 }
 
-void PacketManager::HandleFriendAcceptPacket(int32 sessionId, Packet* packet)
+void PacketManager::HandleFriendRemoveRequestPacket(int32 sessionId, Packet* packet)
 {
-	auto* p = static_cast<FriendAcceptPacket*>(packet);
+	auto* p = static_cast<FriendRemoveRequestPacket*>(packet);
+	auto session = SessionManager::GetInst().GetSession(sessionId);
+	if (!session || !session->IsLogin()) return;
+
+	auto myId = session->GetUserDBID();
+	auto targetId = p->TargetUserID;
+
+	auto ret = DBManager::GetInst().RemoveFriend(myId, targetId);
+
+	FriendOperationResultPacket resPkt(EFriendOpType::Remove, ret);
+	SessionManager::GetInst().SendPacket(sessionId, &resPkt);
+
+	if (ret != DBResultCode::SUCCESS) return;
+
+	RemoveFriendPacket myPkt(targetId);
+	RemoveFriendPacket targetPkt(myId);
+
+	SessionManager::GetInst().SendPacket(sessionId, &myPkt);
+	SessionManager::GetInst().SendPacket(targetId, &targetPkt);
+}
+
+void PacketManager::HandleFriendAcceptRequestPacket(int32 sessionId, Packet* packet)
+{
+	auto* p = static_cast<FriendAcceptRequestPacket*>(packet);
 	auto session = SessionManager::GetInst().GetSession(sessionId);
 	if (!session || !session->IsLogin()) return;
 
@@ -373,15 +396,32 @@ void PacketManager::HandleFriendAcceptPacket(int32 sessionId, Packet* packet)
 
 	auto ret = DBManager::GetInst().AcceptFriendRequest(myId, targetId);
 	DBResultCode code = ret.first;
-	std::optional<FFriendInfo> friendsinfo = ret.second;
-	//Todo: 수락시 서로 친구 정보 공유
+	std::optional<FFriendInfo> friendInfo = ret.second;
+
 	FriendOperationResultPacket resPkt(EFriendOpType::Accept, code);
 	SessionManager::GetInst().SendPacket(sessionId, &resPkt);
+
+	if (code != DBResultCode::SUCCESS || !friendInfo.has_value())
+		return;
+
+	AddFriendPacket myPkt(friendInfo.value());
+	SessionManager::GetInst().SendPacket(sessionId, &myPkt);
+
+	auto selfInfo = SessionManager::GetInst().GetSession(sessionId)->GetPlayerInfo();
+	FFriendInfo reverseInfo;
+	reverseInfo.Id = myId;
+	reverseInfo.SetName(ConvertToWString(selfInfo.GetName()));
+	reverseInfo.Level = selfInfo.Stats.Level;
+	reverseInfo.bAccepted = true;
+
+	AddFriendPacket targetPkt(reverseInfo);
+	SessionManager::GetInst().SendPacket(targetId, &targetPkt);
 }
 
-void PacketManager::HandleFriendRejectPacket(int32 sessionId, Packet* packet)
+
+void PacketManager::HandleFriendRejectRequestPacket(int32 sessionId, Packet* packet)
 {
-	auto* p = static_cast<FriendRejectPacket*>(packet);
+	auto* p = static_cast<FriendRejectRequestPacket*>(packet);
 	auto session = SessionManager::GetInst().GetSession(sessionId);
 	if (!session || !session->IsLogin()) return;
 
@@ -390,19 +430,5 @@ void PacketManager::HandleFriendRejectPacket(int32 sessionId, Packet* packet)
 
 	auto ret = DBManager::GetInst().RemoveFriendRequest(myId, targetId);
 	FriendOperationResultPacket resPkt(EFriendOpType::Reject, ret);
-	SessionManager::GetInst().SendPacket(sessionId, &resPkt);
-}
-
-void PacketManager::HandleFriendRemovePacket(int32 sessionId, Packet* packet)
-{
-	auto* p = static_cast<FriendRemovePacket*>(packet);
-	auto session = SessionManager::GetInst().GetSession(sessionId);
-	if (!session || !session->IsLogin()) return;
-
-	auto myId = session->GetUserDBID();
-	auto targetId = p->TargetUserID;
-
-	auto ret = DBManager::GetInst().RemoveFriend(myId, targetId);
-	FriendOperationResultPacket resPkt(EFriendOpType::Remove, ret);
 	SessionManager::GetInst().SendPacket(sessionId, &resPkt);
 }

@@ -297,28 +297,28 @@ void UGPNetworkManager::SendMyRemoveStatePacket(uint32 State)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendFriendRequest(const FString& TargetNickName)
+void UGPNetworkManager::SendMyFriendRequest(const FString& TargetNickName)
 {
 	FTCHARToUTF8 NameUtf8(*TargetNickName);
-	FriendRequestPacket Packet(NameUtf8.Get());
+	FriendAddRequestPacket Packet(NameUtf8.Get());
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendFriendAccept(int32 RequesterUserID)
+void UGPNetworkManager::SendMyFriendAccept(int32 RequesterUserID)
 {
-	FriendAcceptPacket Packet(RequesterUserID);
+	FriendAcceptRequestPacket Packet(RequesterUserID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendFriendReject(int32 RequesterUserID)
+void UGPNetworkManager::SendMyFriendReject(int32 RequesterUserID)
 {
-	FriendRejectPacket Packet(RequesterUserID);
+	FriendRejectRequestPacket Packet(RequesterUserID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendFriendRemove(int32 TargetUserID)
+void UGPNetworkManager::SendMyFriendRemove(int32 TargetUserID)
 {
-	FriendRemovePacket Packet(TargetUserID);
+	FriendRemoveRequestPacket Packet(TargetUserID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
@@ -649,6 +649,18 @@ void UGPNetworkManager::ProcessPacket()
 
 					UE_LOG(LogTemp, Log, TEXT("- %s (Lv.%d) [%s]"), *Name, Info.Level, *Status);
 				}
+				break;
+			}
+			case EPacketType::S_ADD_FRIEND:
+			{
+				AddFriendPacket* Pkt = reinterpret_cast<AddFriendPacket*>(RemainingData.GetData());
+				UE_LOG(LogTemp, Log, TEXT("친구 추가: %s"), *Pkt->NewFriend.GetName());
+				break;
+			}
+			case EPacketType::S_REMOVE_FRIEND:
+			{
+				RemoveFriendPacket* Pkt = reinterpret_cast<RemoveFriendPacket*>(RemainingData.GetData());
+				UE_LOG(LogTemp, Log, TEXT("친구 제거됨: UserID=%d"), Pkt->FriendUserID);
 				break;
 			}
 #pragma endregion
