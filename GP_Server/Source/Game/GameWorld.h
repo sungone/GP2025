@@ -97,7 +97,7 @@ public:
 	std::shared_ptr<Player> GetPlayerByID(int32 id);
 	std::shared_ptr<Monster> GetMonsterByID(int32 id);
 	std::shared_ptr<Character> GetCharacterByID(int32 id);
-	int32 GetMonsterCnt(ZoneType zone) const { return _monsterCnt[zone]; }
+	int32 GetMonsterCnt(ZoneType zone) { return _monsterCnt[zone]; }
 	bool IsMonster(int32 id);
 	int32 GenerateMonsterId() { return _nextMonsterId++; }
 private:

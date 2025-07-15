@@ -15,7 +15,7 @@ void Player::Init()
 	_info.CollisionRadius = playerCollision;
 	_info.State = ECharacterStateType::STATE_IDLE;
 	ApplyLevelStats(_info.Stats.Level);
-	SetCurrentQuest(QuestType::CH2_CLEAR_E_BUILDING);
+	SetCurrentQuest(QuestType::TUT_KILL_ONE_MON);
 #endif
 }
 
@@ -599,7 +599,17 @@ bool Player::GiveQuestReward(QuestType quest)
 
 	auto pkt = QuestRewardPacket(quest, res, exp, gold);
 	SessionManager::GetInst().SendPacket(_id, &pkt);
-	questData->RewarditemType();
+	auto itemid = questData->RewarditemType;
+
+	if (questData->RewarditemType != -1)
+	{
+		FVector forward = _info.GetFrontVector();
+		float spawnDistance = 100.f;
+		FVector itemPos = GetPos() + forward * spawnDistance;
+		auto droppedItem = WorldItem(itemid, itemPos);
+		GameWorld::GetInst().SpawnWorldItem(droppedItem, GetZone());
+	}
+
 	return true;
 }
 

@@ -246,7 +246,7 @@ void Monster::PerformFlameBreath()
 	const int delayMs = 500; // 이펙트 먼저 보여주고 0.5초 후 판정
 
 	FVector origin = _pos;
-	FVector forward = _info.GetFrontVector().Normalize();
+	FVector forward = _info.GetFrontVector();
 
 	std::unordered_set<int32> viewListCopy;
 	{
@@ -303,7 +303,7 @@ void Monster::PerformFlameBreathRotate()
 	const float rotationPerTickDeg = 9.f;
 
 	FVector origin = _pos;
-	FVector forward = _info.GetFrontVector().Normalize();
+	FVector forward = _info.GetFrontVector();
 	forward.Z = 0.0f;
 
 	float startYawRad = DegreesToRadians(-180.f);
