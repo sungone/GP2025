@@ -112,6 +112,14 @@ struct ShopItemInfo
 	uint32 ItemID;
 	uint32 Price;
 };
+
+struct FFriendInfo
+{
+	uint32 Id;
+	std::string Nickname;
+	uint32 Level;
+	bool bAccepted;
+};
 #define START_ZONE ZoneType::TUK
 struct FInfoData
 {

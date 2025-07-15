@@ -22,4 +22,12 @@ public:
 	bool UpdatePlayerInfo(uint32 dbId, const FInfoData& info);
 	bool AddUserItem(uint32 dbId, uint32 itemID, uint8 itemTypeID);
 	bool RemoveUserItem(uint32 dbId, uint32 itemID);
+
+	bool SendFriendRequest(uint32 fromId, uint32 toId);
+	bool IsFriendOrPending(uint32 userId, uint32 targetId);
+	std::optional<FFriendInfo> AcceptFriendRequest(uint32 fromId, uint32 toId);
+	bool RemoveFriendRequest(uint32 fromId, uint32 toId);
+	bool RemoveFriend(uint32 userId, uint32 friendId);
+	std::vector<FFriendInfo> GetFriendList(uint32 userId);
+
 };

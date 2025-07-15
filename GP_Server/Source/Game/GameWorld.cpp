@@ -74,7 +74,6 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 
 	//for test
 	player->AddGold(10000);
-	BuyItem(playerId, (uint8)Type::EWeapon::ENERGY_SWORD, 1);
 	BuyItem(playerId, (uint8)Type::EQuestItem::KEY, 1);
 
 	auto& playerInfo = player->GetInfo();
