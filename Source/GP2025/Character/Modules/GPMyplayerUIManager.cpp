@@ -17,6 +17,7 @@
 #include "Skill/GPSkillStruct.h"
 #include "Quest/GPQuestMessageStruct.h"
 #include "UI/GPQuestWidget.h"
+#include "UI/Friend/GPFriendBox.h"
 #include "Inventory/GPSkillInfo.h"
 
 UGPMyplayerUIManager::UGPMyplayerUIManager()
@@ -688,6 +689,10 @@ void UGPMyplayerUIManager::OpenFriendBox()
 	if (FriendBoxWidget && !FriendBoxWidget->IsInViewport())
 	{
 		FriendBoxWidget->AddToViewport();
+		if (UGPFriendBox* FriendBox = Cast<UGPFriendBox>(FriendBoxWidget))
+		{
+			FriendBox->PlayOpenAnimation(false); 
+		}
 
 		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
 		if (PC)
@@ -707,6 +712,11 @@ void UGPMyplayerUIManager::OpenFriendBox()
 void UGPMyplayerUIManager::CloseFriendBox()
 {
 	if (!Owner || !FriendBoxWidget) return;
+
+	if (UGPFriendBox* FriendBox = Cast<UGPFriendBox>(FriendBoxWidget))
+	{
+		FriendBox->PlayOpenAnimation(true);
+	}
 
 	if (FriendBoxWidget->IsInViewport())
 	{

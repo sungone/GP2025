@@ -91,3 +91,16 @@ void UGPFriendBox::OnRejectButtonClicked()
 	// TODO: NetMgr ¡æ SendFriendRejectPacket
 	UE_LOG(LogTemp, Log, TEXT("[FriendBox] RejectButton clicked ¡æ Send FriendRejectPacket to server."));
 }
+
+void UGPFriendBox::PlayOpenAnimation(bool bReverse)
+{
+	if (!OpenAnim) return;
+
+	PlayAnimation(
+		OpenAnim,
+		0.f,
+		1,
+		bReverse ? EUMGSequencePlayMode::Reverse : EUMGSequencePlayMode::Forward,
+		1.f
+	);
+}

@@ -78,4 +78,13 @@ public:
 	// Getter (Optional)
 	FORCEINLINE UUserWidget* GetFriendListWidget() const { return FriendListWidget; }
 	FORCEINLINE UUserWidget* GetRequestedFriendWidget() const { return RequestedFriendWidget; }
+
+
+public:
+	/** Friend창 열/닫기 애니메이션 */
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	UWidgetAnimation* OpenAnim;
+
+	/** 애니메이션 재생 함수 */
+	void PlayOpenAnimation(bool bReverse);
 };
