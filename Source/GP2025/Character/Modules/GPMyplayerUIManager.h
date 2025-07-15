@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "../../GP_Server/Source/Common/Type.h"
 #include "GPMyplayerUIManager.generated.h"
+
 
 /**
  * 
@@ -126,5 +128,12 @@ public :
 
 // Skill Info Update From Inventory
 	void UpdateSkillInfosFromPlayer();
+
+
+// Quest Message
+	void ShowQuestStartMessage(QuestType InQuestType);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Quest")
+	UDataTable* QuestMessageTable;
 };
 

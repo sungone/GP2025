@@ -999,6 +999,8 @@ void UGPObjectManager::OnQuestStart(QuestType Quest)
 		uint8 QuestID = static_cast<uint8>(Quest);
 		UE_LOG(LogTemp, Warning, TEXT("=== [ObjectManager] Calling UIManager->AddQuestEntry(%d) ==="), QuestID);
 		MyPlayer->UIManager->AddQuestEntry(QuestID, false);
+
+		MyPlayer->UIManager->ShowQuestStartMessage(Quest);
 	}
 	else
 	{

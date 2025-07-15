@@ -15,6 +15,7 @@
 #include "Character/Modules/GPMyplayerSoundManager.h"
 #include "UI/GPSkillLevelUpText.h"
 #include "Skill/GPSkillStruct.h"
+#include "Quest/GPQuestMessageStruct.h"
 #include "Inventory/GPSkillInfo.h"
 
 UGPMyplayerUIManager::UGPMyplayerUIManager()
@@ -59,6 +60,12 @@ UGPMyplayerUIManager::UGPMyplayerUIManager()
 	if (DeadWidgetClassBPClass.Succeeded())
 	{
 		DeadScreenWidgetClass = DeadWidgetClassBPClass.Class;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UDataTable> QuestTableObj(TEXT("/Game/Quest/GPQuestMessageTable.GPQuestMessageTable"));
+	if (QuestTableObj.Succeeded())
+	{
+		QuestMessageTable = QuestTableObj.Object;
 	}
 }
 void UGPMyplayerUIManager::Initialize(AGPCharacterMyplayer* InOwner)
@@ -583,6 +590,23 @@ void UGPMyplayerUIManager::UpdateSkillInfosFromPlayer()
 				0,
 				InputKey
 			);
+		}
+	}
+}
+
+void UGPMyplayerUIManager::ShowQuestStartMessage(QuestType InQuestType)
+{
+	if (QuestMessageTable)
+	{
+		FName RowName = *FString::Printf(TEXT("%d"), static_cast<uint8>(InQuestType));
+		FGPQuestMessageStruct* Row = QuestMessageTable->FindRow<FGPQuestMessageStruct>(
+			RowName,
+			TEXT("Quest Message Lookup")
+		);
+
+		if (GetInGameWidget())
+		{
+			GetInGameWidget()->ShowGameMessage(Row->QuestMessage, 3.0f);
 		}
 	}
 }
