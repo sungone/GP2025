@@ -58,6 +58,5 @@ private:
 	std::shared_ptr<Player> _player;
 	std::unique_ptr<SessionSocket> _sSocket;
 	SessionState _state = SessionState::None;
-
 	std::mutex _sMutex;
 };
