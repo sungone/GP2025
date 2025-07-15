@@ -44,6 +44,11 @@ public:
 
 	void HandleChatSendPacket(int32 sessionId, Packet* packet);
 	
+	void HandleFriendAddRequestPacket(int32 sessionId, Packet* packet);
+	void HandleFriendAcceptRequestPacket(int32 sessionId, Packet* packet);
+	void HandleFriendRemoveRequestPacket(int32 sessionId, Packet* packet);
+	void HandleFriendRejectRequestPacket(int32 sessionId, Packet* packet);
+	
 private:
 	SessionManager& _sessionMgr = SessionManager::GetInst();
 	DBManager& _dbMgr = DBManager::GetInst();

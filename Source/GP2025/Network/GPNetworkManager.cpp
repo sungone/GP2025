@@ -297,6 +297,36 @@ void UGPNetworkManager::SendMyRemoveStatePacket(uint32 State)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
+void UGPNetworkManager::SendMyFriendRequest(const FString& TargetNickName)
+{
+	FTCHARToUTF8 NameUtf8(*TargetNickName);
+	FriendAddRequestPacket Packet(NameUtf8.Get());
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendMyFriendAccept(int32 RequesterUserID)
+{
+	FriendAcceptRequestPacket Packet(RequesterUserID);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendMyFriendReject(int32 RequesterUserID)
+{
+	FriendRejectRequestPacket Packet(RequesterUserID);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendMyFriendRemove(int32 TargetUserID)
+{
+	FriendRemoveRequestPacket Packet(TargetUserID);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+//void UGPNetworkManager::SendFriendListRequest(int32 PlayerID)
+//{
+//	//Todo: 로드 실패시 요청해야함.
+//}
+
 void UGPNetworkManager::ReceiveData()
 {
 	uint32 DataSize;
@@ -592,6 +622,44 @@ void UGPNetworkManager::ProcessPacket()
 				UE_LOG(LogTemp, Log, TEXT("%s: %s"), *SenderName, *ChatText);
 
 				OnReceiveChat.Broadcast(SenderName, ChatText);
+				break;
+			}
+#pragma endregion
+#pragma region Friend
+			case EPacketType::S_FRIEND_OPERATION_RESULT:
+			{
+				FriendOperationResultPacket* Pkt = reinterpret_cast<FriendOperationResultPacket*>(RemainingData.GetData());
+				DBResultCode Code = Pkt->ResultCode;
+				EFriendOpType OpType =  Pkt->OperationType;
+
+				break;
+			}
+			case EPacketType::S_FRIEND_LIST:
+			{
+				FriendListPacket* Pkt = reinterpret_cast<FriendListPacket*>(RemainingData.GetData());
+				uint8 Count = Pkt->FriendCount;
+
+				UE_LOG(LogTemp, Log, TEXT("== Friend List =="));
+				for (int i = 0; i < Count; ++i)
+				{
+					FFriendInfo& Info = Pkt->Friends[i];
+					FString Name = Info.GetName();
+					FString Status = Info.bAccepted ? TEXT("친구") : TEXT("요청중");
+					UE_LOG(LogTemp, Log, TEXT("- %s (Lv.%d) [%s]"), *Name, Info.Level, *Status);
+				}
+				break;
+			}
+			case EPacketType::S_ADD_FRIEND:
+			{
+				AddFriendPacket* Pkt = reinterpret_cast<AddFriendPacket*>(RemainingData.GetData());
+				FString Name = Pkt->NewFriend.GetName();
+				UE_LOG(LogTemp, Log, TEXT("친구 추가: %s"), *Name);
+				break;
+			}
+			case EPacketType::S_REMOVE_FRIEND:
+			{
+				RemoveFriendPacket* Pkt = reinterpret_cast<RemoveFriendPacket*>(RemainingData.GetData());
+				UE_LOG(LogTemp, Log, TEXT("친구 제거됨: UserID=%d"), Pkt->FriendUserID);
 				break;
 			}
 #pragma endregion

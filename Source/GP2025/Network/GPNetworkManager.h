@@ -83,6 +83,12 @@ public:
 	void SendMyChatMessage(const FString& Message);
 	void SendMyRemoveStatePacket(uint32 State);
 
+	void SendMyFriendRequest(const FString& TargetNickName);
+	void SendMyFriendAccept(int32 RequesterUserID);
+	void SendMyFriendReject(int32 RequesterUserID);
+	void SendMyFriendRemove(int32 TargetUserID);
+	//void SendFriendListRequest(int32 PlayerID); ³ªÁß¿¡
+
 private:
 	void SendPacket(uint8* Buf, int32 Size);
 	void ReceiveData();

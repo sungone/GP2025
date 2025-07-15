@@ -8,6 +8,7 @@ struct DBLoginResult
 	std::vector<std::pair<uint32, uint8>> items;
 };
 
+
 class DBManager
 {
 public:
@@ -22,4 +23,13 @@ public:
 	bool UpdatePlayerInfo(uint32 dbId, const FInfoData& info);
 	bool AddUserItem(uint32 dbId, uint32 itemID, uint8 itemTypeID);
 	bool RemoveUserItem(uint32 dbId, uint32 itemID);
+
+	DBResultCode SendFriendRequest(uint32 fromId, uint32 toId);
+	bool IsFriendOrPending(uint32 userId, uint32 targetId);
+	std::pair<DBResultCode, std::optional<FFriendInfo>> AcceptFriendRequest(uint32 fromId, uint32 toId);
+	DBResultCode RemoveFriendRequest(uint32 fromId, uint32 toId);
+	DBResultCode RemoveFriend(uint32 userId, uint32 friendId);
+	std::pair<DBResultCode, std::vector<FFriendInfo>> GetFriendList(uint32 userId);
+	int32 FindUserDBId(const std::string& nickname);
+
 };

@@ -73,8 +73,34 @@ CREATE TABLE `player_info` (
 
 LOCK TABLES `player_info` WRITE;
 /*!40000 ALTER TABLE `player_info` DISABLE KEYS */;
-INSERT INTO `player_info` VALUES (1,1,7356.34,19489.6,160,-52.4654,50,150,90,10,0,600,550,550,75,0.3,3,0.25,200,0,1,1,2,1,3,1,0,0,0,0,0);
 /*!40000 ALTER TABLE `player_info` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `user_friends`
+--
+
+DROP TABLE IF EXISTS `user_friends`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user_friends` (
+  `user_id` int unsigned NOT NULL,
+  `friend_id` int unsigned NOT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`user_id`,`friend_id`),
+  KEY `fk_user_friends_friend` (`friend_id`),
+  CONSTRAINT `fk_user_friends_friend` FOREIGN KEY (`friend_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_user_friends_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user_friends`
+--
+
+LOCK TABLES `user_friends` WRITE;
+/*!40000 ALTER TABLE `user_friends` DISABLE KEYS */;
+/*!40000 ALTER TABLE `user_friends` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -118,7 +144,7 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `login_id` (`login_id`),
   UNIQUE KEY `nickname` (`nickname`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -127,7 +153,6 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'dev','2025','관리자');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -140,4 +165,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-26 20:51:02
+-- Dump completed on 2025-07-15 12:38:01
