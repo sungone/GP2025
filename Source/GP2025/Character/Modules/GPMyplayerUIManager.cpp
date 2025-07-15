@@ -74,6 +74,12 @@ UGPMyplayerUIManager::UGPMyplayerUIManager()
 	{
 		MainQuestStartWidgetClass = MainQuestStartBPClass.Class;
 	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> FriendBoxBPClass(TEXT("/Game/UI/Friend/WBP_FriendBox"));
+	if (FriendBoxBPClass.Succeeded())
+	{
+		FriendBoxWidgetClass = FriendBoxBPClass.Class;
+	}
 }
 void UGPMyplayerUIManager::Initialize(AGPCharacterMyplayer* InOwner)
 {
@@ -667,3 +673,53 @@ void UGPMyplayerUIManager::PlayMainQuestStartWidget()
 	}
 }
 
+void UGPMyplayerUIManager::OpenFriendBox()
+{
+	if (!Owner || !FriendBoxWidgetClass) return;
+
+	UWorld* World = Owner->GetWorld();
+	if (!World) return;
+
+	if (!FriendBoxWidget)
+	{
+		FriendBoxWidget = CreateWidget<UUserWidget>(World, FriendBoxWidgetClass);
+	}
+
+	if (FriendBoxWidget && !FriendBoxWidget->IsInViewport())
+	{
+		FriendBoxWidget->AddToViewport();
+
+		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
+		if (PC)
+		{
+			PC->SetShowMouseCursor(true);
+
+			FInputModeGameAndUI InputMode;
+			InputMode.SetWidgetToFocus(FriendBoxWidget->TakeWidget());
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			PC->SetInputMode(InputMode);
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("[UIManager] FriendBoxWidget opened."));
+	}
+}
+
+void UGPMyplayerUIManager::CloseFriendBox()
+{
+	if (!Owner || !FriendBoxWidget) return;
+
+	if (FriendBoxWidget->IsInViewport())
+	{
+		FriendBoxWidget->RemoveFromParent();
+		FriendBoxWidget = nullptr;
+
+		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
+		if (PC)
+		{
+			PC->SetShowMouseCursor(false);
+			PC->SetInputMode(FInputModeGameOnly());
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("[UIManager] FriendBoxWidget closed."));
+	}
+}

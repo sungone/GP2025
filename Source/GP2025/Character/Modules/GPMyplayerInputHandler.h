@@ -118,6 +118,7 @@ public :
 
 	UFUNCTION(BlueprintCallable)
 	void Interact();
+	bool bIsFriendBoxOpen = false;
 
 	void EnterChatting();
 	

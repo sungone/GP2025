@@ -143,5 +143,17 @@ public :
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Quest")
 	TSubclassOf<UUserWidget> MainQuestStartWidgetClass;
+
+// Friend
+	public:
+		// FriendBox
+		void OpenFriendBox();
+		void CloseFriendBox();
+
+		UPROPERTY()
+		class UUserWidget* FriendBoxWidget;
+
+		UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Friend")
+		TSubclassOf<UUserWidget> FriendBoxWidgetClass;
 };
 

@@ -295,7 +295,23 @@ void UGPMyplayerInputHandler::Refuse()
 
 void UGPMyplayerInputHandler::Interact()
 {
-	if (!Owner) return;
+	if (!Owner || !Owner->UIManager) return;
+
+	if (!bIsFriendBoxOpen)
+	{
+		Owner->UIManager->OpenFriendBox();
+		bIsFriendBoxOpen = true;
+	}
+	else
+	{
+		Owner->UIManager->CloseFriendBox();
+		bIsFriendBoxOpen = false;
+	}
+
+	if (Owner->SoundManager && Owner->SoundManager->ClickSound)
+	{
+		Owner->SoundManager->PlaySFX(Owner->SoundManager->ClickSound);
+	}
 }
 
 void UGPMyplayerInputHandler::EnterChatting()
