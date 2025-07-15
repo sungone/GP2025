@@ -97,6 +97,7 @@ enum EPacketType : uint8
 	S_FRIEND_LIST,
 	S_ADD_FRIEND,
 	S_REMOVE_FRIEND,
+	S_REQUEST_FRIEND,
 
 	//for test
 	S_DEBUG_TRIANGLE,

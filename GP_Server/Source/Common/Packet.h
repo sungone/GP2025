@@ -778,4 +778,15 @@ struct RemoveFriendPacket : public Packet
 	}
 };
 
+struct FriendRequestPacket : public Packet
+{
+	FFriendInfo RequesterInfo;
+
+	FriendRequestPacket(const FFriendInfo& requesterInfo)
+		: Packet(EPacketType::S_REQUEST_FRIEND), RequesterInfo(requesterInfo)
+	{
+		Header.PacketSize = sizeof(FriendRequestPacket);
+	}
+};
+
 #pragma endregion
