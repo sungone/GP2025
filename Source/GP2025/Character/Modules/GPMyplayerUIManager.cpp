@@ -16,6 +16,7 @@
 #include "UI/GPSkillLevelUpText.h"
 #include "Skill/GPSkillStruct.h"
 #include "Quest/GPQuestMessageStruct.h"
+#include "UI/GPQuestWidget.h"
 #include "Inventory/GPSkillInfo.h"
 
 UGPMyplayerUIManager::UGPMyplayerUIManager()
@@ -66,6 +67,12 @@ UGPMyplayerUIManager::UGPMyplayerUIManager()
 	if (QuestTableObj.Succeeded())
 	{
 		QuestMessageTable = QuestTableObj.Object;
+	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> MainQuestStartBPClass(TEXT("/Game/UI/WBP_MainQuestStart"));
+	if (MainQuestStartBPClass.Succeeded())
+	{
+		MainQuestStartWidgetClass = MainQuestStartBPClass.Class;
 	}
 }
 void UGPMyplayerUIManager::Initialize(AGPCharacterMyplayer* InOwner)
@@ -607,6 +614,55 @@ void UGPMyplayerUIManager::ShowQuestStartMessage(QuestType InQuestType)
 		if (GetInGameWidget())
 		{
 			GetInGameWidget()->ShowGameMessage(Row->QuestMessage, 3.0f);
+		}
+	}
+}
+
+void UGPMyplayerUIManager::PlayMainQuestStartWidget()
+{
+	if (!Owner) return;
+	UWorld* World = Owner->GetWorld();
+	if (!World) return;
+
+	if (!MainQuestStartWidget && MainQuestStartWidgetClass)
+	{
+		MainQuestStartWidget = CreateWidget<UUserWidget>(World, MainQuestStartWidgetClass);
+	}
+
+	if (MainQuestStartWidget && !MainQuestStartWidget->IsInViewport())
+	{
+		MainQuestStartWidget->AddToViewport();
+
+		if (UGPQuestWidget* QuestWidget = Cast<UGPQuestWidget>(MainQuestStartWidget))
+		{
+			if (QuestWidget->QuestExitButton)
+			{
+				QuestWidget->QuestExitButton->SetVisibility(ESlateVisibility::Hidden);
+				UE_LOG(LogTemp, Log, TEXT("[UIManager] QuestExitButton hidden in MainQuestStartWidget."));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[UIManager] QuestExitButton is null in MainQuestStartWidget."));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("[UIManager] Cast to UGPQuestWidget failed for MainQuestStartWidget."));
+		}
+	}
+
+	// 입력 모드 UI Only 전환 (선택 사항)
+	if (Owner->IsPlayerControlled())
+	{
+		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
+		if (PC)
+		{
+			PC->bShowMouseCursor = true;
+
+			FInputModeUIOnly InputMode;
+			InputMode.SetWidgetToFocus(MainQuestStartWidget->TakeWidget());
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			PC->SetInputMode(InputMode);
 		}
 	}
 }

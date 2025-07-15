@@ -42,8 +42,6 @@ void UGPQuestWidget::SetQuestTitle(const FText& Title)
 
 void UGPQuestWidget::OnQuestAccepted()
 {
-	if (!OwningNPC) return;
-
 	// 플레이어 접근
 	AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (!MyPlayer) return;
@@ -54,6 +52,35 @@ void UGPQuestWidget::OnQuestAccepted()
 	if (ClickSound)
 	{
 		UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
+	}
+
+	if (!OwningNPC) // MainQuestStart
+	{
+		if (MyPlayer->CharacterInfo.GetCurrentQuest().QuestType == QuestType::TUT_COMPLETE)
+		{
+			NetMgr->SendMyCompleteQuest(QuestType::TUT_COMPLETE);
+			UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] MainQuestStart: SendMyCompleteQuest(TUT_COMPLETE)"));
+		}
+
+		RemoveFromParent();
+
+		if (APlayerController* PC = Cast<APlayerController>(MyPlayer->GetController()))
+		{
+			if (MyPlayer->UIManager && MyPlayer->UIManager->bIsInventoryOpen)
+			{
+				PC->bShowMouseCursor = true;
+				FInputModeGameAndUI InputMode;
+				InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+				PC->SetInputMode(InputMode);
+			}
+			else
+			{
+				PC->bShowMouseCursor = false;
+				PC->SetInputMode(FInputModeGameOnly());
+			}
+		}
+
+		return;
 	}
 
 	// NPC 타입에 따라 처리 분기
@@ -117,3 +144,4 @@ void UGPQuestWidget::OnQuestExit()
 		OwningNPC->ExitInteraction();
 	}
 }
+

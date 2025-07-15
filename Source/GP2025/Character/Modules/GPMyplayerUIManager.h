@@ -135,5 +135,13 @@ public :
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Quest")
 	UDataTable* QuestMessageTable;
+
+// Main Quest Start Widget
+	void PlayMainQuestStartWidget();
+	UPROPERTY()
+	UUserWidget* MainQuestStartWidget;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Quest")
+	TSubclassOf<UUserWidget> MainQuestStartWidgetClass;
 };
 
