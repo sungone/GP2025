@@ -97,10 +97,10 @@ void UGPQuestListEntryWidget::SetQuestTask(uint8 InQuestType)
         TaskDescription = TEXT("회복 아이템을 사용하기");
         break;
     case QuestType::TUT_BUY_ITEM:
-        TaskDescription = TEXT("상점에서 아이템을 구매하기");
+        TaskDescription = TEXT("상점에서 무기 아이템을 구매하기");
         break;
     case QuestType::TUT_EQUIP_ITEM:
-        TaskDescription = TEXT("구매한 아이템을 착용하기");
+        TaskDescription = TEXT("구매한 무기 아이템을 착용하기");
         break;
     case QuestType::TUT_COMPLETE:
         TaskDescription = TEXT("튜토리얼 완료!");

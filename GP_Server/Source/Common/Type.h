@@ -337,36 +337,37 @@ enum class QuestType : uint8
 UENUM(BlueprintType)
 enum class QuestType : uint8
 {
-	NONE UMETA(DisplayName = "None"),
+	NONE                      = 0       UMETA(DisplayName = "None"),
 
 	// Chapter 1
-	CH1_TALK_TO_STUDENT_A     UMETA(DisplayName = "Talk to Student A"),
-	CH1_GO_TO_E_FIRST         UMETA(DisplayName = "Go to E First"),
-	CH1_FIND_JANITOR          UMETA(DisplayName = "Find Janitor"),
-	CH1_GO_TO_BUNKER          UMETA(DisplayName = "Go to Bunker"),
-	CH1_BUNKER_CLEANUP        UMETA(DisplayName = "Bunker Cleanup"),
-	CH1_FIND_KEY_ITEM         UMETA(DisplayName = "Find Key Item"),
+	CH1_TALK_TO_STUDENT_A     = 1       UMETA(DisplayName = "Talk to Student A"),
+	CH1_GO_TO_E_FIRST         = 2       UMETA(DisplayName = "Go to E First"),
+	CH1_FIND_JANITOR          = 3       UMETA(DisplayName = "Find Janitor"),
+	CH1_GO_TO_BUNKER          = 4       UMETA(DisplayName = "Go to Bunker"),
+	CH1_BUNKER_CLEANUP        = 5       UMETA(DisplayName = "Bunker Cleanup"),
+	CH1_FIND_KEY_ITEM         = 6       UMETA(DisplayName = "Find Key Item"),
 
 	// Chapter 2
-	CH2_ENTER_E_BUILDING      UMETA(DisplayName = "Enter E Building"),
-	CH2_CLEAR_E_BUILDING      UMETA(DisplayName = "Clear E Building"),
-	CH2_KILL_DESKMON          UMETA(DisplayName = "Kill Deskmon"),
+	CH2_ENTER_E_BUILDING      = 7       UMETA(DisplayName = "Enter E Building"),
+	CH2_CLEAR_E_BUILDING      = 8       UMETA(DisplayName = "Clear E Building"),
+	CH2_KILL_DESKMON          = 9       UMETA(DisplayName = "Kill Deskmon"),
 
 	// Chapter 3
-	CH3_RETURN_TO_TIP_WITH_DOC UMETA(DisplayName = "Return to TIP with Document"),
-	CH3_CLEAR_SERVER_ROOM     UMETA(DisplayName = "Clear Server Room"),
-	CH3_KILL_DRILL            UMETA(DisplayName = "Kill Drill"),
+	CH3_RETURN_TO_TIP_WITH_DOC = 10     UMETA(DisplayName = "Return to TIP with Document"),
+	CH3_CLEAR_SERVER_ROOM     = 11      UMETA(DisplayName = "Clear Server Room"),
+	CH3_KILL_DRILL            = 12      UMETA(DisplayName = "Kill Drill"),
 
 	// Chapter 4
-	CH4_ENTER_GYM             UMETA(DisplayName = "Enter Gym"),
-	CH4_KILL_TINO             UMETA(DisplayName = "Kill Tino"),
+	CH4_ENTER_GYM             = 13      UMETA(DisplayName = "Enter Gym"),
+	CH4_KILL_TINO             = 14      UMETA(DisplayName = "Kill Tino"),
 
 	// Tutorial
-	TUT_MOVE                  UMETA(DisplayName = "Tutorial - Move"),
-	TUT_KILL_ONE_MON          UMETA(DisplayName = "Tutorial - Kill One Monster"),
-	TUT_USE_ITEM              UMETA(DisplayName = "Tutorial - Use Item"),
-	TUT_BUY_ITEM              UMETA(DisplayName = "Tutorial - Buy Item"),
-	TUT_EQUIP_ITEM            UMETA(DisplayName = "Tutorial - Equip Item"),
-	TUT_COMPLETE              UMETA(DisplayName = "Tutorial - Complete")
+	TUT_MOVE                  = 100     UMETA(DisplayName = "Tutorial - Move"),
+	TUT_KILL_ONE_MON          = 101     UMETA(DisplayName = "Tutorial - Kill One Monster"),
+	TUT_USE_ITEM              = 102     UMETA(DisplayName = "Tutorial - Use Item"),
+	TUT_BUY_ITEM              = 103     UMETA(DisplayName = "Tutorial - Buy Item"),
+	TUT_EQUIP_ITEM            = 104     UMETA(DisplayName = "Tutorial - Equip Item"),
+	TUT_COMPLETE              = 105     UMETA(DisplayName = "Tutorial - Complete")
 };
+
 #endif

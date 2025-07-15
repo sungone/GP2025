@@ -496,7 +496,7 @@ uint8 Player::EquipItem(uint32 itemId)
 	_info.EquipItemByType(itemType);
 
 	auto type = targetItem->GetItemCategory();
-	if (IsInTutorialQuest()&& type == EItemCategory::Weapon)
+	if (IsInTutorialQuest() && type == EItemCategory::Weapon)
 	{
 		CheckAndUpdateQuestProgress();
 	}
@@ -645,6 +645,8 @@ bool Player::SetCurrentQuest(QuestType quest)
 	{
 		GameWorld::GetInst().QuestSpawn(_id, quest);
 	}
+	_bTutQuest = (static_cast<uint8>(quest) >= static_cast<uint8>(QuestType::TUT_MOVE));
+
 	return true;
 }
 
