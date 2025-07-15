@@ -31,6 +31,6 @@ public:
 	DBResultCode RemoveFriendRequest(uint32 fromId, uint32 toId);
 	DBResultCode RemoveFriend(uint32 userId, uint32 friendId);
 	std::pair<DBResultCode, std::vector<FFriendInfo>> GetFriendList(uint32 userId);
-	int32 FindUserDBId(const std::string& nickname);
+	int32 FindUserDBId(const std::wstring& nickname);
 
 };

@@ -2,6 +2,7 @@
 #include "DBManager.h"
 #include "GameWorld.h"
 #include "ScopedDBSession.h"
+#include "SessionManager.h"
 
 bool DBManager::Connect(const std::string& host, const std::string& user, const std::string& pwd, const std::string& db)
 {
@@ -483,7 +484,8 @@ std::pair<DBResultCode, std::vector<FFriendInfo>> DBManager::GetFriendList(uint3
 			info.SetName(ConvertToWString(nickname));
 			info.Level = static_cast<uint32>(row[2].get<int>());
 			info.bAccepted = row[3].get<int>() == 1;
-
+			int32 sess = SessionManager::GetInst().GetOnlineSessionId(info.Id);
+			info.isOnline = (sess != -1);
 			friendList.emplace_back(info);
 		}
 
@@ -497,7 +499,7 @@ std::pair<DBResultCode, std::vector<FFriendInfo>> DBManager::GetFriendList(uint3
 	}
 }
 
-int32 DBManager::FindUserDBId(const std::string& nickname)
+int32 DBManager::FindUserDBId(const std::wstring& nickname)
 {
 	try
 	{

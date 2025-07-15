@@ -10,6 +10,7 @@
 /**
  * 
  */
+struct FFriendInfo;
 UCLASS()
 class GP2025_API UGPFriendBox : public UUserWidget
 {

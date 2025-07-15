@@ -354,12 +354,25 @@ void PacketManager::HandleFriendAddRequestPacket(int32 sessionId, Packet* packet
 	if (!session || !session->IsLogin()) return;
 
 	auto myId = session->GetUserDBID();
-	auto targetNick = std::string(p->TargetNickName);
+	auto targetNick = ConvertToWString(p->TargetNickName);
 	auto targetId = DBManager::GetInst().FindUserDBId(targetNick);
-	auto result = DBManager::GetInst().SendFriendRequest(myId, targetId);
+	DBResultCode result = DBManager::GetInst().SendFriendRequest(myId, targetId);
 
 	FriendOperationResultPacket resPkt(EFriendOpType::Request, result);
 	SessionManager::GetInst().SendPacket(sessionId, &resPkt);
+	int32 targetSessId = SessionManager::GetInst().GetOnlineSessionId(targetId);
+	if (targetSessId != -1)
+	{
+		auto& pInfo = session->GetPlayerInfo();
+		auto name = pInfo.GetName();
+		FFriendInfo info;
+		info.Id = myId;
+		info.SetName(ConvertToWString(name));
+		info.Level = pInfo.GetLevel();
+		info.isOnline = true;
+		FriendRequestPacket requestPkt(info);
+		SessionManager::GetInst().SendPacket(targetSessId, &requestPkt);
+	}
 }
 
 void PacketManager::HandleFriendRemoveRequestPacket(int32 sessionId, Packet* packet)

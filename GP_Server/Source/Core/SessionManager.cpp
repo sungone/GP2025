@@ -164,3 +164,13 @@ int SessionManager::GenerateId()
 	_freeIds.pop();
 	return id;
 }
+
+int32 SessionManager::GetOnlineSessionId(uint32 dbid)
+{
+	for (auto& session : _sessions)
+	{
+		if (session && session->IsLogin() && session->GetUserDBID() == dbid)
+			return session->GetId();
+	}
+	return -1;
+}
