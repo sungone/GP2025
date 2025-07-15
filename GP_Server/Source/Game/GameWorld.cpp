@@ -888,7 +888,16 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 		return;
 	}
 	if(player->IsQuestInProgress(quest))
-		player->CheckAndUpdateQuestProgress(EQuestCategory::INTERACT);
+	{
+		const QuestData* questData = QuestTable::GetInst().GetQuest(quest);
+		if (!questData)
+		{
+			LOG_W("Invalid quest ID");
+			return;
+		}
+		auto type = questData->Catagory;
+		player->CheckAndUpdateQuestProgress(type);
+	}
 }
 
 void GameWorld::QuestSpawn(int32 playerId, QuestType quest)
