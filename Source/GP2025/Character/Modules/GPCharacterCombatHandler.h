@@ -33,6 +33,8 @@ public:
 	void SetDeadMontage(UAnimMontage* Montage);
 	void SetDeadEventDelay(float Delay);
 
+	// 몬스터 Hit
+	void PlayMonsterHitMontage();
 	// 스킬
 	void PlayQSkillMontage();
 	void PlayESkillMontage();
@@ -50,6 +52,7 @@ public:
 	void SetQSkillMontage(UAnimMontage* Montage);
 	void SetESkillMontage(UAnimMontage* Montage);
 	void SetRSkillMontage(UAnimMontage* Montage);
+	void SetMonsterHitMontage(UAnimMontage* Montage);
 
 	// <GunenrPlayer R Skill Ability>
 	void ApplyAttackSpeedBoost(float BoostPlayRate, float Duration);
@@ -113,6 +116,9 @@ public:
 
 	UPROPERTY()
 	UAnimMontage* DeadMontage;
+
+	UPROPERTY()
+	UAnimMontage* MonsterHitMontage;
 
 private :
 	// AnimMontage PlayRate

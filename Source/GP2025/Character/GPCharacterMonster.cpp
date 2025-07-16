@@ -5,6 +5,7 @@
 #include "Character/GPCharacterMyPlayer.h"
 #include "Character/GPCharacterControlData.h"
 #include "Character/Modules/GPCharacterUIHandler.h"
+#include "Character/Modules/GPCharacterCombatHandler.h"
 #include "UI/GPHpBarWidget.h"
 #include "UI/GPLevelWidget.h"
 #include "Kismet/GameplayStatics.h"
@@ -67,6 +68,8 @@ void AGPCharacterMonster::SetCharacterData(const UGPCharacterControlData* Charac
 
 	GetCapsuleComponent()->SetCapsuleHalfHeight(CharacterControlData->CapsuleHalfHeight);
 	GetCapsuleComponent()->SetCapsuleRadius(CharacterControlData->CapsuleRadius);
+
+	CombatHandler->SetMonsterHitMontage(CharacterControlData->MonsterHitAnimMontage);
 
 	//if (CharacterControlData->bIsBoos)
 	//ApplyCapsuleAndMeshScaling(CharacterControlData->CapsuleRadius, CharacterControlData->CapsuleHalfHeight);

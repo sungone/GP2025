@@ -246,6 +246,41 @@ void UGPCharacterCombatHandler::SetDeadEventDelay(float Delay)
 	DeadEventDelayTime = Delay;
 }
 
+void UGPCharacterCombatHandler::PlayMonsterHitMontage()
+{
+	if (!Owner || !MonsterHitMontage)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Combat] Cannot play MonsterHitMontage. Owner or montage is null."));
+		return;
+	}
+
+	UAnimInstance* AnimInstance = Owner->GetCharacterMesh()->GetAnimInstance();
+	if (!AnimInstance)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Combat] AnimInstance is null. Cannot play MonsterHitMontage."));
+		return;
+	}
+
+	if (AnimInstance->Montage_IsPlaying(MonsterHitMontage))
+	{
+		UE_LOG(LogTemp, Log, TEXT("[Combat] MonsterHitMontage already playing. Skipping playback."));
+		return;
+	}
+
+	float LocalPlayRate = 1.5f;
+	float Result = AnimInstance->Montage_Play(MonsterHitMontage, LocalPlayRate);
+
+	if (Result == 0.f)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Combat] Failed to play MonsterHitMontage."));
+		return;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("[Combat] Playing MonsterHitMontage at rate %f"), LocalPlayRate);
+	}
+}
+
 void UGPCharacterCombatHandler::PlayQSkillMontage()
 {
 	PlaySkillMontage(QSkillMontage);
@@ -543,6 +578,11 @@ void UGPCharacterCombatHandler::SetESkillMontage(UAnimMontage* Montage)
 void UGPCharacterCombatHandler::SetRSkillMontage(UAnimMontage* Montage)
 {
 	RSkillMontage = Montage;
+}
+
+void UGPCharacterCombatHandler::SetMonsterHitMontage(UAnimMontage* Montage)
+{
+	MonsterHitMontage = Montage;
 }
 
 void UGPCharacterCombatHandler::ApplyAttackSpeedBoost(float BoostPlayRate, float Duration)

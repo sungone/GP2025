@@ -91,6 +91,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	UAnimMontage* DeadAnimMontage;
 
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	UAnimMontage* MonsterHitAnimMontage;
+
 	// 장비 아이템 설정
 	UPROPERTY(EditAnywhere, Category = "PlayerMesh")
 	USkeletalMesh* HelmetMesh;

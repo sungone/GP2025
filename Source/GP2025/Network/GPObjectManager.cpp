@@ -442,6 +442,11 @@ void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage
 
 			Monster->SetCharacterInfo(MonsterInfo);
 
+			if (Monster->CombatHandler)
+			{
+				Monster->CombatHandler->PlayMonsterHitMontage();
+			}
+
 			FVector SpawnLocation = Monster->GetActorLocation() + FVector(0, 0, 100);
 			FActorSpawnParameters SpawnParams;
 
