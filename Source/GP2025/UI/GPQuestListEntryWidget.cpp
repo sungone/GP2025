@@ -87,8 +87,8 @@ void UGPQuestListEntryWidget::SetQuestTask(uint8 InQuestType)
         break;
 
         // Tutorial
-    case QuestType::TUT_MOVE:
-        TaskDescription = TEXT("몬스터를 찾아 이동하기");
+    case QuestType::TUT_START:
+        TaskDescription = TEXT("튜토리얼 시작");
         break;
     case QuestType::TUT_KILL_ONE_MON:
         TaskDescription = TEXT("몬스터를 한 마리 처치하기");
