@@ -25,7 +25,7 @@ public:
 	bool AddUserItem(uint32 dbId, uint32 itemID, uint8 itemTypeID);
 	bool RemoveUserItem(uint32 dbId, uint32 itemID);
 
-	DBResultCode FriendRequest(uint32 fromId, uint32 toId);
+	DBResultCode AddFriendRequest(uint32 fromId, uint32 toId);
 	bool IsFriendOrPending(uint32 userId, uint32 targetId);
 	std::pair<DBResultCode, std::optional<FFriendInfo>> AcceptFriendRequest(uint32 fromId, uint32 toId);
 	DBResultCode RejectFriendRequest(uint32 fromId, uint32 toId);

@@ -177,7 +177,7 @@ int SessionManager::GenerateId()
 	return id;
 }
 
-int32 SessionManager::GetOnlineSessionId(uint32 dbid)
+int32 SessionManager::GetOnlineSessionIdByDBId(uint32 dbid)
 {
 	for (auto& session : _sessions)
 	{

@@ -298,7 +298,7 @@ bool DBManager::RemoveUserItem(uint32 dbId, uint32 itemID)
 }
 
 
-DBResultCode DBManager::FriendRequest(uint32 myId, uint32 targetId)
+DBResultCode DBManager::AddFriendRequest(uint32 myId, uint32 targetId)
 {
 	if (myId == targetId)
 		return DBResultCode::FRIEND_SELF_REQUEST;
@@ -520,7 +520,7 @@ std::pair<DBResultCode, std::vector<FFriendInfo>> DBManager::GetFriendList(uint3
 			info.bAccepted = row[3].get<int>() == 1;
 			info.bIsRequester = (row[4].get<uint32>() == myId);
 
-			int32 sess = SessionManager::GetInst().GetOnlineSessionId(info.DBId);
+			int32 sess = SessionManager::GetInst().GetOnlineSessionIdByDBId(info.DBId);
 			info.isOnline = (sess != -1);
 			friendList.emplace_back(info);
 		}

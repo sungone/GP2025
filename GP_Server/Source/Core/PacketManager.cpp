@@ -356,13 +356,13 @@ void PacketManager::HandleFriendAddRequestPacket(int32 sessionId, Packet* packet
 	auto myId = session->GetUserDBID();
 	auto targetNick = ConvertToWString(p->TargetNickName);
 	auto targetId = DBManager::GetInst().FindUserDBId(targetNick);
-	DBResultCode resCode = DBManager::GetInst().FriendRequest(myId, targetId);
+	DBResultCode resCode = DBManager::GetInst().AddFriendRequest(myId, targetId);
 
 	FriendOperationResultPacket resPkt(EFriendOpType::Request, resCode);
 	SessionManager::GetInst().SendPacket(sessionId, &resPkt);
 	if (resCode != DBResultCode::SUCCESS) return;
 
-	int32 targetSessId = SessionManager::GetInst().GetOnlineSessionId(targetId);
+	int32 targetSessId = SessionManager::GetInst().GetOnlineSessionIdByDBId(targetId);
 	if (targetSessId != -1)
 	{
 		auto& pInfo = session->GetPlayerInfo();
@@ -394,10 +394,13 @@ void PacketManager::HandleFriendRemoveRequestPacket(int32 sessionId, Packet* pac
 	if (ret != DBResultCode::SUCCESS) return;
 
 	RemoveFriendPacket myPkt(targetId);
-	RemoveFriendPacket targetPkt(myId);
-
 	SessionManager::GetInst().SendPacket(sessionId, &myPkt);
-	SessionManager::GetInst().SendPacket(targetId, &targetPkt);
+	int32 targetSessId = SessionManager::GetInst().GetOnlineSessionIdByDBId(targetId);
+	if (targetSessId != -1)
+	{
+		RemoveFriendPacket targetPkt(myId);
+		SessionManager::GetInst().SendPacket(targetSessId, &targetPkt);
+	}
 }
 
 void PacketManager::HandleFriendAcceptRequestPacket(int32 sessionId, Packet* packet)
@@ -423,14 +426,19 @@ void PacketManager::HandleFriendAcceptRequestPacket(int32 sessionId, Packet* pac
 	SessionManager::GetInst().SendPacket(sessionId, &myPkt);
 
 	auto selfInfo = SessionManager::GetInst().GetSession(sessionId)->GetPlayerInfo();
-	FFriendInfo reverseInfo;
-	reverseInfo.DBId = myId;
-	reverseInfo.SetName(ConvertToWString(selfInfo.GetName()));
-	reverseInfo.Level = selfInfo.Stats.Level;
-	reverseInfo.bAccepted = true;
+	int32 targetSessId = SessionManager::GetInst().GetOnlineSessionIdByDBId(targetId);
+	if (targetSessId != -1)
+	{
+		FFriendInfo info;
+		info.DBId = myId;
+		info.SetName(ConvertToWString(selfInfo.GetName()));
+		info.Level = selfInfo.Stats.Level;
+		info.bAccepted = true;
 
-	AddFriendPacket targetPkt(reverseInfo);
-	SessionManager::GetInst().SendPacket(targetId, &targetPkt);
+		AddFriendPacket targetPkt(info);
+		SessionManager::GetInst().SendPacket(targetSessId, &targetPkt);
+	}
+
 }
 
 
