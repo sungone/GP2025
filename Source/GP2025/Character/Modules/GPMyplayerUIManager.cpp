@@ -723,7 +723,6 @@ void UGPMyplayerUIManager::CloseFriendBox()
 	if (FriendBoxWidget->IsInViewport())
 	{
 		FriendBoxWidget->RemoveFromParent();
-		FriendBoxWidget = nullptr;
 
 		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
 		if (PC)
