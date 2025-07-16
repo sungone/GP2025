@@ -136,6 +136,12 @@ void UGPMyplayerUIManager::OnSetUpInGameWidgets()
 			}
 		}
 	}
+
+	if (FriendBoxWidgetClass && !FriendBoxWidget)
+	{
+		FriendBoxWidget = CreateWidget<UUserWidget>(World, FriendBoxWidgetClass);
+		UE_LOG(LogTemp, Log, TEXT("[UIManager] FriendBoxWidget created during setup."));
+	}
 }
 
 void UGPMyplayerUIManager::ToggleInventory()
@@ -682,11 +688,6 @@ void UGPMyplayerUIManager::OpenFriendBox()
 
 	UWorld* World = Owner->GetWorld();
 	if (!World) return;
-
-	if (!FriendBoxWidget)
-	{
-		FriendBoxWidget = CreateWidget<UUserWidget>(World, FriendBoxWidgetClass);
-	}
 
 	if (FriendBoxWidget && !FriendBoxWidget->IsInViewport())
 	{
