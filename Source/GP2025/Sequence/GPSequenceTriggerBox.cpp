@@ -1,0 +1,58 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Sequence/GPSequenceTriggerBox.h"
+#include "Engine/World.h"
+#include "Character/GPCharacterMyplayer.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/Character.h"
+
+AGPSequenceTriggerBox::AGPSequenceTriggerBox()
+{
+	OnActorBeginOverlap.AddDynamic(this, &AGPSequenceTriggerBox::OnOverlapBegin);
+}
+
+void AGPSequenceTriggerBox::BeginPlay()
+{
+    Super::BeginPlay();
+}
+
+void AGPSequenceTriggerBox::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
+{
+
+    if (!OtherActor) return;
+
+    AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(OtherActor);
+    if (MyPlayer)
+    {
+        if (MyPlayer->bHasPlayedTinoSequence)
+        {
+            UE_LOG(LogTemp, Log, TEXT("This player has already played the sequence."));
+            return;
+        }
+
+        // ½ÃÄö½º Àç»ý
+        if (!LevelSequenceAsset)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("[GPSequenceTriggerBox] LevelSequenceAsset is null."));
+            return;
+        }
+
+        FMovieSceneSequencePlaybackSettings PlaybackSettings;
+        PlaybackSettings.bAutoPlay = false;
+
+        SequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(
+            GetWorld(),
+            LevelSequenceAsset,
+            PlaybackSettings,
+            SequenceActor
+        );
+
+        if (SequencePlayer)
+        {
+            SequencePlayer->Play();
+            UE_LOG(LogTemp, Log, TEXT("Sequence played for player %s"), *MyPlayer->GetName());
+            MyPlayer->bHasPlayedTinoSequence = true;
+        }
+    }
+}

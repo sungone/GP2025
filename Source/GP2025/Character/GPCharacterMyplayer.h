@@ -98,4 +98,8 @@ public :
 	UFUNCTION(BlueprintImplementableEvent, Category = "CameraShake")
 	void PlayerHittedCameraShake();
 
+	// Sequence 재생 여부
+public:
+	UPROPERTY()
+	bool bHasPlayedTinoSequence = false;
 };
