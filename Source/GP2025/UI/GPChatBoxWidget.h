@@ -49,7 +49,7 @@ public:
 
 
 public:
-	void AddChatMessage(const FString& UserName, const FString& Message);
+	void AddChatMessage(uint8 Channel, const FString& UserName, const FString& Message);
 
 	UFUNCTION()
 	void HandleChatReceived(uint8 Channel, const FString& Sender, const FString& Message);

@@ -66,11 +66,40 @@ void UGPChatBoxWidget::HandleSendMessage()
 
 	if (UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>())
 	{
-		EChatChannel Channel;
-		//Todo: Text에 포함된 글자 or 버튼으로 채널 설정
-		Channel = EChatChannel::All;//임시로 전체만 설정
-		NetMgr->SendMyChatMessage(Text.ToString(), Channel);
+		EChatChannel Channel = EChatChannel::All; // 기본값
+		FString RawText = Text.ToString().TrimStartAndEnd();
+
+		if (RawText.StartsWith("/"))
+		{
+			if (RawText.Len() >= 2)
+			{
+				TCHAR CommandChar = RawText[1];
+				switch (CommandChar)
+				{
+				case 'a':
+					Channel = EChatChannel::All;
+					break;
+				case 'f':
+					Channel = EChatChannel::Friend;
+					break;
+				case 'z':
+					Channel = EChatChannel::Zone;
+					break;
+				default:
+					Channel = EChatChannel::All;
+					break;
+				}
+
+				RawText = RawText.Mid(2).TrimStartAndEnd();
+			}
+		}
+
+		if (!RawText.IsEmpty())
+		{
+			NetMgr->SendMyChatMessage(RawText, Channel);
+		}
 	}
+
 
 	SendMessageText->SetText(FText::GetEmpty());
 
@@ -102,17 +131,16 @@ void UGPChatBoxWidget::SetKeyboardFocusToInput()
 	}
 }
 
-void UGPChatBoxWidget::AddChatMessage(const FString& UserName, const FString& Message)
+void UGPChatBoxWidget::AddChatMessage(uint8 Channel, const FString& UserName, const FString& Message)
 {
 	if (!ChatMessageWidgetClass || !ScrollBox)
 	{
 		return;
 	}
-
 	UGPChatMessageWidget* NewMessageWidget = CreateWidget<UGPChatMessageWidget>(this, ChatMessageWidgetClass);
 	if (NewMessageWidget)
 	{
-		NewMessageWidget->SetChatMessage(UserName, Message);
+		NewMessageWidget->SetChatMessage(Channel, UserName, Message);
 		ScrollBox->AddChild(NewMessageWidget);
 		ScrollBox->ScrollToEnd();
 	}
@@ -120,18 +148,5 @@ void UGPChatBoxWidget::AddChatMessage(const FString& UserName, const FString& Me
 
 void UGPChatBoxWidget::HandleChatReceived(uint8 Channel, const FString& Sender, const FString& Message)
 {
-	EChatChannel ChatChannel = static_cast<EChatChannel>(Channel);
-	switch (ChatChannel)
-	{
-	case EChatChannel::All:
-		break;
-	case EChatChannel::Friend:
-		break;
-	case EChatChannel::Zone:
-		break;
-	default:
-		break;
-	}
-	//Todo: 위에 채널에 따라 분기처리
-	AddChatMessage(Sender, Message);
+	AddChatMessage(Channel, Sender, Message);
 }
