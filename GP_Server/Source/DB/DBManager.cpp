@@ -297,7 +297,6 @@ bool DBManager::RemoveUserItem(uint32 dbId, uint32 itemID)
 	}
 }
 
-
 DBResultCode DBManager::AddFriendRequest(uint32 myId, uint32 targetId)
 {
 	if (myId == targetId)
@@ -333,7 +332,6 @@ DBResultCode DBManager::AddFriendRequest(uint32 myId, uint32 targetId)
 		return DBResultCode::DB_ERROR;
 	}
 }
-
 
 bool DBManager::IsFriendOrPending(uint32 myId, uint32 targetId)
 {

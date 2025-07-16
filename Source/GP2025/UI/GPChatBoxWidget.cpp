@@ -66,7 +66,10 @@ void UGPChatBoxWidget::HandleSendMessage()
 
 	if (UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>())
 	{
-		NetMgr->SendMyChatMessage(Text.ToString());
+		EChatChannel Channel;
+		//Todo: Text에 포함된 글자 or 버튼으로 채널 설정
+		Channel = EChatChannel::All;//임시로 전체만 설정
+		NetMgr->SendMyChatMessage(Text.ToString(), Channel);
 	}
 
 	SendMessageText->SetText(FText::GetEmpty());
@@ -115,7 +118,20 @@ void UGPChatBoxWidget::AddChatMessage(const FString& UserName, const FString& Me
 	}
 }
 
-void UGPChatBoxWidget::HandleChatReceived(const FString& Sender, const FString& Message)
+void UGPChatBoxWidget::HandleChatReceived(uint8 Channel, const FString& Sender, const FString& Message)
 {
+	EChatChannel ChatChannel = static_cast<EChatChannel>(Channel);
+	switch (ChatChannel)
+	{
+	case EChatChannel::All:
+		break;
+	case EChatChannel::Friend:
+		break;
+	case EChatChannel::Zone:
+		break;
+	default:
+		break;
+	}
+	//Todo: 위에 채널에 따라 분기처리
 	AddChatMessage(Sender, Message);
 }

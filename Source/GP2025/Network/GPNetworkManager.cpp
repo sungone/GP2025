@@ -284,10 +284,10 @@ void UGPNetworkManager::SendMyCompleteQuest(QuestType quest)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendMyChatMessage(const FString& Message)
+void UGPNetworkManager::SendMyChatMessage(const FString& Message, EChatChannel Channel)
 {
 	FTCHARToUTF8 MsgUtf8(*Message);
-	ChatSendPacket Packet(MsgUtf8.Get());
+	ChatSendPacket Packet(MsgUtf8.Get(),Channel);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
@@ -371,8 +371,6 @@ void UGPNetworkManager::ProcessPacket()
 				LoginSuccessPacket* Pkt = reinterpret_cast<LoginSuccessPacket*>(RemainingData.GetData());
 
 				OnEnterLobby.Broadcast();
-
-				// Todo: 입장버튼 클릭시 호출되도록
 				break;
 			}
 			case EPacketType::S_LOGIN_FAIL:
@@ -397,7 +395,7 @@ void UGPNetworkManager::ProcessPacket()
 			{
 				EnterGamePacket* Pkt = reinterpret_cast<EnterGamePacket*>(RemainingData.GetData());
 				OnEnterGame.Broadcast();
-				FInfoData Data =  Pkt->PlayerInfo;
+				FInfoData Data = Pkt->PlayerInfo;
 				ObjectMgr->ChangeZone(ZoneType::TUK, Data.GetZone(), Data.Pos);
 				ObjectMgr->AddMyPlayer(Pkt->PlayerInfo);
 				break;
@@ -613,10 +611,10 @@ void UGPNetworkManager::ProcessPacket()
 				ChatBroadcastPacket* Pkt = reinterpret_cast<ChatBroadcastPacket*>(RemainingData.GetData());
 				FString SenderName = UTF8_TO_TCHAR(Pkt->SenderNickName);
 				FString ChatText = UTF8_TO_TCHAR(Pkt->Message);
-
+				EChatChannel Channel = Pkt->Channel;
 				UE_LOG(LogTemp, Log, TEXT("%s: %s"), *SenderName, *ChatText);
 
-				OnReceiveChat.Broadcast(SenderName, ChatText);
+				OnReceiveChat.Broadcast(static_cast<uint8>(Channel), SenderName, ChatText);
 				break;
 			}
 #pragma endregion
@@ -625,7 +623,7 @@ void UGPNetworkManager::ProcessPacket()
 			{
 				FriendOperationResultPacket* Pkt = reinterpret_cast<FriendOperationResultPacket*>(RemainingData.GetData());
 				DBResultCode Code = Pkt->ResultCode;
-				EFriendOpType OpType =  Pkt->OperationType;
+				EFriendOpType OpType = Pkt->OperationType;
 				{
 					switch (Code)
 					{

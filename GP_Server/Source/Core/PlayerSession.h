@@ -51,6 +51,7 @@ public:
 		_gameJobQueue.Run();
 	}
 	uint32 GetUserDBID() { return _dbId; };
+	const std::vector<FFriendInfo>& GetFriends() const { return _friends; }
 private:
 	JobQueue _gameJobQueue;
 	int32 _id = -1;
@@ -59,4 +60,5 @@ private:
 	std::unique_ptr<SessionSocket> _sSocket;
 	SessionState _state = SessionState::None;
 	std::mutex _sMutex;
+	std::vector<FFriendInfo> _friends;
 };

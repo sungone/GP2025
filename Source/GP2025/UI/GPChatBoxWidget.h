@@ -52,7 +52,7 @@ public:
 	void AddChatMessage(const FString& UserName, const FString& Message);
 
 	UFUNCTION()
-	void HandleChatReceived(const FString& Sender, const FString& Message);
+	void HandleChatReceived(uint8 Channel, const FString& Sender, const FString& Message);
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Chat")

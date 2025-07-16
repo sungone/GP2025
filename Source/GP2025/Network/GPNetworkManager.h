@@ -10,7 +10,7 @@
 class AGPCharacterPlayer;
 class AGPCharacterMonster;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReceiveChat, const FString&, Sender, const FString&, Message);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnReceiveChat, uint8, Channel, const FString&, Sender, const FString&, Message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnBuyItemResult, bool, bSuccess, uint32, CurrentGold, const FString&, Message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnSellItemResult, bool, bSuccess, uint32, CurrentGold, const FString&, Message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUserAuthFailed, FString, Message);
@@ -80,7 +80,7 @@ public:
 	void SendMyRequestQuest(QuestType quest);
 	void SendMyCompleteQuest(QuestType quest);
 
-	void SendMyChatMessage(const FString& Message);
+	void SendMyChatMessage(const FString& Message, EChatChannel Channel);
 	void SendMyRemoveStatePacket(uint32 State);
 
 	void SendMyFriendRequest(const FString& TargetNickName);

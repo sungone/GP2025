@@ -588,8 +588,6 @@ void UGPObjectManager::PlayFlameBreathEffect(const FVector& Origin, const FVecto
 		FVector CenterDir = FVector(FMath::Cos(BaseYawRad), FMath::Sin(BaseYawRad), 0.0f);
 		DrawDebugLine(WorldContext, Origin, Origin + CenterDir * Range, Color, false, 2.0f, 0, 1.0f);
 	}
-
-	//todo: 불브레스
 }
 
 
