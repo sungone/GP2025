@@ -104,6 +104,7 @@ void UGPFriendBox::OnAddButtonClicked()
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("[FriendBox] AddButton clicked ¡æ Send FriendAddPacket to server."));
+	SendNicknameText->SetText(FText::GetEmpty());
 }
 
 void UGPFriendBox::OnRemoveButtonClicked()
