@@ -43,6 +43,7 @@ void PlayerSession::Login(const DBLoginResult& dbRes)
 	{
 		_dbId = dbRes.dbId;
 		_player->LoadFromDB(dbRes);
+		_friends = dbRes.friends;
 	}
 #endif
 }

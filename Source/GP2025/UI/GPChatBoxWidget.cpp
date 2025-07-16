@@ -66,8 +66,40 @@ void UGPChatBoxWidget::HandleSendMessage()
 
 	if (UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>())
 	{
-		NetMgr->SendMyChatMessage(Text.ToString());
+		EChatChannel Channel = EChatChannel::All; // ±âº»°ª
+		FString RawText = Text.ToString().TrimStartAndEnd();
+
+		if (RawText.StartsWith("/"))
+		{
+			if (RawText.Len() >= 2)
+			{
+				TCHAR CommandChar = RawText[1];
+				switch (CommandChar)
+				{
+				case 'a':
+					Channel = EChatChannel::All;
+					break;
+				case 'f':
+					Channel = EChatChannel::Friend;
+					break;
+				case 'z':
+					Channel = EChatChannel::Zone;
+					break;
+				default:
+					Channel = EChatChannel::All;
+					break;
+				}
+
+				RawText = RawText.Mid(2).TrimStartAndEnd();
+			}
+		}
+
+		if (!RawText.IsEmpty())
+		{
+			NetMgr->SendMyChatMessage(RawText, Channel);
+		}
 	}
+
 
 	SendMessageText->SetText(FText::GetEmpty());
 
@@ -99,23 +131,22 @@ void UGPChatBoxWidget::SetKeyboardFocusToInput()
 	}
 }
 
-void UGPChatBoxWidget::AddChatMessage(const FString& UserName, const FString& Message)
+void UGPChatBoxWidget::AddChatMessage(uint8 Channel, const FString& UserName, const FString& Message)
 {
 	if (!ChatMessageWidgetClass || !ScrollBox)
 	{
 		return;
 	}
-
 	UGPChatMessageWidget* NewMessageWidget = CreateWidget<UGPChatMessageWidget>(this, ChatMessageWidgetClass);
 	if (NewMessageWidget)
 	{
-		NewMessageWidget->SetChatMessage(UserName, Message);
+		NewMessageWidget->SetChatMessage(Channel, UserName, Message);
 		ScrollBox->AddChild(NewMessageWidget);
 		ScrollBox->ScrollToEnd();
 	}
 }
 
-void UGPChatBoxWidget::HandleChatReceived(const FString& Sender, const FString& Message)
+void UGPChatBoxWidget::HandleChatReceived(uint8 Channel, const FString& Sender, const FString& Message)
 {
-	AddChatMessage(Sender, Message);
+	AddChatMessage(Channel, Sender, Message);
 }

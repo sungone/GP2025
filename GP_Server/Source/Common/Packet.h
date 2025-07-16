@@ -588,9 +588,10 @@ struct QuestRewardPacket : public Packet
 struct ChatSendPacket : public Packet
 {
 	char Message[CHAT_MESSAGE_LEN];
+	EChatChannel Channel;
 
-	ChatSendPacket(const char* Msg)
-		: Packet(EPacketType::C_CHAT_SEND)
+	ChatSendPacket(const char* Msg, EChatChannel channel)
+		: Packet(EPacketType::C_CHAT_SEND), Channel(channel)
 	{
 		SAFE_STRCPY(Message, Msg, CHAT_MESSAGE_LEN - 1);
 		Message[CHAT_MESSAGE_LEN - 1] = '\0';
@@ -603,9 +604,9 @@ struct ChatBroadcastPacket : public Packet
 {
 	char SenderNickName[NICKNAME_LEN];
 	char Message[CHAT_MESSAGE_LEN];
-
-	ChatBroadcastPacket(const char* Sender, const char* Msg)
-		: Packet(EPacketType::S_CHAT_BROADCAST)
+	EChatChannel Channel;
+	ChatBroadcastPacket(const char* Sender, const char* Msg, EChatChannel channel)
+		: Packet(EPacketType::S_CHAT_BROADCAST), Channel(channel)
 	{
 		SAFE_STRCPY(SenderNickName, Sender, NICKNAME_LEN - 1);
 		SenderNickName[NICKNAME_LEN - 1] = '\0';

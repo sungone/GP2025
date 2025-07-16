@@ -21,6 +21,7 @@ public:
 	void HandleLogin(int32 sessionId, const DBLoginResult& dbRes = DBLoginResult());
 	void SendPacket(int32 sessionId, const Packet* packet);
 	void BroadcastToAll(Packet* packet);
+	void BroadcastToFriends(int32 sessionId, Packet* packet);
 	void BroadcastToViewList(Packet* packet, const std::unordered_set<int32>& viewList);
 	std::array<std::unique_ptr<PlayerSession>, MAX_CLIENT>& GetSessions() { return _sessions; }
 	PlayerSession* GetSession(int32 sessionId);

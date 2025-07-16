@@ -17,9 +17,12 @@ class GP2025_API UGPChatMessageWidget : public UUserWidget
 
 public:
 	// 메시지 텍스트를 설정
-	void SetChatMessage(const FString& UserName, const FString& Message);
+	void SetChatMessage(uint8 Channel, const FString& UserName, const FString& Message);
 
 protected:
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* ChannelText;
+
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* UserNameText;
 

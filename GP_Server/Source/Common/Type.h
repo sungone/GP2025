@@ -104,6 +104,19 @@ enum EPacketType : uint8
 	S_DEBUG_LINE
 };
 
+#ifndef SERVER_BUILD
+UENUM(BlueprintType)
+#endif
+enum class EChatChannel : uint8
+{
+	All,
+	Friend,
+	Zone
+};
+
+#ifndef SERVER_BUILD
+UENUM(BlueprintType)
+#endif
 enum class EFriendOpType : uint8
 {
 	Request,

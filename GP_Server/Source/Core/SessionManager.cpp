@@ -140,6 +140,24 @@ void SessionManager::BroadcastToAll(Packet* packet)
 			session->DoSend(packet);
 }
 
+void SessionManager::BroadcastToFriends(int32 sessionId, Packet* packet)
+{
+	auto session = GetSession(sessionId);
+	if (!session)
+	{
+		LOG_W("Invalid");
+		return;
+	}
+	const auto& friends = session->GetFriends();
+	for (const auto& f : friends)
+	{
+		int32 fsessId = GetOnlineSessionIdByDBId(f.DBId);
+		if (fsessId != -1)
+		{
+			SendPacket(fsessId, packet);
+		}
+	}
+}
 
 void SessionManager::BroadcastToViewList(Packet* packet, const std::unordered_set<int32>& viewList)
 {
