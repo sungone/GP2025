@@ -43,7 +43,7 @@ UGPMyplayerUIManager::UGPMyplayerUIManager()
 	}
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> GunCrosshairWidgetBPClass(TEXT("/Game/UI/WBP_GunCrosshair"));
-	if (GunCrosshairWidgetBPClass.Succeeded()) 
+	if (GunCrosshairWidgetBPClass.Succeeded())
 	{
 		GunCrosshairWidgetClass = GunCrosshairWidgetBPClass.Class;
 	}
@@ -117,7 +117,7 @@ void UGPMyplayerUIManager::OnSetUpInGameWidgets()
 		if (GunCrosshairWidget)
 		{
 			GunCrosshairWidget->AddToViewport();
-			GunCrosshairWidget->SetVisibility(ESlateVisibility::Hidden); 
+			GunCrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 
@@ -139,8 +139,9 @@ void UGPMyplayerUIManager::OnSetUpInGameWidgets()
 
 	if (FriendBoxWidgetClass && !FriendBoxWidget)
 	{
-		FriendBoxWidget = CreateWidget<UUserWidget>(World, FriendBoxWidgetClass);
-		UE_LOG(LogTemp, Log, TEXT("[UIManager] FriendBoxWidget created during setup."));
+		FriendBoxWidget = CreateWidget<UGPFriendBox>(World, FriendBoxWidgetClass);
+		FriendBoxWidget->AddToViewport();
+		FriendBoxWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
@@ -230,7 +231,7 @@ void UGPMyplayerUIManager::CloseInventory()
 						PC->SetInputMode(FInputModeGameOnly());
 					}
 				}),
-			0.3f,    
+			0.3f,
 			false
 		);
 	}
@@ -318,7 +319,6 @@ void UGPMyplayerUIManager::UpdateQuestState(uint8 QuestType, bool bIsSuccess)
 		QuestList->UpdateQuestState(QuestType, bIsSuccess);
 	}
 }
-
 
 
 UGPQuestListWidget* UGPMyplayerUIManager::GetQuestListWidget()
@@ -465,7 +465,7 @@ void UGPMyplayerUIManager::FocusChatInput()
 	if (UGPChatBoxWidget* Chat = InGame->ChatBoxWidget)
 	{
 		Chat->SetVisibility(ESlateVisibility::Visible);
-		Chat->SetKeyboardFocusToInput(); 
+		Chat->SetKeyboardFocusToInput();
 
 		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
 		if (PC)
@@ -686,16 +686,10 @@ void UGPMyplayerUIManager::OpenFriendBox()
 {
 	if (!Owner || !FriendBoxWidgetClass) return;
 
-	UWorld* World = Owner->GetWorld();
-	if (!World) return;
-
-	if (FriendBoxWidget && !FriendBoxWidget->IsInViewport())
+	if (FriendBoxWidget)
 	{
-		FriendBoxWidget->AddToViewport();
-		if (UGPFriendBox* FriendBox = Cast<UGPFriendBox>(FriendBoxWidget))
-		{
-			FriendBox->PlayOpenAnimation(false); 
-		}
+		FriendBoxWidget->SetVisibility(ESlateVisibility::Visible);
+		FriendBoxWidget->PlayOpenAnimation(false);
 
 		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
 		if (PC)
@@ -715,25 +709,16 @@ void UGPMyplayerUIManager::OpenFriendBox()
 void UGPMyplayerUIManager::CloseFriendBox()
 {
 	if (!Owner || !FriendBoxWidget) return;
-
-	if (UGPFriendBox* FriendBox = Cast<UGPFriendBox>(FriendBoxWidget))
+	FriendBoxWidget->PlayOpenAnimation(true);
+	FriendBoxWidget->SetVisibility(ESlateVisibility::Hidden);
+	APlayerController* PC = Cast<APlayerController>(Owner->GetController());
+	if (PC)
 	{
-		FriendBox->PlayOpenAnimation(true);
+		PC->SetShowMouseCursor(false);
+		PC->SetInputMode(FInputModeGameOnly());
 	}
 
-	if (FriendBoxWidget->IsInViewport())
-	{
-		FriendBoxWidget->RemoveFromParent();
-
-		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
-		if (PC)
-		{
-			PC->SetShowMouseCursor(false);
-			PC->SetInputMode(FInputModeGameOnly());
-		}
-
-		UE_LOG(LogTemp, Log, TEXT("[UIManager] FriendBoxWidget closed."));
-	}
+	UE_LOG(LogTemp, Log, TEXT("[UIManager] FriendBoxWidget closed."));
 }
 
 UGPFriendBox* UGPMyplayerUIManager::GetFriendBoxWidget()

@@ -9,14 +9,14 @@
 
 
 /**
- * 
+ *
  */
 UCLASS()
 class GP2025_API UGPMyplayerUIManager : public UObject
 {
 	GENERATED_BODY()
 
-public :
+public:
 	UGPMyplayerUIManager();
 public:
 	void Initialize(class AGPCharacterMyplayer* InOwner);
@@ -26,7 +26,7 @@ public:
 
 	// Inventory
 	void ToggleInventory();
-	
+
 	void ResetToggleInventory();
 
 	void OpenInventory();
@@ -44,7 +44,7 @@ public:
 
 	// Dead
 	void ShowDeadScreen();
-	
+
 	// Quest
 	// Quest Entry 직접 추가용 함수
 	void AddQuestEntry(uint8 QuestType, bool bIsSuccess = false);
@@ -109,16 +109,16 @@ public:
 
 	bool bInventoryToggled = false;
 
-public :
+public:
 	class UGPInGameWidget* GetInGameWidget();
 	class UGPInventory* GetInventoryWidget();
 
-public :
+public:
 	void ShowLobbyUI();
 	void ShowLoginUI();
 
-// Skill Level UP Text
-public :
+	// Skill Level UP Text
+public:
 	void SpawnSkillLevelText(int32 NewLevel);
 
 	// Chat System
@@ -130,13 +130,13 @@ public :
 	void UpdateSkillInfosFromPlayer();
 
 
-// Quest Message
+	// Quest Message
 	void ShowQuestStartMessage(QuestType InQuestType);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Quest")
 	UDataTable* QuestMessageTable;
 
-// Main Quest Start Widget
+	// Main Quest Start Widget
 	void PlayMainQuestStartWidget();
 	UPROPERTY()
 	UUserWidget* MainQuestStartWidget;
@@ -144,18 +144,18 @@ public :
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Quest")
 	TSubclassOf<UUserWidget> MainQuestStartWidgetClass;
 
-// Friend
-	public:
-		// FriendBox
-		void OpenFriendBox();
-		void CloseFriendBox();
+	// Friend
+public:
+	// FriendBox
+	void OpenFriendBox();
+	void CloseFriendBox();
 
-		UPROPERTY()
-		class UUserWidget* FriendBoxWidget;
+	UPROPERTY()
+	class UGPFriendBox* FriendBoxWidget;
 
-		UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Friend")
-		TSubclassOf<UUserWidget> FriendBoxWidgetClass;
+	UPROPERTY()
+	TSubclassOf<UUserWidget> FriendBoxWidgetClass;
 
-		class UGPFriendBox* GetFriendBoxWidget();
+	class UGPFriendBox* GetFriendBoxWidget();
 };
 

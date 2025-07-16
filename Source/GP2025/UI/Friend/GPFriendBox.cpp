@@ -184,30 +184,6 @@ void UGPFriendBox::OnRejectButtonClicked()
 	UE_LOG(LogTemp, Log, TEXT("[FriendBox] RejectButton clicked → Send FriendRejectPacket to server."));
 }
 
-//void UGPFriendBox::UpdateFriendList(const TArray<FFriendInfo>& FriendList)
-//{
-//	if (FriendListWidget)
-//	{
-//		FriendListWidget->ClearFriendEntries();
-//		for (const auto& Info : FriendList)
-//		{
-//			FriendListWidget->AddFriendEntry(Info.NickName, Info.Level);
-//		}
-//	}
-//}
-//
-//void UGPFriendBox::UpdateRequestList(const TArray<FFriendInfo>& RequestList)
-//{
-//	if (RequestedFriendWidget)
-//	{
-//		RequestedFriendWidget->ClearFriendEntries();
-//		for (const auto& Info : RequestList)
-//		{
-//			RequestedFriendWidget->AddFriendEntry(Info.NickName, Info.Level);
-//		}
-//	}
-//}
-
 void UGPFriendBox::PlayOpenAnimation(bool bReverse)
 {
 	if (!OpenAnim) return;
@@ -221,22 +197,24 @@ void UGPFriendBox::PlayOpenAnimation(bool bReverse)
 	);
 }
 
-void UGPFriendBox::OnFriendAccepted(
-	uint32 FriendUserID,
-	const FString& Nickname,
-	int32 Level,
-	bool bAccepted,
-	bool bOnline)
+void UGPFriendBox::AddToRequestedList(uint32 FriendUserID, const FString& Nickname, int32 Level, bool bOnline)
 {
-	UE_LOG(LogTemp, Log, TEXT("[FriendBox] OnFriendAccepted → UserID: %d (%s)"), FriendUserID, *Nickname);
+	if (FriendListWidget)
+	{
+		RequestedFriendWidget->AddFriendEntry(FriendUserID, Nickname, Level, bOnline);
+	}
+}
 
-	// (1) 요청 목록에서 제거
+void UGPFriendBox::RemoveFromRequestedList(uint32 FriendUserID)
+{
 	if (RequestedFriendWidget)
 	{
 		RequestedFriendWidget->RemoveFriendEntry(FriendUserID);
 	}
+}
 
-	// (2) 친구 목록에 추가
+void UGPFriendBox::AddToFriendList(uint32 FriendUserID, const FString& Nickname, int32 Level, bool bOnline)
+{
 	if (FriendListWidget)
 	{
 		FriendListWidget->RemoveFriendEntry(FriendUserID);
@@ -244,3 +222,10 @@ void UGPFriendBox::OnFriendAccepted(
 	}
 }
 
+void UGPFriendBox::RemoveFromFriendList(uint32 FriendUserID)
+{
+	if (FriendListWidget)
+	{
+		FriendListWidget->RemoveFriendEntry(FriendUserID);
+	}
+}
