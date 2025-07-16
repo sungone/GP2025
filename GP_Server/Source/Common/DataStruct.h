@@ -119,10 +119,11 @@ struct ShopItemInfo
 
 struct FFriendInfo
 {
-	uint32 Id;//dbId
+	uint32 DBId;
 	char NickName[NICKNAME_LEN];
 	uint32 Level;
 	bool bAccepted;
+	bool bIsRequester = false;
 	bool isOnline = false;
 	const char* GetName() const { return NickName; }
 #ifdef SERVER_BUILD

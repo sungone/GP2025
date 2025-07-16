@@ -23,6 +23,7 @@ public:
 	void Init(uint8 itemTypeID);
 	uint32 GenerateItemID()
 	{
+		//Todo:DB에서 중복 안되게 DB에서 시작 id받아서 처리해야
 		static int i = 300;
 		return i++;
 	}

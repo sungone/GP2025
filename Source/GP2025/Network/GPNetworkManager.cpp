@@ -626,21 +626,32 @@ void UGPNetworkManager::ProcessPacket()
 				FriendOperationResultPacket* Pkt = reinterpret_cast<FriendOperationResultPacket*>(RemainingData.GetData());
 				DBResultCode Code = Pkt->ResultCode;
 				EFriendOpType OpType =  Pkt->OperationType;
-
-				break;
-			}
-			case EPacketType::S_FRIEND_LIST:
-			{
-				FriendListPacket* Pkt = reinterpret_cast<FriendListPacket*>(RemainingData.GetData());
-				uint8 Count = Pkt->FriendCount;
-
-				UE_LOG(LogTemp, Log, TEXT("== Friend List =="));
-				for (int i = 0; i < Count; ++i)
 				{
-					FFriendInfo& Info = Pkt->Friends[i];
-					FString Name = UTF8_TO_TCHAR(Info.GetName());
-					FString Status = Info.bAccepted ? TEXT("친구") : TEXT("요청중");
-					UE_LOG(LogTemp, Log, TEXT("- %s (Lv.%d) [%s]"), *Name, Info.Level, *Status);
+					switch (Code)
+					{
+					case DBResultCode::SUCCESS:
+						UE_LOG(LogTemp, Warning, TEXT("[Friend] Operation Success. Type: %d"), static_cast<int32>(OpType));
+						break;
+					case DBResultCode::FRIEND_ALREADY_REQUESTED:
+						UE_LOG(LogTemp, Warning, TEXT("[Friend] Already requested."));
+						break;
+					case DBResultCode::FRIEND_ALREADY_ADDED:
+						UE_LOG(LogTemp, Warning, TEXT("[Friend] Already added."));
+						break;
+					case DBResultCode::FRIEND_SELF_REQUEST:
+						UE_LOG(LogTemp, Warning, TEXT("[Friend] Cannot add yourself."));
+						break;
+					case DBResultCode::FRIEND_USER_NOT_FOUND:
+						UE_LOG(LogTemp, Warning, TEXT("[Friend] Target user not found."));
+						break;
+					case DBResultCode::DB_ERROR:
+						UE_LOG(LogTemp, Error, TEXT("[Friend] Database error."));
+						break;
+					default:
+						UE_LOG(LogTemp, Error, TEXT("[Friend] Unknown result code."));
+						break;
+					}
+
 				}
 				break;
 			}
@@ -651,7 +662,7 @@ void UGPNetworkManager::ProcessPacket()
 				FString Name = FriendInfo.GetName();
 				UE_LOG(LogTemp, Log, TEXT("친구 추가: %s"), *Name);
 
-				ObjectMgr->AddFriend(FriendInfo.Id,
+				ObjectMgr->AddFriend(FriendInfo.DBId,
 					FString(FriendInfo.GetName()),
 					FriendInfo.Level,
 					FriendInfo.bAccepted,
@@ -669,7 +680,7 @@ void UGPNetworkManager::ProcessPacket()
 				FriendRequestPacket* Pkt = reinterpret_cast<FriendRequestPacket*>(RemainingData.GetData());
 				const FFriendInfo& Info = Pkt->RequesterInfo;
 
-				uint32 UserID = Info.Id;
+				uint32 UserID = Info.DBId;
 				FString Name = UTF8_TO_TCHAR(Info.GetName());
 				int32 Level = Info.Level;
 				bool bOnline = Info.isOnline;

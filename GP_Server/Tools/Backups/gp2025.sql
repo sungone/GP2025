@@ -87,6 +87,7 @@ CREATE TABLE `user_friends` (
   `user_id` int unsigned NOT NULL,
   `friend_id` int unsigned NOT NULL,
   `status` tinyint(1) NOT NULL DEFAULT '0',
+  `requester_id` int unsigned DEFAULT NULL,
   PRIMARY KEY (`user_id`,`friend_id`),
   KEY `fk_user_friends_friend` (`friend_id`),
   CONSTRAINT `fk_user_friends_friend` FOREIGN KEY (`friend_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
@@ -165,4 +166,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-15 12:38:01
+-- Dump completed on 2025-07-16 11:40:07

@@ -356,17 +356,19 @@ void PacketManager::HandleFriendAddRequestPacket(int32 sessionId, Packet* packet
 	auto myId = session->GetUserDBID();
 	auto targetNick = ConvertToWString(p->TargetNickName);
 	auto targetId = DBManager::GetInst().FindUserDBId(targetNick);
-	DBResultCode result = DBManager::GetInst().SendFriendRequest(myId, targetId);
+	DBResultCode resCode = DBManager::GetInst().FriendRequest(myId, targetId);
 
-	FriendOperationResultPacket resPkt(EFriendOpType::Request, result);
+	FriendOperationResultPacket resPkt(EFriendOpType::Request, resCode);
 	SessionManager::GetInst().SendPacket(sessionId, &resPkt);
+	if (resCode != DBResultCode::SUCCESS) return;
+
 	int32 targetSessId = SessionManager::GetInst().GetOnlineSessionId(targetId);
 	if (targetSessId != -1)
 	{
 		auto& pInfo = session->GetPlayerInfo();
 		auto name = pInfo.GetName();
 		FFriendInfo info;
-		info.Id = myId;
+		info.DBId = myId;
 		info.SetName(ConvertToWString(name));
 		info.Level = pInfo.GetLevel();
 		info.isOnline = true;
@@ -382,7 +384,7 @@ void PacketManager::HandleFriendRemoveRequestPacket(int32 sessionId, Packet* pac
 	if (!session || !session->IsLogin()) return;
 
 	auto myId = session->GetUserDBID();
-	auto targetId = p->TargetUserID;
+	auto targetId = p->TargetDBID;
 
 	auto ret = DBManager::GetInst().RemoveFriend(myId, targetId);
 
@@ -405,7 +407,7 @@ void PacketManager::HandleFriendAcceptRequestPacket(int32 sessionId, Packet* pac
 	if (!session || !session->IsLogin()) return;
 
 	auto myId = session->GetUserDBID();
-	auto targetId = p->RequesterUserID;
+	auto targetId = p->TargetDBID;
 
 	auto ret = DBManager::GetInst().AcceptFriendRequest(myId, targetId);
 	DBResultCode code = ret.first;
@@ -422,7 +424,7 @@ void PacketManager::HandleFriendAcceptRequestPacket(int32 sessionId, Packet* pac
 
 	auto selfInfo = SessionManager::GetInst().GetSession(sessionId)->GetPlayerInfo();
 	FFriendInfo reverseInfo;
-	reverseInfo.Id = myId;
+	reverseInfo.DBId = myId;
 	reverseInfo.SetName(ConvertToWString(selfInfo.GetName()));
 	reverseInfo.Level = selfInfo.Stats.Level;
 	reverseInfo.bAccepted = true;
@@ -439,9 +441,9 @@ void PacketManager::HandleFriendRejectRequestPacket(int32 sessionId, Packet* pac
 	if (!session || !session->IsLogin()) return;
 
 	auto myId = session->GetUserDBID();
-	auto targetId = p->RequesterUserID;
+	auto targetId = p->TargetDBID;
 
-	auto ret = DBManager::GetInst().RemoveFriendRequest(myId, targetId);
+	auto ret = DBManager::GetInst().RejectFriendRequest(myId, targetId);
 	FriendOperationResultPacket resPkt(EFriendOpType::Reject, ret);
 	SessionManager::GetInst().SendPacket(sessionId, &resPkt);
 }

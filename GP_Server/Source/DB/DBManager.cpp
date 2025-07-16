@@ -274,7 +274,6 @@ bool DBManager::AddUserItem(uint32 dbId, uint32 itemID, uint8 itemTypeID)
 	}
 }
 
-
 bool DBManager::RemoveUserItem(uint32 dbId, uint32 itemID)
 {
 	try {
@@ -298,12 +297,13 @@ bool DBManager::RemoveUserItem(uint32 dbId, uint32 itemID)
 	}
 }
 
-DBResultCode DBManager::SendFriendRequest(uint32 fromId, uint32 toId)
+
+DBResultCode DBManager::FriendRequest(uint32 myId, uint32 targetId)
 {
-	if (fromId == toId)
+	if (myId == targetId)
 		return DBResultCode::FRIEND_SELF_REQUEST;
 
-	if (IsFriendOrPending(fromId, toId))
+	if (IsFriendOrPending(myId, targetId))
 		return DBResultCode::FRIEND_ALREADY_REQUESTED;
 
 	try {
@@ -311,12 +311,20 @@ DBResultCode DBManager::SendFriendRequest(uint32 fromId, uint32 toId)
 		auto& sess = scoped.Get();
 		auto schema = sess.getSchema("gp2025");
 
+		sess.startTransaction();
 		schema.getTable("user_friends")
-			.insert("user_id", "friend_id", "status")
-			.values(fromId, toId, 0)
+			.insert("user_id", "friend_id", "status", "requester_id")
+			.values(myId, targetId, 0, myId)
 			.execute();
 
-		LOG_D("Friend request sent: {} -> {}", fromId, toId);
+		schema.getTable("user_friends")
+			.insert("user_id", "friend_id", "status", "requester_id")
+			.values(targetId, myId, 0, myId)
+			.execute();
+
+		sess.commit();
+
+		LOG_D("Friend request sent (bidirectional): {} <-> {}", myId, targetId);
 		return DBResultCode::SUCCESS;
 	}
 	catch (const mysqlx::Error& e)
@@ -326,7 +334,8 @@ DBResultCode DBManager::SendFriendRequest(uint32 fromId, uint32 toId)
 	}
 }
 
-bool DBManager::IsFriendOrPending(uint32 userId, uint32 targetId)
+
+bool DBManager::IsFriendOrPending(uint32 myId, uint32 targetId)
 {
 	try {
 		ScopedDBSession scoped;
@@ -335,8 +344,8 @@ bool DBManager::IsFriendOrPending(uint32 userId, uint32 targetId)
 
 		auto result = schema.getTable("user_friends")
 			.select("status")
-			.where("user_id = :uid AND friend_id = :fid")
-			.bind("uid", userId)
+			.where("((user_id = :uid AND friend_id = :fid) OR (user_id = :fid AND friend_id = :uid))")
+			.bind("uid", myId)
 			.bind("fid", targetId)
 			.execute();
 
@@ -349,53 +358,66 @@ bool DBManager::IsFriendOrPending(uint32 userId, uint32 targetId)
 	}
 }
 
-std::pair<DBResultCode, std::optional<FFriendInfo>> DBManager::AcceptFriendRequest(uint32 fromId, uint32 toId)
+std::pair<DBResultCode, std::optional<FFriendInfo>> DBManager::AcceptFriendRequest(uint32 myId, uint32 requesterId)
 {
 	try {
 		ScopedDBSession scoped;
 		auto& sess = scoped.Get();
 		auto schema = sess.getSchema("gp2025");
 
-		// 1. 요청 상태를 'accepted'로 변경
-		auto updateRes = schema.getTable("user_friends")
+		sess.startTransaction();
+
+		auto updateRes1 = schema.getTable("user_friends")
 			.update()
 			.set("status", 1)
 			.where("user_id = :from AND friend_id = :to AND status = 0")
-			.bind("from", fromId)
-			.bind("to", toId)
+			.bind("from", requesterId)
+			.bind("to", myId)
 			.execute();
 
-		if (updateRes.getAffectedItemsCount() == 0)
+		if (updateRes1.getAffectedItemsCount() == 0)
+		{
+			sess.rollback();
 			return { DBResultCode::FRIEND_USER_NOT_FOUND, std::nullopt };
+		}
 
-		// 2. 역방향 accepted 관계 삽입 (중복이면 무시)
-		try {
+		auto updateRes2 = schema.getTable("user_friends")
+			.update()
+			.set("status", 1)
+			.where("user_id = :to AND friend_id = :from")
+			.bind("to", myId)
+			.bind("from", requesterId)
+			.execute();
+
+		if (updateRes2.getAffectedItemsCount() == 0)
+		{
 			schema.getTable("user_friends")
-				.insert("user_id", "friend_id", "status")
-				.values(toId, fromId, 1)
+				.insert("user_id", "friend_id", "status", "requester_id")
+				.values(myId, requesterId, 1, requesterId)
 				.execute();
 		}
-		catch (...) {
-			// 이미 있는 경우 무시
-		}
 
-		// 3. 친구 정보 조회
 		auto result = sess.sql(
 			"SELECT u.id, u.nickname, p.level "
 			"FROM users u JOIN player_info p ON u.id = p.id "
 			"WHERE u.id = ?"
-		).bind(fromId).execute();
+		).bind(requesterId).execute();
 
 		auto row = result.fetchOne();
-		if (!row) return { DBResultCode::FRIEND_USER_NOT_FOUND, std::nullopt };
+		if (!row) {
+			sess.rollback();
+			return { DBResultCode::FRIEND_USER_NOT_FOUND, std::nullopt };
+		}
+
+		sess.commit();
 
 		FFriendInfo info;
-		info.Id = static_cast<uint32>(row[0].get<int>());
-
+		info.DBId = static_cast<uint32>(row[0].get<int>());
 		std::string nickname = row[1].get<std::string>();
 		info.SetName(ConvertToWString(nickname));
 		info.Level = static_cast<uint32>(row[2].get<int>());
 		info.bAccepted = true;
+		info.bIsRequester = false;
 
 		return { DBResultCode::SUCCESS, info };
 	}
@@ -406,29 +428,35 @@ std::pair<DBResultCode, std::optional<FFriendInfo>> DBManager::AcceptFriendReque
 	}
 }
 
-DBResultCode DBManager::RemoveFriendRequest(uint32 fromId, uint32 toId)
+DBResultCode DBManager::RejectFriendRequest(uint32 myId, uint32 requesterId)
 {
 	try {
 		ScopedDBSession scoped;
 		auto& sess = scoped.Get();
 		auto schema = sess.getSchema("gp2025");
 
+		sess.startTransaction();
+
 		auto result = schema.getTable("user_friends")
 			.remove()
-			.where("user_id = :from AND friend_id = :to AND status = 0")
-			.bind("from", fromId)
-			.bind("to", toId)
+			.where("((user_id = :from AND friend_id = :to) OR (user_id = :to AND friend_id = :from)) AND status = 0")
+			.bind("from", requesterId)
+			.bind("to", myId)
 			.execute();
 
-		if (result.getAffectedItemsCount() == 0)
+		if (result.getAffectedItemsCount() == 0) {
+			sess.rollback();
 			return DBResultCode::FRIEND_USER_NOT_FOUND;
+		}
 
-		LOG_D("Friend request removed: {} -> {}", fromId, toId);
+		sess.commit();
+
+		LOG_D("Friend request rejected and removed (both directions): {} <-> {}", myId, requesterId);
 		return DBResultCode::SUCCESS;
 	}
 	catch (const mysqlx::Error& e)
 	{
-		LOG_E("MySQL Error (RemoveFriendRequest): {}", e.what());
+		LOG_E("MySQL Error (RejectFriendRequest): {}", e.what());
 		return DBResultCode::DB_ERROR;
 	}
 }
@@ -440,6 +468,8 @@ DBResultCode DBManager::RemoveFriend(uint32 userId, uint32 friendId)
 		auto& sess = scoped.Get();
 		auto schema = sess.getSchema("gp2025");
 
+		sess.startTransaction();
+
 		auto result = schema.getTable("user_friends")
 			.remove()
 			.where("((user_id = :u1 AND friend_id = :u2) OR (user_id = :u2 AND friend_id = :u1)) AND status = 1")
@@ -447,10 +477,14 @@ DBResultCode DBManager::RemoveFriend(uint32 userId, uint32 friendId)
 			.bind("u2", friendId)
 			.execute();
 
-		if (result.getAffectedItemsCount() == 0)
+		if (result.getAffectedItemsCount() == 0) {
+			sess.rollback();
 			return DBResultCode::FRIEND_USER_NOT_FOUND;
+		}
 
-		LOG_D("Friendship removed: {} <-> {}", userId, friendId);
+		sess.commit();
+
+		LOG_D("Friendship removed (both directions): {} <-> {}", userId, friendId);
 		return DBResultCode::SUCCESS;
 	}
 	catch (const mysqlx::Error& e)
@@ -460,7 +494,7 @@ DBResultCode DBManager::RemoveFriend(uint32 userId, uint32 friendId)
 	}
 }
 
-std::pair<DBResultCode, std::vector<FFriendInfo>> DBManager::GetFriendList(uint32 userId)
+std::pair<DBResultCode, std::vector<FFriendInfo>> DBManager::GetFriendList(uint32 myId)
 {
 	std::vector<FFriendInfo> friendList;
 
@@ -469,27 +503,29 @@ std::pair<DBResultCode, std::vector<FFriendInfo>> DBManager::GetFriendList(uint3
 		auto& sess = scoped.Get();
 
 		auto result = sess.sql(
-			"SELECT f.friend_id, u.nickname, p.level, f.status "
+			"SELECT f.friend_id, u.nickname, p.level, f.status, f.requester_id "
 			"FROM user_friends f "
 			"JOIN users u ON f.friend_id = u.id "
 			"JOIN player_info p ON f.friend_id = p.id "
 			"WHERE f.user_id = ?"
-		).bind(userId).execute();
+		).bind(myId).execute();
 
 		for (const auto& row : result)
 		{
 			FFriendInfo info;
-			info.Id = static_cast<uint32>(row[0].get<int>());
+			info.DBId = static_cast<uint32>(row[0].get<int>());
 			std::string nickname = row[1].get<std::string>();
 			info.SetName(ConvertToWString(nickname));
 			info.Level = static_cast<uint32>(row[2].get<int>());
 			info.bAccepted = row[3].get<int>() == 1;
-			int32 sess = SessionManager::GetInst().GetOnlineSessionId(info.Id);
+			info.bIsRequester = (row[4].get<uint32>() == myId);
+
+			int32 sess = SessionManager::GetInst().GetOnlineSessionId(info.DBId);
 			info.isOnline = (sess != -1);
 			friendList.emplace_back(info);
 		}
 
-		LOG_D("Loaded {} friend(s) for user {}", friendList.size(), userId);
+		LOG_D("Loaded {} friend(s) for user {}", friendList.size(), myId);
 		return { DBResultCode::SUCCESS, friendList };
 	}
 	catch (const mysqlx::Error& e)

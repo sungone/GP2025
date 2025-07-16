@@ -105,8 +105,20 @@ void SessionManager::HandleLogin(int32 sessionId, const DBLoginResult& dbRes)
 	SendPacket(sessionId, &spkt);
 	if (!dbRes.friends.empty())
 	{
-		FriendListPacket pkt(static_cast<uint8>(dbRes.friends.size()), dbRes.friends.data());
-		SessionManager::GetInst().SendPacket(sessionId, &pkt);
+		const auto& friends = dbRes.friends;
+		for (const FFriendInfo& f : friends)
+		{
+			if (f.bAccepted)
+			{
+				AddFriendPacket pkt(f);
+				SessionManager::GetInst().SendPacket(sessionId, &pkt);
+			}
+			else if (!f.bIsRequester)
+			{
+				FriendRequestPacket requestPkt(f);
+				SessionManager::GetInst().SendPacket(sessionId, &requestPkt);
+			}
+		}
 	}
 }
 
