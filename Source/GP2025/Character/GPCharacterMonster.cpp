@@ -39,6 +39,20 @@ AGPCharacterMonster::AGPCharacterMonster()
 		DeathEffect = DeathEffectObj.Object;
 	}
 
+	// MonsterHitSound 로드
+	static ConstructorHelpers::FObjectFinder<USoundBase> HitSoundObj(TEXT("/Game/Sound/SFX/MonsterHit.MonsterHit"));
+	if (HitSoundObj.Succeeded())
+	{
+		MonsterHitSound = HitSoundObj.Object;
+	}
+
+	// MonsterCriticalHitSound 로드
+	static ConstructorHelpers::FObjectFinder<USoundBase> CritHitSoundObj(TEXT("/Game/Sound/SFX/MonsterHit.MonsterHit"));
+	if (CritHitSoundObj.Succeeded())
+	{
+		MonsterCriticalHitSound = CritHitSoundObj.Object;
+	}
+
 	SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
 	SetRootComponent(SceneRoot);
 

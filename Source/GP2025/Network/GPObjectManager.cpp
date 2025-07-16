@@ -452,6 +452,7 @@ void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage
 			FActorSpawnParameters SpawnParams;
 
 			bool isCrt = (MyPlayer && MyPlayer->CharacterInfo.GetDamage() * 10 < Damage);
+			USoundBase* SoundToPlay = nullptr;
 
 			AGPFloatingDamageText* DamageText = FloatingDamageTextPool->Acquire();
 			if (DamageText)
@@ -483,6 +484,9 @@ void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage
 							true
 						);
 					}
+
+					if (Monster->MonsterCriticalHitSound)
+						SoundToPlay = Monster->MonsterCriticalHitSound;
 				}
 			}
 			else
@@ -505,7 +509,19 @@ void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage
 							true
 						);
 					}
+
+					if (Monster->MonsterHitSound)
+						SoundToPlay = Monster->MonsterHitSound;
 				}
+			}
+
+			if (SoundToPlay)
+			{
+				UGameplayStatics::PlaySoundAtLocation(
+					Monster,
+					SoundToPlay,
+					Monster->GetActorLocation()
+				);
 			}
 		}
 	}
