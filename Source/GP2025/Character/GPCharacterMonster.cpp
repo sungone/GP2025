@@ -32,6 +32,13 @@ AGPCharacterMonster::AGPCharacterMonster()
 	{
 		CriticalEffect = CriEffectAsset.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> DeathEffectObj(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ChromaticSlash_OmniBurst.NS_ChromaticSlash_OmniBurst"));
+	if (DeathEffectObj.Succeeded())
+	{
+		DeathEffect = DeathEffectObj.Object;
+	}
+
 	SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
 	SetRootComponent(SceneRoot);
 
@@ -116,4 +123,28 @@ void AGPCharacterMonster::AdjustMeshToCapsule()
 
 	Capsule->SetRelativeLocation(FVector(0.f, 0.f, CapsuleHalfHeight));
 	Capsule->SetCapsuleRadius(CharacterInfo.CollisionRadius);
+}
+
+void AGPCharacterMonster::PlayDeathEffect()
+{
+	if (DeathEffect)
+	{
+		FVector SpawnLocation = GetActorLocation();
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			DeathEffect,
+			SpawnLocation,
+			FRotator::ZeroRotator,
+			FVector(1.0f),
+			true,                       // bAutoDestroy
+			true,                       // bAutoActivate
+			ENCPoolMethod::None,        // Pooling Method
+			true                        // bPreCullCheck
+		);
+		UE_LOG(LogTemp, Log, TEXT("DeathEffect spawned for Monster [%s]"), *GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DeathEffect is null for Monster [%s]"), *GetName());
+	}
 }

@@ -409,6 +409,7 @@ void UGPObjectManager::HandleMonsterDeath(int32 MonsterID)
 		{
 			AGPCharacterMonster* Monster = WeakMonsterPtr->Get();
 			Monster->CombatHandler->HandleDeath();
+
 		}
 		Monsters.Remove(MonsterID);
 	}

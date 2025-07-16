@@ -33,6 +33,12 @@ public :
 	UPROPERTY(EditAnywhere, Category = "Effect")
 	class UNiagaraSystem* CriticalEffect;
 
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	class UNiagaraSystem* DeathEffect;
+	UFUNCTION()
+	void PlayDeathEffect();
+
+
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* SceneRoot;
 };

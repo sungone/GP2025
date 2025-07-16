@@ -7,6 +7,7 @@
 #include "Network/GPNetworkManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Character/GPCharacterMonster.h"
 #include "Character/Modules/GPMyplayerSoundManager.h"
 
 
@@ -221,10 +222,16 @@ void UGPCharacterCombatHandler::HandleDeath()
 	}
 	else
 	{
+
 		Owner->GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda([LocalOwner]()
 			{
 				if (!LocalOwner) return;
 				LocalOwner->Destroy();
+
+				if (AGPCharacterMonster* LocalMonster = Cast<AGPCharacterMonster>(LocalOwner))
+				{
+					LocalMonster->PlayDeathEffect();
+				}
 
 			}), DeathAnimDuration - 0.3f, false);
 	}
