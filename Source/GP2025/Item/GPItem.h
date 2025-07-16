@@ -49,6 +49,12 @@ public:
 	UPROPERTY()
 	int32 Amount;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	class UNiagaraSystem* SpawnEffect;
+
+	UPROPERTY()
+	class UNiagaraComponent* SpawnedEffectComp;
+
 private:
 	UPROPERTY()
 	class UGPItemPool* Pool;

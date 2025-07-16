@@ -8,8 +8,11 @@
 #include "Blueprint/UserWidget.h"
 #include "GPItemStruct.h"
 #include "Components/WidgetComponent.h"
+#include "NiagaraComponent.h"
 #include "Character/Modules/GPMyplayerInputHandler.h"
 #include "Character/Modules/GPMyplayerSoundManager.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
 #include "GameFramework/PlayerController.h"
 #include "ObjectPool/GPItemPool.h"
 
@@ -33,6 +36,12 @@ AGPItem::AGPItem()
 	ItemInteractionWidgetComp->SetWidgetSpace(EWidgetSpace::Screen);
 	ItemInteractionWidgetComp->SetDrawSize(FVector2D(150.f, 50.f));
 	ItemInteractionWidgetComp->SetVisibility(false);
+
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> NiagaraEffectFinder(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Buff_Loop_02.NS_ARPGEssentials_Buff_Loop_02"));
+	if (NiagaraEffectFinder.Succeeded())
+	{
+		SpawnEffect = NiagaraEffectFinder.Object;
+	}
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClassFinder(TEXT("/Game/Inventory/Widgets/WBP_ItemInteraction"));
 	if (WidgetClassFinder.Succeeded())
@@ -135,6 +144,12 @@ void AGPItem::TryTakeItem()
 		OverlappingPlayer->SoundManager->PlaySFX(OverlappingPlayer->SoundManager->PickUpItemSound);
 	}
 
+	if (SpawnedEffectComp)
+	{
+		SpawnedEffectComp->Deactivate();
+		SpawnedEffectComp = nullptr;
+	}
+
 	OverlappingPlayer = nullptr;
 	HideInteractionWidget();
 }
@@ -156,6 +171,25 @@ void AGPItem::SetupItem(int32 NewItemID, uint8 NewItemtype, int32 NewAmount)
 	{
 		ItemStaticMesh->SetStaticMesh(ItemData->ItemStaticMesh);
 		ItemStaticMesh->SetVisibility(true);
+	}
+
+	if (SpawnEffect)
+	{
+		if (SpawnedEffectComp)
+		{
+			SpawnedEffectComp->DestroyComponent();
+			SpawnedEffectComp = nullptr;
+		}
+
+		SpawnedEffectComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
+			SpawnEffect,
+			RootComponent,
+			NAME_None,
+			FVector(0.f, 0.f, 10.f), 
+			FRotator::ZeroRotator,
+			EAttachLocation::KeepRelativeOffset,
+			true
+		);
 	}
 }
 
