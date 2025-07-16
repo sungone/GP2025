@@ -8,7 +8,7 @@ void UGPChatMessageWidget::SetChatMessage(uint8 Channel, const FString& UserName
 {
 	if (ChannelText)
 	{
-		const FString Channels[] = { TEXT("ÀüÃ¼"), TEXT("Ä£±¸"), TEXT("Áö¿ª") };
+		const FString Channels[] = { TEXT("ì „ì²´"), TEXT("ì¹œêµ¬"), TEXT("ì§€ì—­") };
 		const FLinearColor Colors[] = {
 			FLinearColor::White,
 			FLinearColor(0.3f, 0.7f, 1.0f),
