@@ -267,7 +267,7 @@ void UGPCharacterCombatHandler::PlayMonsterHitMontage()
 		return;
 	}
 
-	float LocalPlayRate = 1.5f;
+	float LocalPlayRate = 1.f;
 	float Result = AnimInstance->Montage_Play(MonsterHitMontage, LocalPlayRate);
 
 	if (Result == 0.f)
