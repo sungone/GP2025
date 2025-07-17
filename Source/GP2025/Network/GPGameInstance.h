@@ -20,11 +20,11 @@ public:
 public:
 	UFUNCTION(BlueprintCallable)
 	bool SaveNavData(bool IsSave);
+	UFUNCTION(BlueprintCallable)
+	void ChangeZoenRequest(FString LevelName);
 private:
 	UPROPERTY()
 	class UGPNetworkManager* NetworkMgr;
-
-
 
  // Android 권한 요청
 #if PLATFORM_ANDROID

@@ -61,6 +61,7 @@ public:
 	void SendMyLogoutPacket();
 	void SendMyEnterGamePacket();
 	void SendMyEnterGamePacket(Type::EPlayer PlayerType);
+
 	void SendMyZoneChangePacket(ZoneType zone);
 	void SendMyRespawnPacket(ZoneType zone);
 

@@ -34,6 +34,22 @@ bool UGPGameInstance::SaveNavData(bool IsSave)
     return false;
 }
 
+void UGPGameInstance::ChangeZoenRequest(FString LevelName)
+{
+	auto GetZoneName = [](FString LevelName) -> ZoneType {
+		if (LevelName == "tip") return ZoneType::TIP;
+		if (LevelName == "TUK") return ZoneType::TUK;
+		if (LevelName == "E") return ZoneType::E;
+		if (LevelName == "gym") return ZoneType::GYM;
+		if (LevelName == "industry") return ZoneType::INDUSTY;
+		return ZoneType::NONE;
+		};
+	
+	ZoneType TargetZone = GetZoneName(LevelName);
+	if (TargetZone == ZoneType::NONE) return;
+	NetworkMgr->SendMyZoneChangePacket(TargetZone);
+}
+
 
 #if PLATFORM_ANDROID
 	void UGPGameInstance::RequestAndroidPermissions()
