@@ -660,7 +660,7 @@ void UGPNetworkManager::ProcessPacket()
 			{
 				AddFriendPacket* Pkt = reinterpret_cast<AddFriendPacket*>(RemainingData.GetData());
 				const FFriendInfo& FriendInfo = Pkt->NewFriend;
-				ObjectMgr->AddFriend(FriendInfo.DBId, UTF8_TO_TCHAR(FriendInfo.GetName()), FriendInfo.Level, FriendInfo.bAccepted, FriendInfo.isOnline);
+				ObjectMgr->AddFriend(FriendInfo);
 				break;
 			}
 			case EPacketType::S_REMOVE_FRIEND:
@@ -672,8 +672,8 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_REQUEST_FRIEND:
 			{
 				FriendRequestPacket* Pkt = reinterpret_cast<FriendRequestPacket*>(RemainingData.GetData());
-				const FFriendInfo& Info = Pkt->RequesterInfo;
-				ObjectMgr->AddRequestFriend(Info.DBId, UTF8_TO_TCHAR(Info.GetName()), Info.Level, Info.isOnline);
+				const FFriendInfo& FriendInfo = Pkt->RequesterInfo;
+				ObjectMgr->AddRequestFriend(FriendInfo);
 				break;
 			}
 #pragma endregion

@@ -1081,32 +1081,50 @@ void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpR
 	}
 }
 
-void UGPObjectManager::AddRequestFriend(uint32 Id, const FString& Name, int32 Level, bool bIsOnline)
+void UGPObjectManager::AddRequestFriend(const FFriendInfo& Info)
 {
+	uint32 DBId = Info.DBId;
+	if (RequestedFriendSet.Contains(DBId))
+		return;
+
+	RequestedFriendSet.Add(DBId);
+
 	if (MyPlayer && MyPlayer->UIManager)
 	{
-		MyPlayer->UIManager->GetFriendBoxWidget()->AddToRequestedList(Id, Name, Level, bIsOnline);
+		MyPlayer->UIManager->GetFriendBoxWidget()->AddToFriendList(Info.DBId, UTF8_TO_TCHAR(Info.GetName()), Info.Level, Info.bAccepted);
 	}
 }
-
 void UGPObjectManager::RemoveRequestFriend(uint32 DBId)
 {
+	if (!RequestedFriendSet.Contains(DBId))
+		return;
+
+	RequestedFriendSet.Remove(DBId);
 	if (MyPlayer && MyPlayer->UIManager)
 	{
 		MyPlayer->UIManager->GetFriendBoxWidget()->RemoveFromRequestedList(DBId);
 	}
 }
 
-void UGPObjectManager::AddFriend(uint32 DBId, const FString& Name, uint32 Level, bool bAccepted, bool bIsOnline)
+void UGPObjectManager::AddFriend(const FFriendInfo& Info)
 {
+	uint32 DBId = Info.DBId;
+	if (FriendMap.Contains(DBId))
+		return;
+
+	FriendMap.Add(DBId, Info);
+
 	if (MyPlayer && MyPlayer->UIManager)
 	{
-		MyPlayer->UIManager->GetFriendBoxWidget()->AddToFriendList(DBId, Name, Level, bIsOnline);
+		MyPlayer->UIManager->GetFriendBoxWidget()->AddToFriendList(Info.DBId, UTF8_TO_TCHAR(Info.GetName()), Info.Level, Info.isOnline);
 	}
 }
 
 void UGPObjectManager::RemoveFriend(uint32 DBId)
 {
+	if (!FriendMap.Contains(DBId))return;
+	FriendMap.Remove(DBId);
+
 	if (MyPlayer && MyPlayer->UIManager)
 	{
 		MyPlayer->UIManager->GetFriendBoxWidget()->RemoveFromFriendList(DBId);

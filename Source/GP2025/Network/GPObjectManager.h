@@ -65,9 +65,9 @@ public:
 
 
 	// Friend
-	void AddRequestFriend(uint32 DBId , const FString& Name , int32 Level , bool bIsOnline);
+	void AddRequestFriend(const FFriendInfo& FriendInfo);
 	void RemoveRequestFriend(uint32 DBId);
-	void AddFriend(uint32 DBId, const FString& Name, uint32 Level, bool bAccepted, bool bIsOnline);
+	void AddFriend(const FFriendInfo& FriendInfo);
 	void RemoveFriend(uint32 DBId);
 
 private:
@@ -85,6 +85,9 @@ private:
 	TMap<int32, TWeakObjectPtr<AGPCharacterMonster>> Monsters;
 
 	TMap<int32, TWeakObjectPtr<AGPItem>> Items;
+
+	TMap<uint32, FFriendInfo> FriendMap;
+	TSet<uint32> RequestedFriendSet;
 
 	UPROPERTY()
 	UWorld* World;
