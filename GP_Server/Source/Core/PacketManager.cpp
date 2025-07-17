@@ -213,6 +213,7 @@ void PacketManager::HandleEnterGamePacket(int32 sessionId, Packet* packet)
 
 	session->EnterGame();
 	_gameWorld.PlayerEnterGame(player);
+	session->SendFriendsInfo();
 }
 
 void PacketManager::HandleMovePacket(int32 sessionId, Packet* packet)

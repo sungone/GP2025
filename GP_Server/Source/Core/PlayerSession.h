@@ -28,12 +28,7 @@ public:
 	bool IsInGame() { return _state == SessionState::InGame; }
 	int32 GetId();
 	FInfoData& GetPlayerInfo();
-
-	void SetSessionState(SessionState newState)
-	{
-		std::lock_guard<std::mutex> lock(_sMutex);
-		_state = newState;
-	}
+	void SendFriendsInfo();
 	std::shared_ptr<Player> GetPlayer();
 
 	void PushJob(std::function<void()> job)
