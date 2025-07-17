@@ -43,7 +43,6 @@ void PlayerSession::Login(const DBLoginResult& dbRes)
 	{
 		_dbId = dbRes.dbId;
 		_player->LoadFromDB(dbRes);
-		_friends = dbRes.friends;
 	}
 #endif
 }
@@ -76,8 +75,9 @@ FInfoData& PlayerSession::GetPlayerInfo()
 	return _player->GetInfo();
 }
 
-void PlayerSession::SendFriendsInfo()
+void PlayerSession::SetAndSendFriendsInfo(std::vector<FFriendInfo> friends)
 {
+	_friends = std::move(friends);
 	//게임입장 후 위젯 생성 이후로 보내줘야 함
 	if (!_friends.empty())
 	{

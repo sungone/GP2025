@@ -213,7 +213,13 @@ void PacketManager::HandleEnterGamePacket(int32 sessionId, Packet* packet)
 
 	session->EnterGame();
 	_gameWorld.PlayerEnterGame(player);
-	session->SendFriendsInfo();
+	uint32 dbId = session->GetUserDBID();
+	auto [friendResultCode, friendList] = DBManager::GetInst().GetFriendList(dbId);
+	if (friendResultCode != DBResultCode::SUCCESS)
+	{
+		LOG_W("Failed to load friend list for user: {}", dbId);
+	}
+	session->SetAndSendFriendsInfo(friendList);
 }
 
 void PacketManager::HandleMovePacket(int32 sessionId, Packet* packet)

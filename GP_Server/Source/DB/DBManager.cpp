@@ -186,14 +186,8 @@ DBLoginResult DBManager::CheckLogin(int32 sessionId, const std::string& login_id
 			uint8 itemTypeID = static_cast<uint8>(row[1].get<int>());
 			itemList.emplace_back(itemID, itemTypeID);
 		}
-		auto [friendResultCode, friendList] = GetFriendList(dbId);
 
-		if (friendResultCode != DBResultCode::SUCCESS)
-		{
-			LOG_W("Failed to load friend list for user: {}", dbId);
-		}
-
-		return { DBResultCode::SUCCESS, dbId, info, itemList, friendList };
+		return { DBResultCode::SUCCESS, dbId, info, itemList };
 	}
 	catch (const mysqlx::Error& e) {
 		LOG_E("MySQL Error (CheckLogin - login_id: {}): {}", login_id, e.what());

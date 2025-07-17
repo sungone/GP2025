@@ -28,7 +28,7 @@ public:
 	bool IsInGame() { return _state == SessionState::InGame; }
 	int32 GetId();
 	FInfoData& GetPlayerInfo();
-	void SendFriendsInfo();
+	void SetAndSendFriendsInfo(std::vector<FFriendInfo> friends);
 	std::shared_ptr<Player> GetPlayer();
 
 	void PushJob(std::function<void()> job)
