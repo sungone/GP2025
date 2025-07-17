@@ -194,10 +194,23 @@ void UGPFriendBox::OnRejectButtonClicked()
 
 void UGPFriendBox::PlayOpenAnimation(bool bReverse)
 {
-	if (!OpenAnim) return;
+	if (!OpenAnim_Re) return;
 
 	PlayAnimation(
-		OpenAnim,
+		OpenAnim_Re,
+		0.f,
+		1,
+		bReverse ? EUMGSequencePlayMode::Reverse : EUMGSequencePlayMode::Forward,
+		1.f
+	);
+}
+
+void UGPFriendBox::PlayCloseAnimation(bool bReverse)
+{
+	if (!CloseAnim_Re) return;
+
+	PlayAnimation(
+		CloseAnim_Re,
 		0.f,
 		1,
 		bReverse ? EUMGSequencePlayMode::Reverse : EUMGSequencePlayMode::Forward,

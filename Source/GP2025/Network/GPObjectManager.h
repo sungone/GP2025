@@ -69,6 +69,7 @@ public:
 	void RemoveRequestFriend(uint32 DBId);
 	void AddFriend(const FFriendInfo& FriendInfo);
 	void RemoveFriend(uint32 DBId);
+	void ShowFriendMessage(int32 Result);
 
 private:
 	UPROPERTY()

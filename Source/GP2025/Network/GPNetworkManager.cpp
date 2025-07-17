@@ -659,6 +659,7 @@ void UGPNetworkManager::ProcessPacket()
 						break;
 					}
 
+					ObjectMgr->ShowFriendMessage(static_cast<int32>(Code));
 				}
 				break;
 			}

@@ -717,7 +717,7 @@ void UGPMyplayerUIManager::OpenFriendBox()
 void UGPMyplayerUIManager::CloseFriendBox()
 {
 	if (!Owner || !FriendBoxWidget) return;
-	FriendBoxWidget->PlayOpenAnimation(true);
+	FriendBoxWidget->PlayCloseAnimation(false);
 	FriendBoxWidget->SetVisibility(ESlateVisibility::Hidden);
 	APlayerController* PC = Cast<APlayerController>(Owner->GetController());
 	if (PC)
@@ -895,26 +895,6 @@ void UGPMyplayerUIManager::AddFriendSystemMessage(EChatFriendNotifyType NotifyTy
 	case EChatFriendNotifyType::AlreadyRequested:
 		Message = TEXT("이미 친구 요청을 보냈습니다.");
 		break;
-	case EChatFriendNotifyType::SelfRequest:
-		Sender = TEXT("시스템");
-		Message = TEXT("자기 자신에게는 친구 요청을 보낼 수 없습니다.");
-		break;
-	case EChatFriendNotifyType::NotFound:
-		Sender = TEXT("시스템");
-		Message = TEXT("해당 유저를 찾을 수 없습니다.");
-		break;
-	case EChatFriendNotifyType::Removed:
-		Message = TEXT("친구 목록에서 제거했습니다.");
-		break;
-	case EChatFriendNotifyType::DBError:
-		Sender = TEXT("시스템");
-		Message = TEXT("친구 처리 중 데이터베이스 오류가 발생했습니다.");
-		break;
-	case EChatFriendNotifyType::UnknownError:
-	default:
-		Sender = TEXT("시스템");
-		Message = TEXT("알 수 없는 오류가 발생했습니다.");
-		break;
 	}
 
 	GetChatBoxWidget()->AddChatMessage(SystemChannel, Sender, Message);
@@ -971,6 +951,46 @@ void UGPMyplayerUIManager::AddFriendSystemMessage(EChatFriendNotifyType NotifyTy
 		Sender = TEXT("시스템");
 		Message = TEXT("알 수 없는 오류가 발생했습니다.");
 		break;
+	}
+
+	GetChatBoxWidget()->AddChatMessage(SystemChannel, Sender, Message);
+}
+
+void UGPMyplayerUIManager::AddFriendSystemMessage(int32 Result)
+{
+	if (!GetChatBoxWidget()) return;
+
+	const uint8 SystemChannel = 1;
+	FString Sender = TEXT(""); // 공란 처리
+	FString Message;
+
+	if (Result == 0)
+	{
+		Message = TEXT("친구 요청이 성공적으로 처리되었습니다!");
+	}
+	else if (Result == -20)
+	{
+		Message = TEXT("이미 친구 요청을 보낸 대상입니다.");
+	}
+	else if (Result == -21)
+	{
+		Message = TEXT("이미 친구로 등록된 대상입니다.");
+	}
+	else if (Result == -22)
+	{
+		Message = TEXT("자기 자신에게는 친구 요청을 보낼 수 없습니다.");
+	}
+	else if (Result == -23)
+	{
+		Message = TEXT("해당 유저를 찾을 수 없습니다.");
+	}
+	else if (Result == -99)
+	{
+		Message = TEXT("친구 요청 처리 중 데이터베이스 오류가 발생했습니다.");
+	}
+	else
+	{
+		Message = TEXT("알 수 없는 오류가 발생했습니다.");
 	}
 
 	GetChatBoxWidget()->AddChatMessage(SystemChannel, Sender, Message);

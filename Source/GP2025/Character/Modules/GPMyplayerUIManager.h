@@ -193,5 +193,7 @@ public:
 
 	void AddFriendSystemMessage(EChatFriendNotifyType NotifyType, const FString& NickName);
 	void AddFriendSystemMessage(EChatFriendNotifyType NotifyType);
+	void AddFriendSystemMessage(int32 Result);
+
 };
 
