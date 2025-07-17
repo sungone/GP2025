@@ -536,9 +536,11 @@ uint8 Player::UnequipItem(uint32 itemId)
 void Player::CheckAndUpdateQuestProgress(EQuestCategory type)
 {
 	auto questData = GetCurrentQuestData();
+	if (!questData) return;
 	QuestType quest = GetCurrentQuest();
 	if (!IsQuestInProgress(quest))
 		return;
+
 	if (type != questData->Catagory)
 	{
 		return;
@@ -648,7 +650,7 @@ bool Player::SetCurrentQuest(QuestType quest)
 
 	if (!StartQuest(quest))
 		return false;
-	LOG_D("Start Quest [{}] = '{} ", static_cast<uint8>(questData->QuestID), ENUM_NAME(quest));
+	LOG_I("Start Quest [{}] = '{} ", static_cast<uint8>(questData->QuestID), ENUM_NAME(quest));
 
 	_curQuestData = questData;
 	auto qpkt = QuestStartPacket(questData->QuestID);
@@ -661,6 +663,32 @@ bool Player::SetCurrentQuest(QuestType quest)
 		GameWorld::GetInst().QuestSpawn(_id, quest);
 	}
 	_bTutQuest = (static_cast<uint8>(quest) >= static_cast<uint8>(QuestType::TUT_START));
+
+	return true;
+}
+
+bool Player::RejectTutorialQuest()
+{
+	QuestType newQuest = QuestType::CH1_TALK_TO_STUDENT_A;
+	const QuestData* questData = QuestTable::GetInst().GetQuest(newQuest);
+	if (!questData)
+	{
+		LOG_W("Invalid quest ID");
+		return false;
+	}
+
+	_curQuest.QuestType = newQuest;
+	_curQuest.Status = EQuestStatus::InProgress;
+	_curQuestData = questData;
+
+	LOG_I("Start Quest [{}] = '{} ", static_cast<uint8>(questData->QuestID), ENUM_NAME(newQuest));
+
+	auto qpkt = QuestStartPacket(questData->QuestID);
+	SessionManager::GetInst().SendPacket(_id, &qpkt);
+	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, GetInfo());
+	SessionManager::GetInst().SendPacket(_id, &infopkt);
+
+	_bTutQuest = false;
 
 	return true;
 }

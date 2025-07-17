@@ -43,6 +43,7 @@ public:
 
 	bool GiveQuestReward(QuestType quest);
 	bool SetCurrentQuest(QuestType quest);
+	bool RejectTutorialQuest();
 	bool IsQuestInProgress(QuestType quest) const;
 	bool StartQuest(QuestType newQuest);
 	bool CompleteCurrentQuest();
