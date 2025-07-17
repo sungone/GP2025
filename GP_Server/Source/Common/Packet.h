@@ -35,6 +35,7 @@ struct TPacket : public Packet
 using FPacketHeader = Packet::PacketHeader;
 using InfoPacket = TPacket<FInfoData>;
 using IDPacket = TPacket<int32>;
+
 #pragma region Account
 struct LoginPacket : public Packet
 {
@@ -116,6 +117,7 @@ struct SignUpFailPacket : public Packet
 };
 #pragma endregion
 
+#pragma region Player
 struct SelectCharacterPacket : public Packet
 {
 	Type::EPlayer PlayerType;
@@ -168,6 +170,8 @@ struct PlayerLevelUpPacket : public Packet
 		Header.PacketSize = sizeof(PlayerLevelUpPacket);
 	}
 };
+#pragma endregion
+
 #pragma region Attack
 struct AttackPacket : public Packet
 {
@@ -299,6 +303,7 @@ struct RemoveStatePacket : public Packet
 
 #pragma endregion
 
+#pragma region Item
 namespace ItemPkt
 {
 	struct SpawnPacket : public Packet
@@ -405,7 +410,9 @@ namespace ItemPkt
 		}
 	};
 }// namespace Item
+#pragma endregion
 
+#pragma region Zone
 struct RequestZoneChangePacket : public Packet
 {
 	ZoneType TargetZone;
@@ -447,6 +454,7 @@ struct RespawnPacket : public Packet
 		Header.PacketSize = sizeof(RespawnPacket);
 	}
 };
+#pragma endregion
 
 #pragma region Shop
 constexpr uint8 MAX_SHOP_ITEMS = 32;
@@ -550,6 +558,17 @@ struct CompleteQuestPacket : public Packet
 	}
 };
 
+struct RejectQuestPacket : public Packet
+{
+	QuestType Quest;
+	RejectQuestPacket(QuestType quest)
+		: Packet(EPacketType::C_REJECT_QUEST)
+		, Quest(quest)
+	{
+		Header.PacketSize = sizeof(RejectQuestPacket);
+	}
+};
+
 struct QuestStartPacket : public Packet
 {
 	QuestType Quest;
@@ -580,7 +599,6 @@ struct QuestRewardPacket : public Packet
 };
 
 #pragma endregion
-
 
 #pragma pack(pop)
 #pragma region Chat
@@ -620,6 +638,7 @@ struct ChatBroadcastPacket : public Packet
 
 #pragma endregion
 
+#pragma region Boss
 namespace Tino
 {
 	struct EarthQuakePacket : public Packet
@@ -650,9 +669,9 @@ namespace Tino
 	};
 
 }
+#pragma endregion
 
-//for test
-
+#pragma region Debug //for test
 struct DebugTrianglePacket : public Packet
 {
 	FVector A;
@@ -681,6 +700,8 @@ struct DebugLinePacket : public Packet
 		Header.PacketSize = sizeof(DebugLinePacket);
 	}
 };
+#pragma endregion
+
 #pragma region Friend
 struct FriendAddRequestPacket : public Packet
 {

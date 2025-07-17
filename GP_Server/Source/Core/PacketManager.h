@@ -41,6 +41,7 @@ public:
 
 	void HandleRequestQuestPacket(int32 sessionId, Packet* packet);
 	void HandleCompleteQuestPacket(int32 sessionId, Packet* packet);
+	void HandleRejectQuestPacket(int32 sessionId, Packet* packet);
 
 	void HandleChatSendPacket(int32 sessionId, Packet* packet);
 	

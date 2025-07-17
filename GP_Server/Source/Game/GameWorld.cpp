@@ -900,6 +900,20 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 	}
 }
 
+void GameWorld::RejectQuest(int32 playerId, QuestType quest)
+{
+	auto player = GetPlayerByID(playerId);
+	if (!player)
+	{
+		LOG_W("Invalid");
+		return;
+	}
+	if (quest == QuestType::TUT_START && player->GetCurrentQuest() == QuestType::TUT_START)
+	{
+		player->SetCurrentQuest(QuestType::CH1_TALK_TO_STUDENT_A);
+	}
+}
+
 void GameWorld::QuestSpawn(int32 playerId, QuestType quest)
 {
 	auto player = GetPlayerByID(playerId);

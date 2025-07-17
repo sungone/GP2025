@@ -80,6 +80,7 @@ enum EPacketType : uint8
 	// --- Quest ---
 	C_REQUEST_QUEST,
 	C_COMPLETE_QUEST,
+	C_REJECT_QUEST,
 
 	S_QUEST_START,
 	S_QUEST_REWARD,
@@ -104,9 +105,6 @@ enum EPacketType : uint8
 	S_DEBUG_LINE
 };
 
-#ifndef SERVER_BUILD
-UENUM(BlueprintType)
-#endif
 enum class EChatChannel : uint8
 {
 	All,
@@ -114,9 +112,6 @@ enum class EChatChannel : uint8
 	Zone
 };
 
-#ifndef SERVER_BUILD
-UENUM(BlueprintType)
-#endif
 enum class EFriendOpType : uint8
 {
 	Request,
@@ -270,7 +265,6 @@ enum ECharacterStateType : uint32
 	STATE_CHASE = 1 << 10,
 };
 
-#ifdef SERVER_BUILD
 enum class ZoneType : uint8
 {
 	NONE = 0,
@@ -294,22 +288,8 @@ enum class EntryType : uint8
 	INDUSTY_IN,
 };
 
-
-#else
-UENUM(BlueprintType)
-enum class ZoneType : uint8
-{
-	NONE UMETA(DisplayName = "None"),
-	TIP  UMETA(DisplayName = "Tip"),
-	TUK  UMETA(DisplayName = "TUK"),
-	E    UMETA(DisplayName = "E"),
-	GYM  UMETA(DisplayName = "Gym"),
-	INDUSTY UMETA(DisplayName = "Industry")
-};
-#endif
 enum class EQuestStatus { NotStarted, InProgress, Completed, };
 
-#ifdef SERVER_BUILD
 enum class EQuestCategory : uint8
 {
 	INTERACT,
@@ -317,18 +297,7 @@ enum class EQuestCategory : uint8
 	KILL,
 	ITEM
 };
-#else
-UENUM(BlueprintType)
-enum class EQuestCategory : uint8
-{
-	INTERACT   UMETA(DisplayName = "Interact"),
-	MOVE       UMETA(DisplayName = "Move"),
-	KILL       UMETA(DisplayName = "Kill"),
-	ITEM       UMETA(DisplayName = "Item")
-};
-#endif
 
-#ifdef SERVER_BUILD
 enum class QuestType : uint8
 {
 	NONE = 0,
@@ -363,41 +332,3 @@ enum class QuestType : uint8
 	TUT_EQUIP_ITEM,
 	TUT_COMPLETE
 };
-#else
-UENUM(BlueprintType)
-enum class QuestType : uint8
-{
-	NONE                      = 0       UMETA(DisplayName = "None"),
-
-	// Chapter 1
-	CH1_TALK_TO_STUDENT_A     = 1       UMETA(DisplayName = "Talk to Student A"),
-	CH1_GO_TO_E_FIRST         = 2       UMETA(DisplayName = "Go to E First"),
-	CH1_FIND_JANITOR          = 3       UMETA(DisplayName = "Find Janitor"),
-	CH1_GO_TO_BUNKER          = 4       UMETA(DisplayName = "Go to Bunker"),
-	CH1_BUNKER_CLEANUP        = 5       UMETA(DisplayName = "Bunker Cleanup"),
-	CH1_FIND_KEY_ITEM         = 6       UMETA(DisplayName = "Find Key Item"),
-
-	// Chapter 2
-	CH2_ENTER_E_BUILDING      = 7       UMETA(DisplayName = "Enter E Building"),
-	CH2_CLEAR_E_BUILDING      = 8       UMETA(DisplayName = "Clear E Building"),
-	CH2_KILL_DESKMON          = 9       UMETA(DisplayName = "Kill Deskmon"),
-
-	// Chapter 3
-	CH3_RETURN_TO_TIP_WITH_DOC = 10     UMETA(DisplayName = "Return to TIP with Document"),
-	CH3_CLEAR_SERVER_ROOM     = 11      UMETA(DisplayName = "Clear Server Room"),
-	CH3_KILL_DRILL            = 12      UMETA(DisplayName = "Kill Drill"),
-
-	// Chapter 4
-	CH4_ENTER_GYM             = 13      UMETA(DisplayName = "Enter Gym"),
-	CH4_KILL_TINO             = 14      UMETA(DisplayName = "Kill Tino"),
-
-	// Tutorial
-	TUT_START               = 100     UMETA(DisplayName = "Tutorial - Start"),
-	TUT_KILL_ONE_MON          = 101     UMETA(DisplayName = "Tutorial - Kill One Monster"),
-	TUT_USE_ITEM              = 102     UMETA(DisplayName = "Tutorial - Use Item"),
-	TUT_BUY_ITEM              = 103     UMETA(DisplayName = "Tutorial - Buy Item"),
-	TUT_EQUIP_ITEM            = 104     UMETA(DisplayName = "Tutorial - Equip Item"),
-	TUT_COMPLETE              = 105     UMETA(DisplayName = "Tutorial - Complete")
-};
-
-#endif

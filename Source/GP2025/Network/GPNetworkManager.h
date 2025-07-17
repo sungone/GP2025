@@ -61,6 +61,7 @@ public:
 	void SendMyLogoutPacket();
 	void SendMyEnterGamePacket();
 	void SendMyEnterGamePacket(Type::EPlayer PlayerType);
+
 	void SendMyZoneChangePacket(ZoneType zone);
 	void SendMyRespawnPacket(ZoneType zone);
 
@@ -79,6 +80,7 @@ public:
 	void SendMyShopSellItem(int32 ItemID);
 	void SendMyRequestQuest(QuestType quest);
 	void SendMyCompleteQuest(QuestType quest);
+	void SendMyRejectQuest(QuestType quest);
 
 	void SendMyChatMessage(const FString& Message, EChatChannel Channel);
 	void SendMyRemoveStatePacket(uint32 State);

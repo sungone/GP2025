@@ -15,7 +15,7 @@ void Player::Init()
 	_info.CollisionRadius = playerCollision;
 	_info.State = ECharacterStateType::STATE_IDLE;
 	ApplyLevelStats(_info.Stats.Level);
-	SetCurrentQuest(QuestType::TUT_KILL_ONE_MON);
+	SetCurrentQuest(QuestType::TUT_START);
 #endif
 }
 

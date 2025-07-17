@@ -287,6 +287,12 @@ void UGPNetworkManager::SendMyCompleteQuest(QuestType quest)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
+void UGPNetworkManager::SendMyRejectQuest(QuestType quest)
+{
+	RejectQuestPacket Packet(quest);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
 void UGPNetworkManager::SendMyChatMessage(const FString& Message, EChatChannel Channel)
 {
 	FTCHARToUTF8 MsgUtf8(*Message);
