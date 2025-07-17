@@ -152,6 +152,14 @@ void UGPFriendBox::OnAcceptButtonClicked()
 		MyPlayer->NetMgr->SendMyFriendAccept(SelectedFriendUserID);
 	}
 
+	if (RequestedFriendWidget)
+	{
+		UGPFriendList* RequestList = Cast<UGPFriendList>(RequestedFriendWidget);
+		if (RequestList)
+		{
+			RequestList->RemoveFriendEntry(SelectedFriendUserID);
+		}
+	}
 	UE_LOG(LogTemp, Log, TEXT("[FriendBox] AcceptButton clicked ¡æ Send FriendAcceptPacket to server."));
 }
 
