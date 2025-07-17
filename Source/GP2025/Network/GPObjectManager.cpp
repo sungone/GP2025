@@ -1093,8 +1093,10 @@ void UGPObjectManager::AddRequestFriend(const FFriendInfo& Info)
 	if (MyPlayer && MyPlayer->UIManager)
 	{
 		MyPlayer->UIManager->GetFriendBoxWidget()->AddToRequestedList(Info.DBId, UTF8_TO_TCHAR(Info.GetName()), Info.Level, Info.bAccepted);
+		MyPlayer->UIManager->AddFriendSystemMessage(EChatFriendNotifyType::RequestReceived, UTF8_TO_TCHAR(Info.GetName()));
 	}
 }
+
 void UGPObjectManager::RemoveRequestFriend(uint32 DBId)
 {
 	if (!RequestedFriendSet.Contains(DBId))
@@ -1118,6 +1120,7 @@ void UGPObjectManager::AddFriend(const FFriendInfo& Info)
 	if (MyPlayer && MyPlayer->UIManager)
 	{
 		MyPlayer->UIManager->GetFriendBoxWidget()->AddToFriendList(Info.DBId, UTF8_TO_TCHAR(Info.GetName()), Info.Level, Info.isOnline);
+		MyPlayer->UIManager->AddFriendSystemMessage(EChatFriendNotifyType::Accepted, UTF8_TO_TCHAR(Info.GetName()));
 	}
 }
 

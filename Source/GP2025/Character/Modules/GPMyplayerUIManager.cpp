@@ -863,3 +863,115 @@ void UGPMyplayerUIManager::ShowSkillUpgradeMessage(ESkillGroup SkillGroup)
 
 	GetChatBoxWidget()->AddChatMessage(SkillChannel, SkillName, Message);
 }
+
+void UGPMyplayerUIManager::AddFriendSystemMessage(EChatFriendNotifyType NotifyType, const FString& NickName)
+{
+	if (!GetChatBoxWidget()) return;
+
+	const uint8 SystemChannel = 1; // 예: 아이템 채널 또는 시스템 채널
+	FString Sender = NickName;
+	FString Message;
+
+	switch (NotifyType)
+	{
+	case EChatFriendNotifyType::RequestReceived:
+		Message = TEXT("친구 신청을 보냈습니다.");
+		break;
+	case EChatFriendNotifyType::RequestSent:
+		Message = TEXT("친구 신청을 보냈습니다.");
+		break;
+	case EChatFriendNotifyType::RequestRejected:
+		Message = TEXT("친구 신청을 거절했습니다.");
+		break;
+	case EChatFriendNotifyType::RequestCancelled:
+		Message = TEXT("보낸 친구 신청을 취소했습니다.");
+		break;
+	case EChatFriendNotifyType::Accepted:
+		Message = TEXT("친구가 되었습니다!");
+		break;
+	case EChatFriendNotifyType::AlreadyFriend:
+		Message = TEXT("이미 친구입니다.");
+		break;
+	case EChatFriendNotifyType::AlreadyRequested:
+		Message = TEXT("이미 친구 요청을 보냈습니다.");
+		break;
+	case EChatFriendNotifyType::SelfRequest:
+		Sender = TEXT("시스템");
+		Message = TEXT("자기 자신에게는 친구 요청을 보낼 수 없습니다.");
+		break;
+	case EChatFriendNotifyType::NotFound:
+		Sender = TEXT("시스템");
+		Message = TEXT("해당 유저를 찾을 수 없습니다.");
+		break;
+	case EChatFriendNotifyType::Removed:
+		Message = TEXT("친구 목록에서 제거했습니다.");
+		break;
+	case EChatFriendNotifyType::DBError:
+		Sender = TEXT("시스템");
+		Message = TEXT("친구 처리 중 데이터베이스 오류가 발생했습니다.");
+		break;
+	case EChatFriendNotifyType::UnknownError:
+	default:
+		Sender = TEXT("시스템");
+		Message = TEXT("알 수 없는 오류가 발생했습니다.");
+		break;
+	}
+
+	GetChatBoxWidget()->AddChatMessage(SystemChannel, Sender, Message);
+}
+
+void UGPMyplayerUIManager::AddFriendSystemMessage(EChatFriendNotifyType NotifyType)
+{
+	if (!GetChatBoxWidget()) return;
+
+	const uint8 SystemChannel = 1; // 예: 아이템 채널 또는 시스템 채널
+	FString Sender = TEXT("");
+	FString Message;
+
+	switch (NotifyType)
+	{
+	case EChatFriendNotifyType::RequestReceived:
+		Message = TEXT("친구 신청을 보냈습니다.");
+		break;
+	case EChatFriendNotifyType::RequestSent:
+		Message = TEXT("친구 신청을 보냈습니다.");
+		break;
+	case EChatFriendNotifyType::RequestRejected:
+		Message = TEXT("친구 신청을 거절했습니다.");
+		break;
+	case EChatFriendNotifyType::RequestCancelled:
+		Message = TEXT("보낸 친구 신청을 취소했습니다.");
+		break;
+	case EChatFriendNotifyType::Accepted:
+		Message = TEXT("친구가 되었습니다!");
+		break;
+	case EChatFriendNotifyType::AlreadyFriend:
+		Message = TEXT("이미 친구입니다.");
+		break;
+	case EChatFriendNotifyType::AlreadyRequested:
+		Message = TEXT("이미 친구 요청을 보냈습니다.");
+		break;
+	case EChatFriendNotifyType::SelfRequest:
+		Sender = TEXT("시스템");
+		Message = TEXT("자기 자신에게는 친구 요청을 보낼 수 없습니다.");
+		break;
+	case EChatFriendNotifyType::NotFound:
+		Sender = TEXT("시스템");
+		Message = TEXT("해당 유저를 찾을 수 없습니다.");
+		break;
+	case EChatFriendNotifyType::Removed:
+		Message = TEXT("친구 목록에서 제거했습니다.");
+		break;
+	case EChatFriendNotifyType::DBError:
+		Sender = TEXT("시스템");
+		Message = TEXT("친구 처리 중 데이터베이스 오류가 발생했습니다.");
+		break;
+	case EChatFriendNotifyType::UnknownError:
+	default:
+		Sender = TEXT("시스템");
+		Message = TEXT("알 수 없는 오류가 발생했습니다.");
+		break;
+	}
+
+	GetChatBoxWidget()->AddChatMessage(SystemChannel, Sender, Message);
+}

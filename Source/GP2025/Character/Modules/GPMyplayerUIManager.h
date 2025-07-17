@@ -7,6 +7,31 @@
 #include "../../GP_Server/Source/Common/Type.h"
 #include "GPMyplayerUIManager.generated.h"
 
+enum class EChatFriendNotifyType : uint8
+{
+	None UMETA(DisplayName = "None"),
+
+	/** 친구 신청 관련 */
+	RequestReceived      UMETA(DisplayName = "친구 신청 받음"),       // 상대방에게 받음
+	RequestSent          UMETA(DisplayName = "친구 신청 보냄"),       // 내가 보냄
+	RequestRejected      UMETA(DisplayName = "친구 신청 거절됨"),
+	RequestCancelled     UMETA(DisplayName = "친구 신청 취소됨"),
+
+	/** 친구 수락/등록 */
+	Accepted             UMETA(DisplayName = "친구 수락됨"),
+	AlreadyFriend        UMETA(DisplayName = "이미 친구임"),
+	AlreadyRequested     UMETA(DisplayName = "이미 친구 요청함"),
+	SelfRequest          UMETA(DisplayName = "자기 자신에게 요청"),
+	NotFound             UMETA(DisplayName = "유저를 찾을 수 없음"),
+
+	/** 친구 삭제 관련 */
+	Removed              UMETA(DisplayName = "친구 삭제됨"),
+
+	/** 기타 오류 */
+	DBError              UMETA(DisplayName = "DB 오류"),
+	UnknownError         UMETA(DisplayName = "알 수 없는 오류"),
+};
+
 
 /**
  *
@@ -166,5 +191,7 @@ public:
 	void ShowSkillUnlockMessage(ESkillGroup SkillGroup);
 	void ShowSkillUpgradeMessage(ESkillGroup SkillGroup);
 
+	void AddFriendSystemMessage(EChatFriendNotifyType NotifyType, const FString& NickName);
+	void AddFriendSystemMessage(EChatFriendNotifyType NotifyType);
 };
 
