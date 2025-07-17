@@ -56,9 +56,9 @@ void UGPQuestWidget::OnQuestAccepted()
 
 	if (!OwningNPC) // MainQuestStart
 	{
-		if (MyPlayer->CharacterInfo.GetCurrentQuest().QuestType == QuestType::TUT_COMPLETE)
+		if (MyPlayer->CharacterInfo.GetCurrentQuest().QuestType == QuestType::TUT_START)
 		{
-			NetMgr->SendMyCompleteQuest(QuestType::TUT_COMPLETE);
+			NetMgr->SendMyCompleteQuest(QuestType::TUT_START);
 			UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] MainQuestStart: SendMyCompleteQuest(TUT_COMPLETE)"));
 		}
 
@@ -138,6 +138,43 @@ void UGPQuestWidget::OnQuestExit()
 	{
 		UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
 	}
+
+	if (!OwningNPC) // MainQuestStart
+	{
+		AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0));
+		if (!MyPlayer) return;
+
+		UGPNetworkManager* NetMgr = MyPlayer->NetMgr;
+		if (!NetMgr) return;
+
+
+		if (MyPlayer->CharacterInfo.GetCurrentQuest().QuestType == QuestType::TUT_START)
+		{
+			NetMgr->SendMyRejectQuest(QuestType::TUT_START);
+			UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] MainQuestStart: SendMyCompleteQuest(TUT_COMPLETE)"));
+		}
+
+		RemoveFromParent();
+
+		if (APlayerController* PC = Cast<APlayerController>(MyPlayer->GetController()))
+		{
+			if (MyPlayer->UIManager && MyPlayer->UIManager->bIsInventoryOpen)
+			{
+				PC->bShowMouseCursor = true;
+				FInputModeGameAndUI InputMode;
+				InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+				PC->SetInputMode(InputMode);
+			}
+			else
+			{
+				PC->bShowMouseCursor = false;
+				PC->SetInputMode(FInputModeGameOnly());
+			}
+		}
+
+		return;
+	}
+
 
 	if (OwningNPC)
 	{
