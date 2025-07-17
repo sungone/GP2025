@@ -1049,6 +1049,14 @@ void UGPObjectManager::OnQuestStart(QuestType Quest)
 			MyPlayer->UIManager->ShowQuestStartMessage(Quest);
 		//}
 	}
+
+	if (Quest == QuestType::TUT_COMPLETE) // 튜토리얼 완료는 바로 클리어
+	{
+		if (MyPlayer && MyPlayer->NetMgr)
+		{
+			MyPlayer->NetMgr->SendMyCompleteQuest(QuestType::TUT_COMPLETE);
+		}
+	}
 }
 
 void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpReward, uint32 GoldReward)
