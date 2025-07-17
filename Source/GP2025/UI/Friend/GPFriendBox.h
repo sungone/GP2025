@@ -93,8 +93,8 @@ public:
 	UWidgetAnimation* CloseAnim_Re;
 
 	/** 애니메이션 재생 함수 */
-	void PlayOpenAnimation(bool bReverse);
-	void PlayCloseAnimation(bool bReverse);
+	void PlayOpenAnimation();
+	void PlayCloseAnimation();
 
 	UPROPERTY()
 	uint32 SelectedFriendUserID = MAX_uint32;

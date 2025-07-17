@@ -72,12 +72,6 @@ UGPMyplayerUIManager::UGPMyplayerUIManager()
 		QuestMessageTable = QuestTableObj.Object;
 	}
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> MainQuestStartBPClass(TEXT("/Game/UI/WBP_MainQuestStart"));
-	if (MainQuestStartBPClass.Succeeded())
-	{
-		MainQuestStartWidgetClass = MainQuestStartBPClass.Class;
-	}
-
 	static ConstructorHelpers::FClassFinder<UUserWidget> FriendBoxBPClass(TEXT("/Game/UI/Friend/WBP_FriendBox"));
 	if (FriendBoxBPClass.Succeeded())
 	{
@@ -641,100 +635,7 @@ void UGPMyplayerUIManager::ShowQuestStartMessage(QuestType InQuestType)
 	}
 }
 
-void UGPMyplayerUIManager::PlayMainQuestStartWidget()
-{
-	if (!Owner) return;
-	UWorld* World = Owner->GetWorld();
-	if (!World) return;
-
-	if (!MainQuestStartWidget && MainQuestStartWidgetClass)
-	{
-		MainQuestStartWidget = CreateWidget<UUserWidget>(World, MainQuestStartWidgetClass);
-	}
-
-	if (MainQuestStartWidget && !MainQuestStartWidget->IsInViewport())
-	{
-		MainQuestStartWidget->AddToViewport();
-
-		if (UGPQuestWidget* QuestWidget = Cast<UGPQuestWidget>(MainQuestStartWidget))
-		{
-			if (QuestWidget->QuestExitButton)
-			{
-				// QuestWidget->QuestExitButton->SetVisibility(ESlateVisibility::Hidden);
-				UE_LOG(LogTemp, Log, TEXT("[UIManager] QuestExitButton hidden in MainQuestStartWidget."));
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("[UIManager] QuestExitButton is null in MainQuestStartWidget."));
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("[UIManager] Cast to UGPQuestWidget failed for MainQuestStartWidget."));
-		}
-	}
-
-	// 입력 모드 UI Only 전환 (선택 사항)
-	if (Owner->IsPlayerControlled())
-	{
-		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
-		if (PC)
-		{
-			PC->bShowMouseCursor = true;
-
-			FInputModeUIOnly InputMode;
-			InputMode.SetWidgetToFocus(MainQuestStartWidget->TakeWidget());
-			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-			PC->SetInputMode(InputMode);
-		}
-	}
-}
-
-void UGPMyplayerUIManager::OpenFriendBox()
-{
-	if (!Owner || !FriendBoxWidgetClass) return;
-
-	if (FriendBoxWidget)
-	{
-		FriendBoxWidget->SetVisibility(ESlateVisibility::Visible);
-		FriendBoxWidget->PlayOpenAnimation(false);
-
-		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
-		if (PC)
-		{
-			PC->SetShowMouseCursor(true);
-
-			FInputModeGameAndUI InputMode;
-			InputMode.SetWidgetToFocus(FriendBoxWidget->TakeWidget());
-			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-			PC->SetInputMode(InputMode);
-		}
-
-		UE_LOG(LogTemp, Log, TEXT("[UIManager] FriendBoxWidget opened."));
-	}
-}
-
-void UGPMyplayerUIManager::CloseFriendBox()
-{
-	if (!Owner || !FriendBoxWidget) return;
-	FriendBoxWidget->PlayCloseAnimation(false);
-	FriendBoxWidget->SetVisibility(ESlateVisibility::Hidden);
-	APlayerController* PC = Cast<APlayerController>(Owner->GetController());
-	if (PC)
-	{
-		PC->SetShowMouseCursor(false);
-		PC->SetInputMode(FInputModeGameOnly());
-	}
-
-	UE_LOG(LogTemp, Log, TEXT("[UIManager] FriendBoxWidget closed."));
-}
-
-UGPFriendBox* UGPMyplayerUIManager::GetFriendBoxWidget()
-{
-	return Cast<UGPFriendBox>(FriendBoxWidget);
-}
-
-void UGPMyplayerUIManager::ShowTutorialQuestWidget()
+void UGPMyplayerUIManager::PlayTutorialQuestWidget()
 {
 	if (!Owner) return;
 
@@ -781,6 +682,51 @@ void UGPMyplayerUIManager::ShowTutorialQuestWidget()
 		}
 	}
 }
+
+void UGPMyplayerUIManager::OpenFriendBox()
+{
+	if (!Owner || !FriendBoxWidgetClass) return;
+
+	if (FriendBoxWidget)
+	{
+		FriendBoxWidget->SetVisibility(ESlateVisibility::Visible);
+		FriendBoxWidget->PlayOpenAnimation();
+
+		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
+		if (PC)
+		{
+			PC->SetShowMouseCursor(true);
+
+			FInputModeGameAndUI InputMode;
+			InputMode.SetWidgetToFocus(FriendBoxWidget->TakeWidget());
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			PC->SetInputMode(InputMode);
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("[UIManager] FriendBoxWidget opened."));
+	}
+}
+
+void UGPMyplayerUIManager::CloseFriendBox()
+{
+	if (!Owner || !FriendBoxWidget) return;
+	FriendBoxWidget->PlayCloseAnimation();
+	FriendBoxWidget->SetVisibility(ESlateVisibility::Hidden);
+	APlayerController* PC = Cast<APlayerController>(Owner->GetController());
+	if (PC)
+	{
+		PC->SetShowMouseCursor(false);
+		PC->SetInputMode(FInputModeGameOnly());
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("[UIManager] FriendBoxWidget closed."));
+}
+
+UGPFriendBox* UGPMyplayerUIManager::GetFriendBoxWidget()
+{
+	return Cast<UGPFriendBox>(FriendBoxWidget);
+}
+
 
 void UGPMyplayerUIManager::ShowSkillUnlockMessage(ESkillGroup SkillGroup)
 {

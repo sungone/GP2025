@@ -192,30 +192,19 @@ void UGPFriendBox::OnRejectButtonClicked()
 	UE_LOG(LogTemp, Log, TEXT("[FriendBox] RejectButton clicked ¡æ Send FriendRejectPacket to server."));
 }
 
-void UGPFriendBox::PlayOpenAnimation(bool bReverse)
+void UGPFriendBox::PlayOpenAnimation()
 {
 	if (!OpenAnim_Re) return;
 
-	PlayAnimation(
-		OpenAnim_Re,
-		0.f,
-		1,
-		bReverse ? EUMGSequencePlayMode::Reverse : EUMGSequencePlayMode::Forward,
-		1.f
-	);
+	PlayAnimation(OpenAnim_Re, 0.f, 1, EUMGSequencePlayMode::Forward, 1.f);
 }
 
-void UGPFriendBox::PlayCloseAnimation(bool bReverse)
+void UGPFriendBox::PlayCloseAnimation()
 {
 	if (!CloseAnim_Re) return;
 
-	PlayAnimation(
-		CloseAnim_Re,
-		0.f,
-		1,
-		bReverse ? EUMGSequencePlayMode::Reverse : EUMGSequencePlayMode::Forward,
-		1.f
-	);
+	PlayAnimation(CloseAnim_Re, 0.f, 1, EUMGSequencePlayMode::Forward, 1.f);
+
 }
 
 void UGPFriendBox::AddToRequestedList(uint32 FriendUserID, const FString& Nickname, int32 Level, bool bOnline)

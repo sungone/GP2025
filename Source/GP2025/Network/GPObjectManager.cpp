@@ -1023,26 +1023,9 @@ void UGPObjectManager::OnQuestStart(QuestType Quest)
 		UE_LOG(LogTemp, Warning, TEXT("=== [ObjectManager] Calling UIManager->AddQuestEntry(%d) ==="), QuestID);
 		MyPlayer->UIManager->AddQuestEntry(QuestID, false);
 
-		//if (Quest == QuestType::TUT_COMPLETE)
-		//{
-		//	FTimerHandle TimerHandle;
-		//	MyPlayer->GetWorld()->GetTimerManager().SetTimer(
-		//		TimerHandle,
-		//		FTimerDelegate::CreateLambda([this]()
-		//			{
-		//				if (MyPlayer && MyPlayer->UIManager)
-		//				{
-		//					MyPlayer->UIManager->PlayMainQuestStartWidget();
-		//					UE_LOG(LogTemp, Warning, TEXT("[ObjectManager] PlayMainQuestStartWidget() executed after delay."));
-		//				}
-		//			}),
-		//		1.0f,
-		//		false);
-		//}
-		//else
-		//{
-			MyPlayer->UIManager->ShowQuestStartMessage(Quest);
-		//}
+
+		MyPlayer->UIManager->ShowQuestStartMessage(Quest);
+		
 	}
 
 	if (Quest == QuestType::TUT_COMPLETE) // 튜토리얼 완료는 바로 클리어

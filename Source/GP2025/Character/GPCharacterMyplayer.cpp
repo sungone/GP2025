@@ -138,7 +138,6 @@ void AGPCharacterMyplayer::OnPlayerEnterGame()
 				UIManager->LobbyWidget->RemoveFromParent();
 			}
 		}
-
 		UIManager->OnSetUpInGameWidgets();
 	}
 
@@ -149,18 +148,27 @@ void AGPCharacterMyplayer::OnPlayerEnterGame()
 		SoundManager->PlayBGMForCurrentLevel(); 
 	}
 
-	GetWorldTimerManager().SetTimer(
-		TutorialWidgetTimerHandle,
-		FTimerDelegate::CreateLambda([this]()
-			{
-				if (UIManager)
+	if (CharacterInfo.GetCurrentQuest().QuestType == QuestType::TUT_START
+		|| CharacterInfo.GetCurrentQuest().QuestType == QuestType::NONE)
+	{
+		UE_LOG(LogTemp, Log, TEXT("[MyPlayer] Current QuestType = %d (TUT_START detected)"),
+			static_cast<uint8>(CharacterInfo.GetCurrentQuest().QuestType));
+
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle,
+			FTimerDelegate::CreateLambda([this]()
 				{
-					UIManager->ShowTutorialQuestWidget();
-				}
-			}),
-		1.0f,
-		false
-	);
+					UE_LOG(LogTemp, Log, TEXT("[MyPlayer] Executing tutorial quest widget."));
+
+					if (UIManager)
+					{
+						UIManager->PlayTutorialQuestWidget();
+					}
+				}),
+			1.0f,
+			false);
+	}
 }
 
 void AGPCharacterMyplayer::OnPlayerEnterLobby()

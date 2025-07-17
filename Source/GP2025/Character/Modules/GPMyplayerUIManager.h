@@ -163,7 +163,7 @@ public:
 	UDataTable* QuestMessageTable;
 
 	// Main Quest Start Widget
-	void PlayMainQuestStartWidget();
+	void PlayTutorialQuestWidget();
 	UPROPERTY()
 	UUserWidget* MainQuestStartWidget;
 
