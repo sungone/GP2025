@@ -161,5 +161,10 @@ public:
 
 // Quest
 	void ShowTutorialQuestWidget();
+
+// Skill Text
+	void ShowSkillUnlockMessage(ESkillGroup SkillGroup);
+	void ShowSkillUpgradeMessage(ESkillGroup SkillGroup);
+
 };
 

@@ -316,11 +316,15 @@ void UGPObjectManager::SkillUnlock(ESkillGroup SkillGID)
 {
 	if (MyPlayer->EffectHandler)
 		MyPlayer->EffectHandler->PlaySkillUnlockEffect();
+
+	if (MyPlayer->UIManager)
+		MyPlayer->UIManager->ShowSkillUnlockMessage(SkillGID);
 }
 
 void UGPObjectManager::SkillUpgrade(ESkillGroup SkillGID)
 {
-	// Todo : UI 처리
+	if (MyPlayer->UIManager)
+		MyPlayer->UIManager->ShowSkillUpgradeMessage(SkillGID);
 }
 
 void UGPObjectManager::LevelUp(const FInfoData& PlayerInfo)

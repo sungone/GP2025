@@ -8,7 +8,7 @@ void UGPChatMessageWidget::SetChatMessage(uint8 Channel, const FString& UserName
 {
 	if (ChannelText)
 	{
-		const FString Channels[] = { TEXT("전체"), TEXT("친구"), TEXT("지역"), TEXT("아이템") };
+		const FString Channels[] = { TEXT("전체"), TEXT("친구"), TEXT("지역"), TEXT("아이템"), TEXT("스킬") };
 		const int32 NumChannels = UE_ARRAY_COUNT(Channels);
 
 		FString ChannelLabel = (Channel < NumChannels) ? Channels[Channel] : TEXT("알 수 없음");
@@ -26,26 +26,29 @@ void UGPChatMessageWidget::SetChatMessage(uint8 Channel, const FString& UserName
 			ChannelColor = FLinearColor(0.3f, 1.0f, 0.3f);
 			break;
 		case 3: // 아이템
-			ChannelColor = FLinearColor(1.0f, 0.9f, 0.4f); // 노란색 톤 제안
+			ChannelColor = FLinearColor(1.0f, 0.9f, 0.4f); 
+			break;
+		case 4: // 스킬
+			ChannelColor = FLinearColor(0.f, 0.f, 0.9f); 
 			break;
 		default:
 			ChannelColor = FLinearColor::Red;
 			break;
 		}
 
-		ChannelText->SetText(FText::FromString(TEXT("[") + Channels[Channel] + TEXT("]")));
+		ChannelText->SetText(FText::FromString(TEXT("[") + ChannelLabel + TEXT("]")));
 		ChannelText->SetColorAndOpacity(FSlateColor(ChannelColor));
 	}
 
 	if (UserNameText)
 	{
-		if (Channel != 3) 
-		{
-			UserNameText->SetText(FText::FromString(UserName + TEXT(":")));
-		}
-		else // 아이템
+		if (Channel == 3 || Channel == 4) // 아이템 , 스킬
 		{
 			UserNameText->SetText(FText::FromString(UserName));
+		}
+		else
+		{
+			UserNameText->SetText(FText::FromString(UserName + TEXT(":")));
 		}
 	}
 

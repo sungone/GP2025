@@ -781,3 +781,85 @@ void UGPMyplayerUIManager::ShowTutorialQuestWidget()
 		}
 	}
 }
+
+void UGPMyplayerUIManager::ShowSkillUnlockMessage(ESkillGroup SkillGroup)
+{
+	if (!GetChatBoxWidget())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[UIManager] ChatBoxWidget is null."));
+		return;
+	}
+
+	FString SkillName;
+
+	switch (SkillGroup)
+	{
+	case ESkillGroup::HitHard:
+		SkillName = TEXT("강타");
+		break;
+	case ESkillGroup::Clash:
+		SkillName = TEXT("돌진");
+		break;
+	case ESkillGroup::Whirlwind:
+		SkillName = TEXT("회오리베기");
+		break;
+	case ESkillGroup::Throwing:
+		SkillName = TEXT("던지기");
+		break;
+	case ESkillGroup::FThrowing:
+		SkillName = TEXT("빨리던지기");
+		break;
+	case ESkillGroup::Anger:
+		SkillName = TEXT("분노");
+		break;
+	default:
+		SkillName = TEXT("");
+		break;
+	}
+
+	FString Message = FString::Printf(TEXT("스킬이 해금되었습니다."));
+	const uint8 SkillChannel = 4;
+
+	GetChatBoxWidget()->AddChatMessage(SkillChannel, SkillName, Message);
+}
+
+void UGPMyplayerUIManager::ShowSkillUpgradeMessage(ESkillGroup SkillGroup)
+{
+	if (!GetChatBoxWidget())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[UIManager] ChatBoxWidget is null."));
+		return;
+	}
+
+	FString SkillName;
+
+	switch (SkillGroup)
+	{
+	case ESkillGroup::HitHard:
+		SkillName = TEXT("강타");
+		break;
+	case ESkillGroup::Clash:
+		SkillName = TEXT("돌진");
+		break;
+	case ESkillGroup::Whirlwind:
+		SkillName = TEXT("회오리베기");
+		break;
+	case ESkillGroup::Throwing:
+		SkillName = TEXT("던지기");
+		break;
+	case ESkillGroup::FThrowing:
+		SkillName = TEXT("빨리던지기");
+		break;
+	case ESkillGroup::Anger:
+		SkillName = TEXT("분노");
+		break;
+	default:
+		SkillName = TEXT("");
+		break;
+	}
+
+	FString Message = FString::Printf(TEXT("스킬이 업그레이드 되었습니다."));
+	const uint8 SkillChannel = 4;
+
+	GetChatBoxWidget()->AddChatMessage(SkillChannel, SkillName, Message);
+}
