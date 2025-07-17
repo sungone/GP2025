@@ -260,23 +260,23 @@ FRotator AGPLevelTransitionTrigger::GetRotationOffsetForLevel(const FString& Lev
 {
 	if (LevelName == "tip")
 	{
-		return FRotator(0.f, 270.f, 0.f); 
+		return FRotator(0.f, 90.f, 0.f); 
 	}
 	else if (LevelName == "E")
 	{
-		return FRotator(0.f, 90.f, 0.f); 
+		return FRotator(0.f, -90.f, 0.f); 
 	}
 	else if (LevelName == "gym")
 	{
-		return FRotator(0.f, 150.f, 0.f); 
+		return FRotator(0.f, -30.f, 0.f); 
 	}
 	else if (LevelName == "TUK")
 	{
-		return FRotator(0.f, 120.f, 0.f); 
+		return FRotator(0.f, -60.f, 0.f); 
 	}
 	else if (LevelName == "industry")
 	{
-		return FRotator(0.f, 0.f, 0.f);
+		return FRotator(0.f, 180.f, 0.f);
 	}
 	else
 	{

@@ -223,6 +223,7 @@ void AGPCharacterNPC::CloseShopUI()
 						{
 							PC->SetInputMode(FInputModeGameOnly());
 							PC->bShowMouseCursor = false;
+							PC->FlushPressedKeys();
 							UE_LOG(LogTemp, Warning, TEXT("[CloseShopUI] SetInputMode(GameOnly) and Hide Mouse Cursor."));
 						}
 						else
@@ -230,6 +231,7 @@ void AGPCharacterNPC::CloseShopUI()
 							UE_LOG(LogTemp, Error, TEXT("[CloseShopUI] PlayerController is NULL."));
 						}
 
+						UE_LOG(LogTemp, Warning, TEXT("[NPC] Setting bIsInteracting = false from CloseShopUI()"));
 						bIsInteracting = false;
 						UE_LOG(LogTemp, Warning, TEXT("[CloseShopUI] bIsInteracting set to false."));
 
@@ -319,9 +321,11 @@ void AGPCharacterNPC::CloseQuestUI()
 		{
 			PC->SetInputMode(FInputModeGameOnly());
 			PC->bShowMouseCursor = false;
+			PC->FlushPressedKeys();
 		}
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("[NPC] Setting bIsInteracting = false from CloseQuestUI()"));
 	bIsInteracting = false;
 }
 
@@ -353,7 +357,8 @@ void AGPCharacterNPC::OnInteractionExit(UPrimitiveComponent* OverlappedComp, AAc
 	if (!MyPlayer) return;
 	InteractionWidgetComponent->SetVisibility(false);
 	MyPlayer->InputHandler->CurrentInteractionTarget = nullptr;
-
+	
+	UE_LOG(LogTemp, Warning, TEXT("[NPC] OnInteractionExit triggered. bIsInteracting = true. Closing interaction."));
 	if (bIsInteracting)
 	{
 		switch (NPCType)
@@ -386,6 +391,7 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 	if (!MyPlayer || !MyPlayer->InputHandler) return;
 	APlayerController* PC = Cast<APlayerController>(MyPlayer->GetController());
 	if (!PC) return;
+	UE_LOG(LogTemp, Warning, TEXT("[NPC] CheckAndHandleInteraction called. bIsInteracting: %s"), bIsInteracting ? TEXT("true") : TEXT("false"));
 	if (bIsInteracting)
 	{
 		return;
@@ -481,6 +487,7 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 
 void AGPCharacterNPC::ExitInteraction()
 {
+	UE_LOG(LogTemp, Warning, TEXT("[NPC] ExitInteraction called. Current bIsInteracting: %s"), bIsInteracting ? TEXT("true") : TEXT("false"));
 	if (!bIsInteracting) return;
 
 	switch (NPCType)
@@ -509,6 +516,7 @@ void AGPCharacterNPC::ExitInteraction()
 		break;
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("[NPC] ExitInteraction called. Current bIsInteracting: %s"), bIsInteracting ? TEXT("true") : TEXT("false"));
 	// bIsInteracting = false;
 }
 
