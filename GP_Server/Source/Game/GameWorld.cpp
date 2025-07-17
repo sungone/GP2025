@@ -234,8 +234,11 @@ void GameWorld::PlayerAttack(int32 playerId)
 		{
 			uint32 monlv = monster->GetInfo().GetLevel();
 			Type::EPlayer playertype = (Type::EPlayer)player->GetInfo().CharacterType;
+#if TEST
 			player->AddExp(TEST_EXP_WEIGHT * 10 * monster->GetInfo().GetLevel());
-
+#else
+			player->AddExp(10 * monster->GetInfo().GetLevel());
+#endif
 			FVector basePos = monster->GetInfo().Pos;
 			auto mquest = monster->GetQuestID();
 			uint32 dropId = monster->GetDropItemId();
@@ -466,6 +469,7 @@ std::shared_ptr<WorldItem> GameWorld::FindWorldItemById(uint32 itemId, ZoneType 
 void GameWorld::SpawnGoldItem(FVector position, ZoneType zone)
 {
 	std::lock_guard<std::mutex> lock(_mtItemZMap);
+	position.Z += 100.f;
 	auto newItem = std::make_shared<WorldItem>(position);
 	_worldItemsByZone[zone].emplace_back(newItem);
 
@@ -481,6 +485,7 @@ void GameWorld::SpawnGoldItem(FVector position, ZoneType zone)
 void GameWorld::SpawnWorldItem(FVector position, uint32 monlv, Type::EPlayer playertype, ZoneType zone)
 {
 	std::lock_guard<std::mutex> lock(_mtItemZMap);
+	position.Z += 100.f;
 	auto newItem = std::make_shared<WorldItem>(position, monlv, playertype);
 	_worldItemsByZone[zone].emplace_back(newItem);
 
