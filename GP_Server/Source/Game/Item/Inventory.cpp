@@ -3,25 +3,10 @@
 
 bool Inventory::LoadItem(const std::shared_ptr<Item>& item)
 {
-	if (!item) return false;
-
-	uint32 itemId = item->GetItemID();
-
-	if (_items.contains(itemId))
-	{
-		LOG_W("LoadItem failed - duplicate itemID: {}", itemId);
-		return false;
-	}
-
-	auto inventoryItem = std::make_shared<InventoryItem>();
-	inventoryItem->item = item;
-	inventoryItem->saved = true;
-
-	_items[itemId] = inventoryItem;
-	return true;
+	return AddItem(item, true);
 }
 
-bool Inventory::AddItem(const std::shared_ptr<Item>& item)
+bool Inventory::AddItem(const std::shared_ptr<Item>& item, bool dbSaved)
 {
 	if (!item) return false;
 
@@ -35,9 +20,12 @@ bool Inventory::AddItem(const std::shared_ptr<Item>& item)
 
 	auto inventoryItem = std::make_shared<InventoryItem>();
 	inventoryItem->item = std::make_shared<Item>(*item);
-	inventoryItem->saved = false;
+	inventoryItem->saved = dbSaved;
 
 	_items[itemId] = inventoryItem;
+	if(inventoryItem->item->GetItemTypeID() == Type::EQuestItem::KEY)
+		_bHasKey = true;
+
 	return true;
 }
 

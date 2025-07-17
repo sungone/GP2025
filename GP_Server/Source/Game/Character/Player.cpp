@@ -211,7 +211,7 @@ bool Player::BuyItem(std::shared_ptr<Item> item, uint32 price, uint16 quantity)
 		return false;
 	}
 	auto type = item->GetItemCategory();
-	if (IsInTutorialQuest() && type == EItemCategory::Weapon)
+	if (GetCurrentQuest() == QuestType::TUT_BUY_ITEM && type == EItemCategory::Weapon)
 	{
 		CheckAndUpdateQuestProgress(EQuestCategory::ITEM);
 	}
@@ -266,6 +266,14 @@ bool Player::TakeWorldItem(const std::shared_ptr<WorldItem> item)
 	float detectDist = 500.f;
 	if (!IsCollision(item->GetPos(), detectDist))
 		return false;
+	if (GetCurrentQuest() == QuestType::CH1_FIND_KEY_ITEM)
+	{
+		auto type = item->GetItemCategory();
+		if (type == EItemCategory::Quest)
+		{
+			CheckAndUpdateQuestProgress(EQuestCategory::ITEM);
+		}
+	}
 	return  AddInventoryItem(item);
 }
 
@@ -492,7 +500,7 @@ void Player::UseItem(uint32 itemId)
 	SessionManager::GetInst().SendPacket(_id, &pkt);
 	_inventory.RemoveItem(itemId);
 
-	if (IsInTutorialQuest() && type == EAbilityType::Recove)
+	if (GetCurrentQuest() == QuestType::TUT_USE_ITEM && type == EAbilityType::Recove)
 	{
 		CheckAndUpdateQuestProgress(EQuestCategory::ITEM);
 	}
@@ -511,7 +519,7 @@ uint8 Player::EquipItem(uint32 itemId)
 	_info.EquipItemByType(itemType);
 
 	auto type = targetItem->GetItemCategory();
-	if (IsInTutorialQuest() && type == EItemCategory::Weapon)
+	if (GetCurrentQuest() == QuestType::TUT_EQUIP_ITEM && type == EItemCategory::Weapon)
 	{
 		CheckAndUpdateQuestProgress(EQuestCategory::ITEM);
 	}
@@ -563,7 +571,11 @@ void Player::CheckAndUpdateQuestProgress(EQuestCategory type)
 	}
 	case EQuestCategory::KILL:
 	{
-		if (quest == QuestType::CH2_CLEAR_E_BUILDING || quest == QuestType::CH3_CLEAR_SERVER_ROOM)
+		if (quest == QuestType::CH1_BUNKER_CLEANUP || quest == QuestType::TUT_KILL_ONE_MON || quest == QuestType::CH2_KILL_DESKMON)
+		{
+			res = true;
+		}
+		else if (quest == QuestType::CH2_CLEAR_E_BUILDING || quest == QuestType::CH3_CLEAR_SERVER_ROOM)
 		{
 			int32 mcnt = GameWorld::GetInst().GetMonsterCnt(GetZone());
 			if (mcnt == 1)
@@ -571,13 +583,11 @@ void Player::CheckAndUpdateQuestProgress(EQuestCategory type)
 				res = true;
 			}
 		}
-		else if (quest == QuestType::TUT_KILL_ONE_MON)
-		{
-			res = true;
-		}
+
 		break;
 	}
 	case EQuestCategory::ITEM:
+
 		res = true;
 		break;
 	}
@@ -650,6 +660,7 @@ bool Player::SetCurrentQuest(QuestType quest)
 
 	if (!StartQuest(quest))
 		return false;
+
 	LOG_I("Start Quest [{}] = '{} ", static_cast<uint8>(questData->QuestID), ENUM_NAME(quest));
 
 	_curQuestData = questData;
@@ -695,6 +706,7 @@ bool Player::RejectTutorialQuest()
 
 bool Player::IsQuestInProgress(QuestType quest) const
 {
+	LOG_I("CompletQuest [{}] == CurQuest[{}] ??", ENUM_NAME(quest), ENUM_NAME(_curQuest.QuestType));
 	return _curQuest.QuestType == quest && _curQuest.Status == EQuestStatus::InProgress;
 }
 

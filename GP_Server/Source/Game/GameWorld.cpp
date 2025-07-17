@@ -72,10 +72,10 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 		_playersByZone[startZone][playerId] = player;
 	}
 
-	//for test
+#if TEST
 	player->AddGold(10000);
-	BuyItem(playerId, (uint8)Type::EQuestItem::KEY, 1);
-
+	//BuyItem(playerId, (uint8)Type::EQuestItem::KEY, 1);
+#endif
 	auto& playerInfo = player->GetInfo();
 
 	EnterGamePacket enterpkt(playerInfo);
@@ -242,15 +242,15 @@ void GameWorld::PlayerAttack(int32 playerId)
 			FVector basePos = monster->GetInfo().Pos;
 			auto mquest = monster->GetQuestID();
 			uint32 dropId = monster->GetDropItemId();
-			if (monster->IsBoss())
+
+			if (monster->HasDropItem())
 			{
-				if (monster->HasDropItem())
-				{
-					FVector itemPos = basePos + RandomUtils::GetRandomOffset();
-					auto dropedItem = WorldItem(dropId, itemPos);
-					SpawnWorldItem(dropedItem, zone);
-				}
+				FVector itemPos = basePos + RandomUtils::GetRandomOffset();
+				auto dropedItem = WorldItem(dropId, itemPos);
+				SpawnWorldItem(dropedItem, zone);
+				player->CheckAndUpdateQuestProgress(EQuestCategory::KILL);
 			}
+
 			if (mquest != QuestType::NONE)
 			{
 				if (mquest == QuestType::CH2_CLEAR_E_BUILDING || mquest == QuestType::CH3_CLEAR_SERVER_ROOM)
@@ -667,6 +667,10 @@ bool GameWorld::TransferToZone(int32 playerId, ZoneType newZone)
 	if (!player) return false;
 	auto& info = player->GetInfo();
 	uint32 playerLevel = info.GetLevel();
+	if (newZone == ZoneType::E && !player->HasKey())
+	{
+		return false;
+	}
 	if (!Map::GetInst().IsZoneAccessible(newZone, playerLevel))
 	{
 		LOG_D("Player [{}] cannot access due to level {}", playerId, playerLevel);
@@ -901,7 +905,8 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 			return;
 		}
 		auto type = questData->Catagory;
-		player->CheckAndUpdateQuestProgress(type);
+		if (type == EQuestCategory::MOVE || type == EQuestCategory::INTERACT)
+			player->CheckAndUpdateQuestProgress(type);
 	}
 }
 

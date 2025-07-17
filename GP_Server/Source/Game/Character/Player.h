@@ -88,7 +88,7 @@ public:
 	}
 	FStatData& GetStats() const { return _stats; }
 	bool IsInTutorialQuest() { return _bTutQuest; }
-
+	bool HasKey() const { return _inventory.HasKey(); }
 private:
 	Type::EPlayer _playerType;
 	Inventory _inventory;
