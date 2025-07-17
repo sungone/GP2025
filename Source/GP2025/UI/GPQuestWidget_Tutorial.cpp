@@ -73,6 +73,12 @@ void UGPQuestWidget_Tutorial::OnTutorialSkipped()
 			PC->bShowMouseCursor = false;
 			PC->SetInputMode(FInputModeGameOnly());
 		}
+
+		if (MyPlayer->UIManager)
+		{
+			MyPlayer->UIManager->AddQuestEntry(static_cast<uint8>(QuestType::CH1_TALK_TO_STUDENT_A), false);
+			MyPlayer->UIManager->ShowQuestStartMessage(QuestType::CH1_TALK_TO_STUDENT_A);
+		}
 	}
 
 	RemoveFromParent();
