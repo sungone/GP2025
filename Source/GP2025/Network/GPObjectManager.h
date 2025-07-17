@@ -104,6 +104,7 @@ private:
 	FName PendingLevelName;
 
 	bool bChangingZone = false;
+
 // Object Pool
 public :
 	UPROPERTY()

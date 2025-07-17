@@ -112,6 +112,7 @@ public:
 public:
 	class UGPInGameWidget* GetInGameWidget();
 	class UGPInventory* GetInventoryWidget();
+	class UGPChatBoxWidget* GetChatBoxWidget();
 
 public:
 	void ShowLobbyUI();

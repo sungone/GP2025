@@ -349,6 +349,11 @@ UGPInventory* UGPMyplayerUIManager::GetInventoryWidget()
 		return nullptr;
 }
 
+UGPChatBoxWidget* UGPMyplayerUIManager::GetChatBoxWidget()
+{
+	return Cast<UGPChatBoxWidget>(GetInGameWidget()->ChatBoxWidget);
+}
+
 void UGPMyplayerUIManager::ShowLobbyUI()
 {
 	if (!Owner) return;

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Inventory/GPInventory.h"
@@ -8,7 +8,9 @@
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 #include "Character/GPCharacterMyplayer.h"
+#include "Character/Modules/GPMyplayerUIManager.h"
 #include "Inventory/GPStatInfo.h"
+#include "UI/GPChatBoxWidget.h"
 #include "Network/GPNetworkManager.h"
 #include "Engine/DataTable.h"
 #include "GPInventory.h"
@@ -93,6 +95,31 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
             ExistingSlot->UpdateQuantityText();
             UE_LOG(LogTemp, Warning, TEXT("Updated Existing Item - %s | Quantity: %d"),
                 *ItemData->ItemName.ToString(), ExistingSlot->SlotData.Quantity);
+
+            // ì±„íŒ…ì°½ì— ì•„ì´í…œ íšë“ ë‚´ìš© í‘œì‹œ
+            if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
+            {
+                UGPChatBoxWidget* ChatWidget = nullptr;
+
+                if (AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(PC->GetPawn()))
+                {
+                    if (MyPlayer->UIManager)
+                    {
+                        ChatWidget = MyPlayer->UIManager->GetChatBoxWidget();
+                    }
+                }
+
+                if (ChatWidget && ItemData)
+                {
+                    FString ItemName = ItemData->ItemName.ToString();
+                    FString ChatMessage = FString::Printf(TEXT("ë¥¼ íšë“í•˜ì˜€ìŠµë‹ˆë‹¤."), *ItemName);
+                    uint8 SystemChannel = 3;
+
+                    UE_LOG(LogTemp, Log, TEXT("[ChatNotify] Sending message: %s"), *ChatMessage);
+
+                    ChatWidget->AddChatMessage(SystemChannel, ItemName, ChatMessage);
+                }
+            }
             return;
         }
     }
@@ -124,7 +151,7 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
         return;
     }
 
-    // UI Ãß°¡
+    // UI ì¶”ê°€
     switch (ItemData->Category)
     {
     case ECategory::sword:
@@ -148,6 +175,31 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
     }
 
     UE_LOG(LogTemp, Warning, TEXT("Item Successfully Added to Inventory - %s [ItemUniqueID : %d]"), *ItemData->ItemName.ToString() , ItemID);
+
+    // ì±„íŒ…ì°½ì— ì•„ì´í…œ íšë“ ë‚´ìš© í‘œì‹œ
+    if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
+    {
+        UGPChatBoxWidget* ChatWidget = nullptr;
+
+        if (AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(PC->GetPawn()))
+        {
+            if (MyPlayer->UIManager)
+            {
+                ChatWidget = MyPlayer->UIManager->GetChatBoxWidget();
+            }
+        }
+
+        if (ChatWidget && ItemData)
+        {
+            FString ItemName = ItemData->ItemName.ToString();
+            FString ChatMessage = FString::Printf(TEXT("ë¥¼ íšë“í•˜ì˜€ìŠµë‹ˆë‹¤."), *ItemName);
+            uint8 SystemChannel = 3;
+
+            UE_LOG(LogTemp, Log, TEXT("[ChatNotify] Sending message: %s"), *ChatMessage);
+
+            ChatWidget->AddChatMessage(SystemChannel, ItemName, ChatMessage);
+        }
+    }
 }
 
 void UGPInventory::UseItemFromInventory(uint32 ItemID)
@@ -207,14 +259,14 @@ void UGPInventory::RemoveItemByUniqueID(uint32 ItemUniqueID)
 
                 if (UniqueIDs.Contains(ItemUniqueID))
                 {
-                    // 1. ¼­¹ö·Î º¸³½ ID »èÁ¦
+                    // 1. ì„œë²„ë¡œ ë³´ë‚¸ ID ì‚­ì œ
                     UniqueIDs.RemoveSingle(ItemUniqueID);
 
-                    // 2. ¼ö·® °»½Å
+                    // 2. ìˆ˜ëŸ‰ ê°±ì‹ 
                     Slot->SlotData.Quantity = UniqueIDs.Num();
                     Slot->UpdateQuantityText();
 
-                    // 3. ¸¸¾à UniqueIDs°¡ ¸ğµÎ ¾ø¾îÁ³´Ù¸é ½½·Ô Á¦°Å
+                    // 3. ë§Œì•½ UniqueIDsê°€ ëª¨ë‘ ì—†ì–´ì¡Œë‹¤ë©´ ìŠ¬ë¡¯ ì œê±°
                     if (Slot->SlotData.Quantity == 0)
                     {
                         if (WrapBox)
@@ -229,7 +281,7 @@ void UGPInventory::RemoveItemByUniqueID(uint32 ItemUniqueID)
                     }
                     else
                     {
-                        // 4. ³²Àº UniqueIDµéÀÌ ÀÖ´Ù¸é ½½·Ô À¯Áö
+                        // 4. ë‚¨ì€ UniqueIDë“¤ì´ ìˆë‹¤ë©´ ìŠ¬ë¡¯ ìœ ì§€
                         UE_LOG(LogTemp, Warning, TEXT("[RemoveItemByUniqueID] Item [%d] removed. Remaining count: %d"),
                             ItemUniqueID, Slot->SlotData.Quantity);
                     }

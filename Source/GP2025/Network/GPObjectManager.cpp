@@ -663,6 +663,7 @@ void UGPObjectManager::ItemSpawn(uint32 ItemID, uint8 ItemType, FVector Pos)
 	Items.Add(ItemID, SpawnedItem);
 	UE_LOG(LogTemp, Log, TEXT("[ItemSpawn] Item [%d] successfully added to Items map"), ItemID);
 }
+
 void UGPObjectManager::ItemPickUp(uint32 ItemID)
 {
 	if (!World || !IsValid(World))
