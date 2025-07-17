@@ -1081,26 +1081,34 @@ void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpR
 	}
 }
 
-void UGPObjectManager::AddRequestFriend(uint32 ID ,const FString& Name, int32 Level , bool bIsOnline)
+void UGPObjectManager::AddRequestFriend(uint32 Id, const FString& Name, int32 Level, bool bIsOnline)
 {
 	if (MyPlayer && MyPlayer->UIManager)
 	{
-		// FriendBox 가져오기
-		UGPFriendBox* FriendBox = MyPlayer->UIManager->GetFriendBoxWidget();
-		if (FriendBox)
-		{
-			UGPFriendList* RequestListWidget = FriendBox->GetRequestedFriendWidget();
-			if (RequestListWidget)
-			{
-				// 요청 리스트에 Entry 추가
-				RequestListWidget->AddFriendEntry(ID , Name, Level , bIsOnline);
-			}
-		}
+		MyPlayer->UIManager->GetFriendBoxWidget()->AddToRequestedList(Id, Name, Level, bIsOnline);
 	}
 }
 
-void UGPObjectManager::AddFriend(uint32 Id, const FString& Name, uint32 Level, bool bAccepted, bool bIsOnline)
+void UGPObjectManager::RemoveRequestFriend(uint32 DBId)
 {
-	MyPlayer->UIManager->GetFriendBoxWidget()->OnFriendAccepted(Id , Name , 
-		Level , bAccepted , bIsOnline);
+	if (MyPlayer && MyPlayer->UIManager)
+	{
+		MyPlayer->UIManager->GetFriendBoxWidget()->RemoveFromRequestedList(DBId);
+	}
+}
+
+void UGPObjectManager::AddFriend(uint32 DBId, const FString& Name, uint32 Level, bool bAccepted, bool bIsOnline)
+{
+	if (MyPlayer && MyPlayer->UIManager)
+	{
+		MyPlayer->UIManager->GetFriendBoxWidget()->AddToFriendList(DBId, Name, Level, bIsOnline);
+	}
+}
+
+void UGPObjectManager::RemoveFriend(uint32 DBId)
+{
+	if (MyPlayer && MyPlayer->UIManager)
+	{
+		MyPlayer->UIManager->GetFriendBoxWidget()->RemoveFromFriendList(DBId);
+	}
 }

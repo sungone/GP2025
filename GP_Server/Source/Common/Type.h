@@ -356,7 +356,7 @@ enum class QuestType : uint8
 	CH4_KILL_TINO,
 
 	// Tutorial
-	TUT_MOVE = 100,
+	TUT_START = 100,
 	TUT_KILL_ONE_MON,
 	TUT_USE_ITEM,
 	TUT_BUY_ITEM,
@@ -392,7 +392,7 @@ enum class QuestType : uint8
 	CH4_KILL_TINO             = 14      UMETA(DisplayName = "Kill Tino"),
 
 	// Tutorial
-	TUT_MOVE                  = 100     UMETA(DisplayName = "Tutorial - Move"),
+	TUT_START               = 100     UMETA(DisplayName = "Tutorial - Start"),
 	TUT_KILL_ONE_MON          = 101     UMETA(DisplayName = "Tutorial - Kill One Monster"),
 	TUT_USE_ITEM              = 102     UMETA(DisplayName = "Tutorial - Use Item"),
 	TUT_BUY_ITEM              = 103     UMETA(DisplayName = "Tutorial - Buy Item"),

@@ -85,9 +85,6 @@ public:
 	FORCEINLINE UGPFriendList* GetFriendListWidget() const { return FriendListWidget; }
 	FORCEINLINE UGPFriendList* GetRequestedFriendWidget() const { return RequestedFriendWidget; }
 
-	//void UpdateFriendList(const TArray<FFriendInfo>& FriendList);
-	//void UpdateRequestList(const TArray<FFriendInfo>& RequestList);
-
 public:
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	UWidgetAnimation* OpenAnim;
@@ -99,11 +96,9 @@ public:
 	UPROPERTY()
 	uint32 SelectedFriendUserID = MAX_uint32;
 
+	void AddToRequestedList(uint32 FriendUserID, const FString& Nickname, int32 Level, bool bOnline);
+	void RemoveFromRequestedList(uint32 FriendUserID);
+	void AddToFriendList(uint32 FriendUserID, const FString& Nickname, int32 Level, bool bOnline);
+	void RemoveFromFriendList(uint32 FriendUserID);
 
-	void OnFriendAccepted(
-		uint32 FriendUserID,
-		const FString& Nickname,
-		int32 Level,
-		bool bAccepted,
-		bool bOnline);
 };

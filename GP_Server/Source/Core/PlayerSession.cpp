@@ -43,7 +43,6 @@ void PlayerSession::Login(const DBLoginResult& dbRes)
 	{
 		_dbId = dbRes.dbId;
 		_player->LoadFromDB(dbRes);
-		_friends = dbRes.friends;
 	}
 #endif
 }
@@ -51,23 +50,6 @@ void PlayerSession::Login(const DBLoginResult& dbRes)
 void PlayerSession::EnterGame()
 {
 	_state = SessionState::InGame;
-	if (!_friends.empty())
-	{
-		const auto& friends = _friends;
-		for (const FFriendInfo& f : friends)
-		{
-			if (f.bAccepted)
-			{
-				AddFriendPacket pkt(f);
-				SessionManager::GetInst().SendPacket(_id, &pkt);
-			}
-			else if (!f.bIsRequester)
-			{
-				FriendRequestPacket requestPkt(f);
-				SessionManager::GetInst().SendPacket(_id, &requestPkt);
-			}
-		}
-	}
 }
 
 void PlayerSession::Logout()
@@ -91,6 +73,29 @@ int32 PlayerSession::GetId()
 FInfoData& PlayerSession::GetPlayerInfo()
 {
 	return _player->GetInfo();
+}
+
+void PlayerSession::SetAndSendFriendsInfo(std::vector<FFriendInfo> friends)
+{
+	_friends = std::move(friends);
+	//게임입장 후 위젯 생성 이후로 보내줘야 함
+	if (!_friends.empty())
+	{
+		const auto& friends = _friends;
+		for (const FFriendInfo& f : friends)
+		{
+			if (f.bAccepted)
+			{
+				AddFriendPacket pkt(f);
+				SessionManager::GetInst().SendPacket(_id, &pkt);
+			}
+			else if (!f.bIsRequester)
+			{
+				FriendRequestPacket requestPkt(f);
+				SessionManager::GetInst().SendPacket(_id, &requestPkt);
+			}
+		}
+	}
 }
 
 std::shared_ptr<Player> PlayerSession::GetPlayer()

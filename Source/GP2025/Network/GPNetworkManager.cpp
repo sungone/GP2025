@@ -287,7 +287,7 @@ void UGPNetworkManager::SendMyCompleteQuest(QuestType quest)
 void UGPNetworkManager::SendMyChatMessage(const FString& Message, EChatChannel Channel)
 {
 	FTCHARToUTF8 MsgUtf8(*Message);
-	ChatSendPacket Packet(MsgUtf8.Get(),Channel);
+	ChatSendPacket Packet(MsgUtf8.Get(), Channel);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
@@ -628,25 +628,25 @@ void UGPNetworkManager::ProcessPacket()
 					switch (Code)
 					{
 					case DBResultCode::SUCCESS:
-						UE_LOG(LogTemp, Warning, TEXT("[Friend] Operation Success. Type: %d"), static_cast<int32>(OpType));
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("[Friend] Success!")));
 						break;
 					case DBResultCode::FRIEND_ALREADY_REQUESTED:
-						UE_LOG(LogTemp, Warning, TEXT("[Friend] Already requested."));
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Friend] Already requested!")));
 						break;
 					case DBResultCode::FRIEND_ALREADY_ADDED:
-						UE_LOG(LogTemp, Warning, TEXT("[Friend] Already added."));
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Friend] Already added!")));
 						break;
 					case DBResultCode::FRIEND_SELF_REQUEST:
-						UE_LOG(LogTemp, Warning, TEXT("[Friend] Cannot add yourself."));
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Friend] Cannot add yourself!")));
 						break;
 					case DBResultCode::FRIEND_USER_NOT_FOUND:
-						UE_LOG(LogTemp, Warning, TEXT("[Friend] Target user not found."));
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Friend] Target user not found!")));
 						break;
 					case DBResultCode::DB_ERROR:
-						UE_LOG(LogTemp, Error, TEXT("[Friend] Database error."));
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Friend] Database error!")));
 						break;
 					default:
-						UE_LOG(LogTemp, Error, TEXT("[Friend] Unknown result code."));
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Friend] Unknown result code!")));
 						break;
 					}
 
@@ -656,37 +656,21 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_ADD_FRIEND:
 			{
 				AddFriendPacket* Pkt = reinterpret_cast<AddFriendPacket*>(RemainingData.GetData());
-				FFriendInfo& FriendInfo = Pkt->NewFriend;
-				FString Name = FriendInfo.GetName();
-				UE_LOG(LogTemp, Log, TEXT("친구 추가: %s"), *Name);
-
-				ObjectMgr->AddFriend(FriendInfo.DBId,
-					FString(FriendInfo.GetName()),
-					FriendInfo.Level,
-					FriendInfo.bAccepted,
-					FriendInfo.isOnline);
+				const FFriendInfo& FriendInfo = Pkt->NewFriend;
+				ObjectMgr->AddFriend(FriendInfo.DBId, UTF8_TO_TCHAR(FriendInfo.GetName()), FriendInfo.Level, FriendInfo.bAccepted, FriendInfo.isOnline);
 				break;
 			}
 			case EPacketType::S_REMOVE_FRIEND:
 			{
 				RemoveFriendPacket* Pkt = reinterpret_cast<RemoveFriendPacket*>(RemainingData.GetData());
-				UE_LOG(LogTemp, Log, TEXT("친구 제거됨: UserID=%d"), Pkt->FriendUserID);
+				ObjectMgr->RemoveFriend(Pkt->FriendUserID);
 				break;
 			}
 			case EPacketType::S_REQUEST_FRIEND:
 			{
 				FriendRequestPacket* Pkt = reinterpret_cast<FriendRequestPacket*>(RemainingData.GetData());
 				const FFriendInfo& Info = Pkt->RequesterInfo;
-
-				uint32 UserID = Info.DBId;
-				FString Name = UTF8_TO_TCHAR(Info.GetName());
-				int32 Level = Info.Level;
-				bool bOnline = Info.isOnline;
-
-				UE_LOG(LogTemp, Log, TEXT("[FriendRequest] New friend request from %s (Lv.%d) %s"),
-					*Name, Level, bOnline ? TEXT("[Online]") : TEXT("[Offline]"));
-
-				ObjectMgr->AddRequestFriend(UserID, Name, Level, bOnline);
+				ObjectMgr->AddRequestFriend(Info.DBId, UTF8_TO_TCHAR(Info.GetName()), Info.Level, Info.isOnline);
 				break;
 			}
 #pragma endregion

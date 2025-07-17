@@ -544,11 +544,7 @@ void Player::CheckAndUpdateQuestProgress(EQuestCategory type)
 		break;
 	case EQuestCategory::MOVE:
 	{
-		if (quest == QuestType::TUT_MOVE)
-		{
-			//클라에서 트리거로 처리
-			res = true;
-		}
+		res = true;
 		break;
 	}
 	case EQuestCategory::KILL:
@@ -652,7 +648,7 @@ bool Player::SetCurrentQuest(QuestType quest)
 	{
 		GameWorld::GetInst().QuestSpawn(_id, quest);
 	}
-	_bTutQuest = (static_cast<uint8>(quest) >= static_cast<uint8>(QuestType::TUT_MOVE));
+	_bTutQuest = (static_cast<uint8>(quest) >= static_cast<uint8>(QuestType::TUT_START));
 
 	return true;
 }

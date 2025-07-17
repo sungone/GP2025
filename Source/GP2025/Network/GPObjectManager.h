@@ -65,8 +65,10 @@ public:
 
 
 	// Friend
-	void AddRequestFriend(uint32 ID , const FString& Name , int32 Level , bool bIsOnline);
-	void AddFriend(uint32 Id, const FString& Name, uint32 Level, bool bAccepted, bool bIsOnline);
+	void AddRequestFriend(uint32 DBId , const FString& Name , int32 Level , bool bIsOnline);
+	void RemoveRequestFriend(uint32 DBId);
+	void AddFriend(uint32 DBId, const FString& Name, uint32 Level, bool bAccepted, bool bIsOnline);
+	void RemoveFriend(uint32 DBId);
 
 private:
 	UPROPERTY()

@@ -25,13 +25,11 @@ void UGPGameInstance::Shutdown()
 	Super::Shutdown();
 }
 
-//NavMesh 추출
 bool UGPGameInstance::SaveNavData(bool IsSave)
 {
 #if !PLATFORM_ANDROID
 	if (IsSave)
 		return GPNavMeshExporter::ExportNavMesh(GetWorld(), TEXT("NavMeshData.json"));
-		//return ExtractNavMeshData(GetWorld(), TEXT("GP_Server/NavMeshData.json"));
 #endif
     return false;
 }

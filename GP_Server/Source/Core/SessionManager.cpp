@@ -182,7 +182,7 @@ int32 SessionManager::GetOnlineSessionIdByDBId(uint32 dbid)
 {
 	for (auto& session : _sessions)
 	{
-		if (session && session->IsLogin() && session->GetUserDBID() == dbid)
+		if (session && session->IsInGame() && session->GetUserDBID() == dbid)
 			return session->GetId();
 	}
 	return -1;
