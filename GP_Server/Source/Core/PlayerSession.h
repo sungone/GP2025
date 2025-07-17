@@ -29,12 +29,6 @@ public:
 	int32 GetId();
 	FInfoData& GetPlayerInfo();
 
-	SessionState GetSessionState()
-	{
-		std::lock_guard<std::mutex> lock(_sMutex);
-		return _state;
-	}
-
 	void SetSessionState(SessionState newState)
 	{
 		std::lock_guard<std::mutex> lock(_sMutex);
