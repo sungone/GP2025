@@ -639,7 +639,7 @@ bool Player::SetCurrentQuest(QuestType quest)
 
 	if (_curQuestData != nullptr)
 	{
-		if (quest != QuestType::TUT_START && _curQuestData->NextQuestID != quest)
+		if (GetCurrentQuest() != QuestType::TUT_START && _curQuestData->NextQuestID != quest)
 		{
 			LOG_D("is not next quest");
 			return false;
