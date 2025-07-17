@@ -8,7 +8,7 @@ void UGPChatMessageWidget::SetChatMessage(uint8 Channel, const FString& UserName
 {
 	if (ChannelText)
 	{
-		const FString Channels[] = { TEXT("전체"), TEXT("친구"), TEXT("지역"), TEXT("아이템"), TEXT("스킬") };
+		const FString Channels[] = { TEXT("전체"), TEXT("친구"), TEXT("지역"), TEXT("아이템"), TEXT("스킬"), TEXT("친구") };
 		const int32 NumChannels = UE_ARRAY_COUNT(Channels);
 
 		FString ChannelLabel = (Channel < NumChannels) ? Channels[Channel] : TEXT("알 수 없음");
@@ -42,7 +42,7 @@ void UGPChatMessageWidget::SetChatMessage(uint8 Channel, const FString& UserName
 
 	if (UserNameText)
 	{
-		if (Channel == 3 || Channel == 4) // 아이템 , 스킬
+		if (Channel == 5 || Channel == 3 || Channel == 4) // 친구 , 아이템 , 스킬
 		{
 			UserNameText->SetText(FText::FromString(UserName));
 		}

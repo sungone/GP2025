@@ -814,14 +814,14 @@ void UGPMyplayerUIManager::AddFriendSystemMessage(EChatFriendNotifyType NotifyTy
 {
 	if (!GetChatBoxWidget()) return;
 
-	const uint8 SystemChannel = 1; // 예: 아이템 채널 또는 시스템 채널
+	const uint8 SystemChannel = 5; // 예: 아이템 채널 또는 시스템 채널
 	FString Sender = NickName;
 	FString Message;
 
 	switch (NotifyType)
 	{
 	case EChatFriendNotifyType::RequestReceived:
-		Message = TEXT("친구 신청을 보냈습니다.");
+		Message = TEXT("님에게 친구 신청이 들어왔습니다.");
 		break;
 	case EChatFriendNotifyType::RequestSent:
 		Message = TEXT("친구 신청을 보냈습니다.");
@@ -841,6 +841,9 @@ void UGPMyplayerUIManager::AddFriendSystemMessage(EChatFriendNotifyType NotifyTy
 	case EChatFriendNotifyType::AlreadyRequested:
 		Message = TEXT("이미 친구 요청을 보냈습니다.");
 		break;
+	case EChatFriendNotifyType::Removed:
+		Message = TEXT("님이 친구목록에서 제거되었습니다.");
+		break;
 	}
 
 	GetChatBoxWidget()->AddChatMessage(SystemChannel, Sender, Message);
@@ -850,14 +853,14 @@ void UGPMyplayerUIManager::AddFriendSystemMessage(EChatFriendNotifyType NotifyTy
 {
 	if (!GetChatBoxWidget()) return;
 
-	const uint8 SystemChannel = 1; // 예: 아이템 채널 또는 시스템 채널
+	const uint8 SystemChannel = 5; // 예: 아이템 채널 또는 시스템 채널
 	FString Sender = TEXT("");
 	FString Message;
 
 	switch (NotifyType)
 	{
 	case EChatFriendNotifyType::RequestReceived:
-		Message = TEXT("친구 신청을 보냈습니다.");
+		Message = TEXT("친구 신청이 들어왔습니다.");
 		break;
 	case EChatFriendNotifyType::RequestSent:
 		Message = TEXT("친구 신청을 보냈습니다.");
@@ -906,13 +909,20 @@ void UGPMyplayerUIManager::AddFriendSystemMessage(int32 Result)
 {
 	if (!GetChatBoxWidget()) return;
 
-	const uint8 SystemChannel = 1;
+	const uint8 SystemChannel = 5;
 	FString Sender = TEXT(""); // 공란 처리
 	FString Message;
 
+	//// Friend
+	//FRIEND_ALREADY_REQUESTED = -20,
+	//	FRIEND_ALREADY_ADDED = -21,
+	//	FRIEND_SELF_REQUEST = -22,
+	//	FRIEND_USER_NOT_FOUND = -23,
+
 	if (Result == 0)
 	{
-		Message = TEXT("친구 요청이 성공적으로 처리되었습니다!");
+		// Message = TEXT("친구 요청이 성공적으로 처리되었습니다!");
+		return;
 	}
 	else if (Result == -20)
 	{
@@ -920,7 +930,7 @@ void UGPMyplayerUIManager::AddFriendSystemMessage(int32 Result)
 	}
 	else if (Result == -21)
 	{
-		Message = TEXT("이미 친구로 등록된 대상입니다.");
+		Message = TEXT("이미 등록된 친구입니다.");
 	}
 	else if (Result == -22)
 	{
@@ -932,11 +942,7 @@ void UGPMyplayerUIManager::AddFriendSystemMessage(int32 Result)
 	}
 	else if (Result == -99)
 	{
-		Message = TEXT("친구 요청 처리 중 데이터베이스 오류가 발생했습니다.");
-	}
-	else
-	{
-		Message = TEXT("알 수 없는 오류가 발생했습니다.");
+		Message = TEXT("해당 유저가 존재하지 않습니다.");
 	}
 
 	GetChatBoxWidget()->AddChatMessage(SystemChannel, Sender, Message);

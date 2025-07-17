@@ -1114,13 +1114,13 @@ void UGPObjectManager::AddFriend(const FFriendInfo& Info)
 void UGPObjectManager::RemoveFriend(uint32 DBId)
 {
 	if (!FriendMap.Contains(DBId))return;
+	FString UserName = FriendMap[DBId].GetName();
 	FriendMap.Remove(DBId);
 
 	if (MyPlayer && MyPlayer->UIManager)
 	{
 		MyPlayer->UIManager->GetFriendBoxWidget()->RemoveFromFriendList(DBId);
-		MyPlayer->UIManager->AddFriendSystemMessage(EChatFriendNotifyType::Removed);
-
+		MyPlayer->UIManager->AddFriendSystemMessage(EChatFriendNotifyType::Removed , UserName);
 	}
 }
 
