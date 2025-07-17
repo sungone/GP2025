@@ -53,7 +53,7 @@ DBLoginResult DBManager::SignUpUser(int32 sessionId, const std::string& login_id
 	FVector newPos{};
 	newinfo.SetLocation(newPos);
 
-	newinfo.CurrentQuest = { QuestType::TUT_START, EQuestStatus::InProgress };
+	newinfo.CurrentQuest = { QuestType::TUT_START, EQuestStatus::NotStarted };
 	newinfo.EquipState = {};
 
 	try {
