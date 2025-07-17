@@ -631,6 +631,9 @@ void UGPMyplayerUIManager::ShowQuestStartMessage(QuestType InQuestType)
 			TEXT("Quest Message Lookup")
 		);
 
+		if (Row->QuestID == 100) // 튜토리얼 시작 메세지를 Return
+			return;
+
 		if (GetInGameWidget())
 		{
 			GetInGameWidget()->ShowGameMessage(Row->QuestMessage, 3.0f);
@@ -729,4 +732,52 @@ void UGPMyplayerUIManager::CloseFriendBox()
 UGPFriendBox* UGPMyplayerUIManager::GetFriendBoxWidget()
 {
 	return Cast<UGPFriendBox>(FriendBoxWidget);
+}
+
+void UGPMyplayerUIManager::ShowTutorialQuestWidget()
+{
+	if (!Owner) return;
+
+	UWorld* World = Owner->GetWorld();
+	if (!World) return;
+
+	// 위젯 클래스 로드
+	TSubclassOf<UGPQuestWidget> WidgetClass = LoadClass<UGPQuestWidget>(
+		nullptr,
+		TEXT("/Game/UI/WBP_TutorialQuest.WBP_TutorialQuest_C")
+	);
+	if (!WidgetClass)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[UIManager] Failed to load TutorialQuest widget class."));
+		return;
+	}
+
+	// 기존 퀘스트 위젯 제거
+	if (CurrentQuestWidget)
+	{
+		CurrentQuestWidget->RemoveFromParent();
+		CurrentQuestWidget = nullptr;
+	}
+
+	// 위젯 생성 및 표시
+	UGPQuestWidget* TutorialWidget = CreateWidget<UGPQuestWidget>(World, WidgetClass);
+	if (TutorialWidget)
+	{
+		TutorialWidget->AddToViewport();
+		CurrentQuestWidget = TutorialWidget;
+
+		UE_LOG(LogTemp, Log, TEXT("[UIManager] Tutorial quest widget displayed."));
+
+		if (APlayerController* PC = Cast<APlayerController>(Owner->GetController()))
+		{
+			PC->bShowMouseCursor = true;
+
+			FInputModeGameAndUI InputMode;
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			InputMode.SetHideCursorDuringCapture(false);
+			InputMode.SetWidgetToFocus(TutorialWidget->TakeWidget());
+
+			PC->SetInputMode(InputMode);
+		}
+	}
 }

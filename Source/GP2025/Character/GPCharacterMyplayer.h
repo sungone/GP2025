@@ -102,4 +102,9 @@ public :
 public:
 	UPROPERTY()
 	bool bHasPlayedTinoSequence = false;
+
+
+	// Tutorial Timer
+	FTimerHandle TutorialWidgetTimerHandle;
+
 };

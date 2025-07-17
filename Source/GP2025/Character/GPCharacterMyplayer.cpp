@@ -20,6 +20,7 @@
 #include "Character/Modules/GPMyplayerNetworkSyncHandler.h"
 #include "Character/Modules/GPMyplayerSoundManager.h"
 #include "Skill/GPSkillCoolDownHandler.h"
+#include "UI/GPQuestWidget.h"
 #include "Components/TextBlock.h"
 #include "kismet/GameplayStatics.h"
 #include "GPCharacterMyplayer.h"
@@ -147,6 +148,19 @@ void AGPCharacterMyplayer::OnPlayerEnterGame()
 		SoundManager->StopBGM();             
 		SoundManager->PlayBGMForCurrentLevel(); 
 	}
+
+	GetWorldTimerManager().SetTimer(
+		TutorialWidgetTimerHandle,
+		FTimerDelegate::CreateLambda([this]()
+			{
+				if (UIManager)
+				{
+					UIManager->ShowTutorialQuestWidget();
+				}
+			}),
+		1.0f,
+		false
+	);
 }
 
 void AGPCharacterMyplayer::OnPlayerEnterLobby()
@@ -350,4 +364,5 @@ void AGPCharacterMyplayer::SetCharacterInfo(const FInfoData& CharacterInfo_)
 		UIManager->GetInventoryWidget()->HandlePlayerStatUpdate();
 	}
 }
+
 

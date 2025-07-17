@@ -158,5 +158,8 @@ public:
 	TSubclassOf<UUserWidget> FriendBoxWidgetClass;
 
 	class UGPFriendBox* GetFriendBoxWidget();
+
+// Quest
+	void ShowTutorialQuestWidget();
 };
 

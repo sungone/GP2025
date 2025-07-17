@@ -44,7 +44,4 @@ public:
 
 	UFUNCTION()
 	void OnQuestExit();
-
-
-
 };
