@@ -118,9 +118,9 @@ void UGPObjectManager::Deinitialize()
 	UE_LOG(LogTemp, Log, TEXT("Object Manager Deinitialized"));
 }
 
-void UGPObjectManager::SetMyPlayer(AGPCharacterPlayer* InMyPlayer)
+void UGPObjectManager::SetMyPlayer(AGPCharacterMyplayer* InMyPlayer)
 {
-	MyPlayer = Cast<AGPCharacterMyplayer>(InMyPlayer);
+	MyPlayer = InMyPlayer;
 }
 
 void UGPObjectManager::AddMyPlayer(const FInfoData& PlayerInfo)
@@ -975,6 +975,12 @@ void UGPObjectManager::HandleLevelLoaded()
 	UE_LOG(LogTemp, Log, TEXT("End Changing Zone [%d]"), MyPlayer->CharacterInfo.ID);
 
 	SetChangeingZone(false);
+	if (MyPlayer && MyPlayer->UIManager)
+	{
+		auto Widget = MyPlayer->UIManager->GetInGameWidget();
+		if (Widget)
+			Widget->ShowZoneChangeMessage(PendingZone);
+	}
 }
 
 

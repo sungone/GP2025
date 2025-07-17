@@ -44,7 +44,7 @@ void AGPCharacterMyplayer::BeginPlay()
 
 	if (NetMgr)
 	{
-		NetMgr->SetMyPlayer(Cast<AGPCharacterPlayer>(this));
+		NetMgr->SetMyPlayer(this);
 		NetMgr->OnEnterGame.AddDynamic(this, &AGPCharacterMyplayer::OnPlayerEnterGame);
 		NetMgr->OnEnterLobby.AddDynamic(this, &AGPCharacterMyplayer::OnPlayerEnterLobby);
 	}
@@ -370,6 +370,18 @@ void AGPCharacterMyplayer::SetCharacterInfo(const FInfoData& CharacterInfo_)
 	if (UIManager && UIManager->GetInventoryWidget())
 	{
 		UIManager->GetInventoryWidget()->HandlePlayerStatUpdate();
+	}
+}
+
+void AGPCharacterMyplayer::PlayFadeOut(float Duration)
+{
+	if (UIManager && UIManager->GetInGameWidget())
+	{
+		UIManager->GetInGameWidget()->PlayFadeOut(Duration);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[PlayFadeOut] InGameWidget is not valid."));
 	}
 }
 

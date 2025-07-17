@@ -9,6 +9,7 @@
 #include "Network/GPObjectManager.h"
 #include "Network/GPGameInstance.h"
 #include "Character/GPCharacterPlayer.h"
+#include "Character/GPCharacterMyPlayer.h"
 
 bool UGPNetworkManager::ConnectToServer()
 {
@@ -49,7 +50,7 @@ void UGPNetworkManager::DisconnectFromServer()
 	}
 }
 
-void UGPNetworkManager::SetMyPlayer(AGPCharacterPlayer* InMyPlayer)
+void UGPNetworkManager::SetMyPlayer(AGPCharacterMyplayer* InMyPlayer)
 {
 	MyPlayer = InMyPlayer;
 	UGPObjectManager* ObjectMgr = GetWorld()->GetSubsystem<UGPObjectManager>();
@@ -251,10 +252,19 @@ void UGPNetworkManager::SendMyUseSkill(ESkillGroup SkillGID, float PlayerYaw, FV
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendMyZoneChangePacket(ZoneType zone)
+void UGPNetworkManager::SendMyZoneChangePacket(ZoneType NewZone)
 {
-	RequestZoneChangePacket Packet(zone);
-	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+	MyPlayer->PlayFadeOut(1.f);
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerHandle,
+		[this, NewZone]()
+		{
+			RequestZoneChangePacket Packet(NewZone);
+			SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+		},
+		0.5f, false
+	);
 }
 
 void UGPNetworkManager::SendMyRespawnPacket(ZoneType zone)

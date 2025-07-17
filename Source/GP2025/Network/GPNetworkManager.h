@@ -8,6 +8,7 @@
 #include "GPNetworkManager.generated.h"
 
 class AGPCharacterPlayer;
+class AGPCharacterMyplayer;
 class AGPCharacterMonster;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnReceiveChat, uint8, Channel, const FString&, Sender, const FString&, Message);
@@ -17,7 +18,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUserAuthFailed, FString, Message)
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterLobby);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterGame);
-
 
 UCLASS()
 class GP2025_API UGPNetworkManager : public UGameInstanceSubsystem
@@ -46,7 +46,7 @@ public:
 	void DisconnectFromServer();
 	void ProcessPacket();
 
-	void SetMyPlayer(AGPCharacterPlayer* InMyPlayer);
+	void SetMyPlayer(AGPCharacterMyplayer* InMyPlayer);
 public:
 	void HandleUserAuthFailure(DBResultCode ResultCode);
 	void HandleBuyItemResult(bool bSuccess, uint32 CurrentGold, DBResultCode ResultCode);
@@ -101,7 +101,7 @@ private:
 	int16 Port = SERVER_PORT;
 
 	UPROPERTY()
-	AGPCharacterPlayer* MyPlayer;
+	AGPCharacterMyplayer* MyPlayer;
 
 	TArray<uint8> RemainingData;
 	TQueue<TArray<uint8>, EQueueMode::Mpsc> RecvQueue;

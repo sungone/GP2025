@@ -8,6 +8,7 @@
 #include "GPObjectManager.generated.h"
 
 class AGPCharacterPlayer;
+class AGPCharacterMyplayer;
 class AGPCharacterMonster;
 class AGPItem;
 
@@ -20,7 +21,7 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
-	void SetMyPlayer(AGPCharacterPlayer* InMyPlayer);
+	void SetMyPlayer(AGPCharacterMyplayer* InMyPlayer);
 	void AddMyPlayer(const FInfoData& PlayerInfo);
 	void AddPlayer(const FInfoData& PlayerInfo);
 	void RemovePlayer(int32 PlayerID);
@@ -79,7 +80,7 @@ private:
 	TSubclassOf<AGPCharacterMonster> MonsterClass;
 
 	UPROPERTY()
-	class AGPCharacterMyplayer* MyPlayer;
+	AGPCharacterMyplayer* MyPlayer;
 
 	TMap<int32, TWeakObjectPtr<AGPCharacterPlayer>> Players;
 

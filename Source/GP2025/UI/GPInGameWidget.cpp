@@ -13,151 +13,181 @@
 void UGPInGameWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-    if (CurrentMapNameText)
-    {
-        CurrentMapNameText->SetText(FText::FromString(TEXT("한국공학대학교")));
-    }
+	if (CurrentMapNameText)
+	{
+		CurrentMapNameText->SetText(FText::FromString(TEXT("한국공학대학교")));
+	}
 }
 
 void UGPInGameWidget::UpdateHealthBar(float Ratio)
 {
-    if (HealthBar)
-    {
-        HealthBar->SetPercent(Ratio);
-    }
+	if (HealthBar)
+	{
+		HealthBar->SetPercent(Ratio);
+	}
 }
 
 void UGPInGameWidget::UpdateExpBar(float Ratio)
 {
-    if (ExpBar)
-    {
-        ExpBar->SetPercent(Ratio);
-    }
+	if (ExpBar)
+	{
+		ExpBar->SetPercent(Ratio);
+	}
 }
 
 void UGPInGameWidget::UpdatePlayerLevel(int32_t NewLevel)
 {
-    if (LevelText)
-    {
-        LevelText->SetText(FText::AsNumber(NewLevel));
+	if (LevelText)
+	{
+		LevelText->SetText(FText::AsNumber(NewLevel));
 
-        if (LastLevel + 1 == NewLevel)
-        {
-            LevelUpAnimation();
-            LastLevel = NewLevel;
-        }
-    }
+		if (LastLevel + 1 == NewLevel)
+		{
+			LevelUpAnimation();
+			LastLevel = NewLevel;
+		}
+	}
 }
 
 FSlateColor UGPInGameWidget::GetQSkillTextColor()
 {
-    if (QSkillBar && QSkillBar->GetPercent() >= 1.0f - KINDA_SMALL_NUMBER)
-    {
-        return FSlateColor(FLinearColor::Blue); // 쿨타임 완료: 파란색
-    }
+	if (QSkillBar && QSkillBar->GetPercent() >= 1.0f - KINDA_SMALL_NUMBER)
+	{
+		return FSlateColor(FLinearColor::Blue); // 쿨타임 완료: 파란색
+	}
 
-    return FSlateColor(FLinearColor::White); // 기본 텍스트 색
+	return FSlateColor(FLinearColor::White); // 기본 텍스트 색
 }
 
 FSlateColor UGPInGameWidget::GetESkillTextColor()
 {
-    if (ESkillBar && ESkillBar->GetPercent() >= 1.0f - KINDA_SMALL_NUMBER)
-    {
-        return FSlateColor(FLinearColor::Blue);
-    }
+	if (ESkillBar && ESkillBar->GetPercent() >= 1.0f - KINDA_SMALL_NUMBER)
+	{
+		return FSlateColor(FLinearColor::Blue);
+	}
 
-    return FSlateColor(FLinearColor::White);
+	return FSlateColor(FLinearColor::White);
 }
 
 FSlateColor UGPInGameWidget::GetRSkillTextColor()
 {
-    if (RSkillBar && RSkillBar->GetPercent() >= 1.0f - KINDA_SMALL_NUMBER)
-    {
-        return FSlateColor(FLinearColor::Blue);
-    }
+	if (RSkillBar && RSkillBar->GetPercent() >= 1.0f - KINDA_SMALL_NUMBER)
+	{
+		return FSlateColor(FLinearColor::Blue);
+	}
 
-    return FSlateColor(FLinearColor::White);
+	return FSlateColor(FLinearColor::White);
 }
 
 void UGPInGameWidget::SetCurrentMapName(const FString& MapName)
 {
-    if (CurrentMapNameText)
-    {
-        CurrentMapNameText->SetText(FText::FromString(MapName));
-        UE_LOG(LogTemp, Log, TEXT("[InGameWidget] Updated current map name to: %s"), *MapName);
-    }
+	if (CurrentMapNameText)
+	{
+		CurrentMapNameText->SetText(FText::FromString(MapName));
+		UE_LOG(LogTemp, Log, TEXT("[InGameWidget] Updated current map name to: %s"), *MapName);
+	}
 }
 
 void UGPInGameWidget::ShowGameMessage(const FText& Message, float Duration)
 {
-    if (!GameMessage) return;
+	if (!GameMessage) return;
 
-    GameMessage->SetText(Message);
-    GameMessageBox->SetVisibility(ESlateVisibility::Visible);
+	GameMessage->SetText(Message);
+	GameMessageBox->SetVisibility(ESlateVisibility::Visible);
 
-    PlayGameMessageFadeIn();
+	PlayGameMessageFadeIn();
 
-    FTimerHandle TimerHandle;
-    GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
-        {
-            PlayGameMessageFadeOut();
-            FTimerHandle HideHandle;
-            GetWorld()->GetTimerManager().SetTimer(HideHandle, [this]()
-                {
-                    GameMessageBox->SetVisibility(ESlateVisibility::Collapsed);
-                }, 1.0f, false);
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+		{
+			PlayGameMessageFadeOut();
+			FTimerHandle HideHandle;
+			GetWorld()->GetTimerManager().SetTimer(HideHandle, [this]()
+				{
+					GameMessageBox->SetVisibility(ESlateVisibility::Collapsed);
+				}, 1.0f, false);
 
-        }, Duration, false);
+		}, Duration, false);
 }
 
 void UGPInGameWidget::LevelUpAnimation()
 {
-    PlayAnimation(LevelUpAnim, 0.f, 1, EUMGSequencePlayMode::Forward, 1.f);
+	PlayAnimation(LevelUpAnim, 0.f, 1, EUMGSequencePlayMode::Forward, 1.f);
 }
 
 void UGPInGameWidget::HitByMonsterAnimation()
 {
-    PlayAnimation(HitByMonsterAnim, 0.f, 1, EUMGSequencePlayMode::Forward, 1.f);
+	PlayAnimation(HitByMonsterAnim, 0.f, 1, EUMGSequencePlayMode::Forward, 1.f);
 }
 
 void UGPInGameWidget::ShowLevelUpArrowTemporarily(UImage* ArrowImage, float Duration)
 {
-    if (!ArrowImage)
-        return;
+	if (!ArrowImage)
+		return;
 
-    // Visible 처리
-    ArrowImage->SetVisibility(ESlateVisibility::Visible);
+	// Visible 처리
+	ArrowImage->SetVisibility(ESlateVisibility::Visible);
 
-    if (LevelUpArrow)
-    {
-        PlayAnimation(LevelUpArrow);
-    }
+	if (LevelUpArrow)
+	{
+		PlayAnimation(LevelUpArrow);
+	}
 
-    // 일정 시간 뒤 Hidden 처리
-    FTimerHandle TimerHandle;
-    GetWorld()->GetTimerManager().SetTimer(
-        TimerHandle,
-        [ArrowImage]()
-        {
-            if (ArrowImage)
-            {
-                ArrowImage->SetVisibility(ESlateVisibility::Hidden);
-            }
-        },
-        Duration,
-        false
-    );
+	// 일정 시간 뒤 Hidden 처리
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerHandle,
+		[ArrowImage]()
+		{
+			if (ArrowImage)
+			{
+				ArrowImage->SetVisibility(ESlateVisibility::Hidden);
+			}
+		},
+		Duration,
+		false
+	);
+}
+
+void UGPInGameWidget::ShowZoneChangeMessage(ZoneType NewZone)
+{
+	FText ZoneNameText;
+
+	switch (NewZone)
+	{
+	case ZoneType::TIP:
+		ZoneNameText = FText::FromString(TEXT("TIP"));
+		break;
+	case ZoneType::E:
+		ZoneNameText = FText::FromString(TEXT("E동 2층"));
+		break;
+	case ZoneType::GYM:
+		ZoneNameText = FText::FromString(TEXT("체육관"));
+		break;
+	case ZoneType::TUK:
+		ZoneNameText = FText::FromString(TEXT("한국공학대학교"));
+		break;
+	case ZoneType::INDUSTY:
+		ZoneNameText = FText::FromString(TEXT("산융 지하실"));
+		break;
+	default:
+		ZoneNameText = FText::GetEmpty();
+		break;
+	}
+
+	ShowGameMessage(ZoneNameText, 3.0f);
+	SetCurrentMapName(ZoneNameText.ToString());
 }
 
 void UGPInGameWidget::PlayFadeOut(float Duration)
 {
-    if (!FadeOverlay || !FadeOutAnim) return;
+	if (!FadeOverlay || !FadeOutAnim) return;
 
-    // FadeOverlay 활성화
-    FadeOverlay->SetVisibility(ESlateVisibility::Visible);
+	// FadeOverlay 활성화
+	FadeOverlay->SetVisibility(ESlateVisibility::Visible);
 
-    // Duration 조절 (기본 애니메이션 길이가 1초라고 가정)
-    PlayAnimation(FadeOutAnim, 0.0f, 1, EUMGSequencePlayMode::Forward, 1.0f / Duration);
+	// Duration 조절 (기본 애니메이션 길이가 1초라고 가정)
+	PlayAnimation(FadeOutAnim, 0.0f, 1, EUMGSequencePlayMode::Forward, 1.0f / Duration);
 }
 
 //void UGPInGameWidget::HideGameMessage()

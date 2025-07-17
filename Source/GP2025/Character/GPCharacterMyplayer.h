@@ -97,8 +97,9 @@ public :
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "CameraShake")
 	void PlayerHittedCameraShake();
-
-	// Sequence 재생 여부
+public:
+	UFUNCTION(BlueprintCallable)
+	void PlayFadeOut(float Duration = 1.0f);
 public:
 	UPROPERTY()
 	bool bHasPlayedTinoSequence = false;

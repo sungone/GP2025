@@ -98,42 +98,13 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 		else if (LevelToLoad == "TUK")  NewZone = ZoneType::TUK;
 		else if (LevelToLoad == "industry")  NewZone = ZoneType::INDUSTY;
 
-		// 이 부분이 핵심:
 		if (NewZone == ZoneType::E)
 		{
-			// 1. 인벤토리 접근
 			if (CachedPlayer->UIManager && CachedPlayer->UIManager->GetInventoryWidget())
 			{
 				UGPInventory* Inventory = CachedPlayer->UIManager->GetInventoryWidget();
 
-				// 2. RowName 25번 아이템 보유 확인
-				if (Inventory->HasItemByType(50)) // 열쇠 아이템이 있을 때에만 포탈 이동 가능
-				{
-					if (CachedPlayer->SoundManager && CachedPlayer->SoundManager->TeleportationSound)
-					{
-						CachedPlayer->SoundManager->PlaySFX(CachedPlayer->SoundManager->TeleportationSound);
-					}
-
-					CachedPlayer->UIManager->GetInGameWidget()->PlayFadeOut(1.f);
-					FTimerHandle TimerHandle;
-					GetWorld()->GetTimerManager().SetTimer(
-						TimerHandle,
-						[this, NewZone]()
-						{
-							UGPNetworkManager* NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-							if (NetworkMgr)
-							{
-								NetworkMgr->SendMyZoneChangePacket(NewZone);
-								ShowZoneChangeMessage(NewZone);
-							}
-						},
-						0.25f, false
-					);
-
-					NetworkMgr->SendMyCompleteQuest(QuestType::CH2_ENTER_E_BUILDING);
-					UE_LOG(LogTemp, Log, TEXT("[LevelTransitionTrigger] ZoneChange + QuestComplete Success"));
-				}
-				else
+				if (!Inventory->HasItemByType(50))
 				{
 					if (CachedPlayer->SoundManager && CachedPlayer->SoundManager->WarningSound)
 					{
@@ -143,38 +114,24 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 					UE_LOG(LogTemp, Warning, TEXT("[LevelTransitionTrigger] Item Type 25 not found. Cannot enter Zone E."));
 				}
 			}
-			else
-			{
-				UE_LOG(LogTemp, Error, TEXT("[LevelTransitionTrigger] Inventory not valid."));
-			}
 		}
-		else
+
+		if (CachedPlayer->SoundManager && CachedPlayer->SoundManager->TeleportationSound)
 		{
-			// E가 아닌 일반적인 존 이동
-
-			if (CachedPlayer->SoundManager && CachedPlayer->SoundManager->TeleportationSound)
-			{
-				CachedPlayer->SoundManager->PlaySFX(CachedPlayer->SoundManager->TeleportationSound);
-			}
-
-			CachedPlayer->UIManager->GetInGameWidget()->PlayFadeOut(1.f);
-			FTimerHandle TimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(
-				TimerHandle,
-				[this, NewZone]()
-				{
-					UGPNetworkManager* NetworkMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-					if (NetworkMgr)
-					{
-						NetworkMgr->SendMyZoneChangePacket(NewZone);
-						ShowZoneChangeMessage(NewZone);
-					}
-				},
-				0.25f, false
-			);
-		
-			UE_LOG(LogTemp, Log, TEXT("[LevelTransitionTrigger] SendMyZoneChangePacket Send Success"));
+			CachedPlayer->SoundManager->PlaySFX(CachedPlayer->SoundManager->TeleportationSound);
 		}
+
+		NetworkMgr->SendMyZoneChangePacket(NewZone);
+
+		//FTimerHandle TimerHandle;
+		//GetWorld()->GetTimerManager().SetTimer(
+		//	TimerHandle,
+		//	[this, NewZone]()
+		//	{
+		//		ShowZoneChangeMessage(NewZone);
+		//	},
+		//	0.5f, false
+		//);
 	}
 }
 
@@ -219,40 +176,11 @@ void AGPLevelTransitionTrigger::OnLevelAdded(ULevel* Level, UWorld* World)
 
 void AGPLevelTransitionTrigger::ShowZoneChangeMessage(ZoneType NewZone)
 {
-	if (CachedPlayer && CachedPlayer->UIManager && CachedPlayer->UIManager->GetInGameWidget())
+	if (CachedPlayer && CachedPlayer->UIManager)
 	{
-		FText ZoneNameText;
-
-		switch (NewZone)
-		{
-		case ZoneType::TIP:
-			ZoneNameText = FText::FromString(TEXT("TIP"));
-			break;
-		case ZoneType::E:
-			ZoneNameText = FText::FromString(TEXT("E동 2층"));
-			break;
-		case ZoneType::GYM:
-			ZoneNameText = FText::FromString(TEXT("체육관"));
-			break;
-		case ZoneType::TUK:
-			ZoneNameText = FText::FromString(TEXT("한국공학대학교"));
-			break;
-		case ZoneType::INDUSTY:
-			ZoneNameText = FText::FromString(TEXT("산융 지하실"));
-			break;
-		default:
-			ZoneNameText = FText::GetEmpty();
-			break;
-		}
-
-		CachedPlayer->UIManager->GetInGameWidget()->ShowGameMessage(ZoneNameText, 3.0f);
-		CachedPlayer->UIManager->GetInGameWidget()->SetCurrentMapName(ZoneNameText.ToString());
-
-		UE_LOG(LogTemp, Log, TEXT("[LevelTransitionTrigger] ZoneChange Message: %s"), *ZoneNameText.ToString());
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[LevelTransitionTrigger] ShowZoneChangeMessage - CachedPlayer or UIManager is NULL"));
+		auto Widget = CachedPlayer->UIManager->GetInGameWidget();
+		if (Widget)
+			Widget->ShowZoneChangeMessage(NewZone);
 	}
 }
 
@@ -260,19 +188,19 @@ FRotator AGPLevelTransitionTrigger::GetRotationOffsetForLevel(const FString& Lev
 {
 	if (LevelName == "tip")
 	{
-		return FRotator(0.f, 270.f, 0.f); 
+		return FRotator(0.f, 270.f, 0.f);
 	}
 	else if (LevelName == "E")
 	{
-		return FRotator(0.f, 90.f, 0.f); 
+		return FRotator(0.f, 90.f, 0.f);
 	}
 	else if (LevelName == "gym")
 	{
-		return FRotator(0.f, 150.f, 0.f); 
+		return FRotator(0.f, 150.f, 0.f);
 	}
 	else if (LevelName == "TUK")
 	{
-		return FRotator(0.f, 120.f, 0.f); 
+		return FRotator(0.f, 120.f, 0.f);
 	}
 	else if (LevelName == "industry")
 	{

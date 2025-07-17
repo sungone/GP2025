@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "../../GP_Server/Source/Common/Common.h"
 #include "GPInGameWidget.generated.h"
 
 /**
@@ -108,7 +109,7 @@ public:
     class UWidgetAnimation* LevelUpArrow;
 
     void ShowLevelUpArrowTemporarily(UImage* ArrowImage, float Duration = 1.0f);
-
+    void ShowZoneChangeMessage(ZoneType NewZone);
 // Fade Out / Fade In
 public :
     UPROPERTY(meta = (BindWidget))
