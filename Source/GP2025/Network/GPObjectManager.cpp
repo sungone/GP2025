@@ -1091,7 +1091,7 @@ void UGPObjectManager::AddRequestFriend(const FFriendInfo& Info)
 
 	if (MyPlayer && MyPlayer->UIManager)
 	{
-		MyPlayer->UIManager->GetFriendBoxWidget()->AddToFriendList(Info.DBId, UTF8_TO_TCHAR(Info.GetName()), Info.Level, Info.bAccepted);
+		MyPlayer->UIManager->GetFriendBoxWidget()->AddToRequestedList(Info.DBId, UTF8_TO_TCHAR(Info.GetName()), Info.Level, Info.bAccepted);
 	}
 }
 void UGPObjectManager::RemoveRequestFriend(uint32 DBId)
