@@ -87,7 +87,9 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 	case EPacketType::C_COMPLETE_QUEST:
 		HandleCompleteQuestPacket(sessionId, packet);
 		break;
-
+	case EPacketType::C_REJECT_QUEST:
+		HandleRejectQuestPacket(sessionId, packet);
+		break;
 
 	case EPacketType::C_CHAT_SEND:
 		HandleChatSendPacket(sessionId, packet);
@@ -344,6 +346,12 @@ void PacketManager::HandleCompleteQuestPacket(int32 sessionId, Packet* packet)
 {
 	auto* p = static_cast<CompleteQuestPacket*>(packet);
 	_gameWorld.CompleteQuest(sessionId, p->Quest);
+}
+
+void PacketManager::HandleRejectQuestPacket(int32 sessionId, Packet* packet)
+{
+	auto* p = static_cast<RejectQuestPacket*>(packet);
+	_gameWorld.RejectQuest(sessionId, p->Quest);
 }
 
 void PacketManager::HandleChatSendPacket(int32 sessionId, Packet* packet)

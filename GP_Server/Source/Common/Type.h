@@ -80,6 +80,7 @@ enum EPacketType : uint8
 	// --- Quest ---
 	C_REQUEST_QUEST,
 	C_COMPLETE_QUEST,
+	C_REJECT_QUEST,
 
 	S_QUEST_START,
 	S_QUEST_REWARD,
