@@ -10,7 +10,11 @@ void Player::Init()
 #ifndef DB_MODE
 	_info.SetName(L"플레이어");
 	SetCharacterType(Type::EPlayer::WARRIOR);
+#if TEST
+	_info.Stats.Level = 3;
+#else
 	_info.Stats.Level = 1;
+#endif
 	_info.Stats.Speed = 200.f;
 	_info.CollisionRadius = playerCollision;
 	_info.State = ECharacterStateType::STATE_IDLE;
@@ -49,17 +53,21 @@ void Player::SetCharacterType(Type::EPlayer type)
 	{
 		_info.fovAngle = 90;
 		_info.AttackRadius = 300;
-		//_info.Skills.Q = FSkillData(ESkillGroup::HitHard, 1);
-		//_info.Skills.E = FSkillData(ESkillGroup::Clash, 1);
-		//_info.Skills.R = FSkillData(ESkillGroup::Whirlwind, 1);
+#if TEST
+		_info.Skills.Q = FSkillData(ESkillGroup::HitHard, 1);
+		_info.Skills.E = FSkillData(ESkillGroup::Clash, 1);
+		_info.Skills.R = FSkillData(ESkillGroup::Whirlwind, 1);
+#endif
 	}
 	else
 	{
 		_info.fovAngle = 10;
 		_info.AttackRadius = 5000;
-		//_info.Skills.Q = FSkillData(ESkillGroup::Throwing, 1);
-		//_info.Skills.E = FSkillData(ESkillGroup::FThrowing, 1);
-		//_info.Skills.R = FSkillData(ESkillGroup::Anger, 1);
+#if TEST
+		_info.Skills.Q = FSkillData(ESkillGroup::Throwing, 1);
+		_info.Skills.E = FSkillData(ESkillGroup::FThrowing, 1);
+		_info.Skills.R = FSkillData(ESkillGroup::Anger, 1);
+#endif
 	}
 }
 
@@ -267,7 +275,11 @@ bool Player::Attack(std::shared_ptr<Character> target)
 	if (!monster) return false;
 	if (!IsInAttackRange(monster->GetInfo()))return false;
 
+#if TEST
 	float atkDamage = GetAttackDamage() * TEST_ATK_WEIGHT;
+#else
+	float atkDamage = GetAttackDamage();
+#endif
 	if (atkDamage > 0.0f)
 	{
 		monster->OnDamaged(atkDamage);
@@ -627,7 +639,7 @@ bool Player::SetCurrentQuest(QuestType quest)
 
 	if (_curQuestData != nullptr)
 	{
-		if (_curQuestData->NextQuestID != quest)
+		if (quest != QuestType::TUT_START && _curQuestData->NextQuestID != quest)
 		{
 			LOG_D("is not next quest");
 			return false;

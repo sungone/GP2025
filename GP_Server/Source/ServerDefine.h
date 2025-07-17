@@ -3,6 +3,8 @@
 #define DB_MODE
 #endif
 
+#define TEST 1
+
 //for test
 inline constexpr int TEST_ATK_WEIGHT = 5;
 inline constexpr int TEST_EXP_WEIGHT = 10;
