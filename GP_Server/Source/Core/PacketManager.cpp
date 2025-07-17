@@ -145,24 +145,31 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 #ifdef DB_MODE
 	auto accountID = pkt->AccountID;
 	auto accountPW = pkt->AccountPW;
+	auto res = DBManager::GetInst().CheckLogin(sessionId, accountID, accountPW);
+	auto loginsess = _sessionMgr.GetOnlineSessionIdByDBId(res.dbId);
+	if (loginsess != -1 && loginsess != sessionId)
 	{
-		auto res = DBManager::GetInst().CheckLogin(sessionId, accountID, accountPW);
-
-		SessionManager::GetInst().Schedule(sessionId, [sessionId, res]() {
-			if (res.code != DBResultCode::SUCCESS)
-			{
-				LoginFailPacket failpkt(res.code);
-				SessionManager::GetInst().SendPacket(sessionId, &failpkt);
-				return;
-			}
-
-			LoginSuccessPacket loginpkt;
-			SessionManager::GetInst().SendPacket(sessionId, &loginpkt);
-			SessionManager::GetInst().HandleLogin(sessionId, res);
-
-			LOG_D("Login Success [{}] userId: {}", sessionId, res.dbId);
-			});
+		LOG_W("User already logged in [{}] - Disconnecting old session: {}", res.dbId, loginsess);
+		res.code = DBResultCode::ALREADY_LOGGED_IN;
+		LoginFailPacket failpkt(res.code);
+		SessionManager::GetInst().SendPacket(sessionId, &failpkt);
+		return;
 	}
+
+	SessionManager::GetInst().Schedule(sessionId, [sessionId, res]() {
+		if (res.code != DBResultCode::SUCCESS)
+		{
+			LoginFailPacket failpkt(res.code);
+			SessionManager::GetInst().SendPacket(sessionId, &failpkt);
+			return;
+		}
+
+		LoginSuccessPacket loginpkt;
+		SessionManager::GetInst().SendPacket(sessionId, &loginpkt);
+		SessionManager::GetInst().HandleLogin(sessionId, res);
+
+		LOG_D("Login Success [{}] userId: {}", sessionId, res.dbId);
+		});
 	return;
 
 #else

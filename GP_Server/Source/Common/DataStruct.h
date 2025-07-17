@@ -7,6 +7,7 @@ enum class DBResultCode : int32
 	INVALID_USER = -1,
 	INVALID_PASSWORD = -2,
 	DUPLICATE_ID = -3,
+	ALREADY_LOGGED_IN = -4,
 
 	//Shop
 	NOT_ENOUGH_GOLD = -10,

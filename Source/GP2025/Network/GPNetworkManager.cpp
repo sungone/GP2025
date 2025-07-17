@@ -86,6 +86,9 @@ void UGPNetworkManager::HandleUserAuthFailure(DBResultCode ResultCode)
 	case DBResultCode::DUPLICATE_ID:
 		ErrorMessage = TEXT("이미 존재하는 아이디입니다");
 		break;
+	case DBResultCode::ALREADY_LOGGED_IN:
+		ErrorMessage = TEXT("이미 로그인된 계정입니다");
+		break;
 	default:
 		ErrorMessage = TEXT("알 수 없는 오류가 발생했습니다");
 		break;
