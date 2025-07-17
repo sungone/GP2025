@@ -908,7 +908,7 @@ void GameWorld::RejectQuest(int32 playerId, QuestType quest)
 		LOG_W("Invalid");
 		return;
 	}
-	if (quest == QuestType::TUT_START)
+	if (quest == QuestType::TUT_START && player->GetCurrentQuest() == QuestType::TUT_START)
 	{
 		player->SetCurrentQuest(QuestType::CH1_TALK_TO_STUDENT_A);
 	}
