@@ -2,7 +2,7 @@
 
 #include "UI/GPChatBoxWidget.h"
 #include "Network/GPNetworkManager.h"
-#include "Network/GObjectManager.h"
+#include "Network/GPObjectManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/GPChatMessageWidget.h"
 #include "Components/EditableText.h"
