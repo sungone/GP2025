@@ -94,6 +94,9 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 	case EPacketType::C_CHAT_SEND:
 		HandleChatSendPacket(sessionId, packet);
 		break;
+	case EPacketType::C_CHAT_WHISPER:
+		HandleChatWhisperPacket(sessionId, packet);
+		break;
 
 
 	case EPacketType::C_FRIEND_REQUEST:
@@ -389,6 +392,26 @@ void PacketManager::HandleChatSendPacket(int32 sessionId, Packet* packet)
 	}
 	default:
 		break;
+	}
+}
+
+void PacketManager::HandleChatWhisperPacket(int32 sessionId, Packet* packet)
+{
+	auto* p = static_cast<ChatWhisperPacket*>(packet);
+	auto session = _sessionMgr.GetSession(sessionId);
+	if (!session || !session->IsInGame()) return;
+
+	auto player = session->GetPlayer();
+	if (!player) return;
+
+	const char* nickname = player->GetInfo().NickName;
+	LOG_I("{}", p->Message);
+
+	auto targetSess = _sessionMgr.GetOnlineSessionIdByDBId(p->TargetDBID);
+	if (targetSess != -1)
+	{
+		ChatBroadcastPacket broadcastPkt(nickname, p->Message, EChatChannel::Whisper);
+		_sessionMgr.SendPacket(targetSess, &broadcastPkt);
 	}
 }
 

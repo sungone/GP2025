@@ -618,6 +618,21 @@ struct ChatSendPacket : public Packet
 	}
 };
 
+struct ChatWhisperPacket : public Packet
+{
+	uint32 TargetDBID;
+	char Message[CHAT_MESSAGE_LEN];
+
+	ChatWhisperPacket(uint32 dbId, const char* Msg)
+		: Packet(EPacketType::C_CHAT_WHISPER), TargetDBID(dbId)
+	{
+		SAFE_STRCPY(Message, Msg, CHAT_MESSAGE_LEN - 1);
+		Message[CHAT_MESSAGE_LEN - 1] = '\0';
+
+		Header.PacketSize = sizeof(ChatWhisperPacket);
+	}
+};
+
 struct ChatBroadcastPacket : public Packet
 {
 	char SenderNickName[NICKNAME_LEN];

@@ -1108,7 +1108,7 @@ void UGPObjectManager::AddFriend(const FFriendInfo& Info)
 	if (FriendMap.Contains(DBId))
 		return;
 
-	FriendMap.Add(DBId, Info);
+	FriendMap.Add(DBId, Info.GetName());
 
 	if (MyPlayer && MyPlayer->UIManager)
 	{
@@ -1136,4 +1136,9 @@ void UGPObjectManager::ShowFriendMessage(int32 Result)
 	{
 		MyPlayer->UIManager->AddFriendSystemMessage(Result);
 	}
+}
+
+uint32 UGPObjectManager::GetFriendDBId(FString Name) const
+{
+	return FriendMap.FindKey(Name) ? *FriendMap.FindKey(Name) : 0;
 }

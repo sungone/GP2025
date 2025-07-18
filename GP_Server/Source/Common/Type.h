@@ -87,6 +87,7 @@ enum EPacketType : uint8
 
 	//--- Chat ---
 	C_CHAT_SEND,
+	C_CHAT_WHISPER,
 	S_CHAT_BROADCAST,
 
 	//--- Friend ---
@@ -109,7 +110,8 @@ enum class EChatChannel : uint8
 {
 	All,
 	Friend,
-	Zone
+	Zone,
+	Whisper,
 };
 
 enum class EFriendOpType : uint8

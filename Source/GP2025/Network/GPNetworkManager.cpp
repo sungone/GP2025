@@ -310,6 +310,13 @@ void UGPNetworkManager::SendMyChatMessage(const FString& Message, EChatChannel C
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
+void UGPNetworkManager::SendMyWhisperMessage(uint32 TargetDBID, const FString& Message)
+{
+	FTCHARToUTF8 MsgUtf8(*Message);
+	ChatWhisperPacket Packet(TargetDBID, MsgUtf8.Get());
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
 void UGPNetworkManager::SendMyRemoveStatePacket(uint32 State)
 {
 	RemoveStatePacket Packet(static_cast<ECharacterStateType>(State));
@@ -323,21 +330,21 @@ void UGPNetworkManager::SendMyFriendRequest(const FString& TargetNickName)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendMyFriendAccept(int32 RequesterUserID)
+void UGPNetworkManager::SendMyFriendAccept(uint32 TargetDBID)
 {
-	FriendAcceptRequestPacket Packet(RequesterUserID);
+	FriendAcceptRequestPacket Packet(TargetDBID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendMyFriendReject(int32 RequesterUserID)
+void UGPNetworkManager::SendMyFriendReject(uint32 TargetDBID)
 {
-	FriendRejectRequestPacket Packet(RequesterUserID);
+	FriendRejectRequestPacket Packet(TargetDBID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendMyFriendRemove(int32 TargetUserID)
+void UGPNetworkManager::SendMyFriendRemove(uint32 TargetDBID)
 {
-	FriendRemoveRequestPacket Packet(TargetUserID);
+	FriendRemoveRequestPacket Packet(TargetDBID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 

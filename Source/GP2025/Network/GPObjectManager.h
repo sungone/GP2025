@@ -71,7 +71,7 @@ public:
 	void AddFriend(const FFriendInfo& FriendInfo);
 	void RemoveFriend(uint32 DBId);
 	void ShowFriendMessage(int32 Result);
-
+	uint32 GetFriendDBId(FString Name) const;
 private:
 	UPROPERTY()
 	TSubclassOf<AGPCharacterPlayer> OtherPlayerClass;
@@ -88,7 +88,7 @@ private:
 
 	TMap<int32, TWeakObjectPtr<AGPItem>> Items;
 
-	TMap<uint32, FFriendInfo> FriendMap;
+	TMap<uint32, FString> FriendMap;
 	TSet<uint32> RequestedFriendSet;
 
 	UPROPERTY()

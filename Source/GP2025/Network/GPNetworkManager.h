@@ -83,13 +83,13 @@ public:
 	void SendMyRejectQuest(QuestType quest);
 
 	void SendMyChatMessage(const FString& Message, EChatChannel Channel);
+	void SendMyWhisperMessage(uint32 TargetDBID, const FString& Message);
 	void SendMyRemoveStatePacket(uint32 State);
 
 	void SendMyFriendRequest(const FString& TargetNickName);
-	void SendMyFriendAccept(int32 RequesterUserID);
-	void SendMyFriendReject(int32 RequesterUserID);
-	void SendMyFriendRemove(int32 TargetUserID);
-	//void SendFriendListRequest(int32 PlayerID); ³ªÁß¿¡
+	void SendMyFriendAccept(uint32 RequesterUserID);
+	void SendMyFriendReject(uint32 RequesterUserID);
+	void SendMyFriendRemove(uint32 TargetUserID);
 
 private:
 	void SendPacket(uint8* Buf, int32 Size);
