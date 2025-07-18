@@ -223,6 +223,7 @@ void AGPCharacterNPC::CloseShopUI()
 						{
 							PC->SetInputMode(FInputModeGameOnly());
 							PC->bShowMouseCursor = false;
+							PC->FlushPressedKeys();
 							UE_LOG(LogTemp, Warning, TEXT("[CloseShopUI] SetInputMode(GameOnly) and Hide Mouse Cursor."));
 						}
 						else
@@ -319,6 +320,7 @@ void AGPCharacterNPC::CloseQuestUI()
 		{
 			PC->SetInputMode(FInputModeGameOnly());
 			PC->bShowMouseCursor = false;
+			PC->FlushPressedKeys();
 		}
 	}
 
