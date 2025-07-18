@@ -40,10 +40,24 @@ void UGPChatBoxWidget::NativeConstruct()
 
 void UGPChatBoxWidget::OnChatCommitted(const FText& Text, ETextCommit::Type CommitMethod)
 {
-	if (CommitMethod == ETextCommit::OnEnter && !Text.IsEmpty())
+	if (CommitMethod != ETextCommit::OnEnter)
+		return;
+
+	FString RawText = Text.ToString().TrimStartAndEnd();
+
+	if (RawText.IsEmpty())
 	{
-		HandleSendMessage();
+		if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
+		{
+			PC->SetShowMouseCursor(false);
+			PC->SetInputMode(FInputModeGameOnly());
+		}
+
+		SendMessageText->SetText(FText::GetEmpty());
+		return;
 	}
+
+	HandleSendMessage();
 }
 
 void UGPChatBoxWidget::OnEnterButtonClicked()
