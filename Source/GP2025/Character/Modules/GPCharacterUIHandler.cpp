@@ -48,43 +48,41 @@ void UGPCharacterUIHandler::UpdateWidgetVisibility()
 	if (!LocalPlayer) return;
 
 	AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(LocalPlayer);
-	bool bIsGunnerZooming = LocalMyPlayer && LocalMyPlayer->bIsGunnerCharacter() && LocalMyPlayer->CameraHandler->IsZooming();
+	if (!LocalMyPlayer) return;
 
-	if (LocalMyPlayer && LocalMyPlayer->bIsGunnerCharacter() && !LocalMyPlayer->CameraHandler->IsZooming())
+	const bool bIsOwnerSelf = (Owner == LocalMyPlayer);
+	const bool bIsGunner = LocalMyPlayer->bIsGunnerCharacter();
+	const bool bIsGunnerZooming = bIsGunner && LocalMyPlayer->CameraHandler->IsZooming();
+
+	if (bIsOwnerSelf)
 	{
-		CharacterStatusWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
+		CharacterStatusWidgetInstance->SetVisibility(ESlateVisibility::Visible);
 		return;
 	}
 
-	float Distance = FVector::Dist(Owner->GetActorLocation(), LocalPlayer->GetActorLocation());
-	float AttackRadius = 300.0f; 
+	const float Distance = FVector::Dist(Owner->GetActorLocation(), LocalMyPlayer->GetActorLocation());
 
-	if (LocalMyPlayer)
+	float MaxVisibleDistance = 300.0f; // 기본 거리
+
+	if (bIsGunner && bIsGunnerZooming)
 	{
-		AttackRadius = LocalMyPlayer->CharacterInfo.AttackRadius;
-	}
+		MaxVisibleDistance = LocalMyPlayer->CharacterInfo.AttackRadius;
 
-	if (bIsGunnerZooming)
-	{
-		float MinScaleDistance = 300.0f;   
-		float MaxScaleDistance = 5000.0f; 
-
-		float DistanceFactor = FMath::Clamp((MaxScaleDistance - Distance) / (MaxScaleDistance - MinScaleDistance), 0.0f, 1.0f);
-
-		float ScaleFactor = FMath::Lerp(0.0001f , 1.f, DistanceFactor);
-
-		UE_LOG(LogTemp, Log, TEXT("Distance: %.2f | DistanceFactor: %.2f | ScaleFactor: %.2f"), Distance, DistanceFactor, ScaleFactor);
-
-		CharacterStatusWidget->SetRelativeScale3D(FVector(ScaleFactor, ScaleFactor, ScaleFactor));
+		const float MinScaleDistance = 300.0f;
+		const float MaxScaleDistance = 5000.0f;
+		const float DistanceFactor = FMath::Clamp((MaxScaleDistance - Distance) / (MaxScaleDistance - MinScaleDistance), 0.0f, 1.0f);
+		const float ScaleFactor = FMath::Lerp(0.0001f, 1.f, DistanceFactor);
+		CharacterStatusWidget->SetRelativeScale3D(FVector(ScaleFactor));
 	}
 	else
 	{
-		CharacterStatusWidget->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
+		CharacterStatusWidget->SetRelativeScale3D(FVector(1.f));
 	}
 
-	bool bVisible = Distance <= (Owner->CharacterInfo.CollisionRadius + AttackRadius);
-	ESlateVisibility Visibility = bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden;
-	CharacterStatusWidgetInstance->SetVisibility(Visibility);
+	const float VisibleRadius = Owner->CharacterInfo.CollisionRadius + MaxVisibleDistance;
+	const bool bVisible = Distance <= VisibleRadius;
+
+	CharacterStatusWidgetInstance->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
 
 UGPWidgetComponent* UGPCharacterUIHandler::CreateWidgetComponent(
