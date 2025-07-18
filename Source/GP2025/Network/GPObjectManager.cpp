@@ -323,6 +323,11 @@ void UGPObjectManager::DamagedPlayer(const FInfoData& PlayerInfo)
 		{
 			MyPlayer->EffectHandler->PlayPlayerHitEffect();
 		}
+
+		if ((LocalMyPlayer == MyPlayer) && MyPlayer->SoundManager)
+		{
+			MyPlayer->SoundManager->PlaySFX(MyPlayer->SoundManager->PlayerHit);
+		}
 	}
 }
 

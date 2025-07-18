@@ -61,6 +61,7 @@ UGPMyplayerSoundManager::UGPMyplayerSoundManager()
 	LOAD_SFX(TeleportationSound, TeleportationSound);
 	LOAD_SFX(WarningSound, WarningSound);
 	LOAD_SFX(PickUpItemSound, PickUpItemSound);
+	LOAD_SFX(PlayerHit, PlayerHit);
 }
 
 void UGPMyplayerSoundManager::Initialize(AGPCharacterMyplayer* InOwner)

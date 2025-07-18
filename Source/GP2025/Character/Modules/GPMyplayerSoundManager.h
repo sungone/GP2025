@@ -107,4 +107,7 @@ public :
 
 	UPROPERTY()
 	USoundBase* PlayerHitSound;
+
+	UPROPERTY()
+	USoundBase* PlayerHit;
 };

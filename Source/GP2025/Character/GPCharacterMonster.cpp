@@ -40,7 +40,7 @@ AGPCharacterMonster::AGPCharacterMonster()
 	}
 
 	// MonsterHitSound ·Îµå
-	static ConstructorHelpers::FObjectFinder<USoundBase> HitSoundObj(TEXT("/Game/Sound/SFX/MonsterHit.MonsterHit"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> HitSoundObj(TEXT("/Game/Sound/SFX/MonsterHit2.MonsterHit2"));
 	if (HitSoundObj.Succeeded())
 	{
 		MonsterHitSound = HitSoundObj.Object;
