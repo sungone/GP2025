@@ -27,6 +27,18 @@ UGPPlayerEffectHandler::UGPPlayerEffectHandler()
     {
         QuestClearEffect = QuestEffectFinder.Object;
     }
+
+    static ConstructorHelpers::FObjectFinder<UNiagaraSystem> HitEffectFinder(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Impact_Stab_01.NS_ARPGEssentials_Impact_Stab_01"));
+    if (HitEffectFinder.Succeeded())
+    {
+        HitEffect = HitEffectFinder.Object;
+    }
+
+    static ConstructorHelpers::FObjectFinder<UNiagaraSystem> CriticalEffectFinder(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Impact_Strike_01.NS_ARPGEssentials_Impact_Strike_01"));
+    if (CriticalEffectFinder.Succeeded())
+    {
+        CriticalEffect = CriticalEffectFinder.Object;
+    }
 }
 
 void UGPPlayerEffectHandler::Init(AGPCharacterPlayer* InOwner)
@@ -81,6 +93,40 @@ void UGPPlayerEffectHandler::PlayQuestClearEffect()
             EAttachLocation::SnapToTargetIncludingScale,
             true
         );
+    }
+}
+
+void UGPPlayerEffectHandler::PlayPlayerHitEffect()
+{
+    if (Owner && HitEffect)
+    {
+        UNiagaraFunctionLibrary::SpawnSystemAttached(
+            HitEffect,
+            Owner->GetRootComponent(),
+            TEXT("Hips"),
+            FVector::ZeroVector,
+            FRotator::ZeroRotator,
+            EAttachLocation::SnapToTargetIncludingScale,
+            true
+        );
+        UE_LOG(LogTemp, Log, TEXT("[EffectHandler] HitEffect played at Hips."));
+    }
+}
+
+void UGPPlayerEffectHandler::PlayPlayerCriticalEffect()
+{
+    if (Owner && CriticalEffect)
+    {
+        UNiagaraFunctionLibrary::SpawnSystemAttached(
+            CriticalEffect,
+            Owner->GetRootComponent(),
+            TEXT("Hips"),
+            FVector::ZeroVector,
+            FRotator::ZeroRotator,
+            EAttachLocation::SnapToTargetIncludingScale,
+            true
+        );
+        UE_LOG(LogTemp, Log, TEXT("[EffectHandler] CriticalEffect played at Hips."));
     }
 }
 

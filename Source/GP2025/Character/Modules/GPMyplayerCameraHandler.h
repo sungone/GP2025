@@ -73,9 +73,18 @@ public :
 
 	UFUNCTION(BlueprintCallable, Category = "Camera")
 	void PlayHitCameraShake();
-	FVector OriginalSocketOffset;
 	FTimerHandle CameraShakeResetTimer;
 
 	UFUNCTION()
 	void ResetCameraShake();
+
+	// 카메라 흔들림 상태
+	bool bIsShaking = false;
+
+	// 원래의 카메라 위치 복구용
+	FVector OriginalSocketOffset = FVector::ZeroVector;
+
+	// 카메라 ArmLength 흔들림 복구용
+	bool bRestoreArmLength = false;
+	float OriginalArmLength = 0.f;
 };

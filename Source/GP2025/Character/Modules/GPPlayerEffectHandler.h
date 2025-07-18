@@ -27,6 +27,12 @@ public:
     UFUNCTION()
     void PlayQuestClearEffect();
 
+    UFUNCTION()
+    void PlayPlayerHitEffect();
+
+    UFUNCTION()
+    void PlayPlayerCriticalEffect();
+
 public:
     UPROPERTY()
     AGPCharacterPlayer* Owner;
@@ -44,4 +50,10 @@ public:
 
     UPROPERTY(EditDefaultsOnly, Category = "Effects")
     TSubclassOf<class AGPEarthQuakeRockActor> EarthQuakeRockActorClass;
+
+    UPROPERTY(EditAnywhere, Category = "Effect")
+    class UNiagaraSystem* HitEffect;
+
+    UPROPERTY(EditAnywhere, Category = "Effect")
+    class UNiagaraSystem* CriticalEffect;
 };

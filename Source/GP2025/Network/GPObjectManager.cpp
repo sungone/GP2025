@@ -254,26 +254,52 @@ void UGPObjectManager::UpdatePlayer(const FInfoData& PlayerInfo)
 
 void UGPObjectManager::PlayerUseSkill(int32 PlayerID, ESkillGroup SkillGID)
 {
-	if (TWeakObjectPtr<AGPCharacterPlayer>* WeakPlayerPtr = Players.Find(PlayerID))
-	{
-		if (WeakPlayerPtr->IsValid())
-		{
-			AGPCharacterPlayer* Player = WeakPlayerPtr->Get();
+	//if (TWeakObjectPtr<AGPCharacterPlayer>* WeakPlayerPtr = Players.Find(PlayerID))
+	//{
+	//	if (WeakPlayerPtr->IsValid())
+	//	{
+	//		AGPCharacterPlayer* Player = WeakPlayerPtr->Get();
 
-			if (SkillGID == ESkillGroup::HitHard || SkillGID == ESkillGroup::Throwing)
-			{
-				Player->CombatHandler->PlayQSkillMontage();
-			}
-			else if (SkillGID == ESkillGroup::Clash || SkillGID == ESkillGroup::FThrowing)
-			{
-				Player->CombatHandler->PlayESkillMontage();
-			}
-			else if (SkillGID == ESkillGroup::Whirlwind || SkillGID == ESkillGroup::Anger)
-			{
-				Player->CombatHandler->PlayRSkillMontage();
-			}
-		}
-	}
+	//		if (!Player || !Player->CombatHandler)
+	//		{
+	//			UE_LOG(LogTemp, Warning, TEXT("[UGPObjectManager::PlayerUseSkill] Player or CombatHandler is null."));
+	//			return;
+	//		}
+
+	//		switch (SkillGID)
+	//		{
+	//		case ESkillGroup::HitHard:
+	//		case ESkillGroup::Throwing:
+	//			UE_LOG(LogTemp, Log, TEXT("[UGPObjectManager::PlayerUseSkill] Entered Q Skill branch."));
+	//			Player->CombatHandler->PlayQSkillMontage();
+	//			break;
+
+	//		case ESkillGroup::Clash:
+	//		case ESkillGroup::FThrowing:
+	//			UE_LOG(LogTemp, Log, TEXT("[UGPObjectManager::PlayerUseSkill] Entered E Skill branch."));
+	//			Player->CombatHandler->PlayESkillMontage();
+	//			break;
+
+	//		case ESkillGroup::Whirlwind:
+	//		case ESkillGroup::Anger:
+	//			UE_LOG(LogTemp, Log, TEXT("[UGPObjectManager::PlayerUseSkill] Entered R Skill branch."));
+	//			Player->CombatHandler->PlayRSkillMontage();
+	//			break;
+
+	//		default:
+	//			UE_LOG(LogTemp, Warning, TEXT("[UGPObjectManager::PlayerUseSkill] Entered Unknown Skill branch."));
+	//			break;
+	//		}
+	//	}
+	//	else
+	//	{
+	//		UE_LOG(LogTemp, Warning, TEXT("[UGPObjectManager::PlayerUseSkill] WeakPlayerPtr is not valid."));
+	//	}
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("[UGPObjectManager::PlayerUseSkill] PlayerID not found in Players map."));
+	//}
 }
 
 void UGPObjectManager::DamagedPlayer(const FInfoData& PlayerInfo)
@@ -291,6 +317,11 @@ void UGPObjectManager::DamagedPlayer(const FInfoData& PlayerInfo)
 			MyPlayer->UIManager->GetInGameWidget()->HitByMonsterAnimation();
 			// Hit Camera Shake
 			MyPlayer->PlayerHittedCameraShake();
+		}
+
+		if ((LocalMyPlayer == MyPlayer) && MyPlayer->EffectHandler)
+		{
+			MyPlayer->EffectHandler->PlayPlayerHitEffect();
 		}
 	}
 }

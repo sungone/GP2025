@@ -29,8 +29,9 @@ void UGPMyplayerCameraHandler::Initialize(AGPCharacterMyplayer* InOwner)
 
 void UGPMyplayerCameraHandler::Tick(float DeltaTime)
 {
-	if (!Owner->FollowCamera || !Owner->CameraBoom) return;
+	if (!Owner || !Owner->FollowCamera || !Owner->CameraBoom) return;
 
+	// === 1. 줌 관련 처리 ===
 	const float TargetFOV = bWantsToZoom ? ZoomedFOV : DefaultFOV;
 	Owner->FollowCamera->SetFieldOfView(FMath::FInterpTo(Owner->FollowCamera->FieldOfView, TargetFOV, DeltaTime, ZoomInterpSpeed));
 
@@ -46,10 +47,10 @@ void UGPMyplayerCameraHandler::Tick(float DeltaTime)
 		Owner->bUseControllerRotationYaw = bWantsToZoom;
 	}
 
-	// NPC 상호작용 시 카메라 처리
-	if (!(!PlayerSpringArm || !PlayerController || !PlayerPawn))
+	// === 2. NPC 상호작용 카메라 회전/줌 ===
+	if (PlayerSpringArm && PlayerController && PlayerPawn)
 	{
-		// 1. 카메라 회전
+		// 회전
 		if (bIsLookingAtTarget)
 		{
 			FRotator CurrentRot = PlayerController->GetControlRotation();
@@ -62,19 +63,28 @@ void UGPMyplayerCameraHandler::Tick(float DeltaTime)
 			PlayerController->SetControlRotation(NewRot);
 		}
 
-		// 2. 카메라 줌 조절
-		if (bIsZoomingForDialogue)
+		// 줌
+		const float CurrentLength = PlayerSpringArm->TargetArmLength;
+		const float DesiredLength = bIsZoomingForDialogue ? DialogueZoomTargetLength : DefaultZoomLength;
+		PlayerSpringArm->TargetArmLength = FMath::FInterpTo(CurrentLength, DesiredLength, DeltaTime, 5.f);
+	}
+
+	// === 3. 카메라 흔들림 복귀 ===
+	if (bRestoreArmLength)
+	{
+		// 일정 속도로 복귀
+		Owner->CameraBoom->TargetArmLength = FMath::FInterpConstantTo(
+			Owner->CameraBoom->TargetArmLength,
+			OriginalArmLength,
+			DeltaTime,
+			100.f // 복귀 속도 (높을수록 빨라짐)
+		);
+
+		// 거의 도달했으면 보정 후 종료
+		if (FMath::Abs(Owner->CameraBoom->TargetArmLength - OriginalArmLength) < 1.f)
 		{
-			float CurrentLength = PlayerSpringArm->TargetArmLength;
-			float NewLength = FMath::FInterpTo(CurrentLength, DialogueZoomTargetLength, DeltaTime, 5.f);
-			PlayerSpringArm->TargetArmLength = NewLength;
-		}
-		else
-		{
-			// 원래 거리로 복귀
-			float CurrentLength = PlayerSpringArm->TargetArmLength;
-			float NewLength = FMath::FInterpTo(CurrentLength, DefaultZoomLength, DeltaTime, 5.f);
-			PlayerSpringArm->TargetArmLength = NewLength;
+			Owner->CameraBoom->TargetArmLength = OriginalArmLength;
+			bRestoreArmLength = false;
 		}
 	}
 }
@@ -131,36 +141,67 @@ void UGPMyplayerCameraHandler::StopDialogueCamera()
 	bIsZoomingForDialogue = false;
 }
 
+//void UGPMyplayerCameraHandler::PlayHitCameraShake()
+//{
+//	if (!Owner || !Owner->CameraBoom) return;
+//
+//	// 원래 SocketOffset 저장
+//	OriginalSocketOffset = Owner->CameraBoom->SocketOffset;
+//
+//	// 흔들 Offset 생성
+//	FVector ShakeOffset = FVector(
+//		FMath::RandRange(-30.f, 30.f),
+//		FMath::RandRange(-30.f, 30.f),
+//		FMath::RandRange(-4.f, 4.f)
+//	);
+//
+//	// 흔들기
+//	Owner->CameraBoom->SocketOffset = OriginalSocketOffset + ShakeOffset;
+//
+//	// 잠깐 뒤 원복
+//	Owner->GetWorldTimerManager().SetTimer(
+//		CameraShakeResetTimer,
+//		this,
+//		&UGPMyplayerCameraHandler::ResetCameraShake,
+//		0.05f,
+//		false
+//	);
+//}
+
 void UGPMyplayerCameraHandler::PlayHitCameraShake()
 {
 	if (!Owner || !Owner->CameraBoom) return;
 
-	// 원래 SocketOffset 저장
+	// 1. 오리지널 값 저장
 	OriginalSocketOffset = Owner->CameraBoom->SocketOffset;
+	OriginalArmLength = Owner->CameraBoom->TargetArmLength;
 
-	// 흔들 Offset 생성
+	// 2. 더 강한 뒤쪽 오프셋
 	FVector ShakeOffset = FVector(
-		FMath::RandRange(-30.f, 30.f),
-		FMath::RandRange(-30.f, 30.f),
-		FMath::RandRange(-4.f, 4.f)
+		FMath::RandRange(-6.f, 6.f),
+		FMath::RandRange(-3.f, 3.f),
+		FMath::RandRange(-20.f, -10.f)
 	);
-
-	// 흔들기
 	Owner->CameraBoom->SocketOffset = OriginalSocketOffset + ShakeOffset;
+	bIsShaking = true;
 
-	// 잠깐 뒤 원복
-	Owner->GetWorldTimerManager().SetTimer(
-		CameraShakeResetTimer,
-		this,
-		&UGPMyplayerCameraHandler::ResetCameraShake,
-		0.05f,
-		false
-	);
+	// 3. 순간적으로 카메라 거리 늘림
+	Owner->CameraBoom->TargetArmLength += 50.f;
+	bRestoreArmLength = true;
 }
 
 void UGPMyplayerCameraHandler::ResetCameraShake()
 {
+	// 사용 안 해도 되지만 이전 방식 호환
 	if (!Owner || !Owner->CameraBoom) return;
-
 	Owner->CameraBoom->SocketOffset = OriginalSocketOffset;
+	bIsShaking = false;
 }
+
+//
+//void UGPMyplayerCameraHandler::ResetCameraShake()
+//{
+//	if (!Owner || !Owner->CameraBoom) return;
+//
+//	Owner->CameraBoom->SocketOffset = OriginalSocketOffset;
+//}
