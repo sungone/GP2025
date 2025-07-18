@@ -30,6 +30,12 @@ void UGPQuestListWidget::NativeConstruct()
 
 void UGPQuestListWidget::AddQuestEntry(uint8 QuestType, bool bIsSuccess)
 {
+	if (QuestType == static_cast<uint8>(QuestType::TUT_START)
+		|| QuestType == static_cast<uint8>(QuestType::TUT_COMPLETE))
+	{
+		return;
+	}
+
 	if (!QuestListEntryClass || QuestEntries.Contains(QuestType))
 		return;
 
