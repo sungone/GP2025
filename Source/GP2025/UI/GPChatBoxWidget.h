@@ -7,6 +7,7 @@
 #include "Components/EditableText.h"
 #include "Components/ScrollBox.h"
 #include "Components/Button.h"
+#include "../../GP_Server/Source/Common/Common.h"
 #include "GPChatBoxWidget.generated.h"
 
 /**
@@ -49,7 +50,7 @@ public:
 
 
 public:
-	void AddChatMessage(uint8 Channel, const FString& UserName, const FString& Message);
+	void AddChatMessage(EChatChannel Channel, const FString& UserName, const FString& Message);
 
 	UFUNCTION()
 	void HandleChatReceived(uint8 Channel, const FString& Sender, const FString& Message);

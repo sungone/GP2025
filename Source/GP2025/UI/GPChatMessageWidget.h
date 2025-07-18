@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
+#include "../../GP_Server/Source/Common/Common.h"
 #include "GPChatMessageWidget.generated.h"
 
 /**
@@ -17,14 +18,14 @@ class GP2025_API UGPChatMessageWidget : public UUserWidget
 
 public:
 	// 메시지 텍스트를 설정
-	void SetChatMessage(uint8 Channel, const FString& UserName, const FString& Message);
+	void SetChatMessage(EChatChannel Channel, const FString& TargetName, const FString& Message);
 
 protected:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* ChannelText;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* UserNameText;
+	UTextBlock* TargetNameText;
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* MessageText;

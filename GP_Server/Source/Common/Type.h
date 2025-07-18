@@ -112,6 +112,9 @@ enum class EChatChannel : uint8
 	Friend,
 	Zone,
 	Whisper,
+	ItemSys,
+	SkillSys,
+	FriendSys,
 };
 
 enum class EFriendOpType : uint8

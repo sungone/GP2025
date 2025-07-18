@@ -113,11 +113,10 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
                 {
                     FString ItemName = ItemData->ItemName.ToString();
                     FString ChatMessage = FString::Printf(TEXT("를 획득하였습니다."), *ItemName);
-                    uint8 SystemChannel = 3;
 
                     UE_LOG(LogTemp, Log, TEXT("[ChatNotify] Sending message: %s"), *ChatMessage);
 
-                    ChatWidget->AddChatMessage(SystemChannel, ItemName, ChatMessage);
+                    ChatWidget->AddChatMessage(EChatChannel::ItemSys, ItemName, ChatMessage);
                 }
             }
             return;
@@ -193,11 +192,10 @@ void UGPInventory::AddItemToInventory(uint32 ItemID , uint8 ItemType, uint32 Qua
         {
             FString ItemName = ItemData->ItemName.ToString();
             FString ChatMessage = FString::Printf(TEXT("를 획득하였습니다."), *ItemName);
-            uint8 SystemChannel = 3;
 
             UE_LOG(LogTemp, Log, TEXT("[ChatNotify] Sending message: %s"), *ChatMessage);
 
-            ChatWidget->AddChatMessage(SystemChannel, ItemName, ChatMessage);
+            ChatWidget->AddChatMessage(EChatChannel::ItemSys, ItemName, ChatMessage);
         }
     }
 }

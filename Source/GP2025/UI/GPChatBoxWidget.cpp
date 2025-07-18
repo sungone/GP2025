@@ -2,7 +2,7 @@
 
 #include "UI/GPChatBoxWidget.h"
 #include "Network/GPNetworkManager.h"
-#include "Network/GPObjectManager.h"
+#include "Network/GObjectManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/GPChatMessageWidget.h"
 #include "Components/EditableText.h"
@@ -64,17 +64,15 @@ void UGPChatBoxWidget::HandleSendMessage()
 
 	if (UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>())
 	{
-		EChatChannel Channel = EChatChannel::All;
+		EChatChannel Channel = EChatChannel::Zone;
 		FString RawText = Text.ToString().TrimStartAndEnd();
 
-		// 명령어 파싱
 		if (RawText.StartsWith("/"))
 		{
 			if (RawText.Len() >= 2)
 			{
 				TCHAR CommandChar = RawText[1];
 
-				// Whisper 처리 먼저
 				if (CommandChar == 'w')
 				{
 					FString Params = RawText.Mid(2).TrimStartAndEnd();
@@ -101,7 +99,6 @@ void UGPChatBoxWidget::HandleSendMessage()
 						}
 					}
 
-					// 귓속말 전송 후 바로 종료
 					SendMessageText->SetText(FText::GetEmpty());
 					if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
 					{
@@ -111,13 +108,11 @@ void UGPChatBoxWidget::HandleSendMessage()
 					return;
 				}
 
-				// 기타 채널 지정
 				switch (CommandChar)
 				{
 				case 'a': Channel = EChatChannel::All; break;
 				case 'f': Channel = EChatChannel::Friend; break;
-				case 'z': Channel = EChatChannel::Zone; break;
-				default: Channel = EChatChannel::All; break;
+				default: Channel = EChatChannel::Zone; break;
 				}
 
 				RawText = RawText.Mid(2).TrimStartAndEnd();
@@ -130,7 +125,6 @@ void UGPChatBoxWidget::HandleSendMessage()
 		}
 	}
 
-	// 초기화
 	SendMessageText->SetText(FText::GetEmpty());
 
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
@@ -139,7 +133,6 @@ void UGPChatBoxWidget::HandleSendMessage()
 		PC->SetInputMode(FInputModeGameOnly());
 	}
 }
-
 
 void UGPChatBoxWidget::SetKeyboardFocusToInput()
 {
@@ -161,7 +154,7 @@ void UGPChatBoxWidget::SetKeyboardFocusToInput()
 	}
 }
 
-void UGPChatBoxWidget::AddChatMessage(uint8 Channel, const FString& UserName, const FString& Message)
+void UGPChatBoxWidget::AddChatMessage(EChatChannel Channel, const FString& TargetName, const FString& Message)
 {
 	if (!ChatMessageWidgetClass || !ScrollBox)
 	{
@@ -170,7 +163,7 @@ void UGPChatBoxWidget::AddChatMessage(uint8 Channel, const FString& UserName, co
 	UGPChatMessageWidget* NewMessageWidget = CreateWidget<UGPChatMessageWidget>(this, ChatMessageWidgetClass);
 	if (NewMessageWidget)
 	{
-		NewMessageWidget->SetChatMessage(Channel, UserName, Message);
+		NewMessageWidget->SetChatMessage(Channel, TargetName, Message);
 		ScrollBox->AddChild(NewMessageWidget);
 		ScrollBox->ScrollToEnd();
 	}
@@ -178,5 +171,6 @@ void UGPChatBoxWidget::AddChatMessage(uint8 Channel, const FString& UserName, co
 
 void UGPChatBoxWidget::HandleChatReceived(uint8 Channel, const FString& Sender, const FString& Message)
 {
-	AddChatMessage(Channel, Sender, Message);
+	EChatChannel ChatChannel = static_cast<EChatChannel>(Channel);
+	AddChatMessage(ChatChannel, Sender, Message);
 }

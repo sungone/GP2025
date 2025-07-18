@@ -764,9 +764,8 @@ void UGPMyplayerUIManager::ShowSkillUnlockMessage(ESkillGroup SkillGroup)
 	}
 
 	FString Message = FString::Printf(TEXT("스킬이 해금되었습니다."));
-	const uint8 SkillChannel = 4;
 
-	GetChatBoxWidget()->AddChatMessage(SkillChannel, SkillName, Message);
+	GetChatBoxWidget()->AddChatMessage(EChatChannel::SkillSys, SkillName, Message);
 }
 
 void UGPMyplayerUIManager::ShowSkillUpgradeMessage(ESkillGroup SkillGroup)
@@ -805,16 +804,14 @@ void UGPMyplayerUIManager::ShowSkillUpgradeMessage(ESkillGroup SkillGroup)
 	}
 
 	FString Message = FString::Printf(TEXT("스킬이 업그레이드 되었습니다."));
-	const uint8 SkillChannel = 4;
 
-	GetChatBoxWidget()->AddChatMessage(SkillChannel, SkillName, Message);
+	GetChatBoxWidget()->AddChatMessage(EChatChannel::SkillSys, SkillName, Message);
 }
 
 void UGPMyplayerUIManager::AddFriendSystemMessage(EChatFriendNotifyType NotifyType, const FString& NickName)
 {
 	if (!GetChatBoxWidget()) return;
 
-	const uint8 SystemChannel = 1; // 예: 아이템 채널 또는 시스템 채널
 	FString Sender = NickName;
 	FString Message;
 
@@ -843,14 +840,13 @@ void UGPMyplayerUIManager::AddFriendSystemMessage(EChatFriendNotifyType NotifyTy
 		break;
 	}
 
-	GetChatBoxWidget()->AddChatMessage(SystemChannel, Sender, Message);
+	GetChatBoxWidget()->AddChatMessage(EChatChannel::FriendSys, Sender, Message);
 }
 
 void UGPMyplayerUIManager::AddFriendSystemMessage(EChatFriendNotifyType NotifyType)
 {
 	if (!GetChatBoxWidget()) return;
 
-	const uint8 SystemChannel = 1; // 예: 아이템 채널 또는 시스템 채널
 	FString Sender = TEXT("");
 	FString Message;
 
@@ -899,14 +895,13 @@ void UGPMyplayerUIManager::AddFriendSystemMessage(EChatFriendNotifyType NotifyTy
 		break;
 	}
 
-	GetChatBoxWidget()->AddChatMessage(SystemChannel, Sender, Message);
+	GetChatBoxWidget()->AddChatMessage(EChatChannel::FriendSys, Sender, Message);
 }
 
 void UGPMyplayerUIManager::AddFriendSystemMessage(int32 Result)
 {
 	if (!GetChatBoxWidget()) return;
 
-	const uint8 SystemChannel = 1;
 	FString Sender = TEXT(""); // 공란 처리
 	FString Message;
 
@@ -939,5 +934,5 @@ void UGPMyplayerUIManager::AddFriendSystemMessage(int32 Result)
 		Message = TEXT("알 수 없는 오류가 발생했습니다.");
 	}
 
-	GetChatBoxWidget()->AddChatMessage(SystemChannel, Sender, Message);
+	GetChatBoxWidget()->AddChatMessage(EChatChannel::FriendSys, Sender, Message);
 }
