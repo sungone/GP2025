@@ -39,3 +39,5 @@
 #include "MonsterTable.h"
 #include "QuestTable.h"
 #include "SpawnTable.h"
+
+inline FWorldState _WorldState[WORLD_MAX_COUNT];

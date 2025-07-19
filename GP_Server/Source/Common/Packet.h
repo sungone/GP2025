@@ -141,7 +141,7 @@ struct RequestEnterGamePacket : public Packet
 {
 	Type::EPlayer PlayerType;
 	EWorldChannel WChannel;
-	RequestEnterGamePacket(Type::EPlayer InType = Type::EPlayer::NONE, EWorldChannel Channel)
+	RequestEnterGamePacket(Type::EPlayer InType = Type::EPlayer::NONE, EWorldChannel Channel = EWorldChannel::TUWorld_1)
 		: Packet(EPacketType::C_ENTER_GAME), PlayerType(InType), WChannel(Channel)
 	{
 		Header.PacketSize = sizeof(RequestEnterGamePacket);
