@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "ItemTable.h"
 
 struct ItemStats
@@ -23,7 +23,7 @@ public:
 	void Init(uint8 itemTypeID);
 	uint32 GenerateItemID()
 	{
-		//Todo:DB¿¡¼­ Áßº¹ ¾ÈµÇ°Ô DB¿¡¼­ ½ÃÀÛ id¹Ş¾Æ¼­ Ã³¸®ÇØ¾ß
+		//Todo:DBì—ì„œ ì¤‘ë³µ ì•ˆë˜ê²Œ DBì—ì„œ ì‹œì‘ idë°›ì•„ì„œ ì²˜ë¦¬í•´ì•¼
 		static int i = 300;
 		return i++;
 	}

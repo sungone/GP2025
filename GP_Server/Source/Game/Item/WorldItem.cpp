@@ -1,12 +1,12 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "WorldItem.h"
 
-WorldItem::WorldItem(uint8 itemTypeID) //ShopItem»ı¼ºÀ¸·Î »ç¿ëÇÔ
+WorldItem::WorldItem(uint8 itemTypeID) //ShopItemìƒì„±ìœ¼ë¡œ ì‚¬ìš©í•¨
 	: Item(itemTypeID), _pos(FVector::ZeroVector)
 {
 
 }
-WorldItem::WorldItem(uint8 itemTypeID, FVector pos)//º¸½º ½ºÆùÅÛ
+WorldItem::WorldItem(uint8 itemTypeID, FVector pos)//ë³´ìŠ¤ ìŠ¤í°í…œ
 	: Item(itemTypeID), _pos(pos)
 {
 	_itemID = GenerateItemID();

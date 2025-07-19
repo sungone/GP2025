@@ -185,6 +185,7 @@
     <ClInclude Include="Source\Game\DataTable\QuestTable.h" />
     <ClInclude Include="Source\Game\DataTable\SpawnTable.h" />
     <ClInclude Include="Source\Game\GameWorld.h" />
+    <ClInclude Include="Source\Game\GameWorldManager.h" />
     <ClInclude Include="Source\Game\Item\Inventory.h" />
     <ClInclude Include="Source\Game\Item\Item.h" />
     <ClInclude Include="Source\Game\Item\WorldItem.h" />
@@ -219,6 +220,7 @@
     <ClCompile Include="Source\Game\DataTable\QuestTable.cpp" />
     <ClCompile Include="Source\Game\DataTable\SpawnTable.cpp" />
     <ClCompile Include="Source\Game\GameWorld.cpp" />
+    <ClCompile Include="Source\Game\GameWorldManager.cpp" />
     <ClCompile Include="Source\Game\Item\Inventory.cpp" />
     <ClCompile Include="Source\Game\Item\Item.cpp" />
     <ClCompile Include="Source\Game\Item\WorldItem.cpp" />

@@ -1,11 +1,11 @@
 ﻿#include "pch.h"
 #include "Player.h"
 #include "SessionManager.h"
-#include "GameWorld.h"
+#include "GameWorldManager.h"
 
-void Player::Init()
+void Player::Init(EWorldChannel channelId)
 {
-	Character::Init();
+	Character::Init(channelId);
 	SetCharacterType(Type::EPlayer::WARRIOR);
 #ifndef DB_MODE
 	_info.SetName(L"플레이어");
@@ -87,13 +87,14 @@ void Player::OnDamaged(float damage)
 	Character::OnDamaged(damage);
 	auto pkt = InfoPacket(EPacketType::S_DAMAGED_PLAYER, GetInfo());
 	SessionManager::GetInst().SendPacket(_id, &pkt);
-	if (IsDead())
-	{
-		ChangeState(ECharacterStateType::STATE_DIE);
-		auto playerID = _id;
-		TimerQueue::AddTimer([playerID] { GameWorld::GetInst().PlayerDead(playerID);}, 10, false);
-		TimerQueue::AddTimer([playerID] { GameWorld::GetInst().RespawnPlayer(playerID, ZoneType::TUK);}, 3000, false);
-	}
+	//auto world = _world;
+	//if (IsDead())
+	//{
+	//	ChangeState(ECharacterStateType::STATE_DIE);
+	//	auto playerID = _id;
+	//	TimerQueue::AddTimer([playerID, world] { world->PlayerDead(playerID);}, 10, false);
+	//	TimerQueue::AddTimer([playerID, world] { world->RespawnPlayer(playerID, ZoneType::TUK);}, 3000, false);
+	//}
 }
 
 void Player::UpdateViewList(std::shared_ptr<Character> other)
@@ -321,11 +322,11 @@ void Player::EndSkill()
 	ResetSkillEffect();
 
 	auto targetState = ECharacterStateType::STATE_NONE;
-	if(GetInfo().HasState(ECharacterStateType::STATE_SKILL_Q))
+	if (GetInfo().HasState(ECharacterStateType::STATE_SKILL_Q))
 		targetState = ECharacterStateType::STATE_SKILL_Q;
-	else if(GetInfo().HasState(ECharacterStateType::STATE_SKILL_E))
+	else if (GetInfo().HasState(ECharacterStateType::STATE_SKILL_E))
 		targetState = ECharacterStateType::STATE_SKILL_E;
-	else if(GetInfo().HasState(ECharacterStateType::STATE_SKILL_R))
+	else if (GetInfo().HasState(ECharacterStateType::STATE_SKILL_R))
 		targetState = ECharacterStateType::STATE_SKILL_R;
 
 	GetInfo().RemoveState(targetState);
@@ -568,7 +569,7 @@ void Player::CheckAndUpdateQuestProgress(EQuestCategory type)
 		}
 		else if (quest == QuestType::CH2_CLEAR_E_BUILDING || quest == QuestType::CH3_CLEAR_SERVER_ROOM)
 		{
-			int32 mcnt = GameWorld::GetInst().GetMonsterCnt(GetZone());
+			int32 mcnt = _world->GetMonsterCnt(GetZone());
 			if (mcnt == 1)
 			{
 				res = true;
@@ -625,7 +626,7 @@ bool Player::GiveQuestReward(QuestType quest)
 		float spawnDistance = 100.f;
 		FVector itemPos = GetPos() + forward * spawnDistance;
 		auto droppedItem = WorldItem(itemid, itemPos);
-		GameWorld::GetInst().SpawnWorldItem(droppedItem, GetZone());
+		_world->SpawnWorldItem(droppedItem, GetZone());
 	}
 
 	return true;
@@ -662,7 +663,7 @@ bool Player::SetCurrentQuest(QuestType quest)
 	SessionManager::GetInst().SendPacket(_id, &infopkt);
 	if (questData->Catagory == EQuestCategory::KILL)
 	{
-		GameWorld::GetInst().QuestSpawn(_id, quest);
+		_world->QuestSpawn(_id, quest);
 	}
 	_bTutQuest = (static_cast<uint8>(quest) >= static_cast<uint8>(QuestType::TUT_START));
 

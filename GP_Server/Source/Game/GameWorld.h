@@ -25,13 +25,8 @@ namespace std {
 class GameWorld
 {
 public:
-	static GameWorld& GetInst()
-	{
-		static GameWorld inst;
-		return inst;
-	}
 
-	bool Init();
+	bool Init(EWorldChannel channelId);
 	// Player
 	void PlayerEnterGame(std::shared_ptr<Player> player);
 	void PlayerLeaveGame(int32 playerId);
@@ -104,6 +99,7 @@ public:
 	bool IsMonster(int32 id);
 	int32 GenerateMonsterId() { return _nextMonsterId++; }
 private:
+	EWorldChannel _channelId;
 	std::array<std::shared_ptr<Player>, MAX_PLAYER> _players;
 	std::unordered_map<ZoneType, std::unordered_map<int32, std::shared_ptr<Player>>> _playersByZone;
 	std::unordered_map<ZoneType, std::unordered_map<int32, std::shared_ptr<Monster>>> _monstersByZone;

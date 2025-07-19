@@ -1,11 +1,11 @@
 ﻿#include "pch.h"
 #include "Monster.h"
 #include "SessionManager.h"
-#include "GameWorld.h"
+#include "GameWorldManager.h"
 
-void Monster::Init()
+void Monster::Init(EWorldChannel channelId)
 {
-	Character::Init();
+	Character::Init(channelId);
 
 	auto data = MonsterTable::GetInst().GetMonsterByTypeId(static_cast<uint8>(_monType));
 	if (!data)
@@ -229,9 +229,14 @@ void Monster::PerformEarthQuake()
 		auto pkt = Tino::EarthQuakePacket(rockPos);
 		SessionManager::GetInst().BroadcastToViewList(&pkt, viewListCopy);
 		auto id = _id;
-		TimerQueue::AddTimer([rockPos, id] {
-			GameWorld::GetInst().HandleEarthQuakeImpact(rockPos);
-			GameWorld::GetInst().UpdateMonsterState(id, ECharacterStateType::STATE_IDLE);
+		auto channelId = _channelId;
+		TimerQueue::AddTimer([rockPos, id, channelId] {
+			auto world = GameWorldManager::GetInst().GetWorld(channelId);
+			if (world)
+			{
+				world->HandleEarthQuakeImpact(rockPos);
+				world->UpdateMonsterState(id, ECharacterStateType::STATE_IDLE);
+			}
 			}, 500, false);
 	}
 }
@@ -258,37 +263,43 @@ void Monster::PerformFlameBreath()
 	SessionManager::GetInst().BroadcastToViewList(&flamePkt, viewListCopy);
 
 	int monsterId = _id;
+	auto channelId = _channelId;
 
 	TimerQueue::AddTimer([=]() {
-		auto monster = GameWorld::GetInst().GetMonsterByID(monsterId);
-		if (!monster) return;
-
-		for (int32 pid : viewListCopy)
+		auto world = GameWorldManager::GetInst().GetWorld(channelId);
+		if (world)
 		{
-			auto player = GameWorld::GetInst().GetPlayerByID(pid);
-			if (!player || player->IsDead()) continue;
+			auto monster = world->GetMonsterByID(monsterId);
+			if (!monster) return;
 
-			FVector toTarget = player->GetInfo().Pos - origin;
-			toTarget.Z = 0.0f;
+			for (int32 pid : viewListCopy)
+			{
+				auto player = world->GetPlayerByID(pid);
+				if (!player || player->IsDead()) continue;
 
-			if (toTarget.LengthSquared() > range * range) continue;
+				FVector toTarget = player->GetInfo().Pos - origin;
+				toTarget.Z = 0.0f;
 
-			FVector toTargetNorm = toTarget.Normalize();
-			float dot = forward.DotProduct(toTargetNorm);
-			float angle = std::acos(dot) * (180.0f / 3.14159265f);
-			if (angle > halfAngleDeg) continue;
+				if (toTarget.LengthSquared() > range * range) continue;
 
-			float dist = std::sqrt(toTarget.LengthSquared());
-			float ratio = 1.0f - (dist / range);
-			float damage = maxDamage * ratio;
+				FVector toTargetNorm = toTarget.Normalize();
+				float dot = forward.DotProduct(toTargetNorm);
+				float angle = std::acos(dot) * (180.0f / 3.14159265f);
+				if (angle > halfAngleDeg) continue;
 
-			LOG_D("FlameBreath HIT [{}] dmg: {:.1f}", pid, damage);
-			player->OnDamaged(damage);
-			auto hitDebugPkt = Tino::FlameBreathPacket(origin, forward, range, halfAngleDeg * 2, true);
-			SessionManager::GetInst().BroadcastToViewList(&hitDebugPkt, viewListCopy);
+				float dist = std::sqrt(toTarget.LengthSquared());
+				float ratio = 1.0f - (dist / range);
+				float damage = maxDamage * ratio;
+
+				LOG_D("FlameBreath HIT [{}] dmg: {:.1f}", pid, damage);
+				player->OnDamaged(damage);
+				auto hitDebugPkt = Tino::FlameBreathPacket(origin, forward, range, halfAngleDeg * 2, true);
+				SessionManager::GetInst().BroadcastToViewList(&hitDebugPkt, viewListCopy);
+			}
+
+			world->UpdateMonsterState(monsterId, ECharacterStateType::STATE_IDLE);
+
 		}
-
-		GameWorld::GetInst().UpdateMonsterState(monsterId, ECharacterStateType::STATE_IDLE);
 		}, delayMs, false);
 }
 
@@ -315,11 +326,16 @@ void Monster::PerformFlameBreathRotate()
 	}
 
 	int32 monsterId = _id;
+	auto channelId = _channelId;
+
 
 	for (int i = 0; i < tickCount; ++i)
 	{
 		TimerQueue::AddTimer([=]() {
-			auto monster = GameWorld::GetInst().GetMonsterByID(monsterId);
+			auto world = GameWorldManager::GetInst().GetWorld(channelId);
+			if (!world) return;
+
+			auto monster = world->GetMonsterByID(monsterId);
 			if (!monster) return;
 
 			// 현재 틱의 회전 각도 (시계방향으로 감소)
@@ -328,7 +344,7 @@ void Monster::PerformFlameBreathRotate()
 
 			for (int32 pid : viewListCopy)
 			{
-				auto player = GameWorld::GetInst().GetPlayerByID(pid);
+				auto player = world->GetPlayerByID(pid);
 				if (!player || player->IsDead()) continue;
 
 				FVector toTarget = player->GetInfo().Pos - origin;
@@ -357,8 +373,11 @@ void Monster::PerformFlameBreathRotate()
 			}, i * tickIntervalMs, false);
 	}
 
-	TimerQueue::AddTimer([monsterId] {
-		GameWorld::GetInst().UpdateMonsterState(monsterId, ECharacterStateType::STATE_IDLE);
+	TimerQueue::AddTimer([monsterId, channelId] {
+		auto world = GameWorldManager::GetInst().GetWorld(channelId);
+		if (!world) return;
+
+		world->UpdateMonsterState(monsterId, ECharacterStateType::STATE_IDLE);
 		}, tickCount * tickIntervalMs, false);
 }
 
@@ -488,7 +507,8 @@ bool Monster::SetTarget()
 
 	float minDistSq = std::numeric_limits<float>::max();
 	std::shared_ptr<Player> nearestPlayer = nullptr;
-
+	auto world = GameWorldManager::GetInst().GetWorld(_channelId);
+	if (!world) return false;
 	for (int32 playerId : viewListCopy)
 	{
 		if (playerId >= MAX_PLAYER)
@@ -496,7 +516,7 @@ bool Monster::SetTarget()
 			continue;
 		}
 
-		auto player = GameWorld::GetInst().GetPlayerByID(playerId);
+		auto player = world->GetPlayerByID(playerId);
 		if (!player || player->IsDead())
 		{
 			RemoveFromViewList(playerId);

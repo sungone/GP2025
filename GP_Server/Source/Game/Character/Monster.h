@@ -15,13 +15,13 @@ enum class EAttackPattern
 class Monster : public Character, public std::enable_shared_from_this<Monster>
 {
 public:
-	Monster(int32 id) : Character(id) { Init(); }
+	Monster(int32 id) : Character(id) { Init(_channelId); }
 	Monster(int32 id, ZoneType zone, Type::EMonster monType)
 		: Character(id), _monType(monType)
 	{
 		_zone = zone;
 	}
-	void Init() override;
+	void Init(EWorldChannel channelId) override;
 	bool IsDirty() const { return _dirty; }
 	void ClearDirty() { _dirty = false; }
 	void ScheduleUpdate();

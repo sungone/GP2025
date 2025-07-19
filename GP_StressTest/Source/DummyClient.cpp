@@ -171,7 +171,7 @@ void DummyClient::SendSignUpPacket()
 
 void DummyClient::SendRequestEnterGamePacket()
 {
-	auto pkt = RequestEnterGamePacket();
+	auto pkt = RequestEnterGamePacket(Type::EPlayer::GUNNER, EWorldChannel::TUWorld_1);
 	DoSend(&pkt);
 }
 

@@ -193,8 +193,9 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 void PacketManager::HandleLogoutPacket(int32 sessionId)
 {
 	auto pkt = IDPacket(EPacketType::S_REMOVE_PLAYER, sessionId);
-	//Todo: 로그인 전에 종료되면 여기서  "Invalid" 호출되는 것 같은데 해결하자
-	_gameWorld.PlayerLeaveGame(sessionId);
+	HandleWithWorld<IDPacket>(sessionId, &pkt, [this](GameWorld* world, IDPacket* p) {
+		world->PlayerLeaveGame(p->Data);
+		});
 	_sessionMgr.Disconnect(sessionId);
 }
 
@@ -225,11 +226,18 @@ void PacketManager::HandleEnterGamePacket(int32 sessionId, Packet* packet)
 	if (!player) return;
 	RequestEnterGamePacket* p = static_cast<RequestEnterGamePacket*>(packet);
 	auto newType = p->PlayerType;
+	auto wChannelId = p->WChannel;
+	auto world = GameWorldManager::GetInst().GetWorld(wChannelId);
+	if (!world)
+	{
+		LOG_W("Invalid World");
+		return;
+	}
+	player->Init(wChannelId);
 	if (newType != Type::EPlayer::NONE)
 		player->SetCharacterType(p->PlayerType);
-
-	session->EnterGame();
-	_gameWorld.PlayerEnterGame(player);
+	session->EnterGame(wChannelId);
+	world->PlayerEnterGame(player);
 	uint32 dbId = session->GetDBID();
 	auto [friendResultCode, friendList] = DBManager::GetInst().GetFriendList(dbId);
 	if (friendResultCode != ResultCode::SUCCESS)
@@ -243,129 +251,136 @@ void PacketManager::HandleMovePacket(int32 sessionId, Packet* packet)
 {
 	auto session = _sessionMgr.GetSession(sessionId);
 	if (!session || !session->IsInGame()) return;
-
-	MovePacket* p = static_cast<MovePacket*>(packet);
-	_gameWorld.PlayerMove(p->PlayerID, p->PlayerPos, p->State, p->MoveTime);
+	HandleWithWorld<MovePacket>(sessionId, packet, [](GameWorld* world, MovePacket* p) {
+		world->PlayerMove(p->PlayerID, p->PlayerPos, p->State, p->MoveTime);
+		});
 }
 
 void PacketManager::HandleStartAimingPacket(int32 sessionId, Packet* packet)
 {
-	StartAimingPacket* p = static_cast<StartAimingPacket*>(packet);
-	_gameWorld.PlayerSetLocation(sessionId, p->PlayerYaw, p->PlayerPos);
-	_gameWorld.PlayerAddState(sessionId, ECharacterStateType::STATE_AIMING);
+	HandleWithWorld<StartAimingPacket>(sessionId, packet, [sessionId](GameWorld* world, StartAimingPacket* p) {
+		world->PlayerSetLocation(sessionId, p->PlayerYaw, p->PlayerPos);
+		world->PlayerAddState(sessionId, ECharacterStateType::STATE_AIMING);
+		});
 }
 
 void PacketManager::HandleStopAimingPacket(int32 sessionId, Packet* packet)
 {
-	StopAimingPacket* p = static_cast<StopAimingPacket*>(packet);
-	_gameWorld.PlayerRemoveState(sessionId, ECharacterStateType::STATE_AIMING);
+	HandleWithWorld<StopAimingPacket>(sessionId, packet, [sessionId](GameWorld* world, StopAimingPacket* p) {
+		world->PlayerRemoveState(sessionId, ECharacterStateType::STATE_AIMING);
+		});
 }
 
 void PacketManager::HandleAttackPacket(int32 sessionId, Packet* packet)
 {
-	AttackPacket* p = static_cast<AttackPacket*>(packet);
-	_gameWorld.PlayerSetLocation(sessionId, p->PlayerYaw, p->PlayerPos);
-	_gameWorld.PlayerAddState(sessionId, ECharacterStateType::STATE_AUTOATTACK);
-	_gameWorld.PlayerAttack(sessionId);
+	HandleWithWorld<AttackPacket>(sessionId, packet, [sessionId](GameWorld* world, AttackPacket* p) {
+		world->PlayerSetLocation(sessionId, p->PlayerYaw, p->PlayerPos);
+		world->PlayerAddState(sessionId, ECharacterStateType::STATE_AUTOATTACK);
+		world->PlayerAttack(sessionId);
+		});
 }
 
 void PacketManager::HandleUseSkillPacket(int32 sessionId, Packet* packet)
 {
-	UseSkillStartPacket* p = static_cast<UseSkillStartPacket*>(packet);
-	_gameWorld.PlayerSetLocation(sessionId, p->PlayerYaw, p->PlayerPos);
-	_gameWorld.PlayerUseSkill(sessionId, p->SkillGID);
+	HandleWithWorld<UseSkillStartPacket>(sessionId, packet, [sessionId](GameWorld* world, UseSkillStartPacket* p) {
+		world->PlayerSetLocation(sessionId, p->PlayerYaw, p->PlayerPos);
+		world->PlayerUseSkill(sessionId, p->SkillGID);
+		});
 }
 
 void PacketManager::HandleEndSkillPacket(int32 sessionId, Packet* packet)
 {
-	UseSkillEndPacket* p = static_cast<UseSkillEndPacket*>(packet);
-	_gameWorld.PlayerEndSkill(sessionId, p->SkillGID);
+	HandleWithWorld<UseSkillEndPacket>(sessionId, packet, [sessionId](GameWorld* world, UseSkillEndPacket* p) {
+		world->PlayerEndSkill(sessionId, p->SkillGID);
+		});
 }
 
 void PacketManager::HandleRemoveStatePacket(int32 sessionId, Packet* packet)
 {
-	RemoveStatePacket* p = static_cast<RemoveStatePacket*>(packet);
-	_gameWorld.PlayerRemoveState(sessionId, p->State);
+	HandleWithWorld<RemoveStatePacket>(sessionId, packet, [sessionId](GameWorld* world, RemoveStatePacket* p) {
+		world->PlayerRemoveState(sessionId, p->State);
+		});
 }
 
 void PacketManager::HandlePickUpItemPacket(int32 sessionId, Packet* packet)
 {
-	IDPacket* p = static_cast<IDPacket*>(packet);
-	auto itemid = p->Data;
-	_gameWorld.PickUpWorldItem(sessionId, itemid);
+	HandleWithWorld<IDPacket>(sessionId, packet, [sessionId](GameWorld* world, IDPacket* p) {
+		world->PickUpWorldItem(sessionId, p->Data);
+		});
 }
 
 void PacketManager::HandleDropItemPacket(int32 sessionId, Packet* packet)
 {
-	IDPacket* p = static_cast<IDPacket*>(packet);
-	auto itemid = p->Data;
-	//_gameWorld.DropInventoryItem(sessionId, itemid);
 }
 
 void PacketManager::HandleUseItemPacket(int32 sessionId, Packet* packet)
 {
-	IDPacket* p = static_cast<IDPacket*>(packet);
-	auto itemid = p->Data;
-	_gameWorld.UseInventoryItem(sessionId, itemid);
+	HandleWithWorld<IDPacket>(sessionId, packet, [sessionId](GameWorld* world, IDPacket* p) {
+		world->UseInventoryItem(sessionId, p->Data);
+		});
 }
 
 void PacketManager::HandleEquipItemPacket(int32 sessionId, Packet* packet)
 {
-	IDPacket* p = static_cast<IDPacket*>(packet);
-	auto itemid = p->Data;
-	_gameWorld.EquipInventoryItem(sessionId, itemid);
+	HandleWithWorld<IDPacket>(sessionId, packet, [sessionId](GameWorld* world, IDPacket* p) {
+		world->EquipInventoryItem(sessionId, p->Data);
+		});
 }
 
 void PacketManager::HandleUnequipItemPacket(int32 sessionId, Packet* packet)
 {
-	IDPacket* p = static_cast<IDPacket*>(packet);
-	auto itemid = p->Data;
-	_gameWorld.UnequipInventoryItem(sessionId, itemid);
+	HandleWithWorld<IDPacket>(sessionId, packet, [sessionId](GameWorld* world, IDPacket* p) {
+		world->UnequipInventoryItem(sessionId, p->Data);
+		});
 }
 
 void PacketManager::HandleZoneChangeRequestPacket(int32 sessionId, Packet* packet)
 {
-	auto* p = static_cast<RequestZoneChangePacket*>(packet);
-	ZoneType targetZone = p->TargetZone;
-
-	_gameWorld.TransferToZone(sessionId, targetZone);
+	HandleWithWorld<RequestZoneChangePacket>(sessionId, packet, [this, sessionId](GameWorld* world, RequestZoneChangePacket* p) {
+		world->TransferToZone(sessionId, p->TargetZone);
+		});
 }
 
 void PacketManager::HandleRespawnRequestPacket(int32 sessionId, Packet* packet)
 {
-	auto* p = static_cast<RespawnRequestPacket*>(packet);
-	ZoneType targetZone = p->TargetZone;
-	_gameWorld.RespawnPlayer(sessionId, targetZone);
+	HandleWithWorld<RespawnRequestPacket>(sessionId, packet, [this, sessionId](GameWorld* world, RespawnRequestPacket* p) {
+		world->RespawnPlayer(sessionId, p->TargetZone);
+		});
 }
 
 void PacketManager::HandleShopBuyItemPacket(int32 sessionId, Packet* packet)
 {
-	auto* p = static_cast<BuyItemPacket*>(packet);
-	_gameWorld.BuyItem(sessionId, p->ItemType, p->Quantity);
+	HandleWithWorld<BuyItemPacket>(sessionId, packet, [this, sessionId](GameWorld* world, BuyItemPacket* p) {
+		world->BuyItem(sessionId, p->ItemType, p->Quantity);
+		});
 }
 
 void PacketManager::HandleShopSellItemPacket(int32 sessionId, Packet* packet)
 {
-	auto* p = static_cast<SellItemPacket*>(packet);
-	_gameWorld.SellItem(sessionId, p->ItemID);
+	HandleWithWorld<SellItemPacket>(sessionId, packet, [this, sessionId](GameWorld* world, SellItemPacket* p) {
+		world->SellItem(sessionId, p->ItemID);
+		});
 }
 
 void PacketManager::HandleRequestQuestPacket(int32 sessionId, Packet* packet)
 {
-	auto* p = static_cast<RequestQuestPacket*>(packet);
-	_gameWorld.RequestQuest(sessionId, p->Quest);
+	HandleWithWorld<RequestQuestPacket>(sessionId, packet, [this, sessionId](GameWorld* world, RequestQuestPacket* p) {
+		world->RequestQuest(sessionId, p->Quest);
+		});
 }
 
 void PacketManager::HandleCompleteQuestPacket(int32 sessionId, Packet* packet)
 {
-	auto* p = static_cast<CompleteQuestPacket*>(packet);
-	_gameWorld.CompleteQuest(sessionId, p->Quest);
+	HandleWithWorld<CompleteQuestPacket>(sessionId, packet, [this, sessionId](GameWorld* world, CompleteQuestPacket* p) {
+		world->CompleteQuest(sessionId, p->Quest);
+		});
 }
 
 void PacketManager::HandleRejectQuestPacket(int32 sessionId, Packet* packet)
 {
-	auto* p = static_cast<RejectQuestPacket*>(packet);
-	_gameWorld.RejectQuest(sessionId, p->Quest);
+	HandleWithWorld<RejectQuestPacket>(sessionId, packet, [this, sessionId](GameWorld* world, RejectQuestPacket* p) {
+		world->RejectQuest(sessionId, p->Quest);
+		});
 }
 
 void PacketManager::HandleChatSendPacket(int32 sessionId, Packet* packet)
@@ -398,7 +413,8 @@ void PacketManager::HandleChatSendPacket(int32 sessionId, Packet* packet)
 	{
 		ZoneType zone = player->GetZone();
 		ChatBroadcastPacket broadcastPkt(nickname, p->Message, channel);
-		_gameWorld.BroadcastToZone(zone, &broadcastPkt);
+		if (auto world = GetValidWorld(sessionId))
+			world->BroadcastToZone(zone, &broadcastPkt);
 		break;
 	}
 	default:
@@ -558,4 +574,17 @@ void PacketManager::HandleFriendRejectRequestPacket(int32 sessionId, Packet* pac
 	auto ret = DBManager::GetInst().RejectFriendRequest(myId, targetId);
 	FriendOperationResultPacket resPkt(EFriendOpType::Reject, ret);
 	_sessionMgr.SendPacket(sessionId, &resPkt);
+}
+
+GameWorld* PacketManager::GetValidWorld(int32 sessionId)
+{
+	auto session = _sessionMgr.GetSession(sessionId);
+	if (!session || !session->IsInGame())
+		return nullptr;
+
+	auto world = GameWorldManager::GetInst().GetWorld(session->GetWorldChannel());
+	if (!world)
+		LOG_W("[PacketManager] Invalid world for sessionId: {}", sessionId);
+
+	return world;
 }

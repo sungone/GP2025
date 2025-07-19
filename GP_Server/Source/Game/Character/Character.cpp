@@ -1,10 +1,12 @@
 #include "pch.h"
 #include "Character.h"
-#include "GameWorld.h"
+#include "GameWorldManager.h"
 
-void Character::Init()
+void Character::Init(EWorldChannel channelId)
 {
+	_channelId = channelId;
 	_info.SetYaw(RandomUtils::GetRandomFloat(-180, 180));
+	_world = GameWorldManager::GetInst().GetWorld(channelId);
 }
 
 bool Character::IsDead()
@@ -21,8 +23,11 @@ void Character::UpdatePos(const FVector& newPos)
 {
 	auto old = GetPos();
 	GetInfo().SetLocationAndYaw(newPos);
+
 	if (GetZone() == ZoneType::TUK)
-		GameWorld::GetInst().MoveGrid(_id, old, newPos);
+	{
+		_world->MoveGrid(_id, old, newPos);
+	}
 }
 
 bool Character::IsCollision(const FVector& pos, float dist)

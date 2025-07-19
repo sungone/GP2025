@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "DBManager.h"
 #include "GameWorld.h"
 #include "ScopedDBSession.h"
@@ -341,7 +341,7 @@ bool DBManager::IsFriendOrPending(uint32 myId, uint32 targetId)
 			.bind("fid", targetId)
 			.execute();
 
-		return result.count() > 0; // �����ϸ� �̹� ģ���ų� ��û ��
+		return result.count() > 0; // 존재하면 이미 친구거나 요청 중
 	}
 	catch (const mysqlx::Error& e)
 	{

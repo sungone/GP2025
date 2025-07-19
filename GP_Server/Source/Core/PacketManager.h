@@ -1,7 +1,7 @@
 #pragma once
 #include "PlayerSession.h"
 #include "SessionManager.h"
-#include "GameWorld.h"
+#include "GameWorldManager.h"
 
 class PacketManager
 {
@@ -11,9 +11,9 @@ public:
 		static PacketManager inst;
 		return inst;
 	}
-
 	void ProcessPacket(int32 sessionId, Packet* packet);
 
+private:
 	void HandleSignUpPacket(int32 sessionId, Packet* packet);
 	void HandleLoginPacket(int32 sessionId, Packet* packet);
 	void HandleLogoutPacket(int32 sessionId);
@@ -51,10 +51,17 @@ public:
 	void HandleFriendAcceptRequestPacket(int32 sessionId, Packet* packet);
 	void HandleFriendRemoveRequestPacket(int32 sessionId, Packet* packet);
 	void HandleFriendRejectRequestPacket(int32 sessionId, Packet* packet);
-	
+private:
+	GameWorld* GetValidWorld(int32 sessionId);
+	template<typename TPacket, typename Func>
+	void HandleWithWorld(int32 sessionId, Packet* packet, Func&& func)
+	{
+		auto* p = static_cast<TPacket*>(packet);
+		if (auto* world = GetValidWorld(sessionId))
+			func(world, p);
+	}
 private:
 	SessionManager& _sessionMgr = SessionManager::GetInst();
 	DBManager& _dbMgr = DBManager::GetInst();
-	GameWorld& _gameWorld = GameWorld::GetInst();
 };
 

@@ -1,12 +1,14 @@
 #pragma once
 #include "Common.h"
 
+class GameWorld;
+
 class Character
 {
 public:
 	Character(int32 id) { _id = id; }
 
-	virtual void Init();
+	virtual void Init(EWorldChannel channelId);
 	virtual void Update() {};
 	virtual bool IsDead();
 
@@ -42,9 +44,11 @@ public:
 public:
 	std::mutex _cLock;
 	std::mutex _vlLock;
+	GameWorld* _world = nullptr;
 protected:
 	FInfoData _info;
 	int32& _id = _info.ID;
 	std::unordered_set<int32> _viewList;
+	EWorldChannel _channelId = EWorldChannel::None;
 };
 
