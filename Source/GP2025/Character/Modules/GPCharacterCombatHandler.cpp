@@ -49,8 +49,6 @@ void UGPCharacterCombatHandler::PlayAutoAttackMontage()
 
 	bool bHasWeapon = Owner->HasWeaponEquipped();
 
-
-
 	if (bHasWeapon)
 	{
 		TArray<UAnimMontage*> MontageCandidates;
@@ -351,8 +349,9 @@ void UGPCharacterCombatHandler::FinishDash()
 		FVector Location = LocalMyPlayer->GetActorLocation();
 		float Yaw = LocalMyPlayer->GetControlRotation().Yaw;
 
-		LocalMyPlayer->NetMgr->SendMyUseSkillStart(ESkillGroup::Clash, Yaw, Location);
+		LocalMyPlayer->NetMgr->SendMyAttackPacket(Yaw, Location);
 
+		// LocalMyPlayer->NetMgr->SendMyUseSkillStart(ESkillGroup::Clash, Yaw, Location);
 	}
 }
 
@@ -419,7 +418,9 @@ void UGPCharacterCombatHandler::ExecuteMultiHit()
 		float Yaw = LocalMyPlayer->GetControlRotation().Yaw;
 
 		UE_LOG(LogTemp, Log, TEXT("MultiHit Attack: %d hits remaining"), RemainingHits);
-		LocalMyPlayer->NetMgr->SendMyUseSkillStart(ESkillGroup::Whirlwind, Yaw, Location);
+		// LocalMyPlayer->NetMgr->SendMyUseSkillStart(ESkillGroup::Whirlwind, Yaw, Location);
+		LocalMyPlayer->NetMgr->SendMyAttackPacket(Yaw, Location);
+
 	}
 
 	RemainingHits--;
@@ -497,25 +498,32 @@ void UGPCharacterCombatHandler::PlaySkillMontage(UAnimMontage* SkillMontage)
 					return;
 				}
 
-				if (CurrentSkillMontage == QSkillMontage)
+				if (AGPCharacterMyplayer* LocalOwner = Cast<AGPCharacterMyplayer>(Owner))
 				{
-					Owner->CharacterInfo.RemoveState(STATE_SKILL_Q);
-				}
-				else if (CurrentSkillMontage == ESkillMontage)
-				{
-					Owner->CharacterInfo.RemoveState(STATE_SKILL_E);
-					if (Owner->CharacterInfo.CharacterType == static_cast<uint8>(Type::EPlayer::WARRIOR))
+					if (CurrentSkillMontage == QSkillMontage)
 					{
-						bIsDashing = false;
-						if (Owner->GetCharacterMovement())
+						LocalOwner->CharacterInfo.RemoveState(STATE_SKILL_Q);
+						LocalOwner->NetMgr->SendMyUseSkillEnd(LocalOwner->bIsGunnerCharacter() ? ESkillGroup::Throwing : ESkillGroup::HitHard);
+					}
+					else if (CurrentSkillMontage == ESkillMontage)
+					{
+						LocalOwner->CharacterInfo.RemoveState(STATE_SKILL_E);
+						LocalOwner->NetMgr->SendMyUseSkillEnd(LocalOwner->bIsGunnerCharacter() ? ESkillGroup::FThrowing : ESkillGroup::Clash);
+
+						if (!LocalOwner->bIsGunnerCharacter())
 						{
-							Owner->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+							bIsDashing = false;
+							if (LocalOwner->GetCharacterMovement())
+							{
+								LocalOwner->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+							}
 						}
 					}
-				}
-				else if (CurrentSkillMontage == RSkillMontage)
-				{
-					Owner->CharacterInfo.RemoveState(STATE_SKILL_R);
+					else if (CurrentSkillMontage == RSkillMontage)
+					{
+						LocalOwner->CharacterInfo.RemoveState(STATE_SKILL_R);
+						LocalOwner->NetMgr->SendMyUseSkillEnd(LocalOwner->bIsGunnerCharacter() ? ESkillGroup::Anger : ESkillGroup::Whirlwind);
+					}
 				}
 			}
 		},
@@ -529,29 +537,62 @@ void UGPCharacterCombatHandler::OnSkillMontageEnded(UAnimMontage* Montage, bool 
 	if (!Owner)
 		return;
 
-	if (Montage == QSkillMontage || Montage == ESkillMontage || Montage == RSkillMontage)
+	bIsUsingSkill = false;
+	const uint8 PlayerType = Owner->CharacterInfo.CharacterType;
+
+	if (AGPCharacterMyplayer* LocalOwner = Cast<AGPCharacterMyplayer>(Owner))
 	{
-		bIsUsingSkill = false;
-
-		if (Owner->CharacterInfo.HasState(STATE_SKILL_Q) && Montage == QSkillMontage)
-			Owner->CharacterInfo.RemoveState(STATE_SKILL_Q);
-
-		if (Owner->CharacterInfo.HasState(STATE_SKILL_E) && Montage == ESkillMontage)
+		if (Montage == QSkillMontage && LocalOwner->CharacterInfo.HasState(STATE_SKILL_Q))
 		{
-			Owner->CharacterInfo.RemoveState(STATE_SKILL_E);
-			if (Owner->CharacterInfo.CharacterType == static_cast<uint8>(Type::EPlayer::WARRIOR))
+			LocalOwner->CharacterInfo.RemoveState(STATE_SKILL_Q);
+
+			if (LocalOwner->bIsGunnerCharacter())
 			{
-				Owner->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+				LocalOwner->NetMgr->SendMyUseSkillEnd(ESkillGroup::Throwing);
+			}
+			else
+			{
+				LocalOwner->NetMgr->SendMyUseSkillEnd(ESkillGroup::HitHard);
 			}
 		}
 
-		if (Owner->CharacterInfo.HasState(STATE_SKILL_R) && Montage == RSkillMontage)
-			Owner->CharacterInfo.RemoveState(STATE_SKILL_R);
-
-		if (Owner->GetWorldTimerManager().IsTimerActive(SkillFailSafeHandle))
+		if (Montage == ESkillMontage && LocalOwner->CharacterInfo.HasState(STATE_SKILL_E))
 		{
-			Owner->GetWorldTimerManager().ClearTimer(SkillFailSafeHandle);
+			LocalOwner->CharacterInfo.RemoveState(STATE_SKILL_E);
+
+			if (LocalOwner->bIsGunnerCharacter())
+			{
+				LocalOwner->NetMgr->SendMyUseSkillEnd(ESkillGroup::FThrowing);
+			}
+			else
+			{
+				LocalOwner->NetMgr->SendMyUseSkillEnd(ESkillGroup::Clash);
+				bIsDashing = false;
+				if (LocalOwner->GetCharacterMovement())
+				{
+					LocalOwner->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+				}
+			}
 		}
+		
+		if (Montage == RSkillMontage && LocalOwner->CharacterInfo.HasState(STATE_SKILL_R))
+		{
+			LocalOwner->CharacterInfo.RemoveState(STATE_SKILL_R);
+
+			if (LocalOwner->bIsGunnerCharacter())
+			{
+				LocalOwner->NetMgr->SendMyUseSkillEnd(ESkillGroup::Anger);
+			}
+			else
+			{
+				LocalOwner->NetMgr->SendMyUseSkillEnd(ESkillGroup::Whirlwind);
+			}
+		}
+	}
+
+	if (Owner->GetWorldTimerManager().IsTimerActive(SkillFailSafeHandle))
+	{
+		Owner->GetWorldTimerManager().ClearTimer(SkillFailSafeHandle);
 	}
 }
 

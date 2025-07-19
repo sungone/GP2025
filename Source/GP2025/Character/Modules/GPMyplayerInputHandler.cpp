@@ -408,6 +408,7 @@ void UGPMyplayerInputHandler::UseSkillQ()
 		Owner->CharacterInfo.AddState(STATE_SKILL_Q);
 		Owner->CombatHandler->PlayQSkillMontage();
 		Owner->NetMgr->SendMyUseSkillStart(ESkillGroup::Throwing, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
+		Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
 		Owner->GunnerAttackCameraShake();
 	}
 	else
@@ -416,6 +417,7 @@ void UGPMyplayerInputHandler::UseSkillQ()
 		Owner->CharacterInfo.AddState(STATE_SKILL_Q);
 		Owner->CombatHandler->PlayQSkillMontage();
 		Owner->NetMgr->SendMyUseSkillStart(ESkillGroup::HitHard, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
+		Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
 	}
 }
 
@@ -443,15 +445,18 @@ void UGPMyplayerInputHandler::UseSkillE()
 		Owner->CharacterInfo.AddState(STATE_SKILL_E);
 		Owner->CombatHandler->PlayESkillMontage();
 		Owner->NetMgr->SendMyUseSkillStart(ESkillGroup::FThrowing, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
+		Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
 		Owner->GunnerAttackCameraShake();
 	}
 	else
 	{
-
 		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_E);
 		Owner->CombatHandler->StartDash(); // 여기서 공격 처리 중
 		// Owner->NetMgr->SendMyUseSkill(ESkillGroup::Clash, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
+		Owner->NetMgr->SendMyUseSkillStart(ESkillGroup::Clash, Owner->GetControlRotation().Yaw, 
+			Owner->GetActorLocation());
+
 		float BoostPlayRate = 4.0f; // 공격속도 몽타지 증가 시간
 		float BoostDuration = 10.f; // 공격속도 증가 지속 시간
 		Owner->CombatHandler->ApplyAttackSpeedBoost(BoostPlayRate, BoostDuration);
@@ -498,6 +503,8 @@ void UGPMyplayerInputHandler::UseSkillR()
 		Owner->CharacterInfo.AddState(STATE_SKILL_R);
 		Owner->CombatHandler->PlayRSkillMontage(); 
 		// Owner->NetMgr->SendMyUseSkill(ESkillGroup::Whirlwind, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
+		Owner->NetMgr->SendMyUseSkillStart(ESkillGroup::Whirlwind, Owner->GetControlRotation().Yaw, 
+			Owner->GetActorLocation());
 		Owner->CombatHandler->PlayMultiHitSkill(HitCount, Interval); // 여기서 공격 처리 중
 	}
 }
