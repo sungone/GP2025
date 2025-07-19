@@ -111,6 +111,7 @@ void UGPNetworkManager::HandleBuyItemResult(bool bSuccess, uint32 CurrentGold, R
 		break;
 	case ResultCode::NOT_ENOUGH_GOLD:
 		ResultMessage = TEXT("골드가 부족합니다");
+
 		break;
 	case ResultCode::ITEM_NOT_FOUND:
 		ResultMessage = TEXT("없는 아이템입니다");
@@ -121,7 +122,6 @@ void UGPNetworkManager::HandleBuyItemResult(bool bSuccess, uint32 CurrentGold, R
 	}
 
 	UE_LOG(LogTemp, Error, TEXT("%s"), *ResultMessage);
-
 	OnBuyItemResult.Broadcast(bSuccess, CurrentGold, ResultMessage);
 }
 
@@ -620,6 +620,7 @@ void UGPNetworkManager::ProcessPacket()
 			{
 				BuyItemResultPacket* Pkt = reinterpret_cast<BuyItemResultPacket*>(RemainingData.GetData());
 				HandleBuyItemResult(Pkt->bSuccess, Pkt->PlayerGold, Pkt->ResCode);
+				ObjectMgr->SoundWhenBuy(Pkt->ResCode);
 				break;
 			}
 			case EPacketType::S_SHOP_SELL_RESULT:

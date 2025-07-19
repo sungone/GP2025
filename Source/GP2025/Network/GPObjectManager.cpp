@@ -928,6 +928,26 @@ void UGPObjectManager::UnequipItem(int32 PlayerID, uint8 ItemType)
 	UE_LOG(LogTemp, Log, TEXT("[UnequipItem] Player [%d] successfully unequipped item: %s"), PlayerID, *ItemData->ItemName.ToString());
 }
 
+void UGPObjectManager::SoundWhenBuy(ResultCode Code)
+{
+	if (MyPlayer->SoundManager)
+	{
+		switch (Code)
+		{
+		case ResultCode::SUCCESS:
+			MyPlayer->SoundManager->PlaySFX(MyPlayer->SoundManager->ShopBuySellSound);
+			break;
+		case ResultCode::NOT_ENOUGH_GOLD:
+			MyPlayer->SoundManager->PlaySFX(MyPlayer->SoundManager->WarningSound);
+			break;
+		case ResultCode::ITEM_NOT_FOUND:
+			break;
+		default:
+			break;
+		}
+	}
+}
+
 void UGPObjectManager::ChangeZone(ZoneType oldZone, ZoneType newZone, const FVector& RandomPos)
 {
 	if (IsChangingZone())

@@ -106,7 +106,6 @@ void UGPShop::SetOwningNPC(AGPCharacterNPC* NPC)
 
 void UGPShop::OnBuyItemClicked()
 {
-
 	if (!MyPlayer)
 	{
 		return;
@@ -129,6 +128,7 @@ void UGPShop::OnBuyItemClicked()
 			if (ClickSound)
 			{
 				UGameplayStatics::PlaySound2D(GetWorld(), ErrorSound);
+				UE_LOG(LogTemp, Log, TEXT("[Shop] Played ErrorSound (Invalid ItemID)"));
 			}
 			return;
 		}
@@ -144,8 +144,8 @@ void UGPShop::OnBuyItemClicked()
 			if (ClickSound)
 			{
 				UGameplayStatics::PlaySound2D(GetWorld(), ErrorSound);
+				UE_LOG(LogTemp, Log, TEXT("[Shop] Played ErrorSound (Wrong class item for Gunner)"));
 			}
-
 			return;
 		}
 
@@ -160,23 +160,23 @@ void UGPShop::OnBuyItemClicked()
 			if (ClickSound)
 			{
 				UGameplayStatics::PlaySound2D(GetWorld(), ErrorSound);
+				UE_LOG(LogTemp, Log, TEXT("[Shop] Played ErrorSound (Wrong class item for Warrior)"));
 			}
-
 			return;
 		}
 
-		if (ClickSound)
-		{
-			UGameplayStatics::PlaySound2D(GetWorld(), SellAndBuySound);
-		}
+		//if (ClickSound)
+		//{
+		//	UGameplayStatics::PlaySound2D(GetWorld(), SellAndBuySound);
+		//	UE_LOG(LogTemp, Log, TEXT("[Shop] Played SellAndBuySound (Successful purchase attempt)"));
+		//}
 
 		const int32 Quantity = 1;
 		NetworkMgr->SendMyShopBuyItem(ItemID, Quantity);
 
-		UE_LOG(LogTemp, Log, TEXT("BuyItem Sent to Server - ItemID: %d, Quantity: %d"), ItemID, Quantity);
+		UE_LOG(LogTemp, Log, TEXT("[Shop] BuyItem Sent to Server - ItemID: %d, Quantity: %d"), ItemID, Quantity);
 	}
 }
-
 void UGPShop::HandleBuyItemResult(bool bSuccess, uint32 CurrentGold, const FString& Message)
 {
 	if (bSuccess)

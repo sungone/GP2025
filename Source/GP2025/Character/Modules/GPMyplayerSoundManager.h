@@ -103,6 +103,9 @@ public :
 	USoundBase* WarningSound;
 
 	UPROPERTY()
+	USoundBase* ShopBuySellSound;
+
+	UPROPERTY()
 	USoundBase* PickUpItemSound;
 
 	UPROPERTY()

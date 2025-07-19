@@ -62,6 +62,7 @@ UGPMyplayerSoundManager::UGPMyplayerSoundManager()
 	LOAD_SFX(WarningSound, WarningSound);
 	LOAD_SFX(PickUpItemSound, PickUpItemSound);
 	LOAD_SFX(PlayerHit, PlayerHit);
+	LOAD_SFX(ShopBuySellSound, ShopBuySellSound);
 }
 
 void UGPMyplayerSoundManager::Initialize(AGPCharacterMyplayer* InOwner)
