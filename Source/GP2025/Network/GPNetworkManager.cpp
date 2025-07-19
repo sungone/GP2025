@@ -179,13 +179,13 @@ void UGPNetworkManager::SendMySelectCharacter(uint8 PlayerType)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendMyEnterGamePacket()
+void UGPNetworkManager::SendMyEnterGamePacket(EWorldChannel WChannel)
 {
 	RequestEnterGamePacket Packet;
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendMyEnterGamePacket(Type::EPlayer PlayerType)
+void UGPNetworkManager::SendMyEnterGamePacket(EWorldChannel WChannel, Type::EPlayer PlayerType)
 {
 	RequestEnterGamePacket Packet(PlayerType);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
@@ -402,7 +402,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_LOGIN_SUCCESS:
 			{
 				LoginSuccessPacket* Pkt = reinterpret_cast<LoginSuccessPacket*>(RemainingData.GetData());
-
+				ObjectMgr->HandleEnterLobby(Pkt->WorldState);
 				OnEnterLobby.Broadcast();
 				break;
 			}
@@ -415,6 +415,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_SIGNUP_SUCCESS:
 			{
 				SignUpSuccessPacket* Pkt = reinterpret_cast<SignUpSuccessPacket*>(RemainingData.GetData());
+				ObjectMgr->HandleEnterLobby(Pkt->WorldState);
 				OnEnterLobby.Broadcast();
 				break;
 			}

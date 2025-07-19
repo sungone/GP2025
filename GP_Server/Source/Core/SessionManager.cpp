@@ -124,8 +124,6 @@ void SessionManager::HandleLogin(int32 sessionId, const DBLoginResult& dbRes)
 		_nameToDbidMap[name] = dbId;
 	}
 #endif
-	SignUpSuccessPacket spkt;
-	SendPacket(sessionId, &spkt);
 }
 
 void SessionManager::SendPacket(int32 sessionId, const Packet* packet)

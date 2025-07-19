@@ -109,6 +109,31 @@ enum EPacketType : uint8
 	S_DEBUG_LINE
 };
 
+enum class EWorldChannel : uint8
+{
+	TUWorld_1,
+	TUWorld_2,
+	TUWorld_3,
+};
+
+enum class EWorldState : uint8
+{
+	Good,
+	Normal,
+	Bad,
+};
+
+struct FWorldState
+{
+	EWorldChannel Channel;
+	EWorldState State;
+	FWorldState(EWorldChannel channel = EWorldChannel::TUWorld_1, EWorldState state = EWorldState::Good)
+		: Channel(channel), State(state)
+	{
+	}
+
+};
+
 enum class EChatChannel : uint8
 {
 	All,

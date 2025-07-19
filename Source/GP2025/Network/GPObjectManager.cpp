@@ -123,6 +123,12 @@ void UGPObjectManager::SetMyPlayer(AGPCharacterMyplayer* InMyPlayer)
 	MyPlayer = InMyPlayer;
 }
 
+void UGPObjectManager::HandleEnterLobby(FWorldState WorldState[WORLD_MAX_COUNT])
+{
+	//Todo:
+	auto LobbyWidget = MyPlayer->UIManager->GetLobbyWidget();
+}
+
 void UGPObjectManager::AddMyPlayer(const FInfoData& PlayerInfo)
 {
 	if (World == nullptr)

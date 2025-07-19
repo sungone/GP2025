@@ -44,3 +44,5 @@ inline std::wstring ConvertToWString(const std::string& str)
 	MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, &wstr[0], size);
 	return wstr;
 }
+
+FWorldState _WorldState[WORLD_MAX_COUNT];
