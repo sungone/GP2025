@@ -112,6 +112,7 @@ void AGPLevelTransitionTrigger::OnOverlapBegin(
 					}
 
 					UE_LOG(LogTemp, Warning, TEXT("[LevelTransitionTrigger] Item Type 25 not found. Cannot enter Zone E."));
+					return;
 				}
 			}
 		}
