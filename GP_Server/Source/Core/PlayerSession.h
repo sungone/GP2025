@@ -22,7 +22,7 @@ public:
 	void Disconnect();
 
 	void Login(const DBLoginResult& dbRes);
-	void EnterGame();
+	void EnterGame(EWorldChannel wchannel);
 	void Logout();
 	bool IsLogin() { return _state != SessionState::None; }
 	bool IsInGame() { return _state == SessionState::InGame; }
@@ -55,6 +55,7 @@ public:
 		_friends.erase(std::remove_if(_friends.begin(), _friends.end(),
 			[dbId](const FFriendInfo& f) { return f.DBId == dbId; }), _friends.end());
 	}
+	EWorldChannel GetWorldChannel() const { return _wChannel; }
 private:
 	JobQueue _gameJobQueue;
 	int32 _id = -1;
@@ -64,6 +65,7 @@ private:
 	std::shared_ptr<Player> _player;
 	std::unique_ptr<SessionSocket> _sSocket;
 	SessionState _state = SessionState::None;
+	EWorldChannel _wChannel = EWorldChannel::None;
 	std::mutex _sMutex;
 	std::vector<FFriendInfo> _friends;
 };

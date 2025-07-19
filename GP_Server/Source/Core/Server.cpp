@@ -2,7 +2,7 @@
 #include "Server.h"
 #include "IOCP.h"
 #include "SessionManager.h"
-#include "GameWorld.h"
+#include "GameWorldManager.h"
 
 bool Server::Init()
 {
@@ -63,9 +63,23 @@ bool Server::Init()
 		return false;
 	}
 
-	if (!GameWorld::GetInst().Init())
+	if (!GameWorldManager::GetInst().Init())
 	{
 		LOG_E("GameMgr");
+		return false;
+	}
+
+	bool res =
+		ItemTable::GetInst().LoadFromCSV(DataTablePath + "ItemTable.csv") &&
+		PlayerLevelTable::GetInst().LoadFromCSV(DataTablePath + "PlayerLevelTable.csv") &&
+		PlayerSkillTable::GetInst().LoadFromCSV(DataTablePath + "PlayerSkillTable.csv") &&
+		MonsterTable::GetInst().LoadFromCSV(DataTablePath + "MonsterTable.csv") &&
+		SpawnTable::GetInst().LoadFromCSV(DataTablePath + "SpawnTable.csv") &&
+		QuestTable::GetInst().LoadFromCSV(DataTablePath + "QuestTable.csv");
+
+	if (!res)
+	{
+		LOG_E("LoadFromCSV");
 		return false;
 	}
 
@@ -172,20 +186,29 @@ void Server::HandleCompletionError(ExpOver* over, int32 id)
 		break;
 	}
 	case CompType::RECV:
-	{
-		LOG_W("CompType : RECV[{}] Code={}", id, over->errorCode);
-		GameWorld::GetInst().PlayerLeaveGame(id);
-		SessionManager::GetInst().Disconnect(id);
-		break;
-	}
 	case CompType::SEND:
 	{
-		LOG_W("CompType : SEND[{}] Code={}", id, over->errorCode);
-		GameWorld::GetInst().PlayerLeaveGame(id);
+		LOG_W("CompType : {}[{}] Code={}",
+			(over->_compType == CompType::RECV ? "RECV" : "SEND"),
+			id, over->errorCode);
+
+		auto session = SessionManager::GetInst().GetSession(id);
+		if (session && session->IsInGame())
+		{
+			EWorldChannel channel = session->GetWorldChannel();
+			auto world = GameWorldManager::GetInst().GetWorld(channel);
+			if (world)
+				world->PlayerLeaveGame(id);
+		}
+
 		SessionManager::GetInst().Disconnect(id);
-		delete over;
+
+		if (over->_compType == CompType::SEND)
+			delete over;
+
 		break;
 	}
+
 	}
 
 }

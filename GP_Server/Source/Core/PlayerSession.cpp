@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "PlayerSession.h"
 #include "SessionManager.h"
 #include "GameWorld.h"
@@ -51,8 +51,9 @@ void PlayerSession::Login(const DBLoginResult& dbRes)
 #endif
 }
 
-void PlayerSession::EnterGame()
+void PlayerSession::EnterGame(EWorldChannel wchannel)
 {
+	_wChannel = wchannel;
 	_state = SessionState::InGame;
 }
 
@@ -60,7 +61,7 @@ void PlayerSession::Logout()
 {
 	if (IsLogin())
 	{
-		//todo: ºä¸®½ºÆ® Á¦°Å
+		//todo: ë·°ë¦¬ìŠ¤íŠ¸ ì œê±°
 		_state = SessionState::None;
 #ifdef DB_MODE
 		_player->SaveToDB(_dbId);
@@ -82,7 +83,7 @@ FInfoData& PlayerSession::GetPlayerInfo()
 void PlayerSession::SetAndSendFriendsInfo(std::vector<FFriendInfo> friends)
 {
 	_friends = std::move(friends);
-	//°ÔÀÓÀÔÀå ÈÄ À§Á¬ »ı¼º ÀÌÈÄ·Î º¸³»Áà¾ß ÇÔ
+	//ê²Œì„ì…ì¥ í›„ ìœ„ì ¯ ìƒì„± ì´í›„ë¡œ ë³´ë‚´ì¤˜ì•¼ í•¨
 	if (!_friends.empty())
 	{
 		const auto& friends = _friends;

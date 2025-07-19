@@ -6,8 +6,8 @@
 class Player : public Character
 {
 public:
-	Player(int32 id) :Character(id) { Init(); }
-	void Init() override;
+	Player(int32 id) :Character(id) { Init(_channelId); }
+	void Init(EWorldChannel channelId) override;
 	void LoadFromDB(const DBLoginResult& dbRes);
 	void SaveToDB(uint32 dbId);
 	void SetCharacterType(Type::EPlayer type);

@@ -1,21 +1,9 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "GameWorld.h"
 
-bool GameWorld::Init()
+bool GameWorld::Init(EWorldChannel channelId)
 {
-	bool res =
-		ItemTable::GetInst().LoadFromCSV(DataTablePath + "ItemTable.csv") &&
-		PlayerLevelTable::GetInst().LoadFromCSV(DataTablePath + "PlayerLevelTable.csv") &&
-		PlayerSkillTable::GetInst().LoadFromCSV(DataTablePath + "PlayerSkillTable.csv") &&
-		MonsterTable::GetInst().LoadFromCSV(DataTablePath + "MonsterTable.csv") &&
-		SpawnTable::GetInst().LoadFromCSV(DataTablePath + "SpawnTable.csv") &&
-		QuestTable::GetInst().LoadFromCSV(DataTablePath + "QuestTable.csv");
-
-	if (!res)
-	{
-		LOG_E("LoadFromCSV");
-		return false;
-	}
+	_channelId = channelId;
 
 	CreateMonster();
 	return true;
@@ -273,13 +261,13 @@ void GameWorld::PlayerAttack(int32 playerId)
 				if (mquest == QuestType::CH2_CLEAR_E_BUILDING || mquest == QuestType::CH3_CLEAR_SERVER_ROOM)
 				{
 					//todo: 
-					// ´Ù¸¥ÇÃ·¹ÀÌ¾î°¡ Á×Àº ¸ó½ºÅÍ È°¼ºÈ­ ¸øÇÏµµ·Ï
-					// ¸ó½ºÅÍ¿¡ Äù½ºÆ® ÁøÇàÁß Ã¼Å© ³Ö¾ßÇÒµí
+					// ë‹¤ë¥¸í”Œë ˆì´ì–´ê°€ ì£½ì€ ëª¬ìŠ¤í„° í™œì„±í™” ëª»í•˜ë„ë¡
+					// ëª¬ìŠ¤í„°ì— í€˜ìŠ¤íŠ¸ ì§„í–‰ì¤‘ ì²´í¬ ë„£ì•¼í• ë“¯
 					_monsterCnt[zone]--;
 				}
 				player->CheckAndUpdateQuestProgress(EQuestCategory::KILL);
 			}
-			//todo: ¾ÆÀÌÅÛ µå¶øÅ×ÀÌºí·Î ½ºÆùÇÏÀÚ
+			//todo: ì•„ì´í…œ ë“œëží…Œì´ë¸”ë¡œ ìŠ¤í°í•˜ìž
 			{
 				FVector itemPos = basePos + RandomUtils::GetRandomOffset();
 				SpawnWorldItem(itemPos, monlv, playertype, zone);
@@ -374,7 +362,7 @@ void GameWorld::CreateMonster()
 					pos = Map::GetInst().GetRandomPos(z);
 				} while (IsCollisionDetected(zone, pos, radius));
 				monster->SetPos(pos);
-				monster->Init();
+				monster->Init(_channelId);
 				monster->SetQuestID(static_cast<QuestType>(info.QuestID));
 				if (info.DropItemID != -1)
 				{
@@ -386,7 +374,7 @@ void GameWorld::CreateMonster()
 				monster->SetBoss(info.bIsBoss);
 				zoneMap[id] = monster;
 				if (zone == ZoneType::TUK)
-					GameWorld::GetInst().EnterGrid(id, pos);
+					EnterGrid(id, pos);
 			}
 		}
 		_monsterCnt[zone] = zoneMap.size();
@@ -414,8 +402,8 @@ void GameWorld::OnMonsterDead(int32 monsterId)
 	monster->SetActive(false);
 	if (monster->GetQuestID() == QuestType::NONE)
 	{
-		TimerQueue::AddTimer([monsterId]() {
-			GameWorld::GetInst().MonsterRespawn(monsterId);
+		TimerQueue::AddTimer([monsterId, this]() {
+			this->MonsterRespawn(monsterId);
 			}, MONSTER_RESPAWN_TIME_MS, false);
 	}
 }
@@ -511,8 +499,8 @@ void GameWorld::SpawnGoldItem(FVector position, ZoneType zone)
 	ItemPkt::SpawnPacket packet(itemId, newItem->GetItemTypeID(), position);
 	BroadcastToZone(zone, &packet);
 
-	TimerQueue::AddTimer([itemId, zone]() {
-		GameWorld::GetInst().DespawnWorldItem(itemId, zone);
+	TimerQueue::AddTimer([itemId, zone, this]() {
+		this->DespawnWorldItem(itemId, zone);
 		}, ITEM_DISAPPEAR_TIME_MS, false);
 }
 
@@ -527,8 +515,8 @@ void GameWorld::SpawnWorldItem(FVector position, uint32 monlv, Type::EPlayer pla
 	ItemPkt::SpawnPacket packet(itemId, newItem->GetItemTypeID(), position);
 	BroadcastToZone(zone, &packet);
 
-	TimerQueue::AddTimer([itemId, zone]() {
-		GameWorld::GetInst().DespawnWorldItem(itemId, zone);
+	TimerQueue::AddTimer([itemId, zone, this]() {
+		this->DespawnWorldItem(itemId, zone);
 		}, ITEM_DISAPPEAR_TIME_MS, false);
 }
 
@@ -543,8 +531,8 @@ void GameWorld::SpawnWorldItem(WorldItem dropedItem, ZoneType zone)
 	BroadcastToZone(zone, &packet);
 	if (newItem->GetItemCategory() != EItemCategory::Quest)
 	{
-		TimerQueue::AddTimer([itemId, zone]() {
-			GameWorld::GetInst().DespawnWorldItem(itemId, zone);
+		TimerQueue::AddTimer([itemId, zone, this]() {
+			this->DespawnWorldItem(itemId, zone);
 			}, ITEM_DISAPPEAR_TIME_MS, false);
 	}
 }

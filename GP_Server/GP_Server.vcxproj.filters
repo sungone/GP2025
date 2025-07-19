@@ -56,11 +56,14 @@
     <Filter Include="Source Files\Game\GameObjects\Character">
       <UniqueIdentifier>{0966d558-393f-4cde-bc3a-30a33c8d61fe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Game\GameWorld\Map">
-      <UniqueIdentifier>{8c3f90d3-fa86-4a55-8ae0-ca4c78604b0d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Game\Job">
       <UniqueIdentifier>{0e2cae6d-8808-472f-bbc3-d43313b17b01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Map">
+      <UniqueIdentifier>{8c3f90d3-fa86-4a55-8ae0-ca4c78604b0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\GameManager">
+      <UniqueIdentifier>{76799e92-02d4-427c-aacc-8b3e6f767dc2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -119,10 +122,10 @@
       <Filter>Source Files\Game\GameObjects\Item</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\Map\Map.h">
-      <Filter>Source Files\Game\GameWorld\Map</Filter>
+      <Filter>Source Files\Game\Map</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\Map\NavMesh.h">
-      <Filter>Source Files\Game\GameWorld\Map</Filter>
+      <Filter>Source Files\Game\Map</Filter>
     </ClInclude>
     <ClInclude Include="Source\Core\IOCP\ExpOver.h">
       <Filter>Source Files\Utils\IOCP</Filter>
@@ -175,6 +178,9 @@
     <ClInclude Include="Source\DB\ScopedDBSession.h">
       <Filter>Source Files\DB</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Game\GameWorldManager.h">
+      <Filter>Source Files\Game\GameManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Core\PlayerSession.cpp">
@@ -214,10 +220,10 @@
       <Filter>Source Files\Game\GameObjects\Item</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Map\Map.cpp">
-      <Filter>Source Files\Game\GameWorld\Map</Filter>
+      <Filter>Source Files\Game\Map</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Map\NavMesh.cpp">
-      <Filter>Source Files\Game\GameWorld\Map</Filter>
+      <Filter>Source Files\Game\Map</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\IOCP\ExpOver.cpp">
       <Filter>Source Files\Utils\IOCP</Filter>
@@ -263,6 +269,9 @@
     </ClCompile>
     <ClCompile Include="Source\DB\DBConnectionPool.cpp">
       <Filter>Source Files\DB</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game\GameWorldManager.cpp">
+      <Filter>Source Files\Game\GameManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

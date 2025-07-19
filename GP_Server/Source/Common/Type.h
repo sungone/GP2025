@@ -111,9 +111,12 @@ enum EPacketType : uint8
 
 enum class EWorldChannel : uint8
 {
+	None,
 	TUWorld_1,
 	TUWorld_2,
 	TUWorld_3,
+	TUWorld_4,
+	TUWorld_5,
 };
 
 enum class EWorldState : uint8
