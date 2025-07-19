@@ -965,6 +965,12 @@ void UGPObjectManager::ChangeZone(ZoneType oldZone, ZoneType newZone, const FVec
 	PendingZone = newZone;
 	PendingLocation = RandomPos;
 
+	if (MyPlayer && MyPlayer->SoundManager)
+	{
+		MyPlayer->SoundManager->StopBGM();
+		MyPlayer->SoundManager->PlayBGMByLevelName(PendingLevelName);
+	}
+
 	UE_LOG(LogTemp, Log, TEXT("Start Changing Zone [%d] From %s to %s"),
 		MyPlayer->CharacterInfo.ID,
 		*OldLevel.ToString(), *PendingLevelName.ToString());
