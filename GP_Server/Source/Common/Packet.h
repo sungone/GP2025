@@ -150,9 +150,10 @@ struct RequestEnterGamePacket : public Packet
 struct EnterGamePacket : public Packet
 {
 	FInfoData PlayerInfo;
+	EWorldChannel WChannel;
 
-	EnterGamePacket(const FInfoData& PlayerInfo_)
-		: Packet(EPacketType::S_ENTER_GAME), PlayerInfo(PlayerInfo_)
+	EnterGamePacket(const FInfoData& PlayerInfo_, EWorldChannel wChannel)
+		: Packet(EPacketType::S_ENTER_GAME), PlayerInfo(PlayerInfo_), WChannel(wChannel)
 	{
 		Header.PacketSize = sizeof(EnterGamePacket);
 	}

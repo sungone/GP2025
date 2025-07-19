@@ -70,4 +70,5 @@ public :
 	void OnChannelChanged(FString SelectedItem, ESelectInfo::Type SelectionType);
 
 	void SetChannelTextColor(FLinearColor NewColor);
+	FLinearColor GetColorByWorldState(EWorldState State);
 };

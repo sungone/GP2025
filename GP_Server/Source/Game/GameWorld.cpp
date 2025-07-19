@@ -80,7 +80,7 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 	}
 #endif
 
-	EnterGamePacket enterpkt(playerInfo);
+	EnterGamePacket enterpkt(playerInfo, _channelId);
 	SessionManager::GetInst().SendPacket(playerId, &enterpkt);
 	player->OnEnterGame();
 	InitViewList(playerId, startZone);

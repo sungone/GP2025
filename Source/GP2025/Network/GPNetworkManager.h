@@ -92,6 +92,13 @@ public:
 	void SendMyFriendReject(uint32 RequesterUserID);
 	void SendMyFriendRemove(uint32 TargetUserID);
 
+	void UpdateWorldStatesFromServer(const FWorldState* ServerStates);
+	EWorldState GetWorldState(EWorldChannel Channel) const;
+	EWorldChannel GetMyChannel() const { return MyChannel; }
+private:
+	UPROPERTY()
+	TMap<uint8, uint8> CachedWorldStates;
+	EWorldChannel MyChannel;
 private:
 	void SendPacket(uint8* Buf, int32 Size);
 	void ReceiveData();

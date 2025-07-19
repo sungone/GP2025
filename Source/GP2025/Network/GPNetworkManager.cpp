@@ -355,6 +355,25 @@ void UGPNetworkManager::SendMyFriendRemove(uint32 TargetDBID)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
+void UGPNetworkManager::UpdateWorldStatesFromServer(const FWorldState* ServerStates)
+{
+	CachedWorldStates.Empty();
+
+	for (int i = 0; i < WORLD_MAX_COUNT; ++i)
+	{
+		uint8 ch = static_cast<uint8>(ServerStates[i].Channel);
+		uint8 state = static_cast<uint8>(ServerStates[i].State);
+		CachedWorldStates.Add(ch, state);
+	}
+}
+
+EWorldState UGPNetworkManager::GetWorldState(EWorldChannel Channel) const
+{
+	if (const uint8* Found = CachedWorldStates.Find(static_cast<uint8>(Channel)))
+		return static_cast<EWorldState>(*Found);
+	return EWorldState::Normal;
+}
+
 void UGPNetworkManager::ReceiveData()
 {
 	uint32 DataSize;
@@ -402,7 +421,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_LOGIN_SUCCESS:
 			{
 				LoginSuccessPacket* Pkt = reinterpret_cast<LoginSuccessPacket*>(RemainingData.GetData());
-				ObjectMgr->HandleEnterLobby(Pkt->WorldState);
+				UpdateWorldStatesFromServer(Pkt->WorldState);
 				OnEnterLobby.Broadcast();
 				break;
 			}
@@ -415,7 +434,8 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_SIGNUP_SUCCESS:
 			{
 				SignUpSuccessPacket* Pkt = reinterpret_cast<SignUpSuccessPacket*>(RemainingData.GetData());
-				ObjectMgr->HandleEnterLobby(Pkt->WorldState);
+				UpdateWorldStatesFromServer(Pkt->WorldState);
+
 				OnEnterLobby.Broadcast();
 				break;
 			}
@@ -429,6 +449,10 @@ void UGPNetworkManager::ProcessPacket()
 			{
 				EnterGamePacket* Pkt = reinterpret_cast<EnterGamePacket*>(RemainingData.GetData());
 				OnEnterGame.Broadcast();
+				MyChannel = Pkt->WChannel;
+				FString Msg = TEXT("Enter Channel [") + FString::FromInt(static_cast<uint8>(MyChannel)) + TEXT("]");
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Msg);
+
 				FInfoData Data = Pkt->PlayerInfo;
 				ObjectMgr->ChangeZone(ZoneType::TUK, Data.GetZone(), Data.Pos);
 				ObjectMgr->AddMyPlayer(Pkt->PlayerInfo);

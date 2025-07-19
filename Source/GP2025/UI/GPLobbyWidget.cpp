@@ -39,6 +39,11 @@ void UGPLobbyWidget::NativeConstruct()
 		ChannelComboBox->AddOption(TEXT("채널1"));
 		ChannelComboBox->AddOption(TEXT("채널2"));
 		ChannelComboBox->AddOption(TEXT("채널3"));
+		ChannelComboBox->AddOption(TEXT("채널4"));
+		ChannelComboBox->AddOption(TEXT("채널5"));
+		ChannelComboBox->AddOption(TEXT("채널6"));
+		ChannelComboBox->AddOption(TEXT("채널7"));
+		ChannelComboBox->AddOption(TEXT("채널8"));
 
 		ChannelComboBox->SetSelectedIndex(0);
 		ChannelComboBox->OnSelectionChanged.AddDynamic(this, &UGPLobbyWidget::OnChannelChanged);
@@ -101,25 +106,47 @@ void UGPLobbyWidget::OnGameStartPressed()
 
 void UGPLobbyWidget::OnChannelChanged(FString SelectedItem, ESelectInfo::Type SelectionType)
 {
-	if (SelectedItem == TEXT("채널1"))
-	{
-		SelectedChannel = EWorldChannel::TUWorld_1;
-		SetChannelTextColor(FLinearColor::Green);
-	}
-	else if (SelectedItem == TEXT("채널2"))
-	{
-		SelectedChannel = EWorldChannel::TUWorld_2;
-		SetChannelTextColor(FLinearColor(1.f, 0.5f, 0.f)); // 주황
-	}
-	else if (SelectedItem == TEXT("채널3"))
-	{
-		SelectedChannel = EWorldChannel::TUWorld_3;
-		SetChannelTextColor(FLinearColor::Red);
-	}
+	static const TMap<FString, EWorldChannel> ChannelMap = {
+		{ TEXT("채널1"), EWorldChannel::TUWorld_1 },
+		{ TEXT("채널2"), EWorldChannel::TUWorld_2 },
+		{ TEXT("채널3"), EWorldChannel::TUWorld_3 },
+		{ TEXT("채널4"), EWorldChannel::TUWorld_4 },
+		{ TEXT("채널5"), EWorldChannel::TUWorld_5 },
+		{ TEXT("채널6"), EWorldChannel::TUWorld_6 },
+		{ TEXT("채널7"), EWorldChannel::TUWorld_7 },
+		{ TEXT("채널8"), EWorldChannel::TUWorld_8 },
+	};
 
+	if (const EWorldChannel* FoundChannel = ChannelMap.Find(SelectedItem))
+	{
+		SelectedChannel = *FoundChannel;
+		UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+		if (NetMgr)
+		{
+			EWorldState State = NetMgr->GetWorldState(SelectedChannel);
+			FLinearColor Color = GetColorByWorldState(State);
+			SetChannelTextColor(Color);
+		}
 
-	UE_LOG(LogTemp, Log, TEXT("Selected Channel: %s"), *SelectedItem);
+		UE_LOG(LogTemp, Log, TEXT("Selected Channel: %s"), *SelectedItem);
+	}
 }
+
+FLinearColor UGPLobbyWidget::GetColorByWorldState(EWorldState State)
+{
+	switch (State)
+	{
+	case EWorldState::Good:
+		return FLinearColor::Green;
+	case EWorldState::Normal:
+		return FLinearColor(1.f, 0.5f, 0.f); // 주황
+	case EWorldState::Bad:
+		return FLinearColor::Red;
+	default:
+		return FLinearColor::White;
+	}
+}
+
 
 void UGPLobbyWidget::SetChannelTextColor(FLinearColor NewColor)
 {

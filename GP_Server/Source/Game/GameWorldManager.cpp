@@ -4,7 +4,7 @@
 bool GameWorldManager::Init()
 {
 	using EC = EWorldChannel;
-	for (uint8 i = static_cast<uint8>(EC::TUWorld_1); i <= static_cast<uint8>(EC::TUWorld_5); ++i)
+	for (uint8 i = static_cast<uint8>(EC::Start); i <= static_cast<uint8>(EC::End); ++i)
 	{
 		EC channel = static_cast<EC>(i);
 		CreateChannel(channel);
@@ -74,7 +74,7 @@ std::array<FWorldState, WORLD_MAX_COUNT> GameWorldManager::GetAllWorldStates()
 
 	using EC = EWorldChannel;
 	int idx = 0;
-	for (uint8 i = static_cast<uint8>(EC::TUWorld_1); i <= static_cast<uint8>(EC::TUWorld_5); ++i)
+	for (uint8 i = static_cast<uint8>(EC::Start); i <= static_cast<uint8>(EC::End); ++i)
 	{
 		EC channel = static_cast<EC>(i);
 		result[idx].Channel = channel;

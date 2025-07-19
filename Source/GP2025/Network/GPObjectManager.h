@@ -22,7 +22,6 @@ public:
 	virtual void Deinitialize() override;
 
 	void SetMyPlayer(AGPCharacterMyplayer* InMyPlayer);
-	void HandleEnterLobby(FWorldState WorldState[WORLD_MAX_COUNT]);
 
 	void AddMyPlayer(const FInfoData& PlayerInfo);
 	void AddPlayer(const FInfoData& PlayerInfo);
