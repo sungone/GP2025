@@ -55,6 +55,7 @@ public:
 	void ChangeZone(ZoneType OldZone, ZoneType NewZone, const FVector& RandomPos);
 	bool IsChangingZone() const { return bChangingZone; }
 	void SetChangeingZone(bool value) { bChangingZone = value; }
+	FRotator GetDefaultZoneRotation(ZoneType Zone);
 
 	UFUNCTION()
 	void HandleLevelUnloaded();

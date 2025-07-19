@@ -984,6 +984,19 @@ void UGPObjectManager::ChangeZone(ZoneType oldZone, ZoneType newZone, const FVec
 	}
 }
 
+FRotator UGPObjectManager::GetDefaultZoneRotation(ZoneType Zone)
+{
+	switch (Zone)
+	{
+	case ZoneType::TIP:     return FRotator(0.f, 90.f, 0.f);
+	case ZoneType::TUK:     return FRotator(0.f, -90.f, 0.f);
+	case ZoneType::E:       return FRotator(0.f, 80.f, 0.f);
+	case ZoneType::GYM:     return FRotator(0.f, -30.f, 0.f);
+	case ZoneType::INDUSTY: return FRotator(0.f, 90.f, 0.f);;
+	default:                return FRotator::ZeroRotator;
+	}
+}
+
 void UGPObjectManager::HandleLevelUnloaded()
 {
 	ULevelStreaming* StreamLevel = UGameplayStatics::GetStreamingLevel(this, PendingLevelName);
@@ -1006,6 +1019,8 @@ void UGPObjectManager::HandleLevelLoaded()
 {
 	MyPlayer->CharacterInfo.SetZone(PendingZone);
 	MyPlayer->SetActorLocation(PendingLocation);
+	FRotator NewRotation = GetDefaultZoneRotation(PendingZone);
+	MyPlayer->SetActorRotation(NewRotation);
 
 	if (MyPlayer->AppearanceHandler)
 	{
