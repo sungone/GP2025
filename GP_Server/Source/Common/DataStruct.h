@@ -88,9 +88,9 @@ struct FStatData
 
 	FStatData()
 		: Level(1), Exp(0.0f), MaxExp(100.0f),
-		Hp(100.0f), MaxHp(100.0f),
-		Damage(10.0f), CrtRate(0.5f), CrtValue(1.5f),
-		Dodge(0.1f), Speed(0.0f)
+		Hp(240.f), MaxHp(240.f),
+		Damage(50.f), CrtRate(0.15f), CrtValue(1.6f),
+		Dodge(0.25f), Speed(0.0f)
 	{
 	}
 };

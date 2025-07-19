@@ -2,9 +2,9 @@ TypeId,Name,Category,Damage,Hp,CrtRate,Dodge,Speed,AbilityType,AbilityValue,Drop
 1,BirdGun,weapon,5,0,0,0,0,0,0,0.05,1,100,200,1,1
 2,PulseGun,weapon,10,0,0.05,0,0,0,0,0.05,1,400,800,1,1
 3,Positron,weapon,18,0,0.1,0,0,0,0,0.02,1,750,1500,1,1
-4,PracSword,weapon,20,0,0,0,0,0,0,0.05,1,100,200,1,1
-5,PulseSword,weapon,40,0,0,0,0,0,0,0.05,1,400,800,1,1
-6,EnergySword,weapon,70,0,0,0,0,0,0,0.02,1,750,1500,1,1
+4,PracSword,weapon,10,0,0,0,0,0,0,0.05,1,100,200,1,1
+5,PulseSword,weapon,25,0,0,0,0,0,0,0.05,1,400,800,1,1
+6,EnergySword,weapon,40,0,0,0,0,0,0,0.02,1,750,1500,1,1
 10,AlloyHelmet,armor,0,0,0.03,0.03,0,0,0,0.05,1,150,300,1,1
 11,EnhanceHelmet,armor,0,0,0.08,0.07,0,0,0,0.05,1,500,1000,1,1
 12,TitanChest,armor,0,30,0,0,10,0,0,0.02,1,150,300,1,1

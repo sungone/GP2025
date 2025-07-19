@@ -727,6 +727,7 @@ bool Player::CompleteCurrentQuest()
 
 void Player::AddItemStats(const ItemStats& stats)
 {
+
 	_stats.Damage += stats.damage;
 	_stats.Hp += stats.hp;
 	_stats.MaxHp += stats.hp;
@@ -734,10 +735,12 @@ void Player::AddItemStats(const ItemStats& stats)
 	_stats.CrtRate = std::clamp(_stats.CrtRate + stats.critRate, 0.0f, 1.0f);
 	_stats.Dodge = std::clamp(_stats.Dodge + stats.dodgeRate, 0.0f, 1.0f);
 	_stats.Speed = std::max(0.0f, _stats.Speed + stats.moveSpeed);
+
 }
 
 void Player::RemoveItemStats(const ItemStats& stats)
 {
+
 	_stats.Damage = std::max(0.0f, _stats.Damage - stats.damage);
 	_stats.Hp = std::max(0.0f, _stats.Hp - stats.hp);
 	_stats.MaxHp = std::max(1.0f, _stats.MaxHp - stats.hp);
@@ -745,6 +748,7 @@ void Player::RemoveItemStats(const ItemStats& stats)
 	_stats.CrtRate = std::clamp(_stats.CrtRate - stats.critRate, 0.0f, 1.0f);
 	_stats.Dodge = std::clamp(_stats.Dodge - stats.dodgeRate, 0.0f, 1.0f);
 	_stats.Speed = std::max(0.0f, _stats.Speed - stats.moveSpeed);
+
 }
 
 void Player::AddExp(float amount)
@@ -778,8 +782,6 @@ void Player::ApplyLevelStats(uint32 level)
 	}
 
 	//for test
-	//_stats.MaxHp = newStats->MaxHp;
-	_stats.MaxHp = 100;
 
 	_stats.Hp = _stats.MaxHp;
 	_stats.Damage = newStats->Damage;
@@ -787,4 +789,5 @@ void Player::ApplyLevelStats(uint32 level)
 	_stats.CrtValue = newStats->CrtValue;
 	_stats.Dodge = newStats->Dodge;
 	_stats.MaxExp = newStats->MaxExp;
+	_stats.MaxHp = newStats->MaxHp;
 }
