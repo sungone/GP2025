@@ -1032,9 +1032,13 @@ void UGPObjectManager::HandleLevelLoaded()
 	SetChangeingZone(false);
 	if (MyPlayer && MyPlayer->UIManager)
 	{
+		MyPlayer->PlayFadeIn();
 		auto Widget = MyPlayer->UIManager->GetInGameWidget();
+
 		if (Widget)
+		{
 			Widget->ShowZoneChangeMessage(PendingZone);
+		}
 	}
 }
 

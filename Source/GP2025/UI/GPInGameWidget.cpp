@@ -179,20 +179,27 @@ void UGPInGameWidget::ShowZoneChangeMessage(ZoneType NewZone)
 	SetCurrentMapName(ZoneNameText.ToString());
 }
 
-void UGPInGameWidget::PlayFadeOut(float Duration)
+void UGPInGameWidget::PlayFadeOut()
 {
-	if (!FadeOverlay || !FadeOutAnim) return;
+	if (!FadeOverlay || !OverlayFadeOutAnim) return;
 
-	// FadeOverlay 활성화
+	// FadeOverlay를 보이게 설정
 	FadeOverlay->SetVisibility(ESlateVisibility::Visible);
 
-	// Duration 조절 (기본 애니메이션 길이가 1초라고 가정)
-	PlayAnimation(FadeOutAnim, 0.0f, 1, EUMGSequencePlayMode::Forward, 1.0f / Duration);
+	// 애니메이션 0.5초 재생 (정상 속도)
+	const float PlayRate = 1.0f;
+	PlayAnimation(OverlayFadeOutAnim, 0.0f, 1, EUMGSequencePlayMode::Forward, PlayRate);
 }
 
-//void UGPInGameWidget::HideGameMessage()
-//{
-//    PlayGameMessageFadeOut();
-//}
+void UGPInGameWidget::PlayFadeIn()
+{
+	if (!FadeOverlay || !OverlayFadeInAnim) return;
 
+	// FadeOverlay를 보이게 설정
+	FadeOverlay->SetVisibility(ESlateVisibility::Visible);
+
+	// 애니메이션 0.5초 재생 (정상 속도)
+	const float PlayRate = 1.0f;
+	PlayAnimation(OverlayFadeInAnim, 0.0f, 1, EUMGSequencePlayMode::Forward, PlayRate);
+}
 

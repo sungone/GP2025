@@ -373,11 +373,23 @@ void AGPCharacterMyplayer::SetCharacterInfo(const FInfoData& CharacterInfo_)
 	}
 }
 
-void AGPCharacterMyplayer::PlayFadeOut(float Duration)
+void AGPCharacterMyplayer::PlayFadeOut()
 {
 	if (UIManager && UIManager->GetInGameWidget())
 	{
-		UIManager->GetInGameWidget()->PlayFadeOut(Duration);
+		UIManager->GetInGameWidget()->PlayFadeOut();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[PlayFadeOut] InGameWidget is not valid."));
+	}
+}
+
+void AGPCharacterMyplayer::PlayFadeIn()
+{
+	if (UIManager && UIManager->GetInGameWidget())
+	{
+		UIManager->GetInGameWidget()->PlayFadeIn();
 	}
 	else
 	{

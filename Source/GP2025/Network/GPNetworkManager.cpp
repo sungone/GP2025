@@ -260,7 +260,7 @@ void UGPNetworkManager::SendMyUseSkillEnd(ESkillGroup SkillGID)
 
 void UGPNetworkManager::SendMyZoneChangePacket(ZoneType NewZone)
 {
-	MyPlayer->PlayFadeOut(1.f);
+	MyPlayer->PlayFadeOut();
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(
 		TimerHandle,

@@ -99,7 +99,10 @@ public :
 	void PlayerHittedCameraShake();
 public:
 	UFUNCTION(BlueprintCallable)
-	void PlayFadeOut(float Duration = 1.0f);
+	void PlayFadeOut();
+
+	UFUNCTION(BlueprintCallable)
+	void PlayFadeIn();
 public:
 	UPROPERTY()
 	bool bHasPlayedTinoSequence = false;

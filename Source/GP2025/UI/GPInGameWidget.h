@@ -116,8 +116,12 @@ public :
     class UImage* FadeOverlay;
 
     UPROPERTY(Transient, meta = (BindWidgetAnim))
-    UWidgetAnimation* FadeOutAnim;
+    UWidgetAnimation* OverlayFadeOutAnim;
 
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
+    UWidgetAnimation* OverlayFadeInAnim;
 
-    void PlayFadeOut(float Duration);
+    void PlayFadeOut();
+    void PlayFadeIn();
+
 };
