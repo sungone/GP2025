@@ -88,9 +88,9 @@ struct LoginSuccessPacket : public Packet
 
 struct LoginFailPacket : public Packet
 {
-	DBResultCode ResultCode;
-	LoginFailPacket(const DBResultCode ResultCode_)
-		: Packet(EPacketType::S_LOGIN_FAIL), ResultCode(ResultCode_)
+	ResultCode ResCode;
+	LoginFailPacket(const ResultCode resCode)
+		: Packet(EPacketType::S_LOGIN_FAIL), ResCode(resCode)
 	{
 		Header.PacketSize = sizeof(LoginFailPacket);
 	}
@@ -108,9 +108,9 @@ struct SignUpSuccessPacket : public Packet
 
 struct SignUpFailPacket : public Packet
 {
-	DBResultCode ResultCode;
-	SignUpFailPacket(const DBResultCode ResultCode_)
-		: Packet(EPacketType::S_SIGNUP_FAIL), ResultCode(ResultCode_)
+	ResultCode ResCode;
+	SignUpFailPacket(const ResultCode resCode)
+		: Packet(EPacketType::S_SIGNUP_FAIL), ResCode(resCode)
 	{
 		Header.PacketSize = sizeof(SignUpFailPacket);
 	}
@@ -492,13 +492,13 @@ struct BuyItemPacket : public Packet
 struct BuyItemResultPacket : public Packet
 {
 	bool          bSuccess;
-	DBResultCode  ResultCode;// 추후 사용
+	ResultCode		 ResCode;
 	uint32        PlayerGold;
 
-	BuyItemResultPacket(bool success, DBResultCode code, uint32 updateGold)
+	BuyItemResultPacket(bool success, ResultCode code, uint32 updateGold)
 		: Packet(EPacketType::S_SHOP_BUY_RESULT)
 		, bSuccess(success)
-		, ResultCode(code)
+		, ResCode(code)
 		, PlayerGold(updateGold)
 	{
 		Header.PacketSize = sizeof(BuyItemResultPacket);
@@ -519,13 +519,13 @@ struct SellItemPacket : public Packet
 struct SellItemResultPacket : public Packet
 {
 	bool          bSuccess;
-	DBResultCode  ResultCode;
+	ResultCode  ResCode;
 	uint32        PlayerGold;
 
-	SellItemResultPacket(bool success, DBResultCode code, uint32 updateGold)
+	SellItemResultPacket(bool success, ResultCode code, uint32 updateGold)
 		: Packet(EPacketType::S_SHOP_SELL_RESULT)
 		, bSuccess(success)
-		, ResultCode(code)
+		, ResCode(code)
 		, PlayerGold(updateGold)
 	{
 		Header.PacketSize = sizeof(SellItemResultPacket);
@@ -620,12 +620,15 @@ struct ChatSendPacket : public Packet
 
 struct ChatWhisperPacket : public Packet
 {
-	uint32 TargetDBID;
+	char TargetNickName[NICKNAME_LEN];
 	char Message[CHAT_MESSAGE_LEN];
 
-	ChatWhisperPacket(uint32 dbId, const char* Msg)
-		: Packet(EPacketType::C_CHAT_WHISPER), TargetDBID(dbId)
+	ChatWhisperPacket(const char* Name, const char* Msg)
+		: Packet(EPacketType::C_CHAT_WHISPER)
 	{
+		SAFE_STRCPY(TargetNickName, Name, NICKNAME_LEN - 1);
+		TargetNickName[NICKNAME_LEN - 1] = '\0';
+
 		SAFE_STRCPY(Message, Msg, CHAT_MESSAGE_LEN - 1);
 		Message[CHAT_MESSAGE_LEN - 1] = '\0';
 
@@ -746,10 +749,10 @@ struct FriendRemoveRequestPacket : public Packet
 struct FriendOperationResultPacket : public Packet
 {
 	EFriendOpType OperationType;
-	DBResultCode ResultCode;
+	ResultCode ResCode;
 
-	FriendOperationResultPacket(EFriendOpType type, DBResultCode result)
-		: Packet(EPacketType::S_FRIEND_OPERATION_RESULT), OperationType(type), ResultCode(result)
+	FriendOperationResultPacket(EFriendOpType type, ResultCode result)
+		: Packet(EPacketType::S_FRIEND_OPERATION_RESULT), OperationType(type), ResCode(result)
 	{
 		Header.PacketSize = sizeof(FriendOperationResultPacket);
 	}

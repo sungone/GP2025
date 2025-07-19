@@ -2,7 +2,7 @@
 
 struct DBLoginResult
 {
-	DBResultCode code;
+	ResultCode code;
 	uint32 dbId = 0;
 	FInfoData info;
 	std::vector<std::pair<uint32, uint8>> items;
@@ -25,12 +25,12 @@ public:
 	bool AddUserItem(uint32 dbId, uint32 itemID, uint8 itemTypeID);
 	bool RemoveUserItem(uint32 dbId, uint32 itemID);
 
-	DBResultCode AddFriendRequest(uint32 fromId, uint32 toId);
+	ResultCode AddFriendRequest(uint32 fromId, uint32 toId);
 	bool IsFriendOrPending(uint32 userId, uint32 targetId);
-	std::pair<DBResultCode, std::optional<FFriendInfo>> AcceptFriendRequest(uint32 fromId, uint32 toId);
-	DBResultCode RejectFriendRequest(uint32 fromId, uint32 toId);
-	DBResultCode RemoveFriend(uint32 userId, uint32 friendId);
-	std::pair<DBResultCode, std::vector<FFriendInfo>> GetFriendList(uint32 userId);
+	std::pair<ResultCode, std::optional<FFriendInfo>> AcceptFriendRequest(uint32 fromId, uint32 toId);
+	ResultCode RejectFriendRequest(uint32 fromId, uint32 toId);
+	ResultCode RemoveFriend(uint32 userId, uint32 friendId);
+	std::pair<ResultCode, std::vector<FFriendInfo>> GetFriendList(uint32 userId);
 	int32 FindUserDBId(const std::wstring& nickname);
 
 };

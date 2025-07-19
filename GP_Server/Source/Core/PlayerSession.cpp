@@ -41,7 +41,8 @@ void PlayerSession::Login(const DBLoginResult& dbRes)
 	_player = std::make_shared<Player>(_id);
 #ifdef DB_MODE
 	{
-		_dbId = dbRes.dbId;
+		SetDBID(dbRes.dbId);
+		SetNickName(dbRes.info.GetName());
 		_player->LoadFromDB(dbRes);
 	}
 #endif

@@ -960,13 +960,13 @@ void GameWorld::BuyItem(int32 playerId, uint8 itemType, uint16 quantity)
 	}
 
 	bool bSuccess = false;
-	DBResultCode  ResultCode = DBResultCode::SUCCESS;
+	ResultCode  ResultCode = ResultCode::SUCCESS;
 
 	auto itemData = ItemTable::GetInst().GetItemByTypeId(itemType);
 	if (!itemData)
 	{
 		LOG_W("Invalid");
-		ResultCode = DBResultCode::ITEM_NOT_FOUND;
+		ResultCode = ResultCode::ITEM_NOT_FOUND;
 		auto respkt = BuyItemResultPacket(bSuccess, ResultCode, 0);
 		SessionManager::GetInst().SendPacket(playerId, &respkt);
 		return;
@@ -985,7 +985,7 @@ void GameWorld::BuyItem(int32 playerId, uint8 itemType, uint16 quantity)
 	}
 	else
 	{
-		ResultCode = DBResultCode::NOT_ENOUGH_GOLD;
+		ResultCode = ResultCode::NOT_ENOUGH_GOLD;
 		auto respkt = BuyItemResultPacket(bSuccess, ResultCode, 0);
 		SessionManager::GetInst().SendPacket(playerId, &respkt);
 	}

@@ -1,7 +1,7 @@
 #pragma once
 #include "Common.h"
 
-enum class DBResultCode : int32
+enum class ResultCode : int32
 {
 	SUCCESS = 0,
 	INVALID_USER = -1,
@@ -18,6 +18,10 @@ enum class DBResultCode : int32
 	FRIEND_ALREADY_ADDED = -21,
 	FRIEND_SELF_REQUEST = -22,
 	FRIEND_USER_NOT_FOUND = -23,
+
+	//Chat
+	TARGET_NOT_IN_GAME = -30,
+	SELF_REQUEST = -31,
 
 	DB_ERROR = -99
 };

@@ -70,24 +70,24 @@ void UGPNetworkManager::SendPacket(uint8* Buf, int32 Size)
 	Socket->Send(Buf, Size, BytesSent);
 }
 
-void UGPNetworkManager::HandleUserAuthFailure(DBResultCode ResultCode)
+void UGPNetworkManager::HandleUserAuthFailure(ResultCode ResCode)
 {
 	FString ErrorMessage;
 
-	switch (ResultCode)
+	switch (ResCode)
 	{
-	case DBResultCode::SUCCESS:
+	case ResultCode::SUCCESS:
 		return;
-	case DBResultCode::INVALID_USER:
+	case ResultCode::INVALID_USER:
 		ErrorMessage = TEXT("계정을 찾을 수 없습니다");
 		break;
-	case DBResultCode::INVALID_PASSWORD:
+	case ResultCode::INVALID_PASSWORD:
 		ErrorMessage = TEXT("비밀번호가 일치하지 않습니다");
 		break;
-	case DBResultCode::DUPLICATE_ID:
+	case ResultCode::DUPLICATE_ID:
 		ErrorMessage = TEXT("이미 존재하는 아이디입니다");
 		break;
-	case DBResultCode::ALREADY_LOGGED_IN:
+	case ResultCode::ALREADY_LOGGED_IN:
 		ErrorMessage = TEXT("이미 로그인된 계정입니다");
 		break;
 	default:
@@ -100,19 +100,19 @@ void UGPNetworkManager::HandleUserAuthFailure(DBResultCode ResultCode)
 	OnUserAuthFailed.Broadcast(ErrorMessage);
 }
 
-void UGPNetworkManager::HandleBuyItemResult(bool bSuccess, uint32 CurrentGold, DBResultCode ResultCode)
+void UGPNetworkManager::HandleBuyItemResult(bool bSuccess, uint32 CurrentGold, ResultCode ResCode)
 {
 	FString ResultMessage;
 
-	switch (ResultCode)
+	switch (ResCode)
 	{
-	case DBResultCode::SUCCESS:
+	case ResultCode::SUCCESS:
 		ResultMessage = TEXT("구매완료!");
 		break;
-	case DBResultCode::NOT_ENOUGH_GOLD:
+	case ResultCode::NOT_ENOUGH_GOLD:
 		ResultMessage = TEXT("골드가 부족합니다");
 		break;
-	case DBResultCode::ITEM_NOT_FOUND:
+	case ResultCode::ITEM_NOT_FOUND:
 		ResultMessage = TEXT("없는 아이템입니다");
 		break;
 	default:
@@ -125,16 +125,16 @@ void UGPNetworkManager::HandleBuyItemResult(bool bSuccess, uint32 CurrentGold, D
 	OnBuyItemResult.Broadcast(bSuccess, CurrentGold, ResultMessage);
 }
 
-void UGPNetworkManager::HandleSellItemResult(bool bSuccess, uint32 CurrentGold, DBResultCode ResultCode)
+void UGPNetworkManager::HandleSellItemResult(bool bSuccess, uint32 CurrentGold, ResultCode ResCode)
 {
 	FString ResultMessage;
 
-	switch (ResultCode)
+	switch (ResCode)
 	{
-	case DBResultCode::SUCCESS:
+	case ResultCode::SUCCESS:
 		ResultMessage = TEXT("판매완료!");
 		break;
-	case DBResultCode::ITEM_NOT_FOUND:
+	case ResultCode::ITEM_NOT_FOUND:
 		ResultMessage = TEXT("없는 아이템입니다");
 		break;
 	default:
@@ -310,10 +310,11 @@ void UGPNetworkManager::SendMyChatMessage(const FString& Message, EChatChannel C
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendMyWhisperMessage(uint32 TargetDBID, const FString& Message)
+void UGPNetworkManager::SendMyWhisperMessage(const FString& TargetName, const FString& Message)
 {
+	FTCHARToUTF8 NameUtf8(*TargetName);
 	FTCHARToUTF8 MsgUtf8(*Message);
-	ChatWhisperPacket Packet(TargetDBID, MsgUtf8.Get());
+	ChatWhisperPacket Packet(NameUtf8.Get(), MsgUtf8.Get());
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
@@ -402,7 +403,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_LOGIN_FAIL:
 			{
 				LoginFailPacket* Pkt = reinterpret_cast<LoginFailPacket*>(RemainingData.GetData());
-				HandleUserAuthFailure(Pkt->ResultCode);
+				HandleUserAuthFailure(Pkt->ResCode);
 				break;
 			}
 			case EPacketType::S_SIGNUP_SUCCESS:
@@ -414,7 +415,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_SIGNUP_FAIL:
 			{
 				SignUpFailPacket* Pkt = reinterpret_cast<SignUpFailPacket*>(RemainingData.GetData());
-				HandleUserAuthFailure(Pkt->ResultCode);
+				HandleUserAuthFailure(Pkt->ResCode);
 				break;
 			}
 			case EPacketType::S_ENTER_GAME:
@@ -606,13 +607,13 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_SHOP_BUY_RESULT:
 			{
 				BuyItemResultPacket* Pkt = reinterpret_cast<BuyItemResultPacket*>(RemainingData.GetData());
-				HandleBuyItemResult(Pkt->bSuccess, Pkt->PlayerGold, Pkt->ResultCode);
+				HandleBuyItemResult(Pkt->bSuccess, Pkt->PlayerGold, Pkt->ResCode);
 				break;
 			}
 			case EPacketType::S_SHOP_SELL_RESULT:
 			{
 				SellItemResultPacket* Pkt = reinterpret_cast<SellItemResultPacket*>(RemainingData.GetData());
-				HandleSellItemResult(Pkt->bSuccess, Pkt->PlayerGold, Pkt->ResultCode);
+				HandleSellItemResult(Pkt->bSuccess, Pkt->PlayerGold, Pkt->ResCode);
 				break;
 			}
 #pragma endregion
@@ -648,27 +649,27 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_FRIEND_OPERATION_RESULT:
 			{
 				FriendOperationResultPacket* Pkt = reinterpret_cast<FriendOperationResultPacket*>(RemainingData.GetData());
-				DBResultCode Code = Pkt->ResultCode;
+				ResultCode Code = Pkt->ResCode;
 				EFriendOpType OpType = Pkt->OperationType;
 				{
 					switch (Code)
 					{
-					case DBResultCode::SUCCESS:
+					case ResultCode::SUCCESS:
 						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("[Friend] Success!")));
 						break;
-					case DBResultCode::FRIEND_ALREADY_REQUESTED:
+					case ResultCode::FRIEND_ALREADY_REQUESTED:
 						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Friend] Already requested!")));
 						break;
-					case DBResultCode::FRIEND_ALREADY_ADDED:
+					case ResultCode::FRIEND_ALREADY_ADDED:
 						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Friend] Already added!")));
 						break;
-					case DBResultCode::FRIEND_SELF_REQUEST:
+					case ResultCode::FRIEND_SELF_REQUEST:
 						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Friend] Cannot add yourself!")));
 						break;
-					case DBResultCode::FRIEND_USER_NOT_FOUND:
+					case ResultCode::FRIEND_USER_NOT_FOUND:
 						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Friend] Target user not found!")));
 						break;
-					case DBResultCode::DB_ERROR:
+					case ResultCode::DB_ERROR:
 						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Friend] Database error!")));
 						break;
 					default:

@@ -222,14 +222,14 @@ bool Player::BuyItem(std::shared_ptr<Item> item, uint32 price, uint16 quantity)
 bool Player::SellItem(uint32 itemId)
 {
 	bool bSuccess = false;
-	DBResultCode resultCode = DBResultCode::SUCCESS;
+	ResultCode resultCode = ResultCode::SUCCESS;
 	uint32 resellPrice = 0;
 
 	auto item = _inventory.FindItem(itemId);
 	if (!item)
 	{
 		LOG_W("Invalid item");
-		resultCode = DBResultCode::ITEM_NOT_FOUND;
+		resultCode = ResultCode::ITEM_NOT_FOUND;
 	}
 	else
 	{
@@ -239,12 +239,12 @@ bool Player::SellItem(uint32 itemId)
 		if (!itemData)
 		{
 			LOG_W("Invalid item data");
-			resultCode = DBResultCode::ITEM_NOT_FOUND;
+			resultCode = ResultCode::ITEM_NOT_FOUND;
 		}
 		else if (!_inventory.RemoveItem(itemId))
 		{
 			LOG_W("Failed remove item");
-			resultCode = DBResultCode::ITEM_NOT_FOUND;
+			resultCode = ResultCode::ITEM_NOT_FOUND;
 		}
 		else
 		{
