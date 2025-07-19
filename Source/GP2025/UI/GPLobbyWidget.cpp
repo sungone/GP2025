@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "UI/GPLobbyWidget.h"
@@ -8,6 +8,7 @@
 #include "GPLobbyWidget.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
+#include "Components/ComboBoxString.h"
 #include "Engine/Texture2D.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -30,6 +31,17 @@ void UGPLobbyWidget::NativeConstruct()
 	if (GameStartButton)
 	{
 		GameStartButton->OnClicked.AddDynamic(this, &UGPLobbyWidget::OnGameStartPressed);
+	}
+
+	if (ChannelComboBox)
+	{
+		ChannelComboBox->ClearOptions();
+		ChannelComboBox->AddOption(TEXT("채널1"));
+		ChannelComboBox->AddOption(TEXT("채널2"));
+		ChannelComboBox->AddOption(TEXT("채널3"));
+
+		ChannelComboBox->SetSelectedIndex(0);
+		ChannelComboBox->OnSelectionChanged.AddDynamic(this, &UGPLobbyWidget::OnChannelChanged);
 	}
 }
 
@@ -56,7 +68,7 @@ void UGPLobbyWidget::UpdatePreviewImage(const FString& ImagePath)
 {
 	if (!PreviewImage) return;
 
-	// �̹��� �ε�
+	// 이미지 로드
 	UTexture2D* NewTexture = LoadObject<UTexture2D>(nullptr, *ImagePath);
 	if (NewTexture)
 	{
@@ -85,4 +97,44 @@ void UGPLobbyWidget::OnGameStartPressed()
 	{
 		UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
 	}
+}
+
+void UGPLobbyWidget::OnChannelChanged(FString SelectedItem, ESelectInfo::Type SelectionType)
+{
+	if (SelectedItem == TEXT("채널1"))
+	{
+		SelectedChannel = EWorldChannel::TUWorld_1;
+		SetChannelTextColor(FLinearColor::Green);
+	}
+	else if (SelectedItem == TEXT("채널2"))
+	{
+		SelectedChannel = EWorldChannel::TUWorld_2;
+		SetChannelTextColor(FLinearColor(1.f, 0.5f, 0.f)); // 주황
+	}
+	else if (SelectedItem == TEXT("채널3"))
+	{
+		SelectedChannel = EWorldChannel::TUWorld_3;
+		SetChannelTextColor(FLinearColor::Red);
+	}
+
+
+	UE_LOG(LogTemp, Log, TEXT("Selected Channel: %s"), *SelectedItem);
+}
+
+void UGPLobbyWidget::SetChannelTextColor(FLinearColor NewColor)
+{
+	if (!ChannelComboBox) return;
+
+	FComboBoxStyle StyleCopy = ChannelComboBox->WidgetStyle;
+
+	FButtonStyle ButtonStyle = StyleCopy.ComboButtonStyle.ButtonStyle;
+
+	ButtonStyle.Normal.TintColor = FSlateColor(NewColor);
+	ButtonStyle.Hovered.TintColor = FSlateColor(NewColor);
+	ButtonStyle.Pressed.TintColor = FSlateColor(NewColor);
+
+	StyleCopy.ComboButtonStyle.ButtonStyle = ButtonStyle;
+	ChannelComboBox->WidgetStyle = StyleCopy;
+
+	UE_LOG(LogTemp, Log, TEXT("R=%.2f G=%.2f B=%.2f"), NewColor.R, NewColor.G, NewColor.B);
 }

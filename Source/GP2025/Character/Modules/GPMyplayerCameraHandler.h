@@ -17,7 +17,7 @@ UCLASS()
 class GP2025_API UGPMyplayerCameraHandler : public UObject
 {
 	GENERATED_BODY()
-	
+
 public:
 
 	void Initialize(AGPCharacterMyplayer* InOwner);
@@ -43,7 +43,8 @@ public:
 
 	FVector DefaultCameraOffset = FVector(0.f, 0.f, 150.f);
 	FRotator DefaultCameraRotationOffset = FRotator(-35.f, 0.f, 0.f);
-	FVector ZoomedCameraOffset = FVector(50.f, 30.f, 100.f);
+	// FVector ZoomedCameraOffset = FVector(50.f, 30.f, 100.f);
+	FVector ZoomedCameraOffset = FVector(40.f, 60.f, 70.f);
 	float DefaultArmLength = 600.f;
 	float ZoomedArmLength = 150.f;
 
@@ -65,26 +66,17 @@ public:
 	FVector LookAtTarget;
 	bool bIsLookingAtTarget = false;
 	bool bIsZoomingForDialogue = false;
-	float DialogueZoomTargetLength = 200.f; 
+	float DialogueZoomTargetLength = 200.f;
 	float DefaultZoomLength = 600.f;
 
 	// Camera Shake
-public :
+public:
 
 	UFUNCTION(BlueprintCallable, Category = "Camera")
 	void PlayHitCameraShake();
+	FVector OriginalSocketOffset;
 	FTimerHandle CameraShakeResetTimer;
 
 	UFUNCTION()
 	void ResetCameraShake();
-
-	// 카메라 흔들림 상태
-	bool bIsShaking = false;
-
-	// 원래의 카메라 위치 복구용
-	FVector OriginalSocketOffset = FVector::ZeroVector;
-
-	// 카메라 ArmLength 흔들림 복구용
-	bool bRestoreArmLength = false;
-	float OriginalArmLength = 0.f;
 };

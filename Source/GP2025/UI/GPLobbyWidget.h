@@ -62,4 +62,12 @@ public :
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	USoundBase* ClickSound;
 
+// Ã¤³Î¸µ
+	UPROPERTY(meta = (BindWidget) , BlueprintReadWrite , Category = "Channel UI")
+	class UComboBoxString* ChannelComboBox;
+
+	UFUNCTION()
+	void OnChannelChanged(FString SelectedItem, ESelectInfo::Type SelectionType);
+
+	void SetChannelTextColor(FLinearColor NewColor);
 };
