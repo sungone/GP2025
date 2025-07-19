@@ -407,7 +407,7 @@ void UGPMyplayerInputHandler::UseSkillQ()
 		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_Q);
 		Owner->CombatHandler->PlayQSkillMontage();
-		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Throwing, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
+		Owner->NetMgr->SendMyUseSkillStart(ESkillGroup::Throwing, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
 		Owner->GunnerAttackCameraShake();
 	}
 	else
@@ -415,7 +415,7 @@ void UGPMyplayerInputHandler::UseSkillQ()
 		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_Q);
 		Owner->CombatHandler->PlayQSkillMontage();
-		Owner->NetMgr->SendMyUseSkill(ESkillGroup::HitHard, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
+		Owner->NetMgr->SendMyUseSkillStart(ESkillGroup::HitHard, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
 	}
 }
 
@@ -442,7 +442,7 @@ void UGPMyplayerInputHandler::UseSkillE()
 		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_E);
 		Owner->CombatHandler->PlayESkillMontage();
-		Owner->NetMgr->SendMyUseSkill(ESkillGroup::FThrowing, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
+		Owner->NetMgr->SendMyUseSkillStart(ESkillGroup::FThrowing, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
 		Owner->GunnerAttackCameraShake();
 	}
 	else
@@ -487,7 +487,7 @@ void UGPMyplayerInputHandler::UseSkillR()
 		Owner->CharacterInfo.AddState(STATE_SKILL_R);
 
 		Owner->CombatHandler->PlayRSkillMontage();
-		Owner->NetMgr->SendMyUseSkill(ESkillGroup::Anger, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
+		Owner->NetMgr->SendMyUseSkillStart(ESkillGroup::Anger, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
 	}
 	else
 	{

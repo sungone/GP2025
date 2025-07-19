@@ -71,12 +71,26 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 		std::lock_guard lock(_mtPlayerZMap);
 		_playersByZone[startZone][playerId] = player;
 	}
+	auto& playerInfo = player->GetInfo();
 
 #if TEST
 	player->AddGold(10000);
+	playerInfo.Stats.Level = 3;
 	//BuyItem(playerId, (uint8)Type::EQuestItem::KEY, 1);
+	BuyItem(playerId, (uint8)Type::EWeapon::PULSE_SWORD, 1);
+	if (static_cast<Type::EPlayer>(playerInfo.CharacterType) == Type::EPlayer::WARRIOR)
+	{
+		playerInfo.Skills.Q = FSkillData(ESkillGroup::HitHard, 1);
+		playerInfo.Skills.E = FSkillData(ESkillGroup::Clash, 1);
+		playerInfo.Skills.R = FSkillData(ESkillGroup::Whirlwind, 1);
+	}
+	else
+	{
+		playerInfo.Skills.Q = FSkillData(ESkillGroup::Throwing, 1);
+		playerInfo.Skills.E = FSkillData(ESkillGroup::FThrowing, 1);
+		playerInfo.Skills.R = FSkillData(ESkillGroup::Anger, 1);
+	}
 #endif
-	auto& playerInfo = player->GetInfo();
 
 	EnterGamePacket enterpkt(playerInfo);
 	SessionManager::GetInst().SendPacket(playerId, &enterpkt);
@@ -289,15 +303,20 @@ void GameWorld::PlayerUseSkill(int32 playerId, ESkillGroup groupId)
 		return;
 	}
 	player->UseSkill(groupId);
-	auto targetState = ECharacterStateType::STATE_NONE;
-	if (groupId == ESkillGroup::HitHard || groupId == ESkillGroup::Throwing)
-		targetState = ECharacterStateType::STATE_SKILL_Q;
-	else if (groupId == ESkillGroup::Clash || groupId == ESkillGroup::FThrowing)
-		targetState = ECharacterStateType::STATE_SKILL_E;
-	else if (groupId == ESkillGroup::Whirlwind || groupId == ESkillGroup::Anger)
-		targetState = ECharacterStateType::STATE_SKILL_R;
-	player->RemoveState(targetState);
+
 }
+
+void GameWorld::PlayerEndSkill(int32 playerId, ESkillGroup groupId)
+{
+	auto player = GetPlayerByID(playerId);
+	if (!player)
+	{
+		LOG_W("Invaild!");
+		return;
+	}
+	player->EndSkill();
+}
+
 
 void GameWorld::PlayerDead(int32 playerID)
 {

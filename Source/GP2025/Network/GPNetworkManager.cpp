@@ -246,9 +246,15 @@ void UGPNetworkManager::SendMyUnequipItem(int32 ItemID)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendMyUseSkill(ESkillGroup SkillGID, float PlayerYaw, FVector PlayerPos)
+void UGPNetworkManager::SendMyUseSkillStart(ESkillGroup SkillGID, float PlayerYaw, FVector PlayerPos)
 {
-	UseSkillPacket Packet(SkillGID, PlayerYaw, PlayerPos);
+	UseSkillStartPacket Packet(SkillGID, PlayerYaw, PlayerPos);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
+void UGPNetworkManager::SendMyUseSkillEnd(ESkillGroup SkillGID)
+{
+	UseSkillEndPacket Packet(SkillGID);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
@@ -473,10 +479,16 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->SkillUpgrade(Pkt->SkillGID);
 				break;
 			}
-			case EPacketType::S_PLAYER_USE_SKILL:
+			case EPacketType::S_PLAYER_USE_SKILL_START:
 			{
-				PlayerUseSkillPacket* Pkt = reinterpret_cast<PlayerUseSkillPacket*>(RemainingData.GetData());
-				ObjectMgr->PlayerUseSkill(Pkt->PlayerID, Pkt->SkillGID);
+				PlayerUseSkillStartPacket* Pkt = reinterpret_cast<PlayerUseSkillStartPacket*>(RemainingData.GetData());
+				ObjectMgr->PlayerUseSkillStart(Pkt->PlayerID, Pkt->SkillGID, Pkt->PlayerYaw, Pkt->PlayerPos);
+				break;
+			}
+			case EPacketType::S_PLAYER_USE_SKILL_END:
+			{
+				PlayerUseSkillEndPacket* Pkt = reinterpret_cast<PlayerUseSkillEndPacket*>(RemainingData.GetData());
+				ObjectMgr->PlayerUseSkillEnd(Pkt->PlayerID);
 				break;
 			}
 			case EPacketType::S_LEVEL_UP:

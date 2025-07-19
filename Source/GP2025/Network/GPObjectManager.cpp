@@ -252,7 +252,7 @@ void UGPObjectManager::UpdatePlayer(const FInfoData& PlayerInfo)
 	}
 }
 
-void UGPObjectManager::PlayerUseSkill(int32 PlayerID, ESkillGroup SkillGID)
+void UGPObjectManager::PlayerUseSkillStart(int32 PlayerID, ESkillGroup SkillGID, float PlayerYaw, FVector PlayerPos)
 {
 	//if (TWeakObjectPtr<AGPCharacterPlayer>* WeakPlayerPtr = Players.Find(PlayerID))
 	//{
@@ -300,6 +300,10 @@ void UGPObjectManager::PlayerUseSkill(int32 PlayerID, ESkillGroup SkillGID)
 	//{
 	//	UE_LOG(LogTemp, Warning, TEXT("[UGPObjectManager::PlayerUseSkill] PlayerID not found in Players map."));
 	//}
+}
+
+void UGPObjectManager::PlayerUseSkillEnd(int32 PlayerID)
+{
 }
 
 void UGPObjectManager::DamagedPlayer(const FInfoData& PlayerInfo)

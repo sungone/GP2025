@@ -29,8 +29,9 @@ public:
 	bool Attack(std::shared_ptr<Character> target);
 
 	void UseSkill(ESkillGroup groupId);
+	void EndSkill();
 	void ExecuteSkillEffect(const FSkillTableData& skill);
-	void ResetSkillEffect(float prevDmg, float prevAtkR, float prevFov);
+	void ResetSkillEffect();
 	void LearnSkill(ESkillGroup groupId);
 	void UpgradeSkill(ESkillGroup groupId);
 	void UnlockSkillsOnLevelUp();
@@ -98,4 +99,8 @@ private:
 	QuestStatus& _curQuest = _info.CurrentQuest;
 	const QuestData* _curQuestData = nullptr;
 	bool _bTutQuest = false;
+
+	float prevDmg = 0;
+	float prevAtkR = 0;
+	float prevFov = 0;
 };

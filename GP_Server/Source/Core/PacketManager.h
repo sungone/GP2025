@@ -25,6 +25,7 @@ public:
 	void HandleStopAimingPacket(int32 sessionId, Packet* packet);
 	void HandleAttackPacket(int32 sessionId, Packet* packet);
 	void HandleUseSkillPacket(int32 sessionId, Packet* packet);
+	void HandleEndSkillPacket(int32 sessionId, Packet* packet);
 	void HandleRemoveStatePacket(int32 sessionId, Packet* packet);
 	
 	void HandlePickUpItemPacket(int32 sessionId, Packet* packet);

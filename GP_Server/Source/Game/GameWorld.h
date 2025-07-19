@@ -41,6 +41,8 @@ public:
 	void PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& time);
 	void PlayerAttack(int32 playerId);
 	void PlayerUseSkill(int32 playerId, ESkillGroup groupId);
+	void PlayerEndSkill(int32 playerId, ESkillGroup groupId);
+	
 	void PlayerDead(int32 playerID);
 
 	// Monster

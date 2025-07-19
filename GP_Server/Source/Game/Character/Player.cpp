@@ -10,11 +10,8 @@ void Player::Init()
 #ifndef DB_MODE
 	_info.SetName(L"플레이어");
 	SetCharacterType(Type::EPlayer::WARRIOR);
-#if TEST
-	_info.Stats.Level = 3;
-#else
+
 	_info.Stats.Level = 1;
-#endif
 	_info.Stats.Speed = 200.f;
 	_info.CollisionRadius = playerCollision;
 	_info.State = ECharacterStateType::STATE_IDLE;
@@ -53,21 +50,11 @@ void Player::SetCharacterType(Type::EPlayer type)
 	{
 		_info.fovAngle = 90;
 		_info.AttackRadius = 300;
-#if TEST
-		_info.Skills.Q = FSkillData(ESkillGroup::HitHard, 1);
-		_info.Skills.E = FSkillData(ESkillGroup::Clash, 1);
-		_info.Skills.R = FSkillData(ESkillGroup::Whirlwind, 1);
-#endif
 	}
 	else
 	{
 		_info.fovAngle = 10;
 		_info.AttackRadius = 5000;
-#if TEST
-		_info.Skills.Q = FSkillData(ESkillGroup::Throwing, 1);
-		_info.Skills.E = FSkillData(ESkillGroup::FThrowing, 1);
-		_info.Skills.R = FSkillData(ESkillGroup::Anger, 1);
-#endif
 	}
 }
 
@@ -318,7 +305,7 @@ void Player::UseSkill(ESkillGroup groupId)
 		LOG_W("Invaild!");
 		return;
 	}
-	LOG_D("Use Skill - {}", static_cast<uint8>(groupId));
+	LOG_I("Use Skill - {}", static_cast<uint8>(groupId));
 	if (groupId == ESkillGroup::HitHard || groupId == ESkillGroup::Throwing)
 		_info.AddState(STATE_SKILL_Q);
 	else if (groupId == ESkillGroup::Clash || groupId == ESkillGroup::FThrowing)
@@ -326,19 +313,35 @@ void Player::UseSkill(ESkillGroup groupId)
 	else if (groupId == ESkillGroup::Whirlwind || groupId == ESkillGroup::Anger)
 		_info.AddState(STATE_SKILL_R);
 
-	auto pkt = PlayerUseSkillPacket(_id, groupId);
-	SessionManager::GetInst().SendPacket(_id, &pkt);
-	SessionManager::GetInst().BroadcastToViewList(&pkt, _viewList);
 	ExecuteSkillEffect(*skilltable);
+	auto pkt = PlayerUseSkillStartPacket(_id, groupId, GetInfo().Yaw, GetPos());
+	SessionManager::GetInst().BroadcastToViewList(&pkt, _viewList);
+}
+
+void Player::EndSkill()
+{
+	ResetSkillEffect();
+
+	auto targetState = ECharacterStateType::STATE_NONE;
+	if(GetInfo().HasState(ECharacterStateType::STATE_SKILL_Q))
+		targetState = ECharacterStateType::STATE_SKILL_Q;
+	else if(GetInfo().HasState(ECharacterStateType::STATE_SKILL_E))
+		targetState = ECharacterStateType::STATE_SKILL_E;
+	else if(GetInfo().HasState(ECharacterStateType::STATE_SKILL_R))
+		targetState = ECharacterStateType::STATE_SKILL_R;
+
+	GetInfo().RemoveState(targetState);
+	auto pkt = PlayerUseSkillEndPacket(_id);
+	SessionManager::GetInst().BroadcastToViewList(&pkt, _viewList);
 }
 
 void Player::ExecuteSkillEffect(const FSkillTableData& skill)
 {
 	if (skill.Type0 == ESkillType::Atk)
 	{
-		float prevDmg = _stats.Damage;
-		float prevAtkR = _info.AttackRadius;
-		float prevFov = _info.fovAngle;
+		prevDmg = _stats.Damage;
+		prevAtkR = _info.AttackRadius;
+		prevFov = _info.fovAngle;
 
 		float percent = skill.Value0;
 		_stats.Damage += static_cast<int>(_stats.Damage * (percent / 100.0f));
@@ -359,15 +362,6 @@ void Player::ExecuteSkillEffect(const FSkillTableData& skill)
 		default:
 			break;
 		}
-		GameWorld::GetInst().PlayerAttack(_id);
-		ResetSkillEffect(prevDmg, prevAtkR, prevFov);
-		//TimerQueue::AddTimer([=] {
-		//	if (auto player = GameWorld::GetInst().GetPlayerByID(_id)) {
-		//		player->ResetSkillEffect(prevDmg, prevAtkR, prevFov);
-		//	}
-		//	}, 1000, true);
-		// Todo: 스킬 개선
-		// R스킬 여러번 보내는듯해서 타이머 여러번 호출되면 꼬인다..
 	}
 	else if (skill.Type0 == ESkillType::BuffTime)
 	{
@@ -378,9 +372,10 @@ void Player::ExecuteSkillEffect(const FSkillTableData& skill)
 		}
 
 	}
+
 }
 
-void Player::ResetSkillEffect(float prevDmg, float prevAtkR, float prevFov)
+void Player::ResetSkillEffect()
 {
 	_stats.Damage = prevDmg;
 	_info.AttackRadius = prevAtkR;

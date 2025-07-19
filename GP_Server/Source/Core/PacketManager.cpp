@@ -41,8 +41,11 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 		HandleStopAimingPacket(sessionId, packet);
 		break;
 
-	case EPacketType::C_USE_SKILL:
+	case EPacketType::C_USE_SKILL_START:
 		HandleUseSkillPacket(sessionId, packet);
+		break;
+	case EPacketType::C_USE_SKILL_END:
+		HandleEndSkillPacket(sessionId, packet);
 		break;
 	case EPacketType::C_REMOVE_STATE:
 		HandleRemoveStatePacket(sessionId, packet);
@@ -266,9 +269,15 @@ void PacketManager::HandleAttackPacket(int32 sessionId, Packet* packet)
 
 void PacketManager::HandleUseSkillPacket(int32 sessionId, Packet* packet)
 {
-	UseSkillPacket* p = static_cast<UseSkillPacket*>(packet);
+	UseSkillStartPacket* p = static_cast<UseSkillStartPacket*>(packet);
 	_gameWorld.PlayerSetLocation(sessionId, p->PlayerYaw, p->PlayerPos);
 	_gameWorld.PlayerUseSkill(sessionId, p->SkillGID);
+}
+
+void PacketManager::HandleEndSkillPacket(int32 sessionId, Packet* packet)
+{
+	UseSkillEndPacket* p = static_cast<UseSkillEndPacket*>(packet);
+	_gameWorld.PlayerEndSkill(sessionId, p->SkillGID);
 }
 
 void PacketManager::HandleRemoveStatePacket(int32 sessionId, Packet* packet)

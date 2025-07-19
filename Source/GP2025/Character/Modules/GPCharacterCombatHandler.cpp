@@ -351,7 +351,7 @@ void UGPCharacterCombatHandler::FinishDash()
 		FVector Location = LocalMyPlayer->GetActorLocation();
 		float Yaw = LocalMyPlayer->GetControlRotation().Yaw;
 
-		LocalMyPlayer->NetMgr->SendMyUseSkill(ESkillGroup::Clash, Yaw, Location);
+		LocalMyPlayer->NetMgr->SendMyUseSkillStart(ESkillGroup::Clash, Yaw, Location);
 
 	}
 }
@@ -419,7 +419,7 @@ void UGPCharacterCombatHandler::ExecuteMultiHit()
 		float Yaw = LocalMyPlayer->GetControlRotation().Yaw;
 
 		UE_LOG(LogTemp, Log, TEXT("MultiHit Attack: %d hits remaining"), RemainingHits);
-		LocalMyPlayer->NetMgr->SendMyUseSkill(ESkillGroup::Whirlwind, Yaw, Location);
+		LocalMyPlayer->NetMgr->SendMyUseSkillStart(ESkillGroup::Whirlwind, Yaw, Location);
 	}
 
 	RemainingHits--;

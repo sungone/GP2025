@@ -236,16 +236,26 @@ struct MonsterDeadPacket : public Packet
 #pragma endregion
 
 #pragma region Skill
-struct UseSkillPacket : public Packet
+struct UseSkillStartPacket : public Packet
 {
 	ESkillGroup SkillGID;
 	float PlayerYaw;
 	FVector PlayerPos;
 
-	UseSkillPacket(ESkillGroup SkillGID_, float PlayerYaw_, FVector PlayerPos_)
-		: Packet(EPacketType::C_USE_SKILL), SkillGID(SkillGID_), PlayerYaw(PlayerYaw_), PlayerPos(PlayerPos_)
+	UseSkillStartPacket(ESkillGroup SkillGID_, float PlayerYaw_, FVector PlayerPos_)
+		: Packet(EPacketType::C_USE_SKILL_START), SkillGID(SkillGID_), PlayerYaw(PlayerYaw_), PlayerPos(PlayerPos_)
 	{
-		Header.PacketSize = sizeof(UseSkillPacket);
+		Header.PacketSize = sizeof(UseSkillStartPacket);
+	}
+};
+struct UseSkillEndPacket : public Packet
+{
+	ESkillGroup SkillGID;
+
+	UseSkillEndPacket(ESkillGroup SkillGID_)
+		: Packet(EPacketType::C_USE_SKILL_END), SkillGID(SkillGID_)
+	{
+		Header.PacketSize = sizeof(UseSkillEndPacket);
 	}
 };
 struct SkillUnlockPacket : public Packet
@@ -266,18 +276,29 @@ struct UpgradeSkillPacket : public Packet
 		Header.PacketSize = sizeof(UpgradeSkillPacket);
 	}
 };
-struct PlayerUseSkillPacket : public Packet
+struct PlayerUseSkillStartPacket : public Packet
 {
 	int32 PlayerID;
 	ESkillGroup SkillGID;
+	float PlayerYaw;
+	FVector PlayerPos;
 
-	PlayerUseSkillPacket(int32 PlayerID_, ESkillGroup SkillGID_)
-		: Packet(EPacketType::S_PLAYER_USE_SKILL), PlayerID(PlayerID_), SkillGID(SkillGID_)
+	PlayerUseSkillStartPacket(int32 PlayerID_, ESkillGroup SkillGID_, float PlayerYaw_, FVector PlayerPos_)
+		: Packet(EPacketType::S_PLAYER_USE_SKILL_START), PlayerID(PlayerID_), SkillGID(SkillGID_), PlayerYaw(PlayerYaw_), PlayerPos(PlayerPos_)
 	{
-		Header.PacketSize = sizeof(UseSkillPacket);
+		Header.PacketSize = sizeof(PlayerUseSkillStartPacket);
 	}
 };
+struct PlayerUseSkillEndPacket : public Packet
+{
+	int32 PlayerID;
 
+	PlayerUseSkillEndPacket(int32 PlayerID_)
+		: Packet(EPacketType::S_PLAYER_USE_SKILL_END), PlayerID(PlayerID_)
+	{
+		Header.PacketSize = sizeof(PlayerUseSkillEndPacket);
+	}
+};
 struct PlayerDeadPacket : public Packet
 {
 	int32 PlayerID;

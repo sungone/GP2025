@@ -29,7 +29,8 @@ public:
 	void DamagedPlayer(const FInfoData& PlayerInfo);
 	void HandlePlayerDeath(int32 playerId);
 
-	void PlayerUseSkill(int32 PlayerID, ESkillGroup SkillGID);
+	void PlayerUseSkillStart(int32 PlayerID, ESkillGroup SkillGID, float PlayerYaw, FVector PlayerPos);
+	void PlayerUseSkillEnd(int32 PlayerID);
 	void SkillUnlock(ESkillGroup SkillGID);
 	void SkillUpgrade(ESkillGroup SkillGID);
 	void LevelUp(const FInfoData& PlayerInfo);

@@ -74,7 +74,8 @@ public:
 	void SendMyUseItem(int32 ItemID);
 	void SendMyEquipItem(int32 ItemID);
 	void SendMyUnequipItem(int32 ItemID);
-	void SendMyUseSkill(ESkillGroup SkillGID, float PlayerYaw, FVector PlayerPos);
+	void SendMyUseSkillStart(ESkillGroup SkillGID, float PlayerYaw, FVector PlayerPos);
+	void SendMyUseSkillEnd(ESkillGroup SkillGID);
 
 	void SendMyShopBuyItem(uint8 ItemTypeID, int32 Quantity);
 	void SendMyShopSellItem(int32 ItemID);
