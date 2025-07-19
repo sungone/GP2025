@@ -653,8 +653,6 @@ bool Player::SetCurrentQuest(QuestType quest)
 	if (!StartQuest(quest))
 		return false;
 
-	LOG_I("Start Quest [{}] = '{} ", static_cast<uint8>(questData->QuestID), ENUM_NAME(quest));
-
 	_curQuestData = questData;
 	auto qpkt = QuestStartPacket(questData->QuestID);
 

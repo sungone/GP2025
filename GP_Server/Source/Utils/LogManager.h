@@ -10,11 +10,11 @@
 #define LOG_W(fmt, ...)  spdlog::get("CoreLogger")->warn("[{}] " fmt, __FUNCTION__, ##__VA_ARGS__)
 #define LOG_E(fmt, ...)  spdlog::get("CoreLogger")->error("[{}] " fmt, __FUNCTION__, ##__VA_ARGS__)
 
+#ifdef _DEBUG
 #define LOG_D(fmt, ...)  spdlog::get("CoreLogger")->debug("[{}] " fmt, __FUNCTION__, ##__VA_ARGS__)
-//#ifdef _DEBUG
-//#else
-//#define LOG_D(fmt, ...)  ((void)0)
-//#endif
+#else
+#define LOG_D(fmt, ...)  ((void)0)
+#endif
 
 
 class LogManager

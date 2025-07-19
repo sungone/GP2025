@@ -136,7 +136,8 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 		}
 
 		SessionManager::GetInst().HandleLogin(sessionId, res);
-		SignUpSuccessPacket spkt(_WorldState);
+		auto states = GameWorldManager::GetInst().GetAllWorldStates();
+		SignUpSuccessPacket spkt(states.data());
 		SessionManager::GetInst().SendPacket(sessionId, &spkt);
 		LOG_D("SignUp Success [{}] userId: {}", sessionId, res.dbId);
 		});
@@ -144,7 +145,8 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 #else
 	LOG_D("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW);
 	_sessionMgr.HandleLogin(sessionId);
-	LoginSuccessPacket loginpkt(_WorldState);
+	auto states = GameWorldManager::GetInst().GetAllWorldStates();
+	LoginSuccessPacket loginpkt(states.data());
 	_sessionMgr.SendPacket(sessionId, &loginpkt);
 #endif
 }
@@ -175,7 +177,8 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 		}
 
 		SessionManager::GetInst().HandleLogin(sessionId, res);
-		LoginSuccessPacket loginpkt(_WorldState);
+		auto states = GameWorldManager::GetInst().GetAllWorldStates();
+		LoginSuccessPacket loginpkt(states.data());
 		SessionManager::GetInst().SendPacket(sessionId, &loginpkt);
 
 		LOG_D("Login Success [{}] userId: {}", sessionId, res.dbId);
@@ -185,7 +188,8 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 #else
 	LOG_D("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW);
 	_sessionMgr.HandleLogin(sessionId);
-	LoginSuccessPacket loginpkt(_WorldState);
+	auto states = GameWorldManager::GetInst().GetAllWorldStates();
+	LoginSuccessPacket loginpkt(states.data());
 	_sessionMgr.SendPacket(sessionId, &loginpkt);
 #endif
 }
@@ -227,7 +231,7 @@ void PacketManager::HandleEnterGamePacket(int32 sessionId, Packet* packet)
 	RequestEnterGamePacket* p = static_cast<RequestEnterGamePacket*>(packet);
 	auto newType = p->PlayerType;
 	auto wChannelId = p->WChannel;
-	auto world = GameWorldManager::GetInst().GetWorld(wChannelId);
+	auto world = GameWorldManager::GetInst().GetAvailableWorld(wChannelId);
 	if (!world)
 	{
 		LOG_W("Invalid World");

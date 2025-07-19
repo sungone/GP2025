@@ -9,7 +9,10 @@
 inline constexpr int TEST_ATK_WEIGHT = 5;
 inline constexpr int TEST_EXP_WEIGHT = 10;
 
-inline constexpr size_t MAX_CLIENT = 3000;
+inline constexpr int GOOD_STATE_WORLD = 500;
+inline constexpr int NORMAL_STATE_WORLD = 1000;
+
+inline constexpr size_t MAX_CLIENT = 5000;
 inline constexpr size_t MAX_PLAYER = MAX_CLIENT;
 inline constexpr size_t MAX_MONSTER = 500;
 inline constexpr size_t MAX_CHARACTER = MAX_PLAYER + MAX_MONSTER;
