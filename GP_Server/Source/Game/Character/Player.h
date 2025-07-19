@@ -93,7 +93,6 @@ public:
 private:
 	Type::EPlayer _playerType;
 	Inventory _inventory;
-	std::unordered_set<int32> _viewList;
 	FStatData& _stats = _info.Stats;
 	uint32& _gold = _info.Gold;
 	QuestStatus& _curQuest = _info.CurrentQuest;

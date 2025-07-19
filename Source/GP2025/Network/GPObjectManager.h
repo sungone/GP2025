@@ -29,6 +29,7 @@ public:
 	void DamagedPlayer(const FInfoData& PlayerInfo);
 	void HandlePlayerDeath(int32 playerId);
 
+	void PlayerAttack(int32 PlayerId, FVector PlayerPos, float PlayerYaw);
 	void PlayerUseSkillStart(int32 PlayerID, ESkillGroup SkillGID, float PlayerYaw, FVector PlayerPos);
 	void PlayerUseSkillEnd(int32 PlayerID);
 	void SkillUnlock(ESkillGroup SkillGID);

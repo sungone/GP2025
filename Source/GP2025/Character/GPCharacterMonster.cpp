@@ -79,6 +79,11 @@ void AGPCharacterMonster::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (UIHandler)
 		UIHandler->UpdateWidgetVisibility();
+	// Attack Sync
+	HandleQSkillState();
+	HandleESkillState();
+	HandleRSkillState();
+	HandleAutoAttackState();
 }
 
 void AGPCharacterMonster::SetCharacterData(const UGPCharacterControlData* CharacterControlData)

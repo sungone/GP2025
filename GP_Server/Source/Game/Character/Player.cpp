@@ -314,8 +314,6 @@ void Player::UseSkill(ESkillGroup groupId)
 		_info.AddState(STATE_SKILL_R);
 
 	ExecuteSkillEffect(*skilltable);
-	auto pkt = PlayerUseSkillStartPacket(_id, groupId, GetInfo().Yaw, GetPos());
-	SessionManager::GetInst().BroadcastToViewList(&pkt, _viewList);
 }
 
 void Player::EndSkill()
@@ -331,8 +329,6 @@ void Player::EndSkill()
 		targetState = ECharacterStateType::STATE_SKILL_R;
 
 	GetInfo().RemoveState(targetState);
-	auto pkt = PlayerUseSkillEndPacket(_id);
-	SessionManager::GetInst().BroadcastToViewList(&pkt, _viewList);
 }
 
 void Player::ExecuteSkillEffect(const FSkillTableData& skill)

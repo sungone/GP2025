@@ -177,10 +177,21 @@ struct AttackPacket : public Packet
 {
 	float PlayerYaw;
 	FVector PlayerPos;
-	AttackPacket(float PlayerYaw_, FVector PlayerPos_)
-		: Packet(EPacketType::C_ATTACK), PlayerYaw(PlayerYaw_), PlayerPos(PlayerPos_)
+	AttackPacket(float yaw, FVector pos)
+		: Packet(EPacketType::C_ATTACK), PlayerYaw(yaw), PlayerPos(pos)
 	{
 		Header.PacketSize = sizeof(AttackPacket);
+	}
+};
+struct PlayerAttackPacket : public Packet
+{
+	int32 PlayerID;
+	FVector PlayerPos;
+	float PlayerYaw;
+	PlayerAttackPacket(int32 playerID,FVector pos, float yaw)
+		: Packet(EPacketType::S_PLAYER_ATTACK), PlayerID(playerID), PlayerPos(pos), PlayerYaw(yaw)
+	{
+		Header.PacketSize = sizeof(PlayerAttackPacket);
 	}
 };
 struct StartAimingPacket : public Packet

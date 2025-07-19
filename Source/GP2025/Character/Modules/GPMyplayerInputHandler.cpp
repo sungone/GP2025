@@ -423,9 +423,7 @@ void UGPMyplayerInputHandler::UseSkillQ()
 
 void UGPMyplayerInputHandler::UseSkillE()
 {
-	bool bIsAlreadyAttacking = Owner->CombatHandler->IsAutoAttacking();
-	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() 
-		 || bIsAlreadyAttacking || !Owner->HasWeaponEquipped()) return;
+	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() || !Owner->HasWeaponEquipped()) return;
 
 	ESkillGroup SkillGroup = Owner->bIsGunnerCharacter() ? ESkillGroup::FThrowing : ESkillGroup::Clash;
 	int32 SkillLevel = Owner->CharacterInfo.GetSkillLevel(SkillGroup);
@@ -452,10 +450,8 @@ void UGPMyplayerInputHandler::UseSkillE()
 	{
 		Owner->SkillCoolDownHandler->StartCoolDown(SkillGroup, SkillLevel);
 		Owner->CharacterInfo.AddState(STATE_SKILL_E);
+		Owner->NetMgr->SendMyUseSkillStart(ESkillGroup::Clash, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
 		Owner->CombatHandler->StartDash(); // 여기서 공격 처리 중
-		// Owner->NetMgr->SendMyUseSkill(ESkillGroup::Clash, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
-		Owner->NetMgr->SendMyUseSkillStart(ESkillGroup::Clash, Owner->GetControlRotation().Yaw, 
-			Owner->GetActorLocation());
 
 		float BoostPlayRate = 4.0f; // 공격속도 몽타지 증가 시간
 		float BoostDuration = 10.f; // 공격속도 증가 지속 시간

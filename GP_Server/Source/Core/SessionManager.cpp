@@ -157,7 +157,6 @@ void SessionManager::BroadcastToFriends(int32 sessionId, Packet* packet)
 	const auto& friends = session->GetFriends();
 	for (const auto& f : friends)
 	{
-		LOG_I("Broadcasting to friend: DBId: {}, Name: {}", f.DBId, f.GetName());
 		int32 fsessId = GetOnlineSessionIdByDBId(f.DBId);
 		if (fsessId != -1)
 		{

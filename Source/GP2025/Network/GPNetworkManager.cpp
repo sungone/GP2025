@@ -453,6 +453,12 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->UpdatePlayer(Pkt->Data);
 				break;
 			}
+			case EPacketType::S_PLAYER_ATTACK:
+			{
+				PlayerAttackPacket* Pkt = reinterpret_cast<PlayerAttackPacket*>(RemainingData.GetData());
+				ObjectMgr->PlayerAttack(Pkt->PlayerID, Pkt->PlayerPos, Pkt->PlayerYaw);
+				break;
+			}
 			case EPacketType::S_DAMAGED_PLAYER:
 			{
 				PlayerDamagePacket* Pkt = reinterpret_cast<PlayerDamagePacket*>(RemainingData.GetData());
