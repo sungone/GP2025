@@ -58,73 +58,83 @@ void UGPChatBoxWidget::OnEnterButtonClicked()
 
 void UGPChatBoxWidget::HandleSendMessage()
 {
-	const FText& Text = SendMessageText->GetText();
-	if (Text.IsEmpty())
+	const FText& InputText = SendMessageText->GetText();
+	FString RawText = InputText.ToString().TrimStartAndEnd();
+
+	if (RawText.IsEmpty())
 		return;
 
-	if (UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>())
+	UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+	if (!NetMgr)
+		return;
+
+	// 기본 채널은 Zone
+	EChatChannel Channel = EChatChannel::Zone;
+
+	// 명령어 처리
+	if (RawText.StartsWith("/"))
 	{
-		EChatChannel Channel = EChatChannel::Zone;
-		FString RawText = Text.ToString().TrimStartAndEnd();
-
-		if (RawText.StartsWith("/"))
+		if (HandleChatCommand(RawText, NetMgr))
 		{
-			if (RawText.Len() >= 2)
-			{
-				TCHAR CommandChar = RawText[1];
-
-				if (CommandChar == 'w')
-				{
-					FString Params = RawText.Mid(2).TrimStartAndEnd();
-					int32 SpaceIndex;
-					if (Params.FindChar(' ', SpaceIndex))
-					{
-						FString TargetName = Params.Left(SpaceIndex);
-						FString Message = Params.Mid(SpaceIndex + 1);
-
-						if (!TargetName.IsEmpty() && !Message.IsEmpty())
-						{
-							if (UGPObjectManager* ObjMgr = GetWorld()->GetSubsystem<UGPObjectManager>())
-							{
-								uint32 TargetDBId = ObjMgr->GetFriendDBId(TargetName);
-								if (TargetDBId != 0)
-								{
-									NetMgr->SendMyWhisperMessage(TargetDBId, Message);
-								}
-								else
-								{
-									UE_LOG(LogTemp, Warning, TEXT("No such friend: %s"), *TargetName);
-								}
-							}
-						}
-					}
-
-					SendMessageText->SetText(FText::GetEmpty());
-					if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
-					{
-						PC->SetShowMouseCursor(false);
-						PC->SetInputMode(FInputModeGameOnly());
-					}
-					return;
-				}
-
-				switch (CommandChar)
-				{
-				case 'a': Channel = EChatChannel::All; break;
-				case 'f': Channel = EChatChannel::Friend; break;
-				default: Channel = EChatChannel::Zone; break;
-				}
-
-				RawText = RawText.Mid(2).TrimStartAndEnd();
-			}
+			ClearChatInput();
+			return;
 		}
-
-		if (!RawText.IsEmpty())
+		else
 		{
-			NetMgr->SendMyChatMessage(RawText, Channel);
+			ClearChatInput();
+			return;
 		}
 	}
 
+	// 일반 채팅 메시지 전송
+	NetMgr->SendMyChatMessage(RawText, Channel);
+	ClearChatInput();
+}
+
+bool UGPChatBoxWidget::HandleChatCommand(const FString& Input, UGPNetworkManager* NetMgr)
+{
+	TCHAR CommandChar = Input.Len() > 1 ? Input[1] : 0;
+
+	if (CommandChar == 'w') // Whisper
+	{
+		FString Params = Input.Mid(2).TrimStartAndEnd();
+		int32 SpaceIndex;
+		if (Params.FindChar(' ', SpaceIndex))
+		{
+			FString TargetName = Params.Left(SpaceIndex);
+			FString Message = Params.Mid(SpaceIndex + 1);
+
+			if (!TargetName.IsEmpty() && !Message.IsEmpty())
+			{
+				NetMgr->SendMyWhisperMessage(TargetName, Message);
+				return true;
+			}
+		}
+		UE_LOG(LogTemp, Warning, TEXT("Invalid whisper format. Usage: /w TargetName Message"));
+		return false;
+	}
+
+	// Other channels: /a, /f
+	EChatChannel Channel = EChatChannel::Zone;
+	switch (CommandChar)
+	{
+	case 'a': Channel = EChatChannel::All; break;
+	case 'f': Channel = EChatChannel::Friend; break;
+	default: return false;
+	}
+
+	FString Message = Input.Mid(2).TrimStartAndEnd();
+	if (!Message.IsEmpty())
+	{
+		NetMgr->SendMyChatMessage(Message, Channel);
+		return true;
+	}
+
+	return false;
+}
+
+void UGPChatBoxWidget::ClearChatInput()
+{
 	SendMessageText->SetText(FText::GetEmpty());
 
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
@@ -133,6 +143,7 @@ void UGPChatBoxWidget::HandleSendMessage()
 		PC->SetInputMode(FInputModeGameOnly());
 	}
 }
+
 
 void UGPChatBoxWidget::SetKeyboardFocusToInput()
 {

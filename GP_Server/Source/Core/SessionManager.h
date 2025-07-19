@@ -27,6 +27,10 @@ public:
 	PlayerSession* GetSession(int32 sessionId);
 	int32 GetOnlineSessionIdByDBId(uint32 dbid);
 
+	uint32 FindDBIdByName(const std::string& name);
+	std::string FindNameByDBId(uint32 dbid);
+	int32 FindSessionIdByName(const std::string& name);
+
 private:
 	int32 GenerateId();
 private:
@@ -36,5 +40,11 @@ private:
 	std::queue<int32> _freeIds;
 	std::mutex _sMutex;
 	std::mutex _idMutex;
+private:
+	std::unordered_map<uint32, int32> _dbidToSessionIdMap;
+	std::unordered_map<uint32, std::string> _dbidToNameMap;
+	std::unordered_map<std::string, uint32> _nameToDbidMap;
+	std::mutex _mapMutex;
+
 };
 

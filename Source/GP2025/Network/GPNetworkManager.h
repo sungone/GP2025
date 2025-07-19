@@ -48,9 +48,9 @@ public:
 
 	void SetMyPlayer(AGPCharacterMyplayer* InMyPlayer);
 public:
-	void HandleUserAuthFailure(DBResultCode ResultCode);
-	void HandleBuyItemResult(bool bSuccess, uint32 CurrentGold, DBResultCode ResultCode);
-	void HandleSellItemResult(bool bSuccess, uint32 CurrentGold, DBResultCode ResultCode);
+	void HandleUserAuthFailure(ResultCode ResCode);
+	void HandleBuyItemResult(bool bSuccess, uint32 CurrentGold, ResultCode ResCode);
+	void HandleSellItemResult(bool bSuccess, uint32 CurrentGold, ResultCode ResCode);
 	
 public:
 	UFUNCTION(BlueprintCallable)
@@ -83,7 +83,7 @@ public:
 	void SendMyRejectQuest(QuestType quest);
 
 	void SendMyChatMessage(const FString& Message, EChatChannel Channel);
-	void SendMyWhisperMessage(uint32 TargetDBID, const FString& Message);
+	void SendMyWhisperMessage(const FString& TargetName, const FString& Message);
 	void SendMyRemoveStatePacket(uint32 State);
 
 	void SendMyFriendRequest(const FString& TargetNickName);

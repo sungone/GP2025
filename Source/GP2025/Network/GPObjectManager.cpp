@@ -1108,7 +1108,7 @@ void UGPObjectManager::AddFriend(const FFriendInfo& Info)
 	if (FriendMap.Contains(DBId))
 		return;
 
-	FriendMap.Add(DBId, Info.GetName());
+	FriendMap.Add(DBId, UTF8_TO_TCHAR(Info.GetName()));
 
 	if (MyPlayer && MyPlayer->UIManager)
 	{

@@ -124,7 +124,7 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 	auto res = DBManager::GetInst().SignUpUser(sessionId, id, pw, name);
 
 	SessionManager::GetInst().Schedule(sessionId, [sessionId, res]() {
-		if (res.code != DBResultCode::SUCCESS)
+		if (res.code != ResultCode::SUCCESS)
 		{
 			LOG_D("SignUp Failed [{}]", sessionId);
 			SignUpFailPacket failpkt(res.code);
@@ -155,14 +155,14 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 	if (loginsess != -1 && loginsess != sessionId)
 	{
 		LOG_W("User already logged in [{}] - Disconnecting old session: {}", res.dbId, loginsess);
-		res.code = DBResultCode::ALREADY_LOGGED_IN;
+		res.code = ResultCode::ALREADY_LOGGED_IN;
 		LoginFailPacket failpkt(res.code);
 		SessionManager::GetInst().SendPacket(sessionId, &failpkt);
 		return;
 	}
 
 	SessionManager::GetInst().Schedule(sessionId, [sessionId, res]() {
-		if (res.code != DBResultCode::SUCCESS)
+		if (res.code != ResultCode::SUCCESS)
 		{
 			LoginFailPacket failpkt(res.code);
 			SessionManager::GetInst().SendPacket(sessionId, &failpkt);
@@ -225,9 +225,9 @@ void PacketManager::HandleEnterGamePacket(int32 sessionId, Packet* packet)
 
 	session->EnterGame();
 	_gameWorld.PlayerEnterGame(player);
-	uint32 dbId = session->GetUserDBID();
+	uint32 dbId = session->GetDBID();
 	auto [friendResultCode, friendList] = DBManager::GetInst().GetFriendList(dbId);
-	if (friendResultCode != DBResultCode::SUCCESS)
+	if (friendResultCode != ResultCode::SUCCESS)
 	{
 		LOG_W("Failed to load friend list for user: {}", dbId);
 	}
@@ -367,7 +367,6 @@ void PacketManager::HandleChatSendPacket(int32 sessionId, Packet* packet)
 	if (!player) return;
 
 	const char* nickname = player->GetInfo().NickName;
-	LOG_I("{}", p->Message);
 	auto channel = p->Channel;
 	switch (channel)
 	{
@@ -380,6 +379,7 @@ void PacketManager::HandleChatSendPacket(int32 sessionId, Packet* packet)
 	case EChatChannel::Friend:
 	{
 		ChatBroadcastPacket broadcastPkt(nickname, p->Message, channel);
+		_sessionMgr.SendPacket(sessionId, &broadcastPkt);
 		_sessionMgr.BroadcastToFriends(sessionId, &broadcastPkt);
 		break;
 	}
@@ -398,22 +398,33 @@ void PacketManager::HandleChatSendPacket(int32 sessionId, Packet* packet)
 void PacketManager::HandleChatWhisperPacket(int32 sessionId, Packet* packet)
 {
 	auto* p = static_cast<ChatWhisperPacket*>(packet);
-	auto session = _sessionMgr.GetSession(sessionId);
-	if (!session || !session->IsInGame()) return;
+	auto sender = _sessionMgr.GetSession(sessionId);
+	if (!sender || !sender->IsInGame()) return;
 
-	auto player = session->GetPlayer();
-	if (!player) return;
-
-	const char* nickname = player->GetInfo().NickName;
-	LOG_I("{}", p->Message);
-
-	auto targetSess = _sessionMgr.GetOnlineSessionIdByDBId(p->TargetDBID);
-	if (targetSess != -1)
+	if (sender->GetNickName() == p->TargetNickName)
 	{
-		ChatBroadcastPacket broadcastPkt(nickname, p->Message, EChatChannel::Whisper);
-		_sessionMgr.SendPacket(targetSess, &broadcastPkt);
+		FriendOperationResultPacket resPkt(EFriendOpType::Request, ResultCode::SELF_REQUEST);
+		_sessionMgr.SendPacket(sessionId, &resPkt);
+		return;
 	}
+
+	int32 targetId = _sessionMgr.FindSessionIdByName(p->TargetNickName);
+	auto receiver = _sessionMgr.GetSession(targetId);
+	if (!receiver || !receiver->IsInGame())
+	{
+		FriendOperationResultPacket resPkt(EFriendOpType::Request, ResultCode::TARGET_NOT_IN_GAME);
+		_sessionMgr.SendPacket(sessionId, &resPkt);
+		return;
+	}
+
+	EChatChannel channel = EChatChannel::Whisper;
+	auto senderName = sender->GetPlayerInfo().NickName;
+	ChatBroadcastPacket pkt(senderName, p->Message, channel);
+
+	_sessionMgr.SendPacket(sessionId, &pkt);
+	_sessionMgr.SendPacket(targetId, &pkt);
 }
+
 
 void PacketManager::HandleFriendAddRequestPacket(int32 sessionId, Packet* packet)
 {
@@ -421,14 +432,14 @@ void PacketManager::HandleFriendAddRequestPacket(int32 sessionId, Packet* packet
 	auto session = _sessionMgr.GetSession(sessionId);
 	if (!session || !session->IsLogin()) return;
 
-	auto myId = session->GetUserDBID();
+	auto myId = session->GetDBID();
 	auto targetNick = ConvertToWString(p->TargetNickName);
 	auto targetId = DBManager::GetInst().FindUserDBId(targetNick);
-	DBResultCode resCode = DBManager::GetInst().AddFriendRequest(myId, targetId);
+	ResultCode resCode = DBManager::GetInst().AddFriendRequest(myId, targetId);
 
 	FriendOperationResultPacket resPkt(EFriendOpType::Request, resCode);
 	_sessionMgr.SendPacket(sessionId, &resPkt);
-	if (resCode != DBResultCode::SUCCESS) return;
+	if (resCode != ResultCode::SUCCESS) return;
 
 	int32 targetSessId = _sessionMgr.GetOnlineSessionIdByDBId(targetId);
 	if (targetSessId != -1)
@@ -451,7 +462,7 @@ void PacketManager::HandleFriendRemoveRequestPacket(int32 sessionId, Packet* pac
 	auto session = _sessionMgr.GetSession(sessionId);
 	if (!session || !session->IsLogin()) return;
 
-	auto myId = session->GetUserDBID();
+	auto myId = session->GetDBID();
 	auto targetId = p->TargetDBID;
 
 	auto ret = DBManager::GetInst().RemoveFriend(myId, targetId);
@@ -459,13 +470,17 @@ void PacketManager::HandleFriendRemoveRequestPacket(int32 sessionId, Packet* pac
 	FriendOperationResultPacket resPkt(EFriendOpType::Remove, ret);
 	_sessionMgr.SendPacket(sessionId, &resPkt);
 
-	if (ret != DBResultCode::SUCCESS) return;
+	if (ret != ResultCode::SUCCESS) return;
+	session->RemoveFriend(targetId);
 
 	RemoveFriendPacket myPkt(targetId);
 	_sessionMgr.SendPacket(sessionId, &myPkt);
 	int32 targetSessId = _sessionMgr.GetOnlineSessionIdByDBId(targetId);
 	if (targetSessId != -1)
 	{
+		auto targetSession = _sessionMgr.GetSession(targetSessId);
+		targetSession->RemoveFriend(myId);
+
 		RemoveFriendPacket targetPkt(myId);
 		_sessionMgr.SendPacket(targetSessId, &targetPkt);
 	}
@@ -477,37 +492,48 @@ void PacketManager::HandleFriendAcceptRequestPacket(int32 sessionId, Packet* pac
 	auto session = _sessionMgr.GetSession(sessionId);
 	if (!session || !session->IsLogin()) return;
 
-	auto myId = session->GetUserDBID();
+	auto myId = session->GetDBID();
 	auto targetId = p->TargetDBID;
 
 	auto ret = DBManager::GetInst().AcceptFriendRequest(myId, targetId);
-	DBResultCode code = ret.first;
-	std::optional<FFriendInfo> friendInfo = ret.second;
+	ResultCode code = ret.first;
+	std::optional<FFriendInfo> friendInfoOpt = ret.second;
 
 	FriendOperationResultPacket resPkt(EFriendOpType::Accept, code);
 	_sessionMgr.SendPacket(sessionId, &resPkt);
 
-	if (code != DBResultCode::SUCCESS || !friendInfo.has_value())
+	if (code != ResultCode::SUCCESS || !friendInfoOpt.has_value())
 		return;
 
-	AddFriendPacket myPkt(friendInfo.value());
+	FFriendInfo friendInfo = friendInfoOpt.value();
+	friendInfo.bAccepted = true;
+	session->AddFriend(friendInfo);
+
+	AddFriendPacket myPkt(friendInfo);
 	_sessionMgr.SendPacket(sessionId, &myPkt);
 
-	auto selfInfo = _sessionMgr.GetSession(sessionId)->GetPlayerInfo();
 	int32 targetSessId = _sessionMgr.GetOnlineSessionIdByDBId(targetId);
 	if (targetSessId != -1)
 	{
-		FFriendInfo info;
-		info.DBId = myId;
-		info.SetName(ConvertToWString(selfInfo.GetName()));
-		info.Level = selfInfo.Stats.Level;
-		info.bAccepted = true;
+		auto targetSession = _sessionMgr.GetSession(targetSessId);
+		if (targetSession)
+		{
+			auto& selfInfo = session->GetPlayerInfo();
 
-		AddFriendPacket targetPkt(info);
-		_sessionMgr.SendPacket(targetSessId, &targetPkt);
+			FFriendInfo myInfo;
+			myInfo.DBId = myId;
+			myInfo.SetName(ConvertToWString(selfInfo.GetName()));
+			myInfo.Level = selfInfo.Stats.Level;
+			myInfo.bAccepted = true;
+
+			targetSession->AddFriend(myInfo);
+
+			AddFriendPacket targetPkt(myInfo);
+			_sessionMgr.SendPacket(targetSessId, &targetPkt);
+		}
 	}
-
 }
+
 
 void PacketManager::HandleFriendRejectRequestPacket(int32 sessionId, Packet* packet)
 {
@@ -515,7 +541,7 @@ void PacketManager::HandleFriendRejectRequestPacket(int32 sessionId, Packet* pac
 	auto session = _sessionMgr.GetSession(sessionId);
 	if (!session || !session->IsLogin()) return;
 
-	auto myId = session->GetUserDBID();
+	auto myId = session->GetDBID();
 	auto targetId = p->TargetDBID;
 
 	auto ret = DBManager::GetInst().RejectFriendRequest(myId, targetId);

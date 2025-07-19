@@ -38,7 +38,7 @@ DBLoginResult DBManager::SignUpUser(int32 sessionId, const std::string& login_id
 	const FStatData* newStats = PlayerLevelTable::GetInst().GetStatByLevel(level);
 	if (!newStats) {
 		LOG_W("Invalid level stat");
-		return { DBResultCode::DB_ERROR };
+		return { ResultCode::DB_ERROR };
 	}
 
 	auto& stats = newinfo.Stats;
@@ -94,16 +94,16 @@ DBLoginResult DBManager::SignUpUser(int32 sessionId, const std::string& login_id
 			.execute();
 
 
-		return { DBResultCode::SUCCESS, dbId, newinfo };
+		return { ResultCode::SUCCESS, dbId, newinfo };
 	}
 	catch (const mysqlx::Error& e)
 	{
 		std::string msg = e.what();
 		if (msg.find("Duplicate entry") != std::string::npos) {
-			return { DBResultCode::DUPLICATE_ID };
+			return { ResultCode::DUPLICATE_ID };
 		}
 		LOG_E("MySQL Error: {}", msg);
-		return { DBResultCode::DB_ERROR };
+		return { ResultCode::DB_ERROR };
 	}
 }
 
@@ -132,11 +132,11 @@ DBLoginResult DBManager::CheckLogin(int32 sessionId, const std::string& login_id
 
 		auto row = result.fetchOne();
 		if (!row)
-			return { DBResultCode::INVALID_USER };
+			return { ResultCode::INVALID_USER };
 
 		std::string dbPassword = row[1].get<std::string>();
 		if (dbPassword != password)
-			return { DBResultCode::INVALID_PASSWORD };
+			return { ResultCode::INVALID_PASSWORD };
 
 		uint32 dbId = static_cast<uint32>(row[0].get<int>());
 		std::string nickname = row[2].get<std::string>();
@@ -187,11 +187,11 @@ DBLoginResult DBManager::CheckLogin(int32 sessionId, const std::string& login_id
 			itemList.emplace_back(itemID, itemTypeID);
 		}
 
-		return { DBResultCode::SUCCESS, dbId, info, itemList };
+		return { ResultCode::SUCCESS, dbId, info, itemList };
 	}
 	catch (const mysqlx::Error& e) {
 		LOG_E("MySQL Error (CheckLogin - login_id: {}): {}", login_id, e.what());
-		return { DBResultCode::DB_ERROR };
+		return { ResultCode::DB_ERROR };
 	}
 }
 
@@ -291,13 +291,13 @@ bool DBManager::RemoveUserItem(uint32 dbId, uint32 itemID)
 	}
 }
 
-DBResultCode DBManager::AddFriendRequest(uint32 myId, uint32 targetId)
+ResultCode DBManager::AddFriendRequest(uint32 myId, uint32 targetId)
 {
 	if (myId == targetId)
-		return DBResultCode::FRIEND_SELF_REQUEST;
+		return ResultCode::FRIEND_SELF_REQUEST;
 
 	if (IsFriendOrPending(myId, targetId))
-		return DBResultCode::FRIEND_ALREADY_REQUESTED;
+		return ResultCode::FRIEND_ALREADY_REQUESTED;
 
 	try {
 		ScopedDBSession scoped;
@@ -318,12 +318,12 @@ DBResultCode DBManager::AddFriendRequest(uint32 myId, uint32 targetId)
 		sess.commit();
 
 		LOG_D("Friend request sent (bidirectional): {} <-> {}", myId, targetId);
-		return DBResultCode::SUCCESS;
+		return ResultCode::SUCCESS;
 	}
 	catch (const mysqlx::Error& e)
 	{
 		LOG_E("MySQL Error (SendFriendRequest): {}", e.what());
-		return DBResultCode::DB_ERROR;
+		return ResultCode::DB_ERROR;
 	}
 }
 
@@ -350,7 +350,7 @@ bool DBManager::IsFriendOrPending(uint32 myId, uint32 targetId)
 	}
 }
 
-std::pair<DBResultCode, std::optional<FFriendInfo>> DBManager::AcceptFriendRequest(uint32 myId, uint32 requesterId)
+std::pair<ResultCode, std::optional<FFriendInfo>> DBManager::AcceptFriendRequest(uint32 myId, uint32 requesterId)
 {
 	try {
 		ScopedDBSession scoped;
@@ -370,7 +370,7 @@ std::pair<DBResultCode, std::optional<FFriendInfo>> DBManager::AcceptFriendReque
 		if (updateRes1.getAffectedItemsCount() == 0)
 		{
 			sess.rollback();
-			return { DBResultCode::FRIEND_USER_NOT_FOUND, std::nullopt };
+			return { ResultCode::FRIEND_USER_NOT_FOUND, std::nullopt };
 		}
 
 		auto updateRes2 = schema.getTable("user_friends")
@@ -398,7 +398,7 @@ std::pair<DBResultCode, std::optional<FFriendInfo>> DBManager::AcceptFriendReque
 		auto row = result.fetchOne();
 		if (!row) {
 			sess.rollback();
-			return { DBResultCode::FRIEND_USER_NOT_FOUND, std::nullopt };
+			return { ResultCode::FRIEND_USER_NOT_FOUND, std::nullopt };
 		}
 
 		sess.commit();
@@ -411,16 +411,16 @@ std::pair<DBResultCode, std::optional<FFriendInfo>> DBManager::AcceptFriendReque
 		info.bAccepted = true;
 		info.bIsRequester = false;
 
-		return { DBResultCode::SUCCESS, info };
+		return { ResultCode::SUCCESS, info };
 	}
 	catch (const mysqlx::Error& e)
 	{
 		LOG_E("MySQL Error (AcceptFriendRequest): {}", e.what());
-		return { DBResultCode::DB_ERROR, std::nullopt };
+		return { ResultCode::DB_ERROR, std::nullopt };
 	}
 }
 
-DBResultCode DBManager::RejectFriendRequest(uint32 myId, uint32 requesterId)
+ResultCode DBManager::RejectFriendRequest(uint32 myId, uint32 requesterId)
 {
 	try {
 		ScopedDBSession scoped;
@@ -438,22 +438,22 @@ DBResultCode DBManager::RejectFriendRequest(uint32 myId, uint32 requesterId)
 
 		if (result.getAffectedItemsCount() == 0) {
 			sess.rollback();
-			return DBResultCode::FRIEND_USER_NOT_FOUND;
+			return ResultCode::FRIEND_USER_NOT_FOUND;
 		}
 
 		sess.commit();
 
 		LOG_D("Friend request rejected and removed (both directions): {} <-> {}", myId, requesterId);
-		return DBResultCode::SUCCESS;
+		return ResultCode::SUCCESS;
 	}
 	catch (const mysqlx::Error& e)
 	{
 		LOG_E("MySQL Error (RejectFriendRequest): {}", e.what());
-		return DBResultCode::DB_ERROR;
+		return ResultCode::DB_ERROR;
 	}
 }
 
-DBResultCode DBManager::RemoveFriend(uint32 userId, uint32 friendId)
+ResultCode DBManager::RemoveFriend(uint32 userId, uint32 friendId)
 {
 	try {
 		ScopedDBSession scoped;
@@ -471,22 +471,22 @@ DBResultCode DBManager::RemoveFriend(uint32 userId, uint32 friendId)
 
 		if (result.getAffectedItemsCount() == 0) {
 			sess.rollback();
-			return DBResultCode::FRIEND_USER_NOT_FOUND;
+			return ResultCode::FRIEND_USER_NOT_FOUND;
 		}
 
 		sess.commit();
 
 		LOG_D("Friendship removed (both directions): {} <-> {}", userId, friendId);
-		return DBResultCode::SUCCESS;
+		return ResultCode::SUCCESS;
 	}
 	catch (const mysqlx::Error& e)
 	{
 		LOG_E("MySQL Error (RemoveFriend): {}", e.what());
-		return DBResultCode::DB_ERROR;
+		return ResultCode::DB_ERROR;
 	}
 }
 
-std::pair<DBResultCode, std::vector<FFriendInfo>> DBManager::GetFriendList(uint32 myId)
+std::pair<ResultCode, std::vector<FFriendInfo>> DBManager::GetFriendList(uint32 myId)
 {
 	std::vector<FFriendInfo> friendList;
 
@@ -518,12 +518,12 @@ std::pair<DBResultCode, std::vector<FFriendInfo>> DBManager::GetFriendList(uint3
 		}
 
 		LOG_D("Loaded {} friend(s) for user {}", friendList.size(), myId);
-		return { DBResultCode::SUCCESS, friendList };
+		return { ResultCode::SUCCESS, friendList };
 	}
 	catch (const mysqlx::Error& e)
 	{
 		LOG_E("MySQL Error (GetFriendList): {}", e.what());
-		return { DBResultCode::DB_ERROR, {} };
+		return { ResultCode::DB_ERROR, {} };
 	}
 }
 

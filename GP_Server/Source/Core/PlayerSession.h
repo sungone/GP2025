@@ -39,12 +39,28 @@ public:
 	void RunGameJobs() {
 		_gameJobQueue.Run();
 	}
-	uint32 GetUserDBID() { return _dbId; };
+
+	uint32 GetDBID() { return _dbId; };
+	void SetDBID(uint32 dbId) { _dbId = dbId; }
+	std::string GetNickName() const { return _nickName; }
+	void SetNickName(const std::string& nickName) { _nickName = nickName; }
+
 	const std::vector<FFriendInfo>& GetFriends() const { return _friends; }
+	void AddFriend(const FFriendInfo& friendInfo)
+	{
+		_friends.push_back(friendInfo);
+	}
+	void RemoveFriend(uint32 dbId)
+	{
+		_friends.erase(std::remove_if(_friends.begin(), _friends.end(),
+			[dbId](const FFriendInfo& f) { return f.DBId == dbId; }), _friends.end());
+	}
 private:
 	JobQueue _gameJobQueue;
 	int32 _id = -1;
 	uint32 _dbId;
+	std::string _nickName;
+
 	std::shared_ptr<Player> _player;
 	std::unique_ptr<SessionSocket> _sSocket;
 	SessionState _state = SessionState::None;

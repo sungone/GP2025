@@ -22,30 +22,24 @@ public:
 	virtual void NativeConstruct() override;
 
 public:
-	// 채팅 입력창
 	UPROPERTY(meta = (BindWidget))
 	UEditableText* SendMessageText;
 
-	// 채팅 전송 버튼
 	UPROPERTY(meta = (BindWidget))
 	UButton* EnterButton;
 
-	// 채팅 메시지 표시 영역
 	UPROPERTY(meta = (BindWidget))
 	UScrollBox* ScrollBox;
 
-	// 채팅 입력 완료 시 처리
 	UFUNCTION()
 	void OnChatCommitted(const FText& Text, ETextCommit::Type CommitMethod);
 
-	// 버튼 클릭 시 처리
 	UFUNCTION()
 	void OnEnterButtonClicked();
 
-	// 내부 전송 처리
 	void HandleSendMessage();
-
-	// 채팅창 엔터로 열기
+	bool HandleChatCommand(const FString& Input, class UGPNetworkManager* NetMgr);
+	void ClearChatInput();
 	void SetKeyboardFocusToInput();
 
 
