@@ -136,13 +136,15 @@ void PacketManager::HandleSignUpPacket(int32 sessionId, Packet* packet)
 		}
 
 		SessionManager::GetInst().HandleLogin(sessionId, res);
+		SignUpSuccessPacket spkt(_WorldState);
+		SessionManager::GetInst().SendPacket(sessionId, &spkt);
 		LOG_D("SignUp Success [{}] userId: {}", sessionId, res.dbId);
 		});
 	return;
 #else
 	LOG_D("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW);
 	_sessionMgr.HandleLogin(sessionId);
-	LoginSuccessPacket loginpkt;
+	LoginSuccessPacket loginpkt(_WorldState);
 	_sessionMgr.SendPacket(sessionId, &loginpkt);
 #endif
 }
@@ -172,9 +174,9 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 			return;
 		}
 
-		LoginSuccessPacket loginpkt;
-		SessionManager::GetInst().SendPacket(sessionId, &loginpkt);
 		SessionManager::GetInst().HandleLogin(sessionId, res);
+		LoginSuccessPacket loginpkt(_WorldState);
+		SessionManager::GetInst().SendPacket(sessionId, &loginpkt);
 
 		LOG_D("Login Success [{}] userId: {}", sessionId, res.dbId);
 		});
@@ -183,7 +185,7 @@ void PacketManager::HandleLoginPacket(int32 sessionId, Packet* packet)
 #else
 	LOG_D("ID: {}, PW: {}", pkt->AccountID, pkt->AccountPW);
 	_sessionMgr.HandleLogin(sessionId);
-	LoginSuccessPacket loginpkt;
+	LoginSuccessPacket loginpkt(_WorldState);
 	_sessionMgr.SendPacket(sessionId, &loginpkt);
 #endif
 }

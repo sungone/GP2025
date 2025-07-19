@@ -24,6 +24,7 @@ enum EPacketType : uint8
 	C_REMOVE_STATE,
 
 	S_PLAYER_MOVE,
+	S_PLAYER_ATTACK,
 	S_PLAYER_STATUS_UPDATE,
 	S_DAMAGED_PLAYER,
 	S_PLAYER_USE_SKILL_START,
@@ -106,6 +107,31 @@ enum EPacketType : uint8
 	//for test
 	S_DEBUG_TRIANGLE,
 	S_DEBUG_LINE
+};
+
+enum class EWorldChannel : uint8
+{
+	TUWorld_1,
+	TUWorld_2,
+	TUWorld_3,
+};
+
+enum class EWorldState : uint8
+{
+	Good,
+	Normal,
+	Bad,
+};
+
+struct FWorldState
+{
+	EWorldChannel Channel;
+	EWorldState State;
+	FWorldState(EWorldChannel channel = EWorldChannel::TUWorld_1, EWorldState state = EWorldState::Good)
+		: Channel(channel), State(state)
+	{
+	}
+
 };
 
 enum class EChatChannel : uint8

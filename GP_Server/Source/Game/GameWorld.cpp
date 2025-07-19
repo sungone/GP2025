@@ -237,6 +237,9 @@ void GameWorld::PlayerAttack(int32 playerId)
 		std::lock_guard lock(player->_vlLock);
 		viewList = player->GetViewList();
 	}
+	auto attpkt = PlayerAttackPacket(playerId, player->GetInfo().Pos, player->GetInfo().Yaw);
+	SessionManager::GetInst().BroadcastToViewList(&attpkt, viewList);
+
 	auto zone = player->GetZone();
 	for (int32 targetId : viewList)
 	{
@@ -290,7 +293,6 @@ void GameWorld::PlayerAttack(int32 playerId)
 
 	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
 	SessionManager::GetInst().SendPacket(playerId, &infopkt);
-	SessionManager::GetInst().BroadcastToViewList(&infopkt, viewList);
 	player->RemoveState(ECharacterStateType::STATE_AUTOATTACK);
 }
 
@@ -303,7 +305,13 @@ void GameWorld::PlayerUseSkill(int32 playerId, ESkillGroup groupId)
 		return;
 	}
 	player->UseSkill(groupId);
-
+	std::unordered_set<int32> viewList;
+	{
+		std::lock_guard lock(player->_vlLock);
+		viewList = player->GetViewList();
+	}
+	auto pkt = PlayerUseSkillStartPacket(playerId, groupId, player->GetInfo().Yaw, player->GetPos());
+	SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
 }
 
 void GameWorld::PlayerEndSkill(int32 playerId, ESkillGroup groupId)
@@ -315,6 +323,13 @@ void GameWorld::PlayerEndSkill(int32 playerId, ESkillGroup groupId)
 		return;
 	}
 	player->EndSkill();
+	std::unordered_set<int32> viewList;
+	{
+		std::lock_guard lock(player->_vlLock);
+		viewList = player->GetViewList();
+	}
+	auto pkt = PlayerUseSkillEndPacket(playerId);
+	SessionManager::GetInst().BroadcastToViewList(&pkt, viewList);
 }
 
 

@@ -76,9 +76,9 @@ void UGPLobbyWidget::OnGameStartPressed()
 	if (NetMgr)
 	{
 		if (SelectedType != Type::EPlayer::NONE)
-			NetMgr->SendMyEnterGamePacket(SelectedType);
+			NetMgr->SendMyEnterGamePacket(SelectedChannel, SelectedType);
 		else
-			NetMgr->SendMyEnterGamePacket();
+			NetMgr->SendMyEnterGamePacket(SelectedChannel);
 	}
 
 	if (ClickSound)

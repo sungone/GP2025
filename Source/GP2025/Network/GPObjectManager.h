@@ -22,6 +22,8 @@ public:
 	virtual void Deinitialize() override;
 
 	void SetMyPlayer(AGPCharacterMyplayer* InMyPlayer);
+	void HandleEnterLobby(FWorldState WorldState[WORLD_MAX_COUNT]);
+
 	void AddMyPlayer(const FInfoData& PlayerInfo);
 	void AddPlayer(const FInfoData& PlayerInfo);
 	void RemovePlayer(int32 PlayerID);
@@ -29,6 +31,7 @@ public:
 	void DamagedPlayer(const FInfoData& PlayerInfo);
 	void HandlePlayerDeath(int32 playerId);
 
+	void PlayerAttack(int32 PlayerId, FVector PlayerPos, float PlayerYaw);
 	void PlayerUseSkillStart(int32 PlayerID, ESkillGroup SkillGID, float PlayerYaw, FVector PlayerPos);
 	void PlayerUseSkillEnd(int32 PlayerID);
 	void SkillUnlock(ESkillGroup SkillGID);

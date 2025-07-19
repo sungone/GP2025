@@ -325,6 +325,16 @@ UGPQuestListWidget* UGPMyplayerUIManager::GetQuestListWidget()
 	return nullptr;
 }
 
+UGPLobbyWidget* UGPMyplayerUIManager::GetLobbyWidget()
+{
+	if (LobbyWidget)
+	{
+		return Cast<UGPLobbyWidget>(LobbyWidget);
+	}
+
+	return nullptr;
+}
+
 UGPInGameWidget* UGPMyplayerUIManager::GetInGameWidget()
 {
 	UGPInGameWidget* Inven = Cast<UGPInGameWidget>(InGameWidget);

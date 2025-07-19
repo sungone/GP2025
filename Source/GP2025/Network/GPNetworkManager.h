@@ -59,8 +59,8 @@ public:
 	void SendMyLoginPacket(const FString& AccountID, const FString& AccountPW);
 	void SendMySignUpPacket(const FString& AccountID, const FString& AccountPW, const FString& NickName);
 	void SendMyLogoutPacket();
-	void SendMyEnterGamePacket();
-	void SendMyEnterGamePacket(Type::EPlayer PlayerType);
+	void SendMyEnterGamePacket(EWorldChannel WChannel);
+	void SendMyEnterGamePacket(EWorldChannel WChannel, Type::EPlayer PlayerType);
 
 	void SendMyZoneChangePacket(ZoneType zone);
 	void SendMyRespawnPacket(ZoneType zone);

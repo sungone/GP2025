@@ -62,7 +62,7 @@ void UGPCharacterUIHandler::UpdateWidgetVisibility()
 
 	const float Distance = FVector::Dist(Owner->GetActorLocation(), LocalMyPlayer->GetActorLocation());
 
-	float MaxVisibleDistance = 300.0f; // 기본 거리
+	float MaxVisibleDistance = 500.0f; // 기본 거리
 
 	if (bIsGunner && bIsGunnerZooming)
 	{

@@ -135,6 +135,7 @@ public:
 	bool bInventoryToggled = false;
 
 public:
+	class UGPLobbyWidget* GetLobbyWidget();
 	class UGPInGameWidget* GetInGameWidget();
 	class UGPInventory* GetInventoryWidget();
 	class UGPChatBoxWidget* GetChatBoxWidget();

@@ -56,6 +56,8 @@ public:
 
 private:
 	Type::EPlayer SelectedType = Type::EPlayer::NONE;
+	EWorldChannel SelectedChannel = EWorldChannel::TUWorld_1;
+
 public :
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	USoundBase* ClickSound;
