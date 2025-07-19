@@ -123,6 +123,12 @@ void UGPObjectManager::SetMyPlayer(AGPCharacterMyplayer* InMyPlayer)
 	MyPlayer = InMyPlayer;
 }
 
+void UGPObjectManager::HandleEnterLobby(FWorldState WorldState[WORLD_MAX_COUNT])
+{
+	//Todo:
+	auto LobbyWidget = MyPlayer->UIManager->GetLobbyWidget();
+}
+
 void UGPObjectManager::AddMyPlayer(const FInfoData& PlayerInfo)
 {
 	if (World == nullptr)
@@ -252,58 +258,70 @@ void UGPObjectManager::UpdatePlayer(const FInfoData& PlayerInfo)
 	}
 }
 
+void UGPObjectManager::PlayerAttack(int32 PlayerID, FVector PlayerPos, float PlayerYaw)
+{
+	if (TWeakObjectPtr<AGPCharacterPlayer>* WeakPlayerPtr = Players.Find(PlayerID))
+	{
+		if (WeakPlayerPtr->IsValid())
+		{
+			AGPCharacterPlayer* Player = WeakPlayerPtr->Get();
+			if (Player->CombatHandler)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Player %d Attack!"), PlayerID));
+
+				Player->CharacterInfo.SetLocation(PlayerPos);
+				Player->CharacterInfo.SetYaw(PlayerYaw);
+				Player->CharacterInfo.AddState(STATE_AUTOATTACK);
+				Player->HandleAutoAttackState();
+				Player->CharacterInfo.RemoveState(STATE_AUTOATTACK);
+			}
+		}
+	}
+}
+
 void UGPObjectManager::PlayerUseSkillStart(int32 PlayerID, ESkillGroup SkillGID, float PlayerYaw, FVector PlayerPos)
 {
-	//if (TWeakObjectPtr<AGPCharacterPlayer>* WeakPlayerPtr = Players.Find(PlayerID))
-	//{
-	//	if (WeakPlayerPtr->IsValid())
-	//	{
-	//		AGPCharacterPlayer* Player = WeakPlayerPtr->Get();
-
-	//		if (!Player || !Player->CombatHandler)
-	//		{
-	//			UE_LOG(LogTemp, Warning, TEXT("[UGPObjectManager::PlayerUseSkill] Player or CombatHandler is null."));
-	//			return;
-	//		}
-
-	//		switch (SkillGID)
-	//		{
-	//		case ESkillGroup::HitHard:
-	//		case ESkillGroup::Throwing:
-	//			UE_LOG(LogTemp, Log, TEXT("[UGPObjectManager::PlayerUseSkill] Entered Q Skill branch."));
-	//			Player->CombatHandler->PlayQSkillMontage();
-	//			break;
-
-	//		case ESkillGroup::Clash:
-	//		case ESkillGroup::FThrowing:
-	//			UE_LOG(LogTemp, Log, TEXT("[UGPObjectManager::PlayerUseSkill] Entered E Skill branch."));
-	//			Player->CombatHandler->PlayESkillMontage();
-	//			break;
-
-	//		case ESkillGroup::Whirlwind:
-	//		case ESkillGroup::Anger:
-	//			UE_LOG(LogTemp, Log, TEXT("[UGPObjectManager::PlayerUseSkill] Entered R Skill branch."));
-	//			Player->CombatHandler->PlayRSkillMontage();
-	//			break;
-
-	//		default:
-	//			UE_LOG(LogTemp, Warning, TEXT("[UGPObjectManager::PlayerUseSkill] Entered Unknown Skill branch."));
-	//			break;
-	//		}
-	//	}
-	//	else
-	//	{
-	//		UE_LOG(LogTemp, Warning, TEXT("[UGPObjectManager::PlayerUseSkill] WeakPlayerPtr is not valid."));
-	//	}
-	//}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("[UGPObjectManager::PlayerUseSkill] PlayerID not found in Players map."));
-	//}
+	if (TWeakObjectPtr<AGPCharacterPlayer>* WeakPlayerPtr = Players.Find(PlayerID))
+	{
+		if (!WeakPlayerPtr->IsValid()) return;
+		AGPCharacterPlayer* Player = WeakPlayerPtr->Get();
+		if (!Player->CombatHandler) return;
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Player %d UseSkill!"), PlayerID));
+		Player->CharacterInfo.SetLocation(PlayerPos);
+		Player->CharacterInfo.SetYaw(PlayerYaw);
+		switch (SkillGID)
+		{
+		case ESkillGroup::HitHard:
+		case ESkillGroup::Throwing:
+			Player->CharacterInfo.AddState(STATE_SKILL_Q);
+			Player->HandleQSkillState();
+			break;
+		case ESkillGroup::Clash:
+		case ESkillGroup::FThrowing:
+			Player->CharacterInfo.AddState(STATE_SKILL_E);
+			Player->HandleESkillState();
+			break;
+		case ESkillGroup::Whirlwind:
+		case ESkillGroup::Anger:
+			Player->CharacterInfo.AddState(STATE_SKILL_R);
+			Player->HandleRSkillState();
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 void UGPObjectManager::PlayerUseSkillEnd(int32 PlayerID)
 {
+	if (TWeakObjectPtr<AGPCharacterPlayer>* WeakPlayerPtr = Players.Find(PlayerID))
+	{
+		if (!WeakPlayerPtr->IsValid()) return;
+		AGPCharacterPlayer* Player = WeakPlayerPtr->Get();
+		Player->CharacterInfo.RemoveState(STATE_SKILL_Q);
+		Player->CharacterInfo.RemoveState(STATE_SKILL_E);
+		Player->CharacterInfo.RemoveState(STATE_SKILL_R);
+	}
 }
 
 void UGPObjectManager::DamagedPlayer(const FInfoData& PlayerInfo)
@@ -1116,7 +1134,7 @@ void UGPObjectManager::OnQuestStart(QuestType Quest)
 
 
 		MyPlayer->UIManager->ShowQuestStartMessage(Quest);
-		
+
 	}
 
 	if (Quest == QuestType::TUT_COMPLETE) // 튜토리얼 완료는 바로 클리어

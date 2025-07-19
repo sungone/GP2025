@@ -78,10 +78,15 @@ struct SignUpPacket : public Packet
 
 struct LoginSuccessPacket : public Packet
 {
-	bool dummy;
-	LoginSuccessPacket()
+	FWorldState WorldState[WORLD_MAX_COUNT];
+
+	LoginSuccessPacket(const FWorldState* InWorldStates)
 		: Packet(EPacketType::S_LOGIN_SUCCESS)
 	{
+		for (int i = 0; i < WORLD_MAX_COUNT; ++i)
+		{
+			WorldState[i] = InWorldStates[i];
+		}
 		Header.PacketSize = sizeof(LoginSuccessPacket);
 	}
 };
@@ -98,10 +103,15 @@ struct LoginFailPacket : public Packet
 
 struct SignUpSuccessPacket : public Packet
 {
-	bool dummy;
-	SignUpSuccessPacket()
+	FWorldState WorldState[WORLD_MAX_COUNT];
+
+	SignUpSuccessPacket(const FWorldState* InWorldStates)
 		: Packet(EPacketType::S_SIGNUP_SUCCESS)
 	{
+		for (int i = 0; i < WORLD_MAX_COUNT; ++i)
+		{
+			WorldState[i] = InWorldStates[i];
+		}
 		Header.PacketSize = sizeof(SignUpSuccessPacket);
 	}
 };
@@ -130,8 +140,9 @@ struct SelectCharacterPacket : public Packet
 struct RequestEnterGamePacket : public Packet
 {
 	Type::EPlayer PlayerType;
-	RequestEnterGamePacket(Type::EPlayer InType = Type::EPlayer::NONE)
-		: Packet(EPacketType::C_ENTER_GAME), PlayerType(InType)
+	EWorldChannel WChannel;
+	RequestEnterGamePacket(Type::EPlayer InType = Type::EPlayer::NONE, EWorldChannel Channel)
+		: Packet(EPacketType::C_ENTER_GAME), PlayerType(InType), WChannel(Channel)
 	{
 		Header.PacketSize = sizeof(RequestEnterGamePacket);
 	}
@@ -177,10 +188,21 @@ struct AttackPacket : public Packet
 {
 	float PlayerYaw;
 	FVector PlayerPos;
-	AttackPacket(float PlayerYaw_, FVector PlayerPos_)
-		: Packet(EPacketType::C_ATTACK), PlayerYaw(PlayerYaw_), PlayerPos(PlayerPos_)
+	AttackPacket(float yaw, FVector pos)
+		: Packet(EPacketType::C_ATTACK), PlayerYaw(yaw), PlayerPos(pos)
 	{
 		Header.PacketSize = sizeof(AttackPacket);
+	}
+};
+struct PlayerAttackPacket : public Packet
+{
+	int32 PlayerID;
+	FVector PlayerPos;
+	float PlayerYaw;
+	PlayerAttackPacket(int32 playerID, FVector pos, float yaw)
+		: Packet(EPacketType::S_PLAYER_ATTACK), PlayerID(playerID), PlayerPos(pos), PlayerYaw(yaw)
+	{
+		Header.PacketSize = sizeof(PlayerAttackPacket);
 	}
 };
 struct StartAimingPacket : public Packet

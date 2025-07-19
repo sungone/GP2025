@@ -114,7 +114,7 @@ void UGPCharacterCombatHandler::PlayAutoAttackMontage()
 			if (!bHasWeapon)
 			{
 				// 맨손 공격일 경우
-				AttackSound = MyPlayer->SoundManager->PlayerPunchSound; 
+				AttackSound = MyPlayer->SoundManager->PlayerPunchSound;
 			}
 			else if (MyPlayer->bIsGunnerCharacter())
 			{
@@ -289,7 +289,6 @@ void UGPCharacterCombatHandler::PlayMonsterHitMontage()
 void UGPCharacterCombatHandler::PlayQSkillMontage()
 {
 	PlaySkillMontage(QSkillMontage);
-
 }
 
 void UGPCharacterCombatHandler::PlayESkillMontage()
@@ -321,7 +320,7 @@ void UGPCharacterCombatHandler::StartDash()
 		DashTimerHandle,
 		this,
 		&UGPCharacterCombatHandler::UpdateDash,
-		0.01f, 
+		0.01f,
 		true
 	);
 }
@@ -339,10 +338,6 @@ void UGPCharacterCombatHandler::FinishDash()
 	bIsDashing = false;
 	DashElapsedTime = 0.0f;
 
-	// E 스킬 몽타지 재생
-	//PlaySkillMontage(ESkillMontage);
-
-	// 공격 패킷 전송 (데미지 처리)
 	AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(Owner);
 	if (LocalMyPlayer && LocalMyPlayer->NetMgr)
 	{
@@ -350,8 +345,6 @@ void UGPCharacterCombatHandler::FinishDash()
 		float Yaw = LocalMyPlayer->GetControlRotation().Yaw;
 
 		LocalMyPlayer->NetMgr->SendMyAttackPacket(Yaw, Location);
-
-		// LocalMyPlayer->NetMgr->SendMyUseSkillStart(ESkillGroup::Clash, Yaw, Location);
 	}
 }
 
@@ -418,7 +411,7 @@ void UGPCharacterCombatHandler::ExecuteMultiHit()
 		float Yaw = LocalMyPlayer->GetControlRotation().Yaw;
 
 		UE_LOG(LogTemp, Log, TEXT("MultiHit Attack: %d hits remaining"), RemainingHits);
-		// LocalMyPlayer->NetMgr->SendMyUseSkillStart(ESkillGroup::Whirlwind, Yaw, Location);
+
 		LocalMyPlayer->NetMgr->SendMyAttackPacket(Yaw, Location);
 
 	}
@@ -468,7 +461,7 @@ void UGPCharacterCombatHandler::PlaySkillMontage(UAnimMontage* SkillMontage)
 
 			if (SkillSound)
 			{
-				MyPlayer->SoundManager->PlaySFX(SkillSound , SoundPlayRate, SoundVolume);
+				MyPlayer->SoundManager->PlaySFX(SkillSound, SoundPlayRate, SoundVolume);
 			}
 		}
 	}
@@ -480,56 +473,6 @@ void UGPCharacterCombatHandler::PlaySkillMontage(UAnimMontage* SkillMontage)
 	AnimInstance->Montage_Play(SkillMontage, PlayRate);
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, SkillMontage);
 
-	float AdjustedDuration = SkillMontage->GetPlayLength() / PlayRate;
-	CurrentSkillMontage = SkillMontage;
-
-	Owner->GetWorldTimerManager().SetTimer(
-		SkillFailSafeHandle,
-		[this]()
-		{
-			if (bIsUsingSkill)
-			{
-				UE_LOG(LogTemp, Error, TEXT("[Combat] Failsafe: Skill Montage did not end. Cleaning up manually."));
-				bIsUsingSkill = false;
-
-				if (!Owner || !Owner->IsValidLowLevel())
-				{
-					UE_LOG(LogTemp, Error, TEXT("[Combat] Failsafe: Owner is nullptr or invalid. Skipping cleanup."));
-					return;
-				}
-
-				if (AGPCharacterMyplayer* LocalOwner = Cast<AGPCharacterMyplayer>(Owner))
-				{
-					if (CurrentSkillMontage == QSkillMontage)
-					{
-						LocalOwner->CharacterInfo.RemoveState(STATE_SKILL_Q);
-						LocalOwner->NetMgr->SendMyUseSkillEnd(LocalOwner->bIsGunnerCharacter() ? ESkillGroup::Throwing : ESkillGroup::HitHard);
-					}
-					else if (CurrentSkillMontage == ESkillMontage)
-					{
-						LocalOwner->CharacterInfo.RemoveState(STATE_SKILL_E);
-						LocalOwner->NetMgr->SendMyUseSkillEnd(LocalOwner->bIsGunnerCharacter() ? ESkillGroup::FThrowing : ESkillGroup::Clash);
-
-						if (!LocalOwner->bIsGunnerCharacter())
-						{
-							bIsDashing = false;
-							if (LocalOwner->GetCharacterMovement())
-							{
-								LocalOwner->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-							}
-						}
-					}
-					else if (CurrentSkillMontage == RSkillMontage)
-					{
-						LocalOwner->CharacterInfo.RemoveState(STATE_SKILL_R);
-						LocalOwner->NetMgr->SendMyUseSkillEnd(LocalOwner->bIsGunnerCharacter() ? ESkillGroup::Anger : ESkillGroup::Whirlwind);
-					}
-				}
-			}
-		},
-		AdjustedDuration + 0.2f,
-		false
-	);
 }
 
 void UGPCharacterCombatHandler::OnSkillMontageEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -574,7 +517,7 @@ void UGPCharacterCombatHandler::OnSkillMontageEnded(UAnimMontage* Montage, bool 
 				}
 			}
 		}
-		
+
 		if (Montage == RSkillMontage && LocalOwner->CharacterInfo.HasState(STATE_SKILL_R))
 		{
 			LocalOwner->CharacterInfo.RemoveState(STATE_SKILL_R);
