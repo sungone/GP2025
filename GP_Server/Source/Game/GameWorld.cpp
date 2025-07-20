@@ -1048,13 +1048,11 @@ GridPos GameWorld::GetGridPos(const FVector& pos)
 
 void GameWorld::EnterGrid(int32 id, const FVector& pos)
 {
-	std::lock_guard<std::mutex> lock(_gridMutex);
 	_gridMap[GetGridPos(pos)].insert(id);
 }
 
 void GameWorld::LeaveGrid(int32 id, const FVector& pos)
 {
-	std::lock_guard<std::mutex> lock(_gridMutex);
 	GridPos gp = GetGridPos(pos);
 	auto it = _gridMap.find(gp);
 	if (it != _gridMap.end())

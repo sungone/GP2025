@@ -99,5 +99,5 @@ void GameWorldManager::UpdateWorldStates()
 			_worldStates[channel] = EWorldState::Bad;
 		LOG_I("Ch{}. Player = {} ({})", static_cast<uint8>(channel), playerCount, ENUM_NAME(_worldStates[channel]));
 	}
-	LOG_I("=== World States Updated ===");
+	LOG_I("----------------------");
 }
