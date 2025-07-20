@@ -33,6 +33,11 @@ public:
     UFUNCTION()
     void PlayPlayerCriticalEffect();
 
+    UFUNCTION()
+    void PlayHealEffect();
+
+    UFUNCTION()
+    void PlayAttackBuffEffect();
 public:
     UPROPERTY()
     AGPCharacterPlayer* Owner;
@@ -56,4 +61,10 @@ public:
 
     UPROPERTY(EditAnywhere, Category = "Effect")
     class UNiagaraSystem* CriticalEffect;
+
+    UPROPERTY(EditAnywhere, Category = "Effect")
+    UNiagaraSystem* HealEffect;
+
+    UPROPERTY(EditAnywhere, Category = "Effect")
+    UNiagaraSystem* AttackBuffEffect;
 };

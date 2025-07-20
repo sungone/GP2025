@@ -39,6 +39,18 @@ UGPPlayerEffectHandler::UGPPlayerEffectHandler()
     {
         CriticalEffect = CriticalEffectFinder.Object;
     }
+
+    ConstructorHelpers::FObjectFinder<UNiagaraSystem> HealEffectAsset(TEXT("/Game/Effects/NS_HealEffect.NS_HealEffect"));
+    if (HealEffectAsset.Succeeded())
+    {
+        HealEffect = HealEffectAsset.Object;
+    }
+
+    ConstructorHelpers::FObjectFinder<UNiagaraSystem> AttackBuffEffectAsset(TEXT("/Game/Effects/NS_AttackBuffEffect.NS_AttackBuffEffect"));
+    if (AttackBuffEffectAsset.Succeeded())
+    {
+        AttackBuffEffect = AttackBuffEffectAsset.Object;
+    }
 }
 
 void UGPPlayerEffectHandler::Init(AGPCharacterPlayer* InOwner)
@@ -128,6 +140,32 @@ void UGPPlayerEffectHandler::PlayPlayerCriticalEffect()
         );
         UE_LOG(LogTemp, Log, TEXT("[EffectHandler] CriticalEffect played at Hips."));
     }
+}
+
+void UGPPlayerEffectHandler::PlayHealEffect()
+{
+    if (!HealEffect) return;
+
+    FVector SpawnLocation = Owner->GetActorLocation() + FVector(0, 0, 80); // 머리 위로 약간
+    UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+        GetWorld(),
+        HealEffect,
+        SpawnLocation,
+        Owner->GetActorRotation()
+    );
+}
+
+void UGPPlayerEffectHandler::PlayAttackBuffEffect()
+{
+    if (!AttackBuffEffect) return;
+
+    FVector SpawnLocation = Owner->GetActorLocation() + FVector(0, 0, 80); // 머리 위로 약간
+    UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+        GetWorld(),
+        AttackBuffEffect,
+        SpawnLocation,
+        Owner->GetActorRotation()
+    );
 }
 
 void UGPPlayerEffectHandler::PlayEarthQuakeRock(const FVector& RockPos)
