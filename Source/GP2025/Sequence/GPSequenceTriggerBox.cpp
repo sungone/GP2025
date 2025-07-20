@@ -4,6 +4,7 @@
 #include "Sequence/GPSequenceTriggerBox.h"
 #include "Engine/World.h"
 #include "Character/GPCharacterMyplayer.h"
+#include "Network/GPObjectManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 
@@ -54,5 +55,11 @@ void AGPSequenceTriggerBox::OnOverlapBegin(AActor* OverlappedActor, AActor* Othe
             UE_LOG(LogTemp, Log, TEXT("Sequence played for player %s"), *MyPlayer->GetName());
             MyPlayer->bHasPlayedTinoSequence = true;
         }
+    }
+
+    UGPObjectManager* ObjectMgr = GetWorld()->GetSubsystem<UGPObjectManager>();
+    if (ObjectMgr)
+    {
+        ObjectMgr->HideTinoMonstersTemporarily(4.5f);
     }
 }
