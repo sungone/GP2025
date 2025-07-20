@@ -17,6 +17,7 @@ void UAnimNotifyState_DrillSkill::NotifyBegin(USkeletalMeshComponent* MeshComp, 
 		FName("DrillSocket"),
 		FVector::ZeroVector,
 		FRotator::ZeroRotator,
+		FVector(4.f),
 		EAttachLocation::SnapToTargetIncludingScale,
 		true
 	);
