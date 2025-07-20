@@ -29,7 +29,6 @@ void Monster::Init(EWorldChannel channelId)
 	_info.AttackRadius = data->AtkRadius;
 	_info.State = ECharacterStateType::STATE_IDLE;
 	_navMesh = &Map::GetInst().GetNavMesh(_zone);
-	ScheduleUpdate();
 }
 
 int32 Monster::GetUpdateDelay()
@@ -39,22 +38,13 @@ int32 Monster::GetUpdateDelay()
 
 void Monster::ScheduleUpdate()
 {
-	auto self = shared_from_this();
-	int32 delayMs = GetUpdateDelay();
+	Update();
 
-	TimerQueue::AddTimer([self]() {
-		if (!self->IsActive()) return;
-
-		self->Update();
-
-		if (self->IsDirty())
-		{
-			self->BroadcastStatus();
-			self->ClearDirty();
-		}
-		int32 delayMs = self->GetUpdateDelay();
-		self->ScheduleUpdate();
-		}, delayMs, false);
+	if (IsDirty())
+	{
+		BroadcastStatus();
+		ClearDirty();
+	}
 }
 
 void Monster::BroadcastStatus()
@@ -490,7 +480,8 @@ void Monster::Patrol()
 	ChangeState(ECharacterStateType::STATE_WALK);
 	FVector currentPos = GetPos();
 	FVector newPos = _navMesh->GetNearbyRandomPosition(currentPos);
-	_info.SetLocationAndYaw(newPos);
+	UpdatePos(newPos);
+
 	if (RandomUtils::GetRandomBool())
 	{
 		ChangeState(ECharacterStateType::STATE_IDLE);

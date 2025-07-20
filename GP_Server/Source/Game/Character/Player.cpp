@@ -562,7 +562,11 @@ void Player::CheckAndUpdateQuestProgress(EQuestCategory type)
 	}
 	case EQuestCategory::KILL:
 	{
-		if (quest == QuestType::CH1_BUNKER_CLEANUP || quest == QuestType::TUT_KILL_ONE_MON || quest == QuestType::CH2_KILL_DESKMON)
+		if (quest == QuestType::CH1_BUNKER_CLEANUP
+			|| quest == QuestType::TUT_KILL_ONE_MON 
+			|| quest == QuestType::CH2_KILL_DESKMON
+			|| quest == QuestType::CH3_KILL_DRILL
+			|| quest == QuestType::CH4_KILL_TINO)
 		{
 			res = true;
 		}

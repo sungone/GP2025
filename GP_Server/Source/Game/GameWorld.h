@@ -42,6 +42,7 @@ public:
 
 	// Monster
 	void CreateMonster();
+	void TestUpdateAll();
 	void OnMonsterDead(int32 monsterId);
 	void UpdateMonsterState(int32 id, ECharacterStateType newState);
 	void MonsterRespawn(int32 monsterId);
@@ -88,7 +89,7 @@ public:
 	void EnterGrid(int32 id, const FVector& pos);
 	void LeaveGrid(int32 id, const FVector& pos);
 	void MoveGrid(int32 id, const FVector& oldPos, const FVector& newPos);
-
+	void UpdateMoveGridInTUK(int32 id, const FVector& oldPos, const FVector& pos);
 	std::vector<int32> QueryNearbyCharacters(const FVector& pos);
 	GridPos GetGridPos(const FVector& pos);
 

@@ -1136,6 +1136,11 @@ void UGPObjectManager::OnQuestStart(QuestType Quest)
 		if (MyPlayer && MyPlayer->NetMgr)
 		{
 			MyPlayer->NetMgr->SendMyCompleteQuest(QuestType::TUT_COMPLETE);
+			UGPInGameWidget* InGameUI = MyPlayer->UIManager->GetInGameWidget();
+			if (!InGameUI) return;
+
+			FText QuestMessage = FText::FromString(TEXT("튜토리얼 퀘스트를 완료했습니다."));
+			InGameUI->ShowGameMessage(QuestMessage, 3.f);
 		}
 	}
 }

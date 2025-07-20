@@ -21,13 +21,8 @@ void Character::OnDamaged(float damage)
 
 void Character::UpdatePos(const FVector& newPos)
 {
-	auto old = GetPos();
+	_prevPos = GetPos();
 	GetInfo().SetLocationAndYaw(newPos);
-
-	if (GetZone() == ZoneType::TUK)
-	{
-		_world->MoveGrid(_id, old, newPos);
-	}
 }
 
 bool Character::IsCollision(const FVector& pos, float dist)

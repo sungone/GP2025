@@ -32,6 +32,7 @@ public:
 	virtual void ChangeState(ECharacterStateType newState) = 0;
 	FInfoData& GetInfo() { return _info; }
 	FVector GetPos() const { return _info.Pos; }
+	FVector GetPrevPos() const { return _prevPos; }
 	ZoneType GetZone() { return _info.GetZone(); }
 	void SetInfo(const FInfoData& info) { _info = info; }
 	void SetPos(const FVector& pos) { _info.Pos = pos; }
@@ -50,5 +51,6 @@ protected:
 	int32& _id = _info.ID;
 	std::unordered_set<int32> _viewList;
 	EWorldChannel _channelId = EWorldChannel::None;
+	FVector _prevPos;
 };
 
