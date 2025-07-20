@@ -86,14 +86,14 @@ void Player::OnDamaged(float damage)
 	Character::OnDamaged(damage);
 	auto pkt = InfoPacket(EPacketType::S_DAMAGED_PLAYER, GetInfo());
 	SessionManager::GetInst().SendPacket(_id, &pkt);
-	//auto world = _world;
-	//if (IsDead())
-	//{
-	//	ChangeState(ECharacterStateType::STATE_DIE);
-	//	auto playerID = _id;
-	//	TimerQueue::AddTimer([playerID, world] { world->PlayerDead(playerID);}, 10, false);
-	//	TimerQueue::AddTimer([playerID, world] { world->RespawnPlayer(playerID, ZoneType::TUK);}, 3000, false);
-	//}
+	auto world = _world;
+	if (IsDead())
+	{
+		ChangeState(ECharacterStateType::STATE_DIE);
+		auto playerID = _id;
+		TimerQueue::AddTimer([playerID, world] { world->PlayerDead(playerID);}, 10, false);
+		TimerQueue::AddTimer([playerID, world] { world->RespawnPlayer(playerID, ZoneType::TUK);}, 3000, false);
+	}
 }
 
 void Player::UpdateViewList(std::shared_ptr<Character> other)
