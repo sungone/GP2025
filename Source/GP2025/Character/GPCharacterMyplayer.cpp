@@ -397,4 +397,15 @@ void AGPCharacterMyplayer::PlayFadeIn()
 	}
 }
 
+void AGPCharacterMyplayer::SetDead(bool bDead)
+{
+	if (bDead)
+	{
+		DisableInput(Cast<APlayerController>(GetController()));
+	}
+	else
+	{
+		EnableInput(Cast<APlayerController>(GetController()));
+	}
+}
 

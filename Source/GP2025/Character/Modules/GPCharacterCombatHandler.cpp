@@ -220,7 +220,6 @@ void UGPCharacterCombatHandler::HandleDeath()
 	}
 	else
 	{
-
 		Owner->GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda([LocalOwner]()
 			{
 				if (!LocalOwner) return;

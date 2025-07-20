@@ -111,4 +111,6 @@ public:
 	// Tutorial Timer
 	FTimerHandle TutorialWidgetTimerHandle;
 
+public :
+	void SetDead(bool bDead);
 };

@@ -355,6 +355,7 @@ void UGPObjectManager::HandlePlayerDeath(int32 playerId)
 
 	if (TargetPlayer == MyPlayer)
 	{
+		MyPlayer->SetDead(true);
 		if (MyPlayer->UIManager)
 		{
 			MyPlayer->UIManager->ShowDeadScreen();
@@ -1093,6 +1094,8 @@ void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
 		MyPlayer->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 		MyPlayer->GetMesh()->SetVisibility(true, true);
 		MyPlayer->GetMesh()->SetHiddenInGame(false);
+
+		MyPlayer->SetDead(false);
 
 		if (MyPlayer->SoundManager)
 		{
