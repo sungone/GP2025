@@ -14,9 +14,11 @@ bool GameWorld::Init(EWorldChannel channelId)
 
 std::shared_ptr<Player> GameWorld::GetPlayerByID(int32 id)
 {
-	if (id < 0 || id >= MAX_PLAYER) return nullptr;
 	std::unique_lock lock(_mtPlayers);
-	return _players[id];
+	auto it = _players.find(id);
+	if (it != _players.end())
+		return it->second;
+	return nullptr;
 }
 
 std::shared_ptr<Monster> GameWorld::GetMonsterByID(int32 id)
