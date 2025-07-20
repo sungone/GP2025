@@ -70,6 +70,8 @@ public:
 	void OnQuestStart(QuestType Quest);
 	void OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpReward, uint32 GoldReward);
 
+	UFUNCTION()
+	void HideTinoMonstersTemporarily(float Duration);
 
 	// Friend
 	void AddRequestFriend(const FFriendInfo& FriendInfo);
