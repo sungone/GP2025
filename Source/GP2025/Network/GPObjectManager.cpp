@@ -1095,8 +1095,6 @@ void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
 		MyPlayer->GetMesh()->SetVisibility(true, true);
 		MyPlayer->GetMesh()->SetHiddenInGame(false);
 
-		MyPlayer->SetDead(false);
-
 		if (MyPlayer->SoundManager)
 		{
 			USoundBase** FoundSound = MyPlayer->SoundManager->LevelBGMSounds.Find(TEXT("TUK"));
@@ -1117,6 +1115,20 @@ void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
 	}
 	UpdatePlayer(info);
 	ChangeZone(oldZone, newZone, RandomPos);
+
+	FTimerHandle RespawnDelayHandle;
+	MyPlayer->GetWorldTimerManager().SetTimer(
+		RespawnDelayHandle,
+		FTimerDelegate::CreateLambda([this]()
+			{
+				if (MyPlayer)
+				{
+					MyPlayer->SetDead(false);
+				}
+			}),
+		2.f,
+		false
+	);
 }
 
 void UGPObjectManager::OnQuestStart(QuestType Quest)
