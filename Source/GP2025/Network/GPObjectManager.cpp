@@ -1234,7 +1234,11 @@ void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpR
 
 	if (MyPlayer && MyPlayer->UIManager)
 	{
-		if (MyPlayer->SoundManager && MyPlayer->SoundManager->QuestClearSound)
+		if (MyPlayer->SoundManager && Quest == QuestType::CH4_KILL_TINO)
+		{
+			MyPlayer->SoundManager->PlaySFX(MyPlayer->SoundManager->FinalQuestClearSound);
+		}
+		else if (MyPlayer->SoundManager && MyPlayer->SoundManager->QuestClearSound)
 		{
 			MyPlayer->SoundManager->PlaySFX(MyPlayer->SoundManager->QuestClearSound);
 		}

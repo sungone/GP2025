@@ -113,4 +113,7 @@ public :
 
 	UPROPERTY()
 	USoundBase* PlayerHit;
+
+	UPROPERTY()
+	USoundBase* FinalQuestClearSound;
 };

@@ -517,7 +517,6 @@ void UGPMyplayerInputHandler::UseSkillE()
 		float BoostDuration = 10.f; // 공격속도 증가 지속 시간
 		Owner->CombatHandler->ApplyAttackSpeedBoost(BoostPlayRate, BoostDuration);
 	}
-
 }
 
 void UGPMyplayerInputHandler::UseSkillR()
