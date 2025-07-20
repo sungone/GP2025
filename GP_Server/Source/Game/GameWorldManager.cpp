@@ -18,8 +18,6 @@ bool GameWorldManager::Init()
 
 void GameWorldManager::CreateChannel(EWorldChannel channelId)
 {
-	std::lock_guard<std::mutex> lock(_mutex);
-
 	if (_gameWorlds.contains(channelId))
 		return;
 
@@ -92,7 +90,6 @@ void GameWorldManager::UpdateWorldStates()
 	for (auto& [channel, world] : _gameWorlds)
 	{
 		int32 playerCount = world->GetPlayerCount();
-		LOG_I("Channel <{}> Player Count: {}", ENUM_NAME(channel), playerCount);
 		EWorldState newState = EWorldState::Normal;
 		if (playerCount < GOOD_STATE_WORLD)
 			_worldStates[channel] = EWorldState::Good;
@@ -100,6 +97,7 @@ void GameWorldManager::UpdateWorldStates()
 			_worldStates[channel] = EWorldState::Normal;
 		else
 			_worldStates[channel] = EWorldState::Bad;
-		LOG_I(" => State: {}", ENUM_NAME(_worldStates[channel]));
+		LOG_I("Ch{}. Player = {} ({})", static_cast<uint8>(channel), playerCount, ENUM_NAME(_worldStates[channel]));
 	}
+	LOG_I("=== World States Updated ===");
 }

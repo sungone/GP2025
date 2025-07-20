@@ -57,18 +57,6 @@ bool Server::Init()
 		return false;
 	}
 
-	if (!Map::GetInst().Init())
-	{
-		LOG_E("MapZone");
-		return false;
-	}
-
-	if (!GameWorldManager::GetInst().Init())
-	{
-		LOG_E("GameMgr");
-		return false;
-	}
-
 	bool res =
 		ItemTable::GetInst().LoadFromCSV(DataTablePath + "ItemTable.csv") &&
 		PlayerLevelTable::GetInst().LoadFromCSV(DataTablePath + "PlayerLevelTable.csv") &&
@@ -80,6 +68,18 @@ bool Server::Init()
 	if (!res)
 	{
 		LOG_E("LoadFromCSV");
+		return false;
+	}
+
+	if (!Map::GetInst().Init())
+	{
+		LOG_E("MapZone");
+		return false;
+	}
+
+	if (!GameWorldManager::GetInst().Init())
+	{
+		LOG_E("GameMgr");
 		return false;
 	}
 

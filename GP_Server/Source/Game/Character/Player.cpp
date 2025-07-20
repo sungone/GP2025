@@ -43,7 +43,6 @@ void Player::SaveToDB(uint32 dbId)
 
 void Player::SetCharacterType(Type::EPlayer type)
 {
-	LOG_D("Set type {}", (type == Type::EPlayer::WARRIOR) ? "warrior" : "gunner");
 	_playerType = type;
 	_info.CharacterType = static_cast<uint8>(_playerType);
 	if (_playerType == Type::EPlayer::WARRIOR)
@@ -591,9 +590,6 @@ void Player::CheckAndUpdateQuestProgress(EQuestCategory type)
 
 bool Player::GiveQuestReward(QuestType quest)
 {
-	if (!IsQuestInProgress(quest))
-		return false;
-
 	const QuestData* questData = _curQuestData;
 	if (!_curQuestData)
 	{
@@ -682,8 +678,6 @@ bool Player::RejectTutorialQuest()
 	_curQuest.Status = EQuestStatus::InProgress;
 	_curQuestData = questData;
 
-	LOG_I("Start Quest [{}] = '{} ", static_cast<uint8>(questData->QuestID), ENUM_NAME(newQuest));
-
 	auto qpkt = QuestStartPacket(questData->QuestID);
 	SessionManager::GetInst().SendPacket(_id, &qpkt);
 	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, GetInfo());
@@ -696,7 +690,6 @@ bool Player::RejectTutorialQuest()
 
 bool Player::IsQuestInProgress(QuestType quest) const
 {
-	LOG_I("CompletQuest [{}] == CurQuest[{}] ??", ENUM_NAME(quest), ENUM_NAME(_curQuest.QuestType));
 	return _curQuest.QuestType == quest && _curQuest.Status == EQuestStatus::InProgress;
 }
 

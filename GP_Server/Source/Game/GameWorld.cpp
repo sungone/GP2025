@@ -918,18 +918,16 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 		LOG_W("Invalid");
 		return;
 	}
-	if (player->IsQuestInProgress(quest))
+
+	const QuestData* questData = QuestTable::GetInst().GetQuest(quest);
+	if (!questData)
 	{
-		const QuestData* questData = QuestTable::GetInst().GetQuest(quest);
-		if (!questData)
-		{
-			LOG_W("Invalid quest ID");
-			return;
-		}
-		auto type = questData->Catagory;
-		if (type == EQuestCategory::MOVE || type == EQuestCategory::INTERACT)
-			player->CheckAndUpdateQuestProgress(type);
+		LOG_W("Invalid quest ID");
+		return;
 	}
+	auto type = questData->Catagory;
+	if (type == EQuestCategory::MOVE || type == EQuestCategory::INTERACT)
+		player->CheckAndUpdateQuestProgress(type);
 }
 
 void GameWorld::RejectQuest(int32 playerId, QuestType quest)
