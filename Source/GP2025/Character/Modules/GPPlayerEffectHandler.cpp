@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Character/GPCharacterPlayer.h"
 #include "NiagaraSystem.h"
+#include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Boss/GPEarthQuakeRockActor.h"
 
@@ -40,13 +41,13 @@ UGPPlayerEffectHandler::UGPPlayerEffectHandler()
         CriticalEffect = CriticalEffectFinder.Object;
     }
 
-    ConstructorHelpers::FObjectFinder<UNiagaraSystem> HealEffectAsset(TEXT("/Game/Effects/NS_HealEffect.NS_HealEffect"));
+    ConstructorHelpers::FObjectFinder<UNiagaraSystem> HealEffectAsset(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Heal_Instant_01.NS_ARPGEssentials_Heal_Instant_01"));
     if (HealEffectAsset.Succeeded())
     {
         HealEffect = HealEffectAsset.Object;
     }
 
-    ConstructorHelpers::FObjectFinder<UNiagaraSystem> AttackBuffEffectAsset(TEXT("/Game/Effects/NS_AttackBuffEffect.NS_AttackBuffEffect"));
+    ConstructorHelpers::FObjectFinder<UNiagaraSystem> AttackBuffEffectAsset(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Debuff_Instant_01.NS_ARPGEssentials_Debuff_Instant_01"));
     if (AttackBuffEffectAsset.Succeeded())
     {
         AttackBuffEffect = AttackBuffEffectAsset.Object;
@@ -144,28 +145,34 @@ void UGPPlayerEffectHandler::PlayPlayerCriticalEffect()
 
 void UGPPlayerEffectHandler::PlayHealEffect()
 {
-    if (!HealEffect) return;
-
-    FVector SpawnLocation = Owner->GetActorLocation() + FVector(0, 0, 80); // 머리 위로 약간
-    UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-        GetWorld(),
-        HealEffect,
-        SpawnLocation,
-        Owner->GetActorRotation()
-    );
+    if (Owner && HealEffect)
+    {
+        UNiagaraFunctionLibrary::SpawnSystemAttached(
+            HealEffect,
+            Owner->GetRootComponent(),
+            TEXT("Hips"),
+            FVector::ZeroVector,
+            FRotator::ZeroRotator,
+            EAttachLocation::SnapToTargetIncludingScale,
+            true
+        );
+    }
 }
 
 void UGPPlayerEffectHandler::PlayAttackBuffEffect()
 {
-    if (!AttackBuffEffect) return;
-
-    FVector SpawnLocation = Owner->GetActorLocation() + FVector(0, 0, 80); // 머리 위로 약간
-    UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-        GetWorld(),
-        AttackBuffEffect,
-        SpawnLocation,
-        Owner->GetActorRotation()
-    );
+    if (Owner && AttackBuffEffect)
+    {
+        UNiagaraFunctionLibrary::SpawnSystemAttached(
+            AttackBuffEffect,
+            Owner->GetRootComponent(),
+            TEXT("Hips"),
+            FVector::ZeroVector,
+            FRotator::ZeroRotator,
+            EAttachLocation::SnapToTargetIncludingScale,
+            true
+        );
+    }
 }
 
 void UGPPlayerEffectHandler::PlayEarthQuakeRock(const FVector& RockPos)

@@ -853,6 +853,64 @@ void UGPObjectManager::UseInventoryItem(uint32 ItemID)
 	}
 	UE_LOG(LogTemp, Log, TEXT("[UseInventoryItem] Inventory Widget is valid"));
 
+	// 스킬 이펙트 처리
+	for (UGPItemSlot* Slot : Inventory->EatableSlots)
+	{
+		if (!Slot)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[UseInventoryItem] Found null slot in EatableSlots"));
+			continue;
+		}
+
+		const TArray<int32>& UniqueIDs = Slot->SlotData.ItemUniqueIDs;
+		UE_LOG(LogTemp, Log, TEXT("[UseInventoryItem] Checking Slot: %s"), *Slot->GetName());
+
+		if (UniqueIDs.Contains(ItemID))
+		{
+			UE_LOG(LogTemp, Log, TEXT("[UseInventoryItem] Match found in Slot: %s with ItemID: %d"), *Slot->GetName(), ItemID);
+
+			FDataTableRowHandle TypeID = Slot->SlotData.ItemID;
+			FName Row = TypeID.RowName;
+			UE_LOG(LogTemp, Log, TEXT("[UseInventoryItem] Item RowName: %s"), *Row.ToString());
+
+			// 회복 아이템 (RowName: 20, 21, 22 , 23)
+			if (Row == FName("20") || Row == FName("21") || Row == FName("22") || Row == FName("23"))
+			{
+				UE_LOG(LogTemp, Log, TEXT("[UseInventoryItem] Detected Heal item with RowName: %s"), *Row.ToString());
+				if (MyPlayer->EffectHandler)
+				{
+					MyPlayer->EffectHandler->PlayHealEffect();
+					UE_LOG(LogTemp, Log, TEXT("[UseInventoryItem] Heal effect played"));
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("[UseInventoryItem] EffectHandler is null (Heal)"));
+				}
+			}
+			// 공격력 버프 아이템 (RowName: 24, 25)
+			else if (Row == FName("24") || Row == FName("25"))
+			{
+				UE_LOG(LogTemp, Log, TEXT("[UseInventoryItem] Detected Attack Buff item with RowName: %s"), *Row.ToString());
+				if (MyPlayer->EffectHandler)
+				{
+					MyPlayer->EffectHandler->PlayAttackBuffEffect();
+					UE_LOG(LogTemp, Log, TEXT("[UseInventoryItem] Attack buff effect played"));
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("[UseInventoryItem] EffectHandler is null (Buff)"));
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[UseInventoryItem] Unknown item RowName: %s - No effect played"), *Row.ToString());
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("[UseInventoryItem] Slot %s does not contain ItemID %d"), *Slot->GetName(), ItemID);
+		}
+	}
 	// Use the item
 	Inventory->UseItemFromInventory(ItemID);
 }
