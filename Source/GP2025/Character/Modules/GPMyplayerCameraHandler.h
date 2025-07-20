@@ -43,8 +43,7 @@ public:
 
 	FVector DefaultCameraOffset = FVector(0.f, 0.f, 150.f);
 	FRotator DefaultCameraRotationOffset = FRotator(-35.f, 0.f, 0.f);
-	// FVector ZoomedCameraOffset = FVector(50.f, 30.f, 100.f);
-	FVector ZoomedCameraOffset = FVector(40.f, 60.f, 70.f);
+	FVector ZoomedCameraOffset = FVector(50.f, 30.f, 100.f);
 	float DefaultArmLength = 600.f;
 	float ZoomedArmLength = 150.f;
 

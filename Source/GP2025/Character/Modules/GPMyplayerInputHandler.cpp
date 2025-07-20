@@ -201,7 +201,19 @@ void UGPMyplayerInputHandler::AutoAttack()
 		{
 			Owner->CharacterInfo.AddState(STATE_AUTOATTACK);
 			Owner->CombatHandler->PlayAutoAttackMontage();
-			Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
+			FTimerHandle TimerHandle;
+			Owner->GetWorldTimerManager().SetTimer(
+				TimerHandle,
+				FTimerDelegate::CreateLambda([this]()
+					{
+						if (Owner)
+						{
+							Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
+						}
+					}),
+				0.2f,
+				false
+			);
 		}
 
 		if (Owner->bIsGunnerCharacter())
@@ -215,7 +227,19 @@ void UGPMyplayerInputHandler::AutoAttack()
 		{
 			Owner->CharacterInfo.AddState(STATE_AUTOATTACK);
 			Owner->CombatHandler->PlayAutoAttackMontage();
-			Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
+			FTimerHandle TimerHandle;
+			Owner->GetWorldTimerManager().SetTimer(
+				TimerHandle,
+				FTimerDelegate::CreateLambda([this]()
+					{
+						if (Owner)
+						{
+							Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
+						}
+					}),
+				0.1f,  
+				false
+			);
 		}
 	}
 }
@@ -408,8 +432,20 @@ void UGPMyplayerInputHandler::UseSkillQ()
 		Owner->CharacterInfo.AddState(STATE_SKILL_Q);
 		Owner->CombatHandler->PlayQSkillMontage();
 		Owner->NetMgr->SendMyUseSkillStart(ESkillGroup::Throwing, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
-		Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
 		Owner->GunnerAttackCameraShake();
+		FTimerHandle TimerHandle;
+		Owner->GetWorldTimerManager().SetTimer(
+			TimerHandle,
+			FTimerDelegate::CreateLambda([this]()
+				{
+					if (Owner)
+					{
+						Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
+					}
+				}),
+			0.2f,  // 지연 시간 (초)
+			false
+		);
 	}
 	else
 	{
@@ -417,7 +453,19 @@ void UGPMyplayerInputHandler::UseSkillQ()
 		Owner->CharacterInfo.AddState(STATE_SKILL_Q);
 		Owner->CombatHandler->PlayQSkillMontage();
 		Owner->NetMgr->SendMyUseSkillStart(ESkillGroup::HitHard, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
-		Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
+		FTimerHandle TimerHandle;
+		Owner->GetWorldTimerManager().SetTimer(
+			TimerHandle,
+			FTimerDelegate::CreateLambda([this]()
+				{
+					if (Owner)
+					{
+						Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
+					}
+				}),
+			0.1f,  // 지연 시간 (초)
+			false
+		);
 	}
 }
 
@@ -443,8 +491,20 @@ void UGPMyplayerInputHandler::UseSkillE()
 		Owner->CharacterInfo.AddState(STATE_SKILL_E);
 		Owner->CombatHandler->PlayESkillMontage();
 		Owner->NetMgr->SendMyUseSkillStart(ESkillGroup::FThrowing, Owner->GetControlRotation().Yaw, Owner->GetActorLocation());
-		Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
 		Owner->GunnerAttackCameraShake();
+		FTimerHandle TimerHandle;
+		Owner->GetWorldTimerManager().SetTimer(
+			TimerHandle,
+			FTimerDelegate::CreateLambda([this]()
+				{
+					if (Owner)
+					{
+						Owner->NetMgr->SendMyAttackPacket(Owner->GetActorRotation().Yaw, Owner->GetActorLocation());
+					}
+				}),
+			0.2f,
+			false
+		);
 	}
 	else
 	{
