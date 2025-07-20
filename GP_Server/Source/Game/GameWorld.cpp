@@ -6,6 +6,9 @@ bool GameWorld::Init(EWorldChannel channelId)
 	_channelId = channelId;
 
 	CreateMonster();
+	TimerQueue::AddTimer([this]() {
+		TestUpdateAll();
+		}, 1000, true);
 	return true;
 }
 
@@ -47,6 +50,11 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 	newPos.Z += 90.f;
 
 	player->UpdatePos(newPos);
+	if (startZone == ZoneType::TUK)
+	{
+		std::lock_guard lock(_gridMutex);
+		EnterGrid(player->GetInfo().ID, newPos);
+	}
 	int32 playerId = player->GetInfo().ID;
 	player->GetInfo().SetZone(startZone);
 
@@ -186,7 +194,7 @@ void GameWorld::PlayerRemoveState(int32 playerId, ECharacterStateType oldState)
 	}
 }
 
-void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& time)
+void GameWorld::PlayerMove(int32 playerId, FVector& newPos, uint32 state, uint64& time)
 {
 	auto player = GetPlayerByID(playerId);
 	if (!player)
@@ -195,12 +203,17 @@ void GameWorld::PlayerMove(int32 playerId, FVector& pos, uint32 state, uint64& t
 
 		return;
 	}
-	LOG_D("Player [{}] Move {}", playerId, pos.ToString());
-	player->UpdatePos(pos);
+	LOG_D("Player [{}] Move {}", playerId, newPos.ToString());
+	player->UpdatePos(newPos);
+	if (player->GetZone() == ZoneType::TUK)
+	{
+		auto oldPos = player->GetPrevPos();
+		UpdateMoveGridInTUK(playerId, oldPos, newPos);
+	}
 	player->GetInfo().State = static_cast<ECharacterStateType>(state);
 	UpdateViewList(playerId);
 
-	auto pkt = MovePacket(playerId, pos, state, time, EPacketType::S_PLAYER_MOVE);
+	auto pkt = MovePacket(playerId, newPos, state, time, EPacketType::S_PLAYER_MOVE);
 	SessionManager::GetInst().SendPacket(playerId, &pkt);
 	auto upkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, player->GetInfo());
 	std::unordered_set<int32> viewList;
@@ -378,6 +391,26 @@ void GameWorld::CreateMonster()
 			}
 		}
 		_monsterCnt[zone] = zoneMap.size();
+	}
+}
+void GameWorld::TestUpdateAll()//Todo: 그리드 업데이트 월드에서 호출하니까 데드락크래시 사라짐.. 이거 개선하자
+{
+	std::lock_guard<std::mutex> lock(_mtMonZMap);
+	for (auto& [zone, monsters] : _monstersByZone)
+	{
+		for (auto& [id, monster] : monsters)
+		{
+			if (monster && monster->IsActive())
+			{
+				monster->ScheduleUpdate();
+				auto newPos = monster->GetPos();
+				if (monster->GetZone() == ZoneType::TUK)
+				{
+					auto oldPos = monster->GetPrevPos();
+					UpdateMoveGridInTUK(id, oldPos, newPos);
+				}
+			}
+		}
 	}
 }
 
@@ -717,7 +750,16 @@ bool GameWorld::TransferToZone(int32 playerId, ZoneType newZone)
 
 	info.SetZone(newZone);
 	player->UpdatePos(newPos);
-
+	if (newZone == ZoneType::TUK)
+	{
+		std::lock_guard lock(_gridMutex);
+		EnterGrid(playerId, newPos);
+	}
+	else
+	{
+		std::lock_guard lock(_gridMutex);
+		LeaveGrid(playerId, player->GetPrevPos());
+	}
 	ClearViewList(playerId);
 	ClearItems(playerId, oldZone);
 
@@ -734,6 +776,13 @@ bool GameWorld::TransferToZone(int32 playerId, ZoneType newZone)
 
 	InitViewList(playerId, newZone);
 	AddItems(playerId, newZone);
+	if(newZone == ZoneType::E ||newZone == ZoneType::GYM)
+	{
+		auto quest = player->GetCurrentQuest();
+		if(quest == QuestType::CH2_ENTER_E_BUILDING||quest == QuestType::CH4_ENTER_GYM)
+			player->CheckAndUpdateQuestProgress(EQuestCategory::MOVE);
+	}
+
 	return true;
 }
 
@@ -753,6 +802,16 @@ void GameWorld::RespawnPlayer(int32 playerId, ZoneType newZone)
 	auto& info = player->GetInfo();
 	info.SetZone(newZone);
 	player->UpdatePos(newPos);
+	if (newZone == ZoneType::TUK)
+	{
+		std::lock_guard lock(_gridMutex);
+		EnterGrid(playerId, newPos);
+	}
+	else
+	{
+		std::lock_guard lock(_gridMutex);
+		LeaveGrid(playerId, player->GetPrevPos());
+	}
 	auto oldName = ENUM_NAME(oldZone);
 	auto newName = ENUM_NAME(newZone);
 	LOG_D("Respawn <{}> To <{}>", oldName, newName);
@@ -1073,6 +1132,12 @@ void GameWorld::MoveGrid(int32 id, const FVector& oldPos, const FVector& newPos)
 		LeaveGrid(id, oldPos);
 		EnterGrid(id, newPos);
 	}
+}
+
+void GameWorld::UpdateMoveGridInTUK(int32 id, const FVector& oldPos, const FVector& pos)
+{
+	std::lock_guard lock(_gridMutex);
+	MoveGrid(id, oldPos, pos);
 }
 
 std::vector<int32> GameWorld::QueryNearbyCharacters(const FVector& pos)
