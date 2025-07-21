@@ -104,8 +104,8 @@ private:
 	void ReceiveData();
 private:
 	class FSocket* Socket;
-	FString IpAddress = SERVER_IP;
-	//FString IpAddress = "211.188.61.31";
+	//FString IpAddress = SERVER_IP;
+	FString IpAddress = "211.188.61.31";
 	int16 Port = SERVER_PORT;
 
 	UPROPERTY()
