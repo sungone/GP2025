@@ -53,7 +53,7 @@ FSlateColor UGPInGameWidget::GetQSkillTextColor()
 {
 	if (QSkillBar && QSkillBar->GetPercent() >= 1.0f - KINDA_SMALL_NUMBER)
 	{
-		return FSlateColor(FLinearColor::Blue); // 쿨타임 완료: 파란색
+		return FSlateColor(FLinearColor(0.0f, 0.414f, 0.505f, 1.0f)); 
 	}
 
 	return FSlateColor(FLinearColor::White); // 기본 텍스트 색
@@ -63,7 +63,7 @@ FSlateColor UGPInGameWidget::GetESkillTextColor()
 {
 	if (ESkillBar && ESkillBar->GetPercent() >= 1.0f - KINDA_SMALL_NUMBER)
 	{
-		return FSlateColor(FLinearColor::Blue);
+		return FSlateColor(FLinearColor(0.0f, 0.414f, 0.505f, 1.0f));
 	}
 
 	return FSlateColor(FLinearColor::White);
@@ -73,7 +73,7 @@ FSlateColor UGPInGameWidget::GetRSkillTextColor()
 {
 	if (RSkillBar && RSkillBar->GetPercent() >= 1.0f - KINDA_SMALL_NUMBER)
 	{
-		return FSlateColor(FLinearColor::Blue);
+		return FSlateColor(FLinearColor(0.0f, 0.414f, 0.505f, 1.0f));
 	}
 
 	return FSlateColor(FLinearColor::White);
