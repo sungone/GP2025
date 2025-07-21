@@ -46,6 +46,9 @@ public :
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	class USoundBase* MonsterCriticalHitSound;
 
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	class USoundBase* MonsterDeadSound;
+
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* SceneRoot;
 

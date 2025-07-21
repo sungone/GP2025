@@ -12,14 +12,19 @@ void UGPQuestListEntryWidget::NativeConstruct()
 
 void UGPQuestListEntryWidget::SetQuestState(bool bIsSuccess)
 {
-	if (!QuestStateText) return;
+    UE_LOG(LogTemp, Log, TEXT("[QuestListEntryWidget::SetQuestState] bIsSuccess: %s"), bIsSuccess ? TEXT("true") : TEXT("false"));
 
-	FString StateText = bIsSuccess ? TEXT("성공") : TEXT("진행중");
+    if (!QuestStateText)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[QuestListEntryWidget::SetQuestState] QuestStateText is null."));
+        return;
+    }
 
-	QuestStateText->SetText(FText::FromString(StateText));
+    FString StateText = bIsSuccess ? TEXT("성공") : TEXT("진행중");
+    QuestStateText->SetText(FText::FromString(StateText));
 
-	FLinearColor StateColor = bIsSuccess ? FLinearColor::Green : FLinearColor::Yellow;
-	QuestStateText->SetColorAndOpacity(FSlateColor(StateColor));
+    FLinearColor StateColor = bIsSuccess ? FLinearColor::Green : FLinearColor::Yellow;
+    QuestStateText->SetColorAndOpacity(FSlateColor(StateColor));
 }
 
 void UGPQuestListEntryWidget::SetQuestTask(uint8 InQuestType)

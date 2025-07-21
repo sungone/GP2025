@@ -478,6 +478,16 @@ void UGPObjectManager::HandleMonsterDeath(int32 MonsterID)
 		if (WeakMonsterPtr->IsValid())
 		{
 			AGPCharacterMonster* Monster = WeakMonsterPtr->Get();
+
+			if (Monster->MonsterDeadSound)
+			{
+				UGameplayStatics::PlaySoundAtLocation(
+					Monster,
+					Monster->MonsterDeadSound,
+					Monster->GetActorLocation()
+				);
+			}
+
 			Monster->CombatHandler->HandleDeath();
 
 		}
@@ -585,7 +595,7 @@ void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage
 				}
 			}
 
-			if (SoundToPlay)
+			if (SoundToPlay && Monster->CharacterInfo.GetHp() > 0)
 			{
 				UGameplayStatics::PlaySoundAtLocation(
 					Monster,

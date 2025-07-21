@@ -78,9 +78,15 @@ void UGPQuestListWidget::AddQuestEntry(uint8 QuestType, bool bIsSuccess)
 
 void UGPQuestListWidget::UpdateQuestState(uint8 QuestType, bool bIsSuccess)
 {
-    if (UGPQuestListEntryWidget** FoundEntry = QuestEntries.Find(QuestType))
-    {
-        (*FoundEntry)->SetQuestState(bIsSuccess);
-    }
+	if (QuestType == 14) // Tino Quest Clear
+	{
+		List0->SetQuestState(true);
+		return;
+	}
+
+	if (UGPQuestListEntryWidget** FoundEntry = QuestEntries.Find(QuestType))
+	{
+		(*FoundEntry)->SetQuestState(bIsSuccess);
+	}
 }
 
