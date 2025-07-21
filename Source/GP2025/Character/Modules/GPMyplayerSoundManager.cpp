@@ -64,6 +64,9 @@ UGPMyplayerSoundManager::UGPMyplayerSoundManager()
 	LOAD_SFX(PlayerHit, PlayerHit);
 	LOAD_SFX(ShopBuySellSound, ShopBuySellSound);
 	LOAD_SFX(FinalQuestClearSound, FinalQuestClearSound);
+	LOAD_SFX(WarriorDeadSound, WarriorDeadSound);
+	LOAD_SFX(GunnerDeadSound, GunnerDeadSound);
+
 }
 
 void UGPMyplayerSoundManager::Initialize(AGPCharacterMyplayer* InOwner)

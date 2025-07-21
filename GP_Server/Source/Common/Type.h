@@ -364,6 +364,7 @@ enum class QuestType : uint8
 	// Chapter 4
 	CH4_ENTER_GYM,
 	CH4_KILL_TINO,
+	CH4_GAME_CLEAR,
 
 	// Tutorial
 	TUT_START = 100,

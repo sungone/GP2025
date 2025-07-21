@@ -355,7 +355,20 @@ void UGPObjectManager::HandlePlayerDeath(int32 playerId)
 
 	if (TargetPlayer == MyPlayer)
 	{
+
 		MyPlayer->SetDead(true);
+
+		if (MyPlayer->SoundManager)
+		{
+			if (MyPlayer->bIsGunnerCharacter())
+			{
+				MyPlayer->SoundManager->PlaySFX(MyPlayer->SoundManager->GunnerDeadSound);
+			}
+			else
+			{
+				MyPlayer->SoundManager->PlaySFX(MyPlayer->SoundManager->WarriorDeadSound);
+			}
+		}
 		if (MyPlayer->UIManager)
 		{
 			MyPlayer->UIManager->ShowDeadScreen();
@@ -1198,10 +1211,7 @@ void UGPObjectManager::OnQuestStart(QuestType Quest)
 		uint8 QuestID = static_cast<uint8>(Quest);
 		UE_LOG(LogTemp, Warning, TEXT("=== [ObjectManager] Calling UIManager->AddQuestEntry(%d) ==="), QuestID);
 		MyPlayer->UIManager->AddQuestEntry(QuestID, false);
-
-
 		MyPlayer->UIManager->ShowQuestStartMessage(Quest);
-
 	}
 
 	if (Quest == QuestType::TUT_COMPLETE) // 튜토리얼 완료는 바로 클리어
@@ -1237,6 +1247,7 @@ void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpR
 		if (MyPlayer->SoundManager && Quest == QuestType::CH4_KILL_TINO)
 		{
 			MyPlayer->SoundManager->PlaySFX(MyPlayer->SoundManager->FinalQuestClearSound);
+			MyPlayer->UIManager->ShowQuestStartMessage(QuestType::CH4_GAME_CLEAR);
 		}
 		else if (MyPlayer->SoundManager && MyPlayer->SoundManager->QuestClearSound)
 		{

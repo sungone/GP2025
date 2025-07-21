@@ -116,4 +116,10 @@ public :
 
 	UPROPERTY()
 	USoundBase* FinalQuestClearSound;
+
+	UPROPERTY()
+	USoundBase* WarriorDeadSound;
+
+	UPROPERTY()
+	USoundBase* GunnerDeadSound;
 };
