@@ -70,7 +70,6 @@ void UGPFriendBox::OnFriendListButtonClicked()
 	if (FriendWidgetSwitcher)
 	{
 		FriendWidgetSwitcher->SetActiveWidgetIndex(WidgetIndex::FriendList);
-		UE_LOG(LogTemp, Log, TEXT("[FriendBox] Switched to FriendList tab."));
 	}
 }
 
@@ -79,7 +78,6 @@ void UGPFriendBox::OnRequestListButtonClicked()
 	if (FriendWidgetSwitcher)
 	{
 		FriendWidgetSwitcher->SetActiveWidgetIndex(WidgetIndex::RequestList);
-		UE_LOG(LogTemp, Log, TEXT("[FriendBox] Switched to RequestList tab."));
 	}
 }
 
@@ -103,17 +101,14 @@ void UGPFriendBox::OnAddButtonClicked()
 		}
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("[FriendBox] AddButton clicked ¡æ Send FriendAddPacket to server."));
 	SendNicknameText->SetText(FText::GetEmpty());
 }
 
 void UGPFriendBox::OnRemoveButtonClicked()
 {
-	UE_LOG(LogTemp, Log, TEXT("[FriendBox] RemoveButton clicked ¡æ Send FriendRemovePacket to server."));
 
 	if (SelectedFriendUserID == MAX_uint32)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[FriendBox] No friend selected for removal."));
 		return;
 	}
 
@@ -140,11 +135,9 @@ void UGPFriendBox::OnAcceptButtonClicked()
 {
 	if (SelectedFriendUserID == MAX_uint32)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[FriendBox] No friend selected."));
 		return;
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("[FriendBox] Accepting friend with UserID: %d"), SelectedFriendUserID);
 
 	AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (MyPlayer && MyPlayer->NetMgr)
@@ -160,18 +153,14 @@ void UGPFriendBox::OnAcceptButtonClicked()
 			RequestList->RemoveFriendEntry(SelectedFriendUserID);
 		}
 	}
-	UE_LOG(LogTemp, Log, TEXT("[FriendBox] AcceptButton clicked ¡æ Send FriendAcceptPacket to server."));
 }
 
 void UGPFriendBox::OnRejectButtonClicked()
 {
 	if (SelectedFriendUserID == MAX_uint32)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[FriendBox] No friend selected for rejection."));
 		return;
 	}
-
-	UE_LOG(LogTemp, Log, TEXT("[FriendBox] Rejecting friend request from UserID: %d"), SelectedFriendUserID);
 
 	AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (MyPlayer && MyPlayer->NetMgr)
@@ -189,7 +178,6 @@ void UGPFriendBox::OnRejectButtonClicked()
 	}
 
 	SelectedFriendUserID = -1;
-	UE_LOG(LogTemp, Log, TEXT("[FriendBox] RejectButton clicked ¡æ Send FriendRejectPacket to server."));
 }
 
 void UGPFriendBox::PlayOpenAnimation()

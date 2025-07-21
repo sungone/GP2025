@@ -28,7 +28,6 @@ void UGPFriendEntry::OnEntryClicked()
     if (OwnerBox)
     {
         OwnerBox->SelectedFriendUserID = static_cast<uint32>(FriendUserID);
-        UE_LOG(LogTemp, Log, TEXT("[FriendEntry] Selected FriendUserID: %d"), FriendUserID);
     }
 }
 
