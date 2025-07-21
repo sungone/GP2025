@@ -307,10 +307,17 @@ void UGPMyplayerUIManager::AddQuestEntry(uint8 QuestType, bool bIsSuccess)
 
 void UGPMyplayerUIManager::UpdateQuestState(uint8 QuestType, bool bIsSuccess)
 {
+	UE_LOG(LogTemp, Log, TEXT("[UIManager::UpdateQuestState] QuestType: %d, bIsSuccess: %s"), QuestType, bIsSuccess ? TEXT("true") : TEXT("false"));
+
 	UGPQuestListWidget* QuestList = GetQuestListWidget();
 	if (QuestList)
 	{
+		UE_LOG(LogTemp, Log, TEXT("[UIManager::UpdateQuestState] QuestListWidget found. Calling UpdateQuestState on it."));
 		QuestList->UpdateQuestState(QuestType, bIsSuccess);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[UIManager::UpdateQuestState] QuestListWidget is null."));
 	}
 }
 

@@ -53,6 +53,12 @@ AGPCharacterMonster::AGPCharacterMonster()
 		MonsterCriticalHitSound = CritHitSoundObj.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<USoundBase> MonDeadSoundObj(TEXT("/Game/Sound/SFX/MonsterDeadSound.MonsterDeadSound"));
+	if (MonDeadSoundObj.Succeeded())
+	{
+		MonsterDeadSound = MonDeadSoundObj.Object;
+	}
+
 	SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
 	SetRootComponent(SceneRoot);
 
