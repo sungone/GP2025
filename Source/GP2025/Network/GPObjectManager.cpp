@@ -1049,7 +1049,7 @@ void UGPObjectManager::ChangeZone(ZoneType oldZone, ZoneType newZone, const FVec
 		case ZoneType::INDUSTY: return "industry";
 		default: return NAME_None;
 		}
-		};
+	};
 
 	FName OldLevel = GetLevelName(oldZone);
 	PendingLevelName = GetLevelName(newZone);

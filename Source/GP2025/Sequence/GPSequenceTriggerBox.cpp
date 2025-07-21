@@ -60,6 +60,7 @@ void AGPSequenceTriggerBox::OnOverlapBegin(AActor* OverlappedActor, AActor* Othe
     UGPObjectManager* ObjectMgr = GetWorld()->GetSubsystem<UGPObjectManager>();
     if (ObjectMgr)
     {
-        ObjectMgr->HideTinoMonstersTemporarily(4.5f);
+        // 티노 시퀀스 수행 후 티노 다시 Visible
+        ObjectMgr->HideTinoMonstersTemporarily(6.f);
     }
 }
