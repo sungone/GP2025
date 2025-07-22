@@ -3,13 +3,13 @@
 
 struct ItemStats
 {
-	int damage;
-	int hp;
+	float damage;
+	float hp;
 	float critRate;
 	float dodgeRate;
 	float moveSpeed;
 
-	ItemStats(int dmg = 0, int h = 0, float crit = 0.0f, float dodge = 0.0f, float speed = 0.0f)
+	ItemStats(float dmg = 0, float h = 0, float crit = 0.0f, float dodge = 0.0f, float speed = 0.0f)
 		: damage(dmg), hp(h), critRate(crit), dodgeRate(dodge), moveSpeed(speed) {
 	}
 };

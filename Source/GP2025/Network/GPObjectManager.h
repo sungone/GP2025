@@ -42,6 +42,7 @@ public:
 	void HandleMonsterDeath(int32 MonsterID);
 	void UpdateMonster(const FInfoData& MonsterInfo);
 	void DamagedMonster(const FInfoData& MonsterInfo, float Damage);
+	bool IsCritical(float Damage);
 	void PlayEarthQuakeEffect(const FVector& RockPos, bool bDebug);
 	void PlayFlameBreathEffect(const FVector& Origin, const FVector& Dir, float Range, float Angle, bool bDebug);
 

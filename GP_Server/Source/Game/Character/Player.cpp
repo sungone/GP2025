@@ -719,19 +719,25 @@ bool Player::CompleteCurrentQuest()
 
 void Player::AddItemStats(const ItemStats& stats)
 {
+	LOG_I(" [AddItemStats] Before Add - Damage: {}, MaxHp: {}, Hp: {}, CrtRate: {}, Dodge: {}, Speed: {}",
+		_stats.Damage, _stats.MaxHp, _stats.Hp, _stats.CrtRate, _stats.Dodge, _stats.Speed);
 
 	_stats.Damage += stats.damage;
-	_stats.Hp += stats.hp;
 	_stats.MaxHp += stats.hp;
+	_stats.Hp += stats.hp;
 
 	_stats.CrtRate = std::clamp(_stats.CrtRate + stats.critRate, 0.0f, 1.0f);
 	_stats.Dodge = std::clamp(_stats.Dodge + stats.dodgeRate, 0.0f, 1.0f);
 	_stats.Speed = std::max(0.0f, _stats.Speed + stats.moveSpeed);
 
+	LOG_I(" [AddItemStats] After Add - Damage: {}, MaxHp: {}, Hp: {}, CrtRate: {}, Dodge: {}, Speed: {}",
+		_stats.Damage, _stats.MaxHp, _stats.Hp, _stats.CrtRate, _stats.Dodge, _stats.Speed);
 }
 
 void Player::RemoveItemStats(const ItemStats& stats)
 {
+	LOG_I(" [RemoveItemStats] Before Remove - Damage: {}, MaxHp: {}, Hp: {}, CrtRate: {}, Dodge: {}, Speed: {}",
+		_stats.Damage, _stats.MaxHp, _stats.Hp, _stats.CrtRate, _stats.Dodge, _stats.Speed);
 
 	_stats.Damage = std::max(0.0f, _stats.Damage - stats.damage);
 	_stats.Hp = std::max(0.0f, _stats.Hp - stats.hp);
@@ -741,6 +747,8 @@ void Player::RemoveItemStats(const ItemStats& stats)
 	_stats.Dodge = std::clamp(_stats.Dodge - stats.dodgeRate, 0.0f, 1.0f);
 	_stats.Speed = std::max(0.0f, _stats.Speed - stats.moveSpeed);
 
+	LOG_I(" [RemoveItemStats] After Remove - Damage: {}, MaxHp: {}, Hp: {}, CrtRate: {}, Dodge: {}, Speed: {}",
+		_stats.Damage, _stats.MaxHp, _stats.Hp, _stats.CrtRate, _stats.Dodge, _stats.Speed);
 }
 
 void Player::AddExp(float amount)

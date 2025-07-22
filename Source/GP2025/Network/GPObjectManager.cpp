@@ -531,7 +531,7 @@ void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage
 			FVector SpawnLocation = Monster->GetActorLocation() + FVector(0, 0, 100);
 			FActorSpawnParameters SpawnParams;
 
-			bool isCrt = (MyPlayer && MyPlayer->CharacterInfo.GetDamage() * 10 < Damage);
+			bool isCrt = IsCritical(Damage);
 			USoundBase* SoundToPlay = nullptr;
 
 			AGPFloatingDamageText* DamageText = FloatingDamageTextPool->Acquire();
@@ -604,6 +604,22 @@ void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage
 				);
 			}
 		}
+	}
+}
+
+bool UGPObjectManager::IsCritical(float Damage)
+{
+	if (!MyPlayer) return false;
+	float PlayerDamage = MyPlayer->CharacterInfo.GetDamage();
+	float PlayerCrtValue = MyPlayer->CharacterInfo.GetCrtValue();
+
+	if (Damage >= (PlayerDamage * PlayerCrtValue))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 
