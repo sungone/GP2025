@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "../../GP_Server/Source/Common/Common.h"
-#define PAKCETSENDTIME 0.5f
+#define PAKCETSENDTIME 0.2f
 #include "GPMyplayerNetworkSyncHandler.generated.h"
 
 /**
