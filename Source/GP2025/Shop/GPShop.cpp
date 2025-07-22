@@ -33,6 +33,15 @@ void UGPShop::NativeConstruct()
 		SellButton->OnClicked.AddDynamic(this, &UGPShop::OnSellItemClicked);
 	}
 
+	if (!ItemDataTable)
+	{
+		ItemDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Item/GPItemTable.GPItemTable"));
+		if (!ItemDataTable)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to load ItemDataTable!"));
+		}
+	}
+
 	if (UGPNetworkManager* Mgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>())
 	{
 		Mgr->OnBuyItemResult.AddDynamic(this, &UGPShop::HandleBuyItemResult);
