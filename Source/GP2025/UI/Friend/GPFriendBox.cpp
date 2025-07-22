@@ -189,9 +189,9 @@ void UGPFriendBox::PlayOpenAnimation()
 
 void UGPFriendBox::PlayCloseAnimation()
 {
-	if (!CloseAnim_Re) return;
+	if (!OpenAnim_Re) return;
 
-	PlayAnimation(CloseAnim_Re, 0.f, 1, EUMGSequencePlayMode::Forward, 1.f);
+	PlayAnimation(OpenAnim_Re, 0.f, 1, EUMGSequencePlayMode::Reverse, 1.f);
 
 }
 

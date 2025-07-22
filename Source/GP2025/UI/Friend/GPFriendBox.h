@@ -89,8 +89,8 @@ public:
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	UWidgetAnimation* OpenAnim_Re;
 
-	UPROPERTY(meta = (BindWidgetAnim), Transient)
-	UWidgetAnimation* CloseAnim_Re;
+	//UPROPERTY(meta = (BindWidgetAnim), Transient)
+	//UWidgetAnimation* CloseAnim_Re;
 
 	/** 애니메이션 재생 함수 */
 	void PlayOpenAnimation();
