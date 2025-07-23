@@ -19,6 +19,7 @@ public:
 	std::array<FWorldState, WORLD_MAX_COUNT> GetAllWorldStates();
 
 	void UpdateWorldStates();
+	
 private:
 	std::unordered_map<EWorldChannel, std::unique_ptr<GameWorld>> _gameWorlds;
 	std::unordered_map<EWorldChannel, EWorldState> _worldStates;

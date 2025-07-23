@@ -14,6 +14,8 @@ enum EPacketType : uint8
 	S_SIGNUP_FAIL,
 	S_ENTER_GAME,
 
+	S_WORLD_STATE,
+
 	// --- Player Actions ---
 	C_MOVE,
 	C_ATTACK,

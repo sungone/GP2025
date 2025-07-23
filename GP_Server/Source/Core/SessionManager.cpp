@@ -245,3 +245,15 @@ int32 SessionManager::FindSessionIdByName(const std::string& name)
 
 	return sessionIt->second;
 }
+
+void SessionManager::BroadcastWorldState(FWorldState worldState)
+{
+	auto pkt = ChangedWorldStatePacket(worldState);
+	for (auto& session : SessionManager::GetInst().GetSessions())
+	{
+		if (session && session->IsLogin())
+		{
+			session->DoSend(&pkt);
+		}
+	}
+}

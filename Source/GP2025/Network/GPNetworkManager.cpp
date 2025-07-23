@@ -355,7 +355,7 @@ void UGPNetworkManager::SendMyFriendRemove(uint32 TargetDBID)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::UpdateWorldStatesFromServer(const FWorldState* ServerStates)
+void UGPNetworkManager::LoadWorldStatesFromServer(const FWorldState* ServerStates)
 {
 	CachedWorldStates.Empty();
 
@@ -365,6 +365,13 @@ void UGPNetworkManager::UpdateWorldStatesFromServer(const FWorldState* ServerSta
 		uint8 state = static_cast<uint8>(ServerStates[i].State);
 		CachedWorldStates.Add(ch, state);
 	}
+}
+
+void UGPNetworkManager::UpdateWorldStateFromServer(const FWorldState ServerStates)
+{
+		uint8 ch = static_cast<uint8>(ServerStates.Channel);
+		uint8 state = static_cast<uint8>(ServerStates.State);
+		CachedWorldStates[ch] = state;
 }
 
 EWorldState UGPNetworkManager::GetWorldState(EWorldChannel Channel) const
@@ -421,7 +428,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_LOGIN_SUCCESS:
 			{
 				LoginSuccessPacket* Pkt = reinterpret_cast<LoginSuccessPacket*>(RemainingData.GetData());
-				UpdateWorldStatesFromServer(Pkt->WorldState);
+				LoadWorldStatesFromServer(Pkt->WorldState);
 				OnEnterLobby.Broadcast();
 				break;
 			}
@@ -434,8 +441,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_SIGNUP_SUCCESS:
 			{
 				SignUpSuccessPacket* Pkt = reinterpret_cast<SignUpSuccessPacket*>(RemainingData.GetData());
-				UpdateWorldStatesFromServer(Pkt->WorldState);
-
+				LoadWorldStatesFromServer(Pkt->WorldState);
 				OnEnterLobby.Broadcast();
 				break;
 			}
@@ -766,7 +772,12 @@ void UGPNetworkManager::ProcessPacket()
 				break;
 			}
 #pragma endregion
-
+			case EPacketType::S_WORLD_STATE:
+			{
+				ChangedWorldStatePacket* Pkt = reinterpret_cast<ChangedWorldStatePacket*>(RemainingData.GetData());
+				UpdateWorldStateFromServer(Pkt->WorldState);
+				break;
+			}
 			default:
 				UE_LOG(LogTemp, Warning, TEXT("Unknown Packet Type received: type [%d] - size %d"),
 					PacketHeader->PacketType, PacketHeader->PacketSize);

@@ -30,6 +30,7 @@ public:
 	uint32 FindDBIdByName(const std::string& name);
 	std::string FindNameByDBId(uint32 dbid);
 	int32 FindSessionIdByName(const std::string& name);
+	void BroadcastWorldState(FWorldState worldState);
 
 private:
 	int32 GenerateId();

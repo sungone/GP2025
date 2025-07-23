@@ -53,7 +53,8 @@ public:
 	// 게임 시작
 	UFUNCTION()
 	void OnGameStartPressed();
-
+	UFUNCTION()
+	void UpdateChannelState();
 private:
 	Type::EPlayer SelectedType = Type::EPlayer::NONE;
 	EWorldChannel SelectedChannel = EWorldChannel::TUWorld_1;
@@ -69,6 +70,4 @@ public :
 	UFUNCTION()
 	void OnChannelChanged(FString SelectedItem, ESelectInfo::Type SelectionType);
 
-	void SetChannelTextColor(FLinearColor NewColor);
-	FLinearColor GetColorByWorldState(EWorldState State);
 };

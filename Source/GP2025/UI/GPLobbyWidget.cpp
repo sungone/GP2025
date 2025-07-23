@@ -35,18 +35,8 @@ void UGPLobbyWidget::NativeConstruct()
 
 	if (ChannelComboBox)
 	{
-		ChannelComboBox->ClearOptions();
-		ChannelComboBox->AddOption(TEXT("채널1"));
-		ChannelComboBox->AddOption(TEXT("채널2"));
-		ChannelComboBox->AddOption(TEXT("채널3"));
-		ChannelComboBox->AddOption(TEXT("채널4"));
-		ChannelComboBox->AddOption(TEXT("채널5"));
-		ChannelComboBox->AddOption(TEXT("채널6"));
-		ChannelComboBox->AddOption(TEXT("채널7"));
-		ChannelComboBox->AddOption(TEXT("채널8"));
-
-		ChannelComboBox->SetSelectedIndex(0);
 		ChannelComboBox->OnSelectionChanged.AddDynamic(this, &UGPLobbyWidget::OnChannelChanged);
+		ChannelComboBox->OnOpening.AddDynamic(this, &UGPLobbyWidget::UpdateChannelState);
 	}
 }
 
@@ -104,8 +94,55 @@ void UGPLobbyWidget::OnGameStartPressed()
 	}
 }
 
+void UGPLobbyWidget::UpdateChannelState()
+{
+	if (ChannelComboBox)
+	{
+		ChannelComboBox->ClearOptions();
+		ChannelComboBox->AddOption(TEXT("자동"));
+
+		UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+
+		for (int32 i = 1; i <= WORLD_MAX_COUNT; ++i)
+		{
+			EWorldChannel Channel = static_cast<EWorldChannel>(i);
+			FString ChannelName = FString::Printf(TEXT("채널%d"), i);
+
+			FString StatusText;
+			if (NetMgr)
+			{
+				EWorldState State = NetMgr->GetWorldState(Channel);
+				switch (State)
+				{
+				case EWorldState::Good:
+					StatusText = TEXT(" (원활)");
+					break;
+				case EWorldState::Normal:
+					StatusText = TEXT(" (보통)");
+					break;
+				case EWorldState::Bad:
+					StatusText = TEXT(" (혼잡)");
+					break;
+				default:
+					StatusText = TEXT(" ( ? )");
+					break;
+				}
+			}
+			FString FullLabel = ChannelName + StatusText;
+			ChannelComboBox->AddOption(FullLabel);
+		}
+	}
+
+}
+
 void UGPLobbyWidget::OnChannelChanged(FString SelectedItem, ESelectInfo::Type SelectionType)
 {
+	int32 SpaceIdx;
+	if (SelectedItem.FindChar(TEXT(' '), SpaceIdx))
+	{
+		SelectedItem = SelectedItem.Left(SpaceIdx);
+	}
+
 	static const TMap<FString, EWorldChannel> ChannelMap = {
 		{ TEXT("채널1"), EWorldChannel::TUWorld_1 },
 		{ TEXT("채널2"), EWorldChannel::TUWorld_2 },
@@ -120,48 +157,7 @@ void UGPLobbyWidget::OnChannelChanged(FString SelectedItem, ESelectInfo::Type Se
 	if (const EWorldChannel* FoundChannel = ChannelMap.Find(SelectedItem))
 	{
 		SelectedChannel = *FoundChannel;
-		UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
-		if (NetMgr)
-		{
-			EWorldState State = NetMgr->GetWorldState(SelectedChannel);
-			FLinearColor Color = GetColorByWorldState(State);
-			SetChannelTextColor(Color);
-		}
 
 		UE_LOG(LogTemp, Log, TEXT("Selected Channel: %s"), *SelectedItem);
 	}
-}
-
-FLinearColor UGPLobbyWidget::GetColorByWorldState(EWorldState State)
-{
-	switch (State)
-	{
-	case EWorldState::Good:
-		return FLinearColor::Green;
-	case EWorldState::Normal:
-		return FLinearColor(1.f, 0.5f, 0.f); // 주황
-	case EWorldState::Bad:
-		return FLinearColor::Red;
-	default:
-		return FLinearColor::White;
-	}
-}
-
-
-void UGPLobbyWidget::SetChannelTextColor(FLinearColor NewColor)
-{
-	if (!ChannelComboBox) return;
-
-	FComboBoxStyle StyleCopy = ChannelComboBox->WidgetStyle;
-
-	FButtonStyle ButtonStyle = StyleCopy.ComboButtonStyle.ButtonStyle;
-
-	ButtonStyle.Normal.TintColor = FSlateColor(NewColor);
-	ButtonStyle.Hovered.TintColor = FSlateColor(NewColor);
-	ButtonStyle.Pressed.TintColor = FSlateColor(NewColor);
-
-	StyleCopy.ComboButtonStyle.ButtonStyle = ButtonStyle;
-	ChannelComboBox->WidgetStyle = StyleCopy;
-
-	UE_LOG(LogTemp, Log, TEXT("R=%.2f G=%.2f B=%.2f"), NewColor.R, NewColor.G, NewColor.B);
 }

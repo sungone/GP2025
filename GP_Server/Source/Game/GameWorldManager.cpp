@@ -90,14 +90,19 @@ void GameWorldManager::UpdateWorldStates()
 	for (auto& [channel, world] : _gameWorlds)
 	{
 		int32 playerCount = world->GetPlayerCount();
-		EWorldState newState = EWorldState::Normal;
+		EWorldState prevState = _worldStates[channel];
+		EWorldState& curState = _worldStates[channel];
 		if (playerCount < GOOD_STATE_WORLD)
-			_worldStates[channel] = EWorldState::Good;
+			curState = EWorldState::Good;
 		else if (playerCount < NORMAL_STATE_WORLD)
-			_worldStates[channel] = EWorldState::Normal;
+			curState = EWorldState::Normal;
 		else
-			_worldStates[channel] = EWorldState::Bad;
+			curState = EWorldState::Bad;
 		LOG_I("Ch{}. Player = {} ({})", static_cast<uint8>(channel), playerCount, ENUM_NAME(_worldStates[channel]));
+		if (prevState != curState)
+		{
+			SessionManager::GetInst().BroadcastWorldState({ channel ,curState });
+		}
 	}
 	LOG_I("----------------------");
 }

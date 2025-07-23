@@ -27,6 +27,7 @@ class GameWorld
 public:
 
 	bool Init(EWorldChannel channelId);
+
 	// Player
 	void PlayerEnterGame(std::shared_ptr<Player> player);
 	void PlayerLeaveGame(int32 playerId);

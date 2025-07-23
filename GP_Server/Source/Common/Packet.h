@@ -36,6 +36,17 @@ using FPacketHeader = Packet::PacketHeader;
 using InfoPacket = TPacket<FInfoData>;
 using IDPacket = TPacket<int32>;
 
+struct ChangedWorldStatePacket : public Packet
+{
+	FWorldState WorldState;
+
+	ChangedWorldStatePacket(const FWorldState& InWorldStates)
+		: Packet(EPacketType::S_WORLD_STATE), WorldState(InWorldStates)
+	{
+		Header.PacketSize = sizeof(ChangedWorldStatePacket);
+	}
+};
+
 #pragma region Account
 struct LoginPacket : public Packet
 {

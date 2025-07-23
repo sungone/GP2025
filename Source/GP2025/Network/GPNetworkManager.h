@@ -92,7 +92,9 @@ public:
 	void SendMyFriendReject(uint32 RequesterUserID);
 	void SendMyFriendRemove(uint32 TargetUserID);
 
-	void UpdateWorldStatesFromServer(const FWorldState* ServerStates);
+	void LoadWorldStatesFromServer(const FWorldState* ServerStates);
+	void UpdateWorldStateFromServer(const FWorldState ServerStates);
+
 	EWorldState GetWorldState(EWorldChannel Channel) const;
 	EWorldChannel GetMyChannel() const { return MyChannel; }
 private:

@@ -80,7 +80,6 @@ private:
 	bool _active = false;
 	bool _isBoss;
 	EAttackPattern _currentPattern;
-
 private:
 	NavMesh* _navMesh = nullptr;
 	std::vector<FVector> _movePath;
