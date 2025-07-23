@@ -178,7 +178,13 @@ void DummyClient::SendRequestEnterGamePacket()
 bool DummyClient::SendMovePacket()
 {
 	if (last_move_time + 1s > high_resolution_clock::now()) return false;
-	if (!Move()) return false;
+	if (!Move()) 
+	{
+		TimerQueue::AddTimer([this]() {
+			SendMovePacket();
+			}, 1000, false);
+		return false;
+	}
 	auto now = NowMs();
 	_info.AddState(ECharacterStateType::STATE_WALK);
 	auto sendPos = _info.Pos;

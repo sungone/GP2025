@@ -23,6 +23,7 @@
     <ClCompile Include="..\GP_Server\Source\Core\IOCP\IOCP.cpp" />
     <ClCompile Include="..\GP_Server\Source\Game\Map\Map.cpp" />
     <ClCompile Include="..\GP_Server\Source\Game\Map\NavMesh.cpp" />
+    <ClCompile Include="..\GP_Server\Source\Utils\TimerQueue.cpp" />
     <ClCompile Include="Source\DummyClient.cpp" />
     <ClCompile Include="Source\DummyClinetManager.cpp" />
     <ClCompile Include="Source\pch.cpp">
@@ -40,6 +41,7 @@
     <ClInclude Include="..\GP_Server\Source\Core\IOCP\IOCP.h" />
     <ClInclude Include="..\GP_Server\Source\Game\Map\Map.h" />
     <ClInclude Include="..\GP_Server\Source\Game\Map\NavMesh.h" />
+    <ClInclude Include="..\GP_Server\Source\Utils\TimerQueue.h" />
     <ClInclude Include="Source\DummyClient.h" />
     <ClInclude Include="Source\DummyClinetManager.h" />
     <ClInclude Include="Source\pch.h" />

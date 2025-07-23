@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "TimerQueue.h"
-#include "GameWorld.h"
+
 std::priority_queue<TimerEvent> TimerQueue::_timerQueue;
 std::mutex TimerQueue::_mutex;
 

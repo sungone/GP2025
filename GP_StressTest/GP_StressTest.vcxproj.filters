@@ -20,6 +20,9 @@
     <Filter Include="소스 파일\Map">
       <UniqueIdentifier>{e018b892-1f63-4d63-9613-1a8cc785899d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Timer">
+      <UniqueIdentifier>{507d276a-fbb7-43cf-a808-752582072bbd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\pch.cpp">
@@ -45,6 +48,9 @@
     </ClCompile>
     <ClCompile Include="..\GP_Server\Source\Game\Map\NavMesh.cpp">
       <Filter>소스 파일\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GP_Server\Source\Utils\TimerQueue.cpp">
+      <Filter>소스 파일\Timer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -80,6 +86,9 @@
     </ClInclude>
     <ClInclude Include="..\GP_Server\Source\Game\Map\Map.h">
       <Filter>소스 파일\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GP_Server\Source\Utils\TimerQueue.h">
+      <Filter>소스 파일\Timer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
