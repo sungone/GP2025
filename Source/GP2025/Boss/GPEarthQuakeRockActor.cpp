@@ -30,22 +30,26 @@ void AGPEarthQuakeRockActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	StartPos = GetActorLocation();
-	ElapsedTime = 0.f;
-
-	GetWorldTimerManager().SetTimer(
-		FallTimerHandle,
-		this,
-		&AGPEarthQuakeRockActor::UpdateFall,
-		FallDuration / NumSteps, 
-		true
-	);
 }
 
 void AGPEarthQuakeRockActor::Init(const FVector& TargetLocation)
 {
 	TargetPos = TargetLocation;
 	TargetPos.Z = 0.f;
+
+	StartPos = TargetPos + FVector(0.f, 0.f, 800.f); // 위에서 낙하
+	SetActorLocation(StartPos);
+
+	ElapsedTime = 0.f;
+
+	// 0.5초 동안 20회 나눠서 이동
+	GetWorldTimerManager().SetTimer(
+		FallTimerHandle,
+		this,
+		&AGPEarthQuakeRockActor::UpdateFall,
+		FallDuration / NumSteps,
+		true
+	);
 }
 
 void AGPEarthQuakeRockActor::UpdateFall()
@@ -59,6 +63,9 @@ void AGPEarthQuakeRockActor::UpdateFall()
 	{
 		GetWorldTimerManager().ClearTimer(FallTimerHandle);
 
+		// TODO: 이 지점에서 충돌 처리 또는 데미지 이벤트 가능
+
+		// 0.5초 후 파괴
 		GetWorldTimerManager().SetTimer(
 			DestroyTimerHandle,
 			this,
