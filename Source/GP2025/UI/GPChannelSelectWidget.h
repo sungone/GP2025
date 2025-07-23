@@ -54,7 +54,4 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* QuitButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting", meta = (ExposeOnSpawn = true))
-	TSubclassOf<UUserWidget> PauseScreenClass;
-
 };

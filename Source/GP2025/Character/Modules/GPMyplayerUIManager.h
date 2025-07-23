@@ -65,7 +65,11 @@ public:
 	void OpenSettingWidget();
 	void CloseSettingWidget();          
 	void ToggleSettingWidget();
-	bool IsSettingWidgetOpen() const;
+	void ResetToggleSetting();
+
+	UPROPERTY()
+	bool bIsSettingOpen = false;
+
 
 	// InGame
 	void ShowInGameUI();
@@ -138,6 +142,7 @@ public:
 	TSubclassOf<UUserWidget> DeadScreenWidgetClass;
 
 	bool bInventoryToggled = false;
+	bool bSettingToggled = false;
 
 public:
 	class UGPLobbyWidget* GetLobbyWidget();

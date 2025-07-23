@@ -75,7 +75,6 @@ EWorldChannel UGPChannelSelectWidget::ConvertIndexToChannel(int32 Index)
 
 void UGPChannelSelectWidget::OnBackClicked()
 {
-	UE_LOG(LogTemp, Log, TEXT("[SettingWidget] Back clicked"));
 	RemoveFromParent();
 
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
@@ -89,13 +88,11 @@ void UGPChannelSelectWidget::OnBackClicked()
 void UGPChannelSelectWidget::OnQuitClicked()
 {
 	RemoveFromParent();
-	if (PauseScreenClass)
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (PC)
 	{
-		APlayerController* PC = GetWorld()->GetFirstPlayerController();
-		if (PC)
-		{
-			PC->SetInputMode(FInputModeUIOnly());
-			PC->SetShowMouseCursor(true);
-		}
+		PC->SetInputMode(FInputModeUIOnly());
+		PC->SetShowMouseCursor(true);
 	}
+	
 }

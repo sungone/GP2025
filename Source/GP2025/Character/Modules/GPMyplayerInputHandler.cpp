@@ -82,6 +82,8 @@ void UGPMyplayerInputHandler::SetupInputBindings(UEnhancedInputComponent* Enhanc
 	EnhancedInput->BindAction(InventoryAction, ETriggerEvent::Completed, this, &UGPMyplayerInputHandler::ResetInventoryToggle);
 
 	EnhancedInput->BindAction(SettingAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::ToggleSettingWidget);
+	EnhancedInput->BindAction(SettingAction, ETriggerEvent::Completed, this, &UGPMyplayerInputHandler::ResetSettingToggle);
+
 	EnhancedInput->BindAction(TakeInteractionAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::TakeInteraction);
 
 	EnhancedInput->BindAction(ZoomAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::StartAiming);
@@ -265,6 +267,30 @@ void UGPMyplayerInputHandler::ResetInventoryToggle()
 	if (Owner->UIManager)
 	{
 		Owner->UIManager->ResetToggleInventory();
+	}
+}
+
+void UGPMyplayerInputHandler::ToggleSetting()
+{
+	if (!Owner) return;
+
+	if (Owner->UIManager)
+	{
+		Owner->UIManager->ToggleSettingWidget();
+	}
+
+	if (Owner->SoundManager)
+	{
+		Owner->SoundManager->PlaySFX(Owner->SoundManager->ClickSound);
+	}
+}
+
+void UGPMyplayerInputHandler::ResetSettingToggle()
+{
+	if (!Owner) return;
+	if (Owner->UIManager)
+	{
+		Owner->UIManager->ResetToggleSetting();
 	}
 }
 
