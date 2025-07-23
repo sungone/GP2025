@@ -227,7 +227,7 @@ void Monster::PerformEarthQuake()
 				world->HandleEarthQuakeImpact(rockPos);
 				world->UpdateMonsterState(id, ECharacterStateType::STATE_IDLE);
 			}
-			}, 500, false);
+			}, ROCK_DELAY_MS, false);
 	}
 }
 
