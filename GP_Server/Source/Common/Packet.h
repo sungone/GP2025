@@ -614,9 +614,9 @@ struct RequestQuestPacket : public Packet
 struct CompleteQuestPacket : public Packet
 {
 	QuestType Quest;
-	CompleteQuestPacket(QuestType quest)
-		: Packet(EPacketType::C_COMPLETE_QUEST)
-		, Quest(quest)
+	bool bForce = false;
+	CompleteQuestPacket(QuestType quest, bool force = false)
+		: Packet(EPacketType::C_COMPLETE_QUEST), Quest(quest), bForce(force)
 	{
 		Header.PacketSize = sizeof(CompleteQuestPacket);
 	}
@@ -782,6 +782,7 @@ struct DebugLinePacket : public Packet
 		Header.PacketSize = sizeof(DebugLinePacket);
 	}
 };
+
 #pragma endregion
 
 #pragma region Friend

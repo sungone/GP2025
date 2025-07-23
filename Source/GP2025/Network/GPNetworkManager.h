@@ -81,7 +81,7 @@ public:
 	void SendMyShopBuyItem(uint8 ItemTypeID, int32 Quantity);
 	void SendMyShopSellItem(int32 ItemID);
 	void SendMyRequestQuest(QuestType quest);
-	void SendMyCompleteQuest(QuestType quest);
+	void SendMyCompleteQuest();
 	void SendMyRejectQuest(QuestType quest);
 
 	void SendMyChatMessage(const FString& Message, EChatChannel Channel);

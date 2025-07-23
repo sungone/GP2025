@@ -58,7 +58,7 @@ void UGPQuestWidget::OnQuestAccepted()
 	{
 		if (MyPlayer->CharacterInfo.GetCurrentQuest().QuestType == QuestType::TUT_START)
 		{
-			NetMgr->SendMyCompleteQuest(QuestType::TUT_START);
+			NetMgr->SendMyCompleteQuest();
 			UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] MainQuestStart: SendMyCompleteQuest(TUT_COMPLETE)"));
 		}
 
@@ -88,13 +88,13 @@ void UGPQuestWidget::OnQuestAccepted()
 	{
 	case ENPCType::STUDENT:
 	{
-		NetMgr->SendMyCompleteQuest(QuestType::CH1_TALK_TO_STUDENT_A);
+		NetMgr->SendMyCompleteQuest();
 		UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] STUDENT NPC: SendMyCompleteQuest(CH1_TALK_TO_STUDENT_A)"));
 		break;
 	}
 	case ENPCType::SECURITY:
 	{
-		NetMgr->SendMyCompleteQuest(QuestType::CH1_FIND_JANITOR);
+		NetMgr->SendMyCompleteQuest();
 		UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] SECURITY NPC: SendMyCompleteQuest(CH1_FIND_JANITOR)"));
 		break;
 	}
@@ -107,7 +107,7 @@ void UGPQuestWidget::OnQuestAccepted()
 
 			if (Inventory->HasItemByType(51))  // 51번 아이템이 있는 경우에만 퀘스트 성공
 			{
-				NetMgr->SendMyCompleteQuest(QuestType::CH3_RETURN_TO_TIP_WITH_DOC);
+				NetMgr->SendMyCompleteQuest();
 				UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] PROFESSOR NPC: Quest Complete Sent"));
 			}
 			else

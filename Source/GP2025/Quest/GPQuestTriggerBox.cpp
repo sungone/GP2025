@@ -61,7 +61,7 @@ void AGPQuestTriggerBox::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherAc
 		case 30: // CH1_GO_TO_E_FIRST
 			if (!Inventory->HasItemByType(50)) // 열쇠 아이템을 가지고 있지 않으면
 			{
-				MyPlayer->NetMgr->SendMyCompleteQuest(QuestType::CH1_GO_TO_E_FIRST);
+				MyPlayer->NetMgr->SendMyCompleteQuest();
 				InGameUI->ShowGameMessage(QuestMessage, 3.f);
 			}
 			break;
@@ -70,7 +70,7 @@ void AGPQuestTriggerBox::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherAc
 			if (MyPlayer->CharacterInfo.GetCurrentQuest().QuestType == QuestType::CH1_GO_TO_BUNKER)
 			{
 				InGameUI->ShowGameMessage(QuestMessage, 3.f);
-				MyPlayer->NetMgr->SendMyCompleteQuest(QuestType::CH1_GO_TO_BUNKER);
+				MyPlayer->NetMgr->SendMyCompleteQuest();
 			}
 			break;
 
