@@ -282,10 +282,19 @@ void UGPMyplayerUIManager::ShowDeadScreen()
 		TypedWidget->AddToViewport();
 		TypedWidget->PlayFadeOut();
 		TypedWidget->StartRespawnCountdown(3);
+		TypedWidget->OnRespawnComplete.AddDynamic(this, &UGPMyplayerUIManager::OnDeadRespawnComplete);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Failed to cast DeadScreenWidget to UGPDeadScreenWidget"));
+	}
+}
+
+void UGPMyplayerUIManager::OnDeadRespawnComplete()
+{
+	if (UGPInGameWidget* LocalInGameWidget = Cast<UGPInGameWidget>(InGameWidget))
+	{
+		LocalInGameWidget->PlayFade(); 
 	}
 }
 

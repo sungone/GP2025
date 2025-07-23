@@ -6,6 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "GPDeadScreenWidget.generated.h"
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRespawnComplete);
+
 /**
  * 
  */
@@ -31,4 +34,8 @@ private:
 
     UPROPERTY(meta = (BindWidget))
     class UTextBlock* RespawnCount;
+
+public:
+    UPROPERTY(BlueprintAssignable, Category = "Event")
+    FOnRespawnComplete OnRespawnComplete;
 };

@@ -24,7 +24,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-
 	// <Login>
 	UFUNCTION()
 	void OnPlayerEnterGame();

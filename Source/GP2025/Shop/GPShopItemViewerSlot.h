@@ -31,4 +31,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
 	void SetImage();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
+	void HiddenImage();
+
 };
