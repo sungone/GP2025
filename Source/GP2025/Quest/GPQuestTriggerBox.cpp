@@ -67,7 +67,7 @@ void AGPQuestTriggerBox::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherAc
 			break;
 
 		case 31: // CH1_GO_TO_BUNKER
-			if (MyPlayer->CharacterInfo.GetCurrentQuest().QuestType == QuestType::CH1_GO_TO_BUNKER)
+			if (MyPlayer->CharacterInfo.GetCurrentQuest().Type == QuestType::CH1_GO_TO_BUNKER)
 			{
 				InGameUI->ShowGameMessage(QuestMessage, 3.f);
 				MyPlayer->NetMgr->SendMyCompleteQuest();

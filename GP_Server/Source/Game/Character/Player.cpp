@@ -23,10 +23,10 @@ void Player::Init(EWorldChannel channelId)
 void Player::LoadFromDB(const DBLoginResult& dbRes)
 {
 	SetInfo(dbRes.info);
-	auto quest = GetInfo().CurrentQuest.QuestType;
+	auto quest = GetInfo().CurrentQuest.Type;
 	if (quest != QuestType::NONE)
 	{
-		SetCurrentQuest(GetInfo().CurrentQuest.QuestType);
+		SetCurrentQuest(GetInfo().CurrentQuest.Type);
 	}
 	for (auto& [itemID, itemTypeID] : dbRes.items)
 	{
@@ -67,9 +67,9 @@ void Player::OnEnterGame()
 			SessionManager::GetInst().SendPacket(_id, &pkt);
 		}
 	}
-	if (_curQuest.QuestType != QuestType::NONE)
+	if (_curQuest.Type != QuestType::NONE)
 	{
-		const QuestData* questData = QuestTable::GetInst().GetQuest(_curQuest.QuestType);
+		const QuestData* questData = QuestTable::GetInst().GetQuest(_curQuest.Type);
 		if (!questData)
 		{
 			LOG_W("Invalid quest datatable");
@@ -678,7 +678,7 @@ bool Player::RejectTutorialQuest()
 		return false;
 	}
 
-	_curQuest.QuestType = newQuest;
+	_curQuest.Type = newQuest;
 	_curQuest.Status = EQuestStatus::InProgress;
 	_curQuestData = questData;
 
@@ -694,7 +694,7 @@ bool Player::RejectTutorialQuest()
 
 bool Player::IsQuestInProgress(QuestType quest) const
 {
-	return _curQuest.QuestType == quest && _curQuest.Status == EQuestStatus::InProgress;
+	return _curQuest.Type == quest && _curQuest.Status == EQuestStatus::InProgress;
 }
 
 bool Player::StartQuest(QuestType newQuest)
@@ -702,14 +702,14 @@ bool Player::StartQuest(QuestType newQuest)
 	if (_curQuest.Status == EQuestStatus::InProgress)
 		return false;
 
-	_curQuest.QuestType = newQuest;
+	_curQuest.Type = newQuest;
 	_curQuest.Status = EQuestStatus::InProgress;
 	return true;
 }
 
 bool Player::CompleteCurrentQuest()
 {
-	if (_curQuest.QuestType != QuestType::NONE && _curQuest.Status == EQuestStatus::InProgress)
+	if (_curQuest.Type != QuestType::NONE && _curQuest.Status == EQuestStatus::InProgress)
 	{
 		_curQuest.Status = EQuestStatus::Completed;
 		return true;

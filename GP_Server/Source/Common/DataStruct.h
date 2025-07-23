@@ -111,8 +111,18 @@ struct FEquitState
 
 struct QuestStatus
 {
-	QuestType QuestType = QuestType::NONE;
+	QuestType Type = QuestType::NONE;
 	EQuestStatus Status = EQuestStatus::NotStarted;
+
+	QuestStatus()
+		: Type(QuestType::NONE), Status(EQuestStatus::NotStarted)
+	{
+	}
+
+	QuestStatus(QuestType InType, EQuestStatus InStatus)
+		: Type(InType), Status(InStatus)
+	{
+	}
 };
 
 struct ShopItemInfo

@@ -56,7 +56,7 @@ void UGPQuestWidget::OnQuestAccepted()
 
 	if (!OwningNPC) // MainQuestStart
 	{
-		if (MyPlayer->CharacterInfo.GetCurrentQuest().QuestType == QuestType::TUT_START)
+		if (MyPlayer->CharacterInfo.GetCurrentQuest().Type == QuestType::TUT_START)
 		{
 			NetMgr->SendMyCompleteQuest();
 			UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] MainQuestStart: SendMyCompleteQuest(TUT_COMPLETE)"));
@@ -148,7 +148,7 @@ void UGPQuestWidget::OnQuestExit()
 		if (!NetMgr) return;
 
 
-		if (MyPlayer->CharacterInfo.GetCurrentQuest().QuestType == QuestType::TUT_START)
+		if (MyPlayer->CharacterInfo.GetCurrentQuest().Type == QuestType::TUT_START)
 		{
 			NetMgr->SendMyRejectQuest(QuestType::TUT_START);
 			UE_LOG(LogTemp, Warning, TEXT("[QuestWidget] MainQuestStart: SendMyCompleteQuest(TUT_COMPLETE)"));

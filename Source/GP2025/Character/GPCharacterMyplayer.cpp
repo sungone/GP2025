@@ -148,11 +148,9 @@ void AGPCharacterMyplayer::OnPlayerEnterGame()
 		SoundManager->PlayBGMForCurrentLevel(); 
 	}
 
-	if (CharacterInfo.GetCurrentQuest().QuestType == QuestType::TUT_START
-		|| CharacterInfo.GetCurrentQuest().QuestType == QuestType::NONE)
+	if (CharacterInfo.GetCurrentQuest().Type == QuestType::TUT_START
+		|| CharacterInfo.GetCurrentQuest().Type == QuestType::NONE)
 	{
-		UE_LOG(LogTemp, Log, TEXT("[MyPlayer] Current QuestType = %d (TUT_START detected)"),
-			static_cast<uint8>(CharacterInfo.GetCurrentQuest().QuestType));
 
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(

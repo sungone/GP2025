@@ -85,7 +85,7 @@ DBLoginResult DBManager::SignUpUser(int32 sessionId, const std::string& login_id
 				static_cast<int>(newinfo.Skills.Q.SkillGID), newinfo.Skills.Q.SkillLevel,
 				static_cast<int>(newinfo.Skills.E.SkillGID), newinfo.Skills.E.SkillLevel,
 				static_cast<int>(newinfo.Skills.R.SkillGID), newinfo.Skills.R.SkillLevel,
-				static_cast<int>(newinfo.CurrentQuest.QuestType),
+				static_cast<int>(newinfo.CurrentQuest.Type),
 				static_cast<int>(newinfo.CurrentQuest.Status),
 				static_cast<int>(newinfo.EquipState.Sword),
 				static_cast<int>(newinfo.EquipState.Helmet),
@@ -165,7 +165,7 @@ DBLoginResult DBManager::CheckLogin(int32 sessionId, const std::string& login_id
 		info.Skills.E = FSkillData((ESkillGroup)row[24].get<int>(), row[25].get<int>());
 		info.Skills.R = FSkillData((ESkillGroup)row[26].get<int>(), row[27].get<int>());
 
-		info.CurrentQuest.QuestType = static_cast<QuestType>(row[28].get<int>());
+		info.CurrentQuest.Type = static_cast<QuestType>(row[28].get<int>());
 		info.CurrentQuest.Status = static_cast<EQuestStatus>(row[29].get<int>());
 
 		info.EquipState.Sword = static_cast<Type::EWeapon>(row[30].get<int>());
@@ -229,7 +229,7 @@ bool DBManager::UpdatePlayerInfo(uint32 dbId, const FInfoData& info)
 			.set("skill2_level", info.Skills.E.SkillLevel)
 			.set("skill3_gid", static_cast<int>(info.Skills.R.SkillGID))
 			.set("skill3_level", info.Skills.R.SkillLevel)
-			.set("current_quest_type", static_cast<int>(info.CurrentQuest.QuestType))
+			.set("current_quest_type", static_cast<int>(info.CurrentQuest.Type))
 			.set("current_quest_status", static_cast<int>(info.CurrentQuest.Status))
 			.set("equip_weapon", static_cast<int>(info.EquipState.Sword))
 			.set("equip_helmet", static_cast<int>(info.EquipState.Helmet))

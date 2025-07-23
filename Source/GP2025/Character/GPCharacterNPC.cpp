@@ -428,7 +428,7 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 		bIsInteracting = true;
 		break;
 	case ENPCType::PROFESSOR:
-		if (MyPlayer->CharacterInfo.CurrentQuest.QuestType != QuestType::CH3_RETURN_TO_TIP_WITH_DOC)
+		if (MyPlayer->CharacterInfo.CurrentQuest.Type != QuestType::CH3_RETURN_TO_TIP_WITH_DOC)
 		{
 			ShowQuestNotAvailableMessage(MyPlayer, GetQuestNotAvailableMessage());
 			return;
@@ -444,7 +444,7 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 		);
 		break;
 	case ENPCType::STUDENT:
-		if (MyPlayer->CharacterInfo.CurrentQuest.QuestType != QuestType::CH1_TALK_TO_STUDENT_A)
+		if (MyPlayer->CharacterInfo.CurrentQuest.Type != QuestType::CH1_TALK_TO_STUDENT_A)
 		{
 			ShowQuestNotAvailableMessage(MyPlayer, GetQuestNotAvailableMessage());
 			return;
@@ -460,7 +460,7 @@ void AGPCharacterNPC::CheckAndHandleInteraction(AGPCharacterMyplayer* MyPlayer)
 		);
 		break;
 	case ENPCType::SECURITY:
-		if (MyPlayer->CharacterInfo.CurrentQuest.QuestType != QuestType::CH1_FIND_JANITOR)
+		if (MyPlayer->CharacterInfo.CurrentQuest.Type != QuestType::CH1_FIND_JANITOR)
 		{
 			ShowQuestNotAvailableMessage(MyPlayer, GetQuestNotAvailableMessage());
 			return;
