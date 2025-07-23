@@ -324,6 +324,11 @@ void UGPShop::HandleSellItemResult(bool bSuccess, uint32 NewGold, const FString&
 	{
 		ShowResultMessage(Message, 3.0f);
 	}
+
+	if (ShopViewerSlot)
+	{
+		ShopViewerSlot->HiddenImage();
+	}
 }
 
 void UGPShop::SetCurrentSlot(UGPItemSlot* InSlot)

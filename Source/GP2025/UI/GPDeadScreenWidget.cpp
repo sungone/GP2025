@@ -19,8 +19,9 @@ void UGPDeadScreenWidget::UpdateRespawnMessage(int32 SecondsLeft)
 void UGPDeadScreenWidget::StartRespawnCountdown(int32 StartSeconds)
 {
     SecondsRemaining = StartSeconds;
-    UpdateRespawnMessage(SecondsRemaining);
 
+    RespawnCount->SetVisibility(ESlateVisibility::Visible);
+    UpdateRespawnMessage(SecondsRemaining);
     GetWorld()->GetTimerManager().SetTimer(
         CountdownTimerHandle,
         this,
@@ -33,12 +34,16 @@ void UGPDeadScreenWidget::TickCountdown()
 {
     SecondsRemaining--;
 
-    if (SecondsRemaining >= 0)
+    if (SecondsRemaining > 0)
     {
         UpdateRespawnMessage(SecondsRemaining);
     }
-
-    if (SecondsRemaining < 0)
+    else if (SecondsRemaining == 0)
+    {
+        RespawnCount->SetVisibility(ESlateVisibility::Hidden);
+        OnRespawnComplete.Broadcast();
+    }
+    else if (SecondsRemaining < 0)
     {
         GetWorld()->GetTimerManager().ClearTimer(CountdownTimerHandle);
         RemoveFromParent(); 

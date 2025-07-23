@@ -203,3 +203,15 @@ void UGPInGameWidget::PlayFadeIn()
 	PlayAnimation(OverlayFadeInAnim, 0.0f, 1, EUMGSequencePlayMode::Forward, PlayRate);
 }
 
+void UGPInGameWidget::PlayFade()
+{
+	if (!FadeOverlay || !OverlayFadeAnim) return;
+
+	// FadeOverlay를 보이게 설정
+	FadeOverlay->SetVisibility(ESlateVisibility::Visible);
+
+	// 애니메이션 0.5초 재생 (정상 속도)
+	const float PlayRate = 1.0f;
+	PlayAnimation(OverlayFadeAnim, 0.0f, 1, EUMGSequencePlayMode::Forward, PlayRate);
+}
+

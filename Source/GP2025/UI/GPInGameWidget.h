@@ -121,7 +121,11 @@ public :
     UPROPERTY(Transient, meta = (BindWidgetAnim))
     UWidgetAnimation* OverlayFadeInAnim;
 
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
+    UWidgetAnimation* OverlayFadeAnim;
+
     void PlayFadeOut();
     void PlayFadeIn();
+    void PlayFade();
 
 };
