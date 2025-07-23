@@ -110,8 +110,10 @@ enum EPacketType : uint8
 	S_REQUEST_FRIEND,
 
 	//for test
+	C_FORCE_NEXT_QUEST,
+
 	S_DEBUG_TRIANGLE,
-	S_DEBUG_LINE
+	S_DEBUG_LINE,
 };
 
 enum class EWorldChannel : uint8

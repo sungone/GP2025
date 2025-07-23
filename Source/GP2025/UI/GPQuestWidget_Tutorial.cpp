@@ -39,7 +39,7 @@ void UGPQuestWidget_Tutorial::OnTutorialAccepted()
 	{
 		if (MyPlayer->NetMgr)
 		{
-			MyPlayer->NetMgr->SendMyCompleteQuest(QuestType::TUT_START);
+			MyPlayer->NetMgr->SendMyCompleteQuest();
 			UE_LOG(LogTemp, Warning, TEXT("[TutorialWidget] SendMyCompleteQuest(TUT_START)"));
 		}
 

@@ -50,6 +50,16 @@ void UGPGameInstance::ChangeZoenRequest(FString LevelName)
 	NetworkMgr->SendMyZoneChangePacket(TargetZone);
 }
 
+void UGPGameInstance::NextQuestRequest()
+{
+	if (!NetworkMgr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Network Manager is not initialized."));
+		return;
+	}
+	NetworkMgr->SendMyCompleteQuest();
+}
+
 
 #if PLATFORM_ANDROID
 	void UGPGameInstance::RequestAndroidPermissions()

@@ -303,9 +303,13 @@ void UGPNetworkManager::SendMyRequestQuest(QuestType quest)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendMyCompleteQuest(QuestType quest)
+void UGPNetworkManager::SendMyCompleteQuest()
 {
-	CompleteQuestPacket Packet(quest);
+	if (!MyPlayer)
+		return;
+
+	QuestType Quest = MyPlayer->CharacterInfo.GetCurrentQuest().QuestType;
+	CompleteQuestPacket Packet(Quest);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 

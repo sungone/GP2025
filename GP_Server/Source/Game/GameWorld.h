@@ -79,7 +79,7 @@ public:
 
 	//Quest
 	void RequestQuest(int32 playerId, QuestType quest);
-	void CompleteQuest(int32 playerId, QuestType quest);
+	void CompleteQuest(int32 playerId, QuestType quest, bool force);
 	void RejectQuest(int32 playerId, QuestType quest);
 	void QuestSpawn(int32 playerId, QuestType quest);
 	void BuyItem(int32 playerId, uint8 itemType, uint16 quantity);
@@ -109,6 +109,7 @@ public:
 private:
 	EWorldChannel _channelId;
 	std::unordered_map<int32, std::shared_ptr<Player>> _players;
+	std::unordered_map<QuestType, int32> _questMons;
 	std::unordered_map<ZoneType, std::unordered_map<int32, std::shared_ptr<Player>>> _playersByZone;
 	std::unordered_map<ZoneType, std::unordered_map<int32, std::shared_ptr<Monster>>> _monstersByZone;
 	std::unordered_map<ZoneType, std::vector<std::shared_ptr<WorldItem>>> _worldItemsByZone;
@@ -121,7 +122,10 @@ private:
 	std::unordered_map<ZoneType, int32> _monsterCnt;
 
 private:
+	std::unordered_map<QuestType, std::vector<std::shared_ptr<Monster>>> _activeQuestMonsters;
+	std::mutex _mtQuestMonsters;
 
+private:
 	std::unordered_map<GridPos, std::unordered_set<int32>> _gridMap;
 	std::mutex _gridMutex;
 };

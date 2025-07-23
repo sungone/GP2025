@@ -778,10 +778,10 @@ bool GameWorld::TransferToZone(int32 playerId, ZoneType newZone)
 
 	InitViewList(playerId, newZone);
 	AddItems(playerId, newZone);
-	if(newZone == ZoneType::E ||newZone == ZoneType::GYM)
+	if (newZone == ZoneType::E || newZone == ZoneType::GYM)
 	{
 		auto quest = player->GetCurrentQuest();
-		if(quest == QuestType::CH2_ENTER_E_BUILDING||quest == QuestType::CH4_ENTER_GYM)
+		if (quest == QuestType::CH2_ENTER_E_BUILDING || quest == QuestType::CH4_ENTER_GYM)
 			player->CheckAndUpdateQuestProgress(EQuestCategory::MOVE);
 	}
 
@@ -971,7 +971,7 @@ void GameWorld::RequestQuest(int32 playerId, QuestType quest)
 	player->SetCurrentQuest(quest);
 }
 
-void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
+void GameWorld::CompleteQuest(int32 playerId, QuestType quest, bool force)
 {
 	auto player = GetPlayerByID(playerId);
 	if (!player)
@@ -987,6 +987,14 @@ void GameWorld::CompleteQuest(int32 playerId, QuestType quest)
 		return;
 	}
 	auto type = questData->Catagory;
+	if (force)
+	{
+		//퀘스트 진행 따라 kill이면 다 죽여야함.
+		player->GiveQuestReward(quest);
+		return;
+	}
+
+
 	if (type == EQuestCategory::MOVE || type == EQuestCategory::INTERACT)
 		player->CheckAndUpdateQuestProgress(type);
 }
@@ -1015,14 +1023,21 @@ void GameWorld::QuestSpawn(int32 playerId, QuestType quest)
 	}
 	{
 		std::lock_guard lock(_mtMonZMap);
-		for (auto& [zone, monMap] : _monstersByZone)
+		std::lock_guard qlock(_mtQuestMonsters);
+
+		if(_activeQuestMonsters[quest].empty())
 		{
-			for (auto& [id, mon] : monMap)
+
+			for (auto& [zone, monMap] : _monstersByZone)
 			{
-				if (!mon) continue;
-				if (!mon->IsActive() && mon->GetQuestID() == quest)
+				for (auto& [id, mon] : monMap)
 				{
-					mon->Respawn();
+					if (!mon) continue;
+					if (!mon->IsActive() && mon->GetQuestID() == quest)
+					{
+						mon->Respawn();
+						_activeQuestMonsters[quest].push_back(mon); // 저장
+					}
 				}
 			}
 		}

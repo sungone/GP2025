@@ -22,6 +22,8 @@ public:
 	bool SaveNavData(bool IsSave);
 	UFUNCTION(BlueprintCallable)
 	void ChangeZoenRequest(FString LevelName);
+	UFUNCTION(BlueprintCallable)
+	void NextQuestRequest();
 private:
 	UPROPERTY()
 	class UGPNetworkManager* NetworkMgr;

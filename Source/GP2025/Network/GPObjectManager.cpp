@@ -1220,7 +1220,10 @@ void UGPObjectManager::OnQuestStart(QuestType Quest)
 {
 	UE_LOG(LogTemp, Warning, TEXT("=== [ObjectManager] OnQuestStart called: QuestType = %d ==="), static_cast<uint8>(Quest));
 
-	if (MyPlayer && MyPlayer->UIManager)
+	if (!MyPlayer) return;
+	MyPlayer->CharacterInfo.CurrentQuest = QuestStatus(Quest, EQuestStatus::InProgress);
+
+	if	(MyPlayer->UIManager)
 	{
 		uint8 QuestID = static_cast<uint8>(Quest);
 		UE_LOG(LogTemp, Warning, TEXT("=== [ObjectManager] Calling UIManager->AddQuestEntry(%d) ==="), QuestID);
@@ -1230,9 +1233,9 @@ void UGPObjectManager::OnQuestStart(QuestType Quest)
 
 	if (Quest == QuestType::TUT_COMPLETE) // 튜토리얼 완료는 바로 클리어
 	{
-		if (MyPlayer && MyPlayer->NetMgr)
+		if (MyPlayer->NetMgr)
 		{
-			MyPlayer->NetMgr->SendMyCompleteQuest(QuestType::TUT_COMPLETE);
+			MyPlayer->NetMgr->SendMyCompleteQuest();
 			UGPInGameWidget* InGameUI = MyPlayer->UIManager->GetInGameWidget();
 			if (!InGameUI) return;
 
