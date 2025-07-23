@@ -26,6 +26,15 @@ void UGPChannelSelectWidget::NativeConstruct()
 		ConfirmButton->OnClicked.AddDynamic(this, &UGPChannelSelectWidget::OnConfirmClicked);
 	}
 
+	if (BackButton)
+	{
+		BackButton->OnClicked.AddDynamic(this, &UGPChannelSelectWidget::OnBackClicked);
+	}
+
+	if (QuitButton)
+	{
+		QuitButton->OnClicked.AddDynamic(this, &UGPChannelSelectWidget::OnQuitClicked);
+	}
 }
 
 void UGPChannelSelectWidget::OnChannelSelected(FString SelectedItem, ESelectInfo::Type SelectionType)
@@ -62,4 +71,31 @@ EWorldChannel UGPChannelSelectWidget::ConvertIndexToChannel(int32 Index)
 		return static_cast<EWorldChannel>(static_cast<uint8>(EWorldChannel::TUWorld_1) + Index - 1);
 	}
 	return EWorldChannel::None;
+}
+
+void UGPChannelSelectWidget::OnBackClicked()
+{
+	UE_LOG(LogTemp, Log, TEXT("[SettingWidget] Back clicked"));
+	RemoveFromParent();
+
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (PC)
+	{
+		PC->SetInputMode(FInputModeGameOnly());
+		PC->SetShowMouseCursor(false);
+	}
+}
+
+void UGPChannelSelectWidget::OnQuitClicked()
+{
+	RemoveFromParent();
+	if (PauseScreenClass)
+	{
+		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		if (PC)
+		{
+			PC->SetInputMode(FInputModeUIOnly());
+			PC->SetShowMouseCursor(true);
+		}
+	}
 }

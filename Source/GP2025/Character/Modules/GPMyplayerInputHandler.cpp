@@ -81,7 +81,7 @@ void UGPMyplayerInputHandler::SetupInputBindings(UEnhancedInputComponent* Enhanc
 	EnhancedInput->BindAction(InventoryAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::ToggleInventory);
 	EnhancedInput->BindAction(InventoryAction, ETriggerEvent::Completed, this, &UGPMyplayerInputHandler::ResetInventoryToggle);
 
-	EnhancedInput->BindAction(SettingAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::OpenSettingWidget);
+	EnhancedInput->BindAction(SettingAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::ToggleSettingWidget);
 	EnhancedInput->BindAction(TakeInteractionAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::TakeInteraction);
 
 	EnhancedInput->BindAction(ZoomAction, ETriggerEvent::Started, this, &UGPMyplayerInputHandler::StartAiming);
@@ -281,10 +281,10 @@ void UGPMyplayerInputHandler::CloseInventory()
 }
 
 
-void UGPMyplayerInputHandler::OpenSettingWidget()
+void UGPMyplayerInputHandler::ToggleSettingWidget()
 {
 	if (!Owner || !Owner->UIManager) return;
-	Owner->UIManager->OpenSettingWidget();
+	Owner->UIManager->ToggleSettingWidget();
 }
 
 void UGPMyplayerInputHandler::Accept()

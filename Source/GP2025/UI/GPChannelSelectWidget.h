@@ -37,4 +37,24 @@ public:
 
 	EWorldChannel ConvertIndexToChannel(int32 Index);
 
+protected:
+	// 버튼 바인딩 함수
+	UFUNCTION()
+	void OnBackClicked();
+
+	UFUNCTION()
+	void OnQuitClicked();
+
+public:
+	// 돌아가기 버튼
+	UPROPERTY(meta = (BindWidget))
+	class UButton* BackButton;
+
+	// 게임 종료 버튼
+	UPROPERTY(meta = (BindWidget))
+	class UButton* QuitButton;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting", meta = (ExposeOnSpawn = true))
+	TSubclassOf<UUserWidget> PauseScreenClass;
+
 };

@@ -110,7 +110,7 @@ public :
 	void CloseInventory();
 
 
-    void OpenSettingWidget();
+    void ToggleSettingWidget();
 
 
 	void Accept();

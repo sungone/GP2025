@@ -63,6 +63,9 @@ public:
 
 	// Setting
 	void OpenSettingWidget();
+	void CloseSettingWidget();          
+	void ToggleSettingWidget();
+	bool IsSettingWidgetOpen() const;
 
 	// InGame
 	void ShowInGameUI();

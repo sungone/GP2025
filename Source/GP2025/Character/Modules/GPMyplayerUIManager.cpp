@@ -30,7 +30,7 @@ UGPMyplayerUIManager::UGPMyplayerUIManager()
 		InventoryWidgetClass = WidgetBPClass.Class;
 	}
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> SettingWidgetBPClass(TEXT("/Game/UI/WBP_PauseScreen"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> SettingWidgetBPClass(TEXT("/Game/UI/WBP_ChannelSelect"));
 	if (SettingWidgetBPClass.Succeeded())
 	{
 		SettingWidgetClass = SettingWidgetBPClass.Class;
@@ -246,6 +246,40 @@ void UGPMyplayerUIManager::OpenSettingWidget()
 			PC->SetInputMode(FInputModeGameAndUI());
 		}
 	}
+}
+
+void UGPMyplayerUIManager::CloseSettingWidget()
+{
+	if (!Owner || !SettingWidget) return;
+
+	if (SettingWidget->IsInViewport())
+	{
+		SettingWidget->RemoveFromParent();
+
+		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
+		if (PC)
+		{
+			PC->SetShowMouseCursor(false);
+			PC->SetInputMode(FInputModeGameOnly());
+		}
+	}
+}
+
+void UGPMyplayerUIManager::ToggleSettingWidget()
+{
+	if (IsSettingWidgetOpen())
+	{
+		CloseSettingWidget();
+	}
+	else
+	{
+		OpenSettingWidget();
+	}
+}
+
+bool UGPMyplayerUIManager::IsSettingWidgetOpen() const
+{
+	return SettingWidget && SettingWidget->IsInViewport();
 }
 
 void UGPMyplayerUIManager::ShowInGameUI()
