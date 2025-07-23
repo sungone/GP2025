@@ -8,6 +8,7 @@
 #include "UI/GPUserNameWidget.h"
 #include "Components/ProgressBar.h"
 #include "Blueprint/UserWidget.h"
+#include "../../GP_Server/Source/Common/Type.h"
 #include "Character/GPCharacterMonster.h"
 #include "Character/Modules/GPMyplayerCameraHandler.h"
 #include "UI/GPCharacterStatusWidget.h"
@@ -54,35 +55,55 @@ void UGPCharacterUIHandler::UpdateWidgetVisibility()
 	const bool bIsGunner = LocalMyPlayer->bIsGunnerCharacter();
 	const bool bIsGunnerZooming = bIsGunner && LocalMyPlayer->CameraHandler->IsZooming();
 
+	// === 자기 자신은 항상 Visible ===
 	if (bIsOwnerSelf)
 	{
 		CharacterStatusWidgetInstance->SetVisibility(ESlateVisibility::Visible);
 		return;
 	}
 
-	const float Distance = FVector::Dist(Owner->GetActorLocation(), LocalMyPlayer->GetActorLocation());
-
-	float MaxVisibleDistance = 500.0f; // 기본 거리
-
-	if (bIsGunner && bIsGunnerZooming)
+	// === 몬스터 처리 ===
+	if (Cast<AGPCharacterMonster>(Owner))
 	{
-		MaxVisibleDistance = LocalMyPlayer->CharacterInfo.AttackRadius;
+		uint8 MonsterType = Owner->CharacterInfo.CharacterType;
 
-		const float MinScaleDistance = 300.0f;
-		const float MaxScaleDistance = 5000.0f;
-		const float DistanceFactor = FMath::Clamp((MaxScaleDistance - Distance) / (MaxScaleDistance - MinScaleDistance), 0.0f, 1.0f);
-		const float ScaleFactor = FMath::Lerp(0.0001f, 1.f, DistanceFactor);
-		CharacterStatusWidget->SetRelativeScale3D(FVector(ScaleFactor));
+		if (MonsterType == 7 || MonsterType == 10 || MonsterType == 11) // 보스들
+		{
+			CharacterStatusWidgetInstance->SetVisibility(ESlateVisibility::Visible);
+			CharacterStatusWidget->SetRelativeScale3D(FVector(1.f));
+			return;
+		}
+
+		// 일반 몬스터는 거리 기반 처리
+		const float Distance = FVector::Dist(Owner->GetActorLocation(), LocalMyPlayer->GetActorLocation());
+
+		float MaxVisibleDistance = 500.0f;
+		if (bIsGunner && bIsGunnerZooming)
+		{
+			MaxVisibleDistance = LocalMyPlayer->CharacterInfo.AttackRadius;
+
+			const float MinScaleDistance = 300.0f;
+			const float MaxScaleDistance = 5000.0f;
+			const float DistanceFactor = FMath::Clamp((MaxScaleDistance - Distance) / (MaxScaleDistance - MinScaleDistance), 0.0f, 1.0f);
+			const float ScaleFactor = FMath::Lerp(0.0001f, 1.f, DistanceFactor);
+			CharacterStatusWidget->SetRelativeScale3D(FVector(ScaleFactor));
+		}
+		else
+		{
+			CharacterStatusWidget->SetRelativeScale3D(FVector(1.f));
+		}
+
+		const float VisibleRadius = Owner->CharacterInfo.CollisionRadius + MaxVisibleDistance;
+		const bool bVisible = Distance <= VisibleRadius;
+
+		CharacterStatusWidgetInstance->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 	}
-	else
+	// === 플레이어는 항상 Visible
+	else if (Cast<AGPCharacterPlayer>(Owner))
 	{
+		CharacterStatusWidgetInstance->SetVisibility(ESlateVisibility::Visible);
 		CharacterStatusWidget->SetRelativeScale3D(FVector(1.f));
 	}
-
-	const float VisibleRadius = Owner->CharacterInfo.CollisionRadius + MaxVisibleDistance;
-	const bool bVisible = Distance <= VisibleRadius;
-
-	CharacterStatusWidgetInstance->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
 
 UGPWidgetComponent* UGPCharacterUIHandler::CreateWidgetComponent(
