@@ -51,6 +51,7 @@ private:
 	void HandleFriendAcceptRequestPacket(int32 sessionId, Packet* packet);
 	void HandleFriendRemoveRequestPacket(int32 sessionId, Packet* packet);
 	void HandleFriendRejectRequestPacket(int32 sessionId, Packet* packet);
+	void HandleChangeChannelPacket(int32 sessionId, Packet* packet);
 private:
 	GameWorld* GetValidWorld(int32 sessionId);
 	template<typename TPacket, typename Func>

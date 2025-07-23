@@ -114,6 +114,10 @@ void PacketManager::ProcessPacket(int32 sessionId, Packet* packet)
 	case EPacketType::C_FRIEND_REJECT:
 		HandleFriendRejectRequestPacket(sessionId, packet);
 		break;
+
+	case EPacketType::C_CHANGE_CHANNEL:
+		HandleChangeChannelPacket(sessionId, packet);
+		break;
 	}
 }
 
@@ -578,6 +582,29 @@ void PacketManager::HandleFriendRejectRequestPacket(int32 sessionId, Packet* pac
 	auto ret = DBManager::GetInst().RejectFriendRequest(myId, targetId);
 	FriendOperationResultPacket resPkt(EFriendOpType::Reject, ret);
 	_sessionMgr.SendPacket(sessionId, &resPkt);
+}
+
+void PacketManager::HandleChangeChannelPacket(int32 sessionId, Packet* packet)
+{
+	auto* p = static_cast<ChangeChannelPacket*>(packet);
+	//auto session = _sessionMgr.GetSession(sessionId);
+	//if (!session || !session->IsInGame()) return;
+	//auto world = GetValidWorld(sessionId);
+	//if (!world) return;
+	//if (world->GetChannelId() == p->NewChannel)
+	//{
+	//	//LOG_W("Already in channel {}", ENUM_NAME(p->NewChannel));
+	//	return;
+	//}
+	//world->PlayerLeaveGame(sessionId);
+	//session->EnterGame(p->NewChannel);
+	//world = GameWorldManager::GetInst().GetAvailableWorld(p->NewChannel);
+	//if (!world)
+	//{
+	//	//LOG_W("Invalid World for channel {}", ENUM_NAME(p->NewChannel));
+	//	return;
+	//}
+	//world->PlayerEnterGame(session->GetPlayer());
 }
 
 GameWorld* PacketManager::GetValidWorld(int32 sessionId)

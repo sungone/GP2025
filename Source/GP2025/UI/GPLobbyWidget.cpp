@@ -35,6 +35,9 @@ void UGPLobbyWidget::NativeConstruct()
 
 	if (ChannelComboBox)
 	{
+		ChannelComboBox->ClearOptions();
+		ChannelComboBox->AddOption(TEXT("자동"));
+		ChannelComboBox->SetSelectedIndex(0);
 		ChannelComboBox->OnSelectionChanged.AddDynamic(this, &UGPLobbyWidget::OnChannelChanged);
 		ChannelComboBox->OnOpening.AddDynamic(this, &UGPLobbyWidget::UpdateChannelState);
 	}

@@ -191,6 +191,12 @@ void UGPNetworkManager::SendMyEnterGamePacket(EWorldChannel WChannel, Type::EPla
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
+void UGPNetworkManager::SendMyChangeChannelPacket(EWorldChannel WChannel)
+{
+	ChangeChannelPacket Packet(WChannel);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
 void UGPNetworkManager::SendMyMovePacket()
 {
 	auto info = MyPlayer->CharacterInfo;

@@ -46,6 +46,15 @@ struct ChangedWorldStatePacket : public Packet
 		Header.PacketSize = sizeof(ChangedWorldStatePacket);
 	}
 };
+struct ChangeChannelPacket :public Packet
+{
+	EWorldChannel NewChannel;
+	ChangeChannelPacket(EWorldChannel InWChannel)
+		: Packet(EPacketType::C_CHANGE_CHANNEL), NewChannel(InWChannel)
+	{
+		Header.PacketSize = sizeof(ChangeChannelPacket);
+	}
+};
 
 #pragma region Account
 struct LoginPacket : public Packet

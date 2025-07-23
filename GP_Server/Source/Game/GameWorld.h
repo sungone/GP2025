@@ -105,6 +105,7 @@ public:
 		std::lock_guard<std::mutex> lock(_mtPlayers);
 		return static_cast<int32>(_players.size());
 	}
+	EWorldChannel GetChannelId() const { return _channelId; }
 private:
 	EWorldChannel _channelId;
 	std::unordered_map<int32, std::shared_ptr<Player>> _players;

@@ -61,6 +61,7 @@ public:
 	void SendMyLogoutPacket();
 	void SendMyEnterGamePacket(EWorldChannel WChannel);
 	void SendMyEnterGamePacket(EWorldChannel WChannel, Type::EPlayer PlayerType);
+	void SendMyChangeChannelPacket(EWorldChannel WChannel);
 
 	void SendMyZoneChangePacket(ZoneType zone);
 	void SendMyRespawnPacket(ZoneType zone);
