@@ -657,23 +657,11 @@ void UGPObjectManager::PlayEarthQuakeEffect(const FVector& RockPos, bool bDebug)
 		if (bDebug) return;
 	}
 
-	FTimerDelegate DelayedRockDelegate;
-	DelayedRockDelegate.BindLambda([=, this]()
-		{
-			if (MyPlayer && MyPlayer->EffectHandler)
-			{
-				MyPlayer->EffectHandler->PlayEarthQuakeRock(RockPos);
-				UE_LOG(LogTemp, Log, TEXT("[PlayEarthQuakeEffect] Rock effect triggered after delay."));
-			}
-		});
-
-	FTimerHandle DelayHandle;
-	WorldContext->GetTimerManager().SetTimer(
-		DelayHandle,
-		DelayedRockDelegate,
-		0.5f, // ← 0.5초 딜레이
-		false
-	);
+	if (MyPlayer && MyPlayer->EffectHandler)
+	{
+		MyPlayer->EffectHandler->PlayEarthQuakeRock(RockPos);
+		UE_LOG(LogTemp, Log, TEXT("[PlayEarthQuakeEffect] Rock effect started immediately"));
+	}
 }
 
 void UGPObjectManager::PlayFlameBreathEffect(const FVector& Origin, const FVector& Dir, float Range, float Angle, bool bDebug)

@@ -27,11 +27,11 @@ private:
 	FVector TargetPos;
 	FVector StartPos;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Fall")
-	float FallDuration = 1.f;
+	UPROPERTY(EditAnywhere, Category = "Fall")
+	float FallDuration = 0.5f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Fall")
-	int32 NumSteps = 20; // 타이머 횟수 (20이면 0.5초 동안 25ms 간격)
+	UPROPERTY(EditAnywhere, Category = "Fall")
+	int32 NumSteps = 20; 
 
 	float ElapsedTime = 0.f;
 	FTimerHandle FallTimerHandle;
