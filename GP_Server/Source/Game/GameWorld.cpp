@@ -74,7 +74,6 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 #if TEST
 	player->AddGold(10000);
 	playerInfo.Stats.Level = 3;
-	//BuyItem(playerId, (uint8)Type::EQuestItem::KEY, 1);
 	BuyItem(playerId, (uint8)Type::EWeapon::PULSE_SWORD, 1);
 	if (static_cast<Type::EPlayer>(playerInfo.CharacterType) == Type::EPlayer::WARRIOR)
 	{
