@@ -243,11 +243,11 @@ void UGPMyplayerUIManager::OpenSettingWidget()
 		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
 		if (PC)
 		{
-			PC->SetShowMouseCursor(true);
-			FInputModeUIOnly InputMode;
+			FInputModeGameAndUI InputMode;
 			InputMode.SetWidgetToFocus(SettingWidget->TakeWidget());
 			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 			PC->SetInputMode(InputMode);
+			PC->SetShowMouseCursor(true);
 		}
 	}
 }
