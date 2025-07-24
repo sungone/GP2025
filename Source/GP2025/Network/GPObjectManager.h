@@ -61,6 +61,7 @@ public:
 	bool IsChangingZone() const { return bChangingZone; }
 	void SetChangeingZone(bool value) { bChangingZone = value; }
 	FRotator GetDefaultZoneRotation(ZoneType Zone);
+	void RefreshInGameUI();
 
 	UFUNCTION()
 	void HandleLevelUnloaded();

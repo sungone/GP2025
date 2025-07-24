@@ -235,7 +235,6 @@ void UGPMyplayerUIManager::OpenSettingWidget()
 {
 	if (!Owner || !SettingWidget) return;
 
-
 	if (!SettingWidget->IsInViewport())
 	{
 		SettingWidget->AddToViewport();
@@ -245,7 +244,10 @@ void UGPMyplayerUIManager::OpenSettingWidget()
 		if (PC)
 		{
 			PC->SetShowMouseCursor(true);
-			PC->SetInputMode(FInputModeGameAndUI());
+			FInputModeUIOnly InputMode;
+			InputMode.SetWidgetToFocus(SettingWidget->TakeWidget());
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			PC->SetInputMode(InputMode);
 		}
 	}
 }

@@ -59,6 +59,7 @@ void UGPCharacterUIHandler::UpdateWidgetVisibility()
 	if (bIsOwnerSelf)
 	{
 		CharacterStatusWidgetInstance->SetVisibility(ESlateVisibility::Visible);
+		CharacterStatusWidget->SetRelativeScale3D(FVector(1.f));
 		return;
 	}
 
@@ -67,7 +68,14 @@ void UGPCharacterUIHandler::UpdateWidgetVisibility()
 	{
 		uint8 MonsterType = Owner->CharacterInfo.CharacterType;
 
-		if (MonsterType == 7 || MonsterType == 10 || MonsterType == 11) // 보스들
+		// 항상 표시할 몬스터 (DESKMON, DRILL, TINO)
+		static const TSet<uint8> AlwaysVisibleMonsters = {
+			static_cast<uint8>(Type::EMonster::DESKMON),
+			static_cast<uint8>(Type::EMonster::DRILL),
+			static_cast<uint8>(Type::EMonster::TINO)
+		};
+
+		if (AlwaysVisibleMonsters.Contains(MonsterType))
 		{
 			CharacterStatusWidgetInstance->SetVisibility(ESlateVisibility::Visible);
 			CharacterStatusWidget->SetRelativeScale3D(FVector(1.f));
@@ -78,7 +86,7 @@ void UGPCharacterUIHandler::UpdateWidgetVisibility()
 		const float Distance = FVector::Dist(Owner->GetActorLocation(), LocalMyPlayer->GetActorLocation());
 
 		float MaxVisibleDistance = 500.0f;
-		if (bIsGunner && bIsGunnerZooming)
+		if (bIsGunnerZooming)
 		{
 			MaxVisibleDistance = LocalMyPlayer->CharacterInfo.AttackRadius;
 
@@ -97,12 +105,32 @@ void UGPCharacterUIHandler::UpdateWidgetVisibility()
 		const bool bVisible = Distance <= VisibleRadius;
 
 		CharacterStatusWidgetInstance->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		return;
 	}
-	// === 플레이어는 항상 Visible
-	else if (Cast<AGPCharacterPlayer>(Owner))
+
+	// === 다른 플레이어 처리: 거리 기반 (2000.f 이내)
+	if (Cast<AGPCharacterPlayer>(Owner))
 	{
-		CharacterStatusWidgetInstance->SetVisibility(ESlateVisibility::Visible);
-		CharacterStatusWidget->SetRelativeScale3D(FVector(1.f));
+		const float Distance = FVector::Dist(Owner->GetActorLocation(), LocalMyPlayer->GetActorLocation());
+
+		const float MaxVisibleDistance = 2000.0f;
+		const float VisibleRadius = Owner->CharacterInfo.CollisionRadius + MaxVisibleDistance;
+		const bool bVisible = Distance <= VisibleRadius;
+
+		if (bVisible)
+		{
+			const float MinScaleDistance = 500.f;
+			const float MaxScaleDistance = MaxVisibleDistance;
+			const float DistanceFactor = FMath::Clamp((MaxScaleDistance - Distance) / (MaxScaleDistance - MinScaleDistance), 0.0f, 1.0f);
+			const float ScaleFactor = FMath::Lerp(0.3f, 1.f, DistanceFactor);
+			CharacterStatusWidget->SetRelativeScale3D(FVector(ScaleFactor));
+		}
+		else
+		{
+			CharacterStatusWidget->SetRelativeScale3D(FVector(1.f));
+		}
+
+		CharacterStatusWidgetInstance->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 	}
 }
 
