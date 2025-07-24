@@ -86,7 +86,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<class UGPItemSlot> SlotClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shop")
 	class UDataTable* ItemDataTable;
 
 	// 슬롯 정보를 저장할 포인터

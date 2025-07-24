@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Network/GPObjectManager.h"
+#include "GameFramework/TouchInterface.h"
 #include "GPPlayerController.generated.h"
 
 /**
@@ -14,11 +15,10 @@ UCLASS()
 class GP2025_API AGPPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
-protected :
-	virtual void BeginPlay() override;
-
 
 public:
 	AGPPlayerController();
+
+public:
+	virtual void BeginPlay() override;
 };
