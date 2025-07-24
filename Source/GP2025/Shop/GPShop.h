@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Item/GPItemStruct.h"
+#include "Inventory/GPItemSlot.h"
+#include "../../GP_Server/Source/Common/Common.h"
 #include "GPShop.generated.h"
 
 
@@ -83,11 +85,11 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UWrapBox* SellWrapBox;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-	TSubclassOf<class UGPItemSlot> SlotClass;
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UGPItemSlot> SlotClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Data")
-	class UDataTable* ItemDataTable;
+	UPROPERTY(EditDefaultsOnly)
+	UDataTable* ItemDataTable;
 
 	// 슬롯 정보를 저장할 포인터
 	UPROPERTY()
