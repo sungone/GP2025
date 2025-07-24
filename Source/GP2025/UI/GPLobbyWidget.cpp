@@ -146,7 +146,7 @@ void UGPLobbyWidget::OnChannelChanged(FString SelectedItem, ESelectInfo::Type Se
 		SelectedItem = SelectedItem.Left(SpaceIdx);
 	}
 
-	static const TMap<FString, EWorldChannel> ChannelMap = {
+	static const TMap<FString, EWorldChannel> Channels = {
 		{ TEXT("채널1"), EWorldChannel::TUWorld_1 },
 		{ TEXT("채널2"), EWorldChannel::TUWorld_2 },
 		{ TEXT("채널3"), EWorldChannel::TUWorld_3 },
@@ -157,7 +157,7 @@ void UGPLobbyWidget::OnChannelChanged(FString SelectedItem, ESelectInfo::Type Se
 		{ TEXT("채널8"), EWorldChannel::TUWorld_8 },
 	};
 
-	if (const EWorldChannel* FoundChannel = ChannelMap.Find(SelectedItem))
+	if (const EWorldChannel* FoundChannel = Channels.Find(SelectedItem))
 	{
 		SelectedChannel = *FoundChannel;
 

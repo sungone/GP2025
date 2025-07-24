@@ -22,7 +22,7 @@ public:
 	virtual void Deinitialize() override;
 
 	void SetMyPlayer(AGPCharacterMyplayer* InMyPlayer);
-
+	
 	void AddMyPlayer(const FInfoData& PlayerInfo);
 	void AddPlayer(const FInfoData& PlayerInfo);
 	void RemovePlayer(int32 PlayerID);
@@ -57,6 +57,7 @@ public:
 
 	void SoundWhenBuy(ResultCode Code);
 
+	void ChangeChannel(const FVector& RandomPos);
 	void ChangeZone(ZoneType OldZone, ZoneType NewZone, const FVector& RandomPos);
 	bool IsChangingZone() const { return bChangingZone; }
 	void SetChangeingZone(bool value) { bChangingZone = value; }

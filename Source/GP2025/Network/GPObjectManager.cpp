@@ -150,8 +150,8 @@ void UGPObjectManager::AddMyPlayer(const FInfoData& PlayerInfo)
 	{
 		MyPlayer->SetNameByCharacterInfo();
 	}
-	auto Player = Cast<AGPCharacterPlayer>(MyPlayer);
-	Players.Add(PlayerInfo.ID, Player);
+	//auto Player = Cast<AGPCharacterPlayer>(MyPlayer);
+	//Players.Add(PlayerInfo.ID, Player);
 
 	auto Weapon = MyPlayer->CharacterInfo.GetEquippedWeapon();
 	if (Weapon != Type::EWeapon::NONE)
@@ -1046,6 +1046,56 @@ void UGPObjectManager::SoundWhenBuy(ResultCode Code)
 	}
 }
 
+void UGPObjectManager::ChangeChannel(const FVector& RandomPos)
+{
+	UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] Start changing channel"));
+
+	for (auto& PlayerPair : Players)
+	{
+		TWeakObjectPtr<AGPCharacterPlayer> PlayerPtr = PlayerPair.Value;
+		if (PlayerPtr.IsValid())
+		{
+			PlayerPtr->Destroy();
+		}
+	}
+	Players.Empty();
+	UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] All other players removed"));
+
+	for (auto& MonsterPair : Monsters)
+	{
+		TWeakObjectPtr<AGPCharacterMonster> MonsterPtr = MonsterPair.Value;
+		if (MonsterPtr.IsValid())
+		{
+			MonsterPtr->Destroy();
+		}
+	}
+	Monsters.Empty();
+	UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] All monsters removed"));
+
+	for (auto& ItemPair : Items)
+	{
+		TWeakObjectPtr<AGPItem> ItemPtr = ItemPair.Value;
+		if (ItemPtr.IsValid())
+		{
+			ItemPtr->ReturnToPool();
+		}
+	}
+	Items.Empty();
+	UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] All items removed"));
+
+	if (MyPlayer)
+	{
+		MyPlayer->SetActorLocation(RandomPos);
+		MyPlayer->CharacterInfo.SetLocation(RandomPos);
+		MyPlayer->PlayFadeIn();
+		if (MyPlayer->UIManager)
+		{
+			MyPlayer->UIManager->GetInGameWidget()->ShowGameMessage(FText::FromString(TEXT("채널이 변경되었습니다.")), 2.f);
+		}
+	}
+}
+
+
 void UGPObjectManager::ChangeZone(ZoneType oldZone, ZoneType newZone, const FVector& RandomPos)
 {
 	if (IsChangingZone())
@@ -1076,7 +1126,7 @@ void UGPObjectManager::ChangeZone(ZoneType oldZone, ZoneType newZone, const FVec
 		case ZoneType::INDUSTY: return "industry";
 		default: return NAME_None;
 		}
-	};
+		};
 
 	FName OldLevel = GetLevelName(oldZone);
 	PendingLevelName = GetLevelName(newZone);
@@ -1228,7 +1278,7 @@ void UGPObjectManager::OnQuestStart(QuestType Quest)
 	if (!MyPlayer) return;
 	MyPlayer->CharacterInfo.CurrentQuest = QuestStatus(Quest, EQuestStatus::InProgress);
 
-	if	(MyPlayer->UIManager)
+	if (MyPlayer->UIManager)
 	{
 		uint8 QuestID = static_cast<uint8>(Quest);
 		UE_LOG(LogTemp, Warning, TEXT("=== [ObjectManager] Calling UIManager->AddQuestEntry(%d) ==="), QuestID);
