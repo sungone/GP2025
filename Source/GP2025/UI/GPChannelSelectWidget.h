@@ -10,6 +10,7 @@
 
 class UComboBoxString;
 class UButton;
+class USlider;
 
 /**
  * 
@@ -53,5 +54,12 @@ public:
 	// 게임 종료 버튼
 	UPROPERTY(meta = (BindWidget))
 	class UButton* QuitButton;
+
+	// BGM 볼륨
+	UPROPERTY(meta = (BindWidget))
+	USlider* BGMVolume;
+
+	UFUNCTION()
+	void OnBGMVolumeChanged(float Value);
 
 };

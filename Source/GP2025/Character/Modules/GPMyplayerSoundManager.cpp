@@ -156,6 +156,14 @@ void UGPMyplayerSoundManager::PlayBGMByLevelName(const FName& LevelName)
 	}
 }
 
+void UGPMyplayerSoundManager::SetBGMVolume(float NewVolume)
+{
+	if (BGMComponent)
+	{
+		BGMComponent->SetVolumeMultiplier(FMath::Clamp(NewVolume, 0.f, 2.f));
+	}
+}
+
 void UGPMyplayerSoundManager::PlaySFX(USoundBase* Sound, float Pitch, float Volume)
 {
 	if (!Sound)
