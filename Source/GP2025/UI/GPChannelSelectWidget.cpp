@@ -122,6 +122,12 @@ void UGPChannelSelectWidget::OnConfirmClicked()
 	}
 
 	RemoveFromParent();
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (PC)
+	{
+		PC->SetInputMode(FInputModeGameOnly());
+		PC->SetShowMouseCursor(false);
+	}
 }
 
 void UGPChannelSelectWidget::OnBackClicked()
