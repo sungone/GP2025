@@ -170,10 +170,10 @@ struct SelectCharacterPacket : public Packet
 };
 struct RequestEnterGamePacket : public Packet
 {
-	Type::EPlayer PlayerType;
 	EWorldChannel WChannel;
-	RequestEnterGamePacket(Type::EPlayer InType = Type::EPlayer::NONE, EWorldChannel Channel = EWorldChannel::TUWorld_1)
-		: Packet(EPacketType::C_ENTER_GAME), PlayerType(InType), WChannel(Channel)
+	Type::EPlayer PlayerType;
+	RequestEnterGamePacket(EWorldChannel Channel = EWorldChannel::TUWorld_1, Type::EPlayer InType = Type::EPlayer::NONE)
+		: Packet(EPacketType::C_ENTER_GAME), WChannel(Channel), PlayerType(InType)
 	{
 		Header.PacketSize = sizeof(RequestEnterGamePacket);
 	}

@@ -181,13 +181,13 @@ void UGPNetworkManager::SendMySelectCharacter(uint8 PlayerType)
 
 void UGPNetworkManager::SendMyEnterGamePacket(EWorldChannel WChannel)
 {
-	RequestEnterGamePacket Packet;
+	RequestEnterGamePacket Packet(WChannel);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
 void UGPNetworkManager::SendMyEnterGamePacket(EWorldChannel WChannel, Type::EPlayer PlayerType)
 {
-	RequestEnterGamePacket Packet(PlayerType);
+	RequestEnterGamePacket Packet(WChannel, PlayerType);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
@@ -478,8 +478,11 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_CHANGE_CHANNEL:
 			{
 				ChangeChannelPacket* Pkt = reinterpret_cast<ChangeChannelPacket*>(RemainingData.GetData());
-				MyChannel = Pkt->WChannel;
-				ObjectMgr->ChangeZone(MyPlayer->CharacterInfo.GetZone(), ZoneType::TUK, Pkt->PlayerPos);
+				if(MyChannel != Pkt->WChannel)
+				{
+					MyChannel = Pkt->WChannel;
+					ObjectMgr->ChangeChannel(Pkt->PlayerPos);
+				}
 				break;
 			}
 			case EPacketType::S_ADD_PLAYER:
