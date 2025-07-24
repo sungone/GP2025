@@ -472,6 +472,7 @@ void UGPNetworkManager::ProcessPacket()
 				FInfoData Data = Pkt->PlayerInfo;
 				ObjectMgr->ChangeZone(ZoneType::TUK, Data.GetZone(), Data.Pos);
 				ObjectMgr->AddMyPlayer(Pkt->PlayerInfo);
+				ObjectMgr->RefreshInGameUI();
 				break;
 			}
 			case EPacketType::S_ADD_PLAYER:
