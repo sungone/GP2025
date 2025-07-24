@@ -35,6 +35,7 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 
 	// Character Type
 	CurrentCharacterType = static_cast<uint8>(Type::EPlayer::GUNNER);
+
 }
 
 void AGPCharacterMyplayer::BeginPlay()
@@ -47,6 +48,7 @@ void AGPCharacterMyplayer::BeginPlay()
 		NetMgr->SetMyPlayer(this);
 		NetMgr->OnEnterGame.AddDynamic(this, &AGPCharacterMyplayer::OnPlayerEnterGame);
 		NetMgr->OnEnterLobby.AddDynamic(this, &AGPCharacterMyplayer::OnPlayerEnterLobby);
+		SetGPChannel(NetMgr->GetMyGPChannel());
 	}
 
 	// Sound Handler
