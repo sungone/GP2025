@@ -5,7 +5,10 @@
 #include "Components/ComboBoxString.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
+#include "Character/GPCharacterMyplayer.h"
 #include "Network/GPNetworkManager.h"
+#include "Components/Slider.h"
+#include "Character/Modules/GPMyplayerSoundManager.h"
 
 static const TMap<FString, EWorldChannel> ChannelMap = {
 	{ TEXT("채널1"), EWorldChannel::TUWorld_1 },
@@ -41,6 +44,11 @@ void UGPChannelSelectWidget::NativeConstruct()
 	if (QuitButton)
 	{
 		QuitButton->OnClicked.AddDynamic(this, &UGPChannelSelectWidget::OnQuitClicked);
+	}
+
+	if (BGMVolume)
+	{
+		BGMVolume->OnValueChanged.AddDynamic(this, &UGPChannelSelectWidget::OnBGMVolumeChanged);
 	}
 }
 
@@ -138,4 +146,18 @@ void UGPChannelSelectWidget::OnQuitClicked()
 		PC->SetShowMouseCursor(true);
 	}
 
+}
+
+void UGPChannelSelectWidget::OnBGMVolumeChanged(float Value)
+{
+	UE_LOG(LogTemp, Log, TEXT("[ChannelSelect] BGM Volume changed: %.2f"), Value);
+
+	if (APlayerController* PC = GetOwningPlayer())
+	{
+		AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(PC->GetPawn());
+		if (MyPlayer && MyPlayer->SoundManager)
+		{
+			MyPlayer->SoundManager->SetBGMVolume(Value);
+		}
+	}
 }

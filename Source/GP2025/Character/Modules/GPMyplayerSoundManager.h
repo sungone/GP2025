@@ -26,6 +26,10 @@ public:
 	void PlayLoginBGM();
 	void PlayBGMForCurrentLevel(); // 맵 이름 기반 자동 재생
 	void PlayBGMByLevelName(const FName& LevelName);
+
+	UFUNCTION(BlueprintCallable)
+	void SetBGMVolume(float NewVolume);
+
 	// 효과음
 	void PlaySFX(class USoundBase* Sound, float Pitch = 1.f, float Volume = 1.f);
 
