@@ -4,7 +4,7 @@
 bool DummyClient::Init(uint32 num)
 {
 	_dummyNum = num;
-	_name = std::format("D{:05}", _dummyNum);
+	_name = std::format("Dummy{}", _dummyNum);
 	return true;
 }
 
@@ -27,7 +27,8 @@ bool DummyClient::Connect(IOCP& hIocp)
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(SERVER_PORT);
 	inet_pton(AF_INET,SERVER_IP, &addr.sin_addr);
-
+	//inet_pton(AF_INET, "211.188.61.31", &addr.sin_addr);
+	
 	if (connect(_socket, (struct sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR)
 	{
 		int errCode = WSAGetLastError();

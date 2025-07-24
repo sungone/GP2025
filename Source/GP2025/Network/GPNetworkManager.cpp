@@ -476,10 +476,12 @@ void UGPNetworkManager::ProcessPacket()
 				break;
 			}
 			case EPacketType::S_CHANGE_CHANNEL:
+			{
 				ChangeChannelPacket* Pkt = reinterpret_cast<ChangeChannelPacket*>(RemainingData.GetData());
 				MyChannel = Pkt->WChannel;
 				ObjectMgr->ChangeZone(MyPlayer->CharacterInfo.GetZone(), ZoneType::TUK, Pkt->PlayerPos);
 				break;
+			}
 			case EPacketType::S_ADD_PLAYER:
 			{
 				InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());
