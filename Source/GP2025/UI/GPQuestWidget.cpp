@@ -75,8 +75,8 @@ void UGPQuestWidget::OnQuestAccepted()
 			}
 			else
 			{
-				PC->bShowMouseCursor = false;
-				PC->SetInputMode(FInputModeGameOnly());
+				PC->bShowMouseCursor = true;
+				PC->SetInputMode(FInputModeGameAndUI());
 			}
 		}
 
@@ -167,8 +167,8 @@ void UGPQuestWidget::OnQuestExit()
 			}
 			else
 			{
-				PC->bShowMouseCursor = false;
-				PC->SetInputMode(FInputModeGameOnly());
+				PC->bShowMouseCursor = true;
+				PC->SetInputMode(FInputModeGameAndUI());
 			}
 		}
 

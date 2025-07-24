@@ -45,7 +45,7 @@ void UGPQuestWidget_Tutorial::OnTutorialAccepted()
 
 		if (APlayerController* PC = Cast<APlayerController>(MyPlayer->GetController()))
 		{
-			PC->bShowMouseCursor = false;
+			PC->bShowMouseCursor = true;
 			PC->SetInputMode(FInputModeGameOnly());
 		}
 	}
@@ -70,7 +70,7 @@ void UGPQuestWidget_Tutorial::OnTutorialSkipped()
 
 		if (APlayerController* PC = Cast<APlayerController>(MyPlayer->GetController()))
 		{
-			PC->bShowMouseCursor = false;
+			PC->bShowMouseCursor = true;
 			PC->SetInputMode(FInputModeGameOnly());
 		}
 
