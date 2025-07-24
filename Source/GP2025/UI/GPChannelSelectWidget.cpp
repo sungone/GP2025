@@ -5,21 +5,31 @@
 #include "Components/ComboBoxString.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
+#include "Character/GPCharacterMyplayer.h"
 #include "Network/GPNetworkManager.h"
+#include "Components/Slider.h"
+#include "Character/Modules/GPMyplayerSoundManager.h"
+
+static const TMap<FString, EWorldChannel> ChannelMap = {
+	{ TEXT("채널1"), EWorldChannel::TUWorld_1 },
+	{ TEXT("채널2"), EWorldChannel::TUWorld_2 },
+	{ TEXT("채널3"), EWorldChannel::TUWorld_3 },
+	{ TEXT("채널4"), EWorldChannel::TUWorld_4 },
+	{ TEXT("채널5"), EWorldChannel::TUWorld_5 },
+	{ TEXT("채널6"), EWorldChannel::TUWorld_6 },
+	{ TEXT("채널7"), EWorldChannel::TUWorld_7 },
+	{ TEXT("채널8"), EWorldChannel::TUWorld_8 },
+};
 
 void UGPChannelSelectWidget::NativeConstruct()
 {
-	ChannelComboBox->OnSelectionChanged.AddDynamic(this, &UGPChannelSelectWidget::OnChannelSelected);
-	ChannelComboBox->AddOption(TEXT("자동"));
-	ChannelComboBox->AddOption(TEXT("1채널"));
-	ChannelComboBox->AddOption(TEXT("2채널"));
-	ChannelComboBox->AddOption(TEXT("3채널"));
-	ChannelComboBox->AddOption(TEXT("4채널"));
-	ChannelComboBox->AddOption(TEXT("5채널"));
-	ChannelComboBox->AddOption(TEXT("6채널"));
-	ChannelComboBox->AddOption(TEXT("7채널"));
-	ChannelComboBox->AddOption(TEXT("8채널"));
-	ChannelComboBox->SetSelectedIndex(0);
+	if (ChannelComboBox)
+	{
+		UpdateChannelState();
+
+		ChannelComboBox->OnSelectionChanged.AddDynamic(this, &UGPChannelSelectWidget::OnChannelSelected);
+		ChannelComboBox->OnOpening.AddDynamic(this, &UGPChannelSelectWidget::UpdateChannelState);
+	}
 
 	if (ConfirmButton)
 	{
@@ -35,21 +45,75 @@ void UGPChannelSelectWidget::NativeConstruct()
 	{
 		QuitButton->OnClicked.AddDynamic(this, &UGPChannelSelectWidget::OnQuitClicked);
 	}
+
+	if (BGMVolume)
+	{
+		BGMVolume->OnValueChanged.AddDynamic(this, &UGPChannelSelectWidget::OnBGMVolumeChanged);
+	}
 }
 
 void UGPChannelSelectWidget::OnChannelSelected(FString SelectedItem, ESelectInfo::Type SelectionType)
 {
+	int32 SpaceIdx;
+	if (SelectedItem.FindChar(TEXT(' '), SpaceIdx))
+	{
+		SelectedItem = SelectedItem.Left(SpaceIdx);
+	}
 
+	if (const EWorldChannel* FoundChannel = ChannelMap.Find(SelectedItem))
+	{
+		SelectedChannel = *FoundChannel;
+
+		UE_LOG(LogTemp, Log, TEXT("Selected Channel: %s"), *SelectedItem);
+	}
+}
+
+void UGPChannelSelectWidget::UpdateChannelState()
+{
+	if (ChannelComboBox)
+	{
+		ChannelComboBox->ClearOptions();
+		ChannelComboBox->AddOption(TEXT("자동"));
+
+		UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+
+		for (int32 i = 1; i <= WORLD_MAX_COUNT; ++i)
+		{
+			EWorldChannel Channel = static_cast<EWorldChannel>(i);
+			FString ChannelName = FString::Printf(TEXT("채널%d"), i);
+
+			FString StatusText;
+			if (NetMgr)
+			{
+				EWorldState State = NetMgr->GetWorldState(Channel);
+				switch (State)
+				{
+				case EWorldState::Good:
+					StatusText = TEXT(" (원활)");
+					break;
+				case EWorldState::Normal:
+					StatusText = TEXT(" (보통)");
+					break;
+				case EWorldState::Bad:
+					StatusText = TEXT(" (혼잡)");
+					break;
+				default:
+					StatusText = TEXT(" ( ? )");
+					break;
+				}
+			}
+			FString FullLabel = ChannelName + StatusText;
+			ChannelComboBox->AddOption(FullLabel);
+		}
+		EWorldChannel Ch = *NetMgr->GetMyGPChannel();
+		ChannelComboBox->SetSelectedIndex(static_cast<int32>(Ch));
+	}
 }
 
 void UGPChannelSelectWidget::OnConfirmClicked()
 {
 	if (ChannelComboBox)
 	{
-		int32 SelectedIndex = ChannelComboBox->FindOptionIndex(ChannelComboBox->GetSelectedOption());
-		EWorldChannel SelectedChannel = ConvertIndexToChannel(SelectedIndex);
-		UE_LOG(LogTemp, Log, TEXT("[ChannelSelectWidget] Confirmed Index: %d, Enum: %d"), SelectedIndex, static_cast<uint8>(SelectedChannel));
-
 		UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
 		if (NetMgr)
 		{
@@ -58,24 +122,16 @@ void UGPChannelSelectWidget::OnConfirmClicked()
 	}
 
 	RemoveFromParent();
-}
-
-EWorldChannel UGPChannelSelectWidget::ConvertIndexToChannel(int32 Index)
-{
-	if (Index <= 0)
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (PC)
 	{
-		return EWorldChannel::None; 
+		PC->SetInputMode(FInputModeGameOnly());
+		PC->SetShowMouseCursor(false);
 	}
-	else if (Index >= 1 && Index <= 8)
-	{
-		return static_cast<EWorldChannel>(static_cast<uint8>(EWorldChannel::TUWorld_1) + Index - 1);
-	}
-	return EWorldChannel::None;
 }
 
 void UGPChannelSelectWidget::OnBackClicked()
 {
-	UE_LOG(LogTemp, Log, TEXT("[SettingWidget] Back clicked"));
 	RemoveFromParent();
 
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
@@ -89,13 +145,24 @@ void UGPChannelSelectWidget::OnBackClicked()
 void UGPChannelSelectWidget::OnQuitClicked()
 {
 	RemoveFromParent();
-	if (PauseScreenClass)
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (PC)
 	{
-		APlayerController* PC = GetWorld()->GetFirstPlayerController();
-		if (PC)
+		PC->SetInputMode(FInputModeUIOnly());
+		PC->SetShowMouseCursor(true);
+	}
+}
+
+void UGPChannelSelectWidget::OnBGMVolumeChanged(float Value)
+{
+	UE_LOG(LogTemp, Log, TEXT("[ChannelSelect] BGM Volume changed: %.2f"), Value);
+
+	if (APlayerController* PC = GetOwningPlayer())
+	{
+		AGPCharacterMyplayer* MyPlayer = Cast<AGPCharacterMyplayer>(PC->GetPawn());
+		if (MyPlayer && MyPlayer->SoundManager)
 		{
-			PC->SetInputMode(FInputModeUIOnly());
-			PC->SetShowMouseCursor(true);
+			MyPlayer->SoundManager->SetBGMVolume(Value);
 		}
 	}
 }

@@ -586,7 +586,7 @@ void PacketManager::HandleFriendRejectRequestPacket(int32 sessionId, Packet* pac
 
 void PacketManager::HandleChangeChannelPacket(int32 sessionId, Packet* packet)
 {
-	auto* p = static_cast<ChangeChannelPacket*>(packet);
+	auto* p = static_cast<ChangeChannelRequestPacket*>(packet);
 	auto session = _sessionMgr.GetSession(sessionId);
 	if (!session || !session->IsInGame()) return;
 	auto world = GetValidWorld(sessionId);
@@ -604,7 +604,7 @@ void PacketManager::HandleChangeChannelPacket(int32 sessionId, Packet* packet)
 		LOG_W("Invalid World for channel {}", ENUM_NAME(p->NewChannel));
 		return;
 	}
-	world->PlayerEnterGame(session->GetPlayer());
+	world->PlayerEnterGame(session->GetPlayer(), true);
 }
 
 GameWorld* PacketManager::GetValidWorld(int32 sessionId)

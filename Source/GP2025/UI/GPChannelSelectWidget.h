@@ -10,6 +10,7 @@
 
 class UComboBoxString;
 class UButton;
+class USlider;
 
 /**
  * 
@@ -34,8 +35,8 @@ public:
 
 	UFUNCTION()
 	void OnConfirmClicked();
-
-	EWorldChannel ConvertIndexToChannel(int32 Index);
+	UFUNCTION()
+	void UpdateChannelState();
 
 protected:
 	// 버튼 바인딩 함수
@@ -54,7 +55,12 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* QuitButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting", meta = (ExposeOnSpawn = true))
-	TSubclassOf<UUserWidget> PauseScreenClass;
+	EWorldChannel SelectedChannel;
+  
+	UPROPERTY(meta = (BindWidget))
+	USlider* BGMVolume;
+
+	UFUNCTION()
+	void OnBGMVolumeChanged(float Value);
 
 };

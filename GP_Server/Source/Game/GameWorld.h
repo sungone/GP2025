@@ -29,7 +29,7 @@ public:
 	bool Init(EWorldChannel channelId);
 
 	// Player
-	void PlayerEnterGame(std::shared_ptr<Player> player);
+	void PlayerEnterGame(std::shared_ptr<Player> player, bool bChange = false);
 	void PlayerLeaveGame(int32 playerId);
 	void PlayerSetLocation(int32 playerId, float yaw, FVector pos);
 	void PlayerAddState(int32 playerId, ECharacterStateType newState);

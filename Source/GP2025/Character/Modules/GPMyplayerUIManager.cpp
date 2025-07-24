@@ -238,12 +238,16 @@ void UGPMyplayerUIManager::OpenSettingWidget()
 	if (!SettingWidget->IsInViewport())
 	{
 		SettingWidget->AddToViewport();
+		bIsSettingOpen = true;
 
 		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
 		if (PC)
 		{
+			FInputModeGameAndUI InputMode;
+			InputMode.SetWidgetToFocus(SettingWidget->TakeWidget());
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			PC->SetInputMode(InputMode);
 			PC->SetShowMouseCursor(true);
-			PC->SetInputMode(FInputModeGameAndUI());
 		}
 	}
 }
@@ -255,6 +259,7 @@ void UGPMyplayerUIManager::CloseSettingWidget()
 	if (SettingWidget->IsInViewport())
 	{
 		SettingWidget->RemoveFromParent();
+		bIsSettingOpen = false;
 
 		APlayerController* PC = Cast<APlayerController>(Owner->GetController());
 		if (PC)
@@ -267,7 +272,10 @@ void UGPMyplayerUIManager::CloseSettingWidget()
 
 void UGPMyplayerUIManager::ToggleSettingWidget()
 {
-	if (IsSettingWidgetOpen())
+	if (!Owner || bSettingToggled || !SettingWidget || !IsValid(SettingWidget)) return;
+	bSettingToggled = true;
+
+	if (SettingWidget->IsInViewport())
 	{
 		CloseSettingWidget();
 	}
@@ -277,9 +285,10 @@ void UGPMyplayerUIManager::ToggleSettingWidget()
 	}
 }
 
-bool UGPMyplayerUIManager::IsSettingWidgetOpen() const
+void UGPMyplayerUIManager::ResetToggleSetting()
 {
-	return SettingWidget && SettingWidget->IsInViewport();
+	if (!Owner || !bSettingToggled) return;
+	bSettingToggled = false;
 }
 
 void UGPMyplayerUIManager::ShowInGameUI()

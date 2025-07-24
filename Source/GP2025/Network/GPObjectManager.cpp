@@ -1121,6 +1121,11 @@ FRotator UGPObjectManager::GetDefaultZoneRotation(ZoneType Zone)
 	}
 }
 
+void UGPObjectManager::RefreshInGameUI()
+{
+
+}
+
 void UGPObjectManager::HandleLevelUnloaded()
 {
 	ULevelStreaming* StreamLevel = UGameplayStatics::GetStreamingLevel(this, PendingLevelName);

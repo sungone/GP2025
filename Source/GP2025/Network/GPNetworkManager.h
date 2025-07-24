@@ -97,7 +97,7 @@ public:
 	void UpdateWorldStateFromServer(const FWorldState ServerStates);
 
 	EWorldState GetWorldState(EWorldChannel Channel) const;
-	EWorldChannel GetMyChannel() const { return MyChannel; }
+	const EWorldChannel* GetMyGPChannel() { return &MyChannel; }
 private:
 	UPROPERTY()
 	TMap<uint8, uint8> CachedWorldStates;

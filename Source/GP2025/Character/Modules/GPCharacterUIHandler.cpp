@@ -8,6 +8,7 @@
 #include "UI/GPUserNameWidget.h"
 #include "Components/ProgressBar.h"
 #include "Blueprint/UserWidget.h"
+#include "../../GP_Server/Source/Common/Type.h"
 #include "Character/GPCharacterMonster.h"
 #include "Character/Modules/GPMyplayerCameraHandler.h"
 #include "UI/GPCharacterStatusWidget.h"
@@ -54,35 +55,83 @@ void UGPCharacterUIHandler::UpdateWidgetVisibility()
 	const bool bIsGunner = LocalMyPlayer->bIsGunnerCharacter();
 	const bool bIsGunnerZooming = bIsGunner && LocalMyPlayer->CameraHandler->IsZooming();
 
+	// === 자기 자신은 항상 Visible ===
 	if (bIsOwnerSelf)
 	{
 		CharacterStatusWidgetInstance->SetVisibility(ESlateVisibility::Visible);
+		CharacterStatusWidget->SetRelativeScale3D(FVector(1.f));
 		return;
 	}
 
-	const float Distance = FVector::Dist(Owner->GetActorLocation(), LocalMyPlayer->GetActorLocation());
-
-	float MaxVisibleDistance = 500.0f; // 기본 거리
-
-	if (bIsGunner && bIsGunnerZooming)
+	// === 몬스터 처리 ===
+	if (Cast<AGPCharacterMonster>(Owner))
 	{
-		MaxVisibleDistance = LocalMyPlayer->CharacterInfo.AttackRadius;
+		uint8 MonsterType = Owner->CharacterInfo.CharacterType;
 
-		const float MinScaleDistance = 300.0f;
-		const float MaxScaleDistance = 5000.0f;
-		const float DistanceFactor = FMath::Clamp((MaxScaleDistance - Distance) / (MaxScaleDistance - MinScaleDistance), 0.0f, 1.0f);
-		const float ScaleFactor = FMath::Lerp(0.0001f, 1.f, DistanceFactor);
-		CharacterStatusWidget->SetRelativeScale3D(FVector(ScaleFactor));
+		// 항상 표시할 몬스터 (DESKMON, DRILL, TINO)
+		static const TSet<uint8> AlwaysVisibleMonsters = {
+			static_cast<uint8>(Type::EMonster::DESKMON),
+			static_cast<uint8>(Type::EMonster::DRILL),
+			static_cast<uint8>(Type::EMonster::TINO)
+		};
+
+		if (AlwaysVisibleMonsters.Contains(MonsterType))
+		{
+			CharacterStatusWidgetInstance->SetVisibility(ESlateVisibility::Visible);
+			CharacterStatusWidget->SetRelativeScale3D(FVector(1.f));
+			return;
+		}
+
+		// 일반 몬스터는 거리 기반 처리
+		const float Distance = FVector::Dist(Owner->GetActorLocation(), LocalMyPlayer->GetActorLocation());
+
+		float MaxVisibleDistance = 500.0f;
+		if (bIsGunnerZooming)
+		{
+			MaxVisibleDistance = LocalMyPlayer->CharacterInfo.AttackRadius;
+
+			const float MinScaleDistance = 300.0f;
+			const float MaxScaleDistance = 5000.0f;
+			const float DistanceFactor = FMath::Clamp((MaxScaleDistance - Distance) / (MaxScaleDistance - MinScaleDistance), 0.0f, 1.0f);
+			const float ScaleFactor = FMath::Lerp(0.0001f, 1.f, DistanceFactor);
+			CharacterStatusWidget->SetRelativeScale3D(FVector(ScaleFactor));
+		}
+		else
+		{
+			CharacterStatusWidget->SetRelativeScale3D(FVector(1.f));
+		}
+
+		const float VisibleRadius = Owner->CharacterInfo.CollisionRadius + MaxVisibleDistance;
+		const bool bVisible = Distance <= VisibleRadius;
+
+		CharacterStatusWidgetInstance->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		return;
 	}
-	else
+
+	// === 다른 플레이어 처리: 거리 기반 (2000.f 이내)
+	if (Cast<AGPCharacterPlayer>(Owner))
 	{
-		CharacterStatusWidget->SetRelativeScale3D(FVector(1.f));
+		const float Distance = FVector::Dist(Owner->GetActorLocation(), LocalMyPlayer->GetActorLocation());
+
+		const float MaxVisibleDistance = 2000.0f;
+		const float VisibleRadius = Owner->CharacterInfo.CollisionRadius + MaxVisibleDistance;
+		const bool bVisible = Distance <= VisibleRadius;
+
+		if (bVisible)
+		{
+			const float MinScaleDistance = 500.f;
+			const float MaxScaleDistance = MaxVisibleDistance;
+			const float DistanceFactor = FMath::Clamp((MaxScaleDistance - Distance) / (MaxScaleDistance - MinScaleDistance), 0.0f, 1.0f);
+			const float ScaleFactor = FMath::Lerp(0.3f, 1.f, DistanceFactor);
+			CharacterStatusWidget->SetRelativeScale3D(FVector(ScaleFactor));
+		}
+		else
+		{
+			CharacterStatusWidget->SetRelativeScale3D(FVector(1.f));
+		}
+
+		CharacterStatusWidgetInstance->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 	}
-
-	const float VisibleRadius = Owner->CharacterInfo.CollisionRadius + MaxVisibleDistance;
-	const bool bVisible = Distance <= VisibleRadius;
-
-	CharacterStatusWidgetInstance->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
 
 UGPWidgetComponent* UGPCharacterUIHandler::CreateWidgetComponent(

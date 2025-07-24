@@ -106,6 +106,13 @@ public :
 	UFUNCTION(BlueprintCallable)
     void ResetInventoryToggle();
 
+	UFUNCTION(BlueprintCallable)
+	void ToggleSetting();
+
+	UFUNCTION(BlueprintCallable)
+	void ResetSettingToggle();
+
+
 	void OpenInventory();
 	void CloseInventory();
 

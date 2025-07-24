@@ -46,11 +46,22 @@ struct ChangedWorldStatePacket : public Packet
 		Header.PacketSize = sizeof(ChangedWorldStatePacket);
 	}
 };
-struct ChangeChannelPacket :public Packet
+struct ChangeChannelRequestPacket :public Packet
 {
 	EWorldChannel NewChannel;
-	ChangeChannelPacket(EWorldChannel InWChannel)
+	ChangeChannelRequestPacket(EWorldChannel InWChannel)
 		: Packet(EPacketType::C_CHANGE_CHANNEL), NewChannel(InWChannel)
+	{
+		Header.PacketSize = sizeof(ChangeChannelRequestPacket);
+	}
+};
+struct ChangeChannelPacket : public Packet
+{
+	FVector PlayerPos;
+	EWorldChannel WChannel;
+
+	ChangeChannelPacket(const FVector& pos, EWorldChannel wChannel)
+		: Packet(EPacketType::S_CHANGE_CHANNEL), PlayerPos(pos), WChannel(wChannel)
 	{
 		Header.PacketSize = sizeof(ChangeChannelPacket);
 	}
