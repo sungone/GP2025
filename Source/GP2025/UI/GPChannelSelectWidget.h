@@ -10,6 +10,7 @@
 
 class UComboBoxString;
 class UButton;
+class USlider;
 
 /**
  * 
@@ -55,4 +56,11 @@ public:
 	class UButton* QuitButton;
 
 	EWorldChannel SelectedChannel;
+  
+	UPROPERTY(meta = (BindWidget))
+	USlider* BGMVolume;
+
+	UFUNCTION()
+	void OnBGMVolumeChanged(float Value);
+
 };
