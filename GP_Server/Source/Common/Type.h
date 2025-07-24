@@ -18,6 +18,7 @@ enum EPacketType : uint8
 	C_CHANGE_CHANNEL,
 
 	S_WORLD_STATE,
+	S_CHANGE_CHANNEL,
 
 	// --- Player Actions ---
 	C_MOVE,

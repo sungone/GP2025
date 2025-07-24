@@ -193,7 +193,7 @@ void UGPNetworkManager::SendMyEnterGamePacket(EWorldChannel WChannel, Type::EPla
 
 void UGPNetworkManager::SendMyChangeChannelPacket(EWorldChannel WChannel)
 {
-	ChangeChannelPacket Packet(WChannel);
+	ChangeChannelRequestPacket Packet(WChannel);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
@@ -475,6 +475,11 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->RefreshInGameUI();
 				break;
 			}
+			case EPacketType::S_CHANGE_CHANNEL:
+				ChangeChannelPacket* Pkt = reinterpret_cast<ChangeChannelPacket*>(RemainingData.GetData());
+				MyChannel = Pkt->WChannel;
+				ObjectMgr->ChangeZone(MyPlayer->CharacterInfo.GetZone(), ZoneType::TUK, Pkt->PlayerPos);
+				break;
 			case EPacketType::S_ADD_PLAYER:
 			{
 				InfoPacket* Pkt = reinterpret_cast<InfoPacket*>(RemainingData.GetData());

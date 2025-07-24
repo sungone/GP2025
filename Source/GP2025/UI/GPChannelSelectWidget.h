@@ -34,8 +34,8 @@ public:
 
 	UFUNCTION()
 	void OnConfirmClicked();
-
-	EWorldChannel ConvertIndexToChannel(int32 Index);
+	UFUNCTION()
+	void UpdateChannelState();
 
 protected:
 	// 버튼 바인딩 함수
@@ -54,4 +54,5 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* QuitButton;
 
+	EWorldChannel SelectedChannel;
 };

@@ -44,7 +44,7 @@ bool GameWorld::IsMonster(int32 id)
 	return id >= MAX_PLAYER;
 }
 
-void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
+void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player, bool bChange)
 {
 	FVector newPos;
 	ZoneType startZone = START_ZONE;
@@ -71,35 +71,44 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player)
 	}
 	auto& playerInfo = player->GetInfo();
 
-#if TEST
-	player->AddGold(10000);
-	playerInfo.Stats.Level = 3;
-	BuyItem(playerId, (uint8)Type::EWeapon::PULSE_SWORD, 1);
-	if (static_cast<Type::EPlayer>(playerInfo.CharacterType) == Type::EPlayer::WARRIOR)
+
+	if (bChange)
 	{
-		playerInfo.Skills.Q = FSkillData(ESkillGroup::HitHard, 1);
-		playerInfo.Skills.E = FSkillData(ESkillGroup::Clash, 1);
-		playerInfo.Skills.R = FSkillData(ESkillGroup::Whirlwind, 1);
+		ChangeChannelPacket changePkt(playerInfo.Pos, _channelId);
+		SessionManager::GetInst().SendPacket(playerId, &changePkt);
 	}
 	else
 	{
-		playerInfo.Skills.Q = FSkillData(ESkillGroup::Throwing, 1);
-		playerInfo.Skills.E = FSkillData(ESkillGroup::FThrowing, 1);
-		playerInfo.Skills.R = FSkillData(ESkillGroup::Anger, 1);
-	}
+
+#if TEST
+		player->AddGold(10000);
+		playerInfo.Stats.Level = 3;
+		BuyItem(playerId, (uint8)Type::EWeapon::PULSE_SWORD, 1);
+		if (static_cast<Type::EPlayer>(playerInfo.CharacterType) == Type::EPlayer::WARRIOR)
+		{
+			playerInfo.Skills.Q = FSkillData(ESkillGroup::HitHard, 1);
+			playerInfo.Skills.E = FSkillData(ESkillGroup::Clash, 1);
+			playerInfo.Skills.R = FSkillData(ESkillGroup::Whirlwind, 1);
+		}
+		else
+		{
+			playerInfo.Skills.Q = FSkillData(ESkillGroup::Throwing, 1);
+			playerInfo.Skills.E = FSkillData(ESkillGroup::FThrowing, 1);
+			playerInfo.Skills.R = FSkillData(ESkillGroup::Anger, 1);
+		}
 #endif
-
-	EnterGamePacket enterpkt(playerInfo, _channelId);
-	SessionManager::GetInst().SendPacket(playerId, &enterpkt);
-	player->OnEnterGame();
+		EnterGamePacket enterpkt(playerInfo, _channelId);
+		SessionManager::GetInst().SendPacket(playerId, &enterpkt);
+		player->OnEnterGame();
+		AddItems(playerId, startZone);
+	}
 	InitViewList(playerId, startZone);
-	AddItems(playerId, startZone);
 
-	LOG_D("Enter Game [{}] - Zone <{}>", playerId, ENUM_NAME(startZone));
 	auto questData = player->GetCurrentQuestData();
 	if (!questData) return;
 	if (questData->Catagory == EQuestCategory::KILL)
 		QuestSpawn(playerId, questData->QuestID);
+	LOG_D("Enter Game [{}] - Zone <{}>", playerId, ENUM_NAME(startZone));
 }
 
 void GameWorld::PlayerLeaveGame(int32 id)
