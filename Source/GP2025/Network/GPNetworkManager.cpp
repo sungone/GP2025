@@ -266,14 +266,32 @@ void UGPNetworkManager::SendMyUseSkillEnd(ESkillGroup SkillGID)
 
 void UGPNetworkManager::SendMyZoneChangePacket(ZoneType NewZone)
 {
+	if (!IsValid(MyPlayer)) return;
 	MyPlayer->PlayFadeOut();
+
+	if (!IsValid(GetWorld())) return;
+
 	FTimerHandle TimerHandle;
+	TWeakObjectPtr<UGPNetworkManager> WeakThis(this);
 	GetWorld()->GetTimerManager().SetTimer(
 		TimerHandle,
-		[this, NewZone]()
+		[WeakThis, NewZone]()
 		{
+			if (!WeakThis.IsValid())
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[NetMgr] UGPNetworkManager is no longer valid during zone change."));
+				return;
+			}
+
+			UGPNetworkManager* StrongThis = WeakThis.Get();
+			if (!IsValid(StrongThis->GetWorld()))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[NetMgr] World is invalid in zone change lambda."));
+				return;
+			}
+
 			RequestZoneChangePacket Packet(NewZone);
-			SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+			StrongThis->SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 		},
 		0.5f, false
 	);

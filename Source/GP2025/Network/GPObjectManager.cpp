@@ -331,8 +331,6 @@ void UGPObjectManager::DamagedPlayer(const FInfoData& PlayerInfo)
 		if ((LocalMyPlayer == MyPlayer) && MyPlayer->UIManager)
 		{
 			MyPlayer->UIManager->GetInGameWidget()->HitByMonsterAnimation();
-			// Hit Camera Shake
-			MyPlayer->PlayerHittedCameraShake();
 		}
 
 		if ((LocalMyPlayer == MyPlayer) && MyPlayer->EffectHandler)
@@ -1103,9 +1101,9 @@ void UGPObjectManager::ChangeZone(ZoneType oldZone, ZoneType newZone, const FVec
 
 	SetChangeingZone(true);
 
-	if (!MyPlayer)
+	if (!IsValid(MyPlayer))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed Changing Zone... Player is nullptr"));
+		UE_LOG(LogTemp, Error, TEXT("[ChangeZone] Failed: MyPlayer is nullptr."));
 		SetChangeingZone(false);
 		return;
 	}
@@ -1133,7 +1131,7 @@ void UGPObjectManager::ChangeZone(ZoneType oldZone, ZoneType newZone, const FVec
 	PendingZone = newZone;
 	PendingLocation = RandomPos;
 
-	if (MyPlayer && MyPlayer->SoundManager)
+	if (IsValid(MyPlayer->SoundManager))
 	{
 		MyPlayer->SoundManager->StopBGM();
 		MyPlayer->SoundManager->PlayBGMByLevelName(PendingLevelName);
@@ -1143,11 +1141,24 @@ void UGPObjectManager::ChangeZone(ZoneType oldZone, ZoneType newZone, const FVec
 		MyPlayer->CharacterInfo.ID,
 		*OldLevel.ToString(), *PendingLevelName.ToString());
 
+	if (!IsValid(GetWorld()))
+	{
+		UE_LOG(LogTemp, Error, TEXT("[ChangeZone] GetWorld() is invalid."));
+		SetChangeingZone(false);
+		return;
+	}
+
 	ULevelStreaming* StreamLevel = UGameplayStatics::GetStreamingLevel(this, OldLevel);
 	if (StreamLevel)
 	{
+		if (!StreamLevel->IsLevelLoaded())
+		{
+			HandleLevelUnloaded(); 
+			return;
+		}
 		StreamLevel->OnLevelUnloaded.RemoveAll(this);
 		StreamLevel->OnLevelUnloaded.AddDynamic(this, &UGPObjectManager::HandleLevelUnloaded);
+
 		StreamLevel->SetShouldBeLoaded(false);
 		StreamLevel->SetShouldBeVisible(false);
 	}
@@ -1178,14 +1189,33 @@ void UGPObjectManager::RefreshInGameUI()
 
 void UGPObjectManager::HandleLevelUnloaded()
 {
+	if (!IsValid(this))
+	{
+		return;
+	}
+
+	if (!IsValid(MyPlayer))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[ObjectManager] MyPlayer is null during HandleLevelUnloaded."));
+		SetChangeingZone(false);
+		return;
+	}
+
 	ULevelStreaming* StreamLevel = UGameplayStatics::GetStreamingLevel(this, PendingLevelName);
 	if (StreamLevel)
 	{
-		StreamLevel->OnLevelLoaded.RemoveAll(this);
-		StreamLevel->OnLevelLoaded.AddDynamic(this, &UGPObjectManager::HandleLevelLoaded);
+		if (!StreamLevel->IsLevelLoaded())
+		{
+			StreamLevel->OnLevelLoaded.RemoveAll(this);
+			StreamLevel->OnLevelLoaded.AddDynamic(this, &UGPObjectManager::HandleLevelLoaded);
 
-		StreamLevel->SetShouldBeLoaded(true);
-		StreamLevel->SetShouldBeVisible(true);
+			StreamLevel->SetShouldBeLoaded(true);
+			StreamLevel->SetShouldBeVisible(true);
+		}
+		else
+		{
+			HandleLevelLoaded();
+		}
 	}
 	else
 	{
@@ -1196,12 +1226,18 @@ void UGPObjectManager::HandleLevelUnloaded()
 
 void UGPObjectManager::HandleLevelLoaded()
 {
+	if (!IsValid(MyPlayer))
+	{
+		SetChangeingZone(false);
+		return;
+	}
+
 	MyPlayer->CharacterInfo.SetZone(PendingZone);
 	MyPlayer->SetActorLocation(PendingLocation);
 	FRotator NewRotation = GetDefaultZoneRotation(PendingZone);
 	MyPlayer->SetActorRotation(NewRotation);
 
-	if (MyPlayer->AppearanceHandler)
+	if (IsValid(MyPlayer->AppearanceHandler))
 	{
 		MyPlayer->AppearanceHandler->SetupLeaderPose();
 	}
@@ -1209,7 +1245,8 @@ void UGPObjectManager::HandleLevelLoaded()
 	UE_LOG(LogTemp, Log, TEXT("End Changing Zone [%d]"), MyPlayer->CharacterInfo.ID);
 
 	SetChangeingZone(false);
-	if (MyPlayer && MyPlayer->UIManager)
+
+	if (IsValid(MyPlayer->UIManager))
 	{
 		MyPlayer->PlayFadeIn();
 		auto Widget = MyPlayer->UIManager->GetInGameWidget();

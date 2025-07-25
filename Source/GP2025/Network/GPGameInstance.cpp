@@ -36,17 +36,29 @@ bool UGPGameInstance::SaveNavData(bool IsSave)
 
 void UGPGameInstance::ChangeZoenRequest(FString LevelName)
 {
-	auto GetZoneName = [](FString LevelName) -> ZoneType {
-		if (LevelName == "tip") return ZoneType::TIP;
-		if (LevelName == "TUK") return ZoneType::TUK;
-		if (LevelName == "E") return ZoneType::E;
-		if (LevelName == "gym") return ZoneType::GYM;
-		if (LevelName == "industry") return ZoneType::INDUSTY;
+	auto GetZoneName = [](const FString& InLevelName) -> ZoneType {
+		if (InLevelName == "tip") return ZoneType::TIP;
+		if (InLevelName == "TUK") return ZoneType::TUK;
+		if (InLevelName == "E") return ZoneType::E;
+		if (InLevelName == "gym") return ZoneType::GYM;
+		if (InLevelName == "industry") return ZoneType::INDUSTY;
 		return ZoneType::NONE;
 		};
 	
 	ZoneType TargetZone = GetZoneName(LevelName);
-	if (TargetZone == ZoneType::NONE) return;
+	if (TargetZone == ZoneType::NONE)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[GameInstance] Invalid Zone Name: %s"), *LevelName);
+		return;
+	}
+
+	if (!IsValid(NetworkMgr))
+	{
+		UE_LOG(LogTemp, Error, TEXT("[GameInstance] NetworkMgr is null! Cannot change zone."));
+		return;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("[GameInstance] Sending Zone Change Request to: %s"), *LevelName);
 	NetworkMgr->SendMyZoneChangePacket(TargetZone);
 }
 

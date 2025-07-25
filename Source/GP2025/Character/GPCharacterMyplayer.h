@@ -93,9 +93,6 @@ public :
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "CameraShake")
 	void WarriorAttackCameraShake();
-
-	UFUNCTION(BlueprintImplementableEvent, Category = "CameraShake")
-	void PlayerHittedCameraShake();
 public:
 	UFUNCTION(BlueprintCallable)
 	void PlayFadeOut();
