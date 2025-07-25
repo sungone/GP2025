@@ -211,7 +211,6 @@ void UGPCharacterCombatHandler::HandleDeath()
 
 	FTimerHandle DeadTimerHandle;
 	AGPCharacterBase* LocalOwner = Owner;
-
 	float DeathAnimDuration = DeadMontage ? DeadMontage->GetPlayLength() : 2.0f;
 
 	if (AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(LocalOwner))
@@ -229,7 +228,6 @@ void UGPCharacterCombatHandler::HandleDeath()
 				{
 					LocalMonster->PlayDeathEffect();
 				}
-
 			}), DeathAnimDuration - 0.3f, false);
 	}
 }
@@ -241,7 +239,7 @@ void UGPCharacterCombatHandler::PlayDeadAnimation()
 	UAnimInstance* AnimInstance = Owner->GetCharacterMesh()->GetAnimInstance();
 	if (!AnimInstance) return;
 
-	AnimInstance->StopAllMontages(0.f);
+	AnimInstance->StopAllMontages(0.1f);
 	AnimInstance->Montage_Play(DeadMontage);
 }
 
