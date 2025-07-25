@@ -598,6 +598,7 @@ void PacketManager::HandleChangeChannelPacket(int32 sessionId, Packet* packet)
 	}
 	world->PlayerLeaveGame(sessionId);
 	session->EnterGame(p->NewChannel);
+	
 	world = GameWorldManager::GetInst().GetAvailableWorld(p->NewChannel);
 	if (!world)
 	{
