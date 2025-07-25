@@ -1098,6 +1098,8 @@ void UGPObjectManager::ChangeChannel(const FVector& RandomPos)
 		{
 			MyPlayer->UIManager->GetInGameWidget()->ShowGameMessage(FText::FromString(TEXT("채널이 변경되었습니다.")), 2.f);
 		}
+		auto Player = Cast<AGPCharacterPlayer>(MyPlayer);
+		Players.Add(MyPlayer->CharacterInfo.ID, Player);
 	}
 }
 
