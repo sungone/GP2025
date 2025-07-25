@@ -24,6 +24,7 @@ public:
 	void PlayBGM(class USoundBase* Sound, float Volume = 0.7f, bool bLoop = true);
 	void StopBGM();
 	void PlayLoginBGM();
+	void StopLoginBGM();
 	void PlayBGMForCurrentLevel(); // 맵 이름 기반 자동 재생
 	void PlayBGMByLevelName(const FName& LevelName);
 

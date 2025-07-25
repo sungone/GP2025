@@ -109,13 +109,35 @@ void UGPMyplayerSoundManager::StopBGM()
 {
 	if (BGMComponent)
 	{
-		BGMComponent->Stop();
+		UE_LOG(LogTemp, Warning, TEXT("[SoundManager] StopBGM called"));
+		if (BGMComponent->IsPlaying())
+		{
+			BGMComponent->Stop();
+			UE_LOG(LogTemp, Warning, TEXT("[SoundManager] BGMComponent stopped"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[SoundManager] BGMComponent was not playing"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("[SoundManager] BGMComponent is null!"));
 	}
 }
 
 void UGPMyplayerSoundManager::PlayLoginBGM()
 {
-	PlayBGM(LoginSound);
+	PlayBGM(LoginSound , 1.f , 0.f);
+}
+
+void UGPMyplayerSoundManager::StopLoginBGM()
+{
+	if (BGMComponent && BGMComponent->Sound == LoginSound)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[SoundManager] StopLoginBGM "));
+		BGMComponent->Stop();
+	}
 }
 
 void UGPMyplayerSoundManager::PlayBGMForCurrentLevel()
