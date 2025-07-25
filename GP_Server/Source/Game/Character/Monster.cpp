@@ -72,6 +72,13 @@ void Monster::Respawn()
 	ScheduleUpdate();
 }
 
+void Monster::Look()
+{
+	if (!_target) return;
+	float yaw = _info.CalculateYaw(_target->GetInfo().Pos);
+	_info.SetYaw(yaw);
+}
+
 void Monster::UpdateViewList(std::shared_ptr<Character> other)
 {
 	if (!other) { LOG_W("Invaild!"); return; }
@@ -165,6 +172,7 @@ bool Monster::IsValid()
 void Monster::Attack()
 {
 	ChangeState(ECharacterStateType::STATE_AUTOATTACK);
+	Look();
 
 	if (!_target || _target->IsDead())
 	{
