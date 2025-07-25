@@ -16,7 +16,7 @@ void Player::Init(EWorldChannel channelId)
 	_info.CollisionRadius = playerCollision;
 	_info.State = ECharacterStateType::STATE_IDLE;
 	ApplyLevelStats(_info.Stats.Level);
-	SetCurrentQuest(QuestType::TUT_START);
+	SetCurrentQuest(QuestType::CH1_TALK_TO_STUDENT_A);
 #endif
 }
 

@@ -106,7 +106,7 @@ public:
 	UPROPERTY()
 	bool bHasPlayedTinoSequence = false;
 
-
+	void ShowLobbyUI();
 	// Tutorial Timer
 	FTimerHandle TutorialWidgetTimerHandle;
 
@@ -114,4 +114,5 @@ public :
 	void SetDead(bool bDead);
 	void SetGPChannel(const EWorldChannel* Channel) { MyChannel = Channel; }
 	const EWorldChannel* MyChannel;
+	bool bNewPlayer = true;
 };
