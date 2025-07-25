@@ -18,6 +18,12 @@ UGPMyplayerSoundManager::UGPMyplayerSoundManager()
 		LoginSound = LoginSoundAsset.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<USoundBase> LobbySoundAsset(TEXT("/Game/Sound/BackgroundBGM/LoginLobbySound.LoginLobbySound"));
+	if (LobbySoundAsset.Succeeded())
+	{
+		LobbySound = LobbySoundAsset.Object;
+	}
+
 	struct FSoundLoadInfo
 	{
 		FName LevelName;
@@ -109,33 +115,37 @@ void UGPMyplayerSoundManager::StopBGM()
 {
 	if (BGMComponent)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[SoundManager] StopBGM called"));
 		if (BGMComponent->IsPlaying())
 		{
 			BGMComponent->Stop();
-			UE_LOG(LogTemp, Warning, TEXT("[SoundManager] BGMComponent stopped"));
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[SoundManager] BGMComponent was not playing"));
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("[SoundManager] BGMComponent is null!"));
 	}
 }
 
 void UGPMyplayerSoundManager::PlayLoginBGM()
 {
-	PlayBGM(LoginSound , 1.f , 0.f);
+	PlayBGM(LoginSound , 1.f , true);
 }
 
 void UGPMyplayerSoundManager::StopLoginBGM()
 {
 	if (BGMComponent && BGMComponent->Sound == LoginSound)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[SoundManager] StopLoginBGM "));
+		BGMComponent->OnAudioFinished.Clear();
+		BGMComponent->Stop();
+	}
+}
+
+void UGPMyplayerSoundManager::PlayLobbyBGM()
+{
+	PlayBGM(LobbySound, 1.0f, true);
+}
+
+void UGPMyplayerSoundManager::StopLobbyBGM()
+{
+	if (BGMComponent && BGMComponent->Sound == LobbySound)
+	{
+		BGMComponent->OnAudioFinished.Clear(); 
 		BGMComponent->Stop();
 	}
 }

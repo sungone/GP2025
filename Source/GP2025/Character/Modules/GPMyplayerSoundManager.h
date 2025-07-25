@@ -25,6 +25,8 @@ public:
 	void StopBGM();
 	void PlayLoginBGM();
 	void StopLoginBGM();
+	void PlayLobbyBGM();
+	void StopLobbyBGM();
 	void PlayBGMForCurrentLevel(); // 맵 이름 기반 자동 재생
 	void PlayBGMByLevelName(const FName& LevelName);
 
@@ -46,6 +48,9 @@ public:
 
 	UPROPERTY()
 	USoundBase* LoginSound;
+
+	UPROPERTY()
+	USoundBase* LobbySound;
 
 	// 루프용
 	UFUNCTION()

@@ -432,6 +432,15 @@ void UGPMyplayerUIManager::ShowLobbyUI()
 	if (LobbyWidget && !LobbyWidget->IsInViewport())
 	{
 		LobbyWidget->AddToViewport();
+		if (UGPLobbyWidget* Lobby = Cast<UGPLobbyWidget>(LobbyWidget))
+		{
+			Lobby->PlayFadeAnim();
+		}
+	}
+
+	if (Owner->SoundManager)
+	{
+		Owner->SoundManager->PlayLobbyBGM();
 	}
 
 	if (Owner && Owner->IsPlayerControlled())

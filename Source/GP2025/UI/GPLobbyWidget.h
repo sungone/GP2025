@@ -35,6 +35,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UImage* PreviewImage;
 
+	UPROPERTY(meta = (BindWidget))
+	UImage* FadeImage;
+
 	// 남자 캐릭터 이미지 경로
 	UPROPERTY(EditAnywhere, Category = "Preview")
 	FString ManImagePath;
@@ -69,5 +72,10 @@ public :
 
 	UFUNCTION()
 	void OnChannelChanged(FString SelectedItem, ESelectInfo::Type SelectionType);
+
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	UWidgetAnimation* FadeAnim;
+
+	void PlayFadeAnim();
 
 };
