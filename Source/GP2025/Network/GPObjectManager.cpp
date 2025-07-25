@@ -1470,11 +1470,14 @@ void UGPObjectManager::AddRequestFriend(const FFriendInfo& Info)
 		return;
 
 	RequestedFriendSet.Add(DBId);
-
 	if (MyPlayer && MyPlayer->UIManager)
 	{
-		MyPlayer->UIManager->GetFriendBoxWidget()->AddToRequestedList(Info.DBId, UTF8_TO_TCHAR(Info.GetName()), Info.Level, Info.bAccepted);
-		MyPlayer->UIManager->AddFriendSystemMessage(EChatFriendNotifyType::RequestReceived, UTF8_TO_TCHAR(Info.GetName()));
+		auto* FriendWidgetPtr = MyPlayer->UIManager->GetFriendBoxWidget();
+		if (FriendWidgetPtr)
+		{
+			FriendWidgetPtr->AddToRequestedList(Info.DBId, UTF8_TO_TCHAR(Info.GetName()), Info.Level, Info.bAccepted);
+			MyPlayer->UIManager->AddFriendSystemMessage(EChatFriendNotifyType::RequestReceived, UTF8_TO_TCHAR(Info.GetName()));
+		}
 	}
 }
 
@@ -1486,8 +1489,12 @@ void UGPObjectManager::RemoveRequestFriend(uint32 DBId)
 	RequestedFriendSet.Remove(DBId);
 	if (MyPlayer && MyPlayer->UIManager)
 	{
-		MyPlayer->UIManager->GetFriendBoxWidget()->RemoveFromRequestedList(DBId);
-		MyPlayer->UIManager->AddFriendSystemMessage(EChatFriendNotifyType::RequestRejected);
+		auto* FriendWidgetPtr = MyPlayer->UIManager->GetFriendBoxWidget();
+		if (FriendWidgetPtr)
+		{
+			FriendWidgetPtr->RemoveFromRequestedList(DBId);
+			MyPlayer->UIManager->AddFriendSystemMessage(EChatFriendNotifyType::RequestRejected);
+		}
 	}
 }
 
@@ -1501,8 +1508,12 @@ void UGPObjectManager::AddFriend(const FFriendInfo& Info)
 
 	if (MyPlayer && MyPlayer->UIManager)
 	{
-		MyPlayer->UIManager->GetFriendBoxWidget()->AddToFriendList(Info.DBId, UTF8_TO_TCHAR(Info.GetName()), Info.Level, Info.isOnline);
-		MyPlayer->UIManager->AddFriendSystemMessage(EChatFriendNotifyType::Accepted, UTF8_TO_TCHAR(Info.GetName()));
+		auto* FriendWidgetPtr = MyPlayer->UIManager->GetFriendBoxWidget();
+		if (FriendWidgetPtr)
+		{
+			FriendWidgetPtr->AddToFriendList(Info.DBId, UTF8_TO_TCHAR(Info.GetName()), Info.Level, Info.isOnline);
+			MyPlayer->UIManager->AddFriendSystemMessage(EChatFriendNotifyType::Accepted, UTF8_TO_TCHAR(Info.GetName()));
+		}
 	}
 }
 
@@ -1513,8 +1524,12 @@ void UGPObjectManager::RemoveFriend(uint32 DBId)
 
 	if (MyPlayer && MyPlayer->UIManager)
 	{
-		MyPlayer->UIManager->GetFriendBoxWidget()->RemoveFromFriendList(DBId);
-		MyPlayer->UIManager->AddFriendSystemMessage(EChatFriendNotifyType::Removed);
+		auto* FriendWidgetPtr = MyPlayer->UIManager->GetFriendBoxWidget();
+		if (FriendWidgetPtr)
+		{
+			FriendWidgetPtr->RemoveFromFriendList(DBId);
+			MyPlayer->UIManager->AddFriendSystemMessage(EChatFriendNotifyType::Removed);
+		}
 	}
 }
 

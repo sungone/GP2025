@@ -304,10 +304,29 @@ bool DBManager::RemoveUserItem(uint32 dbId, uint32 itemID)
 	}
 }
 
+bool DBManager::DoesUserExist(uint32 userId)
+{
+	try {
+		ScopedDBSession scoped;
+		auto& sess = scoped.Get();
+		auto result = sess.getSchema("gp2025").getTable("users")
+			.select("id").where("id = :id").bind("id", userId).execute();
+
+		return result.count() > 0;
+	}
+	catch (const mysqlx::Error& e) {
+		LOG_E("MySQL Error (DoesUserExist): {}", e.what());
+		return false;
+	}
+}
+
 ResultCode DBManager::AddFriendRequest(uint32 myId, uint32 targetId)
 {
 	if (myId == targetId)
 		return ResultCode::FRIEND_SELF_REQUEST;
+
+	if (!DoesUserExist(targetId))
+		return ResultCode::FRIEND_USER_NOT_FOUND;
 
 	if (IsFriendOrPending(myId, targetId))
 		return ResultCode::FRIEND_ALREADY_REQUESTED;
@@ -477,7 +496,7 @@ ResultCode DBManager::RemoveFriend(uint32 userId, uint32 friendId)
 
 		auto result = schema.getTable("user_friends")
 			.remove()
-			.where("((user_id = :u1 AND friend_id = :u2) OR (user_id = :u2 AND friend_id = :u1)) AND status = 1")
+			.where("(user_id = :u1 AND friend_id = :u2) OR (user_id = :u2 AND friend_id = :u1)")
 			.bind("u1", userId)
 			.bind("u2", friendId)
 			.execute();

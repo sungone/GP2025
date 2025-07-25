@@ -79,7 +79,6 @@ void UGPChannelSelectWidget::UpdateChannelState()
 	if (ChannelComboBox)
 	{
 		ChannelComboBox->ClearOptions();
-		ChannelComboBox->AddOption(TEXT("자동"));
 
 		UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
 
