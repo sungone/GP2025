@@ -4,8 +4,13 @@
 
 void Character::Init(EWorldChannel channelId)
 {
-	_channelId = channelId;
 	_info.SetYaw(RandomUtils::GetRandomFloat(-180, 180));
+	SetWorldChannel(channelId);
+}
+
+void Character::SetWorldChannel(EWorldChannel channelId)
+{
+	_channelId = channelId;
 	_world = GameWorldManager::GetInst().GetWorld(channelId);
 }
 

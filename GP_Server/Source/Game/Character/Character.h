@@ -9,6 +9,7 @@ public:
 	Character(int32 id) { _id = id; }
 
 	virtual void Init(EWorldChannel channelId);
+	virtual void SetWorldChannel(EWorldChannel channelId);
 	virtual void Update() {};
 	virtual bool IsDead();
 
