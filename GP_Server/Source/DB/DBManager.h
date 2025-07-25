@@ -22,7 +22,7 @@ public:
 	DBLoginResult SignUpUser(int32 sessionId, const std::string& login_id, const std::string& password, const std::wstring& nickname);
 	DBLoginResult CheckLogin(int32 sessionId, const std::string& login_id, const std::string& password);
 	bool UpdatePlayerInfo(uint32 dbId, const FInfoData& info);
-	bool AddUserItem(uint32 dbId, uint32 itemID, uint8 itemTypeID);
+	bool AddUserItem(uint32 dbId, uint8 itemTypeID);
 	bool RemoveUserItem(uint32 dbId, uint32 itemID);
 
 	ResultCode AddFriendRequest(uint32 fromId, uint32 toId);

@@ -82,20 +82,6 @@ void GameWorld::PlayerEnterGame(std::shared_ptr<Player> player, bool bChange)
 
 #if TEST
 		player->AddGold(10000);
-		playerInfo.Stats.Level = 3;
-		BuyItem(playerId, (uint8)Type::EWeapon::PULSE_SWORD, 1);
-		if (static_cast<Type::EPlayer>(playerInfo.CharacterType) == Type::EPlayer::WARRIOR)
-		{
-			playerInfo.Skills.Q = FSkillData(ESkillGroup::HitHard, 1);
-			playerInfo.Skills.E = FSkillData(ESkillGroup::Clash, 1);
-			playerInfo.Skills.R = FSkillData(ESkillGroup::Whirlwind, 1);
-		}
-		else
-		{
-			playerInfo.Skills.Q = FSkillData(ESkillGroup::Throwing, 1);
-			playerInfo.Skills.E = FSkillData(ESkillGroup::FThrowing, 1);
-			playerInfo.Skills.R = FSkillData(ESkillGroup::Anger, 1);
-		}
 #endif
 		EnterGamePacket enterpkt(playerInfo, _channelId);
 		SessionManager::GetInst().SendPacket(playerId, &enterpkt);

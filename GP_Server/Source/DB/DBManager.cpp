@@ -175,7 +175,7 @@ DBLoginResult DBManager::CheckLogin(int32 sessionId, const std::string& login_id
 		std::vector<std::pair<uint32, uint8>> itemList;
 
 		auto itemResult = schema.getTable("user_items")
-			.select("item_uid", "item_type_id")
+			.select("item_id", "item_type_id")
 			.where("user_id = :uid")
 			.bind("uid", dbId)
 			.execute();
@@ -248,17 +248,29 @@ bool DBManager::UpdatePlayerInfo(uint32 dbId, const FInfoData& info)
 	}
 }
 
-bool DBManager::AddUserItem(uint32 dbId, uint32 itemID, uint8 itemTypeID)
+bool DBManager::AddUserItem(uint32 dbId, uint8 itemTypeID)
 {
 	try {
 		ScopedDBSession scoped;
 		auto& sess = scoped.Get();
 		auto schema = sess.getSchema("gp2025");
-		schema.getTable("user_items")
-			.insert("item_uid", "user_id", "item_type_id")
-			.values(itemID, dbId, itemTypeID)
+
+		auto result = sess.sql("SELECT IFNULL(MAX(item_id), 0) + 1 AS next_id FROM user_items WHERE user_id = ?")
+			.bind(dbId)
 			.execute();
 
+		auto row = result.fetchOne();
+		if (!row)
+			return false;
+
+		uint32 nextItemId = static_cast<uint32>(row[0].get<int>());
+
+		schema.getTable("user_items")
+			.insert("user_id", "item_id", "item_type_id")
+			.values(dbId, nextItemId, itemTypeID)
+			.execute();
+
+		LOG_D("Add item - user_id: {}, item_id: {}, item_type: {}", dbId, nextItemId, itemTypeID);
 		return true;
 	}
 	catch (const mysqlx::Error& e)
@@ -268,6 +280,7 @@ bool DBManager::AddUserItem(uint32 dbId, uint32 itemID, uint8 itemTypeID)
 	}
 }
 
+
 bool DBManager::RemoveUserItem(uint32 dbId, uint32 itemID)
 {
 	try {
@@ -276,7 +289,7 @@ bool DBManager::RemoveUserItem(uint32 dbId, uint32 itemID)
 		auto schema = sess.getSchema("gp2025");
 		schema.getTable("user_items")
 			.remove()
-			.where("item_uid = :uid AND user_id = :userid")
+			.where("item_id = :uid AND user_id = :userid")
 			.bind("uid", itemID)
 			.bind("userid", dbId)
 			.execute();
