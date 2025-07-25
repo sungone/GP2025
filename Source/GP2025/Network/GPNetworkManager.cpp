@@ -321,19 +321,29 @@ void UGPNetworkManager::SendMyRequestQuest(QuestType quest)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
+void UGPNetworkManager::SendMyRejectQuest(QuestType quest)
+{
+	RejectQuestPacket Packet(quest);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
 void UGPNetworkManager::SendMyCompleteQuest()
 {
 	if (!MyPlayer)
 		return;
 
 	QuestType Quest = MyPlayer->CharacterInfo.GetCurrentQuest().QuestType;
-	CompleteQuestPacket Packet(Quest);
+	CompleteQuestPacket Packet(Quest, false);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendMyRejectQuest(QuestType quest)
+void UGPNetworkManager::SendMySkipQuest()
 {
-	RejectQuestPacket Packet(quest);
+	if (!MyPlayer)
+		return;
+
+	QuestType Quest = MyPlayer->CharacterInfo.GetCurrentQuest().QuestType;
+	CompleteQuestPacket Packet(Quest, true);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
@@ -458,6 +468,8 @@ void UGPNetworkManager::ProcessPacket()
 				LoginSuccessPacket* Pkt = reinterpret_cast<LoginSuccessPacket*>(RemainingData.GetData());
 				LoadWorldStatesFromServer(Pkt->WorldState);
 				OnEnterLobby.Broadcast();
+				MyPlayer->bNewPlayer = false;
+				MyPlayer->ShowLobbyUI();
 				break;
 			}
 			case EPacketType::S_LOGIN_FAIL:
@@ -471,6 +483,8 @@ void UGPNetworkManager::ProcessPacket()
 				SignUpSuccessPacket* Pkt = reinterpret_cast<SignUpSuccessPacket*>(RemainingData.GetData());
 				LoadWorldStatesFromServer(Pkt->WorldState);
 				OnEnterLobby.Broadcast();
+				MyPlayer->bNewPlayer = true;
+				ObjectMgr->PlayWorldIntro();
 				break;
 			}
 			case EPacketType::S_SIGNUP_FAIL:
@@ -490,6 +504,7 @@ void UGPNetworkManager::ProcessPacket()
 				FInfoData Data = Pkt->PlayerInfo;
 				ObjectMgr->ChangeZone(ZoneType::TUK, Data.GetZone(), Data.Pos);
 				ObjectMgr->AddMyPlayer(Pkt->PlayerInfo);
+				ObjectMgr->ShowTutorialStartQuest();
 				break;
 			}
 			case EPacketType::S_CHANGE_CHANNEL:

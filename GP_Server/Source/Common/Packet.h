@@ -626,7 +626,7 @@ struct CompleteQuestPacket : public Packet
 {
 	QuestType Quest;
 	bool bForce = false;
-	CompleteQuestPacket(QuestType quest, bool force = false)
+	CompleteQuestPacket(QuestType quest, bool force)
 		: Packet(EPacketType::C_COMPLETE_QUEST), Quest(quest), bForce(force)
 	{
 		Header.PacketSize = sizeof(CompleteQuestPacket);
