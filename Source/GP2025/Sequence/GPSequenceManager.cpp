@@ -45,6 +45,12 @@ void UGPSequenceManager::PlaySequenceByName(UObject* WorldContext, FName Sequenc
 	if (SequencePlayer)
 	{
 		SequencePlayer->OnFinished.AddDynamic(this, &UGPSequenceManager::OnSequenceFinished);
+		
+		APlayerController* PC = World->GetFirstPlayerController();
+		if (PC)
+		{
+			PC->SetInputMode(FInputModeGameOnly());
+		}
 		SequencePlayer->Play();
 		UE_LOG(LogTemp, Log, TEXT("[SequenceManager] Playing sequence: %s"), *SequenceName.ToString());
 	}
@@ -55,6 +61,7 @@ void UGPSequenceManager::SkipSequence()
 	if (SequencePlayer && SequencePlayer->IsPlaying())
 	{
 		SequencePlayer->Stop();
+		SequencePlayer->OnFinished.Broadcast();
 		UE_LOG(LogTemp, Log, TEXT("[SequenceManager] Sequence skipped"));
 	}
 }
@@ -67,6 +74,7 @@ bool UGPSequenceManager::IsSequencePlaying() const
 void UGPSequenceManager::OnSequenceFinished()
 {
 	UE_LOG(LogTemp, Log, TEXT("Sequence finished"));
+
 
 	if (OnSequenceFinishedDelegate.IsBound())
 	{

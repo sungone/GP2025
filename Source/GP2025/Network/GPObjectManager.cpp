@@ -446,7 +446,12 @@ void UGPObjectManager::AddMonster(const FInfoData& MonsterInfo)
 	Monster->SetCharacterInfo(MonsterInfo);
 	Monster->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
 	Monster->SetCharacterType(MonsterInfo.CharacterType);
-
+	if (Monster->CharacterInfo.CharacterType == static_cast<uint8>(Type::EMonster::TINO))
+	{
+		Tino = Monster;
+		Monster->SetActorHiddenInGame(true);
+		Monster->SetActorEnableCollision(false);
+	}
 	if (Monster->UIHandler)
 	{
 		Monster->SetNameByCharacterInfo();
@@ -465,6 +470,10 @@ void UGPObjectManager::RemoveMonster(int32 MonsterID)
 		{
 			AGPCharacterMonster* Monster = WeakMonsterPtr->Get();
 			Monster->Destroy();
+			if (Monster->CharacterInfo.CharacterType == static_cast<uint8>(Type::EMonster::TINO))
+			{
+				Tino = nullptr;
+			}
 		}
 		Monsters.Remove(MonsterID);
 	}
@@ -1270,9 +1279,9 @@ void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
 	);
 }
 
-void UGPObjectManager::OnFirstEnterGame()
+void UGPObjectManager::ShowTutorialStartQuest()
 {
-	if (!MyPlayer||!MyPlayer->bNewPlayer) return;
+	if (!MyPlayer) return;
 
 	auto QuestType = MyPlayer->CharacterInfo.CurrentQuest.QuestType;
 	if (QuestType == QuestType::TUT_START
@@ -1373,65 +1382,6 @@ void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpR
 	}
 }
 
-void UGPObjectManager::HideTinoMonstersTemporarily(float Duration)
-{
-	UE_LOG(LogTemp, Log, TEXT("[HideTinoMonstersTemporarily] Called with duration: %.2f"), Duration);
-
-	int32 HideCount = 0;
-
-	for (const TPair<int32, TWeakObjectPtr<AGPCharacterMonster>>& Elem : Monsters)
-	{
-		const TWeakObjectPtr<AGPCharacterMonster>& WeakMonster = Elem.Value;
-
-		if (!WeakMonster.IsValid())
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[HideTinoMonstersTemporarily] WeakMonster (ID: %d) is not valid"), Elem.Key);
-			continue;
-		}
-
-		AGPCharacterMonster* Monster = WeakMonster.Get();
-		if (!Monster)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[HideTinoMonstersTemporarily] Monster (ID: %d) is null after Get()"), Elem.Key);
-			continue;
-		}
-
-		if (Monster->CharacterInfo.CharacterType == static_cast<uint8>(Type::EMonster::TINO))
-		{
-			UE_LOG(LogTemp, Log, TEXT("[HideTinoMonstersTemporarily] Hiding TINO Monster (ID: %d)"), Elem.Key);
-
-			Monster->SetActorHiddenInGame(true);
-			Monster->SetActorEnableCollision(false);
-			HideCount++;
-
-			FTimerHandle UnhideTimer;
-			FTimerDelegate UnhideDelegate;
-			UnhideDelegate.BindLambda([Monster]()
-				{
-					if (Monster)
-					{
-						UE_LOG(LogTemp, Log, TEXT("[HideTinoMonstersTemporarily] Restoring TINO Monster visibility"));
-						Monster->SetActorHiddenInGame(false);
-						Monster->SetActorEnableCollision(true);
-					}
-				});
-
-			GetWorld()->GetTimerManager().SetTimer(UnhideTimer, UnhideDelegate, Duration, false);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Log, TEXT("[HideTinoMonstersTemporarily] Monster (ID: %d) is not TINO. Type: %d"),
-				Elem.Key,
-				Monster->CharacterInfo.CharacterType);
-		}
-	}
-
-	if (HideCount == 0)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[HideTinoMonstersTemporarily] No TINO monsters were hidden."));
-	}
-}
-
 void UGPObjectManager::PlayWorldIntro()
 {
 	UWorld* MyWorld = GetWorld();
@@ -1469,6 +1419,11 @@ void UGPObjectManager::OnWorldIntroFinished()
 
 void UGPObjectManager::OnTinoIntroFinished()
 {
+	if (Tino)
+	{
+		Tino->SetActorHiddenInGame(false);
+		Tino->SetActorEnableCollision(true);
+	}
 }
 
 void UGPObjectManager::AddRequestFriend(const FFriendInfo& Info)

@@ -32,13 +32,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sequences")
 	TArray<FNamedSequence> SequenceList;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "Sequences")
 	void PlaySequenceByName(UObject* WorldContext, FName SequenceName);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "Sequences")
 	void SkipSequence();
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "Sequences")
 	bool IsSequencePlaying() const;
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "Sequences")
 	void OnSequenceFinished();
 
 private:

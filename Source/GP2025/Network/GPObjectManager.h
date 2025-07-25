@@ -69,12 +69,9 @@ public:
 	void HandleLevelLoaded();
 	void RespawnMyPlayer(const FInfoData& info);
 	
-	void OnFirstEnterGame();
+	void ShowTutorialStartQuest();
 	void OnQuestStart(QuestType Quest);
 	void OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpReward, uint32 GoldReward);
-
-	UFUNCTION()
-	void HideTinoMonstersTemporarily(float Duration);
 
 	void PlayWorldIntro();
 	void PlayTinoIntro();
@@ -104,7 +101,7 @@ private:
 	TMap<int32, TWeakObjectPtr<AGPCharacterPlayer>> Players;
 
 	TMap<int32, TWeakObjectPtr<AGPCharacterMonster>> Monsters;
-
+	AGPCharacterMonster* Tino = nullptr;
 	TMap<int32, TWeakObjectPtr<AGPItem>> Items;
 
 	TMap<uint32, FString> FriendMap;
