@@ -440,6 +440,7 @@ void UGPNetworkManager::ProcessPacket()
 				LoginSuccessPacket* Pkt = reinterpret_cast<LoginSuccessPacket*>(RemainingData.GetData());
 				LoadWorldStatesFromServer(Pkt->WorldState);
 				OnEnterLobby.Broadcast();
+				MyPlayer->bNewPlayer = false;
 				break;
 			}
 			case EPacketType::S_LOGIN_FAIL:
@@ -453,6 +454,8 @@ void UGPNetworkManager::ProcessPacket()
 				SignUpSuccessPacket* Pkt = reinterpret_cast<SignUpSuccessPacket*>(RemainingData.GetData());
 				LoadWorldStatesFromServer(Pkt->WorldState);
 				OnEnterLobby.Broadcast();
+				MyPlayer->bNewPlayer = true;
+				ObjectMgr->PlayWorldIntro();
 				break;
 			}
 			case EPacketType::S_SIGNUP_FAIL:
@@ -472,7 +475,6 @@ void UGPNetworkManager::ProcessPacket()
 				FInfoData Data = Pkt->PlayerInfo;
 				ObjectMgr->ChangeZone(ZoneType::TUK, Data.GetZone(), Data.Pos);
 				ObjectMgr->AddMyPlayer(Pkt->PlayerInfo);
-				ObjectMgr->RefreshInGameUI();
 				break;
 			}
 			case EPacketType::S_CHANGE_CHANNEL:

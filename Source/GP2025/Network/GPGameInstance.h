@@ -28,6 +28,17 @@ private:
 	UPROPERTY()
 	class UGPNetworkManager* NetworkMgr;
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sequence")
+	TSubclassOf<UGPSequenceManager> SequenceManagerClass;
+private:
+	UPROPERTY()
+	class UGPSequenceManager* SequenceMgr;
+public:
+	UFUNCTION(BlueprintCallable)
+	UGPSequenceManager* GetSequenceManager() { return SequenceMgr; }
+
+
  // Android 권한 요청
 #if PLATFORM_ANDROID
 	void RequestAndroidPermissions();

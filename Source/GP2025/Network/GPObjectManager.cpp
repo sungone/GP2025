@@ -28,9 +28,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
-#include "GPObjectManager.h"
 #include "TimerManager.h"
-
+#include "Sequence/GPSequenceManager.h"
 void UGPObjectManager::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
@@ -150,8 +149,8 @@ void UGPObjectManager::AddMyPlayer(const FInfoData& PlayerInfo)
 	{
 		MyPlayer->SetNameByCharacterInfo();
 	}
-	//auto Player = Cast<AGPCharacterPlayer>(MyPlayer);
-	//Players.Add(PlayerInfo.ID, Player);
+	auto Player = Cast<AGPCharacterPlayer>(MyPlayer);
+	Players.Add(PlayerInfo.ID, Player);
 
 	auto Weapon = MyPlayer->CharacterInfo.GetEquippedWeapon();
 	if (Weapon != Type::EWeapon::NONE)
@@ -1053,7 +1052,7 @@ void UGPObjectManager::ChangeChannel(const FVector& RandomPos)
 	for (auto& PlayerPair : Players)
 	{
 		TWeakObjectPtr<AGPCharacterPlayer> PlayerPtr = PlayerPair.Value;
-		if (PlayerPtr.IsValid())
+		if (PlayerPtr.IsValid() && PlayerPtr.Get() != MyPlayer)
 		{
 			PlayerPtr->Destroy();
 		}
@@ -1112,7 +1111,8 @@ void UGPObjectManager::ChangeZone(ZoneType oldZone, ZoneType newZone, const FVec
 
 	if (oldZone == newZone && oldZone == ZoneType::TUK)
 	{
-		MyPlayer->SetActorLocation(RandomPos);
+		if (RandomPos != FVector::ZeroVector)
+			MyPlayer->SetActorLocation(RandomPos);
 		SetChangeingZone(false);
 		return;
 	}
@@ -1136,7 +1136,8 @@ void UGPObjectManager::ChangeZone(ZoneType oldZone, ZoneType newZone, const FVec
 	if (MyPlayer && MyPlayer->SoundManager)
 	{
 		MyPlayer->SoundManager->StopBGM();
-		MyPlayer->SoundManager->PlayBGMByLevelName(PendingLevelName);
+		if (RandomPos != FVector::ZeroVector)
+			MyPlayer->SoundManager->PlayBGMByLevelName(PendingLevelName);
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("Start Changing Zone [%d] From %s to %s"),
@@ -1171,11 +1172,6 @@ FRotator UGPObjectManager::GetDefaultZoneRotation(ZoneType Zone)
 	}
 }
 
-void UGPObjectManager::RefreshInGameUI()
-{
-
-}
-
 void UGPObjectManager::HandleLevelUnloaded()
 {
 	ULevelStreaming* StreamLevel = UGameplayStatics::GetStreamingLevel(this, PendingLevelName);
@@ -1197,28 +1193,31 @@ void UGPObjectManager::HandleLevelUnloaded()
 void UGPObjectManager::HandleLevelLoaded()
 {
 	MyPlayer->CharacterInfo.SetZone(PendingZone);
-	MyPlayer->SetActorLocation(PendingLocation);
-	FRotator NewRotation = GetDefaultZoneRotation(PendingZone);
-	MyPlayer->SetActorRotation(NewRotation);
-
-	if (MyPlayer->AppearanceHandler)
+	if (PendingLocation != FVector::ZeroVector)
 	{
-		MyPlayer->AppearanceHandler->SetupLeaderPose();
-	}
-
-	UE_LOG(LogTemp, Log, TEXT("End Changing Zone [%d]"), MyPlayer->CharacterInfo.ID);
-
-	SetChangeingZone(false);
-	if (MyPlayer && MyPlayer->UIManager)
-	{
-		MyPlayer->PlayFadeIn();
-		auto Widget = MyPlayer->UIManager->GetInGameWidget();
-
-		if (Widget)
+		MyPlayer->SetActorLocation(PendingLocation);
+		FRotator NewRotation = GetDefaultZoneRotation(PendingZone);
+		MyPlayer->SetActorRotation(NewRotation);
+		if (MyPlayer->AppearanceHandler)
 		{
-			Widget->ShowZoneChangeMessage(PendingZone);
+			MyPlayer->AppearanceHandler->SetupLeaderPose();
+		}
+
+		if (MyPlayer && MyPlayer->UIManager)
+		{
+			MyPlayer->PlayFadeIn();
+			auto Widget = MyPlayer->UIManager->GetInGameWidget();
+
+			if (Widget)
+			{
+				Widget->ShowZoneChangeMessage(PendingZone);
+			}
 		}
 	}
+
+
+	SetChangeingZone(false);
+	UE_LOG(LogTemp, Log, TEXT("End Changing Zone [%d]"), MyPlayer->CharacterInfo.ID);
 }
 
 
@@ -1271,12 +1270,42 @@ void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
 	);
 }
 
+void UGPObjectManager::OnFirstEnterGame()
+{
+	if (!MyPlayer) return;
+
+	auto QuestType = MyPlayer->CharacterInfo.CurrentQuest.QuestType;
+	if (QuestType == QuestType::TUT_START
+		|| QuestType == QuestType::NONE)
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle,
+			FTimerDelegate::CreateLambda([this]()
+				{
+					if (!MyPlayer) return;
+
+					if (MyPlayer->UIManager)
+					{
+						MyPlayer->UIManager->PlayTutorialQuestWidget();
+					}
+				}),
+			1.0f,
+			false);
+	}
+}
+
 void UGPObjectManager::OnQuestStart(QuestType Quest)
 {
 	UE_LOG(LogTemp, Warning, TEXT("=== [ObjectManager] OnQuestStart called: QuestType = %d ==="), static_cast<uint8>(Quest));
 
 	if (!MyPlayer) return;
 	MyPlayer->CharacterInfo.CurrentQuest = QuestStatus(Quest, EQuestStatus::InProgress);
+
+	if (Quest == QuestType::CH4_KILL_TINO)
+	{
+		PlayTinoIntro();
+	}
 
 	if (MyPlayer->UIManager)
 	{
@@ -1286,16 +1315,24 @@ void UGPObjectManager::OnQuestStart(QuestType Quest)
 		MyPlayer->UIManager->ShowQuestStartMessage(Quest);
 	}
 
-	if (Quest == QuestType::TUT_COMPLETE) // 튜토리얼 완료는 바로 클리어
+	if (Quest == QuestType::TUT_COMPLETE)
 	{
 		if (MyPlayer->NetMgr)
 		{
-			MyPlayer->NetMgr->SendMyCompleteQuest();
-			UGPInGameWidget* InGameUI = MyPlayer->UIManager->GetInGameWidget();
-			if (!InGameUI) return;
+			FTimerHandle RespawnDelayHandle;
+			MyPlayer->GetWorldTimerManager().SetTimer(
+				RespawnDelayHandle,
+				FTimerDelegate::CreateLambda([this]()
+					{
+						if (MyPlayer)
+						{
+							MyPlayer->NetMgr->SendMyCompleteQuest();
+						}
+					}),
+				5.f,
+				false
+			);
 
-			FText QuestMessage = FText::FromString(TEXT("튜토리얼 퀘스트를 완료했습니다."));
-			InGameUI->ShowGameMessage(QuestMessage, 3.f);
 		}
 	}
 }
@@ -1393,6 +1430,46 @@ void UGPObjectManager::HideTinoMonstersTemporarily(float Duration)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[HideTinoMonstersTemporarily] No TINO monsters were hidden."));
 	}
+}
+
+void UGPObjectManager::PlayWorldIntro()
+{
+	UWorld* MyWorld = GetWorld();
+	if (!MyWorld) return;
+	ChangeZone(ZoneType::TUK, ZoneType::E, FVector::ZeroVector);
+
+	UGPGameInstance* GI = Cast<UGPGameInstance>(UGameplayStatics::GetGameInstance(MyWorld));
+	if (!GI) return;
+
+	UGPSequenceManager* SeqMgr = GI->GetSequenceManager();
+	if (!SeqMgr) return;
+	SeqMgr->OnSequenceFinishedDelegate.BindUObject(this, &UGPObjectManager::OnWorldIntroFinished);
+	SeqMgr->PlaySequenceByName(this, TEXT("WorldIntro"));
+}
+
+void UGPObjectManager::PlayTinoIntro()
+{
+	UWorld* MyWorld = GetWorld();
+	if (!MyWorld) return;
+
+	UGPGameInstance* GI = Cast<UGPGameInstance>(UGameplayStatics::GetGameInstance(MyWorld));
+	if (!GI) return;
+
+	UGPSequenceManager* SeqMgr = GI->GetSequenceManager();
+	if (!SeqMgr) return;
+
+	SeqMgr->PlaySequenceByName(this, TEXT("TinoIntro"));
+}
+
+void UGPObjectManager::OnWorldIntroFinished()
+{
+	ChangeZone(ZoneType::E, ZoneType::TUK, FVector::ZeroVector);
+	if (MyPlayer->UIManager)
+		MyPlayer->UIManager->ShowLobbyUI();
+}
+
+void UGPObjectManager::OnTinoIntroFinished()
+{
 }
 
 void UGPObjectManager::AddRequestFriend(const FFriendInfo& Info)

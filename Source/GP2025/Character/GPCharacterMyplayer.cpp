@@ -149,28 +149,7 @@ void AGPCharacterMyplayer::OnPlayerEnterGame()
 		SoundManager->StopBGM();             
 		SoundManager->PlayBGMForCurrentLevel(); 
 	}
-
-	if (CharacterInfo.GetCurrentQuest().QuestType == QuestType::TUT_START
-		|| CharacterInfo.GetCurrentQuest().QuestType == QuestType::NONE)
-	{
-		UE_LOG(LogTemp, Log, TEXT("[MyPlayer] Current QuestType = %d (TUT_START detected)"),
-			static_cast<uint8>(CharacterInfo.GetCurrentQuest().QuestType));
-
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(
-			TimerHandle,
-			FTimerDelegate::CreateLambda([this]()
-				{
-					UE_LOG(LogTemp, Log, TEXT("[MyPlayer] Executing tutorial quest widget."));
-
-					if (UIManager)
-					{
-						UIManager->PlayTutorialQuestWidget();
-					}
-				}),
-			1.0f,
-			false);
-	}
+	
 }
 
 void AGPCharacterMyplayer::OnPlayerEnterLobby()
@@ -182,8 +161,6 @@ void AGPCharacterMyplayer::OnPlayerEnterLobby()
 			UIManager->LoginWidget->SetVisibility(ESlateVisibility::Collapsed);
 			UIManager->LoginWidget->RemoveFromParent();
 		}
-
-		UIManager->ShowLobbyUI();
 	}
 }
 
@@ -273,7 +250,7 @@ void AGPCharacterMyplayer::UpdateSkillCooldownBars()
 		|| !UIManager->GetInGameWidget()->ESkillBar
 		|| !UIManager->GetInGameWidget()->RSkillBar)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[CooldownUI] Widget references are invalid."));
+		//UE_LOG(LogTemp, Error, TEXT("[CooldownUI] Widget references are invalid."));
 		return;
 	}
 

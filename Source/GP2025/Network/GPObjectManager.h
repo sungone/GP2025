@@ -62,7 +62,6 @@ public:
 	bool IsChangingZone() const { return bChangingZone; }
 	void SetChangeingZone(bool value) { bChangingZone = value; }
 	FRotator GetDefaultZoneRotation(ZoneType Zone);
-	void RefreshInGameUI();
 
 	UFUNCTION()
 	void HandleLevelUnloaded();
@@ -70,11 +69,20 @@ public:
 	void HandleLevelLoaded();
 	void RespawnMyPlayer(const FInfoData& info);
 	
+	void OnFirstEnterGame();
 	void OnQuestStart(QuestType Quest);
 	void OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpReward, uint32 GoldReward);
 
 	UFUNCTION()
 	void HideTinoMonstersTemporarily(float Duration);
+
+	void PlayWorldIntro();
+	void PlayTinoIntro();
+
+	UFUNCTION()
+	void OnWorldIntroFinished();
+	UFUNCTION()
+	void OnTinoIntroFinished();
 
 	// Friend
 	void AddRequestFriend(const FFriendInfo& FriendInfo);
