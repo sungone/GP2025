@@ -303,19 +303,29 @@ void UGPNetworkManager::SendMyRequestQuest(QuestType quest)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
+void UGPNetworkManager::SendMyRejectQuest(QuestType quest)
+{
+	RejectQuestPacket Packet(quest);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
 void UGPNetworkManager::SendMyCompleteQuest()
 {
 	if (!MyPlayer)
 		return;
 
 	QuestType Quest = MyPlayer->CharacterInfo.GetCurrentQuest().QuestType;
-	CompleteQuestPacket Packet(Quest);
+	CompleteQuestPacket Packet(Quest, false);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendMyRejectQuest(QuestType quest)
+void UGPNetworkManager::SendMySkipQuest()
 {
-	RejectQuestPacket Packet(quest);
+	if (!MyPlayer)
+		return;
+
+	QuestType Quest = MyPlayer->CharacterInfo.GetCurrentQuest().QuestType;
+	CompleteQuestPacket Packet(Quest, true);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 

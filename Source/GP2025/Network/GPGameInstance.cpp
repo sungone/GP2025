@@ -68,7 +68,7 @@ void UGPGameInstance::NextQuestRequest()
 		UE_LOG(LogTemp, Warning, TEXT("Network Manager is not initialized."));
 		return;
 	}
-	NetworkMgr->SendMyCompleteQuest();
+	NetworkMgr->SendMySkipQuest();
 }
 
 
