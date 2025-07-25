@@ -1272,7 +1272,7 @@ void UGPObjectManager::RespawnMyPlayer(const FInfoData& info)
 
 void UGPObjectManager::OnFirstEnterGame()
 {
-	if (!MyPlayer) return;
+	if (!MyPlayer||!MyPlayer->bNewPlayer) return;
 
 	auto QuestType = MyPlayer->CharacterInfo.CurrentQuest.QuestType;
 	if (QuestType == QuestType::TUT_START
@@ -1464,8 +1464,7 @@ void UGPObjectManager::PlayTinoIntro()
 void UGPObjectManager::OnWorldIntroFinished()
 {
 	ChangeZone(ZoneType::E, ZoneType::TUK, FVector::ZeroVector);
-	if (MyPlayer->UIManager)
-		MyPlayer->UIManager->ShowLobbyUI();
+	MyPlayer->ShowLobbyUI();
 }
 
 void UGPObjectManager::OnTinoIntroFinished()

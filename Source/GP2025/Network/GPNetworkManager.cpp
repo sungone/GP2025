@@ -441,6 +441,7 @@ void UGPNetworkManager::ProcessPacket()
 				LoadWorldStatesFromServer(Pkt->WorldState);
 				OnEnterLobby.Broadcast();
 				MyPlayer->bNewPlayer = false;
+				MyPlayer->ShowLobbyUI();
 				break;
 			}
 			case EPacketType::S_LOGIN_FAIL:
@@ -475,6 +476,7 @@ void UGPNetworkManager::ProcessPacket()
 				FInfoData Data = Pkt->PlayerInfo;
 				ObjectMgr->ChangeZone(ZoneType::TUK, Data.GetZone(), Data.Pos);
 				ObjectMgr->AddMyPlayer(Pkt->PlayerInfo);
+				ObjectMgr->OnFirstEnterGame();
 				break;
 			}
 			case EPacketType::S_CHANGE_CHANNEL:

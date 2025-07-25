@@ -106,7 +106,7 @@ public:
 	UPROPERTY()
 	bool bHasPlayedTinoSequence = false;
 
-
+	void ShowLobbyUI();
 	// Tutorial Timer
 	FTimerHandle TutorialWidgetTimerHandle;
 

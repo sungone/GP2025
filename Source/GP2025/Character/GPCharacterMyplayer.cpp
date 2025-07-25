@@ -376,6 +376,12 @@ void AGPCharacterMyplayer::PlayFadeIn()
 	}
 }
 
+void AGPCharacterMyplayer::ShowLobbyUI()
+{
+	if (UIManager)
+		UIManager->ShowLobbyUI();
+}
+
 void AGPCharacterMyplayer::SetDead(bool bDead)
 {
 	if (bDead)
