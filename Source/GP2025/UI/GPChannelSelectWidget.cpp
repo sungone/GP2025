@@ -26,6 +26,8 @@ void UGPChannelSelectWidget::NativeConstruct()
 	if (ChannelComboBox)
 	{
 		UpdateChannelState();
+		ChannelComboBox->OnSelectionChanged.RemoveDynamic(this, &UGPChannelSelectWidget::OnChannelSelected);
+		ChannelComboBox->OnOpening.RemoveDynamic(this, &UGPChannelSelectWidget::UpdateChannelState);
 
 		ChannelComboBox->OnSelectionChanged.AddDynamic(this, &UGPChannelSelectWidget::OnChannelSelected);
 		ChannelComboBox->OnOpening.AddDynamic(this, &UGPChannelSelectWidget::UpdateChannelState);
@@ -33,21 +35,25 @@ void UGPChannelSelectWidget::NativeConstruct()
 
 	if (ConfirmButton)
 	{
+		ConfirmButton->OnClicked.RemoveDynamic(this, &UGPChannelSelectWidget::OnConfirmClicked);
 		ConfirmButton->OnClicked.AddDynamic(this, &UGPChannelSelectWidget::OnConfirmClicked);
 	}
 
 	if (BackButton)
 	{
+		BackButton->OnClicked.RemoveDynamic(this, &UGPChannelSelectWidget::OnBackClicked);
 		BackButton->OnClicked.AddDynamic(this, &UGPChannelSelectWidget::OnBackClicked);
 	}
 
 	if (QuitButton)
 	{
+		QuitButton->OnClicked.RemoveDynamic(this, &UGPChannelSelectWidget::OnQuitClicked);
 		QuitButton->OnClicked.AddDynamic(this, &UGPChannelSelectWidget::OnQuitClicked);
 	}
 
 	if (BGMVolume)
 	{
+		BGMVolume->OnValueChanged.RemoveDynamic(this, &UGPChannelSelectWidget::OnBGMVolumeChanged);
 		BGMVolume->OnValueChanged.AddDynamic(this, &UGPChannelSelectWidget::OnBGMVolumeChanged);
 	}
 }
