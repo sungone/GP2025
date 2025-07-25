@@ -319,65 +319,28 @@ void UGPObjectManager::PlayerUseSkillEnd(int32 PlayerID)
 
 void UGPObjectManager::DamagedPlayer(const FInfoData& PlayerInfo)
 {
-	UE_LOG(LogTemp, Warning, TEXT("[DamagedPlayer] Called with PlayerInfo.ID = %d"), PlayerInfo.ID);
-
 	if (TWeakObjectPtr<AGPCharacterPlayer>* WeakPlayerPtr = Players.Find(PlayerInfo.ID))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[DamagedPlayer] Found Player in Players map"));
-
 		if (WeakPlayerPtr->IsValid())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("[DamagedPlayer] WeakPlayerPtr is valid. Calling SetCharacterInfo"));
 			WeakPlayerPtr->Get()->SetCharacterInfo(PlayerInfo);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[DamagedPlayer] WeakPlayerPtr is NOT valid"));
 		}
 
 		AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(WeakPlayerPtr->Get());
-		if ((LocalMyPlayer == MyPlayer))
+		if ((LocalMyPlayer == MyPlayer) && MyPlayer->UIManager)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("[DamagedPlayer] LocalMyPlayer is the same as MyPlayer"));
-
-			if (MyPlayer->UIManager)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("[DamagedPlayer] UIManager is valid. Calling HitByMonsterAnimation()"));
-				MyPlayer->UIManager->GetInGameWidget()->HitByMonsterAnimation();
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("[DamagedPlayer] UIManager is NULL"));
-			}
-
-			if (MyPlayer->EffectHandler)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("[DamagedPlayer] EffectHandler is valid. Playing Hit Effect"));
-				MyPlayer->EffectHandler->PlayPlayerHitEffect();
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("[DamagedPlayer] EffectHandler is NULL"));
-			}
-
-			if (MyPlayer->SoundManager)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("[DamagedPlayer] SoundManager is valid. Playing Hit Sound"));
-				MyPlayer->SoundManager->PlaySFX(MyPlayer->SoundManager->PlayerHit);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("[DamagedPlayer] SoundManager is NULL"));
-			}
+			MyPlayer->UIManager->GetInGameWidget()->HitByMonsterAnimation();
 		}
-		else
+
+		if ((LocalMyPlayer == MyPlayer) && MyPlayer->EffectHandler)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("[DamagedPlayer] LocalMyPlayer is not MyPlayer (likely another player)"));
+			MyPlayer->EffectHandler->PlayPlayerHitEffect();
 		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[DamagedPlayer] Player ID %d not found in Players map"), PlayerInfo.ID);
+
+		if ((LocalMyPlayer == MyPlayer) && MyPlayer->SoundManager)
+		{
+			MyPlayer->SoundManager->PlaySFX(MyPlayer->SoundManager->PlayerHit);
+		}
 	}
 }
 
@@ -1093,88 +1056,50 @@ void UGPObjectManager::ChangeChannel(const FVector& RandomPos)
 {
 	UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] Start changing channel"));
 
-	// 1. 다른 플레이어 제거
 	for (auto& PlayerPair : Players)
 	{
 		TWeakObjectPtr<AGPCharacterPlayer> PlayerPtr = PlayerPair.Value;
-		if (PlayerPtr.IsValid())
+		if (PlayerPtr.IsValid() && PlayerPtr.Get() != MyPlayer)
 		{
-			if (PlayerPtr.Get() != MyPlayer)
-			{
-				UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] Destroying other player ID: %d"), PlayerPair.Key);
-				PlayerPtr->Destroy();
-			}
-			else
-			{
-				UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] Skipped destroying MyPlayer ID: %d"), PlayerPair.Key);
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[ChangeChannel] Invalid PlayerPtr ID: %d"), PlayerPair.Key);
+			PlayerPtr->Destroy();
 		}
 	}
 	Players.Empty();
 	UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] All other players removed"));
 
-	// 2. 몬스터 제거
 	for (auto& MonsterPair : Monsters)
 	{
 		TWeakObjectPtr<AGPCharacterMonster> MonsterPtr = MonsterPair.Value;
 		if (MonsterPtr.IsValid())
 		{
-			UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] Destroying monster ID: %d"), MonsterPair.Key);
 			MonsterPtr->Destroy();
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[ChangeChannel] Invalid MonsterPtr ID: %d"), MonsterPair.Key);
 		}
 	}
 	Monsters.Empty();
 	UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] All monsters removed"));
 
-	// 3. 아이템 제거
 	for (auto& ItemPair : Items)
 	{
 		TWeakObjectPtr<AGPItem> ItemPtr = ItemPair.Value;
 		if (ItemPtr.IsValid())
 		{
-			UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] Returning item to pool ID: %d"), ItemPair.Key);
 			ItemPtr->ReturnToPool();
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[ChangeChannel] Invalid ItemPtr ID: %d"), ItemPair.Key);
 		}
 	}
 	Items.Empty();
 	UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] All items removed"));
 
-	// 4. 플레이어 위치 이동
 	if (MyPlayer)
 	{
-		UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] Moving MyPlayer to new position: X=%.2f Y=%.2f Z=%.2f"), RandomPos.X, RandomPos.Y, RandomPos.Z);
-
 		MyPlayer->SetActorLocation(RandomPos);
 		MyPlayer->CharacterInfo.SetLocation(RandomPos);
-
 		MyPlayer->PlayFadeIn();
-		UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] Called MyPlayer->PlayFadeIn()"));
-
 		if (MyPlayer->UIManager)
 		{
-			UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] Showing '채널이 변경되었습니다.' message on UI"));
 			MyPlayer->UIManager->GetInGameWidget()->ShowGameMessage(FText::FromString(TEXT("채널이 변경되었습니다.")), 2.f);
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[ChangeChannel] UIManager is NULL"));
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[ChangeChannel] MyPlayer is NULL"));
+		auto Player = Cast<AGPCharacterPlayer>(MyPlayer);
+		Players.Add(MyPlayer->CharacterInfo.ID, Player);
 	}
 }
 
