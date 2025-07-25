@@ -325,6 +325,7 @@ void UGPMyplayerUIManager::ShowDeadScreen()
 		TypedWidget->AddToViewport();
 		TypedWidget->PlayFadeOut();
 		TypedWidget->StartRespawnCountdown(3);
+		TypedWidget->OnRespawnComplete.Clear();
 		TypedWidget->OnRespawnComplete.AddDynamic(this, &UGPMyplayerUIManager::OnDeadRespawnComplete);
 	}
 	else
