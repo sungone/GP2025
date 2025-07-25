@@ -13,23 +13,7 @@
 
 UGPCharacterCombatHandler::UGPCharacterCombatHandler()
 {
-	static ConstructorHelpers::FObjectFinder<USoundBase> BunkerSoundObj(TEXT("/Game/Sound/SFX/BunkerMonsterAttackSound.BunkerMonsterAttackSound"));
-	if (BunkerSoundObj.Succeeded())
-	{
-		BunkerMonsterAttackSound = BunkerSoundObj.Object;
-	}
 
-	static ConstructorHelpers::FObjectFinder<USoundBase> EMonsterSoundObj(TEXT("/Game/Sound/SFX/EMonsterAttackSound.EMonsterAttackSound"));
-	if (EMonsterSoundObj.Succeeded())
-	{
-		EMonsterAttackSound = EMonsterSoundObj.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<USoundBase> IndustrySoundObj(TEXT("/Game/Sound/SFX/IndustryMonsterAttackSound.IndustryMonsterAttackSound"));
-	if (IndustrySoundObj.Succeeded())
-	{
-		IndustryMonsterAttackSound = IndustrySoundObj.Object;
-	}
 }
 
 void UGPCharacterCombatHandler::Initialize(AGPCharacterBase* InOwner)
@@ -130,23 +114,6 @@ void UGPCharacterCombatHandler::PlayAutoAttackMontage()
 			{
 				MyPlayer->SoundManager->PlaySFX(AttackSound, 1.f, SoundPlayRate); // Volume, Pitch
 			}
-		}
-	}
-	else
-	{
-		if (Owner->CharacterInfo.GetLevel() >= 1 && Owner->CharacterInfo.GetLevel() <= 3)
-		{
-			UGameplayStatics::PlaySoundAtLocation(Owner, BunkerMonsterAttackSound, Owner->GetActorLocation());
-		}
-		else if (Owner->CharacterInfo.GetLevel() >= 4 && Owner->CharacterInfo.GetLevel() <= 6)
-		{
-			UGameplayStatics::PlaySoundAtLocation(Owner, EMonsterAttackSound, Owner->GetActorLocation());
-
-		}
-		else if (Owner->CharacterInfo.GetLevel() >= 7 && Owner->CharacterInfo.GetLevel() <= 9)
-		{
-			UGameplayStatics::PlaySoundAtLocation(Owner, IndustryMonsterAttackSound, Owner->GetActorLocation());
-
 		}
 	}
 

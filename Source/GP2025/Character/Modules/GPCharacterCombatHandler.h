@@ -135,15 +135,4 @@ private :
 
 	UPROPERTY()
 	UAnimMontage* CurrentSkillMontage = nullptr;
-
-	// 몬스터가 가지는 사운드
-public :
-	UPROPERTY()
-	USoundBase* BunkerMonsterAttackSound;
-
-	UPROPERTY()
-	USoundBase* EMonsterAttackSound;
-
-	UPROPERTY()
-	USoundBase* IndustryMonsterAttackSound;
 };

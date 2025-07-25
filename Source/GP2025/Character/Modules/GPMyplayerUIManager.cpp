@@ -987,6 +987,7 @@ void UGPMyplayerUIManager::AddFriendSystemMessage(int32 Result)
 	if (Result == 0)
 	{
 		Message = TEXT("친구 요청이 성공적으로 처리되었습니다!");
+		return;
 	}
 	else if (Result == -20)
 	{
