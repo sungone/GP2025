@@ -1407,7 +1407,7 @@ void UGPObjectManager::PlayTinoIntro()
 
 	UGPSequenceManager* SeqMgr = GI->GetSequenceManager();
 	if (!SeqMgr) return;
-
+	SeqMgr->OnSequenceFinishedDelegate.BindUObject(this, &UGPObjectManager::OnTinoIntroFinished);
 	SeqMgr->PlaySequenceByName(this, TEXT("TinoIntro"));
 }
 
