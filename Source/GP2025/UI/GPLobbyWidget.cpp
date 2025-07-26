@@ -164,3 +164,12 @@ void UGPLobbyWidget::OnChannelChanged(FString SelectedItem, ESelectInfo::Type Se
 		UE_LOG(LogTemp, Log, TEXT("Selected Channel: %s"), *SelectedItem);
 	}
 }
+
+void UGPLobbyWidget::PlayFadeAnim()
+{
+	if (!FadeImage || !FadeAnim) return;
+	FadeImage->SetVisibility(ESlateVisibility::Visible);
+
+	const float PlayRate = 1.0f;
+	PlayAnimation(FadeAnim, 0.0f, 1, EUMGSequencePlayMode::Forward, PlayRate);
+}

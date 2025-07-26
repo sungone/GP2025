@@ -275,12 +275,12 @@ struct FInfoData
 	void UnequipItemByType(uint8 itemTypeID)
 	{
 		if (itemTypeID >= static_cast<uint8>(Type::EWeapon::START) &&
-			itemTypeID < static_cast<uint8>(Type::EWeapon::END))
+			itemTypeID <= static_cast<uint8>(Type::EWeapon::END))
 		{
 			EquipState.Sword = Type::EWeapon::NONE;
 		}
 		else if (itemTypeID >= static_cast<uint8>(Type::EArmor::START) &&
-			itemTypeID < static_cast<uint8>(Type::EArmor::END))
+			itemTypeID <= static_cast<uint8>(Type::EArmor::END))
 		{
 			Type::EArmor armor = static_cast<Type::EArmor>(itemTypeID);
 			switch (armor)

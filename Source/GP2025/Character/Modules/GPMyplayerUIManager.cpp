@@ -325,6 +325,7 @@ void UGPMyplayerUIManager::ShowDeadScreen()
 		TypedWidget->AddToViewport();
 		TypedWidget->PlayFadeOut();
 		TypedWidget->StartRespawnCountdown(3);
+		TypedWidget->OnRespawnComplete.Clear();
 		TypedWidget->OnRespawnComplete.AddDynamic(this, &UGPMyplayerUIManager::OnDeadRespawnComplete);
 	}
 	else
@@ -431,6 +432,15 @@ void UGPMyplayerUIManager::ShowLobbyUI()
 	if (LobbyWidget && !LobbyWidget->IsInViewport())
 	{
 		LobbyWidget->AddToViewport();
+		if (UGPLobbyWidget* Lobby = Cast<UGPLobbyWidget>(LobbyWidget))
+		{
+			Lobby->PlayFadeAnim();
+		}
+	}
+
+	if (Owner->SoundManager)
+	{
+		Owner->SoundManager->PlayLobbyBGM();
 	}
 
 	if (Owner && Owner->IsPlayerControlled())
@@ -977,6 +987,7 @@ void UGPMyplayerUIManager::AddFriendSystemMessage(int32 Result)
 	if (Result == 0)
 	{
 		Message = TEXT("친구 요청이 성공적으로 처리되었습니다!");
+		return;
 	}
 	else if (Result == -20)
 	{

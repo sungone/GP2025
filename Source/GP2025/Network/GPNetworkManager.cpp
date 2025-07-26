@@ -10,6 +10,7 @@
 #include "Network/GPGameInstance.h"
 #include "Character/GPCharacterPlayer.h"
 #include "Character/GPCharacterMyPlayer.h"
+#include "Character/Modules/GPMyplayerSoundManager.h"
 
 bool UGPNetworkManager::ConnectToServer()
 {
@@ -469,6 +470,7 @@ void UGPNetworkManager::ProcessPacket()
 				LoadWorldStatesFromServer(Pkt->WorldState);
 				OnEnterLobby.Broadcast();
 				MyPlayer->bNewPlayer = false;
+				ObjectMgr->StopLoginSound();
 				MyPlayer->ShowLobbyUI();
 				break;
 			}
@@ -484,6 +486,7 @@ void UGPNetworkManager::ProcessPacket()
 				LoadWorldStatesFromServer(Pkt->WorldState);
 				OnEnterLobby.Broadcast();
 				MyPlayer->bNewPlayer = true;
+				ObjectMgr->StopLoginSound();
 				ObjectMgr->PlayWorldIntro();
 				break;
 			}

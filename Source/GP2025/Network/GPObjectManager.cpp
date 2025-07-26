@@ -636,7 +636,6 @@ void UGPObjectManager::PlayEarthQuakeEffect(const FVector& RockPos, bool bDebug)
 
 	//서버 값 처리 확인용
 	{
-
 		const FColor SphereColor = (bDebug) ? FColor::Red : FColor::Yellow;
 		const FColor LineColor = FColor::Yellow;
 
@@ -1446,6 +1445,12 @@ void UGPObjectManager::PlayTinoIntro()
 	if (!SeqMgr) return;
 	SeqMgr->OnSequenceFinishedDelegate.BindUObject(this, &UGPObjectManager::OnTinoIntroFinished);
 	SeqMgr->PlaySequenceByName(this, TEXT("TinoIntro"));
+}
+
+void UGPObjectManager::StopLoginSound()
+{
+	if (MyPlayer->SoundManager)
+		MyPlayer->SoundManager->StopLoginBGM();
 }
 
 void UGPObjectManager::OnWorldIntroFinished()

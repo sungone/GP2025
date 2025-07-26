@@ -35,7 +35,6 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 
 	// Character Type
 	CurrentCharacterType = static_cast<uint8>(Type::EPlayer::GUNNER);
-
 }
 
 void AGPCharacterMyplayer::BeginPlay()
@@ -109,12 +108,11 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 	if (NetworkSyncHandler)
 		NetworkSyncHandler->Tick(DeltaTime);
 
-	if (SkillCoolDownHandler && IsValid(SkillCoolDownHandler))
+	if (IsValid(SkillCoolDownHandler))
 	{
 		UpdateSkillCooldownBars();
 	}
 }
-
 
 void AGPCharacterMyplayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -143,13 +141,11 @@ void AGPCharacterMyplayer::OnPlayerEnterGame()
 		UIManager->OnSetUpInGameWidgets();
 	}
 
-	// LoginSound 중지 -> 현재 레벨에 맞는 Background Sound 재생
 	if (SoundManager)
 	{
-		SoundManager->StopBGM();             
+		SoundManager->StopLobbyBGM();
 		SoundManager->PlayBGMForCurrentLevel(); 
 	}
-	
 }
 
 void AGPCharacterMyplayer::OnPlayerEnterLobby()

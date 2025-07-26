@@ -75,6 +75,7 @@ public:
 
 	void PlayWorldIntro();
 	void PlayTinoIntro();
+	void StopLoginSound();
 
 	UFUNCTION()
 	void OnWorldIntroFinished();

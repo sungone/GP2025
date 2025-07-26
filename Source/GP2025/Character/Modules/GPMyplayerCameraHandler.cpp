@@ -19,7 +19,6 @@ void UGPMyplayerCameraHandler::Initialize(AGPCharacterMyplayer* InOwner)
 	Owner->CameraBoom->SetRelativeRotation(DefaultCameraRotationOffset);
 
 	Owner->CameraBoom->bUsePawnControlRotation = true;
-	Owner->CameraBoom->bUsePawnControlRotation = true;
 	Owner->CameraBoom->bDoCollisionTest = true;
 	Owner->CameraBoom->ProbeChannel = ECC_Camera;
 

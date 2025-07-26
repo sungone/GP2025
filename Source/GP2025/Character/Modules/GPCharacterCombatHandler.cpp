@@ -13,23 +13,7 @@
 
 UGPCharacterCombatHandler::UGPCharacterCombatHandler()
 {
-	static ConstructorHelpers::FObjectFinder<USoundBase> BunkerSoundObj(TEXT("/Game/Sound/SFX/BunkerMonsterAttackSound.BunkerMonsterAttackSound"));
-	if (BunkerSoundObj.Succeeded())
-	{
-		BunkerMonsterAttackSound = BunkerSoundObj.Object;
-	}
 
-	static ConstructorHelpers::FObjectFinder<USoundBase> EMonsterSoundObj(TEXT("/Game/Sound/SFX/EMonsterAttackSound.EMonsterAttackSound"));
-	if (EMonsterSoundObj.Succeeded())
-	{
-		EMonsterAttackSound = EMonsterSoundObj.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<USoundBase> IndustrySoundObj(TEXT("/Game/Sound/SFX/IndustryMonsterAttackSound.IndustryMonsterAttackSound"));
-	if (IndustrySoundObj.Succeeded())
-	{
-		IndustryMonsterAttackSound = IndustrySoundObj.Object;
-	}
 }
 
 void UGPCharacterCombatHandler::Initialize(AGPCharacterBase* InOwner)
@@ -132,23 +116,6 @@ void UGPCharacterCombatHandler::PlayAutoAttackMontage()
 			}
 		}
 	}
-	else
-	{
-		if (Owner->CharacterInfo.GetLevel() >= 1 && Owner->CharacterInfo.GetLevel() <= 3)
-		{
-			UGameplayStatics::PlaySoundAtLocation(Owner, BunkerMonsterAttackSound, Owner->GetActorLocation());
-		}
-		else if (Owner->CharacterInfo.GetLevel() >= 4 && Owner->CharacterInfo.GetLevel() <= 6)
-		{
-			UGameplayStatics::PlaySoundAtLocation(Owner, EMonsterAttackSound, Owner->GetActorLocation());
-
-		}
-		else if (Owner->CharacterInfo.GetLevel() >= 7 && Owner->CharacterInfo.GetLevel() <= 9)
-		{
-			UGameplayStatics::PlaySoundAtLocation(Owner, IndustryMonsterAttackSound, Owner->GetActorLocation());
-
-		}
-	}
 
 	bIsAutoAttacking = true;
 
@@ -211,7 +178,6 @@ void UGPCharacterCombatHandler::HandleDeath()
 
 	FTimerHandle DeadTimerHandle;
 	AGPCharacterBase* LocalOwner = Owner;
-
 	float DeathAnimDuration = DeadMontage ? DeadMontage->GetPlayLength() : 2.0f;
 
 	if (AGPCharacterMyplayer* LocalMyPlayer = Cast<AGPCharacterMyplayer>(LocalOwner))
@@ -229,7 +195,6 @@ void UGPCharacterCombatHandler::HandleDeath()
 				{
 					LocalMonster->PlayDeathEffect();
 				}
-
 			}), DeathAnimDuration - 0.3f, false);
 	}
 }
@@ -241,7 +206,7 @@ void UGPCharacterCombatHandler::PlayDeadAnimation()
 	UAnimInstance* AnimInstance = Owner->GetCharacterMesh()->GetAnimInstance();
 	if (!AnimInstance) return;
 
-	AnimInstance->StopAllMontages(0.f);
+	AnimInstance->StopAllMontages(0.1f);
 	AnimInstance->Montage_Play(DeadMontage);
 }
 
