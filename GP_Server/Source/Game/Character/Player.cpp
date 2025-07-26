@@ -24,11 +24,6 @@ void Player::Init(EWorldChannel channelId)
 void Player::LoadFromDB(const DBLoginResult& dbRes)
 {
 	SetInfo(dbRes.info);
-	auto quest = GetInfo().CurrentQuest.QuestType;
-	if (quest != QuestType::NONE)
-	{
-		SetCurrentQuest(GetInfo().CurrentQuest.QuestType);
-	}
 	for (auto& [itemID, itemTypeID] : dbRes.items)
 	{
 		LoadInventoryItem(std::make_shared<Item>(itemID, itemTypeID));
@@ -58,17 +53,10 @@ void Player::OnEnterGame()
 			SessionManager::GetInst().SendPacket(_id, &pkt);
 		}
 	}
-	if (_curQuest.QuestType != QuestType::NONE)
+	auto quest = _curQuest.QuestType;
+	if (quest != QuestType::NONE)
 	{
-		const QuestData* questData = QuestTable::GetInst().GetQuest(_curQuest.QuestType);
-		if (!questData)
-		{
-			LOG_W("Invalid quest datatable");
-			return;
-		}
-
-		auto questpkt = QuestStartPacket(questData->QuestID);
-		SessionManager::GetInst().SendPacket(_id, &questpkt);
+		SetCurrentQuest(GetInfo().CurrentQuest.QuestType);
 	}
 }
 
@@ -670,16 +658,13 @@ bool Player::SetCurrentQuest(QuestType quest)
 			return false;
 		}
 	}
-
-	if (!StartQuest(quest))
-		return false;
-
+	StartQuest(quest);
 	_curQuestData = questData;
 	auto qpkt = QuestStartPacket(questData->QuestID);
-
 	SessionManager::GetInst().SendPacket(_id, &qpkt);
 	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, GetInfo());
 	SessionManager::GetInst().SendPacket(_id, &infopkt);
+
 	if (questData->Catagory == EQuestCategory::KILL)
 	{
 		_world->QuestSpawn(_id, quest);
