@@ -322,15 +322,7 @@ void AGPCharacterMyplayer::ChangePlayerType()
 void AGPCharacterMyplayer::SetCharacterInfo(const FInfoData& CharacterInfo_)
 {
 	Super::SetCharacterInfo(CharacterInfo_);
-
-	UGPInGameWidget* InGame = Cast<UGPInGameWidget>(UIManager->GetInGameWidget());
-
-	if (!InGame) return;
-
-	InGame->UpdateHealthBar(CharacterInfo_.Stats.Hp / CharacterInfo_.Stats.MaxHp);
-	InGame->UpdateExpBar(CharacterInfo_.Stats.Exp / CharacterInfo_.Stats.MaxExp);
-	InGame->UpdatePlayerLevel(CharacterInfo_.Stats.Level);
-
+	UpdateUIInfo();
 	if (CharacterInfo_.GetLevel() > PrevLevel)
 	{
 		// UIManager->SpawnSkillLevelText(CharacterInfo_.Stats.Level);
@@ -346,6 +338,18 @@ void AGPCharacterMyplayer::SetCharacterInfo(const FInfoData& CharacterInfo_)
 	{
 		UIManager->GetInventoryWidget()->HandlePlayerStatUpdate();
 	}
+}
+
+void AGPCharacterMyplayer::UpdateUIInfo()
+{
+	UGPInGameWidget* InGame = Cast<UGPInGameWidget>(UIManager->GetInGameWidget());
+
+	if (!InGame) return;
+
+	InGame->UpdateHealthBar(CharacterInfo.Stats.Hp / CharacterInfo.Stats.MaxHp);
+	InGame->UpdateExpBar(CharacterInfo.Stats.Exp / CharacterInfo.Stats.MaxExp);
+	InGame->UpdatePlayerLevel(CharacterInfo.Stats.Level);
+	InGame->UpdateGold(CharacterInfo.Gold);
 }
 
 void AGPCharacterMyplayer::PlayFadeOut()

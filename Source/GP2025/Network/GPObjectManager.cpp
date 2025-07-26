@@ -1416,6 +1416,7 @@ void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpR
 
 		uint8 QuestID = static_cast<uint8>(Quest);
 		MyPlayer->UIManager->UpdateQuestState(QuestID, true);
+		MyPlayer->UpdateUIInfo();
 	}
 }
 

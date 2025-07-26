@@ -35,6 +35,14 @@ void UGPInGameWidget::UpdateExpBar(float Ratio)
 	}
 }
 
+void UGPInGameWidget::UpdateGold(int32 NewGold)
+{
+	if (MoneyText)
+	{
+		MoneyText->SetText(FText::AsNumber(NewGold));
+	}
+}
+
 void UGPInGameWidget::UpdatePlayerLevel(int32_t NewLevel)
 {
 	if (LevelText)
