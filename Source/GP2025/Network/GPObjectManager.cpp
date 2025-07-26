@@ -1091,8 +1091,9 @@ void UGPObjectManager::ChangeChannel(const FVector& RandomPos)
 
 	if (MyPlayer)
 	{
-		MyPlayer->SetActorLocation(RandomPos);
-		MyPlayer->CharacterInfo.SetLocation(RandomPos);
+		ZoneType CurZone = MyPlayer->CharacterInfo.GetZone();
+		ChangeZone(CurZone, START_ZONE, RandomPos);
+
 		MyPlayer->PlayFadeIn();
 		if (MyPlayer->UIManager)
 		{
