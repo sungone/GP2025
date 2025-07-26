@@ -11,6 +11,8 @@
  * 
  */
 struct FFriendInfo;
+class UGPFriendEntry;
+
 UCLASS()
 class GP2025_API UGPFriendBox : public UUserWidget
 {
@@ -99,6 +101,13 @@ public:
 	UPROPERTY()
 	uint32 SelectedFriendUserID = MAX_uint32;
 
+	UPROPERTY()
+	UGPFriendEntry* SelectedEntry = nullptr;
+
+public:
+	void SetSelectedFriend(UGPFriendEntry* NewEntry);
+	
+public:
 	void AddToRequestedList(uint32 FriendUserID, const FString& Nickname, int32 Level, bool bOnline);
 	void RemoveFromRequestedList(uint32 FriendUserID);
 	void AddToFriendList(uint32 FriendUserID, const FString& Nickname, int32 Level, bool bOnline);
