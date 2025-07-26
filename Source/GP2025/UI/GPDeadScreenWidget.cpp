@@ -23,6 +23,8 @@ void UGPDeadScreenWidget::StartRespawnCountdown(int32 StartSeconds)
 
     RespawnCount->SetVisibility(ESlateVisibility::Visible);
     UpdateRespawnMessage(SecondsRemaining);
+    PlayFadeAnim();
+
     GetWorld()->GetTimerManager().SetTimer(
         CountdownTimerHandle,
         this,
@@ -38,8 +40,6 @@ void UGPDeadScreenWidget::TickCountdown()
     if (SecondsRemaining > 0)
     {
         UpdateRespawnMessage(SecondsRemaining);
-        if (SecondsRemaining == 1)
-            PlayFadeIn();
     }
     else if (SecondsRemaining == 0)
     {
@@ -52,7 +52,7 @@ void UGPDeadScreenWidget::TickCountdown()
     }
 }
 
-void UGPDeadScreenWidget::PlayFadeIn()
+void UGPDeadScreenWidget::PlayFadeAnim()
 {
     if (!FadeOverlay || !FadeInAnim) return;
 

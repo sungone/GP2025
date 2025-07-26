@@ -39,7 +39,7 @@ public :
     UPROPERTY(Transient, meta = (BindWidgetAnim))
     UWidgetAnimation* FadeInAnim;
 
-    void PlayFadeIn();
+    void PlayFadeAnim();
 
     UPROPERTY(meta = (BindWidget))
     class UImage* FadeOverlay;
