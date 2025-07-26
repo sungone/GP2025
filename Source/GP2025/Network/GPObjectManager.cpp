@@ -550,15 +550,27 @@ void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage
 
 			UE_LOG(LogTemp, Warning, TEXT("Damaged monster [%d]"), MonsterInfo.ID);
 			Monster->PlayHitEffect();
-			if (isCrt)
+			Type::EMonster MonsterType = static_cast<Type::EMonster>(MonsterInfo.CharacterType);
+
+			if (MonsterType == Type::EMonster::TINO)
 			{
-				if (Monster->MonsterCriticalHitSound)
-					SoundToPlay = Monster->MonsterCriticalHitSound;
+				if (Monster->TinoHitSound)
+				{
+					SoundToPlay = Monster->TinoHitSound;
+				}
 			}
 			else
 			{
-				if (Monster->MonsterHitSound)
-					SoundToPlay = Monster->MonsterHitSound;
+				if (isCrt)
+				{
+					if (Monster->MonsterCriticalHitSound)
+						SoundToPlay = Monster->MonsterCriticalHitSound;
+				}
+				else
+				{
+					if (Monster->MonsterHitSound)
+						SoundToPlay = Monster->MonsterHitSound;
+				}
 			}
 
 			if (SoundToPlay && Monster->CharacterInfo.GetHp() > 0)

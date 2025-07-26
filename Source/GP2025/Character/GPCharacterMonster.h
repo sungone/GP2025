@@ -45,6 +45,9 @@ public :
 	class USoundBase* MonsterCriticalHitSound;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
+	class USoundBase* TinoHitSound;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
 	class USoundBase* MonsterDeadSound;
 
 	UPROPERTY(VisibleAnywhere)

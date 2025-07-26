@@ -52,6 +52,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	class UNiagaraSystem* SpawnEffect;
 
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	class UNiagaraSystem* SpecialSpawnEffect;
+
 	UPROPERTY()
 	class UNiagaraComponent* SpawnedEffectComp;
 
