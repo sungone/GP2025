@@ -322,7 +322,7 @@ void UGPMyplayerUIManager::ShowDeadScreen()
 			LocalInGameWidget->ShowGameMessage(FText::FromString(TEXT("몬스터에게 사망하셨습니다")), 2.f);
 		}
 
-		TypedWidget->AddToViewport();
+		TypedWidget->AddToViewport(999);
 		TypedWidget->PlayFadeOut();
 		TypedWidget->StartRespawnCountdown(3);
 		TypedWidget->OnRespawnComplete.Clear();
@@ -336,10 +336,19 @@ void UGPMyplayerUIManager::ShowDeadScreen()
 
 void UGPMyplayerUIManager::OnDeadRespawnComplete()
 {
-	if (UGPInGameWidget* LocalInGameWidget = Cast<UGPInGameWidget>(InGameWidget))
+	if (!DeadScreenWidgetClass)
 	{
-		LocalInGameWidget->PlayFade(); 
+		UE_LOG(LogTemp, Error, TEXT("DeadScreenWidgetClass is NULL"));
+		return;
 	}
+
+	if (!DeadScreenWidget)
+	{
+		DeadScreenWidget = CreateWidget<UGPDeadScreenWidget>(GetWorld(), DeadScreenWidgetClass);
+	}
+
+	UGPDeadScreenWidget* TypedWidget = Cast<UGPDeadScreenWidget>(DeadScreenWidget);
+	TypedWidget->PlayFadeIn();
 }
 
 void UGPMyplayerUIManager::AddQuestEntry(uint8 QuestType, bool bIsSuccess)

@@ -38,4 +38,13 @@ private:
 public:
     UPROPERTY(BlueprintAssignable, Category = "Event")
     FOnRespawnComplete OnRespawnComplete;
+
+public :
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
+    UWidgetAnimation* FadeInAnim;
+
+    void PlayFadeIn();
+
+    UPROPERTY(meta = (BindWidget))
+    class UImage* FadeOverlay;
 };
