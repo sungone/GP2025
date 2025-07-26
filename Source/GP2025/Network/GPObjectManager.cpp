@@ -307,27 +307,20 @@ void UGPObjectManager::PlayerUseSkillStart(int32 PlayerID, ESkillGroup SkillGID,
 			if (SkillGID == ESkillGroup::Throwing)
 			{
 				ProjectileToSpawn = Player->GunnerQSkillProjectileClass;
-				UE_LOG(LogTemp, Log, TEXT("[ProjectileEffect] Using GunnerQSkillProjectileClass"));
+				SpawnGunnerProjectileEffect(Player, SkillGID, PlayerYaw, PlayerPos, ProjectileToSpawn);
 			}
 			else if (SkillGID == ESkillGroup::FThrowing)
 			{
 				ProjectileToSpawn = Player->GunnerESkillProjectileClass;
-				UE_LOG(LogTemp, Log, TEXT("[ProjectileEffect] Using GunnerESkillProjectileClass"));
+				SpawnGunnerFThrowingEffect(
+					Player,
+					PlayerYaw,
+					PlayerPos,
+					Player->GunnerESkillProjectileClass,
+					5,
+					1.2f
+				);
 			}
-
-			if (ProjectileToSpawn)
-			{
-				UE_LOG(LogTemp, Log, TEXT("[ProjectileEffect] Spawning projectile for PlayerID: %d"), Player->CharacterInfo.ID);
-				SpawnGunnerProjectileEffect(Player, SkillGID, PlayerYaw, PlayerPos, ProjectileToSpawn);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error, TEXT("[ProjectileEffect] ProjectileToSpawn is NULL! Check Blueprint assignment."));
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[ProjectileEffect] Player is not Gunner or SkillGID %d is not a projectile skill"), (int32)SkillGID);
 		}
 
 		switch (SkillGID)
@@ -1529,6 +1522,39 @@ void UGPObjectManager::SpawnGunnerProjectileEffect(AGPCharacterPlayer* Player, E
 		SpawnRotation,
 		SpawnParams
 	);
+}
+
+void UGPObjectManager::SpawnGunnerFThrowingEffect(AGPCharacterPlayer* Player, float PlayerYaw, FVector PlayerPos, TSubclassOf<AActor> ProjectileClass, int32 NumProjectiles, float SpreadAngleDeg)
+{
+	if (!Player || !ProjectileClass || NumProjectiles <= 0)
+		return;
+
+	FVector MuzzleLoc = Player->GetCharacterMesh()->GetSocketLocation(TEXT("MuzzleSocket"));
+
+	FRotator CenterRotation = FRotator(0.f, PlayerYaw, 0.f);
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = Player;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	for (int32 i = 0; i < NumProjectiles; ++i)
+	{
+		int32 OffsetFromCenter = i - (NumProjectiles / 2); // 중앙 기준 좌우 퍼짐
+		FRotator SpreadRot = CenterRotation;
+		SpreadRot.Yaw += OffsetFromCenter * SpreadAngleDeg;
+
+		AActor* Spawned = Player->GetWorld()->SpawnActor<AActor>(
+			ProjectileClass,
+			MuzzleLoc,
+			SpreadRot,
+			SpawnParams
+		);
+
+		if (Spawned)
+		{
+			UE_LOG(LogTemp, Log, TEXT("[FThrowing] Projectile spawned at %s, Rot: %s"), *MuzzleLoc.ToString(), *SpreadRot.ToString());
+		}
+	}
 }
 
 void UGPObjectManager::AddRequestFriend(const FFriendInfo& Info)

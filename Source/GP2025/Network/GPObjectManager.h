@@ -135,4 +135,12 @@ public :
 // Gunner Bullet Sync
 	void SpawnGunnerProjectileEffect(AGPCharacterPlayer* Player, ESkillGroup SkillGID, float PlayerYaw,
 		FVector PlayerPos, TSubclassOf<AActor> ProjectileClass);
+
+	void SpawnGunnerFThrowingEffect(
+		AGPCharacterPlayer* Player,
+		float PlayerYaw,
+		FVector PlayerPos,
+		TSubclassOf<AActor> ProjectileClass,
+		int32 NumProjectiles,
+		float SpreadAngleDeg);
 };
