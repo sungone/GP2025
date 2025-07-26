@@ -76,8 +76,6 @@ public:
 
 	// Dead
 	void ShowDeadScreen();
-	UFUNCTION()
-	void OnDeadRespawnComplete();
 
 	// Quest
 	// Quest Entry 직접 추가용 함수

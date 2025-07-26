@@ -324,30 +324,11 @@ void UGPMyplayerUIManager::ShowDeadScreen()
 		TypedWidget->AddToViewport(999);
 		TypedWidget->PlayFadeOut();
 		TypedWidget->StartRespawnCountdown(3);
-		TypedWidget->OnRespawnComplete.Clear();
-		TypedWidget->OnRespawnComplete.AddDynamic(this, &UGPMyplayerUIManager::OnDeadRespawnComplete);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Failed to cast DeadScreenWidget to UGPDeadScreenWidget"));
 	}
-}
-
-void UGPMyplayerUIManager::OnDeadRespawnComplete()
-{
-	if (!DeadScreenWidgetClass)
-	{
-		UE_LOG(LogTemp, Error, TEXT("DeadScreenWidgetClass is NULL"));
-		return;
-	}
-
-	if (!DeadScreenWidget)
-	{
-		DeadScreenWidget = CreateWidget<UGPDeadScreenWidget>(GetWorld(), DeadScreenWidgetClass);
-	}
-
-	UGPDeadScreenWidget* TypedWidget = Cast<UGPDeadScreenWidget>(DeadScreenWidget);
-	TypedWidget->PlayFadeIn();
 }
 
 void UGPMyplayerUIManager::AddQuestEntry(uint8 QuestType, bool bIsSuccess)
