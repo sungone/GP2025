@@ -19,7 +19,14 @@ inline constexpr size_t MAX_CHARACTER = MAX_PLAYER + MAX_MONSTER;
 
 inline constexpr float VIEW_DIST = 4000.f;
 inline constexpr float GRID_CELL_SIZE = 2000.f;
+
 inline constexpr float playerCollision = 50.f;
+inline constexpr float DfAtkRadius = 100;
+inline constexpr float DFfovAngle = 120;
+inline constexpr float DfWarriorAtkRadius = 90;
+inline constexpr float DFWarriorfovAngle = 300;
+inline constexpr float DfGunnerAtkRadius = 10;
+inline constexpr float DFGunnerfovAngle = 5000;
 
 constexpr int ITEM_DISAPPEAR_TIME_MS = 60 * 1000;
 constexpr int MONSTER_RESPAWN_TIME_MS = 10 * 1000;
