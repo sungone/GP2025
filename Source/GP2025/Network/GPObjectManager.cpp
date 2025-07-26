@@ -1503,33 +1503,21 @@ void UGPObjectManager::SpawnGunnerProjectileEffect(AGPCharacterPlayer* Player, E
 {
 	if (!Player)
 	{
-		UE_LOG(LogTemp, Error, TEXT("SpawnGunnerProjectileByYaw: Player is NULL"));
 		return;
 	}
 
 	if (!ProjectileClass)
 	{
-		UE_LOG(LogTemp, Error, TEXT("SpawnGunnerProjectileByYaw: ProjectileClass is NULL"));
 		return;
 	}
 
-	// 총구 위치는 Socket 기준
-	FVector MuzzleLoc = Player->GetMesh()->GetSocketLocation(TEXT("MuzzleSocket"));
+	FVector MuzzleLoc = Player->GetCharacterMesh()->GetSocketLocation(TEXT("MuzzleSocket"));
 
-	// Yaw만 적용한 회전 → 정면 방향 추출
 	FRotator YawRotation = FRotator(0.f, PlayerYaw, 0.f);
-	FVector FireDir = YawRotation.Vector(); // 단위 방향 벡터
+	FVector FireDir = YawRotation.Vector();
 	FVector TargetPoint = MuzzleLoc + FireDir * 10000.f;
 
-	// TargetPoint를 기준으로 총알이 향해야 할 방향 계산
 	FRotator SpawnRotation = (TargetPoint - MuzzleLoc).Rotation();
-
-	UE_LOG(LogTemp, Log, TEXT("[ProjectileByYaw] Muzzle: %s | Yaw: %.2f | FireDir: %s | Rot: %s"),
-		*MuzzleLoc.ToString(),
-		PlayerYaw,
-		*FireDir.ToString(),
-		*SpawnRotation.ToString()
-	);
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = Player;
@@ -1541,15 +1529,6 @@ void UGPObjectManager::SpawnGunnerProjectileEffect(AGPCharacterPlayer* Player, E
 		SpawnRotation,
 		SpawnParams
 	);
-
-	if (Spawned)
-	{
-		UE_LOG(LogTemp, Log, TEXT("[ProjectileByYaw] Spawned successfully"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("[ProjectileByYaw] Failed to spawn projectile"));
-	}
 }
 
 void UGPObjectManager::AddRequestFriend(const FFriendInfo& Info)
