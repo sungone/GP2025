@@ -21,7 +21,7 @@ inline constexpr float VIEW_DIST = 4000.f;
 inline constexpr float GRID_CELL_SIZE = 2000.f;
 
 inline constexpr float playerCollision = 50.f;
-inline constexpr float DfAtkRadius = 100;
+inline constexpr float DfAtkRadius = 150;
 inline constexpr float DFfovAngle = 120;
 inline constexpr float DfWarriorAtkRadius = 300;
 inline constexpr float DFWarriorfovAngle = 90;

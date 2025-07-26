@@ -467,11 +467,8 @@ void Player::OnEquipWeapon()
 
 void Player::OnUnequipWeapon()
 {
-	if (_playerType == Type::EPlayer::WARRIOR)
-	{
-		_info.AttackRadius = DfAtkRadius;
-		_info.fovAngle = DFfovAngle;
-	}
+	_info.AttackRadius = DfAtkRadius;
+	_info.fovAngle = DFfovAngle;
 }
 
 void Player::UseItem(uint32 itemId)
@@ -586,7 +583,7 @@ void Player::CheckAndUpdateQuestProgress(EQuestCategory type)
 	case EQuestCategory::KILL:
 	{
 		if (quest == QuestType::CH1_BUNKER_CLEANUP
-			|| quest == QuestType::TUT_KILL_ONE_MON 
+			|| quest == QuestType::TUT_KILL_ONE_MON
 			|| quest == QuestType::CH2_KILL_DESKMON
 			|| quest == QuestType::CH3_KILL_DRILL
 			|| quest == QuestType::CH4_KILL_TINO)
