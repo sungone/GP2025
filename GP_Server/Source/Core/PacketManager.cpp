@@ -235,7 +235,16 @@ void PacketManager::HandleEnterGamePacket(int32 sessionId, Packet* packet)
 	RequestEnterGamePacket* p = static_cast<RequestEnterGamePacket*>(packet);
 	auto newType = p->PlayerType;
 	auto wChannelId = p->WChannel;
-	auto world = GameWorldManager::GetInst().GetAvailableWorld(wChannelId);
+	GameWorld* world = nullptr;
+	if(wChannelId == EWorldChannel::None)
+	{
+		world = GameWorldManager::GetInst().GetAvailableWorld(wChannelId);
+	}
+	else
+	{
+		world = GameWorldManager::GetInst().GetWorld(wChannelId);
+	}
+
 	if (!world)
 	{
 		LOG_W("Invalid World");
@@ -603,14 +612,14 @@ void PacketManager::HandleChangeChannelPacket(int32 sessionId, Packet* packet)
 		return;
 	}
 	world->PlayerLeaveGame(sessionId);
-	session->EnterGame(p->NewChannel);
 	
-	world = GameWorldManager::GetInst().GetAvailableWorld(p->NewChannel);
+	world = GameWorldManager::GetInst().GetWorld(p->NewChannel);
 	if (!world)
 	{
 		LOG_W("Invalid World for channel {}", ENUM_NAME(p->NewChannel));
 		return;
 	}
+	session->EnterGame(p->NewChannel);
 	world->PlayerEnterGame(session->GetPlayer(), true);
 }
 
