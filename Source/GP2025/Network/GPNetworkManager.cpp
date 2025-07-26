@@ -12,6 +12,12 @@
 #include "Character/GPCharacterMyPlayer.h"
 #include "Character/Modules/GPMyplayerSoundManager.h"
 
+
+void UGPNetworkManager::SetIpAddress(const FString& NewIp)
+{
+	IpAddress = NewIp;
+}
+
 bool UGPNetworkManager::ConnectToServer()
 {
 	Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("ClientSocket"));
@@ -39,6 +45,30 @@ bool UGPNetworkManager::ConnectToServer()
 	Socket->SetNonBlocking(true);
 	return bConnected;
 }
+
+void UGPNetworkManager::TryConnectLoop()
+{
+	if (ConnectToServer())
+	{
+		RetryCount = 0;
+	}
+	else
+	{
+		RetryCount++;
+		if (RetryCount < MaxRetries)
+		{
+			FTimerHandle RetryHandle;
+			GetWorld()->GetTimerManager().SetTimer(RetryHandle, this, &UGPNetworkManager::TryConnectLoop, RetryInterval, false);
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, TEXT("Retrying..."));
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("All retries failed."));
+			RetryCount = 0;
+		}
+	}
+}
+
 
 void UGPNetworkManager::DisconnectFromServer()
 {

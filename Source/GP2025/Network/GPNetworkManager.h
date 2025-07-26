@@ -41,8 +41,14 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnSellItemResult OnSellItemResult;
+private:
+	int32 RetryCount = 0;
+	const int32 MaxRetries = 5;
+	const float RetryInterval = 3.0f;
 public:
+	void SetIpAddress(const FString& NewIp);
 	bool ConnectToServer();
+	void TryConnectLoop();
 	void DisconnectFromServer();
 	void ProcessPacket();
 

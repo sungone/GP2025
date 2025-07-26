@@ -46,6 +46,11 @@ void UGPLoginWidget::NativeConstruct()
 	{
 		Mgr->OnUserAuthFailed.AddDynamic(this, &UGPLoginWidget::HandleLoginFail);
 	}
+
+	if (ConnectButton)
+	{
+		ConnectButton->OnClicked.AddDynamic(this, &UGPLoginWidget::OnConnectButtonClicked);
+	}
 }
 
 void UGPLoginWidget::SwitchWidget()
@@ -225,5 +230,21 @@ void UGPLoginWidget::HideErrorMessage()
 	if (TextSignUpError)
 	{
 		TextSignUpError->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void UGPLoginWidget::OnConnectButtonClicked()
+{
+	FString InputIp = IpInputBox->GetText().ToString();
+	if (InputIp.IsEmpty())
+	{
+		InputIp = SERVER_IP;
+	}
+
+	UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+	if (NetMgr)
+	{
+		NetMgr->SetIpAddress(InputIp);
+		NetMgr->TryConnectLoop();
 	}
 }
