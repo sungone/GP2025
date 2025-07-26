@@ -60,4 +60,16 @@ public :
 	class UGPPlayerEffectHandler* EffectHandler;
 
 	virtual bool HasWeaponEquipped() const override;
+
+	// Gunner Projectile
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile")
+	TSubclassOf<AActor> GunnerAttackProjectileClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile")
+	TSubclassOf<AActor> GunnerQSkillProjectileClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile")
+	TSubclassOf<AActor> GunnerESkillProjectileClass;
 };

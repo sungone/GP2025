@@ -131,4 +131,8 @@ public :
 
 	UPROPERTY()
 	class UGPItemPool* ItemPool;
+
+// Gunner Bullet Sync
+	void SpawnGunnerProjectileEffect(AGPCharacterPlayer* Player, ESkillGroup SkillGID, float PlayerYaw,
+		FVector PlayerPos, TSubclassOf<AActor> ProjectileClass);
 };

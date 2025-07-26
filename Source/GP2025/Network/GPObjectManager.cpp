@@ -269,6 +269,19 @@ void UGPObjectManager::PlayerAttack(int32 PlayerID, FVector PlayerPos, float Pla
 				Player->HandleAutoAttackState();
 				Player->CharacterInfo.RemoveState(STATE_AUTOATTACK);
 			}
+
+			if (Player->bIsGunnerCharacter() && Player->GunnerAttackProjectileClass)
+			{
+				UE_LOG(LogTemp, Log, TEXT("[AutoAttack] Gunner %d firing projectile!"), PlayerID);
+
+				SpawnGunnerProjectileEffect(
+					Player,
+					ESkillGroup::None,
+					PlayerYaw,
+					PlayerPos,
+					Player->GunnerAttackProjectileClass
+				);
+			}
 		}
 	}
 }
@@ -283,6 +296,40 @@ void UGPObjectManager::PlayerUseSkillStart(int32 PlayerID, ESkillGroup SkillGID,
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Player %d UseSkill!"), PlayerID));
 		Player->CharacterInfo.SetLocation(PlayerPos);
 		Player->CharacterInfo.SetYaw(PlayerYaw);
+
+		if (Player->bIsGunnerCharacter() &&
+			(SkillGID == ESkillGroup::Throwing || SkillGID == ESkillGroup::FThrowing))
+		{
+			UE_LOG(LogTemp, Log, TEXT("[ProjectileEffect] Player %d is Gunner and using SkillGID: %d"), Player->CharacterInfo.ID, (int32)SkillGID);
+
+			TSubclassOf<AActor> ProjectileToSpawn = nullptr;
+
+			if (SkillGID == ESkillGroup::Throwing)
+			{
+				ProjectileToSpawn = Player->GunnerQSkillProjectileClass;
+				UE_LOG(LogTemp, Log, TEXT("[ProjectileEffect] Using GunnerQSkillProjectileClass"));
+			}
+			else if (SkillGID == ESkillGroup::FThrowing)
+			{
+				ProjectileToSpawn = Player->GunnerESkillProjectileClass;
+				UE_LOG(LogTemp, Log, TEXT("[ProjectileEffect] Using GunnerESkillProjectileClass"));
+			}
+
+			if (ProjectileToSpawn)
+			{
+				UE_LOG(LogTemp, Log, TEXT("[ProjectileEffect] Spawning projectile for PlayerID: %d"), Player->CharacterInfo.ID);
+				SpawnGunnerProjectileEffect(Player, SkillGID, PlayerYaw, PlayerPos, ProjectileToSpawn);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("[ProjectileEffect] ProjectileToSpawn is NULL! Check Blueprint assignment."));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[ProjectileEffect] Player is not Gunner or SkillGID %d is not a projectile skill"), (int32)SkillGID);
+		}
+
 		switch (SkillGID)
 		{
 		case ESkillGroup::HitHard:
@@ -1449,6 +1496,59 @@ void UGPObjectManager::OnTinoIntroFinished()
 	if (MyPlayer->InputHandler)
 	{
 		MyPlayer->InputHandler->SetInputEnabled(true);
+	}
+}
+
+void UGPObjectManager::SpawnGunnerProjectileEffect(AGPCharacterPlayer* Player, ESkillGroup SkillGID, float PlayerYaw, FVector PlayerPos, TSubclassOf<AActor> ProjectileClass)
+{
+	if (!Player)
+	{
+		UE_LOG(LogTemp, Error, TEXT("SpawnGunnerProjectileByYaw: Player is NULL"));
+		return;
+	}
+
+	if (!ProjectileClass)
+	{
+		UE_LOG(LogTemp, Error, TEXT("SpawnGunnerProjectileByYaw: ProjectileClass is NULL"));
+		return;
+	}
+
+	// 총구 위치는 Socket 기준
+	FVector MuzzleLoc = Player->GetMesh()->GetSocketLocation(TEXT("MuzzleSocket"));
+
+	// Yaw만 적용한 회전 → 정면 방향 추출
+	FRotator YawRotation = FRotator(0.f, PlayerYaw, 0.f);
+	FVector FireDir = YawRotation.Vector(); // 단위 방향 벡터
+	FVector TargetPoint = MuzzleLoc + FireDir * 10000.f;
+
+	// TargetPoint를 기준으로 총알이 향해야 할 방향 계산
+	FRotator SpawnRotation = (TargetPoint - MuzzleLoc).Rotation();
+
+	UE_LOG(LogTemp, Log, TEXT("[ProjectileByYaw] Muzzle: %s | Yaw: %.2f | FireDir: %s | Rot: %s"),
+		*MuzzleLoc.ToString(),
+		PlayerYaw,
+		*FireDir.ToString(),
+		*SpawnRotation.ToString()
+	);
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = Player;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	AActor* Spawned = Player->GetWorld()->SpawnActor<AActor>(
+		ProjectileClass,
+		MuzzleLoc,
+		SpawnRotation,
+		SpawnParams
+	);
+
+	if (Spawned)
+	{
+		UE_LOG(LogTemp, Log, TEXT("[ProjectileByYaw] Spawned successfully"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("[ProjectileByYaw] Failed to spawn projectile"));
 	}
 }
 
