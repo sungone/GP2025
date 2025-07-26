@@ -128,4 +128,8 @@ private:
 	TArray<uint8> RemainingData;
 	TQueue<TArray<uint8>, EQueueMode::Mpsc> RecvQueue;
 	bool bConnected;
+
+public:
+	bool IsLoadingFromServer() { return bIsLoading; }
+	bool bIsLoading = false;
 };

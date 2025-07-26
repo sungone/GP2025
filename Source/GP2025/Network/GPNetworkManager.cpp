@@ -499,6 +499,7 @@ void UGPNetworkManager::ProcessPacket()
 			{
 				LoginSuccessPacket* Pkt = reinterpret_cast<LoginSuccessPacket*>(RemainingData.GetData());
 				LoadWorldStatesFromServer(Pkt->WorldState);
+				bIsLoading = true;
 				OnEnterLobby.Broadcast();
 				MyPlayer->bNewPlayer = false;
 				ObjectMgr->StopLoginSound();
@@ -514,6 +515,7 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_SIGNUP_SUCCESS:
 			{
 				SignUpSuccessPacket* Pkt = reinterpret_cast<SignUpSuccessPacket*>(RemainingData.GetData());
+				bIsLoading = true;
 				LoadWorldStatesFromServer(Pkt->WorldState);
 				OnEnterLobby.Broadcast();
 				MyPlayer->bNewPlayer = true;
@@ -539,6 +541,12 @@ void UGPNetworkManager::ProcessPacket()
 				ObjectMgr->ChangeZone(ZoneType::TUK, Data.GetZone(), Data.Pos);
 				ObjectMgr->AddMyPlayer(Pkt->PlayerInfo);
 				ObjectMgr->ShowTutorialStartQuest();
+				FTimerHandle DelayHandle;
+				GetWorld()->GetTimerManager().SetTimer(DelayHandle, [this]()
+					{
+						bIsLoading = false;
+					}, 5.0f, false);
+
 				break;
 			}
 			case EPacketType::S_CHANGE_CHANNEL:

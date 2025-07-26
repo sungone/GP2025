@@ -569,7 +569,6 @@ void PacketManager::HandleFriendAcceptRequestPacket(int32 sessionId, Packet* pac
 	}
 }
 
-
 void PacketManager::HandleFriendRejectRequestPacket(int32 sessionId, Packet* packet)
 {
 	auto* p = static_cast<FriendRejectRequestPacket*>(packet);
@@ -582,6 +581,13 @@ void PacketManager::HandleFriendRejectRequestPacket(int32 sessionId, Packet* pac
 	auto ret = DBManager::GetInst().RejectFriendRequest(myId, targetId);
 	FriendOperationResultPacket resPkt(EFriendOpType::Reject, ret);
 	_sessionMgr.SendPacket(sessionId, &resPkt);
+
+	int32 targetSessId = _sessionMgr.GetOnlineSessionIdByDBId(targetId);
+	if (targetSessId != -1)
+	{
+		FriendOperationResultPacket resPkt(EFriendOpType::Reject, ret);
+		_sessionMgr.SendPacket(targetSessId, &resPkt);
+	}
 }
 
 void PacketManager::HandleChangeChannelPacket(int32 sessionId, Packet* packet)
