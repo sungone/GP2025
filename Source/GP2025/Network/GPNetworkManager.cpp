@@ -715,15 +715,15 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_EQUIP_ITEM:
 			{
 				ItemPkt::EquipItemPacket* Pkt = reinterpret_cast<ItemPkt::EquipItemPacket*>(RemainingData.GetData());
-				ObjectMgr->EquipItem(Pkt->PlayerID, Pkt->ItemType);
 				ObjectMgr->UpdatePlayer(Pkt->PlayerInfo);
+				ObjectMgr->EquipItem(Pkt->PlayerID, Pkt->ItemType);
 				break;
 			}
 			case EPacketType::S_UNEQUIP_ITEM:
 			{
 				ItemPkt::UnequipItemPacket* Pkt = reinterpret_cast<ItemPkt::UnequipItemPacket*>(RemainingData.GetData());
-				ObjectMgr->UnequipItem(Pkt->PlayerID, Pkt->ItemType);
 				ObjectMgr->UpdatePlayer(Pkt->PlayerInfo);
+				ObjectMgr->UnequipItem(Pkt->PlayerID, Pkt->ItemType);
 				break;
 			}
 #pragma endregion

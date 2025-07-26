@@ -111,7 +111,7 @@ void UGPChannelSelectWidget::UpdateChannelState()
 			ChannelComboBox->AddOption(FullLabel);
 		}
 		EWorldChannel Ch = *NetMgr->GetMyGPChannel();
-		ChannelComboBox->SetSelectedIndex(static_cast<int32>(Ch));
+		ChannelComboBox->SetSelectedIndex(static_cast<int32>(Ch)-1);
 	}
 }
 
