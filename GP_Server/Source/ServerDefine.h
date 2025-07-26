@@ -23,10 +23,10 @@ inline constexpr float GRID_CELL_SIZE = 2000.f;
 inline constexpr float playerCollision = 50.f;
 inline constexpr float DfAtkRadius = 100;
 inline constexpr float DFfovAngle = 120;
-inline constexpr float DfWarriorAtkRadius = 90;
-inline constexpr float DFWarriorfovAngle = 300;
-inline constexpr float DfGunnerAtkRadius = 10;
-inline constexpr float DFGunnerfovAngle = 5000;
+inline constexpr float DfWarriorAtkRadius = 300;
+inline constexpr float DFWarriorfovAngle = 90;
+inline constexpr float DfGunnerAtkRadius = 5000;
+inline constexpr float DFGunnerfovAngle = 10;
 
 constexpr int ITEM_DISAPPEAR_TIME_MS = 60 * 1000;
 constexpr int MONSTER_RESPAWN_TIME_MS = 10 * 1000;
