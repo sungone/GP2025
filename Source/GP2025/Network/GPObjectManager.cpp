@@ -549,57 +549,16 @@ void UGPObjectManager::DamagedMonster(const FInfoData& MonsterInfo, float Damage
 			}
 
 			UE_LOG(LogTemp, Warning, TEXT("Damaged monster [%d]"), MonsterInfo.ID);
-
-
+			Monster->PlayHitEffect();
 			if (isCrt)
 			{
-				if (Monster->CriticalEffect)
-				{
-					USkeletalMeshComponent* Mesh = Monster->GetMesh();
-					if (Mesh)
-					{
-						UNiagaraFunctionLibrary::SpawnSystemAttached(
-							Monster->CriticalEffect,
-							Mesh,
-							FName(TEXT("HitSocket")),
-							FVector(0.f, 0.f, 0.f),
-							FRotator::ZeroRotator,
-							EAttachLocation::SnapToTarget,
-							true,
-							true,
-							ENCPoolMethod::None,
-							true
-						);
-					}
-
-					if (Monster->MonsterCriticalHitSound)
-						SoundToPlay = Monster->MonsterCriticalHitSound;
-				}
+				if (Monster->MonsterCriticalHitSound)
+					SoundToPlay = Monster->MonsterCriticalHitSound;
 			}
 			else
 			{
-				if (Monster->HitEffect)
-				{
-					USkeletalMeshComponent* Mesh = Monster->GetMesh();
-					if (Mesh)
-					{
-						UNiagaraFunctionLibrary::SpawnSystemAttached(
-							Monster->HitEffect,
-							Mesh,
-							FName(TEXT("HitSocket")),
-							FVector(0.f, 0.f, 0.f),
-							FRotator::ZeroRotator,
-							EAttachLocation::SnapToTarget,
-							true,
-							true,
-							ENCPoolMethod::None,
-							true
-						);
-					}
-
-					if (Monster->MonsterHitSound)
-						SoundToPlay = Monster->MonsterHitSound;
-				}
+				if (Monster->MonsterHitSound)
+					SoundToPlay = Monster->MonsterHitSound;
 			}
 
 			if (SoundToPlay && Monster->CharacterInfo.GetHp() > 0)

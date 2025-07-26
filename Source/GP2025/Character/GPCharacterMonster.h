@@ -31,12 +31,12 @@ public :
 	class UNiagaraSystem* HitEffect;
 
 	UPROPERTY(EditAnywhere, Category = "Effect")
-	class UNiagaraSystem* CriticalEffect;
-
-	UPROPERTY(EditAnywhere, Category = "Effect")
 	class UNiagaraSystem* DeathEffect;
 	UFUNCTION()
 	void PlayDeathEffect();
+
+	UFUNCTION()
+	void PlayHitEffect();
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	class USoundBase* MonsterHitSound;
