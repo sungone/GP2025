@@ -50,6 +50,12 @@ AGPCharacterMonster::AGPCharacterMonster()
 		MonsterCriticalHitSound = CritHitSoundObj.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<USoundBase> TinoHitSoundObj(TEXT("/Game/Sound/SFX/TinoHit.TinoHit"));
+	if (TinoHitSoundObj.Succeeded())
+	{
+		TinoHitSound = TinoHitSoundObj.Object;
+	}
+
 	static ConstructorHelpers::FObjectFinder<USoundBase> MonDeadSoundObj(TEXT("/Game/Sound/SFX/MonsterDeadSound.MonsterDeadSound"));
 	if (MonDeadSoundObj.Succeeded())
 	{

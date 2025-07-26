@@ -589,7 +589,7 @@ void UGPMyplayerUIManager::UpdateSkillInfosFromPlayer()
 
 	if (bIsGunner)
 	{
-		SkillNames = { TEXT("던지기"), TEXT("빨리던지기"), TEXT("분노") };
+		SkillNames = { TEXT("피어스 샷"), TEXT("탄환의 비"), TEXT("분노") };
 		SkillKeys = { TEXT(" Q "), TEXT(" E "), TEXT(" R ") };
 	}
 	else
