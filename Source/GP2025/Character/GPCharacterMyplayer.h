@@ -83,6 +83,7 @@ public :
 	// <CharacterInfo>
 public :
 	virtual void SetCharacterInfo(const FInfoData& CharacterInfo_) override;
+	void UpdateUIInfo();
 	int32 PrevLevel = 1;
 
 

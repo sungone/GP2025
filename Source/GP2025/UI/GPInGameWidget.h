@@ -51,12 +51,14 @@ public :
     UPROPERTY(meta = (BindWidget))
     class UGPChatBoxWidget* ChatBoxWidget;
 
-
+    UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category = "UI")
+    class UTextBlock* MoneyText;
 
 public :
     void UpdateHealthBar(float Ratio);
     void UpdateExpBar(float Ratio);
     void UpdatePlayerLevel(int32_t NewLevel);
+    void UpdateGold(int32 NewGold);
 
     struct FSlateColor GetQSkillTextColor();
     struct FSlateColor GetESkillTextColor();

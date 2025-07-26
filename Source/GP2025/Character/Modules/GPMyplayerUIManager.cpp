@@ -170,7 +170,6 @@ void UGPMyplayerUIManager::OpenInventory()
 		UGPInventory* Inventory = Cast<UGPInventory>(InventoryWidget);
 		if (Inventory && IsValid(Owner))
 		{
-			Inventory->SetGold(Owner->CharacterInfo.Gold);
 			UpdateSkillInfosFromPlayer();
 		}
 

@@ -1062,8 +1062,9 @@ void UGPObjectManager::ChangeChannel(const FVector& RandomPos)
 
 	if (MyPlayer)
 	{
-		MyPlayer->SetActorLocation(RandomPos);
-		MyPlayer->CharacterInfo.SetLocation(RandomPos);
+		ZoneType CurZone = MyPlayer->CharacterInfo.GetZone();
+		ChangeZone(CurZone, START_ZONE, RandomPos);
+
 		MyPlayer->PlayFadeIn();
 		if (MyPlayer->UIManager)
 		{
@@ -1387,6 +1388,7 @@ void UGPObjectManager::OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpR
 
 		uint8 QuestID = static_cast<uint8>(Quest);
 		MyPlayer->UIManager->UpdateQuestState(QuestID, true);
+		MyPlayer->UpdateUIInfo();
 	}
 }
 

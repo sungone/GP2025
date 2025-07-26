@@ -183,7 +183,7 @@ void UGPShop::HandleBuyItemResult(bool bSuccess, uint32 CurrentGold, const FStri
 	{
 		UpdateMoneyText(CurrentGold);
 		MyPlayer->CharacterInfo.Gold = CurrentGold;
-
+		MyPlayer->UpdateUIInfo();
 		PopulateSellItems();
 	}
 
@@ -291,6 +291,7 @@ void UGPShop::HandleSellItemResult(bool bSuccess, uint32 NewGold, const FString&
 	{
 		UpdateMoneyText(NewGold);
 		MyPlayer->CharacterInfo.Gold = NewGold;
+		MyPlayer->UpdateUIInfo();
 
 		if (CurrentSlot)
 		{

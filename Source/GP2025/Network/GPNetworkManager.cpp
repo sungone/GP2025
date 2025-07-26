@@ -536,16 +536,19 @@ void UGPNetworkManager::ProcessPacket()
 				MyChannel = Pkt->WChannel;
 				FString Msg = TEXT("Enter Channel [") + FString::FromInt(static_cast<uint8>(MyChannel)) + TEXT("]");
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Msg);
-
-				FInfoData Data = Pkt->PlayerInfo;
-				ObjectMgr->ChangeZone(ZoneType::TUK, Data.GetZone(), Data.Pos);
-				ObjectMgr->AddMyPlayer(Pkt->PlayerInfo);
-				ObjectMgr->ShowTutorialStartQuest();
-				FTimerHandle DelayHandle;
-				GetWorld()->GetTimerManager().SetTimer(DelayHandle, [this]()
-					{
-						bIsLoading = false;
-					}, 5.0f, false);
+				if(MyPlayer)
+				{
+					ZoneType CurZone = MyPlayer->CharacterInfo.GetZone();
+					FInfoData Data = Pkt->PlayerInfo;
+					ObjectMgr->ChangeZone(CurZone, Data.GetZone(), Data.Pos);
+					ObjectMgr->AddMyPlayer(Pkt->PlayerInfo);
+					ObjectMgr->ShowTutorialStartQuest();
+					FTimerHandle DelayHandle;
+					GetWorld()->GetTimerManager().SetTimer(DelayHandle, [this]()
+						{
+							bIsLoading = false;
+						}, 5.0f, false);
+				}
 
 				break;
 			}
