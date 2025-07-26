@@ -38,11 +38,12 @@ void UGPDeadScreenWidget::TickCountdown()
     if (SecondsRemaining > 0)
     {
         UpdateRespawnMessage(SecondsRemaining);
+        if (SecondsRemaining == 1)
+            PlayFadeIn();
     }
     else if (SecondsRemaining == 0)
     {
         RespawnCount->SetVisibility(ESlateVisibility::Hidden);
-        OnRespawnComplete.Broadcast();
     }
     else if (SecondsRemaining < -2)
     {
@@ -55,7 +56,7 @@ void UGPDeadScreenWidget::PlayFadeIn()
 {
     if (!FadeOverlay || !FadeInAnim) return;
 
-    // FadeOverlay를 보이게 설정
+    
     FadeOverlay->SetVisibility(ESlateVisibility::Visible);
 
     const float PlayRate = 1.0f;
