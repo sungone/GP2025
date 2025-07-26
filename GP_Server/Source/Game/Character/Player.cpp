@@ -17,6 +17,7 @@ void Player::Init(EWorldChannel channelId)
 	_info.State = ECharacterStateType::STATE_IDLE;
 	ApplyLevelStats(_info.Stats.Level);
 	SetCurrentQuest(QuestType::CH1_TALK_TO_STUDENT_A);
+	OnUnequipWeapon();
 #endif
 }
 
