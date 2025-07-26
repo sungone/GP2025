@@ -259,6 +259,6 @@ void UGPLoginWidget::UpdateConnectState(bool bConnected)
 {
 	if (!ConnectState) return;
 
-	FLinearColor Color = bConnected ? FLinearColor(0.f, 1.f, 0.f, 0.5f) : FLinearColor(1.f, 0.f, 0.f, 0.5f);
+	FLinearColor Color = bConnected ? FLinearColor(0.f, 1.f, 0.f, 0.5f) : FLinearColor(1.f, 1.f, 1.f, 0.2f);
 	ConnectState->SetColorAndOpacity(FSlateColor(Color));
 }
