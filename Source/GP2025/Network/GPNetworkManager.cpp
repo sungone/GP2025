@@ -32,7 +32,7 @@ bool UGPNetworkManager::ConnectToServer()
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Connecting To Server..."));
 
-	bool bConnected = Socket->Connect(*InternetAddr);
+	bConnected = Socket->Connect(*InternetAddr);
 	if (bConnected)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Connection Success"));
@@ -43,6 +43,7 @@ bool UGPNetworkManager::ConnectToServer()
 	}
 
 	Socket->SetNonBlocking(true);
+	OnConnectionResult.Broadcast(bConnected);
 	return bConnected;
 }
 

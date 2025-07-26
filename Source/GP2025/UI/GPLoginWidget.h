@@ -92,6 +92,12 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UButton* ConnectButton;
 
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* ConnectState;
+
 	UFUNCTION()
 	void OnConnectButtonClicked();
+	UFUNCTION()
+	void UpdateConnectState(bool bConnected);
+
 };
