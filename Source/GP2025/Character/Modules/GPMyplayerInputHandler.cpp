@@ -102,7 +102,7 @@ void UGPMyplayerInputHandler::SetupInputBindings(UEnhancedInputComponent* Enhanc
 
 void UGPMyplayerInputHandler::Move(const FInputActionValue& Value)
 {
-	if (!Owner || !Owner->Controller) return;
+	if (!Owner || !Owner->Controller || !bInputEnabled) return;
 
 	if (Owner->CameraHandler->bWantsToZoom)
 		return;
@@ -120,7 +120,7 @@ void UGPMyplayerInputHandler::Move(const FInputActionValue& Value)
 
 void UGPMyplayerInputHandler::Look(const FInputActionValue& Value)
 {
-	if (!Owner) return;
+	if (!Owner || !bInputEnabled) return;
 
 	FVector2D LookAxis = Value.Get<FVector2D>();
 	Owner->AddControllerYawInput(LookAxis.X);
@@ -129,7 +129,7 @@ void UGPMyplayerInputHandler::Look(const FInputActionValue& Value)
 
 void UGPMyplayerInputHandler::Jump()
 {
-	if (!Owner || !bCanJump) return;
+	if (!Owner || !bCanJump || !bInputEnabled) return;
 
 	Owner->Jump();
 	bCanJump = false;
@@ -164,7 +164,7 @@ void UGPMyplayerInputHandler::StopJumping()
 
 void UGPMyplayerInputHandler::StartSprinting()
 {
-	if (!Owner) return;
+	if (!Owner || !bInputEnabled) return;
 
 	Owner->GetCharacterMovement()->MaxWalkSpeed = Owner->NetworkSyncHandler->SprintSpeed;
 	Owner->CharacterInfo.RemoveState(STATE_WALK);
@@ -182,7 +182,7 @@ void UGPMyplayerInputHandler::StopSprinting()
 
 void UGPMyplayerInputHandler::AutoAttack()
 {
-	if (!Owner)
+	if (!Owner || !bInputEnabled)
 	{
 		return;
 	}
@@ -248,7 +248,7 @@ void UGPMyplayerInputHandler::AutoAttack()
 
 void UGPMyplayerInputHandler::ToggleInventory()
 {
-	if (!Owner) return;
+	if (!Owner || !bInputEnabled) return;
 
 	if (Owner->UIManager)
 	{
@@ -309,13 +309,13 @@ void UGPMyplayerInputHandler::CloseInventory()
 
 void UGPMyplayerInputHandler::ToggleSettingWidget()
 {
-	if (!Owner || !Owner->UIManager) return;
+	if (!Owner || !Owner->UIManager || !bInputEnabled) return;
 	Owner->UIManager->ToggleSettingWidget();
 }
 
 void UGPMyplayerInputHandler::Accept()
 {
-	if (!Owner || !Owner->UIManager) return;
+	if (!Owner || !Owner->UIManager || !bInputEnabled) return;
 
 	if (UGPQuestWidget* QuestWidget = Owner->UIManager->CurrentQuestWidget)
 	{
@@ -330,7 +330,7 @@ void UGPMyplayerInputHandler::Accept()
 
 void UGPMyplayerInputHandler::Refuse()
 {
-	if (!Owner || !Owner->UIManager) return;
+	if (!Owner || !Owner->UIManager || !bInputEnabled) return;
 
 	if (UGPQuestWidget* QuestWidget = Owner->UIManager->CurrentQuestWidget)
 	{
@@ -345,7 +345,7 @@ void UGPMyplayerInputHandler::Refuse()
 
 void UGPMyplayerInputHandler::Interact()
 {
-	if (!Owner || !Owner->UIManager) return;
+	if (!Owner || !Owner->UIManager || !bInputEnabled) return;
 
 	if (!bIsFriendBoxOpen)
 	{
@@ -366,13 +366,13 @@ void UGPMyplayerInputHandler::Interact()
 
 void UGPMyplayerInputHandler::EnterChatting()
 {
-	if (!Owner || !Owner->UIManager) return;
+	if (!Owner || !Owner->UIManager || !bInputEnabled) return;
 	Owner->UIManager->FocusChatInput();
 }
 
 void UGPMyplayerInputHandler::TakeInteraction()
 {
-	if (!Owner) return;
+	if (!Owner || !bInputEnabled) return;
 
 	// Item Drop
 	bGetTakeItem = true;
@@ -397,7 +397,7 @@ void UGPMyplayerInputHandler::TakeInteraction()
 
 void UGPMyplayerInputHandler::StartAiming()
 {
-	if (!Owner || !Owner->bIsGunnerCharacter()) return;
+	if (!Owner || !Owner->bIsGunnerCharacter() || !bInputEnabled) return;
 
 	if (!Owner->HasWeaponEquipped())
 	{
@@ -438,7 +438,7 @@ void UGPMyplayerInputHandler::UseSkillQ()
 {
 	bool bIsAlreadyAttacking = Owner->CombatHandler->IsAutoAttacking();
 	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() 
-		 || bIsAlreadyAttacking || !Owner->HasWeaponEquipped()) return;
+		 || bIsAlreadyAttacking || !Owner->HasWeaponEquipped() || !bInputEnabled) return;
 
 	ESkillGroup SkillGroup = Owner->bIsGunnerCharacter() ? ESkillGroup::Throwing : ESkillGroup::HitHard;
 	int32 SkillLevel = Owner->CharacterInfo.GetSkillLevel(SkillGroup);
@@ -497,7 +497,7 @@ void UGPMyplayerInputHandler::UseSkillQ()
 
 void UGPMyplayerInputHandler::UseSkillE()
 {
-	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() || !Owner->HasWeaponEquipped()) return;
+	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() || !Owner->HasWeaponEquipped() || !bInputEnabled) return;
 
 	ESkillGroup SkillGroup = Owner->bIsGunnerCharacter() ? ESkillGroup::FThrowing : ESkillGroup::Clash;
 	int32 SkillLevel = Owner->CharacterInfo.GetSkillLevel(SkillGroup);
@@ -549,7 +549,7 @@ void UGPMyplayerInputHandler::UseSkillR()
 {
 	bool bIsAlreadyAttacking = Owner->CombatHandler->IsAutoAttacking();
 	if (!Owner || !Owner->SkillCoolDownHandler || Owner->CombatHandler->IsUsingSkill() 
-		 || bIsAlreadyAttacking || !Owner->HasWeaponEquipped()) return;
+		 || bIsAlreadyAttacking || !Owner->HasWeaponEquipped() || !bInputEnabled) return;
 
 	ESkillGroup SkillGroup = Owner->bIsGunnerCharacter() ? ESkillGroup::Anger : ESkillGroup::Whirlwind;
 	int32 SkillLevel = Owner->CharacterInfo.GetSkillLevel(SkillGroup);
@@ -587,5 +587,26 @@ void UGPMyplayerInputHandler::UseSkillR()
 		Owner->NetMgr->SendMyUseSkillStart(ESkillGroup::Whirlwind, Owner->GetControlRotation().Yaw, 
 			Owner->GetActorLocation());
 		Owner->CombatHandler->PlayMultiHitSkill(HitCount, Interval); // 여기서 공격 처리 중
+	}
+}
+
+void UGPMyplayerInputHandler::SetInputEnabled(bool bEnabled)
+{
+	bInputEnabled = bEnabled;
+
+	if (!Owner) return;
+
+	if (AGPPlayerController* PC = Cast<AGPPlayerController>(Owner->GetController()))
+	{
+		if (!bEnabled)
+		{
+			PC->SetIgnoreMoveInput(true);
+			PC->SetIgnoreLookInput(true);
+		}
+		else
+		{
+			PC->SetIgnoreMoveInput(false);
+			PC->SetIgnoreLookInput(false);
+		}
 	}
 }

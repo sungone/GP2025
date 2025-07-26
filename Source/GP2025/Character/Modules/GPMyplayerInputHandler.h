@@ -155,4 +155,15 @@ private:
 	bool bCanJump = true;
 	FTimerHandle JumpCooldownTimerHandle;
 
+
+public :
+	// Input Enabled
+
+	UFUNCTION(BlueprintCallable)
+	void SetInputEnabled(bool bEnabled);
+
+	bool IsInputEnabled() const { return bInputEnabled; }
+
+private:
+	bool bInputEnabled = true;
 };

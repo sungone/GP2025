@@ -8,6 +8,7 @@
 #include "Character/Modules/GPPlayerAppearanceHandler.h"
 #include "Character/Modules/GPCharacterCombatHandler.h"
 #include "Character/Modules/GPPlayerEffectHandler.h"
+#include "Character/Modules/GPMyplayerInputHandler.h"
 #include "Skill/GPSkillCoolDownHandler.h"
 #include "UI/GPFloatingDamageText.h"
 #include "Network/GPGameInstance.h"
@@ -1438,6 +1439,11 @@ void UGPObjectManager::PlayTinoIntro()
 	UWorld* MyWorld = GetWorld();
 	if (!MyWorld) return;
 
+	if (MyPlayer->InputHandler)
+	{
+		MyPlayer->InputHandler->SetInputEnabled(false);
+	}
+
 	UGPGameInstance* GI = Cast<UGPGameInstance>(UGameplayStatics::GetGameInstance(MyWorld));
 	if (!GI) return;
 
@@ -1465,6 +1471,11 @@ void UGPObjectManager::OnTinoIntroFinished()
 	{
 		Tino->SetActorHiddenInGame(false);
 		Tino->SetActorEnableCollision(true);
+	}
+
+	if (MyPlayer->InputHandler)
+	{
+		MyPlayer->InputHandler->SetInputEnabled(true);
 	}
 }
 

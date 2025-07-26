@@ -113,7 +113,7 @@ void UGPPlayerEffectHandler::PlayPlayerHitEffect()
 {
     if (Owner && HitEffect)
     {
-        UNiagaraFunctionLibrary::SpawnSystemAttached(
+        UNiagaraComponent* EffectComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
             HitEffect,
             Owner->GetRootComponent(),
             TEXT("Hips"),
@@ -122,7 +122,11 @@ void UGPPlayerEffectHandler::PlayPlayerHitEffect()
             EAttachLocation::SnapToTargetIncludingScale,
             true
         );
-        UE_LOG(LogTemp, Log, TEXT("[EffectHandler] HitEffect played at Hips."));
+
+        if (EffectComponent)
+        {
+            EffectComponent->SetWorldScale3D(FVector(0.6f));
+        }
     }
 }
 
