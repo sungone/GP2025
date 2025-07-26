@@ -83,4 +83,21 @@ public :
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	USoundBase* ClickSound;
+
+
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* IpInputBox;
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* ConnectButton;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* ConnectState;
+
+	UFUNCTION()
+	void OnConnectButtonClicked();
+	UFUNCTION()
+	void UpdateConnectState(bool bConnected);
+
 };

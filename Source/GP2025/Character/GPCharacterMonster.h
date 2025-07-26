@@ -38,11 +38,9 @@ public :
 	UFUNCTION()
 	void PlayDeathEffect();
 
-	/** 일반 피격 사운드 */
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	class USoundBase* MonsterHitSound;
 
-	/** 크리티컬 피격 사운드 */
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	class USoundBase* MonsterCriticalHitSound;
 
@@ -51,6 +49,4 @@ public :
 
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* SceneRoot;
-
-
 };

@@ -12,6 +12,12 @@
 #include "Character/GPCharacterMyPlayer.h"
 #include "Character/Modules/GPMyplayerSoundManager.h"
 
+
+void UGPNetworkManager::SetIpAddress(const FString& NewIp)
+{
+	IpAddress = NewIp;
+}
+
 bool UGPNetworkManager::ConnectToServer()
 {
 	Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("ClientSocket"));
@@ -26,7 +32,7 @@ bool UGPNetworkManager::ConnectToServer()
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Connecting To Server..."));
 
-	bool bConnected = Socket->Connect(*InternetAddr);
+	bConnected = Socket->Connect(*InternetAddr);
 	if (bConnected)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Connection Success"));
@@ -37,8 +43,33 @@ bool UGPNetworkManager::ConnectToServer()
 	}
 
 	Socket->SetNonBlocking(true);
+	OnConnectionResult.Broadcast(bConnected);
 	return bConnected;
 }
+
+void UGPNetworkManager::TryConnectLoop()
+{
+	if (ConnectToServer())
+	{
+		RetryCount = 0;
+	}
+	else
+	{
+		RetryCount++;
+		if (RetryCount < MaxRetries)
+		{
+			FTimerHandle RetryHandle;
+			GetWorld()->GetTimerManager().SetTimer(RetryHandle, this, &UGPNetworkManager::TryConnectLoop, RetryInterval, false);
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, TEXT("Retrying..."));
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("All retries failed."));
+			RetryCount = 0;
+		}
+	}
+}
+
 
 void UGPNetworkManager::DisconnectFromServer()
 {

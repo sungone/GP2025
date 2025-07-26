@@ -77,5 +77,4 @@ public :
 	UWidgetAnimation* FadeAnim;
 
 	void PlayFadeAnim();
-
 };

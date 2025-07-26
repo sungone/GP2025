@@ -45,16 +45,6 @@ void Player::SetCharacterType(Type::EPlayer type)
 {
 	_playerType = type;
 	_info.CharacterType = static_cast<uint8>(_playerType);
-	if (_playerType == Type::EPlayer::WARRIOR)
-	{
-		_info.fovAngle = 90;
-		_info.AttackRadius = 300;
-	}
-	else
-	{
-		_info.fovAngle = 10;
-		_info.AttackRadius = 5000;
-	}
 }
 
 void Player::OnEnterGame()
@@ -461,6 +451,26 @@ void Player::UnlockSkillsOnLevelUp()
 }
 
 
+void Player::OnEquipWeapon()
+{
+	if (_playerType == Type::EPlayer::WARRIOR)
+	{
+		_info.AttackRadius = DfWarriorAtkRadius;
+		_info.fovAngle = DFWarriorfovAngle;
+	}
+	else
+	{
+		_info.AttackRadius = DfGunnerAtkRadius;
+		_info.fovAngle = DFGunnerfovAngle;
+	}
+}
+
+void Player::OnUnequipWeapon()
+{
+	_info.AttackRadius = DfAtkRadius;
+	_info.fovAngle = DFfovAngle;
+}
+
 void Player::UseItem(uint32 itemId)
 {
 	auto targetItem = _inventory.FindItem(itemId);
@@ -502,6 +512,11 @@ uint8 Player::EquipItem(uint32 itemId)
 {
 	auto targetItem = _inventory.FindItem(itemId);
 	if (!targetItem) return 0;
+	auto type = targetItem->GetItemCategory();
+	if (type == EItemCategory::Weapon)
+	{
+		OnEquipWeapon();
+	}
 
 	const ItemStats& itemStats = targetItem->GetStats();
 	AddItemStats(itemStats);
@@ -509,7 +524,7 @@ uint8 Player::EquipItem(uint32 itemId)
 	uint8 itemType = targetItem->GetItemTypeID();
 	_info.EquipItemByType(itemType);
 
-	auto type = targetItem->GetItemCategory();
+
 	if (GetCurrentQuest() == QuestType::TUT_EQUIP_ITEM && type == EItemCategory::Weapon)
 	{
 		CheckAndUpdateQuestProgress(EQuestCategory::ITEM);
@@ -529,6 +544,11 @@ uint8 Player::UnequipItem(uint32 itemId)
 	uint8 itemType = targetItem->GetItemTypeID();
 	_info.UnequipItemByType(itemType);
 
+	auto type = targetItem->GetItemCategory();
+	if (type == EItemCategory::Weapon)
+	{
+		OnUnequipWeapon();
+	}
 	return itemType;
 }
 
@@ -563,7 +583,7 @@ void Player::CheckAndUpdateQuestProgress(EQuestCategory type)
 	case EQuestCategory::KILL:
 	{
 		if (quest == QuestType::CH1_BUNKER_CLEANUP
-			|| quest == QuestType::TUT_KILL_ONE_MON 
+			|| quest == QuestType::TUT_KILL_ONE_MON
 			|| quest == QuestType::CH2_KILL_DESKMON
 			|| quest == QuestType::CH3_KILL_DRILL
 			|| quest == QuestType::CH4_KILL_TINO)
