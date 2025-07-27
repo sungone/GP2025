@@ -1459,6 +1459,12 @@ void UGPObjectManager::PlayTinoIntro()
 {
 	UWorld* MyWorld = GetWorld();
 	if (!MyWorld) return;
+	ZoneType CurZone = MyPlayer->CharacterInfo.GetZone();
+	if (CurZone != ZoneType::GYM)
+	{
+		bFighting = true;
+		return;
+	}
 
 	if (MyPlayer->InputHandler)
 	{
