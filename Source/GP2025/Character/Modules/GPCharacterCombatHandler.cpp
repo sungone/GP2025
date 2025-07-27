@@ -189,12 +189,13 @@ void UGPCharacterCombatHandler::HandleDeath()
 		Owner->GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda([LocalOwner]()
 			{
 				if (!LocalOwner) return;
-				LocalOwner->Destroy();
 
 				if (AGPCharacterMonster* LocalMonster = Cast<AGPCharacterMonster>(LocalOwner))
 				{
-					LocalMonster->PlayDeathEffect();
+					if(LocalMonster)
+						LocalMonster->PlayDeathEffect();
 				}
+				LocalOwner->Destroy();
 			}), DeathAnimDuration - 0.3f, false);
 	}
 }
