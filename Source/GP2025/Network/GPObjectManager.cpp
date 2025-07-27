@@ -1436,6 +1436,12 @@ void UGPObjectManager::PlayWorldIntro()
 {
 	UWorld* MyWorld = GetWorld();
 	if (!MyWorld) return;
+
+	if (MyPlayer->InputHandler)
+	{
+		MyPlayer->InputHandler->SetInputEnabled(false);
+	}
+
 	ChangeZone(ZoneType::TUK, ZoneType::E, FVector::ZeroVector);
 
 	UGPGameInstance* GI = Cast<UGPGameInstance>(UGameplayStatics::GetGameInstance(MyWorld));
@@ -1476,6 +1482,11 @@ void UGPObjectManager::OnWorldIntroFinished()
 {
 	ChangeZone(ZoneType::E, ZoneType::TUK, FVector::ZeroVector);
 	MyPlayer->ShowLobbyUI();
+
+	if (MyPlayer->InputHandler)
+	{
+		MyPlayer->InputHandler->SetInputEnabled(true);
+	}
 }
 
 void UGPObjectManager::OnTinoIntroFinished()
