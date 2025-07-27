@@ -63,6 +63,8 @@ public :
 	UPROPERTY(meta = (BindWidget))
 	UEditableTextBox* TBSignUpNname;
 
+	void FocusOnEditableTextBox(UEditableTextBox* TextBox);
+
 	UFUNCTION()
 	void SwitchWidget();
 	UFUNCTION()

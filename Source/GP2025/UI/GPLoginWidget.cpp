@@ -57,8 +57,28 @@ void UGPLoginWidget::NativeConstruct()
 
 		}
 	}
+
+	FocusOnEditableTextBox(TBSignUpID);
+	FocusOnEditableTextBox(TBSignUpPW);
+	FocusOnEditableTextBox(TBSignUpNname);
 }
 
+void UGPLoginWidget::FocusOnEditableTextBox(UEditableTextBox* TextBox)
+{
+	if (!TextBox) return;
+
+	APlayerController* PC = GetOwningPlayer();
+	if (!PC) return;
+
+	TextBox->SetUserFocus(PC);
+	TextBox->SetKeyboardFocus();
+
+	FInputModeUIOnly InputMode;
+	InputMode.SetWidgetToFocus(TextBox->TakeWidget());
+	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	PC->SetInputMode(InputMode);
+	PC->SetShowMouseCursor(true);
+}
 void UGPLoginWidget::SwitchWidget()
 {
 	if (LoginSwitcher)
