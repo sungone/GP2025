@@ -39,7 +39,7 @@ inline long long NowMs()
 
 inline int delayTime;
 constexpr int DELAY_LIMIT = 100;
-constexpr int DELAY_LIMIT2 = 150;
+constexpr int DELAY_LIMIT2 = 300;
 constexpr int ACCEPT_DELY = 40;
 
 inline void UpdateDelay(int rtt_ms) {
@@ -48,7 +48,7 @@ inline void UpdateDelay(int rtt_ms) {
 }
 
 inline std::atomic_int _active_clients;
-inline constexpr size_t MAX_CLIENT = 10000;
+inline constexpr size_t MAX_CLIENT = 2000;
 inline constexpr size_t MAX_PLAYER = MAX_CLIENT;
 inline constexpr float VIEW_DIST = 5000.f;
 inline constexpr float playerCollision = 50.f;

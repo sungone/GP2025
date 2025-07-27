@@ -1,7 +1,7 @@
 #pragma once
 #include "DummyClient.h"
 
-constexpr int32 CLIENT_NUM = 500;
+constexpr int32 CLIENT_NUM = 5000;
 class DummyClientManager
 {
 public:
@@ -12,6 +12,7 @@ public:
 	}
 	bool Init();
 	void Run();
+	void Shutdown();
 	void SendMovePacket(int i);
 
 	void WorkerThread();
@@ -38,5 +39,6 @@ private:
 	std::atomic_int _num_connections;
 	std::atomic_int _client_to_close;
 	std::vector<std::thread> _threads;
+	std::atomic<bool> _running{ true };
 };
 
