@@ -44,6 +44,14 @@ void DummyClientManager::Run()
 
 }
 
+void DummyClientManager::Shutdown()
+{
+	_running = false;
+	for (auto& client : _clients)
+		client.Disconnect();
+	TimerQueue::_cv.notify_all();
+}
+
 void DummyClientManager::SendMovePacket(int i)
 {
 	if (_clients[i].IsConnected())
@@ -64,7 +72,7 @@ void DummyClientManager::WorkerThread()
 	static auto lastCheck = std::chrono::steady_clock::now();
 
 	try {
-		while (true)
+		while (_running)
 		{
 			BOOL ret = _hIocp.GetCompletion(rbyte, id, over);
 			ExpOver* expOver = reinterpret_cast<ExpOver*>(over);

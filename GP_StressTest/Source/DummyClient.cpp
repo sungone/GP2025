@@ -172,7 +172,7 @@ void DummyClient::SendSignUpPacket()
 
 void DummyClient::SendRequestEnterGamePacket()
 {
-	auto pkt = RequestEnterGamePacket(EWorldChannel::TUWorld_1);
+	auto pkt = RequestEnterGamePacket(EWorldChannel::None);
 	DoSend(&pkt);
 }
 
