@@ -186,15 +186,17 @@ void UGPCharacterCombatHandler::HandleDeath()
 	}
 	else
 	{
-		Owner->GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda([LocalOwner]()
+		TWeakObjectPtr<AGPCharacterBase> WeakOwner = Owner;
+		Owner->GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda([WeakOwner]()
 			{
-				if (!LocalOwner) return;
-				LocalOwner->Destroy();
+				if (!WeakOwner.IsValid()) return;
 
+				AGPCharacterBase* LocalOwner = WeakOwner.Get();
 				if (AGPCharacterMonster* LocalMonster = Cast<AGPCharacterMonster>(LocalOwner))
 				{
 					LocalMonster->PlayDeathEffect();
 				}
+				LocalOwner->Destroy();
 			}), DeathAnimDuration - 0.3f, false);
 	}
 }

@@ -18,9 +18,9 @@ void TimerQueue::TimerThread()
 		auto now = std::chrono::system_clock::now();
 		auto& top = _timerQueue.top();
 
-		if (now >= top.wakeUpTime)
+		if (now >= _timerQueue.top().wakeUpTime)
 		{
-			auto event = top;
+			auto event = _timerQueue.top();
 			_timerQueue.pop();
 			lock.unlock();
 
@@ -34,8 +34,10 @@ void TimerQueue::TimerThread()
 		}
 		else
 		{
-			_cv.wait_until(lock, top.wakeUpTime);
+			auto wakeTime = _timerQueue.top().wakeUpTime;
+			_cv.wait_until(lock, wakeTime);
 		}
+
 	}
 }
 

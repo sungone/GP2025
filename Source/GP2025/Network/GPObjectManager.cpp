@@ -243,6 +243,7 @@ void UGPObjectManager::RemovePlayer(int32 PlayerID)
 
 void UGPObjectManager::UpdatePlayer(const FInfoData& PlayerInfo)
 {
+	if (IsChangingZone()) return;
 	if (TWeakObjectPtr<AGPCharacterPlayer>* WeakPlayerPtr = Players.Find(PlayerInfo.ID))
 	{
 		if (WeakPlayerPtr->IsValid())
@@ -265,6 +266,11 @@ void UGPObjectManager::PlayerAttack(int32 PlayerID, FVector PlayerPos, float Pla
 
 				Player->CharacterInfo.SetLocation(PlayerPos);
 				Player->CharacterInfo.SetYaw(PlayerYaw);
+
+				FVector Loc(PlayerPos);
+				FRotator Rot(0, PlayerYaw, 0);
+				Player->SetActorLocationAndRotation(Loc, Rot);
+
 				Player->CharacterInfo.AddState(STATE_AUTOATTACK);
 				Player->HandleAutoAttackState();
 				Player->CharacterInfo.RemoveState(STATE_AUTOATTACK);
@@ -387,6 +393,7 @@ void UGPObjectManager::DamagedPlayer(const FInfoData& PlayerInfo)
 
 void UGPObjectManager::HandlePlayerDeath(int32 playerId)
 {
+	if (IsChangingZone()) return;
 	TWeakObjectPtr<AGPCharacterPlayer> WeakPlayer = Players.FindRef(playerId);
 	AGPCharacterPlayer* TargetPlayer = WeakPlayer.Get();
 	if (!TargetPlayer) return;
@@ -488,8 +495,11 @@ void UGPObjectManager::AddMonster(const FInfoData& MonsterInfo)
 	if (Monster->CharacterInfo.CharacterType == static_cast<uint8>(Type::EMonster::TINO))
 	{
 		Tino = Monster;
-		Monster->SetActorHiddenInGame(true);
-		Monster->SetActorEnableCollision(false);
+		if(!bFighting)
+		{
+			Monster->SetActorHiddenInGame(true);
+			Monster->SetActorEnableCollision(false);
+		}
 	}
 	if (Monster->UIHandler)
 	{
@@ -544,6 +554,7 @@ void UGPObjectManager::HandleMonsterDeath(int32 MonsterID)
 
 void UGPObjectManager::UpdateMonster(const FInfoData& MonsterInfo)
 {
+	if (IsChangingZone()) return;
 	if (TWeakObjectPtr<AGPCharacterMonster>* WeakMonsterPtr = Monsters.Find(MonsterInfo.ID))
 	{
 		if (WeakMonsterPtr->IsValid())
@@ -1100,18 +1111,19 @@ void UGPObjectManager::ChangeChannel(const FVector& RandomPos)
 	Items.Empty();
 	UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] All items removed"));
 
+	auto Player = Cast<AGPCharacterPlayer>(MyPlayer);
+	Players.Add(MyPlayer->CharacterInfo.ID, Player);
+
 	if (MyPlayer)
 	{
 		ZoneType CurZone = MyPlayer->CharacterInfo.GetZone();
-		ChangeZone(CurZone, START_ZONE, RandomPos);
+		if(CurZone!= START_ZONE)
+			ChangeZone(CurZone, START_ZONE, RandomPos);
 
-		MyPlayer->PlayFadeIn();
 		if (MyPlayer->UIManager)
 		{
 			MyPlayer->UIManager->GetInGameWidget()->ShowGameMessage(FText::FromString(TEXT("채널이 변경되었습니다.")), 2.f);
 		}
-		auto Player = Cast<AGPCharacterPlayer>(MyPlayer);
-		Players.Add(MyPlayer->CharacterInfo.ID, Player);
 	}
 }
 
@@ -1175,6 +1187,42 @@ void UGPObjectManager::ChangeZone(ZoneType oldZone, ZoneType newZone, const FVec
 	ULevelStreaming* StreamLevel = UGameplayStatics::GetStreamingLevel(this, OldLevel);
 	if (StreamLevel)
 	{
+		for (auto& PlayerPair : Players)
+		{
+			TWeakObjectPtr<AGPCharacterPlayer> PlayerPtr = PlayerPair.Value;
+			if (PlayerPtr.IsValid() && PlayerPtr.Get() != MyPlayer)
+			{
+				PlayerPtr->Destroy();
+			}
+		}
+		Players.Empty();
+		UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] All other players removed"));
+
+		for (auto& MonsterPair : Monsters)
+		{
+			TWeakObjectPtr<AGPCharacterMonster> MonsterPtr = MonsterPair.Value;
+			if (MonsterPtr.IsValid())
+			{
+				MonsterPtr->Destroy();
+			}
+		}
+		Monsters.Empty();
+		UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] All monsters removed"));
+
+		for (auto& ItemPair : Items)
+		{
+			TWeakObjectPtr<AGPItem> ItemPtr = ItemPair.Value;
+			if (ItemPtr.IsValid())
+			{
+				ItemPtr->ReturnToPool();
+			}
+		}
+		Items.Empty();
+		UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] All items removed"));
+
+		auto Player = Cast<AGPCharacterPlayer>(MyPlayer);
+		Players.Add(MyPlayer->CharacterInfo.ID, Player);
+
 		if (!StreamLevel->IsLevelLoaded())
 		{
 			HandleLevelUnloaded();
@@ -1387,7 +1435,7 @@ void UGPObjectManager::OnQuestStart(QuestType Quest)
 							MyPlayer->NetMgr->SendMyCompleteQuest();
 						}
 					}),
-				5.f,
+				2.f,
 				false
 			);
 
@@ -1457,6 +1505,12 @@ void UGPObjectManager::PlayTinoIntro()
 {
 	UWorld* MyWorld = GetWorld();
 	if (!MyWorld) return;
+	ZoneType CurZone = MyPlayer->CharacterInfo.GetZone();
+	if (CurZone != ZoneType::GYM)
+	{
+		bFighting = true;
+		return;
+	}
 
 	if (MyPlayer->InputHandler)
 	{
@@ -1493,6 +1547,7 @@ void UGPObjectManager::OnTinoIntroFinished()
 {
 	if (Tino)
 	{
+		bFighting = true;
 		Tino->SetActorHiddenInGame(false);
 		Tino->SetActorEnableCollision(true);
 	}

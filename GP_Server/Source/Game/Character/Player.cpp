@@ -41,6 +41,7 @@ void Player::SetCharacterType(Type::EPlayer type)
 {
 	_playerType = type;
 	_info.CharacterType = static_cast<uint8>(_playerType);
+	OnUnequipWeapon();
 }
 
 void Player::OnEnterGame()

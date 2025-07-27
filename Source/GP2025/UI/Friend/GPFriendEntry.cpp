@@ -53,10 +53,10 @@ void UGPFriendEntry::UpdateSelectionState()
 
     if (bIsSelected)
     {
-        BackgroundBorder->SetBrushColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.2f));
+        BackgroundBorder->SetBrushColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.5f));
     }
     else
     {
-        BackgroundBorder->SetBrushColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.4f));
+        BackgroundBorder->SetBrushColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.2f));
     }
 }

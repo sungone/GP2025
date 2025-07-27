@@ -3,14 +3,14 @@
 #define DB_MODE
 #endif
 
-#define TEST 0
+#define TEST 1
 
 //for test
 inline constexpr int TEST_ATK_WEIGHT = 5;
 inline constexpr int TEST_EXP_WEIGHT = 10;
 
-inline constexpr int GOOD_STATE_WORLD = 300;
-inline constexpr int NORMAL_STATE_WORLD = 600;
+inline constexpr int GOOD_STATE_WORLD = 200;
+inline constexpr int NORMAL_STATE_WORLD = 400;
 
 inline constexpr size_t MAX_CLIENT = 10000;
 inline constexpr size_t MAX_PLAYER = MAX_CLIENT;
@@ -21,7 +21,7 @@ inline constexpr float VIEW_DIST = 4000.f;
 inline constexpr float GRID_CELL_SIZE = 2000.f;
 
 inline constexpr float playerCollision = 50.f;
-inline constexpr float DfAtkRadius = 150;
+inline constexpr float DfAtkRadius = 200;
 inline constexpr float DFfovAngle = 120;
 inline constexpr float DfWarriorAtkRadius = 300;
 inline constexpr float DFWarriorfovAngle = 90;
