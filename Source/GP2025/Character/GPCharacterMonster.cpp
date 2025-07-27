@@ -81,6 +81,14 @@ void AGPCharacterMonster::BeginPlay()
 	MyMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	MyMesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	MyMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+	UCapsuleComponent* Capsule = GetCapsuleComponent();
+	if (Capsule)
+	{
+		Capsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		Capsule->SetCollisionResponseToAllChannels(ECR_Block);
+		Capsule->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore); 
+	}
 }
 
 void AGPCharacterMonster::Tick(float DeltaTime)
