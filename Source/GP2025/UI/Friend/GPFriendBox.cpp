@@ -227,3 +227,23 @@ void UGPFriendBox::RemoveFromFriendList(uint32 FriendUserID)
 		FriendListWidget->RemoveFriendEntry(FriendUserID);
 	}
 }
+
+void UGPFriendBox::SetSelectedFriend(UGPFriendEntry* NewEntry)
+{
+	if (SelectedEntry)
+	{
+		SelectedEntry->SetSelected(false);
+	}
+
+	SelectedEntry = NewEntry;
+
+	if (SelectedEntry)
+	{
+		SelectedEntry->SetSelected(true);
+		SelectedFriendUserID = SelectedEntry->FriendUserID;
+	}
+	else
+	{
+		SelectedFriendUserID = MAX_uint32;
+	}
+}

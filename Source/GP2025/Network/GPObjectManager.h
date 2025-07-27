@@ -62,7 +62,6 @@ public:
 	bool IsChangingZone() const { return bChangingZone; }
 	void SetChangeingZone(bool value) { bChangingZone = value; }
 	FRotator GetDefaultZoneRotation(ZoneType Zone);
-	void RefreshInGameUI();
 
 	UFUNCTION()
 	void HandleLevelUnloaded();
@@ -70,11 +69,18 @@ public:
 	void HandleLevelLoaded();
 	void RespawnMyPlayer(const FInfoData& info);
 	
+	void ShowTutorialStartQuest();
 	void OnQuestStart(QuestType Quest);
 	void OnQuestReward(QuestType Quest, bool bSuccess, uint32 ExpReward, uint32 GoldReward);
 
+	void PlayWorldIntro();
+	void PlayTinoIntro();
+	void StopLoginSound();
+
 	UFUNCTION()
-	void HideTinoMonstersTemporarily(float Duration);
+	void OnWorldIntroFinished();
+	UFUNCTION()
+	void OnTinoIntroFinished();
 
 	// Friend
 	void AddRequestFriend(const FFriendInfo& FriendInfo);
@@ -96,7 +102,7 @@ private:
 	TMap<int32, TWeakObjectPtr<AGPCharacterPlayer>> Players;
 
 	TMap<int32, TWeakObjectPtr<AGPCharacterMonster>> Monsters;
-
+	AGPCharacterMonster* Tino = nullptr;
 	TMap<int32, TWeakObjectPtr<AGPItem>> Items;
 
 	TMap<uint32, FString> FriendMap;
@@ -125,4 +131,16 @@ public :
 
 	UPROPERTY()
 	class UGPItemPool* ItemPool;
+
+// Gunner Bullet Sync
+	void SpawnGunnerProjectileEffect(AGPCharacterPlayer* Player, ESkillGroup SkillGID, float PlayerYaw,
+		FVector PlayerPos, TSubclassOf<AActor> ProjectileClass);
+
+	void SpawnGunnerFThrowingEffect(
+		AGPCharacterPlayer* Player,
+		float PlayerYaw,
+		FVector PlayerPos,
+		TSubclassOf<AActor> ProjectileClass,
+		int32 NumProjectiles,
+		float SpreadAngleDeg);
 };

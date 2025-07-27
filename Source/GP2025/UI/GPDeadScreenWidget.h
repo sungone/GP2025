@@ -35,7 +35,12 @@ private:
     UPROPERTY(meta = (BindWidget))
     class UTextBlock* RespawnCount;
 
-public:
-    UPROPERTY(BlueprintAssignable, Category = "Event")
-    FOnRespawnComplete OnRespawnComplete;
+public :
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
+    UWidgetAnimation* FadeInAnim;
+
+    void PlayFadeAnim();
+
+    UPROPERTY(meta = (BindWidget))
+    class UImage* FadeOverlay;
 };

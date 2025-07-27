@@ -10,6 +10,13 @@
 #include "Network/GPGameInstance.h"
 #include "Character/GPCharacterPlayer.h"
 #include "Character/GPCharacterMyPlayer.h"
+#include "Character/Modules/GPMyplayerSoundManager.h"
+
+
+void UGPNetworkManager::SetIpAddress(const FString& NewIp)
+{
+	IpAddress = NewIp;
+}
 
 bool UGPNetworkManager::ConnectToServer()
 {
@@ -25,7 +32,7 @@ bool UGPNetworkManager::ConnectToServer()
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Connecting To Server..."));
 
-	bool bConnected = Socket->Connect(*InternetAddr);
+	bConnected = Socket->Connect(*InternetAddr);
 	if (bConnected)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Connection Success"));
@@ -36,8 +43,33 @@ bool UGPNetworkManager::ConnectToServer()
 	}
 
 	Socket->SetNonBlocking(true);
+	OnConnectionResult.Broadcast(bConnected);
 	return bConnected;
 }
+
+void UGPNetworkManager::TryConnectLoop()
+{
+	if (ConnectToServer())
+	{
+		RetryCount = 0;
+	}
+	else
+	{
+		RetryCount++;
+		if (RetryCount < MaxRetries)
+		{
+			FTimerHandle RetryHandle;
+			GetWorld()->GetTimerManager().SetTimer(RetryHandle, this, &UGPNetworkManager::TryConnectLoop, RetryInterval, false);
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, TEXT("Retrying..."));
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("All retries failed."));
+			RetryCount = 0;
+		}
+	}
+}
+
 
 void UGPNetworkManager::DisconnectFromServer()
 {
@@ -266,14 +298,32 @@ void UGPNetworkManager::SendMyUseSkillEnd(ESkillGroup SkillGID)
 
 void UGPNetworkManager::SendMyZoneChangePacket(ZoneType NewZone)
 {
+	if (!IsValid(MyPlayer)) return;
 	MyPlayer->PlayFadeOut();
+
+	if (!IsValid(GetWorld())) return;
+
 	FTimerHandle TimerHandle;
+	TWeakObjectPtr<UGPNetworkManager> WeakThis(this);
 	GetWorld()->GetTimerManager().SetTimer(
 		TimerHandle,
-		[this, NewZone]()
+		[WeakThis, NewZone]()
 		{
+			if (!WeakThis.IsValid())
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[NetMgr] UGPNetworkManager is no longer valid during zone change."));
+				return;
+			}
+
+			UGPNetworkManager* StrongThis = WeakThis.Get();
+			if (!IsValid(StrongThis->GetWorld()))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[NetMgr] World is invalid in zone change lambda."));
+				return;
+			}
+
 			RequestZoneChangePacket Packet(NewZone);
-			SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+			StrongThis->SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 		},
 		0.5f, false
 	);
@@ -303,19 +353,29 @@ void UGPNetworkManager::SendMyRequestQuest(QuestType quest)
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
+void UGPNetworkManager::SendMyRejectQuest(QuestType quest)
+{
+	RejectQuestPacket Packet(quest);
+	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+}
+
 void UGPNetworkManager::SendMyCompleteQuest()
 {
 	if (!MyPlayer)
 		return;
 
-	QuestType Quest = MyPlayer->CharacterInfo.GetCurrentQuest().Type;
-	CompleteQuestPacket Packet(Quest);
+	QuestType Quest = MyPlayer->CharacterInfo.GetCurrentQuest().QuestType;
+	CompleteQuestPacket Packet(Quest, false);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
-void UGPNetworkManager::SendMyRejectQuest(QuestType quest)
+void UGPNetworkManager::SendMySkipQuest()
 {
-	RejectQuestPacket Packet(quest);
+	if (!MyPlayer)
+		return;
+
+	QuestType Quest = MyPlayer->CharacterInfo.GetCurrentQuest().QuestType;
+	CompleteQuestPacket Packet(Quest, true);
 	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
 }
 
@@ -439,7 +499,11 @@ void UGPNetworkManager::ProcessPacket()
 			{
 				LoginSuccessPacket* Pkt = reinterpret_cast<LoginSuccessPacket*>(RemainingData.GetData());
 				LoadWorldStatesFromServer(Pkt->WorldState);
+				bIsLoading = true;
 				OnEnterLobby.Broadcast();
+				MyPlayer->bNewPlayer = false;
+				ObjectMgr->StopLoginSound();
+				MyPlayer->ShowLobbyUI();
 				break;
 			}
 			case EPacketType::S_LOGIN_FAIL:
@@ -451,8 +515,12 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_SIGNUP_SUCCESS:
 			{
 				SignUpSuccessPacket* Pkt = reinterpret_cast<SignUpSuccessPacket*>(RemainingData.GetData());
+				bIsLoading = true;
 				LoadWorldStatesFromServer(Pkt->WorldState);
 				OnEnterLobby.Broadcast();
+				MyPlayer->bNewPlayer = true;
+				ObjectMgr->StopLoginSound();
+				ObjectMgr->PlayWorldIntro();
 				break;
 			}
 			case EPacketType::S_SIGNUP_FAIL:
@@ -468,11 +536,20 @@ void UGPNetworkManager::ProcessPacket()
 				MyChannel = Pkt->WChannel;
 				FString Msg = TEXT("Enter Channel [") + FString::FromInt(static_cast<uint8>(MyChannel)) + TEXT("]");
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Msg);
+				if(MyPlayer)
+				{
+					ZoneType CurZone = MyPlayer->CharacterInfo.GetZone();
+					FInfoData Data = Pkt->PlayerInfo;
+					ObjectMgr->ChangeZone(CurZone, Data.GetZone(), Data.Pos);
+					ObjectMgr->AddMyPlayer(Pkt->PlayerInfo);
+					ObjectMgr->ShowTutorialStartQuest();
+					FTimerHandle DelayHandle;
+					GetWorld()->GetTimerManager().SetTimer(DelayHandle, [this]()
+						{
+							bIsLoading = false;
+						}, 5.0f, false);
+				}
 
-				FInfoData Data = Pkt->PlayerInfo;
-				ObjectMgr->ChangeZone(ZoneType::TUK, Data.GetZone(), Data.Pos);
-				ObjectMgr->AddMyPlayer(Pkt->PlayerInfo);
-				ObjectMgr->RefreshInGameUI();
 				break;
 			}
 			case EPacketType::S_CHANGE_CHANNEL:
@@ -641,15 +718,15 @@ void UGPNetworkManager::ProcessPacket()
 			case EPacketType::S_EQUIP_ITEM:
 			{
 				ItemPkt::EquipItemPacket* Pkt = reinterpret_cast<ItemPkt::EquipItemPacket*>(RemainingData.GetData());
-				ObjectMgr->EquipItem(Pkt->PlayerID, Pkt->ItemType);
 				ObjectMgr->UpdatePlayer(Pkt->PlayerInfo);
+				ObjectMgr->EquipItem(Pkt->PlayerID, Pkt->ItemType);
 				break;
 			}
 			case EPacketType::S_UNEQUIP_ITEM:
 			{
 				ItemPkt::UnequipItemPacket* Pkt = reinterpret_cast<ItemPkt::UnequipItemPacket*>(RemainingData.GetData());
-				ObjectMgr->UnequipItem(Pkt->PlayerID, Pkt->ItemType);
 				ObjectMgr->UpdatePlayer(Pkt->PlayerInfo);
+				ObjectMgr->UnequipItem(Pkt->PlayerID, Pkt->ItemType);
 				break;
 			}
 #pragma endregion

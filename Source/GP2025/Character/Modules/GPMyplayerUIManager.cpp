@@ -170,7 +170,6 @@ void UGPMyplayerUIManager::OpenInventory()
 		UGPInventory* Inventory = Cast<UGPInventory>(InventoryWidget);
 		if (Inventory && IsValid(Owner))
 		{
-			Inventory->SetGold(Owner->CharacterInfo.Gold);
 			UpdateSkillInfosFromPlayer();
 		}
 
@@ -322,22 +321,13 @@ void UGPMyplayerUIManager::ShowDeadScreen()
 			LocalInGameWidget->ShowGameMessage(FText::FromString(TEXT("몬스터에게 사망하셨습니다")), 2.f);
 		}
 
-		TypedWidget->AddToViewport();
+		TypedWidget->AddToViewport(999);
 		TypedWidget->PlayFadeOut();
 		TypedWidget->StartRespawnCountdown(3);
-		TypedWidget->OnRespawnComplete.AddDynamic(this, &UGPMyplayerUIManager::OnDeadRespawnComplete);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Failed to cast DeadScreenWidget to UGPDeadScreenWidget"));
-	}
-}
-
-void UGPMyplayerUIManager::OnDeadRespawnComplete()
-{
-	if (UGPInGameWidget* LocalInGameWidget = Cast<UGPInGameWidget>(InGameWidget))
-	{
-		LocalInGameWidget->PlayFade(); 
 	}
 }
 
@@ -431,6 +421,15 @@ void UGPMyplayerUIManager::ShowLobbyUI()
 	if (LobbyWidget && !LobbyWidget->IsInViewport())
 	{
 		LobbyWidget->AddToViewport();
+		if (UGPLobbyWidget* Lobby = Cast<UGPLobbyWidget>(LobbyWidget))
+		{
+			Lobby->PlayFadeAnim();
+		}
+	}
+
+	if (Owner->SoundManager)
+	{
+		Owner->SoundManager->PlayLobbyBGM();
 	}
 
 	if (Owner && Owner->IsPlayerControlled())
@@ -579,7 +578,7 @@ void UGPMyplayerUIManager::UpdateSkillInfosFromPlayer()
 
 	if (bIsGunner)
 	{
-		SkillNames = { TEXT("던지기"), TEXT("빨리던지기"), TEXT("분노") };
+		SkillNames = { TEXT("피어스 샷"), TEXT("탄환의 비"), TEXT("분노") };
 		SkillKeys = { TEXT(" Q "), TEXT(" E "), TEXT(" R ") };
 	}
 	else
@@ -977,6 +976,7 @@ void UGPMyplayerUIManager::AddFriendSystemMessage(int32 Result)
 	if (Result == 0)
 	{
 		Message = TEXT("친구 요청이 성공적으로 처리되었습니다!");
+		return;
 	}
 	else if (Result == -20)
 	{

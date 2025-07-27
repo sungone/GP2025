@@ -55,6 +55,7 @@ void PlayerSession::EnterGame(EWorldChannel wchannel)
 {
 	_wChannel = wchannel;
 	_state = SessionState::InGame;
+	_player->SetWorldChannel(wchannel);
 }
 
 void PlayerSession::Logout()

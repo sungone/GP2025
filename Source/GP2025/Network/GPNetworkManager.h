@@ -15,6 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnReceiveChat, uint8, Channel, c
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnBuyItemResult, bool, bSuccess, uint32, CurrentGold, const FString&, Message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnSellItemResult, bool, bSuccess, uint32, CurrentGold, const FString&, Message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUserAuthFailed, FString, Message);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnConnectionResult, bool, bSuccess);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterLobby);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterGame);
@@ -24,6 +25,9 @@ class GP2025_API UGPNetworkManager : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(BlueprintAssignable)
+	FOnConnectionResult OnConnectionResult;
+
 	UPROPERTY(BlueprintAssignable)
 	FOnUserAuthFailed OnUserAuthFailed;
 
@@ -41,8 +45,14 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnSellItemResult OnSellItemResult;
+private:
+	int32 RetryCount = 0;
+	const int32 MaxRetries = 5;
+	const float RetryInterval = 3.0f;
 public:
+	void SetIpAddress(const FString& NewIp);
 	bool ConnectToServer();
+	void TryConnectLoop();
 	void DisconnectFromServer();
 	void ProcessPacket();
 
@@ -81,8 +91,9 @@ public:
 	void SendMyShopBuyItem(uint8 ItemTypeID, int32 Quantity);
 	void SendMyShopSellItem(int32 ItemID);
 	void SendMyRequestQuest(QuestType quest);
-	void SendMyCompleteQuest();
 	void SendMyRejectQuest(QuestType quest);
+	void SendMyCompleteQuest();
+	void SendMySkipQuest();
 
 	void SendMyChatMessage(const FString& Message, EChatChannel Channel);
 	void SendMyWhisperMessage(const FString& TargetName, const FString& Message);
@@ -98,6 +109,7 @@ public:
 
 	EWorldState GetWorldState(EWorldChannel Channel) const;
 	const EWorldChannel* GetMyGPChannel() { return &MyChannel; }
+	bool IsConnected() { return bConnected; }
 private:
 	UPROPERTY()
 	TMap<uint8, uint8> CachedWorldStates;
@@ -115,4 +127,9 @@ private:
 
 	TArray<uint8> RemainingData;
 	TQueue<TArray<uint8>, EQueueMode::Mpsc> RecvQueue;
+	bool bConnected;
+
+public:
+	bool IsLoadingFromServer() { return bIsLoading; }
+	bool bIsLoading = false;
 };

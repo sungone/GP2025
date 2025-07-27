@@ -31,9 +31,6 @@ public:
     void PlayPlayerHitEffect();
 
     UFUNCTION()
-    void PlayPlayerCriticalEffect();
-
-    UFUNCTION()
     void PlayHealEffect();
 
     UFUNCTION()
@@ -57,10 +54,7 @@ public:
     TSubclassOf<class AGPEarthQuakeRockActor> EarthQuakeRockActorClass;
 
     UPROPERTY(EditAnywhere, Category = "Effect")
-    class UNiagaraSystem* HitEffect;
-
-    UPROPERTY(EditAnywhere, Category = "Effect")
-    class UNiagaraSystem* CriticalEffect;
+    class UNiagaraSystem* PlayerHitEffect;
 
     UPROPERTY(EditAnywhere, Category = "Effect")
     UNiagaraSystem* HealEffect;

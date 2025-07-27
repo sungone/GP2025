@@ -16,18 +16,14 @@ void Player::Init(EWorldChannel channelId)
 	_info.CollisionRadius = playerCollision;
 	_info.State = ECharacterStateType::STATE_IDLE;
 	ApplyLevelStats(_info.Stats.Level);
-	SetCurrentQuest(QuestType::TUT_START);
+	SetCurrentQuest(QuestType::CH1_TALK_TO_STUDENT_A);
+	OnUnequipWeapon();
 #endif
 }
 
 void Player::LoadFromDB(const DBLoginResult& dbRes)
 {
 	SetInfo(dbRes.info);
-	auto quest = GetInfo().CurrentQuest.Type;
-	if (quest != QuestType::NONE)
-	{
-		SetCurrentQuest(GetInfo().CurrentQuest.Type);
-	}
 	for (auto& [itemID, itemTypeID] : dbRes.items)
 	{
 		LoadInventoryItem(std::make_shared<Item>(itemID, itemTypeID));
@@ -45,16 +41,6 @@ void Player::SetCharacterType(Type::EPlayer type)
 {
 	_playerType = type;
 	_info.CharacterType = static_cast<uint8>(_playerType);
-	if (_playerType == Type::EPlayer::WARRIOR)
-	{
-		_info.fovAngle = 90;
-		_info.AttackRadius = 300;
-	}
-	else
-	{
-		_info.fovAngle = 10;
-		_info.AttackRadius = 5000;
-	}
 }
 
 void Player::OnEnterGame()
@@ -67,17 +53,10 @@ void Player::OnEnterGame()
 			SessionManager::GetInst().SendPacket(_id, &pkt);
 		}
 	}
-	if (_curQuest.Type != QuestType::NONE)
+	auto quest = _curQuest.QuestType;
+	if (quest != QuestType::NONE)
 	{
-		const QuestData* questData = QuestTable::GetInst().GetQuest(_curQuest.Type);
-		if (!questData)
-		{
-			LOG_W("Invalid quest datatable");
-			return;
-		}
-
-		auto questpkt = QuestStartPacket(questData->QuestID);
-		SessionManager::GetInst().SendPacket(_id, &questpkt);
+		SetCurrentQuest(GetInfo().CurrentQuest.QuestType);
 	}
 }
 
@@ -461,6 +440,26 @@ void Player::UnlockSkillsOnLevelUp()
 }
 
 
+void Player::OnEquipWeapon()
+{
+	if (_playerType == Type::EPlayer::WARRIOR)
+	{
+		_info.AttackRadius = DfWarriorAtkRadius;
+		_info.fovAngle = DFWarriorfovAngle;
+	}
+	else
+	{
+		_info.AttackRadius = DfGunnerAtkRadius;
+		_info.fovAngle = DFGunnerfovAngle;
+	}
+}
+
+void Player::OnUnequipWeapon()
+{
+	_info.AttackRadius = DfAtkRadius;
+	_info.fovAngle = DFfovAngle;
+}
+
 void Player::UseItem(uint32 itemId)
 {
 	auto targetItem = _inventory.FindItem(itemId);
@@ -502,6 +501,11 @@ uint8 Player::EquipItem(uint32 itemId)
 {
 	auto targetItem = _inventory.FindItem(itemId);
 	if (!targetItem) return 0;
+	auto type = targetItem->GetItemCategory();
+	if (type == EItemCategory::Weapon)
+	{
+		OnEquipWeapon();
+	}
 
 	const ItemStats& itemStats = targetItem->GetStats();
 	AddItemStats(itemStats);
@@ -509,7 +513,7 @@ uint8 Player::EquipItem(uint32 itemId)
 	uint8 itemType = targetItem->GetItemTypeID();
 	_info.EquipItemByType(itemType);
 
-	auto type = targetItem->GetItemCategory();
+
 	if (GetCurrentQuest() == QuestType::TUT_EQUIP_ITEM && type == EItemCategory::Weapon)
 	{
 		CheckAndUpdateQuestProgress(EQuestCategory::ITEM);
@@ -529,6 +533,11 @@ uint8 Player::UnequipItem(uint32 itemId)
 	uint8 itemType = targetItem->GetItemTypeID();
 	_info.UnequipItemByType(itemType);
 
+	auto type = targetItem->GetItemCategory();
+	if (type == EItemCategory::Weapon)
+	{
+		OnUnequipWeapon();
+	}
 	return itemType;
 }
 
@@ -563,7 +572,7 @@ void Player::CheckAndUpdateQuestProgress(EQuestCategory type)
 	case EQuestCategory::KILL:
 	{
 		if (quest == QuestType::CH1_BUNKER_CLEANUP
-			|| quest == QuestType::TUT_KILL_ONE_MON 
+			|| quest == QuestType::TUT_KILL_ONE_MON
 			|| quest == QuestType::CH2_KILL_DESKMON
 			|| quest == QuestType::CH3_KILL_DRILL
 			|| quest == QuestType::CH4_KILL_TINO)
@@ -649,16 +658,13 @@ bool Player::SetCurrentQuest(QuestType quest)
 			return false;
 		}
 	}
-
-	if (!StartQuest(quest))
-		return false;
-
+	StartQuest(quest);
 	_curQuestData = questData;
 	auto qpkt = QuestStartPacket(questData->QuestID);
-
 	SessionManager::GetInst().SendPacket(_id, &qpkt);
 	auto infopkt = InfoPacket(EPacketType::S_PLAYER_STATUS_UPDATE, GetInfo());
 	SessionManager::GetInst().SendPacket(_id, &infopkt);
+
 	if (questData->Catagory == EQuestCategory::KILL)
 	{
 		_world->QuestSpawn(_id, quest);
@@ -678,7 +684,7 @@ bool Player::RejectTutorialQuest()
 		return false;
 	}
 
-	_curQuest.Type = newQuest;
+	_curQuest.QuestType = newQuest;
 	_curQuest.Status = EQuestStatus::InProgress;
 	_curQuestData = questData;
 
@@ -694,7 +700,7 @@ bool Player::RejectTutorialQuest()
 
 bool Player::IsQuestInProgress(QuestType quest) const
 {
-	return _curQuest.Type == quest && _curQuest.Status == EQuestStatus::InProgress;
+	return _curQuest.QuestType == quest && _curQuest.Status == EQuestStatus::InProgress;
 }
 
 bool Player::StartQuest(QuestType newQuest)
@@ -702,14 +708,14 @@ bool Player::StartQuest(QuestType newQuest)
 	if (_curQuest.Status == EQuestStatus::InProgress)
 		return false;
 
-	_curQuest.Type = newQuest;
+	_curQuest.QuestType = newQuest;
 	_curQuest.Status = EQuestStatus::InProgress;
 	return true;
 }
 
 bool Player::CompleteCurrentQuest()
 {
-	if (_curQuest.Type != QuestType::NONE && _curQuest.Status == EQuestStatus::InProgress)
+	if (_curQuest.QuestType != QuestType::NONE && _curQuest.Status == EQuestStatus::InProgress)
 	{
 		_curQuest.Status = EQuestStatus::Completed;
 		return true;

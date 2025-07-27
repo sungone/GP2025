@@ -28,6 +28,7 @@ public:
 	int32 GetUpdateDelay();
 	void BroadcastStatus();
 	void Respawn();
+	void Look();
 
 	void UpdateViewList(std::shared_ptr<Character> other) override;
 	void Update();

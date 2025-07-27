@@ -5,6 +5,7 @@
 #include "Character/GPCharacterMyplayer.h"
 #include "Kismet/GameplayStatics.h"
 #include "Network/GPNetworkManager.h"
+#include "Components/Image.h"
 #include "Components/TextBlock.h"    
 
 
@@ -22,6 +23,8 @@ void UGPDeadScreenWidget::StartRespawnCountdown(int32 StartSeconds)
 
     RespawnCount->SetVisibility(ESlateVisibility::Visible);
     UpdateRespawnMessage(SecondsRemaining);
+    PlayFadeAnim();
+
     GetWorld()->GetTimerManager().SetTimer(
         CountdownTimerHandle,
         this,
@@ -41,11 +44,21 @@ void UGPDeadScreenWidget::TickCountdown()
     else if (SecondsRemaining == 0)
     {
         RespawnCount->SetVisibility(ESlateVisibility::Hidden);
-        OnRespawnComplete.Broadcast();
     }
-    else if (SecondsRemaining < 0)
+    else if (SecondsRemaining < -2)
     {
         GetWorld()->GetTimerManager().ClearTimer(CountdownTimerHandle);
         RemoveFromParent(); 
     }
+}
+
+void UGPDeadScreenWidget::PlayFadeAnim()
+{
+    if (!FadeOverlay || !FadeInAnim) return;
+
+    
+    FadeOverlay->SetVisibility(ESlateVisibility::Visible);
+
+    const float PlayRate = 1.0f;
+    PlayAnimation(FadeInAnim, 0.0f, 1, EUMGSequencePlayMode::Forward, PlayRate);
 }

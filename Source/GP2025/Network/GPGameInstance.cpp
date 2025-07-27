@@ -3,6 +3,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GPUtils.h"
 #include "Network/GPNavMeshExporter.h"
+#include "Sequence/GPSequenceManager.h"
 
 #if PLATFORM_ANDROID
 #include "AndroidPermissionFunctionLibrary.h"
@@ -13,6 +14,15 @@ void UGPGameInstance::Init()
 	Super::Init();
 	NetworkMgr = GetSubsystem<UGPNetworkManager>();
 	NetworkMgr->ConnectToServer();
+	if (SequenceManagerClass)
+	{
+		SequenceMgr = NewObject<UGPSequenceManager>(this, SequenceManagerClass);
+		UE_LOG(LogTemp, Log, TEXT("[GameInstance] SequenceManager created from BP"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("No SequenceManagerClass set!"));
+	}
 
 #if PLATFORM_ANDROID
 	RequestAndroidPermissions();
@@ -23,6 +33,7 @@ void UGPGameInstance::Shutdown()
 {
 	NetworkMgr->DisconnectFromServer();
 	Super::Shutdown();
+	SequenceMgr = nullptr;
 }
 
 bool UGPGameInstance::SaveNavData(bool IsSave)
@@ -31,22 +42,34 @@ bool UGPGameInstance::SaveNavData(bool IsSave)
 	if (IsSave)
 		return GPNavMeshExporter::ExportNavMesh(GetWorld(), TEXT("NavMeshData.json"));
 #endif
-    return false;
+	return false;
 }
 
 void UGPGameInstance::ChangeZoenRequest(FString LevelName)
 {
-	auto GetZoneName = [](FString LevelName) -> ZoneType {
-		if (LevelName == "tip") return ZoneType::TIP;
-		if (LevelName == "TUK") return ZoneType::TUK;
-		if (LevelName == "E") return ZoneType::E;
-		if (LevelName == "gym") return ZoneType::GYM;
-		if (LevelName == "industry") return ZoneType::INDUSTY;
+	auto GetZoneName = [](const FString& InLevelName) -> ZoneType {
+		if (InLevelName == "tip") return ZoneType::TIP;
+		if (InLevelName == "TUK") return ZoneType::TUK;
+		if (InLevelName == "E") return ZoneType::E;
+		if (InLevelName == "gym") return ZoneType::GYM;
+		if (InLevelName == "industry") return ZoneType::INDUSTY;
 		return ZoneType::NONE;
 		};
-	
+
 	ZoneType TargetZone = GetZoneName(LevelName);
-	if (TargetZone == ZoneType::NONE) return;
+	if (TargetZone == ZoneType::NONE)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[GameInstance] Invalid Zone Name: %s"), *LevelName);
+		return;
+	}
+
+	if (!IsValid(NetworkMgr))
+	{
+		UE_LOG(LogTemp, Error, TEXT("[GameInstance] NetworkMgr is null! Cannot change zone."));
+		return;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("[GameInstance] Sending Zone Change Request to: %s"), *LevelName);
 	NetworkMgr->SendMyZoneChangePacket(TargetZone);
 }
 
@@ -57,41 +80,41 @@ void UGPGameInstance::NextQuestRequest()
 		UE_LOG(LogTemp, Warning, TEXT("Network Manager is not initialized."));
 		return;
 	}
-	NetworkMgr->SendMyCompleteQuest();
+	NetworkMgr->SendMySkipQuest();
 }
 
 
 #if PLATFORM_ANDROID
-	void UGPGameInstance::RequestAndroidPermissions()
-	{
-        TArray<FString> Permissions;
+void UGPGameInstance::RequestAndroidPermissions()
+{
+	TArray<FString> Permissions;
 
-        Permissions.Add("android.permission.READ_MEDIA_IMAGES");
-        Permissions.Add("android.permission.READ_MEDIA_VIDEO");
-        Permissions.Add("android.permission.READ_MEDIA_AUDIO");
+	Permissions.Add("android.permission.READ_MEDIA_IMAGES");
+	Permissions.Add("android.permission.READ_MEDIA_VIDEO");
+	Permissions.Add("android.permission.READ_MEDIA_AUDIO");
 
-        Permissions.Add("android.permission.READ_EXTERNAL_STORAGE");
-        Permissions.Add("android.permission.WRITE_EXTERNAL_STORAGE");
-        Permissions.Add("android.permission.MANAGE_EXTERNAL_STORAGE");
+	Permissions.Add("android.permission.READ_EXTERNAL_STORAGE");
+	Permissions.Add("android.permission.WRITE_EXTERNAL_STORAGE");
+	Permissions.Add("android.permission.MANAGE_EXTERNAL_STORAGE");
 
-        Permissions.Add("android.permission.POST_NOTIFICATIONS");
+	Permissions.Add("android.permission.POST_NOTIFICATIONS");
 
-        Permissions.Add("android.permission.INTERNET");
-        Permissions.Add("android.permission.ACCESS_NETWORK_STATE");
-        Permissions.Add("android.permission.ACCESS_WIFI_STATE");
+	Permissions.Add("android.permission.INTERNET");
+	Permissions.Add("android.permission.ACCESS_NETWORK_STATE");
+	Permissions.Add("android.permission.ACCESS_WIFI_STATE");
 
-        Permissions.Add("android.permission.BLUETOOTH_SCAN");
-        Permissions.Add("android.permission.BLUETOOTH_CONNECT");
-        Permissions.Add("android.permission.BLUETOOTH_ADVERTISE");
+	Permissions.Add("android.permission.BLUETOOTH_SCAN");
+	Permissions.Add("android.permission.BLUETOOTH_CONNECT");
+	Permissions.Add("android.permission.BLUETOOTH_ADVERTISE");
 
-        Permissions.Add("android.permission.VIBRATE");
-        Permissions.Add("android.permission.SCHEDULE_EXACT_ALARM");
+	Permissions.Add("android.permission.VIBRATE");
+	Permissions.Add("android.permission.SCHEDULE_EXACT_ALARM");
 
-        Permissions.Add("android.permission.FOREGROUND_SERVICE");
+	Permissions.Add("android.permission.FOREGROUND_SERVICE");
 
-        Permissions.Add("android.permission.RECORD_AUDIO");
+	Permissions.Add("android.permission.RECORD_AUDIO");
 
-        UAndroidPermissionFunctionLibrary::AcquirePermissions(Permissions);
-	}
+	UAndroidPermissionFunctionLibrary::AcquirePermissions(Permissions);
+}
 #endif
 

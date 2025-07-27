@@ -36,6 +36,8 @@ public:
 	void UpgradeSkill(ESkillGroup groupId);
 	void UnlockSkillsOnLevelUp();
 
+	void OnEquipWeapon();
+	void OnUnequipWeapon();
 	void UseItem(uint32 itemId);
 	uint8 EquipItem(uint32 itemId);
 	uint8 UnequipItem(uint32 itemId);

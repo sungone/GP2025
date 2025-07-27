@@ -42,9 +42,20 @@ void UGPLoginWidget::NativeConstruct()
 	if (ButtonSignUpOK)
 		ButtonSignUpOK->OnClicked.AddDynamic(this, &UGPLoginWidget::TrySignUp);
 
-	if (UGPNetworkManager* Mgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>())
+	if (ConnectButton)
+		ConnectButton->OnClicked.AddDynamic(this, &UGPLoginWidget::OnConnectButtonClicked);
+
+	if (TextError && ConnectState && IpInputBox)
 	{
-		Mgr->OnUserAuthFailed.AddDynamic(this, &UGPLoginWidget::HandleLoginFail);
+		if (UGPNetworkManager* Mgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>())
+		{
+			Mgr->OnUserAuthFailed.AddDynamic(this, &UGPLoginWidget::HandleLoginFail);
+			Mgr->OnConnectionResult.AddDynamic(this, &UGPLoginWidget::UpdateConnectState);
+			bool Ret = Mgr->IsConnected();
+			UpdateConnectState(Ret);
+			IpInputBox->SetHintText(FText::FromString(FString(SERVER_IP)));
+
+		}
 	}
 }
 
@@ -226,4 +237,28 @@ void UGPLoginWidget::HideErrorMessage()
 	{
 		TextSignUpError->SetVisibility(ESlateVisibility::Hidden);
 	}
+}
+
+void UGPLoginWidget::OnConnectButtonClicked()
+{
+	FString InputIp = IpInputBox->GetText().ToString();
+	if (InputIp.IsEmpty())
+	{
+		InputIp = SERVER_IP;
+	}
+
+	UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+	if (NetMgr)
+	{
+		NetMgr->SetIpAddress(InputIp);
+		NetMgr->TryConnectLoop();
+	}
+}
+
+void UGPLoginWidget::UpdateConnectState(bool bConnected)
+{
+	if (!ConnectState) return;
+
+	FLinearColor Color = bConnected ? FLinearColor(0.f, 1.f, 0.f, 0.5f) : FLinearColor(1.f, 1.f, 1.f, 0.2f);
+	ConnectState->SetColorAndOpacity(FSlateColor(Color));
 }

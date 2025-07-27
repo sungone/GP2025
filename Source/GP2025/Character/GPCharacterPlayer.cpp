@@ -35,6 +35,24 @@ AGPCharacterPlayer::AGPCharacterPlayer()
     EquippedItemIDs.Add(ECategory::chest, -1);
 
     SetCharacterType(CurrentCharacterType);
+
+    static ConstructorHelpers::FClassFinder<AActor> AttackProjectileClassFinder(TEXT("/Game/effect/ProjectilesVol1/Blueprints/BP_Projectile_13.BP_Projectile_13_C"));
+    if (AttackProjectileClassFinder.Succeeded())
+    {
+        GunnerAttackProjectileClass = AttackProjectileClassFinder.Class;
+    }
+
+    static ConstructorHelpers::FClassFinder<AActor> QProjectileClassFinder(TEXT("/Game/effect/ProjectilesVol1/Blueprints/BP_Projectile_14.BP_Projectile_14_C"));
+    if (QProjectileClassFinder.Succeeded())
+    {
+        GunnerQSkillProjectileClass = QProjectileClassFinder.Class;
+    }
+
+    static ConstructorHelpers::FClassFinder<AActor> EProjectileClassFinder(TEXT("/Game/effect/ProjectilesVol1/Blueprints/BP_Projectile.BP_Projectile_C"));
+    if (EProjectileClassFinder.Succeeded())
+    {
+        GunnerESkillProjectileClass = EProjectileClassFinder.Class;
+    }
 }
 
 void AGPCharacterPlayer::BeginPlay()

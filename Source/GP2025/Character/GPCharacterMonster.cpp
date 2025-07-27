@@ -7,6 +7,9 @@
 #include "Character/Modules/GPCharacterUIHandler.h"
 #include "Character/Modules/GPCharacterCombatHandler.h"
 #include "UI/GPHpBarWidget.h"
+#include "NiagaraSystem.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "UI/GPLevelWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
@@ -21,16 +24,10 @@ AGPCharacterMonster::AGPCharacterMonster()
 	GetMesh()->SetCollisionProfileName(TEXT("PhysicsActor"));
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> HitEffectAsset(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Impact_Stab_01.NS_ARPGEssentials_Impact_Stab_01"));
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> HitEffectAsset(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ChromaticSlash_Impact_Stab_01.NS_ChromaticSlash_Impact_Stab_01"));
 	if (HitEffectAsset.Succeeded())
 	{
 		HitEffect = HitEffectAsset.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> CriEffectAsset(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Impact_Strike_01.NS_ARPGEssentials_Impact_Strike_01"));
-	if (CriEffectAsset.Succeeded())
-	{
-		CriticalEffect = CriEffectAsset.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> DeathEffectObj(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ChromaticSlash_OmniBurst.NS_ChromaticSlash_OmniBurst"));
@@ -51,6 +48,12 @@ AGPCharacterMonster::AGPCharacterMonster()
 	if (CritHitSoundObj.Succeeded())
 	{
 		MonsterCriticalHitSound = CritHitSoundObj.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> TinoHitSoundObj(TEXT("/Game/Sound/SFX/TinoHit.TinoHit"));
+	if (TinoHitSoundObj.Succeeded())
+	{
+		TinoHitSound = TinoHitSoundObj.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> MonDeadSoundObj(TEXT("/Game/Sound/SFX/MonsterDeadSound.MonsterDeadSound"));
@@ -171,5 +174,27 @@ void AGPCharacterMonster::PlayDeathEffect()
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("DeathEffect is null for Monster [%s]"), *GetName());
+	}
+}
+
+void AGPCharacterMonster::PlayHitEffect()
+{
+	if (HitEffect)
+	{
+		UNiagaraComponent* EffectComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
+			HitEffect,
+			GetMesh(),
+			TEXT("HitSocket"),
+			FVector::ZeroVector,
+			FRotator::ZeroRotator,
+			EAttachLocation::SnapToTargetIncludingScale,
+			false
+		);
+
+		if (EffectComponent)
+		{
+			EffectComponent->SetWorldScale3D(FVector(2.f));
+			EffectComponent->Activate(true);
+		}
 	}
 }

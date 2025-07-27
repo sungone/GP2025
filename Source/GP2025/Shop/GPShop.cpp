@@ -33,15 +33,6 @@ void UGPShop::NativeConstruct()
 		SellButton->OnClicked.AddDynamic(this, &UGPShop::OnSellItemClicked);
 	}
 
-	if (!ItemDataTable)
-	{
-		ItemDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Item/GPItemTable.GPItemTable"));
-		if (!ItemDataTable)
-		{
-			UE_LOG(LogTemp, Error, TEXT("Failed to load ItemDataTable!"));
-		}
-	}
-
 	if (UGPNetworkManager* Mgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>())
 	{
 		Mgr->OnBuyItemResult.AddDynamic(this, &UGPShop::HandleBuyItemResult);
@@ -192,7 +183,7 @@ void UGPShop::HandleBuyItemResult(bool bSuccess, uint32 CurrentGold, const FStri
 	{
 		UpdateMoneyText(CurrentGold);
 		MyPlayer->CharacterInfo.Gold = CurrentGold;
-
+		MyPlayer->UpdateUIInfo();
 		PopulateSellItems();
 	}
 
@@ -300,6 +291,7 @@ void UGPShop::HandleSellItemResult(bool bSuccess, uint32 NewGold, const FString&
 	{
 		UpdateMoneyText(NewGold);
 		MyPlayer->CharacterInfo.Gold = NewGold;
+		MyPlayer->UpdateUIInfo();
 
 		if (CurrentSlot)
 		{

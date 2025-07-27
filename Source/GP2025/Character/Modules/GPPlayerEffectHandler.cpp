@@ -32,14 +32,14 @@ UGPPlayerEffectHandler::UGPPlayerEffectHandler()
     static ConstructorHelpers::FObjectFinder<UNiagaraSystem> HitEffectFinder(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Impact_Stab_01.NS_ARPGEssentials_Impact_Stab_01"));
     if (HitEffectFinder.Succeeded())
     {
-        HitEffect = HitEffectFinder.Object;
+        PlayerHitEffect = HitEffectFinder.Object;
     }
 
-    static ConstructorHelpers::FObjectFinder<UNiagaraSystem> CriticalEffectFinder(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Impact_Strike_01.NS_ARPGEssentials_Impact_Strike_01"));
-    if (CriticalEffectFinder.Succeeded())
-    {
-        CriticalEffect = CriticalEffectFinder.Object;
-    }
+    //static ConstructorHelpers::FObjectFinder<UNiagaraSystem> CriticalEffectFinder(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Impact_Strike_01.NS_ARPGEssentials_Impact_Strike_01"));
+    //if (CriticalEffectFinder.Succeeded())
+    //{
+    //    MonsterHitEffect = CriticalEffectFinder.Object;
+    //}
 
     ConstructorHelpers::FObjectFinder<UNiagaraSystem> HealEffectAsset(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Heal_Instant_01.NS_ARPGEssentials_Heal_Instant_01"));
     if (HealEffectAsset.Succeeded())
@@ -111,37 +111,41 @@ void UGPPlayerEffectHandler::PlayQuestClearEffect()
 
 void UGPPlayerEffectHandler::PlayPlayerHitEffect()
 {
-    if (Owner && HitEffect)
+    if (Owner && PlayerHitEffect)
     {
-        UNiagaraFunctionLibrary::SpawnSystemAttached(
-            HitEffect,
+        UNiagaraComponent* EffectComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
+            PlayerHitEffect,
             Owner->GetRootComponent(),
             TEXT("Hips"),
             FVector::ZeroVector,
             FRotator::ZeroRotator,
             EAttachLocation::SnapToTargetIncludingScale,
-            true
+            false
         );
-        UE_LOG(LogTemp, Log, TEXT("[EffectHandler] HitEffect played at Hips."));
+
+        if (EffectComponent)
+        {
+            EffectComponent->SetWorldScale3D(FVector(0.6f));
+            EffectComponent->Activate(true);
+        }
     }
 }
 
-void UGPPlayerEffectHandler::PlayPlayerCriticalEffect()
-{
-    if (Owner && CriticalEffect)
-    {
-        UNiagaraFunctionLibrary::SpawnSystemAttached(
-            CriticalEffect,
-            Owner->GetRootComponent(),
-            TEXT("Hips"),
-            FVector::ZeroVector,
-            FRotator::ZeroRotator,
-            EAttachLocation::SnapToTargetIncludingScale,
-            true
-        );
-        UE_LOG(LogTemp, Log, TEXT("[EffectHandler] CriticalEffect played at Hips."));
-    }
-}
+//void UGPPlayerEffectHandler::PlayMonsterHitEffect()
+//{
+//    if (Owner && MonsterHitEffect)
+//    {
+//        UNiagaraFunctionLibrary::SpawnSystemAttached(
+//            MonsterHitEffect,
+//            Owner->GetRootComponent(),
+//            TEXT("Hips"),
+//            FVector::ZeroVector,
+//            FRotator::ZeroRotator,
+//            EAttachLocation::SnapToTargetIncludingScale,
+//            true
+//        );
+//    }
+//}
 
 void UGPPlayerEffectHandler::PlayHealEffect()
 {

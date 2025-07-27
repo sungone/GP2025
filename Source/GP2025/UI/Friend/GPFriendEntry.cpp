@@ -27,7 +27,7 @@ void UGPFriendEntry::OnEntryClicked()
 {
     if (OwnerBox)
     {
-        OwnerBox->SelectedFriendUserID = static_cast<uint32>(FriendUserID);
+        OwnerBox->SetSelectedFriend(this);
     }
 }
 
@@ -38,5 +38,25 @@ void UGPFriendEntry::NativeConstruct()
     if (EntryButton)
     {
         EntryButton->OnClicked.AddDynamic(this, &UGPFriendEntry::OnEntryClicked);
+    }
+}
+
+void UGPFriendEntry::SetSelected(bool bSelected)
+{
+    bIsSelected = bSelected;
+    UpdateSelectionState();
+}
+
+void UGPFriendEntry::UpdateSelectionState()
+{
+    if (!BackgroundBorder) return;
+
+    if (bIsSelected)
+    {
+        BackgroundBorder->SetBrushColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.2f));
+    }
+    else
+    {
+        BackgroundBorder->SetBrushColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.4f));
     }
 }

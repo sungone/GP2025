@@ -83,6 +83,7 @@ public :
 	// <CharacterInfo>
 public :
 	virtual void SetCharacterInfo(const FInfoData& CharacterInfo_) override;
+	void UpdateUIInfo();
 	int32 PrevLevel = 1;
 
 
@@ -93,9 +94,6 @@ public :
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "CameraShake")
 	void WarriorAttackCameraShake();
-
-	UFUNCTION(BlueprintImplementableEvent, Category = "CameraShake")
-	void PlayerHittedCameraShake();
 public:
 	UFUNCTION(BlueprintCallable)
 	void PlayFadeOut();
@@ -106,7 +104,7 @@ public:
 	UPROPERTY()
 	bool bHasPlayedTinoSequence = false;
 
-
+	void ShowLobbyUI();
 	// Tutorial Timer
 	FTimerHandle TutorialWidgetTimerHandle;
 
@@ -114,4 +112,5 @@ public :
 	void SetDead(bool bDead);
 	void SetGPChannel(const EWorldChannel* Channel) { MyChannel = Channel; }
 	const EWorldChannel* MyChannel;
+	bool bNewPlayer = true;
 };

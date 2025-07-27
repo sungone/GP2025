@@ -43,6 +43,12 @@ AGPItem::AGPItem()
 		SpawnEffect = NiagaraEffectFinder.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> SpeNiagaraEffectFinder(TEXT("/Game/effect/ARPGEssentials/Effects/NS_ARPGEssentials_Loot_05_Legendary_Tino.NS_ARPGEssentials_Loot_05_Legendary_Tino"));
+	if (SpeNiagaraEffectFinder.Succeeded())
+	{
+		SpecialSpawnEffect = SpeNiagaraEffectFinder.Object;
+	}
+
 	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClassFinder(TEXT("/Game/Inventory/Widgets/WBP_ItemInteraction"));
 	if (WidgetClassFinder.Succeeded())
 	{
@@ -173,23 +179,39 @@ void AGPItem::SetupItem(int32 NewItemID, uint8 NewItemtype, int32 NewAmount)
 		ItemStaticMesh->SetVisibility(true);
 	}
 
-	if (SpawnEffect)
-	{
-		if (SpawnedEffectComp)
-		{
-			SpawnedEffectComp->DestroyComponent();
-			SpawnedEffectComp = nullptr;
-		}
+	UNiagaraSystem* EffectToUse = nullptr;
 
+	if (NewItemtype == 15 && SpecialSpawnEffect)
+	{
+		EffectToUse = SpecialSpawnEffect;
+	}
+	else
+	{
+		EffectToUse = SpawnEffect;
+	}
+
+	if (SpawnedEffectComp)
+	{
+		SpawnedEffectComp->DestroyComponent();
+		SpawnedEffectComp = nullptr;
+	}
+
+	if (EffectToUse)
+	{
 		SpawnedEffectComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
-			SpawnEffect,
+			EffectToUse,
 			RootComponent,
 			NAME_None,
-			FVector(0.f, 0.f, 10.f), 
+			FVector(0.f, 0.f, 10.f),
 			FRotator::ZeroRotator,
 			EAttachLocation::KeepRelativeOffset,
 			true
 		);
+
+		if (SpawnedEffectComp)
+		{
+			SpawnedEffectComp->SetRelativeScale3D(FVector(0.6f)); 
+		}
 	}
 }
 

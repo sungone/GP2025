@@ -18,6 +18,12 @@ UGPMyplayerSoundManager::UGPMyplayerSoundManager()
 		LoginSound = LoginSoundAsset.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<USoundBase> LobbySoundAsset(TEXT("/Game/Sound/BackgroundBGM/LoginLobbySound.LoginLobbySound"));
+	if (LobbySoundAsset.Succeeded())
+	{
+		LobbySound = LobbySoundAsset.Object;
+	}
+
 	struct FSoundLoadInfo
 	{
 		FName LevelName;
@@ -109,13 +115,39 @@ void UGPMyplayerSoundManager::StopBGM()
 {
 	if (BGMComponent)
 	{
-		BGMComponent->Stop();
+		if (BGMComponent->IsPlaying())
+		{
+			BGMComponent->Stop();
+		}
 	}
 }
 
 void UGPMyplayerSoundManager::PlayLoginBGM()
 {
-	PlayBGM(LoginSound);
+	PlayBGM(LoginSound , 1.f , true);
+}
+
+void UGPMyplayerSoundManager::StopLoginBGM()
+{
+	if (BGMComponent && BGMComponent->Sound == LoginSound)
+	{
+		BGMComponent->OnAudioFinished.Clear();
+		BGMComponent->Stop();
+	}
+}
+
+void UGPMyplayerSoundManager::PlayLobbyBGM()
+{
+	PlayBGM(LobbySound, 1.0f, true);
+}
+
+void UGPMyplayerSoundManager::StopLobbyBGM()
+{
+	if (BGMComponent && BGMComponent->Sound == LobbySound)
+	{
+		BGMComponent->OnAudioFinished.Clear(); 
+		BGMComponent->Stop();
+	}
 }
 
 void UGPMyplayerSoundManager::PlayBGMForCurrentLevel()

@@ -35,7 +35,6 @@ AGPCharacterMyplayer::AGPCharacterMyplayer()
 
 	// Character Type
 	CurrentCharacterType = static_cast<uint8>(Type::EPlayer::GUNNER);
-
 }
 
 void AGPCharacterMyplayer::BeginPlay()
@@ -109,12 +108,11 @@ void AGPCharacterMyplayer::Tick(float DeltaTime)
 	if (NetworkSyncHandler)
 		NetworkSyncHandler->Tick(DeltaTime);
 
-	if (SkillCoolDownHandler && IsValid(SkillCoolDownHandler))
+	if (IsValid(SkillCoolDownHandler))
 	{
 		UpdateSkillCooldownBars();
 	}
 }
-
 
 void AGPCharacterMyplayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -143,31 +141,10 @@ void AGPCharacterMyplayer::OnPlayerEnterGame()
 		UIManager->OnSetUpInGameWidgets();
 	}
 
-	// LoginSound 중지 -> 현재 레벨에 맞는 Background Sound 재생
 	if (SoundManager)
 	{
-		SoundManager->StopBGM();             
+		SoundManager->StopLobbyBGM();
 		SoundManager->PlayBGMForCurrentLevel(); 
-	}
-
-	if (CharacterInfo.GetCurrentQuest().Type == QuestType::TUT_START
-		|| CharacterInfo.GetCurrentQuest().Type == QuestType::NONE)
-	{
-
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(
-			TimerHandle,
-			FTimerDelegate::CreateLambda([this]()
-				{
-					UE_LOG(LogTemp, Log, TEXT("[MyPlayer] Executing tutorial quest widget."));
-
-					if (UIManager)
-					{
-						UIManager->PlayTutorialQuestWidget();
-					}
-				}),
-			1.0f,
-			false);
 	}
 }
 
@@ -180,8 +157,6 @@ void AGPCharacterMyplayer::OnPlayerEnterLobby()
 			UIManager->LoginWidget->SetVisibility(ESlateVisibility::Collapsed);
 			UIManager->LoginWidget->RemoveFromParent();
 		}
-
-		UIManager->ShowLobbyUI();
 	}
 }
 
@@ -271,7 +246,7 @@ void AGPCharacterMyplayer::UpdateSkillCooldownBars()
 		|| !UIManager->GetInGameWidget()->ESkillBar
 		|| !UIManager->GetInGameWidget()->RSkillBar)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[CooldownUI] Widget references are invalid."));
+		//UE_LOG(LogTemp, Error, TEXT("[CooldownUI] Widget references are invalid."));
 		return;
 	}
 
@@ -347,15 +322,7 @@ void AGPCharacterMyplayer::ChangePlayerType()
 void AGPCharacterMyplayer::SetCharacterInfo(const FInfoData& CharacterInfo_)
 {
 	Super::SetCharacterInfo(CharacterInfo_);
-
-	UGPInGameWidget* InGame = Cast<UGPInGameWidget>(UIManager->GetInGameWidget());
-
-	if (!InGame) return;
-
-	InGame->UpdateHealthBar(CharacterInfo_.Stats.Hp / CharacterInfo_.Stats.MaxHp);
-	InGame->UpdateExpBar(CharacterInfo_.Stats.Exp / CharacterInfo_.Stats.MaxExp);
-	InGame->UpdatePlayerLevel(CharacterInfo_.Stats.Level);
-
+	UpdateUIInfo();
 	if (CharacterInfo_.GetLevel() > PrevLevel)
 	{
 		// UIManager->SpawnSkillLevelText(CharacterInfo_.Stats.Level);
@@ -371,6 +338,18 @@ void AGPCharacterMyplayer::SetCharacterInfo(const FInfoData& CharacterInfo_)
 	{
 		UIManager->GetInventoryWidget()->HandlePlayerStatUpdate();
 	}
+}
+
+void AGPCharacterMyplayer::UpdateUIInfo()
+{
+	UGPInGameWidget* InGame = Cast<UGPInGameWidget>(UIManager->GetInGameWidget());
+
+	if (!InGame) return;
+
+	InGame->UpdateHealthBar(CharacterInfo.Stats.Hp / CharacterInfo.Stats.MaxHp);
+	InGame->UpdateExpBar(CharacterInfo.Stats.Exp / CharacterInfo.Stats.MaxExp);
+	InGame->UpdatePlayerLevel(CharacterInfo.Stats.Level);
+	InGame->UpdateGold(CharacterInfo.Gold);
 }
 
 void AGPCharacterMyplayer::PlayFadeOut()
@@ -395,6 +374,12 @@ void AGPCharacterMyplayer::PlayFadeIn()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[PlayFadeOut] InGameWidget is not valid."));
 	}
+}
+
+void AGPCharacterMyplayer::ShowLobbyUI()
+{
+	if (UIManager)
+		UIManager->ShowLobbyUI();
 }
 
 void AGPCharacterMyplayer::SetDead(bool bDead)

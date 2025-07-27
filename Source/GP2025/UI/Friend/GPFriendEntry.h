@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/Border.h"
 #include "GPFriendEntry.generated.h"
 
 /**
@@ -22,6 +23,9 @@ public:
 
     UFUNCTION()
     void OnEntryClicked();
+
+    void UpdateSelectionState();
+    void SetSelected(bool bSelected);
 public:
 
     UPROPERTY(meta = (BindWidget))
@@ -36,7 +40,11 @@ public:
     UPROPERTY()
     uint32 FriendUserID;
 
+    UPROPERTY(meta = (BindWidget))
+    UBorder* BackgroundBorder;
+    
     bool bIsOnline = false;
+    bool bIsSelected = false;
 
     UPROPERTY()
     class UGPFriendBox* OwnerBox; // Parent box widget

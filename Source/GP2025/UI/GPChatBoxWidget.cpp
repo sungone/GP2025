@@ -185,6 +185,17 @@ void UGPChatBoxWidget::AddChatMessage(EChatChannel Channel, const FString& Targe
 	{
 		return;
 	}
+	UGPNetworkManager* NetMgr = GetGameInstance()->GetSubsystem<UGPNetworkManager>();
+	if (!NetMgr)
+		return;
+	bool bLoading = NetMgr->IsLoadingFromServer();
+	if (bLoading)
+	{
+		//임시 - 로그인 후 잠시 시스템 메세지 출력 x 
+		if(Channel == EChatChannel::FriendSys || Channel == EChatChannel::ItemSys || Channel == EChatChannel::SkillSys)
+		return;
+	}
+
 	UGPChatMessageWidget* NewMessageWidget = CreateWidget<UGPChatMessageWidget>(this, ChatMessageWidgetClass);
 	if (NewMessageWidget)
 	{

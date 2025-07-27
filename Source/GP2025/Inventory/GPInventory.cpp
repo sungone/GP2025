@@ -299,14 +299,6 @@ void UGPInventory::RemoveItemByUniqueID(uint32 ItemUniqueID)
 }
 
 
-void UGPInventory::SetGold(int32 Amount)
-{
-    if (MoneyText)
-    {
-        MoneyText->SetText(FText::AsNumber(Amount));
-    }
-}
-
 void UGPInventory::HandlePlayerStatUpdate()
 {
     if (StatInfo && StatInfo->IsVisible())
