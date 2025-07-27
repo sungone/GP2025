@@ -59,7 +59,7 @@ void AGPQuestTriggerBox::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherAc
 		switch (TriggerQuestType)
 		{
 		case 30: // CH1_GO_TO_E_FIRST
-			if (MyPlayer->CharacterInfo.GetCurrentQuest().QuestType == QuestType::CH1_GO_TO_E_FIRST)
+			if (MyPlayer->CharacterInfo.GetCurrentQuest().Type == QuestType::CH1_GO_TO_E_FIRST)
 			{
 				if (!Inventory->HasItemByType(50)) // 열쇠 아이템을 가지고 있지 않으면
 				{

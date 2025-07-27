@@ -1332,7 +1332,7 @@ void UGPObjectManager::ShowTutorialStartQuest()
 {
 	if (!MyPlayer) return;
 
-	auto QuestType = MyPlayer->CharacterInfo.CurrentQuest.QuestType;
+	auto QuestType = MyPlayer->CharacterInfo.CurrentQuest.Type;
 	if (QuestType == QuestType::TUT_START
 		|| QuestType == QuestType::NONE)
 	{
