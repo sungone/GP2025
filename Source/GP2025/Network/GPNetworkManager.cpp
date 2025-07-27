@@ -225,8 +225,34 @@ void UGPNetworkManager::SendMyEnterGamePacket(EWorldChannel WChannel, Type::EPla
 
 void UGPNetworkManager::SendMyChangeChannelPacket(EWorldChannel WChannel)
 {
-	ChangeChannelRequestPacket Packet(WChannel);
-	SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+	if (!IsValid(MyPlayer)) return;
+	MyPlayer->PlayFadeOut();
+
+	if (!IsValid(GetWorld())) return;
+
+	FTimerHandle TimerHandle;
+	TWeakObjectPtr<UGPNetworkManager> WeakThis(this);
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerHandle,
+		[WeakThis, WChannel]()
+		{
+			if (!WeakThis.IsValid())
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[NetMgr] UGPNetworkManager is no longer valid during zone change."));
+				return;
+			}
+
+			UGPNetworkManager* StrongThis = WeakThis.Get();
+			if (!IsValid(StrongThis->GetWorld()))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[NetMgr] World is invalid in zone change lambda."));
+				return;
+			}
+			ChangeChannelRequestPacket Packet(WChannel);
+			StrongThis->SendPacket(reinterpret_cast<uint8*>(&Packet), sizeof(Packet));
+		},
+		0.5f, false
+	);
 }
 
 void UGPNetworkManager::SendMyMovePacket()

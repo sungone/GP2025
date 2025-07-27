@@ -488,8 +488,11 @@ void UGPObjectManager::AddMonster(const FInfoData& MonsterInfo)
 	if (Monster->CharacterInfo.CharacterType == static_cast<uint8>(Type::EMonster::TINO))
 	{
 		Tino = Monster;
-		Monster->SetActorHiddenInGame(true);
-		Monster->SetActorEnableCollision(false);
+		if(!bFighting)
+		{
+			Monster->SetActorHiddenInGame(true);
+			Monster->SetActorEnableCollision(false);
+		}
 	}
 	if (Monster->UIHandler)
 	{
@@ -1105,7 +1108,6 @@ void UGPObjectManager::ChangeChannel(const FVector& RandomPos)
 		ZoneType CurZone = MyPlayer->CharacterInfo.GetZone();
 		ChangeZone(CurZone, START_ZONE, RandomPos);
 
-		MyPlayer->PlayFadeIn();
 		if (MyPlayer->UIManager)
 		{
 			MyPlayer->UIManager->GetInGameWidget()->ShowGameMessage(FText::FromString(TEXT("채널이 변경되었습니다.")), 2.f);
@@ -1493,6 +1495,7 @@ void UGPObjectManager::OnTinoIntroFinished()
 {
 	if (Tino)
 	{
+		bFighting = true;
 		Tino->SetActorHiddenInGame(false);
 		Tino->SetActorEnableCollision(true);
 	}

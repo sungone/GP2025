@@ -103,6 +103,7 @@ private:
 
 	TMap<int32, TWeakObjectPtr<AGPCharacterMonster>> Monsters;
 	AGPCharacterMonster* Tino = nullptr;
+	bool bFighting = false;
 	TMap<int32, TWeakObjectPtr<AGPItem>> Items;
 
 	TMap<uint32, FString> FriendMap;
