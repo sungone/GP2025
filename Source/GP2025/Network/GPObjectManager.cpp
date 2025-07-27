@@ -243,6 +243,7 @@ void UGPObjectManager::RemovePlayer(int32 PlayerID)
 
 void UGPObjectManager::UpdatePlayer(const FInfoData& PlayerInfo)
 {
+	if (IsChangingZone()) return;
 	if (TWeakObjectPtr<AGPCharacterPlayer>* WeakPlayerPtr = Players.Find(PlayerInfo.ID))
 	{
 		if (WeakPlayerPtr->IsValid())
@@ -265,6 +266,11 @@ void UGPObjectManager::PlayerAttack(int32 PlayerID, FVector PlayerPos, float Pla
 
 				Player->CharacterInfo.SetLocation(PlayerPos);
 				Player->CharacterInfo.SetYaw(PlayerYaw);
+
+				FVector Loc(PlayerPos);
+				FRotator Rot(0, PlayerYaw, 0);
+				Player->SetActorLocationAndRotation(Loc, Rot);
+
 				Player->CharacterInfo.AddState(STATE_AUTOATTACK);
 				Player->HandleAutoAttackState();
 				Player->CharacterInfo.RemoveState(STATE_AUTOATTACK);
@@ -387,6 +393,7 @@ void UGPObjectManager::DamagedPlayer(const FInfoData& PlayerInfo)
 
 void UGPObjectManager::HandlePlayerDeath(int32 playerId)
 {
+	if (IsChangingZone()) return;
 	TWeakObjectPtr<AGPCharacterPlayer> WeakPlayer = Players.FindRef(playerId);
 	AGPCharacterPlayer* TargetPlayer = WeakPlayer.Get();
 	if (!TargetPlayer) return;
@@ -547,6 +554,7 @@ void UGPObjectManager::HandleMonsterDeath(int32 MonsterID)
 
 void UGPObjectManager::UpdateMonster(const FInfoData& MonsterInfo)
 {
+	if (IsChangingZone()) return;
 	if (TWeakObjectPtr<AGPCharacterMonster>* WeakMonsterPtr = Monsters.Find(MonsterInfo.ID))
 	{
 		if (WeakMonsterPtr->IsValid())
@@ -1389,7 +1397,7 @@ void UGPObjectManager::OnQuestStart(QuestType Quest)
 							MyPlayer->NetMgr->SendMyCompleteQuest();
 						}
 					}),
-				5.f,
+				2.f,
 				false
 			);
 
