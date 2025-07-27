@@ -1111,17 +1111,19 @@ void UGPObjectManager::ChangeChannel(const FVector& RandomPos)
 	Items.Empty();
 	UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] All items removed"));
 
+	auto Player = Cast<AGPCharacterPlayer>(MyPlayer);
+	Players.Add(MyPlayer->CharacterInfo.ID, Player);
+
 	if (MyPlayer)
 	{
 		ZoneType CurZone = MyPlayer->CharacterInfo.GetZone();
-		ChangeZone(CurZone, START_ZONE, RandomPos);
+		if(CurZone!= START_ZONE)
+			ChangeZone(CurZone, START_ZONE, RandomPos);
 
 		if (MyPlayer->UIManager)
 		{
 			MyPlayer->UIManager->GetInGameWidget()->ShowGameMessage(FText::FromString(TEXT("채널이 변경되었습니다.")), 2.f);
 		}
-		auto Player = Cast<AGPCharacterPlayer>(MyPlayer);
-		Players.Add(MyPlayer->CharacterInfo.ID, Player);
 	}
 }
 
@@ -1185,6 +1187,42 @@ void UGPObjectManager::ChangeZone(ZoneType oldZone, ZoneType newZone, const FVec
 	ULevelStreaming* StreamLevel = UGameplayStatics::GetStreamingLevel(this, OldLevel);
 	if (StreamLevel)
 	{
+		for (auto& PlayerPair : Players)
+		{
+			TWeakObjectPtr<AGPCharacterPlayer> PlayerPtr = PlayerPair.Value;
+			if (PlayerPtr.IsValid() && PlayerPtr.Get() != MyPlayer)
+			{
+				PlayerPtr->Destroy();
+			}
+		}
+		Players.Empty();
+		UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] All other players removed"));
+
+		for (auto& MonsterPair : Monsters)
+		{
+			TWeakObjectPtr<AGPCharacterMonster> MonsterPtr = MonsterPair.Value;
+			if (MonsterPtr.IsValid())
+			{
+				MonsterPtr->Destroy();
+			}
+		}
+		Monsters.Empty();
+		UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] All monsters removed"));
+
+		for (auto& ItemPair : Items)
+		{
+			TWeakObjectPtr<AGPItem> ItemPtr = ItemPair.Value;
+			if (ItemPtr.IsValid())
+			{
+				ItemPtr->ReturnToPool();
+			}
+		}
+		Items.Empty();
+		UE_LOG(LogTemp, Log, TEXT("[ChangeChannel] All items removed"));
+
+		auto Player = Cast<AGPCharacterPlayer>(MyPlayer);
+		Players.Add(MyPlayer->CharacterInfo.ID, Player);
+
 		if (!StreamLevel->IsLevelLoaded())
 		{
 			HandleLevelUnloaded();
