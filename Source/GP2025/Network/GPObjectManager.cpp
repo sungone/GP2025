@@ -1105,7 +1105,6 @@ void UGPObjectManager::ChangeChannel(const FVector& RandomPos)
 		ZoneType CurZone = MyPlayer->CharacterInfo.GetZone();
 		ChangeZone(CurZone, START_ZONE, RandomPos);
 
-		MyPlayer->PlayFadeIn();
 		if (MyPlayer->UIManager)
 		{
 			MyPlayer->UIManager->GetInGameWidget()->ShowGameMessage(FText::FromString(TEXT("채널이 변경되었습니다.")), 2.f);
