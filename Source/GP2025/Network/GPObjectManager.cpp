@@ -488,8 +488,11 @@ void UGPObjectManager::AddMonster(const FInfoData& MonsterInfo)
 	if (Monster->CharacterInfo.CharacterType == static_cast<uint8>(Type::EMonster::TINO))
 	{
 		Tino = Monster;
-		Monster->SetActorHiddenInGame(true);
-		Monster->SetActorEnableCollision(false);
+		if(!bFighting)
+		{
+			Monster->SetActorHiddenInGame(true);
+			Monster->SetActorEnableCollision(false);
+		}
 	}
 	if (Monster->UIHandler)
 	{
@@ -1492,6 +1495,7 @@ void UGPObjectManager::OnTinoIntroFinished()
 {
 	if (Tino)
 	{
+		bFighting = true;
 		Tino->SetActorHiddenInGame(false);
 		Tino->SetActorEnableCollision(true);
 	}
