@@ -82,7 +82,7 @@ void AGPCharacterMyplayer::BeginPlay()
 	if (UIManager)
 	{
 		UIManager->Initialize(this);
-		UIManager->ShowLoginUI();
+		//UIManager->ShowLoginUI();
 	}
 	
 	SetCharacterType(CurrentCharacterType);
